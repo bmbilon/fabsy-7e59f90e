@@ -25,15 +25,15 @@ const ROISection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           {/* Left side - ROI breakdown */}
           <div className="space-y-8">
-            <Card className="p-8 bg-white/95 backdrop-blur-sm shadow-fab border-primary/10">
+            <Card className="p-8 bg-gradient-card shadow-fab border-white/20 backdrop-blur-sm">
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <DollarSign className="h-6 w-6 text-primary" />
-                  <h3 className="text-2xl font-bold text-secondary">Return on Investment</h3>
+                  <h3 className="text-2xl font-bold text-card-foreground">Return on Investment</h3>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 bg-accent/30 rounded-lg">
+                  <div className="flex justify-between items-center p-4 bg-accent/50 rounded-lg">
                     <span className="text-lg text-secondary">Service Investment:</span>
                     <span className="text-xl font-bold text-primary">$488</span>
                   </div>
@@ -43,7 +43,7 @@ const ROISection = () => {
                     <span className="text-xl font-bold text-primary">$1,001 - $1,650</span>
                   </div>
                   
-                  <div className="border-t pt-4">
+                  <div className="border-t border-muted pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-secondary">Your Profit:</span>
                       <span className="text-2xl font-bold text-gradient-primary">$513 - $1,162</span>
@@ -61,13 +61,13 @@ const ROISection = () => {
             </Card>
 
             <div className="grid grid-cols-2 gap-4">
-              <Card className="p-6 text-center bg-white/95 backdrop-blur-sm shadow-fab">
+              <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
                 <div className="text-2xl font-bold text-gradient-primary">94%</div>
                 <div className="text-sm text-secondary">Success Rate</div>
               </Card>
               
-              <Card className="p-6 text-center bg-white/95 backdrop-blur-sm shadow-fab">
+              <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <Clock className="h-8 w-8 text-secondary mx-auto mb-3" />
                 <div className="text-2xl font-bold text-gradient-primary">2-4</div>
                 <div className="text-sm text-secondary">Weeks Process</div>

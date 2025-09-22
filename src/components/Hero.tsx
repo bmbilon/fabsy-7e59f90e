@@ -19,9 +19,9 @@ const Hero = () => {
             <div className="space-y-4">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-white drop-shadow-lg">
                 Keep Your Abstract{" "}
-                <span className="text-gradient-primary">Fab</span>
+                <span className="text-gradient-primary font-script text-6xl lg:text-8xl">Fab</span>
               </h1>
-              <p className="text-2xl lg:text-3xl font-semibold text-white/90 drop-shadow-md">
+              <p className="text-2xl lg:text-3xl font-medium text-white/95 drop-shadow-md">
                 Minimize the Tab
               </p>
             </div>
@@ -64,15 +64,15 @@ const Hero = () => {
 
           {/* Right column - Cost visualization */}
           <div className="space-y-6">
-            <Card className="p-8 bg-white/95 backdrop-blur-sm shadow-elevated border-primary/20">
+            <Card className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
               <div className="text-center space-y-6">
                 <div className="flex items-center justify-center gap-4">
                   <Calculator className="h-8 w-8 text-primary" />
-                  <h3 className="text-2xl font-bold text-secondary">The Hidden Cost Reality</h3>
+                  <h3 className="text-2xl font-bold text-card-foreground">The Hidden Cost Reality</h3>
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 bg-accent/30 rounded-lg">
+                  <div className="flex justify-between items-center p-4 bg-accent/50 rounded-lg">
                     <span className="text-lg text-secondary">Ticket Fine:</span>
                     <span className="text-2xl font-bold text-secondary">$150</span>
                   </div>
@@ -86,7 +86,7 @@ const Hero = () => {
                     <span className="text-2xl font-bold text-destructive">$1,500</span>
                   </div>
                   
-                  <div className="border-t pt-4">
+                  <div className="border-t border-muted pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-secondary">Total Real Cost:</span>
                       <span className="text-3xl font-bold text-destructive">$1,650</span>
@@ -99,7 +99,7 @@ const Hero = () => {
                     <Shield className="h-5 w-5 text-primary" />
                     <span className="font-semibold text-primary">Fabsy Solution</span>
                   </div>
-                  <div className="text-sm text-secondary">
+                  <div className="text-sm text-card-foreground">
                     Pay <span className="font-bold text-primary">$488</span> • Save up to <span className="font-bold text-primary">$1,650</span>
                   </div>
                 </div>

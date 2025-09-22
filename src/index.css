@@ -8,16 +8,16 @@ All colors MUST be HSL for proper theming.
 
 @layer base {
   :root {
-    /* Dark pink/purple gradient background */
-    --background: linear-gradient(135deg, hsl(332 45% 25%), hsl(270 40% 30%));
-    --background-solid: 332 45% 25%;
+    /* Light pink/coral gradient background like the reference */
+    --background: linear-gradient(135deg, hsl(340 60% 75%), hsl(320 55% 80%));
+    --background-solid: 340 60% 75%;
     --foreground: 0 0% 100%;
 
-    --card: 332 30% 20%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 340 30% 25%;
 
-    --popover: 332 25% 18%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 30% 25%;
 
     /* Bright Blue Primary */
     --primary: 210 100% 58%;
@@ -26,42 +26,48 @@ All colors MUST be HSL for proper theming.
     --primary-dark: 210 100% 48%;
 
     /* Dark Grey Secondary */
-    --secondary: 220 15% 25%;
+    --secondary: 340 25% 35%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 220 15% 35%;
-    --secondary-dark: 220 15% 15%;
+    --secondary-light: 340 20% 45%;
+    --secondary-dark: 340 30% 25%;
 
     /* Soft Neutrals */
-    --muted: 332 20% 15%;
-    --muted-foreground: 0 0% 95%;
+    --muted: 340 40% 85%;
+    --muted-foreground: 340 25% 35%;
 
-    --accent: 210 100% 85%;
-    --accent-foreground: 220 15% 25%;
+    --accent: 340 50% 90%;
+    --accent-foreground: 340 30% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 332 20% 35%;
-    --input: 332 25% 22%;
+    --border: 340 30% 80%;
+    --input: 340 40% 85%;
     --ring: 210 100% 58%;
 
     --radius: 0.75rem;
 
-    /* Beautiful Dark Gradients */
+    /* Beautiful Light Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
-    --gradient-hero: linear-gradient(135deg, hsl(332 50% 25%), hsl(270 45% 30%), hsl(300 40% 35%));
+    --gradient-hero: linear-gradient(135deg, hsl(340 60% 75%), hsl(320 55% 80%), hsl(350 50% 85%));
     --gradient-soft: linear-gradient(180deg, hsl(var(--background-solid)), hsl(var(--muted)));
-    --gradient-card: linear-gradient(145deg, hsl(332 35% 25%) 0%, hsl(270 30% 30%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(340 40% 95%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary-light)));
 
     /* Enhanced Shadows */
-    --shadow-fab: 0 10px 30px -5px hsl(var(--primary) / 0.4);
+    --shadow-fab: 0 10px 30px -5px hsl(340 30% 60% / 0.3);
     --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
-    --shadow-elevated: 0 20px 60px -10px hsl(var(--primary) / 0.5);
+    --shadow-elevated: 0 20px 60px -10px hsl(340 30% 60% / 0.4);
+
+    /* Typography - Feminine Fonts */
+    --font-display: 'Poppins', 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-script: 'Dancing Script', cursive;
 
     /* Typography enhancements */
-    --font-display: 'Inter', system-ui, sans-serif;
+    --font-display: 'Poppins', 'Inter', system-ui, sans-serif;
     --font-body: 'Inter', system-ui, sans-serif;
+    --font-script: 'Dancing Script', cursive;
 
     /* Animation variables */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -139,6 +145,11 @@ All colors MUST be HSL for proper theming.
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 600;
+  }
+
+  /* Feminine script class */
+  .font-script {
+    font-family: var(--font-script);
   }
 }
 
