@@ -18,11 +18,11 @@ const Hero = () => {
           <div className="text-center lg:text-left space-y-8">
             <div className="space-y-4">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-white drop-shadow-lg">
-                Keep Your Abstract{" "}
-                <span className="text-gradient-hero font-script text-6xl lg:text-8xl">Fab</span>
+                Fight Your Traffic{" "}
+                <span className="text-primary">Ticket</span>
               </h1>
               <p className="text-2xl lg:text-3xl font-medium text-white/95 drop-shadow-md">
-                Minimize the Tab
+                Save Money & Points
               </p>
             </div>
             
