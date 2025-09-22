@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DollarSign, TrendingUp, Shield, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const ROISection = () => {
   return (
@@ -119,9 +120,11 @@ const ROISection = () => {
               </div>
             </div>
 
-            <Button size="lg" className="w-full bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow">
-              Start Saving Money Now
-            </Button>
+            <Link to="/submit-ticket">
+              <Button size="lg" className="w-full bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow">
+                Start Saving Money Now
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

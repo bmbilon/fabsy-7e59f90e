@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Shield, Calculator } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-woman-driver.jpg";
 
 const Hero = () => {
@@ -33,9 +34,11 @@ const Hero = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button size="lg" className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow">
-                  Upload Your Ticket <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Link to="/submit-ticket">
+                  <Button size="lg" className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow w-full sm:w-auto">
+                    Upload Your Ticket <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
                 <Button variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 transition-smooth">
                   Calculate Real Cost
                 </Button>

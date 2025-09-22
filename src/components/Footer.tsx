@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -20,9 +21,11 @@ const Footer = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90 transition-smooth shadow-glow">
-                  Upload Your Ticket Now <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Link to="/submit-ticket">
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 transition-smooth shadow-glow w-full sm:w-auto">
+                    Upload Your Ticket Now <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
                 <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10 transition-smooth">
                   Get Free Quote
                 </Button>
