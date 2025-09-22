@@ -100,7 +100,7 @@ const Hero = () => {
                     <span className="font-semibold text-primary">Fabsy Solution</span>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Pay <span className="font-bold text-primary">$499</span> • Save up to <span className="font-bold text-primary">$1,650</span>
+                    Pay <span className="font-bold text-primary">$488</span> • Save up to <span className="font-bold text-primary">$1,650</span>
                   </div>
                 </div>
               </div>

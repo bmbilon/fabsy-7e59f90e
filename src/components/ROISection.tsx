@@ -13,7 +13,7 @@ const ROISection = () => {
             Smart Financial Move
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-            <span className="text-gradient-primary">Pay $499</span> to Save{" "}
+            <span className="text-gradient-primary">Pay $488</span> to Save{" "}
             <span className="text-gradient-primary">$1,650</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -35,7 +35,7 @@ const ROISection = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-background/50 rounded-lg">
                     <span className="text-lg">Service Investment:</span>
-                    <span className="text-xl font-bold text-primary">$499</span>
+                    <span className="text-xl font-bold text-primary">$488</span>
                   </div>
                   
                   <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg border border-primary/10">
@@ -46,7 +46,7 @@ const ROISection = () => {
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold">Your Profit:</span>
-                      <span className="text-2xl font-bold text-gradient-primary">$502 - $1,151</span>
+                      <span className="text-2xl font-bold text-gradient-primary">$513 - $1,162</span>
                     </div>
                   </div>
                 </div>

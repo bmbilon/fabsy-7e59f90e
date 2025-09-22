@@ -140,16 +140,16 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
         <div className="space-y-3">
           <div className="flex justify-between">
             <span>Fabsy Defense Service</span>
-            <span>$499.00</span>
+            <span>$488.00</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Alberta HST (5%)</span>
-            <span>$24.95</span>
+            <span>$24.40</span>
           </div>
           <div className="border-t pt-3">
             <div className="flex justify-between text-lg font-bold">
               <span>Total Amount</span>
-              <span className="text-primary">$523.95</span>
+              <span className="text-primary">$512.40</span>
             </div>
           </div>
           {formData.insuranceCompany && (

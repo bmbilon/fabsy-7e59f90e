@@ -37,7 +37,7 @@ const Footer = () => {
                   <div className="text-white/70">Success Rate</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold">$499</div>
+                  <div className="text-3xl font-bold">$488</div>
                   <div className="text-white/70">Fixed Fee</div>
                 </div>
                 <div>
