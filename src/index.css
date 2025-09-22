@@ -8,53 +8,56 @@ All colors MUST be HSL for proper theming.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 332 15% 15%;
+    /* Light pink gradient background */
+    --background: linear-gradient(135deg, hsl(332 40% 95%), hsl(340 30% 97%));
+    --background-solid: 332 40% 95%;
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 332 15% 15%;
+    --card: 332 35% 92%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 332 15% 15%;
+    --popover: 332 30% 90%;
+    --popover-foreground: 0 0% 100%;
 
-    /* Fabulous Pink-Purple Brand Colors */
-    --primary: 332 81% 62%;
+    /* Bright Blue Primary */
+    --primary: 210 100% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 332 81% 72%;
-    --primary-dark: 332 81% 52%;
+    --primary-light: 210 100% 68%;
+    --primary-dark: 210 100% 48%;
 
-    /* Purple Accent */
-    --secondary: 270 81% 62%;
+    /* Dark Grey Secondary */
+    --secondary: 220 15% 25%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 270 81% 72%;
-    --secondary-dark: 270 81% 52%;
+    --secondary-light: 220 15% 35%;
+    --secondary-dark: 220 15% 15%;
 
     /* Soft Neutrals */
-    --muted: 332 20% 96%;
-    --muted-foreground: 332 15% 45%;
+    --muted: 332 25% 88%;
+    --muted-foreground: 0 0% 95%;
 
-    --accent: 332 20% 94%;
-    --accent-foreground: 332 15% 25%;
+    --accent: 210 100% 85%;
+    --accent-foreground: 220 15% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 332 20% 90%;
-    --input: 332 20% 94%;
-    --ring: 332 81% 62%;
+    --border: 332 20% 85%;
+    --input: 332 25% 90%;
+    --ring: 210 100% 58%;
 
     --radius: 0.75rem;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary-light)), hsl(var(--secondary-light)));
-    --gradient-soft: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+    /* Beautiful Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
+    --gradient-hero: linear-gradient(135deg, hsl(332 40% 95%), hsl(340 30% 97%), hsl(210 100% 95%));
+    --gradient-soft: linear-gradient(180deg, hsl(var(--background-solid)), hsl(var(--muted)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(332 30% 88%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary-light)));
 
-    /* Shadows with brand colors */
-    --shadow-fab: 0 10px 30px -5px hsl(var(--primary) / 0.2);
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.15);
-    --shadow-elevated: 0 20px 60px -10px hsl(var(--primary) / 0.25);
+    /* Enhanced Shadows */
+    --shadow-fab: 0 10px 30px -5px hsl(var(--primary) / 0.3);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.25);
+    --shadow-elevated: 0 20px 60px -10px hsl(var(--primary) / 0.4);
 
     /* Typography enhancements */
     --font-display: 'Inter', system-ui, sans-serif;
@@ -128,7 +131,8 @@ All colors MUST be HSL for proper theming.
   }
 
   body {
-    @apply bg-background text-foreground;
+    background: var(--background);
+    @apply text-foreground;
     font-family: var(--font-body);
   }
 
@@ -184,5 +188,17 @@ All colors MUST be HSL for proper theming.
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .text-gradient-accent {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Background gradients */
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
   }
 }
