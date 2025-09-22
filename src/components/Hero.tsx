@@ -77,16 +77,16 @@ const Hero = () => {
               </div>
               
               {/* Driver's Abstract Document */}
-              <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3 w-32 transform rotate-[-5deg] border-2 border-gray-200">
+              <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3 w-32 transform rotate-[-5deg] border-2 border-gray-200 relative">
+                {/* Check mark in upper right corner */}
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                
                 <div className="text-xs font-bold text-gray-800 mb-1">DRIVER'S ABSTRACT</div>
                 <div className="text-[8px] text-gray-600 mb-2">Demerit Points</div>
-                <div className="flex items-center justify-center mb-1">
+                <div className="flex items-center justify-center">
                   <span className="text-2xl font-bold text-green-500">0</span>
-                </div>
-                <div className="flex justify-center">
-                  <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs">✓</span>
-                  </div>
                 </div>
               </div>
             </div>
