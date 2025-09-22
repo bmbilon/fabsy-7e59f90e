@@ -62,13 +62,20 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Right column - Clean image only */}
+          {/* Right column - Image with overlay */}
           <div className="flex items-center justify-center">
-            <img 
-              src={heroImage} 
-              alt="Confident professional woman driver" 
-              className="rounded-2xl shadow-elevated w-full max-w-md h-80 object-cover"
-            />
+            <div className="relative">
+              <img 
+                src={heroImage} 
+                alt="Confident professional woman driver" 
+                className="rounded-2xl shadow-elevated w-full max-w-md h-80 object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/30">
+                <h2 className="text-white text-2xl font-bold text-center px-4 drop-shadow-lg">
+                  No demerit points on my FABstract!
+                </h2>
+              </div>
+            </div>
           </div>
         </div>
       </div>
