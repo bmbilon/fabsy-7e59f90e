@@ -1,115 +1,184 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Scale, Mail, Phone, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const footerLinks = {
+    company: [
+      { name: "About Us", path: "/about" },
+      { name: "How It Works", path: "/how-it-works" },
+      { name: "What We Help With", path: "/services" },
+      { name: "Success Stories", path: "/testimonials" },
+    ],
+    legal: [
+      { name: "Privacy Policy", path: "/privacy-policy" },
+      { name: "Terms of Service", path: "/terms" },
+      { name: "Cookie Policy", path: "/cookie-policy" },
+      { name: "Legal Disclaimer", path: "/disclaimer" },
+    ],
+    support: [
+      { name: "Submit Ticket", path: "/submit-ticket" },
+      { name: "Contact Us", path: "/contact" },
+      { name: "FAQ", path: "/faq" },
+      { name: "Client Portal", path: "/portal" },
+    ]
+  };
+
   return (
-    <footer className="bg-gradient-primary text-white">
-      {/* Final CTA Section */}
-      <div className="py-20">
-        <div className="container mx-auto px-4">
-          <Card className="p-12 bg-white/10 backdrop-blur-sm border-white/20 shadow-elevated text-center">
-            <div className="space-y-8 max-w-4xl mx-auto">
-              <h2 className="text-4xl lg:text-5xl font-bold">
-                Don't Let That Ticket Cost You $1,650
-              </h2>
-              <p className="text-xl text-white/80 leading-relaxed">
-                You work hard for your money. One moment of going 10 over shouldn't 
-                cost you thousands in insurance increases over the next 3 years. 
-                Take action now and keep your abstract fab.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/submit-ticket">
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 transition-smooth shadow-glow w-full sm:w-auto">
-                    Upload Your Ticket Now <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10 transition-smooth">
-                  Get Free Quote
-                </Button>
+    <footer className="bg-white/95 backdrop-blur-sm border-t border-muted">
+      <div className="container mx-auto px-4 py-16">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          {/* Brand Section */}
+          <div className="lg:col-span-1">
+            <Link to="/" className="flex items-center gap-2 mb-6">
+              <Scale className="h-8 w-8 text-primary" />
+              <span className="font-script text-3xl font-bold text-gradient-hero">
+                Fabsy
+              </span>
+            </Link>
+            
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Expert traffic ticket defense for Alberta women. Keep your abstract fab, minimize the tab.
+            </p>
+            
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-primary" />
+                <span>hello@fabsy.ca</span>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 text-center">
-                <div>
-                  <div className="text-3xl font-bold">94%</div>
-                  <div className="text-white/70">Success Rate</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold">$488</div>
-                  <div className="text-white/70">Fixed Fee</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold">2-4</div>
-                  <div className="text-white/70">Weeks Process</div>
-                </div>
+              <div className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-primary" />
+                <span>1-888-FABSY-00</span>
               </div>
-            </div>
-          </Card>
-        </div>
-      </div>
-
-      {/* Footer Info */}
-      <div className="border-t border-white/10 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div className="space-y-4">
-              <h3 className="text-2xl font-bold">Fabsy</h3>
-              <p className="text-white/70 text-sm leading-relaxed">
-                Alberta's premier traffic ticket fighting service for women. 
-                Keep your abstract fab, minimize the tab.
-              </p>
-            </div>
-
-            {/* Services */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold">Services</h4>
-              <ul className="space-y-2 text-sm text-white/70">
-                <li>Speeding Tickets</li>
-                <li>Red Light Violations</li>
-                <li>Stop Sign Violations</li>
-                <li>Distracted Driving</li>
-                <li>Insurance Rate Protection</li>
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold">Resources</h4>
-              <ul className="space-y-2 text-sm text-white/70">
-                <li>Cost Calculator</li>
-                <li>Success Stories</li>
-                <li>FAQ</li>
-                <li>Alberta Traffic Laws</li>
-                <li>Insurance Impact Guide</li>
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold">Get In Touch</h4>
-              <div className="space-y-3 text-sm text-white/70">
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  <span>1-888-FABSY-AB</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  <span>hello@fabsy.ca</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>Serving All of Alberta</span>
-                </div>
+              <div className="flex items-center gap-3">
+                <MapPin className="h-4 w-4 text-primary" />
+                <span>Alberta, Canada</span>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm text-white/60">
-            <p>© 2024 Fabsy. All rights reserved. | Available at fabsy.ca and fabsy.com</p>
-            <p className="mt-2">Professional legal services for Alberta traffic violations.</p>
+          {/* Company Links */}
+          <div>
+            <h3 className="font-semibold text-card-foreground mb-4">Company</h3>
+            <ul className="space-y-3">
+              {footerLinks.company.map((link) => (
+                <li key={link.name}>
+                  <Link 
+                    to={link.path}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support Links */}
+          <div>
+            <h3 className="font-semibold text-card-foreground mb-4">Support</h3>
+            <ul className="space-y-3">
+              {footerLinks.support.map((link) => (
+                <li key={link.name}>
+                  <Link 
+                    to={link.path}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div>
+            <h3 className="font-semibold text-card-foreground mb-4">Legal</h3>
+            <ul className="space-y-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.name}>
+                  <Link 
+                    to={link.path}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <Card className="p-8 mb-12 bg-gradient-card shadow-fab border-primary/10">
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-card-foreground mb-4">
+              Ready to Fight Your Traffic Ticket?
+            </h3>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Join thousands of Alberta women who've protected their driving records with Fabsy's expert legal defense.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/submit-ticket">
+                <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
+                  Submit Your Ticket - $488
+                </Button>
+              </Link>
+              <Button variant="outline" className="border-primary/30 hover:bg-primary/10 transition-smooth">
+                Call 1-888-FABSY-00
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        <Separator className="mb-8" />
+
+        {/* Bottom Section */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="text-sm text-muted-foreground text-center md:text-left">
+            <p>© {currentYear} Fabsy Legal Services. All rights reserved.</p>
+            <p className="mt-1">
+              Licensed to practice law in Alberta, Canada. 
+              Professional legal services for traffic ticket defense.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-xs text-muted-foreground text-center">
+              <p className="font-medium">Follow us:</p>
+            </div>
+            <div className="flex gap-3">
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Legal Disclaimer */}
+        <div className="mt-8 pt-6 border-t border-muted">
+          <div className="text-xs text-muted-foreground leading-relaxed">
+            <p className="mb-2">
+              <strong>Legal Disclaimer:</strong> The information provided on this website is for general information purposes only. 
+              Nothing on this site should be taken as legal advice for any individual case or situation. 
+              This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
+            </p>
+            <p>
+              Results may vary. Past performance does not guarantee future results. 
+              Our success rate is based on historical data and individual results may differ.
+            </p>
           </div>
         </div>
       </div>
