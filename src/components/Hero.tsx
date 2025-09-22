@@ -77,7 +77,7 @@ const Hero = () => {
               </div>
               
               {/* Driver's Abstract Document */}
-              <div className="absolute bottom-4 -right-16 bg-white rounded shadow-lg p-4 w-36 h-44 transform rotate-[5deg] border border-gray-300 relative overflow-hidden">
+              <div className="absolute bottom-4 left-1/2 bg-white rounded shadow-lg p-4 w-36 h-44 transform -translate-x-1/2 rotate-[5deg] border border-gray-300 relative overflow-hidden">
                 {/* Check mark in upper right corner */}
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
                   <span className="text-white text-xs font-bold">✓</span>
