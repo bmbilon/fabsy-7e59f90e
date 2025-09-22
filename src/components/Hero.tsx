@@ -68,16 +68,16 @@ const Hero = () => {
               <img 
                 src={heroImage} 
                 alt="Confident professional woman driver" 
-                className="rounded-2xl shadow-elevated w-full max-w-md h-80 object-cover"
+                className="rounded-2xl shadow-elevated w-full max-w-md h-80 object-cover transform scale-x-[-1]"
               />
-              <div className="absolute inset-0 flex items-start justify-start rounded-2xl bg-black/20 p-6">
-                <h2 className="text-pink-300 text-3xl font-script font-semibold drop-shadow-lg leading-relaxed">
+              <div className="absolute inset-0 flex items-start justify-end rounded-2xl bg-black/20 p-6">
+                <h2 className="text-pink-300 text-3xl font-script font-semibold drop-shadow-lg leading-relaxed text-right">
                   No demerit points<br />on my FABstract!
                 </h2>
               </div>
               
               {/* Driver's Abstract Document */}
-              <div className="absolute bottom-4 left-4 bg-white rounded shadow-lg p-4 w-36 h-44 transform rotate-[-5deg] border border-gray-300 relative overflow-hidden">
+              <div className="absolute bottom-4 right-4 bg-white rounded shadow-lg p-4 w-36 h-44 transform rotate-[5deg] border border-gray-300 relative overflow-hidden">
                 {/* Check mark in upper right corner */}
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
                   <span className="text-white text-xs font-bold">✓</span>
