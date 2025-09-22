@@ -62,57 +62,13 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Right column - Cost visualization */}
-          <div className="space-y-6">
-            <Card className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
-              <div className="text-center space-y-6">
-                <div className="flex items-center justify-center gap-4">
-                  <Calculator className="h-8 w-8 text-primary" />
-                  <h3 className="text-2xl font-bold text-card-foreground">The Hidden Cost Reality</h3>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 bg-accent/50 rounded-lg">
-                    <span className="text-lg text-secondary">Ticket Fine:</span>
-                    <span className="text-2xl font-bold text-secondary">$150</span>
-                  </div>
-                  
-                  <div className="flex justify-center">
-                    <ArrowRight className="h-6 w-6 text-primary animate-pulse" />
-                  </div>
-                  
-                  <div className="flex justify-between items-center p-4 bg-destructive/15 rounded-lg border border-destructive/30">
-                    <span className="text-lg text-secondary">Insurance Increase (3 years):</span>
-                    <span className="text-2xl font-bold text-destructive">$1,500</span>
-                  </div>
-                  
-                  <div className="border-t border-muted pt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-secondary">Total Real Cost:</span>
-                      <span className="text-3xl font-bold text-destructive">$1,650</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Shield className="h-5 w-5 text-primary" />
-                    <span className="font-semibold text-primary">Fabsy Solution</span>
-                  </div>
-                  <div className="text-sm text-card-foreground">
-                    Pay <span className="font-bold text-primary">$488</span> • Save up to <span className="font-bold text-primary">$1,650</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <div className="hidden lg:block">
-              <img 
-                src={heroImage} 
-                alt="Confident professional woman driver" 
-                className="rounded-2xl shadow-elevated w-full h-80 object-cover"
-              />
-            </div>
+          {/* Right column - Clean image only */}
+          <div className="flex items-center justify-center">
+            <img 
+              src={heroImage} 
+              alt="Confident professional woman driver" 
+              className="rounded-2xl shadow-elevated w-full max-w-md h-80 object-cover"
+            />
           </div>
         </div>
       </div>
