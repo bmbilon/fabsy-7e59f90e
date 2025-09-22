@@ -19,7 +19,7 @@ const Hero = () => {
             <div className="space-y-4">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-white drop-shadow-lg">
                 Keep Your Abstract{" "}
-                <span className="text-gradient-primary font-script text-6xl lg:text-8xl">Fab</span>
+                <span className="text-gradient-hero font-script text-6xl lg:text-8xl">Fab</span>
               </h1>
               <p className="text-2xl lg:text-3xl font-medium text-white/95 drop-shadow-md">
                 Minimize the Tab
@@ -35,7 +35,7 @@ const Hero = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link to="/submit-ticket">
-                  <Button size="lg" className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow w-full sm:w-auto">
+                  <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow w-full sm:w-auto border-0">
                     Upload Your Ticket <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>

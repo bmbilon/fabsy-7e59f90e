@@ -8,16 +8,16 @@ All colors MUST be HSL for proper theming.
 
 @layer base {
   :root {
-    /* Light pink/coral gradient background like the reference */
-    --background: linear-gradient(135deg, hsl(340 60% 75%), hsl(320 55% 80%));
-    --background-solid: 340 60% 75%;
+    /* Broad sweeping pink to purple gradient background */
+    --background: linear-gradient(135deg, hsl(320 70% 75%) 0%, hsl(290 65% 70%) 25%, hsl(260 60% 75%) 50%, hsl(280 65% 80%) 75%, hsl(310 70% 85%) 100%);
+    --background-solid: 320 70% 75%;
     --foreground: 0 0% 100%;
 
     --card: 0 0% 100%;
-    --card-foreground: 340 30% 25%;
+    --card-foreground: 280 30% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 340 30% 25%;
+    --popover-foreground: 280 30% 25%;
 
     /* Bright Blue Primary */
     --primary: 210 100% 58%;
@@ -25,39 +25,40 @@ All colors MUST be HSL for proper theming.
     --primary-light: 210 100% 68%;
     --primary-dark: 210 100% 48%;
 
-    /* Dark Grey Secondary */
-    --secondary: 340 25% 35%;
+    /* Purple Secondary */
+    --secondary: 280 35% 40%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 340 20% 45%;
-    --secondary-dark: 340 30% 25%;
+    --secondary-light: 280 30% 50%;
+    --secondary-dark: 280 40% 30%;
 
     /* Soft Neutrals */
-    --muted: 340 40% 85%;
-    --muted-foreground: 340 25% 35%;
+    --muted: 300 40% 90%;
+    --muted-foreground: 280 30% 40%;
 
-    --accent: 340 50% 90%;
-    --accent-foreground: 340 30% 25%;
+    --accent: 270 50% 90%;
+    --accent-foreground: 280 30% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 340 30% 80%;
-    --input: 340 40% 85%;
+    --border: 300 30% 85%;
+    --input: 300 40% 90%;
     --ring: 210 100% 58%;
 
     --radius: 0.75rem;
 
-    /* Beautiful Light Gradients */
+    /* Broad sweeping gradients from pink to purple */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
-    --gradient-hero: linear-gradient(135deg, hsl(340 60% 75%), hsl(320 55% 80%), hsl(350 50% 85%));
-    --gradient-soft: linear-gradient(180deg, hsl(var(--background-solid)), hsl(var(--muted)));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(340 40% 95%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary-light)));
+    --gradient-hero: linear-gradient(135deg, hsl(320 70% 75%) 0%, hsl(290 65% 70%) 20%, hsl(260 60% 75%) 40%, hsl(280 65% 80%) 60%, hsl(310 70% 85%) 80%, hsl(330 75% 90%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(320 70% 80%) 0%, hsl(290 65% 75%) 25%, hsl(260 60% 80%) 50%, hsl(280 65% 85%) 75%, hsl(310 70% 90%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(300 40% 95%) 30%, hsl(270 35% 90%) 70%, hsl(320 45% 95%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(320 60% 85%) 0%, hsl(290 55% 80%) 25%, hsl(260 50% 85%) 50%, hsl(280 55% 90%) 75%, hsl(310 60% 95%) 100%);
+    --gradient-button: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(270 70% 60%) 50%, hsl(290 65% 65%) 100%);
 
-    /* Enhanced Shadows */
-    --shadow-fab: 0 10px 30px -5px hsl(340 30% 60% / 0.3);
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
-    --shadow-elevated: 0 20px 60px -10px hsl(340 30% 60% / 0.4);
+    /* Enhanced Shadows with purple tints */
+    --shadow-fab: 0 10px 30px -5px hsl(290 40% 60% / 0.3);
+    --shadow-glow: 0 0 40px hsl(280 50% 70% / 0.4);
+    --shadow-elevated: 0 20px 60px -10px hsl(300 35% 65% / 0.4);
 
     /* Typography - Feminine Fonts */
     --font-display: 'Poppins', 'Inter', system-ui, sans-serif;
@@ -193,6 +194,15 @@ All colors MUST be HSL for proper theming.
     transition: var(--transition-bounce);
   }
 
+  /* Background gradients */
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .bg-gradient-button {
+    background: var(--gradient-button);
+  }
+
   /* Text gradients */
   .text-gradient-primary {
     background: var(--gradient-primary);
@@ -208,8 +218,10 @@ All colors MUST be HSL for proper theming.
     background-clip: text;
   }
 
-  /* Background gradients */
-  .bg-gradient-accent {
-    background: var(--gradient-accent);
+  .text-gradient-hero {
+    background: linear-gradient(135deg, hsl(320 70% 40%) 0%, hsl(290 65% 45%) 25%, hsl(260 60% 50%) 50%, hsl(280 65% 45%) 75%, hsl(310 70% 40%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }

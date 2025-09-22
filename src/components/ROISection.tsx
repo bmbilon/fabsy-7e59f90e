@@ -13,11 +13,11 @@ const ROISection = () => {
             Smart Financial Move
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white drop-shadow-lg">
-            <span className="text-gradient-primary">Pay $488</span> to Save{" "}
-            <span className="text-gradient-primary">$1,650</span>
+            <span className="text-gradient-hero">Pay $488</span> to Save{" "}
+            <span className="text-gradient-hero">$1,650</span>
           </h2>
           <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            That's not just smart — that's <span className="font-semibold text-primary shadow-glow">fabulous</span> financial planning.
+            That's not just smart — that's <span className="font-semibold text-primary shadow-glow font-script text-2xl">fabulous</span> financial planning.
             Invest in yourself and protect your driving record.
           </p>
         </div>
@@ -46,13 +46,13 @@ const ROISection = () => {
                   <div className="border-t border-muted pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold text-secondary">Your Profit:</span>
-                      <span className="text-2xl font-bold text-gradient-primary">$513 - $1,162</span>
+                      <span className="text-2xl font-bold text-gradient-hero">$513 - $1,162</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-secondary/10 p-4 rounded-lg border border-secondary/20 text-center">
-                  <div className="text-3xl font-bold text-gradient-primary mb-2">2-3x ROI</div>
+                <div className="bg-gradient-accent p-4 rounded-lg border border-white/20 text-center">
+                  <div className="text-3xl font-bold text-gradient-hero mb-2">2-3x ROI</div>
                   <div className="text-sm text-secondary">
                     That's better than most investment portfolios
                   </div>
@@ -63,13 +63,13 @@ const ROISection = () => {
             <div className="grid grid-cols-2 gap-4">
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
-                <div className="text-2xl font-bold text-gradient-primary">94%</div>
+                <div className="text-2xl font-bold text-gradient-hero">94%</div>
                 <div className="text-sm text-secondary">Success Rate</div>
               </Card>
               
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <Clock className="h-8 w-8 text-secondary mx-auto mb-3" />
-                <div className="text-2xl font-bold text-gradient-primary">2-4</div>
+                <div className="text-2xl font-bold text-gradient-hero">2-4</div>
                 <div className="text-sm text-secondary">Weeks Process</div>
               </Card>
             </div>
@@ -121,7 +121,7 @@ const ROISection = () => {
             </div>
 
             <Link to="/submit-ticket">
-              <Button size="lg" className="w-full bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow">
+              <Button size="lg" className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
                 Start Saving Money Now
               </Button>
             </Link>
