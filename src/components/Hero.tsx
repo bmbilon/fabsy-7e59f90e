@@ -29,7 +29,7 @@ const Hero = () => {
             <div className="space-y-6">
               <p className="text-xl lg:text-2xl text-white/95 max-w-2xl drop-shadow-sm">
                 That <span className="font-bold text-primary shadow-glow">$150 ticket</span> is actually costing you{" "}
-                <span className="font-bold text-destructive shadow-glow">$1,650</span>. 
+                <span className="font-bold text-destructive shadow-glow">$5,000</span>. 
                 We fight it with a <span className="font-bold text-primary shadow-glow">94% success rate</span>.
               </p>
               
@@ -56,7 +56,7 @@ const Hero = () => {
                 <div className="text-sm text-white/80">Women Served</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white drop-shadow-lg">up to $5,000+</div>
+                <div className="text-3xl font-bold text-white drop-shadow-lg">$1,200</div>
                 <div className="text-sm text-white/80">Avg. Saved</div>
               </div>
             </div>
