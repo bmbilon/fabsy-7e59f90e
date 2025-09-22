@@ -77,16 +77,37 @@ const Hero = () => {
               </div>
               
               {/* Driver's Abstract Document */}
-              <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3 w-32 transform rotate-[-5deg] border-2 border-gray-200 relative">
+              <div className="absolute bottom-4 left-4 bg-white rounded shadow-lg p-4 w-36 h-44 transform rotate-[-5deg] border border-gray-300 relative overflow-hidden">
                 {/* Check mark in upper right corner */}
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">✓</span>
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
+                  <span className="text-white text-xs font-bold">✓</span>
                 </div>
                 
-                <div className="text-xs font-bold text-gray-800 mb-1">DRIVER'S ABSTRACT</div>
-                <div className="text-[8px] text-gray-600 mb-2">Demerit Points</div>
-                <div className="flex items-center justify-center">
-                  <span className="text-2xl font-bold text-green-500">0</span>
+                {/* Document header */}
+                <div className="border-b border-gray-200 pb-2 mb-3">
+                  <div className="text-[10px] font-bold text-gray-800 text-center leading-tight">MINISTRY OF TRANSPORTATION</div>
+                  <div className="text-[8px] text-gray-600 text-center">DRIVER'S ABSTRACT</div>
+                </div>
+                
+                {/* Document content */}
+                <div className="space-y-2">
+                  <div className="text-[8px] text-gray-700">
+                    <div className="flex justify-between">
+                      <span>License #:</span>
+                      <span>P****-*****-****1</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t border-gray-100 pt-2">
+                    <div className="text-[8px] text-gray-600 mb-1">DEMERIT POINTS</div>
+                    <div className="flex items-center justify-center bg-green-50 rounded p-2">
+                      <span className="text-2xl font-bold text-green-600">0</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-[7px] text-gray-500 text-center mt-2">
+                    Status: CLEAN RECORD
+                  </div>
                 </div>
               </div>
             </div>
