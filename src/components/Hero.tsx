@@ -85,28 +85,22 @@ const Hero = () => {
                 
                 {/* Document header */}
                 <div className="border-b border-gray-200 pb-2 mb-3">
-                  <div className="text-[10px] font-bold text-gray-800 text-center leading-tight">MINISTRY OF TRANSPORTATION</div>
-                  <div className="text-[8px] text-gray-600 text-center">DRIVER'S ABSTRACT</div>
+                  <div className="text-[10px] font-bold text-gray-800 text-center">DRIVER'S ABSTRACT</div>
                 </div>
                 
                 {/* Document content */}
                 <div className="space-y-2">
-                  <div className="text-[8px] text-gray-700">
-                    <div className="flex justify-between">
-                      <span>License #:</span>
-                      <span>P****-*****-****1</span>
-                    </div>
+                  <div className="text-[8px] text-gray-500 space-y-1">
+                    <div>________________</div>
+                    <div>________________</div>
+                    <div>________________</div>
                   </div>
                   
-                  <div className="border-t border-gray-100 pt-2">
+                  <div className="border-t border-gray-100 pt-2 mt-4">
                     <div className="text-[8px] text-gray-600 mb-1">DEMERIT POINTS</div>
                     <div className="flex items-center justify-center bg-green-50 rounded p-2">
                       <span className="text-2xl font-bold text-green-600">0</span>
                     </div>
-                  </div>
-                  
-                  <div className="text-[7px] text-gray-500 text-center mt-2">
-                    Status: CLEAN RECORD
                   </div>
                 </div>
               </div>
