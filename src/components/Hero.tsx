@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Shield, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroImage from "@/assets/hero-woman-driver.jpg";
+import heroImage from "@/assets/hero-woman-driver-new.jpg";
 
 const Hero = () => {
   return (
