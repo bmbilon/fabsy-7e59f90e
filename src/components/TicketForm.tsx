@@ -23,6 +23,8 @@ export interface FormData {
   postalCode: string;
   dateOfBirth: Date | undefined;
   driversLicense: string;
+  driversLicenseImage: File | null;
+  addressDifferentFromLicense: boolean;
   
   // Ticket Details
   ticketNumber: string;
@@ -51,16 +53,21 @@ export interface FormData {
 }
 
 const initialFormData: FormData = {
+  // Personal Information
   firstName: "",
   lastName: "",
   email: "",
   phone: "",
   address: "",
   city: "",
-  province: "Alberta",
+  province: "",
   postalCode: "",
   dateOfBirth: undefined,
   driversLicense: "",
+  driversLicenseImage: null,
+  addressDifferentFromLicense: false,
+  
+  // Ticket Details
   ticketNumber: "",
   issueDate: undefined,
   location: "",
@@ -69,6 +76,8 @@ const initialFormData: FormData = {
   fineAmount: "",
   courtDate: undefined,
   ticketImage: null,
+  
+  // Defense Information
   pleaType: "",
   explanation: "",
   circumstances: "",
@@ -77,6 +86,8 @@ const initialFormData: FormData = {
   evidence: false,
   evidenceDetails: "",
   priorTickets: "none",
+  
+  // Additional Info
   insuranceCompany: "",
   vehicleDetails: "",
   additionalNotes: ""
