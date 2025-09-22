@@ -70,9 +70,9 @@ const Hero = () => {
                 alt="Confident professional woman driver" 
                 className="rounded-2xl shadow-elevated w-full max-w-md h-80 object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/30">
-                <h2 className="text-white text-2xl font-bold text-center px-4 drop-shadow-lg">
-                  No demerit points on my FABstract!
+              <div className="absolute inset-0 flex items-start justify-start rounded-2xl bg-black/20 p-6">
+                <h2 className="text-pink-300 text-3xl font-script font-semibold drop-shadow-lg leading-relaxed">
+                  No demerit points<br />on my FABstract!
                 </h2>
               </div>
             </div>
