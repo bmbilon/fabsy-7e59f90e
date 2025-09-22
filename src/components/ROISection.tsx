@@ -1,0 +1,132 @@
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { DollarSign, TrendingUp, Shield, Clock } from "lucide-react";
+
+const ROISection = () => {
+  return (
+    <section className="py-20 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+            Smart Financial Move
+          </Badge>
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+            <span className="text-gradient-primary">Pay $499</span> to Save{" "}
+            <span className="text-gradient-primary">$1,650</span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            That's not just smart — that's <span className="font-semibold text-primary">fabulous</span> financial planning.
+            Invest in yourself and protect your driving record.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+          {/* Left side - ROI breakdown */}
+          <div className="space-y-8">
+            <Card className="p-8 bg-gradient-card shadow-fab border-primary/10">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <DollarSign className="h-6 w-6 text-primary" />
+                  <h3 className="text-2xl font-bold">Return on Investment</h3>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-4 bg-background/50 rounded-lg">
+                    <span className="text-lg">Service Investment:</span>
+                    <span className="text-xl font-bold text-primary">$499</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg border border-primary/10">
+                    <span className="text-lg">Potential Insurance Savings:</span>
+                    <span className="text-xl font-bold text-primary">$1,001 - $1,650</span>
+                  </div>
+                  
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold">Your Profit:</span>
+                      <span className="text-2xl font-bold text-gradient-primary">$502 - $1,151</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-secondary/10 p-4 rounded-lg border border-secondary/20 text-center">
+                  <div className="text-3xl font-bold text-gradient-primary mb-2">2-3x ROI</div>
+                  <div className="text-sm text-muted-foreground">
+                    That's better than most investment portfolios
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="p-6 text-center bg-gradient-card shadow-fab">
+                <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
+                <div className="text-2xl font-bold text-gradient-primary">94%</div>
+                <div className="text-sm text-muted-foreground">Success Rate</div>
+              </Card>
+              
+              <Card className="p-6 text-center bg-gradient-card shadow-fab">
+                <Clock className="h-8 w-8 text-secondary mx-auto mb-3" />
+                <div className="text-2xl font-bold text-gradient-primary">2-4</div>
+                <div className="text-sm text-muted-foreground">Weeks Process</div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Right side - Value proposition */}
+          <div className="space-y-8">
+            <div className="space-y-6">
+              <h3 className="text-3xl font-bold">
+                You Work Hard for Your Money
+              </h3>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Don't let one moment of going 10 over cost you $1,650 over three years. 
+                Our expert team has helped over 5,000 Alberta women protect their driving records 
+                and keep their insurance rates low.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 p-4 bg-primary/5 rounded-lg border border-primary/10">
+                <Shield className="h-6 w-6 text-primary mt-1" />
+                <div>
+                  <h4 className="font-semibold text-primary mb-1">Protected Driving Record</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Keep your abstract clean and maintain your good driver status
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-secondary/5 rounded-lg border border-secondary/10">
+                <DollarSign className="h-6 w-6 text-secondary mt-1" />
+                <div>
+                  <h4 className="font-semibold text-secondary mb-1">Lower Insurance Premiums</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Avoid the 3-year insurance penalty that can cost $200-$500 annually
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-accent/50 rounded-lg border border-accent">
+                <Clock className="h-6 w-6 text-primary mt-1" />
+                <div>
+                  <h4 className="font-semibold text-primary mb-1">Time & Stress Free</h4>
+                  <p className="text-sm text-muted-foreground">
+                    No court dates, no paperwork, no dealing with bureaucracy
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Button size="lg" className="w-full bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow">
+              Start Saving Money Now
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ROISection;
