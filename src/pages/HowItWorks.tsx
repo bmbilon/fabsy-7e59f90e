@@ -67,7 +67,7 @@ const HowItWorks = () => {
       icon: DollarSign,
       title: "Insurance Protection",
       description: "Avoid insurance premium increases that can cost you thousands over 3 years.",
-      highlight: "Save Up to $1,650"
+      highlight: "Save Up to 5,000+"
     }
   ];
 
