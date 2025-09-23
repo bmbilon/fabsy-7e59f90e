@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download } from "lucide-react";
+import JurisdictionChecker from "../JurisdictionChecker";
 import { FormData } from "../TicketForm";
 import { useState } from "react";
 
@@ -250,6 +251,15 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           </PopoverContent>
         </Popover>
       </div>
+
+      {/* Jurisdiction Checker */}
+      <JurisdictionChecker 
+        initialLocation={formData.location}
+        onResult={(result) => {
+          // You could store jurisdiction result in form data if needed
+          console.log('Jurisdiction result:', result);
+        }}
+      />
 
       {/* Vehicle Seizure Checkbox */}
       <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">

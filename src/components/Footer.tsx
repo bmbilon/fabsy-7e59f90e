@@ -168,10 +168,26 @@ const Footer = () => {
               We provide traffic ticket representation services, not legal advice. Our services are limited to representation in provincial traffic court matters. 
               This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
             </p>
-            <p>
+            <p className="mb-4">
               Results may vary. Past performance does not guarantee future results. 
               Our success rate is based on historical data and individual results may differ.
             </p>
+            
+            {/* Agent Practice Limitations */}
+            <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800 mb-4">
+              <p className="font-semibold text-amber-800 dark:text-amber-200 mb-2">Limitations on Agent Practice:</p>
+              <div className="space-y-1 text-amber-700 dark:text-amber-300">
+                <p><strong>What We Cannot Do:</strong></p>
+                <ul className="list-disc ml-4 space-y-1">
+                  <li>Represent clients on summary conviction appeals</li>
+                  <li>Appear on hybrid criminal matters</li>
+                  <li>Represent clients facing potential imprisonment exceeding six months without approved program participation</li>
+                </ul>
+                
+                <p className="mt-3"><strong>Geographic Restrictions:</strong></p>
+                <p>Some Alberta court locations do not permit paid non-lawyer agents to provide representation. This varies by jurisdiction within the province. We will verify if representation is permitted at your specific court location.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
