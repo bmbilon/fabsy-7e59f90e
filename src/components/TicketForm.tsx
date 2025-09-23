@@ -7,7 +7,6 @@ import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import PersonalInfoStep from "./form-steps/PersonalInfoStep";
 import TicketDetailsStep from "./form-steps/TicketDetailsStep";
 import DefenseStep from "./form-steps/DefenseStep";
-import ConsentStep from "./form-steps/ConsentStep";
 import PaymentStep from "./form-steps/PaymentStep";
 import ReviewStep from "./form-steps/ReviewStep";
 import { useToast } from "@/hooks/use-toast";
@@ -46,10 +45,6 @@ export interface FormData {
   evidence: boolean;
   evidenceDetails: string;
   priorTickets: string;
-  
-  // Consent Information (Form SRA12675)
-  consentGiven: boolean;
-  consentUnderstood: boolean;
   
   // Additional Info
   insuranceCompany: string;
@@ -92,10 +87,6 @@ const initialFormData: FormData = {
   evidenceDetails: "",
   priorTickets: "none",
   
-  // Consent Information (Form SRA12675)
-  consentGiven: false,
-  consentUnderstood: false,
-  
   // Additional Info
   insuranceCompany: "",
   vehicleDetails: "",
@@ -106,9 +97,8 @@ const steps = [
   { id: 1, title: "Personal Info", description: "Your basic information" },
   { id: 2, title: "Ticket Details", description: "Information about your ticket" },
   { id: 3, title: "Your Defense", description: "Why you want to fight this ticket" },
-  { id: 4, title: "Consent Form", description: "Required legal authorization" },
-  { id: 5, title: "Payment", description: "Secure payment processing" },
-  { id: 6, title: "Review", description: "Review and submit" }
+  { id: 4, title: "Payment", description: "Secure payment processing" },
+  { id: 5, title: "Review", description: "Review and submit" }
 ];
 
 const TicketForm = () => {
@@ -167,10 +157,8 @@ const TicketForm = () => {
       case 3:
         return <DefenseStep formData={formData} updateFormData={updateFormData} />;
       case 4:
-        return <ConsentStep formData={formData} updateFormData={updateFormData} />;
-      case 5:
         return <PaymentStep formData={formData} updateFormData={updateFormData} />;
-      case 6:
+      case 5:
         return <ReviewStep formData={formData} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
       default:
         return null;
@@ -210,7 +198,7 @@ const TicketForm = () => {
             
             <Progress value={progress} className="h-2" />
             
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {steps.map((step) => (
                 <div key={step.id} className="text-center">
                   <div className={`w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-medium transition-smooth ${
@@ -239,7 +227,7 @@ const TicketForm = () => {
           {renderStep()}
 
           {/* Navigation */}
-          {currentStep < 6 && (
+          {currentStep < 5 && (
             <div className="flex justify-between mt-8 pt-6 border-t">
               <Button 
                 variant="outline" 
@@ -253,10 +241,9 @@ const TicketForm = () => {
               
               <Button 
                 onClick={nextStep}
-                disabled={currentStep === 4 && (!formData.consentGiven || !formData.consentUnderstood)}
-                className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2 disabled:opacity-50"
+                className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
               >
-                {currentStep === 4 ? 'Proceed to Payment' : 'Continue'}
+                Continue
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>

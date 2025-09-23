@@ -131,29 +131,6 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
         </div>
       </Card>
 
-      {/* Consent Confirmation */}
-      <Card className="p-6 bg-gradient-card shadow-fab border-primary/10">
-        <div className="flex items-center gap-3 mb-4">
-          <FileText className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-bold">Legal Authorization</h3>
-        </div>
-        <div className="space-y-3 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Form SRA12675 Consent:</span>
-            <span className={`px-2 py-1 rounded text-xs font-medium ${
-              formData.consentGiven && formData.consentUnderstood
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {formData.consentGiven && formData.consentUnderstood ? '✓ Authorized' : '✗ Not Authorized'}
-            </span>
-          </div>
-          <div className="text-muted-foreground">
-            Client has provided written consent for legal representation as required by Alberta law.
-          </div>
-        </div>
-      </Card>
-
       {/* Payment Summary */}
       <Card className="p-6 bg-gradient-card shadow-fab border-primary/10">
         <div className="flex items-center gap-3 mb-4">
