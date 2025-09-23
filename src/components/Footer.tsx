@@ -16,7 +16,7 @@ const Footer = () => {
     ],
     legal: [
       { name: "Privacy Policy", path: "/privacy-policy" },
-      { name: "Terms of Service", path: "/terms" },
+      { name: "Terms of Service", path: "/terms-of-service" },
       { name: "Cookie Policy", path: "/cookie-policy" },
       { name: "Legal Disclaimer", path: "/disclaimer" },
     ],
