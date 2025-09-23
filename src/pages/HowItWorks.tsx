@@ -33,7 +33,7 @@ const HowItWorks = () => {
     {
       icon: FileCheck,
       title: "Strategy Development",
-      description: "We craft a personalized defense strategy based on your specific case circumstances and Alberta traffic laws.",
+      description: "We craft a personalized defense strategy based on your specific case circumstances and Alberta traffic regulations.",
       time: "1-2 days"
     },
     {

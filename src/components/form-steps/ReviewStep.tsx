@@ -178,7 +178,7 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
             <div>
               <div className="font-medium">Expert Review (24-48 hours)</div>
-              <div className="text-muted-foreground">Our legal team reviews your case and develops a defense strategy</div>
+              <div className="text-muted-foreground">Our expert team reviews your case and develops a defense strategy</div>
             </div>
           </div>
           <div className="flex items-start gap-3">

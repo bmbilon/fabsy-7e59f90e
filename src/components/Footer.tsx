@@ -117,7 +117,7 @@ const Footer = () => {
               Ready to Fight Your Traffic Ticket?
             </h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Join thousands of Alberta women who've protected their driving records with Fabsy's expert legal defense.
+              Join thousands of Alberta women who've protected their driving records with Fabsy's expert traffic representation.
             </p>
             
             <div className="flex justify-center">
@@ -135,10 +135,10 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-sm text-muted-foreground text-center md:text-left">
-            <p>© {currentYear} Fabsy Legal Services. All rights reserved.</p>
+            <p>© {currentYear} Fabsy Traffic Services. All rights reserved.</p>
             <p className="mt-1">
-              Licensed to practice law in Alberta, Canada. 
-              Professional legal services for traffic ticket defense.
+              Authorized traffic ticket representatives in Alberta, Canada. 
+              Professional representation services for traffic ticket defense.
             </p>
           </div>
           
@@ -164,8 +164,8 @@ const Footer = () => {
         <div className="mt-8 pt-6 border-t border-muted">
           <div className="text-xs text-muted-foreground leading-relaxed">
             <p className="mb-2">
-              <strong>Legal Disclaimer:</strong> The information provided on this website is for general information purposes only. 
-              Nothing on this site should be taken as legal advice for any individual case or situation. 
+              <strong>Important Notice:</strong> The information provided on this website is for general information purposes only. 
+              We provide traffic ticket representation services, not legal advice. Our services are limited to representation in provincial traffic court matters. 
               This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
             </p>
             <p>

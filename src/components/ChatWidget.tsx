@@ -44,7 +44,7 @@ const ChatWidget = () => {
     const message = userMessage.toLowerCase();
     
     if (message.includes('cost') || message.includes('price') || message.includes('fee')) {
-      return "Our traffic ticket defense service costs $488. This includes full legal representation, court appearances if needed, and expert defense strategies. Most clients save 3-5 times our fee in avoided insurance increases.";
+      return "Our traffic ticket representation service costs $488. This includes full court representation, court appearances if needed, and expert defense strategies. Most clients save 3-5 times our fee in avoided insurance increases.";
     }
     
     if (message.includes('how') && (message.includes('work') || message.includes('process'))) {
@@ -52,7 +52,7 @@ const ChatWidget = () => {
     }
     
     if (message.includes('success') || message.includes('win') || message.includes('rate')) {
-      return "We have a 94% success rate in reducing or dismissing traffic tickets. Our experienced lawyers specialize in Alberta traffic law and have handled thousands of cases successfully.";
+      return "We have a 94% success rate in reducing or dismissing traffic tickets. Our experienced traffic representatives specialize in Alberta traffic matters and have handled thousands of cases successfully.";
     }
     
     if (message.includes('insurance') || message.includes('premium')) {

@@ -92,9 +92,9 @@ const About = () => {
                   insurance increases that could have been avoided.
                 </p>
                 <p>
-                  As experienced traffic lawyers, we saw how the system was stacked against 
+                  As experienced traffic representatives, we saw how the system was stacked against 
                   everyday drivers, especially women who often face higher insurance premiums 
-                  and less aggressive legal representation.
+                  and less aggressive court representation.
                 </p>
                 <p>
                   We decided to change that. By focusing exclusively on traffic ticket defense 
@@ -116,7 +116,7 @@ const About = () => {
               </div>
               
               <p className="text-muted-foreground leading-relaxed mb-6">
-                To provide every Alberta woman with accessible, expert legal defense 
+                To provide every Alberta woman with accessible, expert traffic representation 
                 against traffic tickets, ensuring fair treatment and protecting their 
                 financial future from insurance discrimination.
               </p>
@@ -164,17 +164,17 @@ const About = () => {
         <div className="mb-16">
           <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm text-center">
             <h2 className="text-4xl font-bold text-card-foreground mb-6">
-              Expert Legal <span className="text-gradient-hero">Team</span>
+              Expert <span className="text-gradient-hero">Team</span>
             </h2>
             
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-card-foreground">
-                  Experienced Lawyers
+                  Experienced Representatives
                 </h3>
                 <p className="text-muted-foreground">
-                  Our team includes lawyers with over 10 years of experience specifically 
-                  in Alberta traffic law, having handled thousands of cases successfully.
+                  Our team includes experienced traffic representatives with over 10 years of experience specifically 
+                  in Alberta traffic matters, having handled thousands of cases successfully.
                 </p>
               </div>
               
@@ -183,8 +183,8 @@ const About = () => {
                   Specialized Knowledge
                 </h3>
                 <p className="text-muted-foreground">
-                  We stay current with all changes to Alberta traffic laws and court procedures 
-                  to ensure the strongest possible defense for every client.
+                  We stay current with all changes to Alberta traffic regulations and court procedures 
+                  to ensure the strongest possible representation for every client.
                 </p>
               </div>
             </div>
