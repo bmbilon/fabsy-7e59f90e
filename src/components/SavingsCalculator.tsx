@@ -24,7 +24,7 @@ const SavingsCalculator = () => {
     'other': { increase: 0.15, points: 2, description: 'Other Traffic Violation' }
   };
 
-  const serviceFee = 299; // Your service fee
+  const serviceFee = 488; // Your service fee
 
   const calculateSavings = () => {
     if (!ticketFine || !violationType || !currentPremium) return;
