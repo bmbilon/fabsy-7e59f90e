@@ -80,8 +80,11 @@ const Hero = () => {
             <div className="relative">
               <img 
                 src={heroImage} 
-                alt="Confident professional woman driver" 
+                alt="Professional Alberta woman driver celebrating clean driving abstract with zero demerit points after successful traffic ticket defense" 
                 className="rounded-2xl shadow-elevated w-full max-w-md h-80 object-cover transform scale-x-[-1]"
+                loading="eager"
+                width="400"
+                height="320"
               />
               <div className="absolute inset-0 flex items-start justify-end rounded-2xl bg-black/20 p-6">
                 <h2 className="text-pink-300 text-3xl font-script font-semibold drop-shadow-lg leading-relaxed text-right">
