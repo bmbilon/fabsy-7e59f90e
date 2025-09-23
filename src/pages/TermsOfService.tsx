@@ -47,17 +47,32 @@ const TermsOfService = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">4. Fees and Payment</h2>
+            <h2 className="text-2xl font-semibold mb-4">4. Zero Risk Guarantee</h2>
+            <p className="mb-4">
+              We stand behind our service with a 100% zero-risk guarantee:
+            </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Service fees are due upon engagement and are non-refundable once representation begins</li>
-              <li>Additional court costs or fines remain the client's responsibility</li>
-              <li>Payment must be received before court representation commences</li>
+              <li>If we do not achieve cost savings on your total ticket-related expenses, you do not pay our representation fee</li>
+              <li>In such cases, you will only be responsible for your original fine amount plus a 10% processing fee</li>
+              <li>This processing fee structure is identical to what you would pay using the court's official online payment system</li>
+              <li>Our guarantee ensures you never pay more than you would have by simply paying the original ticket</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">5. Fees and Payment</h2>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Our standard representation fee is $488</li>
+              <li>Under our zero-risk guarantee, you only pay this fee if we achieve cost savings for you</li>
+              <li>If we do not save you money, you pay only your original fine plus 10% processing fee</li>
+              <li>Payment of our representation fee is due only after successful resolution that results in cost savings</li>
+              <li>Additional court costs or fines beyond our control remain the client's responsibility</li>
               <li>All fees are quoted in Canadian dollars</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5. Client Responsibilities</h2>
+            <h2 className="text-2xl font-semibold mb-4">6. Client Responsibilities</h2>
             <p className="mb-4">Clients agree to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide accurate and complete information about their traffic ticket</li>

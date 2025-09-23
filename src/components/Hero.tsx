@@ -32,6 +32,18 @@ const Hero = () => {
                 <span className="font-bold text-destructive shadow-glow">$5,000+</span>. 
                 We fight it with a <span className="font-bold text-primary shadow-glow">94% success rate</span>.
               </p>
+
+              {/* Zero Risk Guarantee */}
+              <div className="bg-white/10 backdrop-blur-sm border border-white/30 rounded-lg p-6 shadow-glow">
+                <div className="flex items-center gap-3 mb-3">
+                  <Shield className="h-6 w-6 text-primary" />
+                  <h3 className="text-xl font-bold text-white">100% Zero Risk Guarantee</h3>
+                </div>
+                <p className="text-white/95 leading-relaxed">
+                  If we don't save you money on your total costs, you don't pay our fee. 
+                  You'll only pay your original fine plus a 10% processing fee - the same as paying through the court's online system.
+                </p>
+              </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link to="/submit-ticket">
@@ -40,7 +52,8 @@ const Hero = () => {
                   </Button>
                 </Link>
                 <Button variant="outline" size="lg" className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-smooth">
-                  Calculate Real Cost
+                  <Calculator className="mr-2 h-5 w-5" />
+                  Calculate Savings
                 </Button>
               </div>
             </div>

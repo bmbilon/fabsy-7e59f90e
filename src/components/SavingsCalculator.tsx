@@ -223,10 +223,10 @@ const SavingsCalculator = () => {
                         {results.recommendation === 'recommend' ? '✅ Recommended' : '⚠️ Consider Carefully'}
                       </h4>
                       <p className="text-sm">
-                        {results.recommendation === 'recommend' 
-                          ? `Fighting this ticket could save you $${results.potentialSavings.toFixed(0)} over 3 years. The potential ROI of ${results.roi.toFixed(0)}% makes representation a smart financial decision.`
-                          : `The potential savings may not justify the representation cost. You might want to consider paying the fine, though factors like your driving record and future insurance rates should also be considered.`
-                        }
+                {results.recommendation === 'recommend' 
+                  ? `Fighting this ticket could save you $${results.potentialSavings.toFixed(0)} over 3 years. The potential ROI of ${results.roi.toFixed(0)}% makes representation a smart financial decision. Plus, with our zero-risk guarantee, you only pay if we save you money!`
+                  : `The potential savings may not justify the representation cost. However, with our zero-risk guarantee, you have nothing to lose - if we don't save you money on your total costs, you only pay your original fine plus a 10% processing fee.`
+                }
                       </p>
                     </div>
 

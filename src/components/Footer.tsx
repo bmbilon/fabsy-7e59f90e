@@ -118,6 +118,7 @@ const Footer = () => {
             </h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Join thousands of Alberta women who've protected their driving records with Fabsy's expert traffic representation.
+              <strong className="block mt-2 text-green-600">Zero Risk Guarantee: You only pay if we save you money!</strong>
             </p>
             
             <div className="flex justify-center">
