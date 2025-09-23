@@ -35,7 +35,7 @@ const ROISection = () => {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <DollarSign className="h-6 w-6 text-primary" />
-                  <h3 className="text-2xl font-bold text-card-foreground">Return on Investment</h3>
+                  <h3 className="text-2xl font-bold text-card-foreground">Your Savings Breakdown</h3>
                 </div>
 
                 <div className="space-y-4">
@@ -58,9 +58,9 @@ const ROISection = () => {
                 </div>
 
                 <div className="bg-gradient-accent p-4 rounded-lg border border-white/20 text-center">
-                  <div className="text-3xl font-bold text-gradient-hero mb-2">2-3x ROI</div>
+                  <div className="text-3xl font-bold text-gradient-hero mb-2">2-3x Savings</div>
                   <div className="text-sm text-secondary">
-                    That's better than most investment portfolios
+                    Save 2-3 times what you invest with us
                   </div>
                 </div>
               </div>

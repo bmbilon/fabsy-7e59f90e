@@ -203,12 +203,12 @@ const SavingsCalculator = () => {
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold">Return on Investment:</span>
+                        <span className="font-semibold">Your Savings Multiplier:</span>
                         <span className={`text-xl font-bold flex items-center gap-1 ${
                           results.roi > 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {results.roi > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                          {results.roi.toFixed(0)}%
+                          {results.roi.toFixed(0)}% more
                         </span>
                       </div>
                     </div>
@@ -224,7 +224,7 @@ const SavingsCalculator = () => {
                       </h4>
                       <p className="text-sm">
                 {results.recommendation === 'recommend' 
-                  ? `Fighting this ticket could save you $${results.potentialSavings.toFixed(0)} over 3 years. The potential ROI of ${results.roi.toFixed(0)}% makes representation a smart financial decision. Plus, with our zero-risk guarantee, you only pay if we save you money!`
+                  ? `Fighting this ticket could save you $${results.potentialSavings.toFixed(0)} over 3 years. You'd save ${results.roi.toFixed(0)}% more than what you invest, making representation a smart financial decision. Plus, with our zero-risk guarantee, you only pay if we save you money!`
                   : `The potential savings may not justify the representation cost. However, with our zero-risk guarantee, you have nothing to lose - if we don't save you money on your total costs, you only pay your original fine plus a 10% processing fee.`
                 }
                       </p>
