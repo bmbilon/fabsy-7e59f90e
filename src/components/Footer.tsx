@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Scale, Mail, Phone, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
+import { Scale, Mail, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -50,10 +50,6 @@ const Footer = () => {
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-primary" />
                 <span>hello@fabsy.ca</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-primary" />
-                <span>1-888-FABSY-00</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-primary" />
@@ -124,15 +120,12 @@ const Footer = () => {
               Join thousands of Alberta women who've protected their driving records with Fabsy's expert legal defense.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Link to="/submit-ticket">
                 <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
                   Submit Your Ticket - $488
                 </Button>
               </Link>
-              <Button variant="outline" className="border-primary/30 hover:bg-primary/10 transition-smooth">
-                Call 1-888-FABSY-00
-              </Button>
             </div>
           </div>
         </Card>
