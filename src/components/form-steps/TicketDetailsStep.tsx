@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Download } from "lucide-react";
 import { FormData } from "../TicketForm";
 import { useState } from "react";
 
@@ -247,6 +249,54 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             />
           </PopoverContent>
         </Popover>
+      </div>
+
+      {/* Vehicle Seizure Checkbox */}
+      <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+        <div className="flex items-start space-x-3">
+          <Checkbox
+            id="vehicleSeized"
+            checked={formData.vehicleSeized}
+            onCheckedChange={(checked) => handleFieldUpdate("vehicleSeized", checked)}
+            className="mt-1"
+          />
+          <div className="space-y-2">
+            <Label htmlFor="vehicleSeized" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              My vehicle was seized
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Check this box if your vehicle was impounded or seized in connection with this ticket.
+            </p>
+          </div>
+        </div>
+        
+        {formData.vehicleSeized && (
+          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 mt-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Download className="h-5 w-5 text-primary" />
+              <span className="font-semibold text-primary">Required Form</span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Since your vehicle was seized, you'll need to complete Form SRA12675 (Written Consent). 
+              Please download, print, sign, and bring this form to your consultation.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-primary border-primary hover:bg-primary/10"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/forms/Form-SRA12675-Written-Consent.pdf';
+                link.download = 'Form-SRA12675-Written-Consent.pdf';
+                link.click();
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download Form SRA12675
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* File Upload */}

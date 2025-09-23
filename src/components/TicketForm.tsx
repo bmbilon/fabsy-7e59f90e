@@ -35,6 +35,7 @@ export interface FormData {
   fineAmount: string;
   courtDate: Date | undefined;
   ticketImage: File | null;
+  vehicleSeized: boolean;
   
   // Defense Information
   pleaType: string;
@@ -76,6 +77,7 @@ const initialFormData: FormData = {
   fineAmount: "",
   courtDate: undefined,
   ticketImage: null,
+  vehicleSeized: false,
   
   // Defense Information
   pleaType: "",
