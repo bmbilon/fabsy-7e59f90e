@@ -231,8 +231,15 @@ const SavingsCalculator = () => {
                     </div>
 
                     {/* Additional Info */}
-                    <div className="text-xs text-muted-foreground bg-muted/30 rounded p-3">
-                      <p><strong>Disclaimer:</strong> This calculator provides estimates based on typical insurance premium increases. Actual impacts may vary based on your insurance provider, driving history, and other factors. This is for informational purposes only and does not constitute financial or legal advice.</p>
+                    <div className="text-xs text-muted-foreground bg-muted/30 rounded p-3 space-y-2">
+                      <p><strong>Data Sources & Disclaimer:</strong></p>
+                      <ul className="list-disc list-inside space-y-1 ml-2">
+                        <li><strong>Fine Amounts:</strong> Based on Alberta Traffic Safety Act and regulations (Alberta.ca)</li>
+                        <li><strong>Demerit Points:</strong> Alberta Transportation demerit point system</li>
+                        <li><strong>Insurance Impact Estimates:</strong> Industry data from Insurance Bureau of Canada and major Alberta insurers</li>
+                        <li><strong>Premium Increases:</strong> Typical ranges based on violation severity and industry studies</li>
+                      </ul>
+                      <p className="mt-2"><strong>Important:</strong> This calculator provides estimates only. Actual insurance impacts vary significantly based on your specific provider, driving history, coverage type, and other individual factors. Results are for informational purposes and do not constitute financial or legal advice. Consult your insurance provider for exact premium impact calculations.</p>
                     </div>
                   </div>
                 )}
