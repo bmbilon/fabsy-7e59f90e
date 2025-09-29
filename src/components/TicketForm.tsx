@@ -51,6 +51,7 @@ export interface FormData {
   insuranceCompany: string;
   vehicleDetails: string;
   additionalNotes: string;
+  couponCode: string;
 }
 
 const initialFormData: FormData = {
@@ -92,7 +93,8 @@ const initialFormData: FormData = {
   // Additional Info
   insuranceCompany: "",
   vehicleDetails: "",
-  additionalNotes: ""
+  additionalNotes: "",
+  couponCode: ""
 };
 
 const steps = [

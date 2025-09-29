@@ -19,6 +19,9 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  
+  const isTestUser = formData.couponCode?.toUpperCase() === "TESTUSER";
+  const displayPrice = isTestUser ? "$0.00" : "$488.00";
 
   const handleFieldUpdate = (field: keyof FormData, value: any) => {
     updateFormData({ [field]: value });
@@ -36,6 +39,20 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
     setIsProcessing(true);
     try {
+      // If TESTUSER coupon, skip payment and go to success
+      if (isTestUser) {
+        toast({
+          title: "Test Submission Successful! 🎉",
+          description: "Your ticket has been submitted for review (Test Mode - No Payment Required).",
+        });
+        // Redirect to success page after short delay
+        setTimeout(() => {
+          window.location.href = "/payment-success?test=true";
+        }, 1500);
+        return;
+      }
+
+      // Regular Stripe payment flow
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { formData }
       });
@@ -88,25 +105,42 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           <div className="border-t pt-4 space-y-3">
             <div className="flex justify-between text-lg">
               <span>Fabsy Flat Fee Service</span>
-              <span className="font-semibold">$488.00 CAD</span>
+              <span className={`font-semibold ${isTestUser ? 'line-through text-muted-foreground' : ''}`}>$488.00 CAD</span>
             </div>
+            {isTestUser && (
+              <div className="flex justify-between text-lg">
+                <span className="text-green-600 font-semibold">Test User Discount</span>
+                <span className="font-semibold text-green-600">-$488.00 CAD</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Processing Fee</span>
               <span>$0.00</span>
             </div>
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>GST (5%)</span>
-              <span>+ Tax as applicable</span>
-            </div>
+            {!isTestUser && (
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>GST (5%)</span>
+                <span>+ Tax as applicable</span>
+              </div>
+            )}
             <div className="border-t pt-2">
               <div className="flex justify-between text-xl font-bold">
                 <span>Total Amount</span>
-                <span className="text-primary">$488.00 CAD + Tax</span>
+                <span className={`${isTestUser ? 'text-green-600' : 'text-primary'}`}>
+                  {displayPrice} CAD {!isTestUser && '+ Tax'}
+                </span>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Final amount with applicable taxes will be calculated at checkout
-            </p>
+            {!isTestUser && (
+              <p className="text-xs text-muted-foreground text-center">
+                Final amount with applicable taxes will be calculated at checkout
+              </p>
+            )}
+            {isTestUser && (
+              <p className="text-xs text-green-600 text-center font-semibold">
+                ✓ Test mode activated - No payment required
+              </p>
+            )}
           </div>
 
           <div className="bg-primary/10 p-3 rounded-lg border border-primary/20">
@@ -124,6 +158,21 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           <div className="flex items-center gap-3">
             <CreditCard className="h-6 w-6 text-primary" />
             <h3 className="text-xl font-bold">Payment Information</h3>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Coupon Code (Optional)</Label>
+            <Input
+              value={formData.couponCode}
+              onChange={(e) => handleFieldUpdate("couponCode", e.target.value)}
+              placeholder="Enter coupon code"
+              className="transition-smooth focus:ring-2 focus:ring-primary/20 uppercase"
+            />
+            {isTestUser && (
+              <p className="text-xs text-green-600 font-semibold">
+                ✓ Valid test user code applied
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -171,10 +220,15 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           >
             {isProcessing ? (
               "Processing..."
+            ) : isTestUser ? (
+              <>
+                <CheckCircle className="h-5 w-5 mr-2" />
+                Submit Test Application (No Payment)
+              </>
             ) : (
               <>
                 <CreditCard className="h-5 w-5 mr-2" />
-                Pay $488 CAD + Tax with Stripe
+                Pay {displayPrice} CAD + Tax with Stripe
               </>
             )}
           </Button>
@@ -183,10 +237,14 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
             <div className="flex items-start gap-3">
               <Shield className="h-5 w-5 text-secondary mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-secondary mb-1">Secure Payment Processing</p>
+                <p className="text-sm font-semibold text-secondary mb-1">
+                  {isTestUser ? "Test Mode Active" : "Secure Payment Processing"}
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  Powered by Stripe. Your payment information is encrypted and processed securely. 
-                  Promo codes accepted at checkout.
+                  {isTestUser 
+                    ? "You're submitting in test mode. Your ticket and contact info will be submitted without payment."
+                    : "Powered by Stripe. Your payment information is encrypted and processed securely. Promo codes accepted at checkout."
+                  }
                 </p>
               </div>
             </div>
