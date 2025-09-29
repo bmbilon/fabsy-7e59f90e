@@ -40,7 +40,7 @@ const HowItWorks = () => {
       icon: Gavel,
       title: "Court Representation",
       description: "We handle all court proceedings on your behalf. No need for you to take time off work or appear in court.",
-      time: "2-4 weeks"
+      time: "2-6 weeks"
     },
     {
       icon: CheckCircle,

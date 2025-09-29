@@ -48,7 +48,7 @@ const ChatWidget = () => {
     }
     
     if (message.includes('how') && (message.includes('work') || message.includes('process'))) {
-      return "Here's how it works: 1) Submit your ticket online, 2) We review and build your defense strategy, 3) We represent you in court if needed, 4) You get the results. The whole process typically takes 2-4 weeks.";
+      return "Here's how it works: 1) Submit your ticket online, 2) We review and build your defense strategy, 3) We represent you in court if needed, 4) You get the results. The whole process typically takes 2-6 weeks.";
     }
     
     if (message.includes('success') || message.includes('win') || message.includes('rate')) {
@@ -60,7 +60,7 @@ const ChatWidget = () => {
     }
     
     if (message.includes('time') || message.includes('long') || message.includes('take')) {
-      return "Most cases are resolved within 2-4 weeks. You don't need to appear in court - we handle everything for you. You'll receive updates throughout the process.";
+      return "Most cases are resolved within 2-6 weeks. You don't need to appear in court - we handle everything for you. You'll receive updates throughout the process.";
     }
     
     if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {

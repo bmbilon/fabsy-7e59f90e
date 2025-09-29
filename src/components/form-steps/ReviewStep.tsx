@@ -184,7 +184,7 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
             <div>
-              <div className="font-medium">Court Representation (2-4 weeks)</div>
+              <div className="font-medium">Court Representation (2-6 weeks)</div>
               <div className="text-muted-foreground">We handle all court proceedings and keep you updated</div>
             </div>
           </div>

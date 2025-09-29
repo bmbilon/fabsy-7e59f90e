@@ -84,7 +84,7 @@ const HowItWorks = () => {
 
         <div className="text-center mt-16">
           <p className="text-lg text-muted-foreground mb-4">
-            <span className="font-semibold text-primary">Average processing time:</span> 2-4 weeks
+            <span className="font-semibold text-primary">Average processing time:</span> 2-6 weeks
           </p>
           <p className="text-sm text-muted-foreground">
             No court dates • No paperwork • No stress • Just results

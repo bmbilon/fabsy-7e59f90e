@@ -75,7 +75,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
             </div>
             <div className="text-center p-4 bg-background/50 rounded-lg">
               <Clock className="h-8 w-8 text-secondary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-secondary">2-4</div>
+              <div className="text-2xl font-bold text-secondary">2-6</div>
               <div className="text-sm text-muted-foreground">Weeks Process</div>
             </div>
             <div className="text-center p-4 bg-background/50 rounded-lg">

@@ -27,7 +27,7 @@ const FAQ = () => {
         },
         {
           q: "How long does the process take?",
-          a: "Most cases are resolved within 2-4 weeks from the time we receive your ticket and payment. However, some complex cases or busy court jurisdictions may take longer. We'll keep you updated throughout the process."
+          a: "Most cases are resolved within 2-6 weeks from the time we receive your ticket and payment. However, some complex cases or busy court jurisdictions may take longer. We'll keep you updated throughout the process."
         }
       ]
     },

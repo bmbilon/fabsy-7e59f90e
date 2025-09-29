@@ -75,7 +75,7 @@ const ROISection = () => {
               
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <Clock className="h-8 w-8 text-secondary mx-auto mb-3" />
-                <div className="text-2xl font-bold text-gradient-hero">2-4</div>
+                <div className="text-2xl font-bold text-gradient-hero">2-6</div>
                 <div className="text-sm text-secondary">Weeks Process</div>
               </Card>
             </div>
