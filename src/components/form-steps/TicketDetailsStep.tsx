@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download } from "lucide-react";
 import JurisdictionChecker from "../JurisdictionChecker";
+import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
 import { FormData } from "../TicketForm";
 import { useState } from "react";
 
@@ -369,6 +370,13 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           you provide, the better we can defend your case. Double-check all details match your ticket exactly.
         </p>
       </div>
+
+      {/* Instant Ticket Analyzer */}
+      <InstantTicketAnalyzer 
+        ticketImage={formData.ticketImage}
+        fineAmount={formData.fineAmount}
+        violation={formData.violation}
+      />
     </form>
   );
 };
