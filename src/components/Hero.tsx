@@ -18,8 +18,8 @@ const Hero = () => {
           <div className="text-center lg:text-left space-y-8">
             <div className="space-y-4">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-white drop-shadow-lg">
-                Beat your traffic{" "}
-                <span className="text-primary">ticket, effortlessly</span>
+                Beat your traffic ticket,{" "}
+                <span className="text-primary">effortlessly</span>
               </h1>
               <p className="text-2xl lg:text-3xl font-medium text-white/95 drop-shadow-md">
                 Save Money & Points
