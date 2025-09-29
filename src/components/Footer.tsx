@@ -191,6 +191,14 @@ const Footer = () => {
             </div>
           </div>
         </div>
+        
+        {/* Terms of Use for Free Tool */}
+        <div className="mt-4 pt-4 border-t border-muted">
+          <p className="text-xs text-muted-foreground text-center">
+            *By using our free ticket assessment tool, you agree to share your contact information and any content contained in your uploaded ticket. 
+            This information may be used to contact you about our services. Your privacy is important to us - see our Privacy Policy for details.
+          </p>
+        </div>
       </div>
     </footer>
   );

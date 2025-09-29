@@ -37,7 +37,7 @@ const Hero = () => {
               <div className="bg-white/90 backdrop-blur-sm border border-white/50 rounded-lg p-6 shadow-glow">
                 <div className="flex items-center gap-3 mb-4">
                   <ArrowRight className="h-6 w-6 text-primary" />
-                  <h3 className="text-xl font-bold text-gray-800">Upload Your Ticket</h3>
+                  <h3 className="text-xl font-bold text-gray-800">Upload Your Ticket*</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors cursor-pointer">
