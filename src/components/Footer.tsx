@@ -114,7 +114,7 @@ const Footer = () => {
         <Card className="p-8 mb-12 bg-gradient-card shadow-fab border-primary/10">
           <div className="text-center">
             <h3 className="text-2xl font-bold text-card-foreground mb-4">
-              Ready to Fight Your Traffic Ticket?
+              Ready to Beat Your Traffic Ticket?
             </h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Join thousands of Alberta women who've protected their driving records with Fabsy's expert traffic representation.
