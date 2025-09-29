@@ -49,7 +49,9 @@ const Footer = () => {
             <div className="space-y-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-primary" />
-                <span>hello@fabsy.ca</span>
+                <a href="mailto:fabsy@execom.ca" className="hover:text-primary transition-colors">
+                  hello@fabsy.ca
+                </a>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-primary" />
