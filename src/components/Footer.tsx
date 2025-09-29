@@ -148,15 +148,15 @@ const Footer = () => {
               <p className="font-medium">Follow us:</p>
             </div>
             <div className="flex gap-3">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <div className="text-muted-foreground">
                 <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              </div>
+              <div className="text-muted-foreground">
                 <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              </div>
+              <div className="text-muted-foreground">
                 <Twitter className="h-5 w-5" />
-              </a>
+              </div>
             </div>
           </div>
         </div>
