@@ -60,14 +60,9 @@ const Hero = () => {
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link to="/submit-ticket">
-                  <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow w-full sm:w-auto border-0">
-                    Upload Your Ticket <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Button variant="outline" size="lg" className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-smooth">
-                  <Calculator className="mr-2 h-5 w-5" />
+              <div className="flex justify-center lg:justify-start">
+                <Button variant="outline" size="lg" className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-smooth text-xl font-bold px-8 py-4">
+                  <Calculator className="mr-3 h-6 w-6" />
                   Calculate Savings
                 </Button>
               </div>
