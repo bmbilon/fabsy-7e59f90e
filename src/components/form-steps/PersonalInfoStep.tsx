@@ -2,14 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Camera, Upload, Loader2, Check } from "lucide-react";
+import { Camera, Upload, Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormData } from "../TicketForm";
@@ -45,6 +43,9 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   const [showAddressFields, setShowAddressFields] = useState(formData.addressDifferentFromLicense);
   const [isProcessingOCR, setIsProcessingOCR] = useState(false);
   const [hasProcessedInitialImage, setHasProcessedInitialImage] = useState(false);
+  const [dobYear, setDobYear] = useState<string>(formData.dateOfBirth ? formData.dateOfBirth.getFullYear().toString() : "");
+  const [dobMonth, setDobMonth] = useState<string>(formData.dateOfBirth ? (formData.dateOfBirth.getMonth() + 1).toString() : "");
+  const [dobDay, setDobDay] = useState<string>(formData.dateOfBirth ? formData.dateOfBirth.getDate().toString() : "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -91,6 +92,42 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   const handleFieldUpdate = (field: keyof PersonalInfoSchema, value: any) => {
     setValue(field, value);
     updateFormData({ [field]: value });
+  };
+
+  // Generate year options (current year - 18 down to 1920)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1920 + 1 }, (_, i) => currentYear - i);
+  const months = [
+    { value: "1", label: "January" },
+    { value: "2", label: "February" },
+    { value: "3", label: "March" },
+    { value: "4", label: "April" },
+    { value: "5", label: "May" },
+    { value: "6", label: "June" },
+    { value: "7", label: "July" },
+    { value: "8", label: "August" },
+    { value: "9", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  // Handle date component changes
+  const handleDateChange = (type: 'year' | 'month' | 'day', value: string) => {
+    let newYear = type === 'year' ? value : dobYear;
+    let newMonth = type === 'month' ? value : dobMonth;
+    let newDay = type === 'day' ? value : dobDay;
+
+    if (type === 'year') setDobYear(value);
+    if (type === 'month') setDobMonth(value);
+    if (type === 'day') setDobDay(value);
+
+    // If all three are selected, create the date
+    if (newYear && newMonth && newDay) {
+      const date = new Date(parseInt(newYear), parseInt(newMonth) - 1, parseInt(newDay));
+      handleFieldUpdate("dateOfBirth", date);
+    }
   };
 
   const processDLOCR = async (file: File) => {
@@ -151,7 +188,12 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           handleFieldUpdate('postalCode', extracted.postalCode);
         }
         if (extracted.dateOfBirth) {
-          handleFieldUpdate('dateOfBirth', new Date(extracted.dateOfBirth));
+          const date = new Date(extracted.dateOfBirth);
+          handleFieldUpdate('dateOfBirth', date);
+          // Update the individual date component states
+          setDobYear(date.getFullYear().toString());
+          setDobMonth((date.getMonth() + 1).toString());
+          setDobDay(date.getDate().toString());
         }
         if (extracted.driversLicense) {
           handleFieldUpdate('driversLicense', extracted.driversLicense);
@@ -323,32 +365,46 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label>Date of Birth *</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal transition-smooth focus:ring-2 focus:ring-primary/20",
-                  !dateOfBirth && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dateOfBirth}
-                onSelect={(date) => handleFieldUpdate("dateOfBirth", date)}
-                disabled={(date) =>
-                  date > new Date() || date < new Date("1900-01-01")
-                }
-                initialFocus
-                className="p-3 pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
+          <div className="grid grid-cols-3 gap-2">
+            <Select value={dobYear} onValueChange={(value) => handleDateChange('year', value)}>
+              <SelectTrigger className="transition-smooth focus:ring-2 focus:ring-primary/20">
+                <SelectValue placeholder="Year" />
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={dobMonth} onValueChange={(value) => handleDateChange('month', value)}>
+              <SelectTrigger className="transition-smooth focus:ring-2 focus:ring-primary/20">
+                <SelectValue placeholder="Month" />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((month) => (
+                  <SelectItem key={month.value} value={month.value}>
+                    {month.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={dobDay} onValueChange={(value) => handleDateChange('day', value)}>
+              <SelectTrigger className="transition-smooth focus:ring-2 focus:ring-primary/20">
+                <SelectValue placeholder="Day" />
+              </SelectTrigger>
+              <SelectContent>
+                {days.map((day) => (
+                  <SelectItem key={day} value={day.toString()}>
+                    {day}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           {errors.dateOfBirth && (
             <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>
           )}
