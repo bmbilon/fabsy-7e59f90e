@@ -356,7 +356,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                 Drag & drop your ticket image here, or click to browse
               </p>
               <p className="text-xs text-muted-foreground">
-                JPG, PNG, or PDF • Max 10MB
+                All image formats supported (JPG, PNG, HEIC, etc.) • Max 10MB
               </p>
             </div>
           )}
