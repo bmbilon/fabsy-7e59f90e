@@ -146,12 +146,16 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
   const nextStep = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
+      // Scroll to top of form
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top of form
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
