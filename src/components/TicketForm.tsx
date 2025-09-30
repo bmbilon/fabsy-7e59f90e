@@ -18,6 +18,7 @@ export interface FormData {
   lastName: string;
   email: string;
   phone: string;
+  smsOptIn: boolean;
   address: string;
   city: string;
   province: string;
@@ -67,6 +68,7 @@ const initialFormData: FormData = {
   lastName: "",
   email: "",
   phone: "",
+  smsOptIn: false,
   address: "",
   city: "",
   province: "",

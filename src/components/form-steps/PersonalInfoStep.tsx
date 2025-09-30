@@ -540,6 +540,19 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           {errors.phone && (
             <p className="text-sm text-destructive">{errors.phone.message}</p>
           )}
+          <div className="flex items-center space-x-2 pt-1">
+            <Checkbox
+              id="smsOptIn"
+              checked={formData.smsOptIn}
+              onCheckedChange={(checked) => updateFormData({ smsOptIn: checked === true })}
+            />
+            <Label 
+              htmlFor="smsOptIn" 
+              className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Contact me by text/SMS
+            </Label>
+          </div>
         </div>
       </div>
 
