@@ -251,7 +251,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           <p className="text-sm text-muted-foreground">Skip typing - upload your license to fill all fields instantly</p>
         </div>
         
-        <Card className="p-6 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+        <Card className="p-6 border-2 border-primary/30 bg-white dark:bg-white">
           <div className="flex flex-col items-center text-center space-y-4">
             {isProcessingOCR ? (
               <div className="space-y-4 py-8">
@@ -263,7 +263,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
               </div>
             ) : imagePreview ? (
               <div className="space-y-4">
-                <div className="relative">
+                <div className="relative bg-white p-4 rounded-lg">
                   <img 
                     src={imagePreview} 
                     alt="Driver's License" 
@@ -274,20 +274,25 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                     Scanned
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Camera className="h-4 w-4 mr-2" />
-                    Replace Photo
-                  </Button>
+                <div className="bg-white p-4 rounded-lg border border-primary/20">
+                  <div className="flex gap-2 justify-center mb-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Camera className="h-4 w-4 mr-2" />
+                      Replace Photo
+                    </Button>
+                  </div>
+                  <p className="text-sm font-medium text-foreground">
+                    Driver's license scanned successfully!
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    ✨ Form fields have been auto-filled. Please review for accuracy and correct any errors.
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  ✨ Fields below have been auto-filled. Please review for accuracy.
-                </p>
               </div>
             ) : (
               <div className="space-y-4 py-4">

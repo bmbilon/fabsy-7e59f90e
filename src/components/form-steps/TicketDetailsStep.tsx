@@ -897,7 +897,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
       {/* Show uploaded ticket status if already uploaded */}
       {formData.ticketImage && (
-        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+        <div className="p-4 bg-white dark:bg-white rounded-lg border-2 border-primary/30">
           <div className="flex items-center gap-3">
             <FileImage className="h-5 w-5 text-primary" />
             <div className="flex-1">
