@@ -27,6 +27,7 @@ const ticketDetailsSchema = z.object({
   }),
   location: z.string().min(5, "Please provide the location where you received the ticket"),
   officer: z.string().min(2, "Officer name is required"),
+  officerBadge: z.string().optional(),
   violation: z.string().min(1, "Please select the violation type"),
   fineAmount: z.string().min(1, "Fine amount is required"),
   courtDate: z.date().optional(),
@@ -58,6 +59,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       issueDate: formData.issueDate,
       location: formData.location,
       officer: formData.officer,
+      officerBadge: formData.officerBadge,
       violation: formData.violation,
       fineAmount: formData.fineAmount,
       courtDate: formData.courtDate,
@@ -111,6 +113,9 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         }
         if (extracted.officer) {
           handleFieldUpdate('officer', extracted.officer);
+        }
+        if (extracted.officerBadge) {
+          handleFieldUpdate('officerBadge', extracted.officerBadge);
         }
         if (extracted.violation) {
           handleFieldUpdate('violation', extracted.violation);
@@ -273,13 +278,29 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             {...register("officer")}
             onBlur={(e) => handleFieldUpdate("officer", e.target.value)}
             className="transition-smooth focus:ring-2 focus:ring-primary/20"
-            placeholder="Officer last name or badge number"
+            placeholder="Officer last name"
           />
           {errors.officer && (
             <p className="text-sm text-destructive">{errors.officer.message}</p>
           )}
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="officerBadge">Officer Badge Number</Label>
+          <Input
+            id="officerBadge"
+            {...register("officerBadge")}
+            onBlur={(e) => handleFieldUpdate("officerBadge", e.target.value)}
+            className="transition-smooth focus:ring-2 focus:ring-primary/20"
+            placeholder="Badge number (if available)"
+          />
+          {errors.officerBadge && (
+            <p className="text-sm text-destructive">{errors.officerBadge.message}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="fineAmount">Fine Amount *</Label>
           <Input
@@ -292,6 +313,10 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           {errors.fineAmount && (
             <p className="text-sm text-destructive">{errors.fineAmount.message}</p>
           )}
+        </div>
+
+        <div className="space-y-2">
+          {/* Empty div for grid alignment */}
         </div>
       </div>
 

@@ -32,6 +32,7 @@ export interface FormData {
   issueDate: Date | undefined;
   location: string;
   officer: string;
+  officerBadge: string;
   violation: string;
   fineAmount: string;
   courtDate: Date | undefined;
@@ -75,6 +76,7 @@ const initialFormData: FormData = {
   issueDate: undefined,
   location: "",
   officer: "",
+  officerBadge: "",
   violation: "",
   fineAmount: "",
   courtDate: undefined,

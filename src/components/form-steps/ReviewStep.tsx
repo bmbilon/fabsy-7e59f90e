@@ -86,6 +86,7 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
             <div><span className="font-medium">Violation:</span> {formData.violation}</div>
             <div><span className="font-medium">Fine Amount:</span> {formData.fineAmount}</div>
             <div><span className="font-medium">Officer:</span> {formData.officer}</div>
+            {formData.officerBadge && <div><span className="font-medium">Badge #:</span> {formData.officerBadge}</div>}
           </div>
           <div className="space-y-2">
             <div><span className="font-medium">Issue Date:</span> {formData.issueDate ? format(formData.issueDate, "MMM dd, yyyy") : "Not provided"}</div>

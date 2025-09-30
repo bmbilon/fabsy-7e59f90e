@@ -44,7 +44,8 @@ serve(async (req) => {
 - ticketNumber: the ticket or violation number
 - issueDate: date in YYYY-MM-DD format
 - location: location where violation occurred
-- officer: officer name or badge number
+- officer: officer name
+- officerBadge: officer badge number (if visible)
 - violation: type of violation (e.g., "Speeding (16-30 km/h over)", "Red Light Violation", etc.)
 - fineAmount: fine amount as number without currency symbol
 - courtDate: court date in YYYY-MM-DD format if present, otherwise null
@@ -73,6 +74,7 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
                   issueDate: { type: "string", nullable: true },
                   location: { type: "string", nullable: true },
                   officer: { type: "string", nullable: true },
+                  officerBadge: { type: "string", nullable: true },
                   violation: { type: "string", nullable: true },
                   fineAmount: { type: "string", nullable: true },
                   courtDate: { type: "string", nullable: true },
