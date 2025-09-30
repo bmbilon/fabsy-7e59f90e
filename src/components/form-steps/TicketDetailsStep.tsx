@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download } from "lucide-react";
-import JurisdictionChecker from "../JurisdictionChecker";
+import { albertaCourts } from "@/data/albertaCourts";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
 import { FormData } from "../TicketForm";
 import { useState, useRef } from "react";
@@ -409,15 +409,50 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </Popover>
       </div>
 
-      {/* Jurisdiction Checker */}
-      <JurisdictionChecker 
-        initialLocation={formData.location || ""}
-        onResult={(result) => {
-          if (result) {
-            console.log('Jurisdiction result:', result);
-          }
-        }}
-      />
+      {/* Court Jurisdiction */}
+      <div className="space-y-2">
+        <Label htmlFor="court-jurisdiction">Court Location (Jurisdiction)</Label>
+        <Select
+          value={formData.courtJurisdiction}
+          onValueChange={(value) => {
+            const court = albertaCourts.find(c => c.name === value);
+            handleFieldUpdate("courtJurisdiction", value);
+            handleFieldUpdate("agentRepresentationPermitted", court ? court.agentsPermitted : null);
+          }}
+        >
+          <SelectTrigger id="court-jurisdiction">
+            <SelectValue placeholder="Select court location" />
+          </SelectTrigger>
+          <SelectContent>
+            {albertaCourts.map((c) => (
+              <SelectItem key={c.name} value={c.name}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {formData.courtJurisdiction && (
+          <div className={cn(
+            "p-3 rounded-md border",
+            formData.agentRepresentationPermitted === true
+              ? "border-primary/40 bg-primary/5"
+              : "border-destructive/40 bg-destructive/5"
+          )}>
+            <p className="text-sm">
+              Agent representation permitted:{" "}
+              <span className="font-semibold">
+                {formData.agentRepresentationPermitted ? "Yes" : "No"}
+              </span>
+            </p>
+            {!formData.agentRepresentationPermitted && (
+              <p className="text-xs text-muted-foreground mt-1">
+                We can still assist with guidance or refer you to appropriate counsel.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Vehicle Seizure Checkbox */}
       <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -699,15 +734,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </Popover>
       </div>
 
-      {/* Jurisdiction Checker */}
-      <JurisdictionChecker 
-        initialLocation={formData.location || ""}
-        onResult={(result) => {
-          if (result) {
-            console.log('Jurisdiction result:', result);
-          }
-        }}
-      />
 
       {/* Vehicle Seizure Checkbox */}
       <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">

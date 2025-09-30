@@ -39,6 +39,8 @@ export interface FormData {
   violation: string;
   fineAmount: string;
   courtDate: Date | undefined;
+  courtJurisdiction: string;
+  agentRepresentationPermitted: boolean | null;
   ticketImage: File | null;
   vehicleSeized: boolean;
   
@@ -86,6 +88,8 @@ const initialFormData: FormData = {
   violation: "",
   fineAmount: "",
   courtDate: undefined,
+  courtJurisdiction: "",
+  agentRepresentationPermitted: null,
   ticketImage: null,
   vehicleSeized: false,
   
