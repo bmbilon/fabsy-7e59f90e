@@ -34,7 +34,7 @@ const Hero = () => {
             <div className="space-y-6">
               <p className="text-xl lg:text-2xl text-white/95 max-w-2xl drop-shadow-sm">
                 That <span className="font-bold text-primary shadow-glow">$150 ticket</span> could actually end up costing you{" "}
-                <span className="font-bold text-destructive shadow-glow">$5,000+</span>. 
+                <span className="font-bold text-destructive shadow-glow">$3,000+ in insurance premiums over the next 3 years</span>. 
                 We fight it with a <span className="font-bold text-primary shadow-glow">94% success rate</span>.
               </p>
 
