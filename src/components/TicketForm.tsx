@@ -111,15 +111,15 @@ const initialFormData: FormData = {
 };
 
 const steps = [
-  { id: 1, title: "Personal Info", description: "Your basic information" },
-  { id: 2, title: "Ticket Details", description: "Information about your ticket" },
+  { id: 1, title: "Ticket Details", description: "Information about your ticket" },
+  { id: 2, title: "Personal Info", description: "Your basic information" },
   { id: 3, title: "Your Defense", description: "Why you want to fight this ticket" },
   { id: 4, title: "Payment", description: "Secure payment processing" },
   { id: 5, title: "Review", description: "Review and submit" }
 ];
 
 const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File | null }) => {
-  const [currentStep, setCurrentStep] = useState(initialTicketImage ? 2 : 1);
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(() => ({
     ...initialFormData,
     ticketImage: initialTicketImage ?? null,
@@ -187,9 +187,9 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <PersonalInfoStep formData={formData} updateFormData={updateFormData} />;
-      case 2:
         return <TicketDetailsStep formData={formData} updateFormData={updateFormData} />;
+      case 2:
+        return <PersonalInfoStep formData={formData} updateFormData={updateFormData} />;
       case 3:
         return <DefenseStep formData={formData} updateFormData={updateFormData} />;
       case 4:
