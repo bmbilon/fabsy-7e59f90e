@@ -14,16 +14,132 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ticket_submissions: {
+        Row: {
+          additional_notes: string | null
+          address: string | null
+          assigned_to: string | null
+          city: string | null
+          coupon_code: string | null
+          court_date: string | null
+          court_location: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          defense_strategy: string | null
+          drivers_license: string | null
+          email: string
+          fine_amount: string
+          first_name: string
+          id: string
+          insurance_company: string | null
+          last_name: string
+          phone: string
+          postal_code: string | null
+          search_vector: unknown | null
+          sms_opt_in: boolean | null
+          status: string | null
+          ticket_number: string
+          updated_at: string | null
+          violation: string
+          violation_date: string | null
+          violation_time: string | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          address?: string | null
+          assigned_to?: string | null
+          city?: string | null
+          coupon_code?: string | null
+          court_date?: string | null
+          court_location?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          defense_strategy?: string | null
+          drivers_license?: string | null
+          email: string
+          fine_amount: string
+          first_name: string
+          id?: string
+          insurance_company?: string | null
+          last_name: string
+          phone: string
+          postal_code?: string | null
+          search_vector?: unknown | null
+          sms_opt_in?: boolean | null
+          status?: string | null
+          ticket_number: string
+          updated_at?: string | null
+          violation: string
+          violation_date?: string | null
+          violation_time?: string | null
+        }
+        Update: {
+          additional_notes?: string | null
+          address?: string | null
+          assigned_to?: string | null
+          city?: string | null
+          coupon_code?: string | null
+          court_date?: string | null
+          court_location?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          defense_strategy?: string | null
+          drivers_license?: string | null
+          email?: string
+          fine_amount?: string
+          first_name?: string
+          id?: string
+          insurance_company?: string | null
+          last_name?: string
+          phone?: string
+          postal_code?: string | null
+          search_vector?: unknown | null
+          sms_opt_in?: boolean | null
+          status?: string | null
+          ticket_number?: string
+          updated_at?: string | null
+          violation?: string
+          violation_date?: string | null
+          violation_time?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "case_manager" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +266,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "case_manager", "user"],
+    },
   },
 } as const

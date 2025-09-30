@@ -13,6 +13,7 @@ const corsHeaders = {
 };
 
 interface TicketNotification {
+  submissionId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -35,7 +36,6 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
-    // Send ADMIN notification email
     const emailResponse = await resend.emails.send({
       from: "Fabsy Notifications <onboarding@resend.dev>",
       to: ["brett@execom.ca"],
@@ -43,7 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
-            New Ticket Form Submission
+            🎫 New Ticket Submission Alert
           </h1>
           
           <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
@@ -54,18 +54,24 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <h2 style="color: #4CAF50; margin-top: 0;">Ticket Details</h2>
+            <h2 style="color: #4CAF50; margin-top: 0;">Quick Details</h2>
             <p><strong>Ticket Number:</strong> ${ticketData.ticketNumber}</p>
             <p><strong>Violation:</strong> ${ticketData.violation}</p>
             <p><strong>Fine Amount:</strong> $${ticketData.fineAmount}</p>
           </div>
           
-          <div style="background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <p style="margin: 0;"><strong>Submitted:</strong> ${ticketData.submittedAt}</p>
+          <div style="background-color: #e8f5e9; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-weight: bold;">View Full Case Details</p>
+            <a href="${origin}/admin/submissions/${ticketData.submissionId}" 
+               style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; 
+                      text-decoration: none; border-radius: 5px; font-weight: bold;">
+              Open Admin Portal
+            </a>
           </div>
           
           <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px;">
-            This is an automated notification from your Fabsy ticket submission system.
+            <strong>Submitted:</strong> ${ticketData.submittedAt}<br>
+            This is an automated notification from your Fabsy case management system.
           </p>
         </div>
       `,

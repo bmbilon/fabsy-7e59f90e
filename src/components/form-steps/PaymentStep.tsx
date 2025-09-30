@@ -39,10 +39,54 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
     setIsProcessing(true);
     try {
-      // Send notification email and SMS FIRST
+      // Save ticket submission to database FIRST
+      console.log('[Payment] Saving ticket submission to database...');
+      const { data: submissionData, error: submissionError } = await supabase
+        .from('ticket_submissions')
+        .insert({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          postal_code: formData.postalCode,
+          date_of_birth: formData.dateOfBirth?.toISOString().split('T')[0],
+          drivers_license: formData.driversLicense,
+          ticket_number: formData.ticketNumber,
+          violation: formData.violation,
+          fine_amount: formData.fineAmount,
+          violation_date: formData.issueDate?.toISOString().split('T')[0],
+          court_location: formData.courtJurisdiction,
+          court_date: formData.courtDate?.toISOString().split('T')[0],
+          defense_strategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
+          additional_notes: formData.additionalNotes,
+          sms_opt_in: formData.smsOptIn,
+          coupon_code: formData.couponCode,
+          insurance_company: formData.insuranceCompany,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (submissionError) {
+        console.error('[Payment] Database error:', submissionError);
+        toast({
+          title: 'Submission Error',
+          description: 'Failed to save your submission. Please try again.',
+          variant: 'destructive',
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      console.log('[Payment] Submission saved successfully:', submissionData.id);
+
+      // Send notification email and SMS
       console.log('[Payment] Sending notification email and SMS...');
       const { error: notificationError } = await supabase.functions.invoke('send-notification', {
         body: {
+          submissionId: submissionData.id,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
