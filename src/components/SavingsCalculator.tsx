@@ -70,7 +70,7 @@ const SavingsCalculator = () => {
   };
 
   return (
-    <section className="py-16 bg-muted/50">
+    <section id="savings-calculator" className="py-16 bg-muted/50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">

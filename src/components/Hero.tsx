@@ -66,7 +66,14 @@ const Hero = () => {
               </div>
               
               <div className="flex justify-center lg:justify-start">
-                <Button variant="outline" size="lg" className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-smooth text-xl font-bold px-8 py-4">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-smooth text-xl font-bold px-8 py-4"
+                  onClick={() => {
+                    document.getElementById('savings-calculator')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
                   <Calculator className="mr-3 h-6 w-6" />
                   Calculate Savings
                 </Button>
