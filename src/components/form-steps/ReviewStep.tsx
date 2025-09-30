@@ -84,6 +84,14 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
           <div className="space-y-2">
             <div><span className="font-medium">Ticket #:</span> {formData.ticketNumber}</div>
             <div><span className="font-medium">Violation:</span> {formData.violation}</div>
+            {(formData.offenceSection || formData.offenceSubSection || formData.offenceDescription) && (
+              <div className="bg-muted/30 p-3 rounded-lg mt-2 space-y-1">
+                <div className="text-xs font-medium text-muted-foreground">Offence Details:</div>
+                {formData.offenceSection && <div className="text-sm">Sec. {formData.offenceSection}</div>}
+                {formData.offenceSubSection && <div className="text-sm">Sub-Sec. {formData.offenceSubSection}</div>}
+                {formData.offenceDescription && <div className="text-sm">{formData.offenceDescription}</div>}
+              </div>
+            )}
             <div><span className="font-medium">Fine Amount:</span> {formData.fineAmount}</div>
             <div><span className="font-medium">Officer:</span> {formData.officer}</div>
             {formData.officerBadge && <div><span className="font-medium">Badge #:</span> {formData.officerBadge}</div>}

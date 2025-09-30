@@ -28,6 +28,9 @@ const ticketDetailsSchema = z.object({
   location: z.string().min(5, "Please provide the location where you received the ticket"),
   officer: z.string().min(2, "Officer name is required"),
   officerBadge: z.string().optional(),
+  offenceSection: z.string().optional(),
+  offenceSubSection: z.string().optional(),
+  offenceDescription: z.string().optional(),
   violation: z.string().min(1, "Please select the violation type"),
   fineAmount: z.string().min(1, "Fine amount is required"),
   courtDate: z.date().optional(),
@@ -60,6 +63,9 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       location: formData.location,
       officer: formData.officer,
       officerBadge: formData.officerBadge,
+      offenceSection: formData.offenceSection,
+      offenceSubSection: formData.offenceSubSection,
+      offenceDescription: formData.offenceDescription,
       violation: formData.violation,
       fineAmount: formData.fineAmount,
       courtDate: formData.courtDate,
@@ -116,6 +122,15 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         }
         if (extracted.officerBadge) {
           handleFieldUpdate('officerBadge', extracted.officerBadge);
+        }
+        if (extracted.offenceSection) {
+          handleFieldUpdate('offenceSection', extracted.offenceSection);
+        }
+        if (extracted.offenceSubSection) {
+          handleFieldUpdate('offenceSubSection', extracted.offenceSubSection);
+        }
+        if (extracted.offenceDescription) {
+          handleFieldUpdate('offenceDescription', extracted.offenceDescription);
         }
         if (extracted.violation) {
           handleFieldUpdate('violation', extracted.violation);
@@ -318,6 +333,68 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         <div className="space-y-2">
           {/* Empty div for grid alignment */}
         </div>
+      </div>
+
+      {/* Offence Details Section */}
+      <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-muted">
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-sm">Offence Details</h3>
+          <span className="text-xs text-muted-foreground">(Optional - helps with defense strategy)</span>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="offenceSection">Section #</Label>
+            <Input
+              id="offenceSection"
+              {...register("offenceSection")}
+              onBlur={(e) => handleFieldUpdate("offenceSection", e.target.value)}
+              className="transition-smooth focus:ring-2 focus:ring-primary/20"
+              placeholder="e.g., 86"
+            />
+            {errors.offenceSection && (
+              <p className="text-sm text-destructive">{errors.offenceSection.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="offenceSubSection">Sub-Section #</Label>
+            <Input
+              id="offenceSubSection"
+              {...register("offenceSubSection")}
+              onBlur={(e) => handleFieldUpdate("offenceSubSection", e.target.value)}
+              className="transition-smooth focus:ring-2 focus:ring-primary/20"
+              placeholder="e.g., (4)(c)"
+            />
+            {errors.offenceSubSection && (
+              <p className="text-sm text-destructive">{errors.offenceSubSection.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2 md:col-span-1">
+            <Label htmlFor="offenceDescription" className="sr-only">Description</Label>
+            <div className="h-6"></div>
+            {/* Spacer to align with other fields */}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="offenceDescription">Offence Description</Label>
+          <Textarea
+            id="offenceDescription"
+            {...register("offenceDescription")}
+            onBlur={(e) => handleFieldUpdate("offenceDescription", e.target.value)}
+            className="transition-smooth focus:ring-2 focus:ring-primary/20 min-h-[60px]"
+            placeholder="e.g., Fail to carry proof of registration or license plate"
+          />
+          {errors.offenceDescription && (
+            <p className="text-sm text-destructive">{errors.offenceDescription.message}</p>
+          )}
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          💡 <strong>Tip:</strong> These details are typically found in the "DID UNLAWFULLY CONTRAVENE SECTION" area of your ticket.
+        </p>
       </div>
 
       <div className="space-y-2">

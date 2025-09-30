@@ -46,6 +46,9 @@ serve(async (req) => {
 - location: location where violation occurred
 - officer: officer name
 - officerBadge: officer badge number (if visible)
+- offenceSection: the section number from "DID UNLAWFULLY CONTRAVENE SECTION" (e.g., "86")
+- offenceSubSection: the sub-section number (e.g., "(4)(c)" or "4(c)")
+- offenceDescription: the description of the offence (e.g., "Fail to carry proof of registration or license plate")
 - violation: type of violation (e.g., "Speeding (16-30 km/h over)", "Red Light Violation", etc.)
 - fineAmount: fine amount as number without currency symbol
 - courtDate: court date in YYYY-MM-DD format if present, otherwise null
@@ -75,6 +78,9 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
                   location: { type: "string", nullable: true },
                   officer: { type: "string", nullable: true },
                   officerBadge: { type: "string", nullable: true },
+                  offenceSection: { type: "string", nullable: true },
+                  offenceSubSection: { type: "string", nullable: true },
+                  offenceDescription: { type: "string", nullable: true },
                   violation: { type: "string", nullable: true },
                   fineAmount: { type: "string", nullable: true },
                   courtDate: { type: "string", nullable: true },

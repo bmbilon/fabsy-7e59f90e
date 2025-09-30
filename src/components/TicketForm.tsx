@@ -33,6 +33,9 @@ export interface FormData {
   location: string;
   officer: string;
   officerBadge: string;
+  offenceSection: string;
+  offenceSubSection: string;
+  offenceDescription: string;
   violation: string;
   fineAmount: string;
   courtDate: Date | undefined;
@@ -77,6 +80,9 @@ const initialFormData: FormData = {
   location: "",
   officer: "",
   officerBadge: "",
+  offenceSection: "",
+  offenceSubSection: "",
+  offenceDescription: "",
   violation: "",
   fineAmount: "",
   courtDate: undefined,
