@@ -16,7 +16,7 @@ import { Download } from "lucide-react";
 import { albertaCourts } from "@/data/albertaCourts";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
 import { FormData } from "../TicketForm";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { albertaTrafficActSections, TrafficActSection } from "@/data/albertaTrafficAct";
@@ -46,6 +46,7 @@ interface TicketDetailsStepProps {
 const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [isProcessingOCR, setIsProcessingOCR] = useState(false);
+  const [hasProcessedInitialImage, setHasProcessedInitialImage] = useState(false);
   const [openOffenceCombobox, setOpenOffenceCombobox] = useState(false);
   const [offenceSearchValue, setOffenceSearchValue] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -75,6 +76,15 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
   const issueDate = watch("issueDate");
   const courtDate = watch("courtDate");
+
+  // Process ticket image on mount if it was uploaded from Hero page
+  useEffect(() => {
+    if (formData.ticketImage && !hasProcessedInitialImage && !formData.ticketNumber) {
+      console.log('[Mount] Processing initial ticket image from Hero page');
+      setHasProcessedInitialImage(true);
+      processTicketOCR(formData.ticketImage);
+    }
+  }, [formData.ticketImage]);
 
   const handleFieldUpdate = (field: keyof TicketDetailsSchema | keyof FormData, value: any) => {
     if (field in formData) {
