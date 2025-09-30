@@ -347,10 +347,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
       {/* Jurisdiction Checker */}
       <JurisdictionChecker 
-        initialLocation={formData.location}
+        initialLocation={formData.location || ""}
         onResult={(result) => {
-          // You could store jurisdiction result in form data if needed
-          console.log('Jurisdiction result:', result);
+          if (result) {
+            console.log('Jurisdiction result:', result);
+          }
         }}
       />
 
