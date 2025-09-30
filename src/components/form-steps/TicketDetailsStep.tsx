@@ -32,7 +32,6 @@ const ticketDetailsSchema = z.object({
   offenceSection: z.string().optional(),
   offenceSubSection: z.string().optional(),
   offenceDescription: z.string().optional(),
-  violation: z.string().min(1, "Please select the violation type"),
   fineAmount: z.string().min(1, "Fine amount is required"),
   courtDate: z.date().optional(),
 });
@@ -69,7 +68,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       offenceSection: formData.offenceSection,
       offenceSubSection: formData.offenceSubSection,
       offenceDescription: formData.offenceDescription,
-      violation: formData.violation,
       fineAmount: formData.fineAmount,
       courtDate: formData.courtDate,
     },
@@ -383,6 +381,92 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </div>
       </div>
 
+      <div className="space-y-2">
+        <Label>Court Date (if scheduled)</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal transition-smooth focus:ring-2 focus:ring-primary/20",
+                !courtDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {courtDate ? format(courtDate, "PPP") : <span>No court date yet</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={courtDate}
+              onSelect={(date) => handleFieldUpdate("courtDate", date)}
+              disabled={(date) => date < new Date()}
+              initialFocus
+              className="p-3 pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Jurisdiction Checker */}
+      <JurisdictionChecker 
+        initialLocation={formData.location || ""}
+        onResult={(result) => {
+          if (result) {
+            console.log('Jurisdiction result:', result);
+          }
+        }}
+      />
+
+      {/* Vehicle Seizure Checkbox */}
+      <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+        <div className="flex items-start space-x-3">
+          <Checkbox
+            id="vehicleSeized"
+            checked={formData.vehicleSeized}
+            onCheckedChange={(checked) => handleFieldUpdate("vehicleSeized", checked)}
+            className="mt-1"
+          />
+          <div className="space-y-2">
+            <Label htmlFor="vehicleSeized" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              My vehicle was seized
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Check this box if your vehicle was impounded or seized in connection with this ticket.
+            </p>
+          </div>
+        </div>
+        
+        {formData.vehicleSeized && (
+          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 mt-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Download className="h-5 w-5 text-primary" />
+              <span className="font-semibold text-primary">Required Form</span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              Since your vehicle was seized, you'll need to complete Form SRA12675 (Written Consent). 
+              Please download, print, sign, and bring this form to your consultation.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-primary border-primary hover:bg-primary/10"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = '/forms/Form-SRA12675-Written-Consent.pdf';
+                link.download = 'Form-SRA12675-Written-Consent.pdf';
+                link.click();
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download Form SRA12675
+            </Button>
+          </div>
+        )}
+      </div>
+
       {/* Offence Details Section */}
       <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-muted">
         <div className="flex items-center gap-2">
@@ -588,28 +672,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       </div>
 
       <div className="space-y-2">
-        <Label>Violation Type *</Label>
-        <Select
-          value={formData.violation}
-          onValueChange={(value) => handleFieldUpdate("violation", value)}
-        >
-          <SelectTrigger className="transition-smooth focus:ring-2 focus:ring-primary/20">
-            <SelectValue placeholder="Select the type of violation" />
-          </SelectTrigger>
-          <SelectContent>
-            {violationTypes.map((violation) => (
-              <SelectItem key={violation} value={violation}>
-                {violation}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.violation && (
-          <p className="text-sm text-destructive">{errors.violation.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
         <Label>Court Date (if scheduled)</Label>
         <Popover>
           <PopoverTrigger asChild>
@@ -695,56 +757,38 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         )}
       </div>
 
-      {/* File Upload */}
-      <div className="space-y-2">
-        <Label>Upload Ticket Image</Label>
-        <div
-          className={cn(
-            "border-2 border-dashed rounded-lg p-8 text-center transition-smooth cursor-pointer hover:border-primary/50",
-            dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-            formData.ticketImage && "border-primary/50 bg-primary/5"
-          )}
-          onClick={openFileDialog}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFileDialog(); } }}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-          role="button"
-          tabIndex={0}
-          aria-label="Upload ticket image"
-        >
-          <input
-            id="ticketUpload"
-            ref={fileInputRef}
-            type="file"
-            className="sr-only"
-            accept="image/*,.heic,.heif,application/pdf"
-            onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                handleFileUpload(e.target.files[0]);
-              }
-            }}
-          />
-          
-          {formData.ticketImage ? (
-            <div className="space-y-2">
-              <FileImage className="h-12 w-12 text-primary mx-auto" />
-              <p className="text-sm font-medium text-primary">
-                {formData.ticketImage.name}
-              </p>
-              {isProcessingOCR ? (
-                <div className="flex items-center gap-2 justify-center text-primary">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <p className="text-xs">Reading ticket...</p>
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Click to change or drag a new image
-                </p>
-              )}
-            </div>
-          ) : (
+      {/* File Upload - Only show if no image uploaded yet */}
+      {!formData.ticketImage && (
+        <div className="space-y-2">
+          <Label>Upload Ticket Image (Optional)</Label>
+          <div
+            className={cn(
+              "border-2 border-dashed rounded-lg p-8 text-center transition-smooth cursor-pointer hover:border-primary/50",
+              dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25"
+            )}
+            onClick={openFileDialog}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFileDialog(); } }}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            role="button"
+            tabIndex={0}
+            aria-label="Upload ticket image"
+          >
+            <input
+              id="ticketUpload"
+              ref={fileInputRef}
+              type="file"
+              className="sr-only"
+              accept="image/*,.heic,.heif,application/pdf"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleFileUpload(e.target.files[0]);
+                }
+              }}
+            />
+            
             <div className="space-y-2">
               <Upload className="h-12 w-12 text-muted-foreground mx-auto" />
               <p className="text-sm font-medium">
@@ -757,12 +801,46 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                 ✨ We'll automatically fill in the details for you!
               </p>
             </div>
-          )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            A clear photo of your ticket helps our experts analyze your case more effectively.
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground">
-          A clear photo of your ticket helps our experts analyze your case more effectively.
-        </p>
-      </div>
+      )}
+
+      {/* Show uploaded ticket status if already uploaded */}
+      {formData.ticketImage && (
+        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+          <div className="flex items-center gap-3">
+            <FileImage className="h-5 w-5 text-primary" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-primary">Ticket Image Uploaded</p>
+              <p className="text-xs text-muted-foreground">{formData.ticketImage.name}</p>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={openFileDialog}
+              className="text-xs"
+            >
+              Change Image
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="sr-only"
+              accept="image/*,.heic,.heif,application/pdf"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleFileUpload(e.target.files[0]);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+
 
       <div className="bg-secondary/5 p-4 rounded-lg border border-secondary/10">
         <p className="text-sm text-muted-foreground">
@@ -775,7 +853,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       <InstantTicketAnalyzer 
         ticketImage={formData.ticketImage}
         fineAmount={formData.fineAmount}
-        violation={formData.violation}
+        violation={formData.offenceDescription || ""}
       />
     </form>
   );
