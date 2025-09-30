@@ -6,7 +6,7 @@ const HowItWorks = () => {
     {
       number: 1,
       title: "Snap & Send",
-      description: "Photo your ticket and upload it instantly through our secure platform. Takes less than 2 minutes.",
+      description: "Upload Photo of your ticket",
       icon: Upload,
       color: "primary"
     },
