@@ -318,9 +318,33 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
             <p className="text-muted-foreground">{steps[currentStep - 1].description}</p>
           </div>
 
+          {/* Navigation - Top */}
+          {currentStep < 6 && (
+            <div className="flex justify-between mb-8 pb-6 border-b">
+              <Button 
+                variant="outline" 
+                onClick={prevStep} 
+                disabled={currentStep === 1}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              
+              <Button 
+                onClick={nextStep}
+                disabled={!isStepValid()}
+                className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
+              >
+                Continue
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
           {renderStep()}
 
-          {/* Navigation */}
+          {/* Navigation - Bottom */}
           {currentStep < 6 && (
             <div className="flex justify-between mt-8 pt-6 border-t">
               <Button 
