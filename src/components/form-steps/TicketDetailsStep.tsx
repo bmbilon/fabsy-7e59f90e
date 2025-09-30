@@ -84,29 +84,42 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   };
 
   const processTicketOCR = async (file: File) => {
+    console.log('[OCR] Starting ticket OCR process with file:', file.name, file.type);
     setIsProcessingOCR(true);
     try {
       // Convert file to base64
+      console.log('[OCR] Converting file to base64...');
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve, reject) => {
         reader.onload = () => {
           const result = reader.result as string;
+          console.log('[OCR] File converted to base64, length:', result.length);
           resolve(result);
         };
-        reader.onerror = reject;
+        reader.onerror = (error) => {
+          console.error('[OCR] FileReader error:', error);
+          reject(error);
+        };
       });
       reader.readAsDataURL(file);
       const imageBase64 = await base64Promise;
 
       // Call OCR edge function
+      console.log('[OCR] Calling ocr-ticket edge function...');
       const { data, error } = await supabase.functions.invoke('ocr-ticket', {
         body: { imageBase64 }
       });
 
-      if (error) throw error;
+      console.log('[OCR] Edge function response:', { data, error });
+
+      if (error) {
+        console.error('[OCR] Edge function error:', error);
+        throw error;
+      }
 
       if (data?.success && data?.data) {
         const extracted = data.data;
+        console.log('[OCR] Extracted data:', extracted);
         
         // Auto-fill fields with extracted data
         if (extracted.ticketNumber) {
@@ -147,9 +160,16 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           title: "Ticket scanned successfully!",
           description: "Form fields have been auto-filled. Please review and correct any errors.",
         });
+      } else {
+        console.warn('[OCR] No data returned from OCR function');
+        toast({
+          title: "Could not extract data",
+          description: "Please fill in the form manually.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
-      console.error('OCR error:', error);
+      console.error('[OCR] Error during OCR process:', error);
       toast({
         title: "Could not read ticket",
         description: "Please fill in the form manually.",
@@ -157,17 +177,23 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       });
     } finally {
       setIsProcessingOCR(false);
+      console.log('[OCR] OCR process completed');
     }
   };
 
   const handleFileUpload = (file: File) => {
+    console.log('[Upload] File selected:', file.name, file.type, file.size);
     const isImageMime = file.type?.startsWith('image/');
     const name = file.name.toLowerCase();
     const isHeic = name.endsWith('.heic') || name.endsWith('.heif');
+    console.log('[Upload] File check - isImageMime:', isImageMime, 'isHeic:', isHeic);
     if (isImageMime || isHeic) {
+      console.log('[Upload] Valid image file, updating formData and triggering OCR');
       updateFormData({ ticketImage: file });
       // Trigger OCR processing
       processTicketOCR(file);
+    } else {
+      console.warn('[Upload] Invalid file type, skipping');
     }
   };
 

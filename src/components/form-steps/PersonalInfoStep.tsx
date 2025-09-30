@@ -82,29 +82,42 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   };
 
   const processDLOCR = async (file: File) => {
+    console.log('[DL OCR] Starting driver license OCR process with file:', file.name, file.type);
     setIsProcessingOCR(true);
     try {
       // Convert file to base64
+      console.log('[DL OCR] Converting file to base64...');
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve, reject) => {
         reader.onload = () => {
           const result = reader.result as string;
+          console.log('[DL OCR] File converted to base64, length:', result.length);
           resolve(result);
         };
-        reader.onerror = reject;
+        reader.onerror = (error) => {
+          console.error('[DL OCR] FileReader error:', error);
+          reject(error);
+        };
       });
       reader.readAsDataURL(file);
       const imageBase64 = await base64Promise;
 
       // Call OCR edge function
+      console.log('[DL OCR] Calling ocr-drivers-license edge function...');
       const { data, error } = await supabase.functions.invoke('ocr-drivers-license', {
         body: { imageBase64 }
       });
 
-      if (error) throw error;
+      console.log('[DL OCR] Edge function response:', { data, error });
+
+      if (error) {
+        console.error('[DL OCR] Edge function error:', error);
+        throw error;
+      }
 
       if (data?.success && data?.data) {
         const extracted = data.data;
+        console.log('[DL OCR] Extracted data:', extracted);
         
         // Auto-fill fields with extracted data
         if (extracted.firstName) {
@@ -136,9 +149,16 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           title: "Driver's license scanned successfully!",
           description: "Form fields have been auto-filled. Please review and correct any errors.",
         });
+      } else {
+        console.warn('[DL OCR] No data returned from OCR function');
+        toast({
+          title: "Could not extract data",
+          description: "Please fill in the form manually.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
-      console.error('OCR error:', error);
+      console.error('[DL OCR] Error during OCR process:', error);
       toast({
         title: "Could not read driver's license",
         description: "Please fill in the form manually.",
@@ -146,16 +166,19 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
       });
     } finally {
       setIsProcessingOCR(false);
+      console.log('[DL OCR] OCR process completed');
     }
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log('[DL Upload] File selected:', file?.name, file?.type, file?.size);
     if (file) {
       setDlImage(file);
       setImagePreview(URL.createObjectURL(file));
       updateFormData({ driversLicenseImage: file });
       // Trigger OCR processing
+      console.log('[DL Upload] Triggering OCR...');
       processDLOCR(file);
     }
   };
