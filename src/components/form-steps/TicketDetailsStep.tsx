@@ -324,7 +324,10 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={(e) => {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+          }}
         >
           <input
             ref={fileInputRef}
