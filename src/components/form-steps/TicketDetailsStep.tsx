@@ -684,7 +684,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               id="offenceSection"
               value={formData.offenceSection}
               onChange={(e) => handleFieldUpdate("offenceSection", e.target.value)}
-              className="transition-smooth focus:ring-2 focus:ring-primary/20"
+              className="bg-white dark:bg-white dark:text-foreground transition-smooth focus:ring-2 focus:ring-primary/20"
               placeholder="e.g., 86"
             />
             {errors.offenceSection && (
@@ -717,7 +717,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               id="offenceSubSection"
               value={formData.offenceSubSection}
               onChange={(e) => handleFieldUpdate("offenceSubSection", e.target.value)}
-              className="transition-smooth focus:ring-2 focus:ring-primary/20"
+              className="bg-white dark:bg-white dark:text-foreground transition-smooth focus:ring-2 focus:ring-primary/20"
               placeholder="e.g., (4)(c)"
             />
             {errors.offenceSubSection && (
@@ -754,7 +754,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             id="offenceDescription"
             value={formData.offenceDescription}
             onChange={(e) => handleFieldUpdate("offenceDescription", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20 min-h-[60px]"
+            className="bg-white dark:bg-white dark:text-foreground transition-smooth focus:ring-2 focus:ring-primary/20 min-h-[60px]"
             placeholder="e.g., Fail to carry proof of registration or license plate"
           />
           {errors.offenceDescription && (
