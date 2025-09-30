@@ -12,44 +12,67 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      if (isSignUp) {
+        // Sign up flow
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/admin/dashboard`
+          }
+        });
 
-      if (authError) throw authError;
+        if (authError) throw authError;
 
-      // Check if user has admin or case_manager role
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', authData.user.id)
-        .in('role', ['admin', 'case_manager'])
-        .single();
+        toast({
+          title: "Account created!",
+          description: "Please contact an administrator to grant you access permissions.",
+        });
 
-      if (roleError || !roleData) {
-        await supabase.auth.signOut();
-        throw new Error('Unauthorized: You do not have admin access');
+        // Switch to login mode after successful signup
+        setIsSignUp(false);
+      } else {
+        // Login flow
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (authError) throw authError;
+
+        // Check if user has admin or case_manager role
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', authData.user.id)
+          .in('role', ['admin', 'case_manager'])
+          .single();
+
+        if (roleError || !roleData) {
+          await supabase.auth.signOut();
+          throw new Error('Unauthorized: You do not have admin access');
+        }
+
+        toast({
+          title: "Welcome back!",
+          description: "Successfully logged in to admin portal.",
+        });
+
+        navigate('/admin/dashboard');
       }
-
-      toast({
-        title: "Welcome back!",
-        description: "Successfully logged in to admin portal.",
-      });
-
-      navigate('/admin/dashboard');
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('Auth error:', error);
       toast({
-        title: "Login Failed",
+        title: isSignUp ? "Sign Up Failed" : "Login Failed",
         description: error.message || "Invalid credentials or insufficient permissions",
         variant: "destructive",
       });
@@ -69,11 +92,11 @@ export default function AdminLogin() {
           </div>
           <CardTitle className="text-2xl text-center">Admin Portal</CardTitle>
           <CardDescription className="text-center">
-            Sign in to access the case management dashboard
+            {isSignUp ? 'Create your admin account' : 'Sign in to access the case management dashboard'}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -98,8 +121,18 @@ export default function AdminLogin() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? (isSignUp ? "Creating account..." : "Signing in...") : (isSignUp ? "Sign Up" : "Sign In")}
             </Button>
+            <div className="text-center text-sm">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-primary hover:underline"
+                disabled={isLoading}
+              >
+                {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+              </button>
+            </div>
           </form>
         </CardContent>
       </Card>
