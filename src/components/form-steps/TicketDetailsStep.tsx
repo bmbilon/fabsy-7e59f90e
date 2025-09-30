@@ -71,7 +71,10 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   };
 
   const handleFileUpload = (file: File) => {
-    if (file.type.startsWith('image/')) {
+    const isImageMime = file.type?.startsWith('image/');
+    const name = file.name.toLowerCase();
+    const isHeic = name.endsWith('.heic') || name.endsWith('.heif');
+    if (isImageMime || isHeic) {
       updateFormData({ ticketImage: file });
     }
   };
@@ -321,17 +324,20 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25",
             formData.ticketImage && "border-primary/50 bg-primary/5"
           )}
+          onClick={(e) => { e.preventDefault(); fileInputRef.current?.click(); }}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
+          role="button"
+          tabIndex={0}
         >
           <input
             id="ticketUpload"
             ref={fileInputRef}
             type="file"
             className="sr-only"
-            accept="image/*,application/pdf"
+            accept="image/*,.heic,.heif,application/pdf"
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 handleFileUpload(e.target.files[0]);
