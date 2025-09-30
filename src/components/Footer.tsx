@@ -30,31 +30,31 @@ const Footer = () => {
 
   return (
     <footer className="bg-white/95 backdrop-blur-sm border-t border-muted">
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
           {/* Brand Section */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-6">
-              <Scale className="h-8 w-8 text-primary" />
-              <span className="font-script text-3xl font-bold text-gradient-hero">
+            <Link to="/" className="flex items-center gap-2 mb-3">
+              <Scale className="h-6 w-6 text-primary" />
+              <span className="font-script text-2xl font-bold text-gradient-hero">
                 Fabsy
               </span>
             </Link>
             
-            <p className="text-muted-foreground mb-6 leading-relaxed">
+            <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
               Expert traffic ticket defense for Alberta women. Keep your abstract fab, minimize the tab.
             </p>
             
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-primary" />
-                <a href="mailto:fabsy@execom.ca" className="hover:text-primary transition-colors">
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Mail className="h-3 w-3 text-primary" />
+                <a href="mailto:hello@fabsy.ca" className="hover:text-primary transition-colors">
                   hello@fabsy.ca
                 </a>
               </div>
-              <div className="flex items-center gap-3">
-                <MapPin className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-2">
+                <MapPin className="h-3 w-3 text-primary" />
                 <span>Alberta, Canada</span>
               </div>
             </div>
@@ -62,13 +62,13 @@ const Footer = () => {
 
           {/* Company Links */}
           <div>
-            <h3 className="font-semibold text-card-foreground mb-4">Company</h3>
-            <ul className="space-y-3">
+            <h3 className="text-sm font-semibold text-card-foreground mb-3">Company</h3>
+            <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -79,13 +79,13 @@ const Footer = () => {
 
           {/* Support Links */}
           <div>
-            <h3 className="font-semibold text-card-foreground mb-4">Support</h3>
-            <ul className="space-y-3">
+            <h3 className="text-sm font-semibold text-card-foreground mb-3">Support</h3>
+            <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -96,13 +96,13 @@ const Footer = () => {
 
           {/* Legal Links */}
           <div>
-            <h3 className="font-semibold text-card-foreground mb-4">Legal</h3>
-            <ul className="space-y-3">
+            <h3 className="text-sm font-semibold text-card-foreground mb-3">Legal</h3>
+            <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
                   <Link 
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -112,94 +112,73 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* CTA Section */}
-        <Card className="p-8 mb-12 bg-gradient-card shadow-fab border-primary/10">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold text-card-foreground mb-4">
-              Ready to Beat Your Traffic Ticket?
-            </h3>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Join thousands of Alberta women who've protected their driving records with Fabsy's expert traffic representation.
-              <strong className="block mt-2 text-green-600">Zero Risk Guarantee: You only pay if we save you money!</strong>
-            </p>
-            
-            <div className="flex justify-center">
-              <Link to="/submit-ticket">
-                <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                  Submit Your Ticket - $488
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </Card>
+        <Separator className="mb-6" />
 
-        <Separator className="mb-8" />
-
-        {/* Bottom Section */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-sm text-muted-foreground text-center md:text-left">
-            <p>© {currentYear} Fabsy Traffic Services. All rights reserved.</p>
-            <p className="mt-1">
-              Authorized traffic ticket representatives in Alberta, Canada. 
-              Professional representation services for traffic ticket defense.
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="text-xs text-muted-foreground text-center">
-              <p className="font-medium">Follow us:</p>
+        {/* Social Media */}
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <span className="text-xs text-muted-foreground font-medium">Follow us:</span>
+          <div className="flex gap-3">
+            <div className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">
+              <Facebook className="h-4 w-4" />
             </div>
-            <div className="flex gap-3">
-              <div className="text-muted-foreground">
-                <Facebook className="h-5 w-5" />
-              </div>
-              <div className="text-muted-foreground">
-                <Instagram className="h-5 w-5" />
-              </div>
-              <div className="text-muted-foreground">
-                <Twitter className="h-5 w-5" />
-              </div>
+            <div className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">
+              <Instagram className="h-4 w-4" />
+            </div>
+            <div className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">
+              <Twitter className="h-4 w-4" />
             </div>
           </div>
         </div>
+
+        {/* Service Description */}
+        <div className="text-xs text-center text-muted-foreground mb-4">
+          <p>
+            Authorized traffic ticket representatives in Alberta, Canada. 
+            Professional representation services for traffic ticket defense.
+          </p>
+        </div>
+
+        <Separator className="mb-4" />
 
         {/* Legal Disclaimer */}
-        <div className="mt-8 pt-6 border-t border-muted">
-          <div className="text-xs text-muted-foreground leading-relaxed">
-            <p className="mb-2">
-              <strong>Important Notice:</strong> The information provided on this website is for general information purposes only. 
-              We provide traffic ticket representation services, not legal advice. Our services are limited to representation in provincial traffic court matters. 
-              This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
-            </p>
-            <p className="mb-4">
-              Results may vary. Past performance does not guarantee future results. 
-              Our success rate is based on historical data and individual results may differ.
-            </p>
-            
-            {/* Agent Practice Limitations */}
-            <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800 mb-4">
-              <p className="font-semibold text-amber-800 dark:text-amber-200 mb-2">Limitations on Agent Practice:</p>
-              <div className="space-y-1 text-amber-700 dark:text-amber-300">
-                <p><strong>What We Cannot Do:</strong></p>
-                <ul className="list-disc ml-4 space-y-1">
-                  <li>Represent clients on summary conviction appeals</li>
-                  <li>Appear on hybrid criminal matters</li>
-                  <li>Represent clients facing potential imprisonment exceeding six months without approved program participation</li>
-                </ul>
-                
-                <p className="mt-3"><strong>Geographic Restrictions:</strong></p>
-                <p>Some Alberta court locations do not permit paid non-lawyer agents to provide representation. This varies by jurisdiction within the province. We will verify if representation is permitted at your specific court location.</p>
-              </div>
+        <div className="text-xs text-muted-foreground leading-relaxed space-y-3 mb-4">
+          <p>
+            <strong>Important Notice:</strong> The information provided on this website is for general information purposes only. 
+            We provide traffic ticket representation services, not legal advice. Our services are limited to representation in provincial traffic court matters. 
+            This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
+          </p>
+          <p>
+            Results may vary. Past performance does not guarantee future results. 
+            Our success rate is based on historical data and individual results may differ.
+          </p>
+          
+          {/* Agent Practice Limitations */}
+          <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded border border-amber-200 dark:border-amber-800">
+            <p className="font-semibold text-amber-800 dark:text-amber-200 mb-2">Limitations on Agent Practice:</p>
+            <div className="space-y-1 text-amber-700 dark:text-amber-300">
+              <p><strong>What We Cannot Do:</strong></p>
+              <ul className="list-disc ml-4 space-y-0.5 text-xs">
+                <li>Represent clients on summary conviction appeals</li>
+                <li>Appear on hybrid criminal matters</li>
+                <li>Represent clients facing potential imprisonment exceeding six months without approved program participation</li>
+              </ul>
+              
+              <p className="mt-2"><strong>Geographic Restrictions:</strong></p>
+              <p className="text-xs">Some Alberta court locations do not permit paid non-lawyer agents to provide representation. This varies by jurisdiction within the province. We will verify if representation is permitted at your specific court location.</p>
             </div>
           </div>
-        </div>
-        
-        {/* Terms of Use for Free Tool */}
-        <div className="mt-4 pt-4 border-t border-muted">
-          <p className="text-xs text-muted-foreground text-center">
+
+          <p className="text-center">
             *By using our free ticket assessment tool, you agree to share your contact information and any content contained in your uploaded ticket. 
             This information may be used to contact you about our services. Your privacy is important to us - see our Privacy Policy for details.
           </p>
+        </div>
+
+        <Separator className="mb-3" />
+        
+        {/* Copyright - Bottom */}
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">© {currentYear} Fabsy Traffic Services. All rights reserved.</p>
         </div>
       </div>
     </footer>
