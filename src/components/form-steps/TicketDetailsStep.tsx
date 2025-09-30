@@ -305,7 +305,28 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   };
 
   return (
-    <form className="space-y-6">
+    <>
+      {/* OCR Processing Modal */}
+      {isProcessingOCR && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-card rounded-lg p-8 max-w-md mx-4 shadow-elevated">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <Loader2 className="h-12 w-12 text-primary animate-spin" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-foreground">
+                Processing Your Ticket
+              </h3>
+              <p className="text-gray-700 dark:text-muted-foreground">
+                Reading ticket details using OCR technology. This will only take a moment...
+              </p>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                <div className="h-full bg-gradient-primary animate-pulse" style={{ width: '60%' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <form className="space-y-6">
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="ticketNumber">Ticket Number *</Label>
@@ -920,6 +941,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         />
       )}
     </form>
+    </>
   );
 };
 
