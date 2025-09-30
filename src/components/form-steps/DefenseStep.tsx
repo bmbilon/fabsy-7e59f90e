@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { FormData } from "../TicketForm";
-import { Scale, Shield, Users, Camera } from "lucide-react";
+import { Scale, Shield, Users, Camera, Mic, MicOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DefenseStepProps {
   formData: FormData;
@@ -13,8 +17,109 @@ interface DefenseStepProps {
 }
 
 const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const { toast } = useToast();
+
   const handleFieldUpdate = (field: keyof FormData, value: any) => {
     updateFormData({ [field]: value });
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setAudioChunks(chunks);
+
+      toast({
+        title: "Recording started",
+        description: "Speak clearly into your microphone. Click the button again to stop.",
+      });
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      toast({
+        title: "Microphone access denied",
+        description: "Please allow microphone access to use voice input.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setMediaRecorder(null);
+    }
+  };
+
+  const transcribeAudio = async (audioBlob: Blob) => {
+    try {
+      toast({
+        title: "Transcribing...",
+        description: "Converting your speech to text...",
+      });
+
+      // Convert blob to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          // Remove data URL prefix
+          const base64 = result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(audioBlob);
+      const audioBase64 = await base64Promise;
+
+      // Call edge function
+      const { data, error } = await supabase.functions.invoke('voice-to-text', {
+        body: { audio: audioBase64 }
+      });
+
+      if (error) throw error;
+
+      if (data?.text) {
+        // Append transcribed text to existing explanation
+        const currentText = formData.explanation;
+        const newText = currentText 
+          ? `${currentText}\n\n${data.text}` 
+          : data.text;
+        handleFieldUpdate("explanation", newText);
+
+        toast({
+          title: "Transcription complete",
+          description: "Your speech has been added to the explanation.",
+        });
+      }
+    } catch (error) {
+      console.error('Transcription error:', error);
+      toast({
+        title: "Transcription failed",
+        description: "Could not transcribe audio. Please try again or type manually.",
+        variant: "destructive",
+      });
+    }
   };
 
   const pleaTypes = [
@@ -84,9 +189,30 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
 
       {/* Explanation */}
       <div className="space-y-3">
-        <Label htmlFor="explanation" className="text-lg font-semibold">
-          Explain Your Case *
-        </Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="explanation" className="text-lg font-semibold">
+            Explain Your Case *
+          </Label>
+          <Button
+            type="button"
+            variant={isRecording ? "destructive" : "outline"}
+            size="sm"
+            onClick={isRecording ? stopRecording : startRecording}
+            className="flex items-center gap-2"
+          >
+            {isRecording ? (
+              <>
+                <MicOff className="h-4 w-4" />
+                Stop Recording
+              </>
+            ) : (
+              <>
+                <Mic className="h-4 w-4" />
+                Voice Input
+              </>
+            )}
+          </Button>
+        </div>
         <p className="text-sm text-muted-foreground">
           Provide a detailed explanation of why you believe you should not be found guilty. 
           Be honest and specific about the circumstances.
