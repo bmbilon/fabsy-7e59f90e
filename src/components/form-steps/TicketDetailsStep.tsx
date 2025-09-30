@@ -314,7 +314,8 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       {/* File Upload */}
       <div className="space-y-2">
         <Label>Upload Ticket Image</Label>
-        <div
+        <label
+          htmlFor="ticketUpload"
           className={cn(
             "border-2 border-dashed rounded-lg p-8 text-center transition-smooth cursor-pointer hover:border-primary/50",
             dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25",
@@ -324,16 +325,13 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          onClick={(e) => {
-            e.stopPropagation();
-            fileInputRef.current?.click();
-          }}
         >
           <input
+            id="ticketUpload"
             ref={fileInputRef}
             type="file"
-            className="hidden"
-            accept="image/*"
+            className="sr-only"
+            accept="image/*,application/pdf"
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 handleFileUpload(e.target.files[0]);
@@ -362,7 +360,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               </p>
             </div>
           )}
-        </div>
+        </label>
         <p className="text-xs text-muted-foreground">
           A clear photo of your ticket helps our experts analyze your case more effectively.
         </p>
