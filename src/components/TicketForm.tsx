@@ -10,6 +10,7 @@ import DefenseStep from "./form-steps/DefenseStep";
 import PaymentStep from "./form-steps/PaymentStep";
 import ReviewStep from "./form-steps/ReviewStep";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface FormData {
   // Personal Information
@@ -130,8 +131,24 @@ const TicketForm = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Here we would submit to backend/Supabase
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      // Send notification email
+      const { error: emailError } = await supabase.functions.invoke('send-notification', {
+        body: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          ticketNumber: formData.ticketNumber,
+          violation: formData.violation,
+          fineAmount: formData.fineAmount,
+          submittedAt: new Date().toLocaleString()
+        }
+      });
+
+      if (emailError) {
+        console.error("Email notification error:", emailError);
+        // Continue with submission even if email fails
+      }
       
       toast({
         title: "Application Submitted Successfully! 🎉",
