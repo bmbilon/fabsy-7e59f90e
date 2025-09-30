@@ -911,12 +911,14 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </p>
       </div>
 
-      {/* Instant Ticket Analyzer */}
-      <InstantTicketAnalyzer 
-        ticketImage={formData.ticketImage}
-        fineAmount={formData.fineAmount}
-        violation={formData.offenceDescription || ""}
-      />
+      {/* Instant Ticket Analyzer - Only show if no ticket image uploaded yet */}
+      {!formData.ticketImage && (
+        <InstantTicketAnalyzer 
+          ticketImage={formData.ticketImage}
+          fineAmount={formData.fineAmount}
+          violation={formData.offenceDescription || ""}
+        />
+      )}
     </form>
   );
 };
