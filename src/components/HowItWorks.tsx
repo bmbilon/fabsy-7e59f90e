@@ -28,8 +28,8 @@ const HowItWorks = () => {
     },
     {
       number: 3,
-      title: "Stay Fabulous",
-      description: "Keep your driving record clean and your insurance rates low. That's fab financial planning.",
+      title: "We Fight, You Relax",
+      description: "After you've chosen us to represent you, we handle everything else and within 2-6 weeks we'll provide the results to you from the Alberta Court system that we've achieved.",
       icon: Trophy,
       color: "primary"
     }
