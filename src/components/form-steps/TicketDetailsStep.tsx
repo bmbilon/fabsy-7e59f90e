@@ -228,6 +228,31 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       )
     : albertaTrafficActSections;
 
+  // Get unique sections, subsections for current section, and descriptions
+  const uniqueSections = Array.from(new Set(albertaTrafficActSections.map(s => s.section))).sort((a, b) => {
+    const numA = parseFloat(a);
+    const numB = parseFloat(b);
+    return numA - numB;
+  });
+
+  const availableSubsections = formData.offenceSection
+    ? Array.from(new Set(
+        albertaTrafficActSections
+          .filter(s => s.section === formData.offenceSection)
+          .map(s => s.subsection)
+      ))
+    : [];
+
+  const availableDescriptions = formData.offenceSection && formData.offenceSubSection
+    ? albertaTrafficActSections
+        .filter(s => s.section === formData.offenceSection && s.subsection === formData.offenceSubSection)
+        .map(s => s.description)
+    : formData.offenceSection
+    ? albertaTrafficActSections
+        .filter(s => s.section === formData.offenceSection)
+        .map(s => s.description)
+    : [];
+
   const openFileDialog = () => {
     const input = fileInputRef.current;
     if (!input) return;
@@ -456,10 +481,29 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         <div className="grid md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="offenceSection">Section #</Label>
+            <Select
+              value={formData.offenceSection}
+              onValueChange={(value) => {
+                handleFieldUpdate("offenceSection", value);
+                handleFieldUpdate("offenceSubSection", "");
+                handleFieldUpdate("offenceDescription", "");
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select section" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[200px]">
+                {uniqueSections.map((section) => (
+                  <SelectItem key={section} value={section}>
+                    Section {section}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
               id="offenceSection"
-              {...register("offenceSection")}
-              onBlur={(e) => handleFieldUpdate("offenceSection", e.target.value)}
+              value={formData.offenceSection}
+              onChange={(e) => handleFieldUpdate("offenceSection", e.target.value)}
               className="transition-smooth focus:ring-2 focus:ring-primary/20"
               placeholder="e.g., 86"
             />
@@ -470,10 +514,29 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
           <div className="space-y-2">
             <Label htmlFor="offenceSubSection">Sub-Section #</Label>
+            <Select
+              value={formData.offenceSubSection}
+              onValueChange={(value) => {
+                handleFieldUpdate("offenceSubSection", value);
+                handleFieldUpdate("offenceDescription", "");
+              }}
+              disabled={!formData.offenceSection}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select subsection" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[200px]">
+                {availableSubsections.map((subsection) => (
+                  <SelectItem key={subsection} value={subsection}>
+                    {subsection}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
               id="offenceSubSection"
-              {...register("offenceSubSection")}
-              onBlur={(e) => handleFieldUpdate("offenceSubSection", e.target.value)}
+              value={formData.offenceSubSection}
+              onChange={(e) => handleFieldUpdate("offenceSubSection", e.target.value)}
               className="transition-smooth focus:ring-2 focus:ring-primary/20"
               placeholder="e.g., (4)(c)"
             />
@@ -491,10 +554,26 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
         <div className="space-y-2">
           <Label htmlFor="offenceDescription">Offence Description</Label>
+          <Select
+            value={formData.offenceDescription}
+            onValueChange={(value) => handleFieldUpdate("offenceDescription", value)}
+            disabled={!formData.offenceSection}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select description" />
+            </SelectTrigger>
+            <SelectContent className="max-h-[200px]">
+              {availableDescriptions.map((description, index) => (
+                <SelectItem key={index} value={description}>
+                  {description}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Textarea
             id="offenceDescription"
-            {...register("offenceDescription")}
-            onBlur={(e) => handleFieldUpdate("offenceDescription", e.target.value)}
+            value={formData.offenceDescription}
+            onChange={(e) => handleFieldUpdate("offenceDescription", e.target.value)}
             className="transition-smooth focus:ring-2 focus:ring-primary/20 min-h-[60px]"
             placeholder="e.g., Fail to carry proof of registration or license plate"
           />
