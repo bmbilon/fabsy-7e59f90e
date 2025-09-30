@@ -3,6 +3,10 @@ import { Resend } from "npm:resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -17,6 +21,7 @@ interface TicketNotification {
   violation: string;
   fineAmount: string;
   submittedAt: string;
+  smsOptIn?: boolean;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -30,6 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
+    // Send email notification
     const emailResponse = await resend.emails.send({
       from: "Fabsy Notifications <onboarding@resend.dev>",
       to: ["brett@execom.ca"],
@@ -67,7 +73,40 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Email sent successfully:", emailResponse);
 
-    return new Response(JSON.stringify({ success: true, emailResponse }), {
+    // Send SMS notification to admin
+    let smsResponse = null;
+    try {
+      const smsMessage = `New Ticket Submission!\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: $${ticketData.fineAmount}`;
+      
+      const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+      const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+      
+      const smsResult = await fetch(twilioUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": `Basic ${twilioAuth}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          To: "+19862510987",
+          From: twilioPhoneNumber || "",
+          Body: smsMessage,
+        }).toString(),
+      });
+
+      if (!smsResult.ok) {
+        const errorText = await smsResult.text();
+        console.error("Twilio SMS error:", errorText);
+      } else {
+        smsResponse = await smsResult.json();
+        console.log("SMS sent successfully:", smsResponse);
+      }
+    } catch (smsError: any) {
+      console.error("Error sending SMS:", smsError.message);
+      // Continue even if SMS fails
+    }
+
+    return new Response(JSON.stringify({ success: true, emailResponse, smsResponse }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",

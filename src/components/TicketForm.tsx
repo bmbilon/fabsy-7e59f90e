@@ -148,7 +148,7 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Send notification email
+      // Send notification email and SMS
       const { error: emailError } = await supabase.functions.invoke('send-notification', {
         body: {
           firstName: formData.firstName,
@@ -158,7 +158,8 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
           ticketNumber: formData.ticketNumber,
           violation: formData.violation,
           fineAmount: formData.fineAmount,
-          submittedAt: new Date().toLocaleString()
+          submittedAt: new Date().toLocaleString(),
+          smsOptIn: formData.smsOptIn
         }
       });
 
