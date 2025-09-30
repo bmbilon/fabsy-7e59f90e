@@ -16,7 +16,7 @@ import { Download } from "lucide-react";
 import JurisdictionChecker from "../JurisdictionChecker";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
 import { FormData } from "../TicketForm";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const ticketDetailsSchema = z.object({
   ticketNumber: z.string().min(1, "Ticket number is required"),
@@ -39,6 +39,7 @@ interface TicketDetailsStepProps {
 
 const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps) => {
   const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const {
     register,
@@ -323,10 +324,10 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          onClick={() => document.getElementById('ticketUpload')?.click()}
+          onClick={() => fileInputRef.current?.click()}
         >
           <input
-            id="ticketUpload"
+            ref={fileInputRef}
             type="file"
             className="hidden"
             accept="image/*"
