@@ -143,19 +143,24 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
+  const scrollToForm = () => {
+    const formElement = document.getElementById('ticket-form-container');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const nextStep = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
-      // Scroll to top of form
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToForm();
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      // Scroll to top of form
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToForm();
     }
   };
 
@@ -267,7 +272,7 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
 
   return (
     <section className="py-20 bg-gradient-soft min-h-screen">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div id="ticket-form-container" className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
