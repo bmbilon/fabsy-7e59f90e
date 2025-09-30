@@ -21,8 +21,8 @@ const HowItWorks = () => {
     },
     {
       number: 2,
-      title: "We Fight, You Relax",
-      description: "Our AI analyzes your case while our experts handle all court proceedings. No stress for you.",
+      title: "Instant Consult Results",
+      description: "We analyze your case instantly and give you the expected results we can achieve. No time consuming phone conversations or meetings required.",
       icon: Users,
       color: "secondary"
     },
