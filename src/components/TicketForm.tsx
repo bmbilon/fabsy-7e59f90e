@@ -216,6 +216,49 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
     }
   };
 
+  // Validation function for each step
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1: // Ticket Details
+        return !!(
+          formData.ticketNumber &&
+          formData.issueDate &&
+          formData.location &&
+          formData.officer &&
+          formData.fineAmount
+        );
+      case 2: // Personal Info
+        return !!(
+          formData.firstName &&
+          formData.lastName &&
+          formData.email &&
+          formData.phone &&
+          formData.dateOfBirth &&
+          formData.driversLicense &&
+          formData.address &&
+          formData.city &&
+          formData.province &&
+          formData.postalCode
+        );
+      case 3: // Defense
+        return !!(
+          formData.pleaType &&
+          formData.explanation
+        );
+      case 4: // Consent
+        return !!(
+          formData.consentGiven &&
+          formData.digitalSignature
+        );
+      case 5: // Payment
+        return true; // Payment step doesn't have required fields to advance
+      case 6: // Review
+        return true;
+      default:
+        return false;
+    }
+  };
+
   const progress = (currentStep / steps.length) * 100;
 
   return (
@@ -292,6 +335,7 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
               
               <Button 
                 onClick={nextStep}
+                disabled={!isStepValid()}
                 className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
               >
                 Continue
