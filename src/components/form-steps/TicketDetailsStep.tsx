@@ -416,6 +416,9 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                           <span className="text-xs text-muted-foreground">
                             {section.description}
                           </span>
+                          <span className="text-xs text-primary/60 font-medium mt-0.5">
+                            {section.act}
+                          </span>
                         </div>
                       </CommandItem>
                     ))}
