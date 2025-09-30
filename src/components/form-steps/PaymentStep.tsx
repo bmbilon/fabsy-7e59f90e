@@ -39,6 +39,35 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
     setIsProcessing(true);
     try {
+      // Send notification email and SMS FIRST
+      console.log('[Payment] Sending notification email and SMS...');
+      const { error: notificationError } = await supabase.functions.invoke('send-notification', {
+        body: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          ticketNumber: formData.ticketNumber,
+          violation: formData.violation,
+          fineAmount: formData.fineAmount,
+          submittedAt: new Date().toLocaleString(),
+          smsOptIn: formData.smsOptIn
+        }
+      });
+
+      if (notificationError) {
+        console.error('[Payment] Notification error:', notificationError);
+        toast({
+          title: "Notification Error",
+          description: "Failed to send notifications. Please contact support.",
+          variant: "destructive",
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      console.log('[Payment] Notifications sent successfully');
+
       // If TESTUSER coupon, skip payment and go to success
       if (isTestUser) {
         toast({
@@ -53,6 +82,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
       }
 
       // Regular Stripe payment flow
+      console.log('[Payment] Creating Stripe checkout session...');
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { formData }
       });
@@ -60,10 +90,11 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
       if (error) throw error;
 
       if (data?.url) {
-        window.open(data.url, '_blank');
+        console.log('[Payment] Redirecting to Stripe checkout...');
+        window.location.href = data.url;
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('[Payment] Payment error:', error);
       toast({
         title: "Payment Error",
         description: "Unable to process payment. Please try again.",
