@@ -145,65 +145,75 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
   return (
     <div className="space-y-8">
       {/* Plea Type Selection */}
-      <div className="space-y-4">
-        <div>
-          <Label className="text-lg font-semibold">How do you wish to plead? *</Label>
+      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+        <div className="mb-4">
+          <Label className="text-lg font-semibold text-primary">How do you wish to plead? *</Label>
           <p className="text-sm text-muted-foreground mt-1">
-            This determines our defense strategy for your case.
+            Choose the strategy that best describes your situation
           </p>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {pleaTypes.map((plea) => (
-            <Card 
+            <button
               key={plea.value}
-              className={`p-4 cursor-pointer transition-smooth border-2 ${
+              type="button"
+              onClick={() => handleFieldUpdate("pleaType", plea.value)}
+              className={`p-4 text-left transition-smooth border-2 rounded-lg ${
                 formData.pleaType === plea.value 
                   ? 'border-primary bg-primary/5' 
-                  : 'border-muted hover:border-primary/30'
+                  : 'border-muted hover:border-primary/30 bg-background'
               }`}
-              onClick={() => handleFieldUpdate("pleaType", plea.value)}
             >
               <div className="flex items-start gap-3">
-                <div className={`w-4 h-4 rounded-full border-2 mt-0.5 transition-smooth ${
+                <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center transition-smooth ${
                   formData.pleaType === plea.value 
                     ? 'border-primary bg-primary' 
                     : 'border-muted-foreground'
-                }`} />
+                }`}>
+                  {formData.pleaType === plea.value && (
+                    <div className="w-2 h-2 bg-white rounded-full" />
+                  )}
+                </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-semibold">{plea.label}</h4>
                     {plea.value === 'not_guilty' && (
                       <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-                        Highest Success Rate
+                        Best Success Rate
                       </Badge>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">{plea.description}</p>
+                  <p className="text-sm text-muted-foreground">{plea.description}</p>
                 </div>
               </div>
-            </Card>
+            </button>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Explanation */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="explanation" className="text-lg font-semibold">
-            Explain Your Case *
-          </Label>
+      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <Label htmlFor="explanation" className="text-lg font-semibold text-primary">
+              Explain Your Case *
+            </Label>
+            <p className="text-sm text-muted-foreground mt-1">
+              Be detailed and specific about the circumstances
+            </p>
+          </div>
           <Button
             type="button"
             variant={isRecording ? "destructive" : "outline"}
             size="sm"
             onClick={isRecording ? stopRecording : startRecording}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 shrink-0"
           >
             {isRecording ? (
               <>
                 <MicOff className="h-4 w-4" />
-                Stop Recording
+                Stop
               </>
             ) : (
               <>
@@ -213,31 +223,27 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
             )}
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Provide a detailed explanation of why you believe you should not be found guilty. 
-          Be honest and specific about the circumstances.
-        </p>
         <Textarea
           id="explanation"
           value={formData.explanation}
           onChange={(e) => handleFieldUpdate("explanation", e.target.value)}
           placeholder="Describe what happened on the day you received the ticket. Include all relevant details about the situation, road conditions, weather, traffic, etc."
-          className="min-h-32 transition-smooth focus:ring-2 focus:ring-primary/20"
+          className="min-h-32"
         />
         {formData.explanation.length > 0 && (
-          <p className="text-xs text-muted-foreground">
-            {formData.explanation.length} characters • The more detail, the better we can help
+          <p className="text-xs text-muted-foreground mt-2">
+            {formData.explanation.length} characters
           </p>
         )}
-      </div>
+      </Card>
 
       {/* Circumstances */}
-      <div className="space-y-3">
-        <Label htmlFor="circumstances" className="text-lg font-semibold">
+      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+        <Label htmlFor="circumstances" className="text-lg font-semibold text-primary block mb-1">
           Additional Circumstances
         </Label>
-        <p className="text-sm text-muted-foreground">
-          Were there any special circumstances that contributed to the situation?
+        <p className="text-sm text-muted-foreground mb-3">
+          Click to add common circumstances or type your own
         </p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
           {commonDefenses.map((defense, index) => (
@@ -249,7 +255,7 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
                 const newText = current ? `${current}\n• ${defense}` : `• ${defense}`;
                 handleFieldUpdate("circumstances", newText);
               }}
-              className="text-xs p-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded transition-smooth text-left"
+              className="text-xs p-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded text-left"
             >
               + {defense}
             </button>
@@ -259,10 +265,10 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
           id="circumstances"
           value={formData.circumstances}
           onChange={(e) => handleFieldUpdate("circumstances", e.target.value)}
-          placeholder="Click the buttons above to add common circumstances, or type your own..."
-          className="min-h-24 transition-smooth focus:ring-2 focus:ring-primary/20"
+          placeholder="Additional circumstances..."
+          className="min-h-20"
         />
-      </div>
+      </Card>
 
       {/* Witnesses */}
       <Card className="p-6 space-y-4">

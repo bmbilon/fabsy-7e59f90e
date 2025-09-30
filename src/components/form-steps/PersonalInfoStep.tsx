@@ -243,12 +243,12 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {/* Driver's License Upload - TOP OF THE FORM */}
-      <div className="space-y-4">
-        <div className="text-center space-y-2">
-          <h3 className="text-xl font-semibold text-primary">Quick Start: Scan Your Driver's License</h3>
-          <p className="text-sm text-muted-foreground">Upload or capture your driver's license to auto-fill all fields below</p>
+      <div className="space-y-3">
+        <div className="text-center space-y-1">
+          <h3 className="text-lg font-semibold text-primary">Auto-Fill: Scan Your Driver's License</h3>
+          <p className="text-sm text-muted-foreground">Skip typing - upload your license to fill all fields instantly</p>
         </div>
         
         <Card className="p-6 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
@@ -325,104 +325,110 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
       </div>
 
       {/* Divider */}
-      <div className="relative">
+      <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-muted" />
+          <span className="w-full border-t border-primary/20" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Or fill manually</span>
+          <span className="bg-background px-3 text-muted-foreground font-medium">Or enter manually</span>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="firstName">Given Name(s) *</Label>
-          <Input
-            id="firstName"
-            {...register("firstName")}
-            onBlur={(e) => handleFieldUpdate("firstName", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          />
-          {errors.firstName && (
-            <p className="text-sm text-destructive">{errors.firstName.message}</p>
-          )}
-        </div>
+      {/* Personal Details */}
+      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+        <h3 className="text-lg font-semibold mb-4 text-primary">Personal Details</h3>
+        <div className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName" className="font-medium">First Name *</Label>
+              <Input
+                id="firstName"
+                {...register("firstName")}
+                onBlur={(e) => handleFieldUpdate("firstName", e.target.value)}
+                className="h-11"
+              />
+              {errors.firstName && (
+                <p className="text-sm text-destructive">{errors.firstName.message}</p>
+              )}
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="lastName">Last Name *</Label>
-          <Input
-            id="lastName"
-            {...register("lastName")}
-            onBlur={(e) => handleFieldUpdate("lastName", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          />
-          {errors.lastName && (
-            <p className="text-sm text-destructive">{errors.lastName.message}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label>Date of Birth *</Label>
-          <div className="grid grid-cols-3 gap-2">
-            <Select value={dobYear} onValueChange={(value) => handleDateChange('year', value)}>
-              <SelectTrigger className="transition-smooth focus:ring-2 focus:ring-primary/20">
-                <SelectValue placeholder="Year" />
-              </SelectTrigger>
-              <SelectContent>
-                {years.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={dobMonth} onValueChange={(value) => handleDateChange('month', value)}>
-              <SelectTrigger className="transition-smooth focus:ring-2 focus:ring-primary/20">
-                <SelectValue placeholder="Month" />
-              </SelectTrigger>
-              <SelectContent>
-                {months.map((month) => (
-                  <SelectItem key={month.value} value={month.value}>
-                    {month.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={dobDay} onValueChange={(value) => handleDateChange('day', value)}>
-              <SelectTrigger className="transition-smooth focus:ring-2 focus:ring-primary/20">
-                <SelectValue placeholder="Day" />
-              </SelectTrigger>
-              <SelectContent>
-                {days.map((day) => (
-                  <SelectItem key={day} value={day.toString()}>
-                    {day}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label htmlFor="lastName" className="font-medium">Last Name *</Label>
+              <Input
+                id="lastName"
+                {...register("lastName")}
+                onBlur={(e) => handleFieldUpdate("lastName", e.target.value)}
+                className="h-11"
+              />
+              {errors.lastName && (
+                <p className="text-sm text-destructive">{errors.lastName.message}</p>
+              )}
+            </div>
           </div>
-          {errors.dateOfBirth && (
-            <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="driversLicense">Driver's License Number *</Label>
-          <Input
-            id="driversLicense"
-            {...register("driversLicense")}
-            onBlur={(e) => handleFieldUpdate("driversLicense", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          />
-          {errors.driversLicense && (
-            <p className="text-sm text-destructive">{errors.driversLicense.message}</p>
-          )}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="font-medium">Date of Birth *</Label>
+              <div className="grid grid-cols-3 gap-2">
+                <Select value={dobYear} onValueChange={(value) => handleDateChange('year', value)}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={dobMonth} onValueChange={(value) => handleDateChange('month', value)}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem key={month.value} value={month.value}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={dobDay} onValueChange={(value) => handleDateChange('day', value)}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Day" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {days.map((day) => (
+                      <SelectItem key={day} value={day.toString()}>
+                        {day}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {errors.dateOfBirth && (
+                <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="driversLicense" className="font-medium">Driver's License Number *</Label>
+              <Input
+                id="driversLicense"
+                {...register("driversLicense")}
+                onBlur={(e) => handleFieldUpdate("driversLicense", e.target.value)}
+                className="h-11"
+              />
+              {errors.driversLicense && (
+                <p className="text-sm text-destructive">{errors.driversLicense.message}</p>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </Card>
 
 
       {/* Address Different From License Checkbox */}
@@ -442,13 +448,11 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
 
       {/* Conditional Address Fields */}
       {showAddressFields && (
-        <div className="space-y-6 p-4 border border-primary/20 rounded-lg bg-primary/5">
-          <div className="space-y-2">
-            <Label className="text-primary font-medium">Current Address (if different from license)</Label>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="currentAddress">Street Address *</Label>
+        <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+          <h3 className="text-lg font-semibold mb-4 text-primary">Current Address</h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentAddress" className="font-medium">Street Address *</Label>
             <Input
               id="currentAddress"
               {...register("address")}
@@ -507,54 +511,59 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
               {errors.postalCode && (
                 <p className="text-sm text-destructive">{errors.postalCode.message}</p>
               )}
+              </div>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
-      {/* Email and Phone - Manual Entry Fields at Bottom */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email Address *</Label>
-          <Input
-            id="email"
-            type="email"
-            {...register("email")}
-            onBlur={(e) => handleFieldUpdate("email", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
-        </div>
+      {/* Contact Information */}
+      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+        <h3 className="text-lg font-semibold mb-4 text-primary">Contact Information</h3>
+        <div className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="font-medium">Email Address *</Label>
+              <Input
+                id="email"
+                type="email"
+                {...register("email")}
+                onBlur={(e) => handleFieldUpdate("email", e.target.value)}
+                className="h-11"
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number *</Label>
-          <Input
-            id="phone"
-            {...register("phone")}
-            placeholder="(403) 555-0123"
-            onBlur={(e) => handleFieldUpdate("phone", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          />
-          {errors.phone && (
-            <p className="text-sm text-destructive">{errors.phone.message}</p>
-          )}
-          <div className="flex items-center space-x-2 pt-1">
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="font-medium">Phone Number *</Label>
+              <Input
+                id="phone"
+                type="tel"
+                {...register("phone")}
+                placeholder="(403) 555-0123"
+                onBlur={(e) => handleFieldUpdate("phone", e.target.value)}
+                className="h-11"
+              />
+              {errors.phone && (
+                <p className="text-sm text-destructive">{errors.phone.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
             <Checkbox
               id="smsOptIn"
               checked={formData.smsOptIn}
               onCheckedChange={(checked) => updateFormData({ smsOptIn: checked === true })}
             />
-            <Label 
-              htmlFor="smsOptIn" 
-              className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Contact me by text/SMS
+            <Label htmlFor="smsOptIn" className="text-sm font-normal cursor-pointer">
+              📱 Send me SMS updates about my case (recommended)
             </Label>
           </div>
         </div>
-      </div>
+      </Card>
 
       <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
         <p className="text-sm text-muted-foreground">

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download } from "lucide-react";
@@ -326,145 +327,148 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </div>
       )}
 
-      <form className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="ticketNumber">Ticket Number *</Label>
-          <Input
-            id="ticketNumber"
-            {...register("ticketNumber")}
-            onBlur={(e) => handleFieldUpdate("ticketNumber", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-            placeholder="e.g., AB123456789"
-          />
-          {errors.ticketNumber && (
-            <p className="text-sm text-destructive">{errors.ticketNumber.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label>Issue Date *</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal transition-smooth focus:ring-2 focus:ring-primary/20",
-                  !issueDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {issueDate ? format(issueDate, "PPP") : <span>Select date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={issueDate}
-                onSelect={(date) => handleFieldUpdate("issueDate", date)}
-                disabled={(date) => date > new Date()}
-                initialFocus
-                className="p-3 pointer-events-auto"
+      <form className="space-y-8">
+      {/* Basic Ticket Information */}
+      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+        <h3 className="text-lg font-semibold mb-4 text-primary">Ticket Information</h3>
+        <div className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="ticketNumber" className="font-medium">Ticket Number *</Label>
+              <Input
+                id="ticketNumber"
+                {...register("ticketNumber")}
+                onBlur={(e) => handleFieldUpdate("ticketNumber", e.target.value)}
+                className="h-11"
+                placeholder="AB123456789"
               />
-            </PopoverContent>
-          </Popover>
-          {errors.issueDate && (
-            <p className="text-sm text-destructive">{errors.issueDate.message}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="location">Location of Violation *</Label>
-        <Input
-          id="location"
-          {...register("location")}
-          onBlur={(e) => handleFieldUpdate("location", e.target.value)}
-          className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          placeholder="e.g., Highway 2 near Calgary, Main St & 1st Ave"
-        />
-        {errors.location && (
-          <p className="text-sm text-destructive">{errors.location.message}</p>
-        )}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="officer">Officer Name *</Label>
-          <Input
-            id="officer"
-            {...register("officer")}
-            onBlur={(e) => handleFieldUpdate("officer", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-            placeholder="Officer last name"
-          />
-          {errors.officer && (
-            <p className="text-sm text-destructive">{errors.officer.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="officerBadge">Officer Badge Number</Label>
-          <Input
-            id="officerBadge"
-            {...register("officerBadge")}
-            onBlur={(e) => handleFieldUpdate("officerBadge", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-            placeholder="Badge number (if available)"
-          />
-          {errors.officerBadge && (
-            <p className="text-sm text-destructive">{errors.officerBadge.message}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="fineAmount">Fine Amount *</Label>
-          <Input
-            id="fineAmount"
-            {...register("fineAmount")}
-            onBlur={(e) => handleFieldUpdate("fineAmount", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-            placeholder="$150"
-          />
-          {errors.fineAmount && (
-            <p className="text-sm text-destructive">{errors.fineAmount.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          {/* Empty div for grid alignment */}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Court Date (if scheduled)</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal transition-smooth focus:ring-2 focus:ring-primary/20",
-                !courtDate && "text-muted-foreground"
+              {errors.ticketNumber && (
+                <p className="text-sm text-destructive">{errors.ticketNumber.message}</p>
               )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {courtDate ? format(courtDate, "PPP") : <span>No court date yet</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={courtDate}
-              onSelect={(date) => handleFieldUpdate("courtDate", date)}
-              disabled={(date) => date < new Date()}
-              initialFocus
-              className="p-3 pointer-events-auto"
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium">Issue Date *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-11 justify-start text-left font-normal",
+                      !issueDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {issueDate ? format(issueDate, "MMM dd, yyyy") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={issueDate}
+                    onSelect={(date) => handleFieldUpdate("issueDate", date)}
+                    disabled={(date) => date > new Date()}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.issueDate && (
+                <p className="text-sm text-destructive">{errors.issueDate.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location" className="font-medium">Location *</Label>
+            <Input
+              id="location"
+              {...register("location")}
+              onBlur={(e) => handleFieldUpdate("location", e.target.value)}
+              className="h-11"
+              placeholder="Highway 2 near Calgary, Main St & 1st Ave"
             />
-          </PopoverContent>
-        </Popover>
-      </div>
+            {errors.location && (
+              <p className="text-sm text-destructive">{errors.location.message}</p>
+            )}
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="fineAmount" className="font-medium">Fine Amount *</Label>
+              <Input
+                id="fineAmount"
+                {...register("fineAmount")}
+                onBlur={(e) => handleFieldUpdate("fineAmount", e.target.value)}
+                className="h-11"
+                placeholder="$150"
+              />
+              {errors.fineAmount && (
+                <p className="text-sm text-destructive">{errors.fineAmount.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium">Court Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-11 justify-start text-left font-normal",
+                      !courtDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {courtDate ? format(courtDate, "MMM dd, yyyy") : "Not set"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={courtDate}
+                    onSelect={(date) => handleFieldUpdate("courtDate", date)}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Officer Information */}
+      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+        <h3 className="text-lg font-semibold mb-4 text-primary">Officer Details</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="officer" className="font-medium">Officer Name *</Label>
+            <Input
+              id="officer"
+              {...register("officer")}
+              onBlur={(e) => handleFieldUpdate("officer", e.target.value)}
+              className="h-11"
+              placeholder="Last name"
+            />
+            {errors.officer && (
+              <p className="text-sm text-destructive">{errors.officer.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="officerBadge" className="font-medium">Badge Number</Label>
+            <Input
+              id="officerBadge"
+              {...register("officerBadge")}
+              onBlur={(e) => handleFieldUpdate("officerBadge", e.target.value)}
+              className="h-11"
+              placeholder="Optional"
+            />
+          </div>
+        </div>
+      </Card>
 
       {/* Court Jurisdiction */}
       <div className="space-y-2">
