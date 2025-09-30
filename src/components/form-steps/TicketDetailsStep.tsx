@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, FileImage } from "lucide-react";
+import { CalendarIcon, Upload, FileImage, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -17,6 +17,8 @@ import JurisdictionChecker from "../JurisdictionChecker";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
 import { FormData } from "../TicketForm";
 import { useState, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ticketDetailsSchema = z.object({
   ticketNumber: z.string().min(1, "Ticket number is required"),
@@ -39,7 +41,9 @@ interface TicketDetailsStepProps {
 
 const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps) => {
   const [dragActive, setDragActive] = useState(false);
+  const [isProcessingOCR, setIsProcessingOCR] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   
   const {
     register,
@@ -70,12 +74,79 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
     updateFormData({ [field]: value });
   };
 
+  const processTicketOCR = async (file: File) => {
+    setIsProcessingOCR(true);
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result);
+        };
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
+      const imageBase64 = await base64Promise;
+
+      // Call OCR edge function
+      const { data, error } = await supabase.functions.invoke('ocr-ticket', {
+        body: { imageBase64 }
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.data) {
+        const extracted = data.data;
+        
+        // Auto-fill fields with extracted data
+        if (extracted.ticketNumber) {
+          handleFieldUpdate('ticketNumber', extracted.ticketNumber);
+        }
+        if (extracted.issueDate) {
+          handleFieldUpdate('issueDate', new Date(extracted.issueDate));
+        }
+        if (extracted.location) {
+          handleFieldUpdate('location', extracted.location);
+        }
+        if (extracted.officer) {
+          handleFieldUpdate('officer', extracted.officer);
+        }
+        if (extracted.violation) {
+          handleFieldUpdate('violation', extracted.violation);
+        }
+        if (extracted.fineAmount) {
+          handleFieldUpdate('fineAmount', `$${extracted.fineAmount}`);
+        }
+        if (extracted.courtDate) {
+          handleFieldUpdate('courtDate', new Date(extracted.courtDate));
+        }
+
+        toast({
+          title: "Ticket scanned successfully!",
+          description: "Form fields have been auto-filled. Please review and correct any errors.",
+        });
+      }
+    } catch (error) {
+      console.error('OCR error:', error);
+      toast({
+        title: "Could not read ticket",
+        description: "Please fill in the form manually.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingOCR(false);
+    }
+  };
+
   const handleFileUpload = (file: File) => {
     const isImageMime = file.type?.startsWith('image/');
     const name = file.name.toLowerCase();
     const isHeic = name.endsWith('.heic') || name.endsWith('.heif');
     if (isImageMime || isHeic) {
       updateFormData({ ticketImage: file });
+      // Trigger OCR processing
+      processTicketOCR(file);
     }
   };
 
@@ -369,9 +440,16 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               <p className="text-sm font-medium text-primary">
                 {formData.ticketImage.name}
               </p>
-              <p className="text-xs text-muted-foreground">
-                Click to change or drag a new image
-              </p>
+              {isProcessingOCR ? (
+                <div className="flex items-center gap-2 justify-center text-primary">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <p className="text-xs">Reading ticket...</p>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Click to change or drag a new image
+                </p>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
@@ -381,6 +459,9 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               </p>
               <p className="text-xs text-muted-foreground">
                 All image formats supported (JPG, PNG, HEIC, etc.) • Max 10MB
+              </p>
+              <p className="text-xs text-primary font-medium">
+                ✨ We'll automatically fill in the details for you!
               </p>
             </div>
           )}
