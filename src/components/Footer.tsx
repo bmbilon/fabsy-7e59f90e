@@ -59,7 +59,7 @@ const Footer = () => {
         </div>
 
         {/* Main Footer Links - 3 Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
+        <div className="grid grid-cols-3 gap-4 mb-3">
           {/* Company Links */}
           <div>
             <h3 className="text-[11px] font-semibold text-card-foreground mb-2">Company</h3>
