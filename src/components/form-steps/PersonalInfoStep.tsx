@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormData } from "../TicketForm";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -44,6 +44,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   const [imagePreview, setImagePreview] = useState<string>("");
   const [showAddressFields, setShowAddressFields] = useState(formData.addressDifferentFromLicense);
   const [isProcessingOCR, setIsProcessingOCR] = useState(false);
+  const [hasProcessedInitialImage, setHasProcessedInitialImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -70,6 +71,17 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   });
 
   const dateOfBirth = watch("dateOfBirth");
+
+  // Process DL image on mount if it was uploaded from elsewhere
+  useEffect(() => {
+    if (formData.driversLicenseImage && !hasProcessedInitialImage && !formData.firstName) {
+      console.log('[Mount] Processing initial DL image');
+      setHasProcessedInitialImage(true);
+      setDlImage(formData.driversLicenseImage);
+      setImagePreview(URL.createObjectURL(formData.driversLicenseImage));
+      processDLOCR(formData.driversLicenseImage);
+    }
+  }, [formData.driversLicenseImage]);
 
   const onSubmit = (data: PersonalInfoSchema) => {
     updateFormData(data);
