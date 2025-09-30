@@ -43,14 +43,16 @@ serve(async (req) => {
               {
                 type: "text",
                 text: `Extract all information from this driver's license image. Return the data in JSON format with these fields:
-- firstName: person's first name
-- lastName: person's last name
-- address: street address
+- firstName: person's first name only (given name)
+- lastName: person's last name only (surname/family name)
+- address: complete street address including unit/suite number
 - city: city name
 - province: province/state (use full name like "Alberta" not "AB")
 - postalCode: postal code in format like "T2P 1J9"
-- dateOfBirth: date of birth in YYYY-MM-DD format
-- driversLicense: driver's license number
+- dateOfBirth: person's DATE OF BIRTH in YYYY-MM-DD format (NOT expiry date, NOT issue date - look for "DOB" or "Date of Birth" field)
+- driversLicense: driver's license number (the main license ID number)
+
+CRITICAL: For dateOfBirth, extract the holder's birth date, NOT the license expiry or issue date. Look for labels like "DOB", "Date of Birth", or "Birth Date".
 
 If any field is not clearly visible, set it to null. Be as accurate as possible. For the province, always return the full name (e.g., "Alberta" instead of "AB").`,
               },

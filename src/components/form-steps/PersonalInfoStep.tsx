@@ -322,37 +322,6 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
 
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address *</Label>
-          <Input
-            id="email"
-            type="email"
-            {...register("email")}
-            onBlur={(e) => handleFieldUpdate("email", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number *</Label>
-          <Input
-            id="phone"
-            {...register("phone")}
-            placeholder="(403) 555-0123"
-            onBlur={(e) => handleFieldUpdate("phone", e.target.value)}
-            className="transition-smooth focus:ring-2 focus:ring-primary/20"
-          />
-          {errors.phone && (
-            <p className="text-sm text-destructive">{errors.phone.message}</p>
-          )}
-        </div>
-      </div>
-
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-2">
           <Label>Date of Birth *</Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -486,6 +455,37 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           </div>
         </div>
       )}
+
+      {/* Email and Phone - Manual Entry Fields at Bottom */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address *</Label>
+          <Input
+            id="email"
+            type="email"
+            {...register("email")}
+            onBlur={(e) => handleFieldUpdate("email", e.target.value)}
+            className="transition-smooth focus:ring-2 focus:ring-primary/20"
+          />
+          {errors.email && (
+            <p className="text-sm text-destructive">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone Number *</Label>
+          <Input
+            id="phone"
+            {...register("phone")}
+            placeholder="(403) 555-0123"
+            onBlur={(e) => handleFieldUpdate("phone", e.target.value)}
+            className="transition-smooth focus:ring-2 focus:ring-primary/20"
+          />
+          {errors.phone && (
+            <p className="text-sm text-destructive">{errors.phone.message}</p>
+          )}
+        </div>
+      </div>
 
       <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
         <p className="text-sm text-muted-foreground">
