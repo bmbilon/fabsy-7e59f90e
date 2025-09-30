@@ -47,6 +47,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   const [dobYear, setDobYear] = useState<string>(formData.dateOfBirth ? formData.dateOfBirth.getFullYear().toString() : "");
   const [dobMonth, setDobMonth] = useState<string>(formData.dateOfBirth ? (formData.dateOfBirth.getMonth() + 1).toString() : "");
   const [dobDay, setDobDay] = useState<string>(formData.dateOfBirth ? formData.dateOfBirth.getDate().toString() : "");
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -321,10 +322,19 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={() => cameraInputRef.current?.click()}
                     >
                       <Camera className="h-4 w-4 mr-2" />
-                      Replace Photo
+                      Take New Photo
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Choose File
                     </Button>
                   </div>
                   <p className="text-sm font-medium text-foreground">
@@ -343,28 +353,47 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                 <div>
                   <p className="font-semibold text-lg text-foreground">Upload Your Driver's License</p>
                   <p className="text-sm text-muted-foreground">
-                    {dragActive ? "Drop your license here" : "Drag & drop or click to upload"}
+                    {dragActive ? "Drop your license here" : "Drag & drop or use buttons below"}
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  size="lg"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="gap-2"
-                >
-                  <Upload className="h-5 w-5" />
-                  Take Photo or Upload
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    type="button"
+                    size="lg"
+                    onClick={() => cameraInputRef.current?.click()}
+                    className="gap-2"
+                  >
+                    <Camera className="h-5 w-5" />
+                    Take Photo
+                  </Button>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="gap-2"
+                  >
+                    <Upload className="h-5 w-5" />
+                    Choose File
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">
                   Supports JPG, PNG, HEIC • Your data is encrypted and secure
                 </p>
               </div>
             )}
             <input
-              ref={fileInputRef}
+              ref={cameraInputRef}
               type="file"
               accept="image/*,.heic,.heif"
               capture="environment"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.heic,.heif"
               onChange={handleImageUpload}
               className="hidden"
             />
