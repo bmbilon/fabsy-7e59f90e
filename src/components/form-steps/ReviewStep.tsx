@@ -82,7 +82,10 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
         </div>
         <div className="grid md:grid-cols-2 gap-4 text-sm">
           <div className="space-y-2">
-            <div><span className="font-medium">Ticket #:</span> {formData.ticketNumber}</div>
+            <div>
+              <span className="font-medium">Ticket Number *</span>
+              <div className="bg-white dark:bg-white/10 p-2 rounded mt-1">{formData.ticketNumber}</div>
+            </div>
             <div><span className="font-medium">Violation:</span> {formData.violation}</div>
             {(formData.offenceSection || formData.offenceSubSection || formData.offenceDescription) && (
               <div className="bg-muted/30 p-3 rounded-lg mt-2 space-y-1">
@@ -92,14 +95,34 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
                 {formData.offenceDescription && <div className="text-sm">{formData.offenceDescription}</div>}
               </div>
             )}
-            <div><span className="font-medium">Fine Amount:</span> {formData.fineAmount}</div>
-            <div><span className="font-medium">Officer:</span> {formData.officer}</div>
-            {formData.officerBadge && <div><span className="font-medium">Badge #:</span> {formData.officerBadge}</div>}
+            <div>
+              <span className="font-medium">Fine Amount *</span>
+              <div className="bg-white dark:bg-white/10 p-2 rounded mt-1">{formData.fineAmount}</div>
+            </div>
+            <div>
+              <span className="font-medium">Officer Name *</span>
+              <div className="bg-white dark:bg-white/10 p-2 rounded mt-1">{formData.officer}</div>
+            </div>
+            {formData.officerBadge && (
+              <div>
+                <span className="font-medium">Badge Number</span>
+                <div className="bg-muted/30 p-2 rounded mt-1">{formData.officerBadge}</div>
+              </div>
+            )}
           </div>
           <div className="space-y-2">
-            <div><span className="font-medium">Issue Date:</span> {formData.issueDate ? format(formData.issueDate, "MMM dd, yyyy") : "Not provided"}</div>
-            <div><span className="font-medium">Location:</span> {formData.location}</div>
-            <div><span className="font-medium">Court Date:</span> {formData.courtDate ? format(formData.courtDate, "MMM dd, yyyy") : "Not scheduled"}</div>
+            <div>
+              <span className="font-medium">Issue Date *</span>
+              <div className="bg-white dark:bg-white/10 p-2 rounded mt-1">{formData.issueDate ? format(formData.issueDate, "MMM dd, yyyy") : "Not provided"}</div>
+            </div>
+            <div>
+              <span className="font-medium">Location *</span>
+              <div className="bg-white dark:bg-white/10 p-2 rounded mt-1">{formData.location}</div>
+            </div>
+            <div>
+              <span className="font-medium">Court Date</span>
+              <div className="bg-muted/30 p-2 rounded mt-1">{formData.courtDate ? format(formData.courtDate, "MMM dd, yyyy") : "Not scheduled"}</div>
+            </div>
             <div><span className="font-medium">Ticket Image:</span> {formData.ticketImage ? "✓ Uploaded" : "Not uploaded"}</div>
           </div>
         </div>
