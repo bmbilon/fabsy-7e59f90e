@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, FileImage, Loader2, Check, ChevronsUpDown } from "lucide-react";
+import { CalendarIcon, Upload, FileImage, Loader2, Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Download } from "lucide-react";
 import JurisdictionChecker from "../JurisdictionChecker";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
@@ -375,56 +374,78 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                 variant="outline"
                 role="combobox"
                 aria-expanded={openOffenceCombobox}
-                className="w-full justify-between"
+                className="w-full justify-between h-auto min-h-10 py-2"
               >
-                {formData.offenceSection && formData.offenceDescription
-                  ? `${formData.offenceSection}${formData.offenceSubSection} - ${formData.offenceDescription}`
-                  : "Type to search sections..."}
+                <span className="text-left">
+                  {formData.offenceSection && formData.offenceDescription
+                    ? `${formData.offenceSection}${formData.offenceSubSection} - ${formData.offenceDescription}`
+                    : "Type to search sections..."}
+                </span>
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0" align="start">
-              <Command shouldFilter={false}>
-                <CommandInput 
-                  placeholder="Search by section number or description..." 
-                  value={offenceSearchValue}
-                  onValueChange={setOffenceSearchValue}
-                />
-                <CommandList>
-                  <CommandEmpty>No matching sections found.</CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-auto">
-                    {filteredSections.map((section, index) => (
-                      <CommandItem
+            <PopoverContent className="w-[500px] p-0" align="start">
+              <div className="flex flex-col">
+                <div className="flex items-center border-b px-3">
+                  <Input
+                    placeholder="Search by section number or description..."
+                    value={offenceSearchValue}
+                    onChange={(e) => setOffenceSearchValue(e.target.value)}
+                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                  {offenceSearchValue && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => setOffenceSearchValue("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                <div className="max-h-[300px] overflow-y-auto p-1">
+                  {filteredSections.length === 0 ? (
+                    <div className="py-6 text-center text-sm text-muted-foreground">
+                      No matching sections found.
+                    </div>
+                  ) : (
+                    filteredSections.map((section, index) => (
+                      <button
                         key={index}
-                        value={section.searchText}
-                        onSelect={() => handleOffenceSelect(section)}
-                        className="cursor-pointer"
+                        onClick={() => handleOffenceSelect(section)}
+                        className={cn(
+                          "w-full flex items-start gap-2 rounded-sm px-2 py-2 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer text-left",
+                          formData.offenceSection === section.section &&
+                          formData.offenceSubSection === section.subsection &&
+                          "bg-accent"
+                        )}
                       >
                         <Check
                           className={cn(
-                            "mr-2 h-4 w-4",
+                            "h-4 w-4 shrink-0 mt-0.5",
                             formData.offenceSection === section.section &&
                             formData.offenceSubSection === section.subsection
                               ? "opacity-100"
                               : "opacity-0"
                           )}
                         />
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-1">
                           <span className="font-medium">
                             Sec. {section.section}{section.subsection}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {section.description}
                           </span>
-                          <span className="text-xs text-primary/60 font-medium mt-0.5">
+                          <span className="text-xs text-primary/60 font-medium">
                             {section.act}
                           </span>
                         </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
             </PopoverContent>
           </Popover>
           <p className="text-xs text-muted-foreground">
