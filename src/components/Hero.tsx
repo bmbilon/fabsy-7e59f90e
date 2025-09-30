@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Shield, Calculator } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-woman-driver-new.jpg";
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const handleHeroFile = (file?: File | null) => {
+    if (!file) return;
+    navigate("/submit-ticket", { state: { ticketImage: file } });
+  };
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-hero overflow-hidden">
       {/* Background decorative elements */}
@@ -46,7 +51,7 @@ const Hero = () => {
                     </svg>
                     <span className="text-sm font-medium text-gray-600">Drag & Drop</span>
                     <span className="text-xs text-gray-500">or click to browse</span>
-                    <input type="file" accept="image/*,.heic,.heif,.pdf" className="sr-only" id="drag-upload" />
+                    <input type="file" accept="image/*,.heic,.heif,.pdf" className="sr-only" id="drag-upload" onChange={(e) => handleHeroFile(e.target.files?.[0])} />
                   </label>
                   <label htmlFor="camera-upload" className="flex flex-col items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors cursor-pointer">
                     <svg className="h-8 w-8 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -55,7 +60,7 @@ const Hero = () => {
                     </svg>
                     <span className="text-sm font-medium text-gray-600">Camera</span>
                     <span className="text-xs text-gray-500">Take photo</span>
-                    <input type="file" accept="image/*,.heic,.heif" capture="environment" className="sr-only" id="camera-upload" />
+                    <input type="file" accept="image/*,.heic,.heif" capture="environment" className="sr-only" id="camera-upload" onChange={(e) => handleHeroFile(e.target.files?.[0])} />
                   </label>
                 </div>
               </div>

@@ -106,9 +106,12 @@ const steps = [
   { id: 5, title: "Review", description: "Review and submit" }
 ];
 
-const TicketForm = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>(initialFormData);
+const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File | null }) => {
+  const [currentStep, setCurrentStep] = useState(initialTicketImage ? 2 : 1);
+  const [formData, setFormData] = useState<FormData>(() => ({
+    ...initialFormData,
+    ticketImage: initialTicketImage ?? null,
+  }));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
