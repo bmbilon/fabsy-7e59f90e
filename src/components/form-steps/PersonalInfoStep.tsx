@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Camera, Upload } from "lucide-react";
+import { CalendarIcon, Camera, Upload, Loader2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,6 +14,8 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormData } from "../TicketForm";
 import { useState, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -41,7 +43,9 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   const [dlImage, setDlImage] = useState<File | null>(formData.driversLicenseImage);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [showAddressFields, setShowAddressFields] = useState(formData.addressDifferentFromLicense);
+  const [isProcessingOCR, setIsProcessingOCR] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const {
     register,
@@ -77,12 +81,82 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
     updateFormData({ [field]: value });
   };
 
+  const processDLOCR = async (file: File) => {
+    setIsProcessingOCR(true);
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result);
+        };
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
+      const imageBase64 = await base64Promise;
+
+      // Call OCR edge function
+      const { data, error } = await supabase.functions.invoke('ocr-drivers-license', {
+        body: { imageBase64 }
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.data) {
+        const extracted = data.data;
+        
+        // Auto-fill fields with extracted data
+        if (extracted.firstName) {
+          handleFieldUpdate('firstName', extracted.firstName);
+        }
+        if (extracted.lastName) {
+          handleFieldUpdate('lastName', extracted.lastName);
+        }
+        if (extracted.address) {
+          handleFieldUpdate('address', extracted.address);
+        }
+        if (extracted.city) {
+          handleFieldUpdate('city', extracted.city);
+        }
+        if (extracted.province) {
+          handleFieldUpdate('province', extracted.province);
+        }
+        if (extracted.postalCode) {
+          handleFieldUpdate('postalCode', extracted.postalCode);
+        }
+        if (extracted.dateOfBirth) {
+          handleFieldUpdate('dateOfBirth', new Date(extracted.dateOfBirth));
+        }
+        if (extracted.driversLicense) {
+          handleFieldUpdate('driversLicense', extracted.driversLicense);
+        }
+
+        toast({
+          title: "Driver's license scanned successfully!",
+          description: "Form fields have been auto-filled. Please review and correct any errors.",
+        });
+      }
+    } catch (error) {
+      console.error('OCR error:', error);
+      toast({
+        title: "Could not read driver's license",
+        description: "Please fill in the form manually.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingOCR(false);
+    }
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setDlImage(file);
       setImagePreview(URL.createObjectURL(file));
       updateFormData({ driversLicenseImage: file });
+      // Trigger OCR processing
+      processDLOCR(file);
     }
   };
 
@@ -93,6 +167,96 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Driver's License Upload - TOP OF THE FORM */}
+      <div className="space-y-4">
+        <div className="text-center space-y-2">
+          <h3 className="text-xl font-semibold text-primary">Quick Start: Scan Your Driver's License</h3>
+          <p className="text-sm text-muted-foreground">Upload or capture your driver's license to auto-fill all fields below</p>
+        </div>
+        
+        <Card className="p-6 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+          <div className="flex flex-col items-center text-center space-y-4">
+            {isProcessingOCR ? (
+              <div className="space-y-4 py-8">
+                <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto" />
+                <div>
+                  <p className="font-medium text-foreground">Scanning your driver's license...</p>
+                  <p className="text-sm text-muted-foreground">This will only take a moment</p>
+                </div>
+              </div>
+            ) : imagePreview ? (
+              <div className="space-y-4">
+                <div className="relative">
+                  <img 
+                    src={imagePreview} 
+                    alt="Driver's License" 
+                    className="max-w-full h-48 object-contain rounded-lg border-2 border-primary/20"
+                  />
+                  <div className="absolute top-2 right-2 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <Check className="h-3 w-3" />
+                    Scanned
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Camera className="h-4 w-4 mr-2" />
+                    Replace Photo
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  ✨ Fields below have been auto-filled. Please review for accuracy.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4 py-4">
+                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/20 mx-auto">
+                  <Camera className="h-10 w-10 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-lg text-foreground">Upload Your Driver's License</p>
+                  <p className="text-sm text-muted-foreground">We'll automatically extract your information</p>
+                </div>
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="gap-2"
+                >
+                  <Upload className="h-5 w-5" />
+                  Take Photo or Upload
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Supports JPG, PNG, HEIC • Your data is encrypted and secure
+                </p>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.heic,.heif"
+              capture="environment"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </div>
+        </Card>
+      </div>
+
+      {/* Divider */}
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-muted" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">Or fill manually</span>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="firstName">First Name *</Label>
@@ -200,60 +364,6 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
         </div>
       </div>
 
-      {/* Driver's License Photo Upload */}
-      <div className="space-y-4">
-        <Label>Driver's License Photo</Label>
-        <Card className="p-6 border-dashed border-2 border-primary/20 bg-primary/5">
-          <div className="flex flex-col items-center text-center space-y-4">
-            {imagePreview ? (
-              <div className="relative">
-                <img 
-                  src={imagePreview} 
-                  alt="Driver's License" 
-                  className="max-w-full h-48 object-contain rounded-lg border"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-2"
-                >
-                  <Camera className="h-4 w-4 mr-2" />
-                  Replace Photo
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
-                  <Camera className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Upload Driver's License Photo</p>
-                  <p className="text-sm text-muted-foreground">Take a photo or upload an image of your driver's license</p>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="gap-2"
-                >
-                  <Upload className="h-4 w-4" />
-                  Choose File
-                </Button>
-              </div>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-          </div>
-        </Card>
-      </div>
 
       {/* Address Different From License Checkbox */}
       <div className="flex items-center space-x-2">
