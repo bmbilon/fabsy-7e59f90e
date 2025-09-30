@@ -43,6 +43,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   const [showAddressFields, setShowAddressFields] = useState(formData.addressDifferentFromLicense);
   const [isProcessingOCR, setIsProcessingOCR] = useState(false);
   const [hasProcessedInitialImage, setHasProcessedInitialImage] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const [dobYear, setDobYear] = useState<string>(formData.dateOfBirth ? formData.dateOfBirth.getFullYear().toString() : "");
   const [dobMonth, setDobMonth] = useState<string>(formData.dateOfBirth ? (formData.dateOfBirth.getMonth() + 1).toString() : "");
   const [dobDay, setDobDay] = useState<string>(formData.dateOfBirth ? formData.dateOfBirth.getDate().toString() : "");
@@ -242,6 +243,37 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
     updateFormData({ addressDifferentFromLicense: checked });
   };
 
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      console.log('[DL Upload] File dropped:', file.name, file.type, file.size);
+      const isImageMime = file.type?.startsWith('image/');
+      const name = file.name.toLowerCase();
+      const isHeic = name.endsWith('.heic') || name.endsWith('.heif');
+      
+      if (isImageMime || isHeic) {
+        setDlImage(file);
+        setImagePreview(URL.createObjectURL(file));
+        updateFormData({ driversLicenseImage: file });
+        processDLOCR(file);
+      }
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {/* Driver's License Upload - TOP OF THE FORM */}
@@ -251,7 +283,16 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           <p className="text-sm text-muted-foreground">Skip typing - upload your license to fill all fields instantly</p>
         </div>
         
-        <Card className="p-6 border-2 border-primary/30 bg-white dark:bg-white">
+        <Card 
+          className={cn(
+            "p-6 border-2 bg-white dark:bg-white transition-colors",
+            dragActive ? "border-primary bg-primary/5" : "border-primary/30"
+          )}
+          onDragEnter={handleDrag}
+          onDragOver={handleDrag}
+          onDragLeave={handleDrag}
+          onDrop={handleDrop}
+        >
           <div className="flex flex-col items-center text-center space-y-4">
             {isProcessingOCR ? (
               <div className="space-y-4 py-8">
@@ -301,7 +342,9 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                 </div>
                 <div>
                   <p className="font-semibold text-lg text-foreground">Upload Your Driver's License</p>
-                  <p className="text-sm text-muted-foreground">We'll automatically extract your information</p>
+                  <p className="text-sm text-muted-foreground">
+                    {dragActive ? "Drop your license here" : "Drag & drop or click to upload"}
+                  </p>
                 </div>
                 <Button
                   type="button"
