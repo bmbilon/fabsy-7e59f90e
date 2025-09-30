@@ -215,21 +215,21 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           <Button 
             onClick={handleStripeCheckout}
             disabled={!agreedToTerms || isProcessing}
-            className="w-full h-12 text-lg font-semibold"
+            className="w-full min-h-12 h-auto text-base sm:text-lg font-semibold whitespace-normal py-3"
             size="lg"
           >
             {isProcessing ? (
               "Processing..."
             ) : isTestUser ? (
-              <>
-                <CheckCircle className="h-5 w-5 mr-2" />
-                Submit Test Application (No Payment)
-              </>
+              <span className="flex items-center justify-center gap-2 flex-wrap">
+                <CheckCircle className="h-5 w-5 flex-shrink-0" />
+                <span>Submit Test Application (No Payment)</span>
+              </span>
             ) : (
-              <>
-                <CreditCard className="h-5 w-5 mr-2" />
-                Pay {displayPrice} CAD + Tax with Stripe
-              </>
+              <span className="flex items-center justify-center gap-2 flex-wrap">
+                <CreditCard className="h-5 w-5 flex-shrink-0" />
+                <span>Pay {displayPrice} CAD + Tax with Stripe</span>
+              </span>
             )}
           </Button>
 
