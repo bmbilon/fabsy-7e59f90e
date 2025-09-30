@@ -28,7 +28,6 @@ const Testimonials = () => {
   ];
 
   const stats = [
-    { number: "5,000+", label: "Alberta Women Served" },
     { number: "94%", label: "Success Rate" },
     { number: "$993", label: "avg saved" },
     { number: "4.9/5", label: "Client Rating" }
@@ -42,7 +41,7 @@ const Testimonials = () => {
             Real Results from Real Women
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-            Join <span className="text-gradient-primary">5,000+</span> Satisfied Clients
+            Be the next to receive <span className="text-gradient-primary">5-Star Results</span> from Fabsy
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Alberta women are taking control of their finances and fighting back. 
