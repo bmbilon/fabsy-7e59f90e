@@ -32,7 +32,7 @@ const Footer = () => {
     <footer className="bg-white/95 backdrop-blur-sm border-t border-muted">
       <div className="container mx-auto px-4 py-4">
         {/* Brand Section */}
-        <div className="mb-3">
+        <div className="mb-3 text-center flex flex-col items-center">
           <Link to="/" className="flex items-center gap-1.5 mb-2">
             <Scale className="h-4 w-4 text-primary" />
             <span className="font-script text-lg font-bold text-gradient-hero">
