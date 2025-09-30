@@ -31,35 +31,35 @@ const Footer = () => {
   return (
     <footer className="bg-white/95 backdrop-blur-sm border-t border-muted">
       <div className="container mx-auto px-4 py-4">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
-          {/* Brand Section */}
-          <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-1.5 mb-2">
-              <Scale className="h-4 w-4 text-primary" />
-              <span className="font-script text-lg font-bold text-gradient-hero">
-                Fabsy
-              </span>
-            </Link>
-            
-            <p className="text-[10px] text-muted-foreground mb-2 leading-tight">
-              Expert traffic ticket defense for Alberta women.
-            </p>
-            
-            <div className="space-y-1 text-[10px] text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Mail className="h-2.5 w-2.5 text-primary" />
-                <a href="mailto:hello@fabsy.ca" className="hover:text-primary transition-colors">
-                  hello@fabsy.ca
-                </a>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <MapPin className="h-2.5 w-2.5 text-primary" />
-                <span>Alberta, Canada</span>
-              </div>
+        {/* Brand Section */}
+        <div className="mb-3">
+          <Link to="/" className="flex items-center gap-1.5 mb-2">
+            <Scale className="h-4 w-4 text-primary" />
+            <span className="font-script text-lg font-bold text-gradient-hero">
+              Fabsy
+            </span>
+          </Link>
+          
+          <p className="text-[10px] text-muted-foreground mb-2 leading-tight max-w-md">
+            Expert traffic ticket defense for Alberta women.
+          </p>
+          
+          <div className="flex gap-4 text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <Mail className="h-2.5 w-2.5 text-primary" />
+              <a href="mailto:hello@fabsy.ca" className="hover:text-primary transition-colors">
+                hello@fabsy.ca
+              </a>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-2.5 w-2.5 text-primary" />
+              <span>Alberta, Canada</span>
             </div>
           </div>
+        </div>
 
+        {/* Main Footer Links - 3 Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
           {/* Company Links */}
           <div>
             <h3 className="text-[11px] font-semibold text-card-foreground mb-2">Company</h3>
