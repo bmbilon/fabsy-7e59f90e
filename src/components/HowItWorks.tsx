@@ -6,7 +6,16 @@ const HowItWorks = () => {
     {
       number: 1,
       title: "Snap & Send",
-      description: "Upload Photo of your ticket",
+      description: (
+        <div className="space-y-2">
+          <ul className="text-left space-y-1">
+            <li>1. Photo of your ticket</li>
+            <li>2. Photo of your ID</li>
+            <li>3. Quick voice note or typed explanation</li>
+          </ul>
+          <p className="text-center font-semibold">Total 2min or less</p>
+        </div>
+      ),
       icon: Upload,
       color: "primary"
     },
