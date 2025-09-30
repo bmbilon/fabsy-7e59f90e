@@ -97,8 +97,8 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
             </div>
             <div className="text-center p-4 bg-background/50 rounded-lg">
               <Shield className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">$1,200</div>
-              <div className="text-sm text-muted-foreground">Avg. Saved</div>
+              <div className="text-2xl font-bold text-primary">$993</div>
+              <div className="text-sm text-muted-foreground">avg saved</div>
             </div>
           </div>
 

@@ -96,8 +96,8 @@ const Hero = () => {
                 <div className="text-sm text-white/80">Women Served</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white drop-shadow-lg">$1,200</div>
-                <div className="text-sm text-white/80">Avg. Saved</div>
+                <div className="text-3xl font-bold text-white drop-shadow-lg">$993</div>
+                <div className="text-sm text-white/80">avg saved</div>
               </div>
             </div>
           </div>

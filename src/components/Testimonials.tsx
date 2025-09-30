@@ -30,7 +30,7 @@ const Testimonials = () => {
   const stats = [
     { number: "5,000+", label: "Alberta Women Served" },
     { number: "94%", label: "Success Rate" },
-    { number: "$1,200", label: "Average Saved" },
+    { number: "$993", label: "avg saved" },
     { number: "4.9/5", label: "Client Rating" }
   ];
 
