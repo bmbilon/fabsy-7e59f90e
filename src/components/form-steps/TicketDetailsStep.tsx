@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, FileImage, Loader2 } from "lucide-react";
+import { CalendarIcon, Upload, FileImage, Loader2, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Download } from "lucide-react";
 import JurisdictionChecker from "../JurisdictionChecker";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
@@ -19,6 +20,7 @@ import { FormData } from "../TicketForm";
 import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { albertaTrafficActSections, TrafficActSection } from "@/data/albertaTrafficAct";
 
 const ticketDetailsSchema = z.object({
   ticketNumber: z.string().min(1, "Ticket number is required"),
@@ -46,6 +48,8 @@ interface TicketDetailsStepProps {
 const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [isProcessingOCR, setIsProcessingOCR] = useState(false);
+  const [openOffenceCombobox, setOpenOffenceCombobox] = useState(false);
+  const [offenceSearchValue, setOffenceSearchValue] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
@@ -205,6 +209,26 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
     "Other"
   ];
 
+  
+  const handleOffenceSelect = (section: TrafficActSection) => {
+    handleFieldUpdate("offenceSection", section.section);
+    handleFieldUpdate("offenceSubSection", section.subsection);
+    handleFieldUpdate("offenceDescription", section.description);
+    setOpenOffenceCombobox(false);
+    setOffenceSearchValue("");
+    
+    toast({
+      title: "Offence details auto-filled",
+      description: `Section ${section.section}${section.subsection} applied`,
+    });
+  };
+
+  const filteredSections = offenceSearchValue
+    ? albertaTrafficActSections.filter((section) =>
+        section.searchText.toLowerCase().includes(offenceSearchValue.toLowerCase())
+      )
+    : albertaTrafficActSections;
+
   const openFileDialog = () => {
     const input = fileInputRef.current;
     if (!input) return;
@@ -341,6 +365,69 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           <h3 className="font-semibold text-sm">Offence Details</h3>
           <span className="text-xs text-muted-foreground">(Optional - helps with defense strategy)</span>
         </div>
+
+        {/* Alberta Traffic Act Search */}
+        <div className="space-y-2">
+          <Label>Search Alberta Highway Traffic Act</Label>
+          <Popover open={openOffenceCombobox} onOpenChange={setOpenOffenceCombobox}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={openOffenceCombobox}
+                className="w-full justify-between"
+              >
+                {formData.offenceSection && formData.offenceDescription
+                  ? `${formData.offenceSection}${formData.offenceSubSection} - ${formData.offenceDescription}`
+                  : "Type to search sections..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+              <Command shouldFilter={false}>
+                <CommandInput 
+                  placeholder="Search by section number or description..." 
+                  value={offenceSearchValue}
+                  onValueChange={setOffenceSearchValue}
+                />
+                <CommandList>
+                  <CommandEmpty>No matching sections found.</CommandEmpty>
+                  <CommandGroup className="max-h-[300px] overflow-auto">
+                    {filteredSections.map((section, index) => (
+                      <CommandItem
+                        key={index}
+                        value={section.searchText}
+                        onSelect={() => handleOffenceSelect(section)}
+                        className="cursor-pointer"
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.offenceSection === section.section &&
+                            formData.offenceSubSection === section.subsection
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            Sec. {section.section}{section.subsection}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {section.description}
+                          </span>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <p className="text-xs text-muted-foreground">
+            💡 Start typing to search by section number or description (e.g., "86", "speeding", "registration")
+          </p>
+        </div>
         
         <div className="grid md:grid-cols-3 gap-4">
           <div className="space-y-2">
@@ -393,7 +480,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </div>
 
         <p className="text-xs text-muted-foreground">
-          💡 <strong>Tip:</strong> These details are typically found in the "DID UNLAWFULLY CONTRAVENE SECTION" area of your ticket.
+          💡 <strong>Tip:</strong> Use the search above or manually enter details from the "DID UNLAWFULLY CONTRAVENE SECTION" area of your ticket.
         </p>
       </div>
 
