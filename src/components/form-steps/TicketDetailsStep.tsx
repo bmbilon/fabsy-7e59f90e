@@ -114,6 +114,23 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
     "Other"
   ];
 
+  const openFileDialog = () => {
+    const input = fileInputRef.current;
+    if (!input) return;
+    try {
+      // Allow re-selecting the same file name
+      (input as any).value = "";
+    } catch {}
+    const anyInput = input as any;
+    if (typeof anyInput.showPicker === "function") {
+      try {
+        anyInput.showPicker();
+        return;
+      } catch {}
+    }
+    input.click();
+  };
+
   return (
     <form className="space-y-6">
       <div className="grid md:grid-cols-2 gap-6">
@@ -317,20 +334,21 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       {/* File Upload */}
       <div className="space-y-2">
         <Label>Upload Ticket Image</Label>
-        <label
-          htmlFor="ticketUpload"
+        <div
           className={cn(
             "border-2 border-dashed rounded-lg p-8 text-center transition-smooth cursor-pointer hover:border-primary/50",
             dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25",
             formData.ticketImage && "border-primary/50 bg-primary/5"
           )}
-          onClick={(e) => { e.preventDefault(); fileInputRef.current?.click(); }}
+          onClick={openFileDialog}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFileDialog(); } }}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
           role="button"
           tabIndex={0}
+          aria-label="Upload ticket image"
         >
           <input
             id="ticketUpload"
@@ -366,7 +384,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               </p>
             </div>
           )}
-        </label>
+        </div>
         <p className="text-xs text-muted-foreground">
           A clear photo of your ticket helps our experts analyze your case more effectively.
         </p>
