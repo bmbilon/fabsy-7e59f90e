@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Calendar, MapPin, Shield, FileText, Phone, Mail, User } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Shield, FileText, Phone, Mail, User as UserIcon } from "lucide-react";
 import { format } from "date-fns";
+import type { User, Session } from '@supabase/supabase-js';
 
 interface TicketSubmission {
   id: string;
@@ -42,27 +43,47 @@ export default function AdminSubmissionDetail() {
   const [submission, setSubmission] = useState<TicketSubmission | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    checkAuthAndFetchSubmission();
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (!session) {
+          navigate('/admin');
+        }
+      }
+    );
+
+    // THEN check for existing session and load data
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session) {
+        checkAuthAndFetchSubmission(session.user);
+      } else {
+        navigate('/admin');
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [id]);
 
-  const checkAuthAndFetchSubmission = async () => {
+  const checkAuthAndFetchSubmission = async (currentUser: User) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        navigate('/admin');
-        return;
-      }
-
       // Check user role
       const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .in('role', ['admin', 'case_manager'])
         .single();
 
@@ -72,6 +93,7 @@ export default function AdminSubmissionDetail() {
           description: "You don't have permission to access this page",
           variant: "destructive",
         });
+        await supabase.auth.signOut();
         navigate('/admin');
         return;
       }
@@ -198,7 +220,7 @@ export default function AdminSubmissionDetail() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
+                  <UserIcon className="h-5 w-5" />
                   Personal Information
                 </CardTitle>
               </CardHeader>
