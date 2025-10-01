@@ -26,9 +26,8 @@ const Hero = () => {
                 <p className="text-sm font-semibold text-white">✓ No Win, No Fee Guarantee</p>
               </div>
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight text-white drop-shadow-lg">
-                Got a ticket in Alberta? You may be able to dispute it — get an instant{" "}
-                <span className="text-primary">AI eligibility check</span>{" "}
-                <span className="text-white/90">(free)</span>.
+                If you got a traffic ticket in Alberta, you may be able to dispute it — start a{" "}
+                <span className="text-primary">free eligibility check</span>.
               </h1>
             </div>
             
@@ -44,14 +43,9 @@ const Hero = () => {
                   Free eligibility check — start now
                   <ArrowRight className="ml-3 h-6 w-6" />
                 </Button>
-                <div className="space-y-2 max-w-md mx-auto lg:mx-0">
-                  <p className="text-sm text-white/80 leading-relaxed">
-                    No-cost review. 24-hour response. Not legal advice—human follow-up available.
-                  </p>
-                  <p className="text-xs text-white/60 leading-relaxed">
-                    Disclaimer: This tool provides general information only and is not legal advice. Results are probabilistic. For case-specific legal advice, request a free human review from Fabsy or consult a licensed professional.
-                  </p>
-                </div>
+                <p className="text-sm text-white/80 leading-relaxed">
+                  No-cost review • 24-hr reply
+                </p>
               </div>
 
               {/* Upload Your Ticket Box */}
