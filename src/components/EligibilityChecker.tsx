@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Upload, Loader2, CheckCircle, XCircle, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -96,6 +98,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
   const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [monthlyPremium, setMonthlyPremium] = useState<string>("");
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -138,8 +141,11 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
       const violationType = detectViolationType(ocrData.violation || '');
       const violation = violationImpacts[violationType];
       
+      // Use custom premium if provided, otherwise use average
+      const userPremium = monthlyPremium ? parseFloat(monthlyPremium) * 12 : AVERAGE_PREMIUM;
+      
       // Calculate insurance impact
-      const annualIncrease = AVERAGE_PREMIUM * violation.increase;
+      const annualIncrease = userPremium * violation.increase;
       const threeYearImpact = annualIncrease * 3;
       const totalCostIfConvicted = fineAmount + threeYearImpact;
       const potentialSavings = totalCostIfConvicted - SERVICE_FEE;
@@ -179,6 +185,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
     setTicketData(null);
     setEligibilityResult(null);
     setImagePreview(null);
+    setMonthlyPremium("");
   };
 
   return (
@@ -230,11 +237,34 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
               )}
 
               {ticketData && !eligibilityResult && (
-                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                  <p className="font-semibold">Ticket Details Extracted:</p>
-                  {ticketData.violation && <p>Violation: {ticketData.violation}</p>}
-                  {ticketData.fine && <p>Fine: {ticketData.fine}</p>}
-                  {ticketData.ticketNumber && <p>Ticket #: {ticketData.ticketNumber}</p>}
+                <div className="space-y-4">
+                  <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                    <p className="font-semibold">Ticket Details Extracted:</p>
+                    {ticketData.violation && <p>Violation: {ticketData.violation}</p>}
+                    {ticketData.fine && <p>Fine: {ticketData.fine}</p>}
+                    {ticketData.ticketNumber && <p>Ticket #: {ticketData.ticketNumber}</p>}
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="monthly-premium" className="text-sm font-medium">
+                        Monthly Insurance Premium (Optional)
+                      </Label>
+                      <Input
+                        id="monthly-premium"
+                        type="number"
+                        placeholder="e.g., 150"
+                        value={monthlyPremium}
+                        onChange={(e) => setMonthlyPremium(e.target.value)}
+                        className="bg-white dark:bg-gray-900"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {monthlyPremium 
+                          ? `Annual: $${(parseFloat(monthlyPremium) * 12).toFixed(0)}` 
+                          : `Leave blank to use average ($${AVERAGE_PREMIUM}/year)`}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
