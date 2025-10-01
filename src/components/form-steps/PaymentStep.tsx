@@ -92,7 +92,8 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           violation: formData.violation,
           fineAmount: formData.fineAmount,
           submittedAt: new Date().toLocaleString(),
-          smsOptIn: formData.smsOptIn
+          smsOptIn: formData.smsOptIn,
+          couponCode: formData.couponCode
         }
       });
 

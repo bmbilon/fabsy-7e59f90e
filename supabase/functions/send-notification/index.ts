@@ -23,6 +23,7 @@ interface TicketNotification {
   fineAmount: string;
   submittedAt: string;
   smsOptIn?: boolean;
+  couponCode?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -34,13 +35,14 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const ticketData: TicketNotification = await req.json();
     const siteOrigin = req.headers.get("origin") || "https://fabsy.ca";
+    const isTestUser = ticketData.couponCode?.toUpperCase() === "TESTUSER";
     
-    console.log("Sending notification email for ticket:", ticketData.ticketNumber);
+    console.log("Sending notification email for ticket:", ticketData.ticketNumber, "| Test User:", isTestUser);
 
     const emailResponse = await resend.emails.send({
       from: "Fabsy Notifications <onboarding@resend.dev>",
-      to: ["brett@execom.ca"],
-      subject: `New Ticket Submission - ${ticketData.firstName} ${ticketData.lastName}`,
+      to: isTestUser ? ["brett@plume.ca"] : ["brett@execom.ca"],
+      subject: `${isTestUser ? '[TEST] ' : ''}New Ticket Submission - ${ticketData.firstName} ${ticketData.lastName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
@@ -156,7 +158,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send SMS notification to admin
     let adminSmsResponse = null;
     try {
-      const adminSmsMessage = `New Ticket Submission!\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: $${ticketData.fineAmount}`;
+      const adminSmsMessage = `${isTestUser ? '[TEST] ' : ''}New Ticket Submission!\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: $${ticketData.fineAmount}`;
       
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
       const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
@@ -168,7 +170,7 @@ const handler = async (req: Request): Promise<Response> => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({
-          To: "+14036695353",
+          To: isTestUser ? "+14036695353" : "+14036695353",
           From: twilioPhoneNumber || "",
           Body: adminSmsMessage,
         }).toString(),
