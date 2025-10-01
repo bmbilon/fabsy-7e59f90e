@@ -7,21 +7,21 @@ const Testimonials = () => {
     {
       name: "Sarah M.",
       location: "Calgary, AB",
-      quote: "I thought my $180 ticket was expensive until I found out it would cost me $1,400 in insurance increases. Fabsy saved me thousands!",
+      quote: "I was worried about how the ticket would affect our family's budget—insurance was already expensive. Fabsy handled everything and kept my record clean. So relieved!",
       rating: 5,
       savings: "$1,220"
     },
     {
       name: "Jennifer L.",
       location: "Edmonton, AB",
-      quote: "As a busy professional, I didn't have time to deal with court dates. Fabsy handled everything and got my ticket dismissed. Worth every penny!",
+      quote: "As a working mom, I didn't have time to figure out court dates and paperwork. Fabsy made it effortless—I just uploaded my ticket and they did the rest. Ticket dismissed!",
       rating: 5,
       savings: "$950"
     },
     {
       name: "Amanda K.",
       location: "Red Deer, AB",
-      quote: "The process was so simple - just uploaded my ticket and forgot about it. Three weeks later, charges dismissed! My insurance rates stayed the same.",
+      quote: "I can't believe how simple it was. No stress, no confusion—just results. My insurance didn't go up and I kept my clean record. Best decision I made!",
       rating: 5,
       savings: "$1,500"
     }
@@ -101,11 +101,11 @@ const Testimonials = () => {
         {/* Bottom CTA */}
         <div className="text-center mt-16 space-y-6">
           <h3 className="text-2xl font-bold">
-            Ready to Join These Smart Women?
+            You Deserve Peace of Mind
           </h3>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Don't let that ticket turn into a $1,650 problem. Take action now and 
-            protect your driving record with Alberta's most trusted ticket fighting service.
+            Don't let one ticket derail your budget or stress you out. Join 1,000+ Alberta women who chose to fight back. 
+            Questions? <a href="tel:403-669-5353" className="font-bold text-primary hover:text-primary-dark transition-smooth underline">Call 403-669-5353</a>
           </p>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Scale, Mail, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
+import { Scale, Mail, MapPin, Phone, Facebook, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -44,7 +44,13 @@ const Footer = () => {
             Expert traffic ticket defense for Alberta women.
           </p>
           
-          <div className="flex gap-4 text-[10px] text-muted-foreground">
+          <div className="flex gap-4 text-[10px] text-muted-foreground flex-wrap justify-center">
+            <div className="flex items-center gap-1.5">
+              <Phone className="h-2.5 w-2.5 text-primary" />
+              <a href="tel:403-669-5353" className="hover:text-primary transition-colors">
+                403-669-5353
+              </a>
+            </div>
             <div className="flex items-center gap-1.5">
               <Mail className="h-2.5 w-2.5 text-primary" />
               <a href="mailto:hello@fabsy.ca" className="hover:text-primary transition-colors">

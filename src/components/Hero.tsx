@@ -22,20 +22,23 @@ const Hero = () => {
           {/* Left column - Hero content */}
           <div className="text-center lg:text-left space-y-8">
             <div className="space-y-4">
+              <div className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-2 mb-4">
+                <p className="text-sm font-semibold text-white">✓ No Win, No Fee Guarantee</p>
+              </div>
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-white drop-shadow-lg">
-                Beat your traffic ticket,{" "}
-                <span className="text-primary">effortlessly</span>
+                Keep Your Insurance{" "}
+                <span className="text-primary">Rates Low</span>
               </h1>
               <p className="text-2xl lg:text-3xl font-medium text-white/95 drop-shadow-md">
-                Save Money & Points
+                We Fight Your Traffic Ticket
               </p>
             </div>
             
             <div className="space-y-6">
-              <p className="text-xl lg:text-2xl text-white/95 max-w-2xl drop-shadow-sm">
-                That <span className="font-bold text-primary shadow-glow">$150 ticket</span> could actually end up costing you{" "}
-                <span className="font-bold text-destructive shadow-glow">$3,000+ in insurance premiums over the next 3 years</span>. 
-                We fight it with a <span className="font-bold text-primary shadow-glow">94% success rate</span>.
+              <p className="text-xl lg:text-2xl text-white/95 max-w-2xl drop-shadow-sm leading-relaxed">
+                A <span className="font-bold text-primary shadow-glow">$150 ticket</span> can spike your insurance by{" "}
+                <span className="font-bold text-destructive shadow-glow">$1,200+ per year</span>. Let us handle it—{" "}
+                <span className="font-bold text-primary shadow-glow">94% success rate</span>, zero stress for you.
               </p>
 
               {/* Upload Your Ticket Box */}
@@ -83,11 +86,10 @@ const Hero = () => {
               <div className="bg-white/10 backdrop-blur-sm border border-white/30 rounded-lg p-6 shadow-glow">
                 <div className="flex items-center gap-3 mb-3">
                   <Shield className="h-6 w-6 text-primary" />
-                  <h3 className="text-xl font-bold text-white">100% Zero Risk Guarantee</h3>
+                  <h3 className="text-xl font-bold text-white">No Win, No Fee—Guaranteed</h3>
                 </div>
                 <p className="text-white/95 leading-relaxed">
-                  If we don't save you money on your total costs, you don't pay our fee. 
-                  You'll only pay your original fine plus a 10% processing fee - the same as paying through the court's online system.
+                  If we don't save you money, you pay nothing. Zero risk, zero pressure. Questions? Call us: <a href="tel:403-669-5353" className="font-bold text-primary hover:text-primary-light transition-smooth underline">403-669-5353</a>
                 </p>
               </div>
             </div>

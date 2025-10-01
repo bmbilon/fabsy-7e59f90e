@@ -1,8 +1,9 @@
 import Hero from "@/components/Hero";
+import TrustBar from "@/components/TrustBar";
 import HowItWorks from "@/components/HowItWorks";
+import Testimonials from "@/components/Testimonials";
 import ROISection from "@/components/ROISection";
 import SavingsCalculator from "@/components/SavingsCalculator";
-import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ChatWidget from "@/components/ChatWidget";
@@ -12,10 +13,11 @@ const Index = () => {
     <main className="min-h-screen">
       <Header />
       <Hero />
+      <TrustBar />
       <HowItWorks />
+      <Testimonials />
       <ROISection />
       <SavingsCalculator />
-      <Testimonials />
       <Footer />
       <ChatWidget />
     </main>
