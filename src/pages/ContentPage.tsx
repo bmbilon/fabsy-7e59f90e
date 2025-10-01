@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { generateFaqJsonLd } from '@/utils/generate-json-ld';
+import { generateFaqJsonLd, generateVideoObjectJsonLd } from '@/utils/generate-json-ld';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -16,10 +16,14 @@ interface ContentPageData {
   h1: string;
   hook: string;
   bullets: string[];
-  what_section: string;
-  how_section: string;
-  next_section: string;
+  what: string;
+  how: string;
+  next: string;
   faqs: FAQ[];
+  video?: {
+    youtubeUrl?: string;
+    transcript?: string;
+  };
 }
 
 interface ContentPageProps {
@@ -32,10 +36,20 @@ interface ContentPageProps {
  * JSON-LD injected from same source data
  */
 export default function ContentPage({ pageData }: ContentPageProps) {
-  const { meta_title, meta_description, h1, hook, bullets, what_section, how_section, next_section, faqs } = pageData;
+  const { meta_title, meta_description, h1, hook, bullets, what, how, next, faqs, video } = pageData;
 
-  // Generate JSON-LD from EXACT same FAQ data
+  // Generate JSON-LD from EXACT same FAQ data (single source of truth)
   const faqJsonLd = generateFaqJsonLd(faqs);
+  
+  // Generate video JSON-LD if video data exists
+  const videoJsonLd = video?.youtubeUrl ? generateVideoObjectJsonLd({
+    name: h1,
+    description: hook,
+    thumbnailUrl: `https://img.youtube.com/vi/${video.youtubeUrl.split('v=')[1]}/maxresdefault.jpg`,
+    uploadDate: new Date().toISOString(),
+    transcript: video.transcript || '',
+    contentUrl: video.youtubeUrl
+  }) : null;
 
   return (
     <>
@@ -45,6 +59,11 @@ export default function ContentPage({ pageData }: ContentPageProps) {
         <script type="application/ld+json">
           {JSON.stringify(faqJsonLd)}
         </script>
+        {videoJsonLd && (
+          <script type="application/ld+json">
+            {JSON.stringify(videoJsonLd)}
+          </script>
+        )}
       </Helmet>
 
       <div className="min-h-screen flex flex-col">
@@ -73,19 +92,19 @@ export default function ContentPage({ pageData }: ContentPageProps) {
           {/* What Section */}
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">What</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: what_section }} />
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: what }} />
           </section>
 
           {/* How Section */}
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">How</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: how_section }} />
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: how }} />
           </section>
 
           {/* Next Steps Section */}
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">Next steps</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: next_section }} />
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: next }} />
           </section>
 
           {/* FAQs - CRITICAL: Exact same text as JSON-LD */}
