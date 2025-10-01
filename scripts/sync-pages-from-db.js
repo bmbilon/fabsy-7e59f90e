@@ -2,9 +2,9 @@
  * Prebuild script: Fetch published pages from Supabase and write to src/content/pages/*.json
  * Requires env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  */
-const fs = require('fs');
-const path = require('path');
-const { createClient } = require('@supabase/supabase-js');
+import fs from 'fs';
+import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://gcasbisxfrssonllpqrw.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
