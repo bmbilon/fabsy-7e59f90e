@@ -52,7 +52,7 @@ const ChatWidget = () => {
     }
     
     if (message.includes('success') || message.includes('win') || message.includes('rate')) {
-      return "We have a 94% success rate in reducing or dismissing traffic tickets. Our experienced traffic representatives specialize in Alberta traffic matters and have handled thousands of cases successfully.";
+      return "We have a 100% success rate in reducing or dismissing traffic tickets. Our experienced traffic representatives specialize in Alberta traffic matters and have handled thousands of cases successfully.";
     }
     
     if (message.includes('insurance') || message.includes('premium')) {

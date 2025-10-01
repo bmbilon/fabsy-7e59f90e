@@ -64,7 +64,7 @@ const Services = () => {
       description: "Running red lights, improper lane changes, and other traffic infractions.",
       penalty: "2-4 demerits",
       fine: "$115-$287",
-      successRate: "90%"
+      successRate: "100%"
     }
   ];
 

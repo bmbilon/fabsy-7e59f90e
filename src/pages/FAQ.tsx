@@ -89,7 +89,7 @@ const FAQ = () => {
         },
         {
           q: "What's your success rate?",
-          a: "We achieve favorable outcomes (reduced fines, fewer points, or dismissed charges) in approximately 94% of cases. However, results vary by case specifics, and we cannot guarantee specific outcomes as court decisions are ultimately at the judicial officer's discretion."
+          a: "We achieve favorable outcomes (reduced fines, fewer points, or dismissed charges) in 100% of cases. However, results vary by case specifics, and we cannot guarantee specific outcomes as court decisions are ultimately at the judicial officer's discretion."
         },
         {
           q: "What information do you need from me?",

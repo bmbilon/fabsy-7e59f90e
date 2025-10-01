@@ -17,7 +17,7 @@ import Footer from "@/components/Footer";
 
 const About = () => {
   const stats = [
-    { number: "94%", label: "Success Rate", icon: Award },
+    { number: "100%", label: "Success Rate", icon: Award },
     { number: "$1.2M+", label: "Insurance Savings", icon: TrendingUp },
     { number: "10+", label: "Years Experience", icon: Star },
   ];
@@ -36,7 +36,7 @@ const About = () => {
     {
       icon: Target,
       title: "Results-Driven",
-      description: "Our 94% success rate speaks for itself. We're not satisfied unless we've fought hard for the best possible outcome for your case."
+      description: "Our 100% success rate speaks for itself. We're not satisfied unless we've fought hard for the best possible outcome for your case."
     }
   ];
 

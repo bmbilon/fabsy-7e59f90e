@@ -130,7 +130,7 @@ const TestimonialsPage = () => {
   const stats = [
     { 
       icon: TrendingDown,
-      number: "94%", 
+      number: "100%", 
       label: "Success Rate",
       description: "Cases won or reduced"
     },
@@ -299,7 +299,7 @@ const TestimonialsPage = () => {
               Join hundreds of Alberta women who chose to fight back
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              94% success rate • No win, no fee guarantee • Average 3-week turnaround
+              100% success rate • No win, no fee guarantee • Average 3-week turnaround
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

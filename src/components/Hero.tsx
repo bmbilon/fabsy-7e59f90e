@@ -114,7 +114,7 @@ const Hero = () => {
             {/* Quick stats */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-6 pt-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white drop-shadow-lg">94%</div>
+                <div className="text-3xl font-bold text-white drop-shadow-lg">100%</div>
                 <div className="text-sm text-white/80">Success Rate</div>
               </div>
               <div className="text-center">
