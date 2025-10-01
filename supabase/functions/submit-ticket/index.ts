@@ -145,6 +145,15 @@ const handler = async (req: Request): Promise<Response> => {
       .from('ticket_submissions')
       .insert({
         client_id: clientId,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        postal_code: formData.postalCode,
+        date_of_birth: formData.dateOfBirth,
+        drivers_license: formData.driversLicense,
         ticket_number: formData.ticketNumber,
         violation: formData.violation,
         fine_amount: formData.fineAmount,
