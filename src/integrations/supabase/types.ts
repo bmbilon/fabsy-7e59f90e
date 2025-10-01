@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      aeo_analytics: {
+        Row: {
+          created_at: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          page_slug: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          page_slug?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          page_slug?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           address: string | null
@@ -240,7 +273,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      aeo_kpi_summary: {
+        Row: {
+          event_date: string | null
+          event_type: string | null
+          total_events: number | null
+          unique_pages: number | null
+          unique_sessions: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
