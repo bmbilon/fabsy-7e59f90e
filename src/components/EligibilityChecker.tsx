@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Upload, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Upload, Loader2, CheckCircle, XCircle, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AILeadCapture from "./AILeadCapture";
@@ -22,8 +22,73 @@ interface TicketData {
 interface EligibilityResult {
   isEligible: boolean;
   reason: string;
-  analysis: string;
-  recommendations: string[];
+  financials: {
+    fine: number;
+    estimatedInsuranceIncrease: number;
+    threeYearImpact: number;
+    totalCostIfConvicted: number;
+    serviceFee: number;
+    potentialSavings: number;
+    roi: number;
+  };
+  violationType: string;
+  demeritPoints: number;
+}
+
+// Same violation impacts as calculator
+const violationImpacts: Record<string, { increase: number; points: number; description: string }> = {
+  'speeding-minor': { increase: 0.15, points: 2, description: 'Minor Speeding (1-15 km/h over)' },
+  'speeding-major': { increase: 0.25, points: 3, description: 'Major Speeding (16-30 km/h over)' },
+  'speeding-excessive': { increase: 0.35, points: 4, description: 'Excessive Speeding (31+ km/h over)' },
+  'careless-driving': { increase: 0.40, points: 6, description: 'Careless/Reckless Driving' },
+  'distracted-driving': { increase: 0.30, points: 3, description: 'Distracted Driving' },
+  'running-light': { increase: 0.20, points: 3, description: 'Running Red Light/Stop Sign' },
+  'following-too-close': { increase: 0.15, points: 2, description: 'Following Too Closely' },
+  'improper-lane-change': { increase: 0.10, points: 2, description: 'Improper Lane Change' },
+  'other': { increase: 0.15, points: 2, description: 'Other Traffic Violation' }
+};
+
+const SERVICE_FEE = 488;
+const AVERAGE_PREMIUM = 1800; // Alberta average
+
+// Map violation text to violation type
+function detectViolationType(violationText: string): string {
+  const text = violationText.toLowerCase();
+  
+  if (text.includes('speed')) {
+    if (text.includes('excessive') || text.match(/\d{2,}\s*km/)) {
+      const match = text.match(/(\d+)\s*km/);
+      if (match) {
+        const speed = parseInt(match[1]);
+        if (speed > 30) return 'speeding-excessive';
+        if (speed > 15) return 'speeding-major';
+      }
+      return 'speeding-major';
+    }
+    return 'speeding-minor';
+  }
+  
+  if (text.includes('careless') || text.includes('reckless') || text.includes('dangerous')) {
+    return 'careless-driving';
+  }
+  
+  if (text.includes('distract') || text.includes('phone') || text.includes('cell')) {
+    return 'distracted-driving';
+  }
+  
+  if (text.includes('red light') || text.includes('stop sign') || text.includes('traffic control')) {
+    return 'running-light';
+  }
+  
+  if (text.includes('follow') && text.includes('close')) {
+    return 'following-too-close';
+  }
+  
+  if (text.includes('lane') && text.includes('change')) {
+    return 'improper-lane-change';
+  }
+  
+  return 'other';
 }
 
 export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerProps) {
@@ -66,30 +131,39 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
       setTicketData(ocrData);
 
-      // Step 2: Analyze eligibility
-      toast.info("Analyzing eligibility...");
-      const question = `Is this ticket eligible for dispute? ${ocrData.violation ? `Violation: ${ocrData.violation}.` : ''} ${ocrData.fine ? `Fine: ${ocrData.fine}.` : ''}`;
+      // Step 2: Calculate eligibility based on financial logic (same as calculator)
+      toast.info("Calculating savings...");
       
-      const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-ticket-ai', {
-        body: { 
-          question,
-          ticketData: ocrData
-        }
-      });
-
-      if (analysisError) throw analysisError;
-
-      // Parse the AI response to determine eligibility
-      const aiAnswer = analysisData.ai_answer;
-      const isEligible = aiAnswer.hook?.toLowerCase().includes('eligible') || 
-                        aiAnswer.hook?.toLowerCase().includes('dispute') ||
-                        aiAnswer.hook?.toLowerCase().includes('fight');
-
+      const fineAmount = parseFloat(ocrData.fine?.replace(/[^0-9.]/g, '') || '0');
+      const violationType = detectViolationType(ocrData.violation || '');
+      const violation = violationImpacts[violationType];
+      
+      // Calculate insurance impact
+      const annualIncrease = AVERAGE_PREMIUM * violation.increase;
+      const threeYearImpact = annualIncrease * 3;
+      const totalCostIfConvicted = fineAmount + threeYearImpact;
+      const potentialSavings = totalCostIfConvicted - SERVICE_FEE;
+      const roi = ((potentialSavings - SERVICE_FEE) / SERVICE_FEE) * 100;
+      
+      // Ticket is eligible if fighting it saves money
+      const isEligible = potentialSavings > 0;
+      
       setEligibilityResult({
         isEligible,
-        reason: aiAnswer.hook || "Analysis complete",
-        analysis: aiAnswer.explain || "",
-        recommendations: aiAnswer.faqs?.map((faq: any) => faq.answer) || []
+        reason: isEligible 
+          ? `This ticket is worth disputing! You could save $${potentialSavings.toFixed(0)} over 3 years.`
+          : `This ticket may not justify representation costs, but our zero-risk guarantee means you have nothing to lose.`,
+        financials: {
+          fine: fineAmount,
+          estimatedInsuranceIncrease: annualIncrease,
+          threeYearImpact,
+          totalCostIfConvicted,
+          serviceFee: SERVICE_FEE,
+          potentialSavings,
+          roi
+        },
+        violationType: violation.description,
+        demeritPoints: violation.points
       });
 
       toast.success("Analysis complete!");
@@ -166,30 +240,98 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
             </div>
           ) : (
             <div className="space-y-6">
-              <div className={`p-6 rounded-lg border-2 ${eligibilityResult.isEligible ? 'border-green-500 bg-green-50 dark:bg-green-950' : 'border-red-500 bg-red-50 dark:bg-red-950'}`}>
+              {/* Eligibility Status */}
+              <div className={`p-6 rounded-lg border-2 ${eligibilityResult.isEligible ? 'border-green-500 bg-green-50 dark:bg-green-950' : 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950'}`}>
                 <div className="flex items-start gap-4">
                   {eligibilityResult.isEligible ? (
                     <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
                   ) : (
-                    <XCircle className="h-8 w-8 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+                    <XCircle className="h-8 w-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-1" />
                   )}
                   <div>
                     <h3 className="text-xl font-bold mb-2">
-                      {eligibilityResult.isEligible ? "Your Ticket May Be Eligible!" : "Limited Eligibility"}
+                      {eligibilityResult.isEligible ? "✅ Worth Fighting!" : "⚠️ Consider Carefully"}
                     </h3>
                     <p className="text-lg">{eligibilityResult.reason}</p>
                   </div>
                 </div>
               </div>
 
-              {eligibilityResult.analysis && (
-                <div className="prose dark:prose-invert max-w-none">
-                  <h4 className="font-semibold text-lg mb-2">Analysis:</h4>
-                  <p className="text-muted-foreground">{eligibilityResult.analysis}</p>
+              {/* Ticket Details */}
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold mb-3">Ticket Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Violation Type:</span>
+                    <p className="font-medium">{eligibilityResult.violationType}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Demerit Points:</span>
+                    <p className="font-medium">{eligibilityResult.demeritPoints} points</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Fine Amount:</span>
+                    <p className="font-medium">${eligibilityResult.financials.fine}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Ticket #:</span>
+                    <p className="font-medium">{ticketData?.ticketNumber || 'N/A'}</p>
+                  </div>
                 </div>
-              )}
+              </div>
 
-              <AILeadCapture />
+              {/* Financial Breakdown */}
+              <div className="bg-muted/50 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                  <h4 className="font-semibold">Financial Impact</h4>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Ticket Fine:</span>
+                    <span className="font-medium">${eligibilityResult.financials.fine}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Annual Insurance Increase:</span>
+                    <span className="font-medium">${eligibilityResult.financials.estimatedInsuranceIncrease.toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>3-Year Insurance Impact:</span>
+                    <span className="font-medium">${eligibilityResult.financials.threeYearImpact.toFixed(0)}</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-semibold">
+                    <span>Total Cost if Convicted:</span>
+                    <span className="text-destructive">${eligibilityResult.financials.totalCostIfConvicted.toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold">
+                    <span>Our Service Fee:</span>
+                    <span>${eligibilityResult.financials.serviceFee}</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-bold text-lg">
+                    <span>Your Savings:</span>
+                    <span className="text-primary">${eligibilityResult.financials.potentialSavings.toFixed(0)}</span>
+                  </div>
+                  {eligibilityResult.financials.roi > 0 && (
+                    <div className="bg-primary/10 rounded p-2 text-center">
+                      <span className="text-primary font-bold">
+                        {eligibilityResult.financials.roi.toFixed(0)}% more than you invest!
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Risk-Free Guarantee */}
+              <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-lg p-4">
+                <h4 className="font-semibold mb-2">🛡️ Zero-Risk Guarantee</h4>
+                <p className="text-sm text-muted-foreground">
+                  {eligibilityResult.isEligible 
+                    ? "With our no-win, no-fee guarantee, you only pay if we save you money. This ticket is worth fighting!"
+                    : "Even if savings are limited, our zero-risk guarantee means you pay nothing if we don't reduce your costs."}
+                </p>
+              </div>
+
+              <AILeadCapture ticketType={eligibilityResult.violationType} />
 
               <div className="flex gap-3">
                 <Button onClick={resetChecker} variant="outline" className="flex-1">
