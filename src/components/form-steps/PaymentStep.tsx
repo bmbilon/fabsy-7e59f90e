@@ -153,7 +153,35 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
       console.log('[Payment] Submission saved successfully:', submissionData.id);
 
-      // Step 3: Send notification email and SMS
+      // Step 3: Generate consent form PDF
+      console.log('[Payment] Generating consent form PDF...');
+      const { error: consentError } = await supabase.functions.invoke('generate-consent-form', {
+        body: {
+          submissionId: submissionData.id,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          province: formData.province,
+          postalCode: formData.postalCode,
+          driversLicense: formData.driversLicense,
+          ticketNumber: formData.ticketNumber,
+          violation: formData.violation,
+          issueDate: formData.issueDate?.toLocaleDateString() || '',
+          digitalSignature: formData.digitalSignature
+        }
+      });
+
+      if (consentError) {
+        console.error('[Payment] Consent form generation error:', consentError);
+        // Continue even if consent form fails - admin can generate manually
+      } else {
+        console.log('[Payment] Consent form generated successfully');
+      }
+
+      // Step 4: Send notification email and SMS
       console.log('[Payment] Sending notification email and SMS...');
       const { error: notificationError } = await supabase.functions.invoke('send-notification', {
         body: {
