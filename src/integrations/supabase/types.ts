@@ -285,6 +285,16 @@ export type Database = {
       }
     }
     Functions: {
+      get_aeo_kpi_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          event_date: string | null
+          event_type: string | null
+          total_events: number | null
+          unique_pages: number | null
+          unique_sessions: number | null
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

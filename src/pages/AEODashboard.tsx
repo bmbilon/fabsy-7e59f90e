@@ -23,14 +23,18 @@ export default function AEODashboard() {
 
   const fetchKPIData = async () => {
     try {
+      // Use the secure RPC function that checks admin role
       const { data, error } = await supabase
-        .from('aeo_kpi_summary')
-        .select('*')
-        .order('event_date', { ascending: false })
-        .limit(100);
+        .rpc('get_aeo_kpi_summary');
 
       if (error) throw error;
-      setKpiData(data || []);
+      
+      // Sort and limit the data client-side since RPC doesn't support chaining
+      const sortedData = (data || [])
+        .sort((a, b) => new Date(b.event_date || '').getTime() - new Date(a.event_date || '').getTime())
+        .slice(0, 100);
+      
+      setKpiData(sortedData);
     } catch (error) {
       console.error('Error fetching KPI data:', error);
     } finally {
