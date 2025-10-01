@@ -10,7 +10,18 @@ const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
 
 interface TicketNotification {
   submissionId?: string;
@@ -100,6 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
     const clientEmailResponse = await resend.emails.send({
       from: "Fabsy <onboarding@resend.dev>",
       to: [ticketData.email],
+      bcc: isTestUser ? ["brett@plume.ca"] : undefined,
       subject: "Your Ticket Submission Confirmation",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -149,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
       `,
       attachments: pdfBuffer ? [{
         filename: 'Written-Consent-Form.pdf',
-        content: Buffer.from(pdfBuffer).toString('base64'),
+        content: arrayBufferToBase64(pdfBuffer),
       }] : [],
     });
 
