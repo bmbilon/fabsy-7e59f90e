@@ -17,7 +17,6 @@ import Footer from "@/components/Footer";
 
 const About = () => {
   const stats = [
-    { number: "5,000+", label: "Women Helped", icon: Users },
     { number: "94%", label: "Success Rate", icon: Award },
     { number: "$1.2M+", label: "Insurance Savings", icon: TrendingUp },
     { number: "10+", label: "Years Experience", icon: Star },
@@ -64,7 +63,7 @@ const About = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           {stats.map((stat, index) => (
             <Card key={index} className="p-6 text-center bg-gradient-card shadow-fab border-white/20 backdrop-blur-sm">
               <stat.icon className="h-8 w-8 text-primary mx-auto mb-3" />
