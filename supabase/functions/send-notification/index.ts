@@ -55,9 +55,41 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber, "| Test User:", isTestUser);
 
+    // SECURITY: Fetch admin users from database to ensure only authorized users receive client data
+    const { data: adminUsers, error: adminError } = await supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'admin');
+
+    if (adminError || !adminUsers || adminUsers.length === 0) {
+      console.error("Failed to fetch admin users:", adminError);
+      throw new Error("No admin users found to send notifications to");
+    }
+
+    // Fetch email addresses for admin users
+    const { data: adminProfiles, error: profileError } = await supabase.auth.admin.listUsers();
+    
+    if (profileError) {
+      console.error("Failed to fetch admin emails:", profileError);
+      throw new Error("Failed to retrieve admin email addresses");
+    }
+
+    const adminUserIds = adminUsers.map(u => u.user_id);
+    const adminEmails = adminProfiles.users
+      .filter(user => adminUserIds.includes(user.id))
+      .map(user => user.email)
+      .filter((email): email is string => email !== undefined);
+
+    if (adminEmails.length === 0) {
+      throw new Error("No valid admin email addresses found");
+    }
+
+    console.log(`Sending admin notification to ${adminEmails.length} admin(s)`);
+
+    // SECURITY: This email contains ALL client data and should ONLY go to verified admin users
     const emailResponse = await resend.emails.send({
       from: "Fabsy Notifications <onboarding@resend.dev>",
-      to: ["brett@execom.ca"],
+      to: adminEmails,
       subject: `${isTestUser ? '[TEST] ' : ''}New Ticket Submission - ${ticketData.firstName} ${ticketData.lastName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -144,7 +176,8 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("Error fetching consent PDF:", pdfError.message);
     }
 
-    // Send CLIENT confirmation email with consent PDF
+    // SECURITY: Send CLIENT confirmation email - contains ONLY this client's own data
+    // Client should NEVER receive other clients' information or admin-only data
     const clientEmailResponse = await resend.emails.send({
       from: "Fabsy <onboarding@resend.dev>",
       to: [ticketData.email],
@@ -203,7 +236,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Client confirmation email sent successfully:", clientEmailResponse);
 
-    // Send SMS notification to admin
+    // SECURITY: Send SMS notification to admin - contains client data, only for verified admin
+    // TODO: Consider storing admin phone numbers in database for better security
     let adminSmsResponse = null;
     try {
       const adminSmsMessage = `${isTestUser ? '[TEST] ' : ''}New Ticket Submission!\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: $${ticketData.fineAmount}`;
@@ -218,7 +252,7 @@ const handler = async (req: Request): Promise<Response> => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({
-          To: isTestUser ? "+14036695353" : "+14036695353",
+          To: "+14036695353", // SECURITY: Hardcoded admin phone - only brett@execom.ca
           From: twilioPhoneNumber || "",
           Body: adminSmsMessage,
         }).toString(),
@@ -236,7 +270,8 @@ const handler = async (req: Request): Promise<Response> => {
       // Continue even if SMS fails
     }
 
-    // Send SMS notification to CLIENT if opted in
+    // SECURITY: Send SMS notification to CLIENT - generic confirmation only, no sensitive data
+    // Client SMS should NEVER contain other clients' information
     let clientSmsResponse = null;
     if (ticketData.smsOptIn) {
       try {
