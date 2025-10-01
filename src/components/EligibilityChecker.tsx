@@ -20,6 +20,12 @@ interface TicketData {
   ticketNumber?: string;
   issueDate?: string;
   location?: string;
+  officer?: string;
+  officerBadge?: string;
+  offenceSection?: string;
+  offenceSubSection?: string;
+  offenceDescription?: string;
+  courtDate?: string;
 }
 
 interface EligibilityResult {
@@ -136,10 +142,23 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
       toast.success("Ticket scanned successfully!");
       
-      // Store data and navigate to analysis page
+      // Store complete data and navigate to analysis page
       const key = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      const extractedData = ocrData?.data || ocrData;
       const payload = {
-        ticketData: ocrData,
+        ticketData: {
+          ticketNumber: extractedData.ticketNumber,
+          issueDate: extractedData.issueDate,
+          location: extractedData.location,
+          officer: extractedData.officer,
+          officerBadge: extractedData.officerBadge,
+          offenceSection: extractedData.offenceSection,
+          offenceSubSection: extractedData.offenceSubSection,
+          offenceDescription: extractedData.offenceDescription,
+          violation: extractedData.violation,
+          fine: extractedData.fineAmount,
+          courtDate: extractedData.courtDate,
+        },
         monthlyPremium: monthlyPremium
       };
       localStorage.setItem(`ticket-analysis:${key}`, JSON.stringify(payload));
