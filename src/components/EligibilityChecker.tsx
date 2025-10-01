@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Loader2, CheckCircle, XCircle, DollarSign } from "lucide-react";
+import { Upload, Loader2, CheckCircle, XCircle, DollarSign, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AILeadCapture from "./AILeadCapture";
@@ -235,24 +235,55 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   id="ticket-upload"
                   disabled={isProcessing}
                 />
-                <label 
-                  htmlFor="ticket-upload" 
-                  className="cursor-pointer flex flex-col items-center space-y-3"
-                >
-                  {isProcessing ? (
-                    <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                  ) : (
-                    <Upload className="h-12 w-12 text-muted-foreground" />
-                  )}
-                  <div>
-                    <p className="text-lg font-semibold">
-                      {isProcessing ? "Processing your ticket..." : "Upload Your Traffic Ticket"}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Click to select or drag and drop
-                    </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="ticket-camera"
+                  disabled={isProcessing}
+                />
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="flex flex-col items-center space-y-3">
+                    {isProcessing ? (
+                      <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                    ) : (
+                      <Upload className="h-12 w-12 text-muted-foreground" />
+                    )}
+                    <div>
+                      <p className="text-lg font-semibold">
+                        {isProcessing ? "Processing your ticket..." : "Upload Your Traffic Ticket"}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Click to select or drag and drop
+                      </p>
+                    </div>
                   </div>
-                </label>
+                  
+                  {!isProcessing && (
+                    <div className="flex gap-3 w-full max-w-sm">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => document.getElementById('ticket-upload')?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Choose File
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => document.getElementById('ticket-camera')?.click()}
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        Take Photo
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {imagePreview && (
