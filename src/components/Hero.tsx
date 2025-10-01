@@ -48,9 +48,7 @@ const Hero = () => {
                 <Button 
                   size="lg" 
                   className="bg-primary hover:bg-primary/90 text-white transition-smooth text-xl font-bold px-8 py-6 shadow-glow"
-                  onClick={() => {
-                    document.getElementById('drag-upload')?.click();
-                  }}
+                  onClick={() => setEligibilityOpen(true)}
                 >
                   Free eligibility check — start now
                   <ArrowRight className="ml-3 h-6 w-6" />
