@@ -35,7 +35,7 @@ REQUIREMENTS:
 - Each FAQ q/a must be plain text (no HTML) and identical between ai_answer.faqs[*] and page_json.faqs[*].
 - Do not claim statistics or rates unless you have a source; use neutral phrasing like "may", "can", "often".
 - Limit meta_title <=60 chars and meta_description <=155 chars.
-- For safety, append ai_answer.disclaimer: "This tool provides general information only and is not legal advice. Results are probabilistic. For case-specific legal advice, request a free human review from Fabsy or consult a licensed professional."
+- For safety, append ai_answer.disclaimer: "This tool provides general information only and is not legal advice. Results are probabilistic. For case-specific legal advice, request a free human review from Fabsy"
 - Output only valid JSON (no extra commentary).
 ```
 
@@ -73,7 +73,7 @@ REQUIREMENTS:
         "a": "Yes, photo radar tickets can be disputed. Common challenges include incorrect vehicle identification or equipment calibration issues."
       }
     ],
-    "disclaimer": "This tool provides general information only and is not legal advice. Results are probabilistic. For case-specific legal advice, request a free human review from Fabsy or consult a licensed professional."
+    "disclaimer": "This tool provides general information only and is not legal advice. Results are probabilistic. For case-specific legal advice, request a free human review from Fabsy"
   },
   "page_json": {
     "slug": "dispute-speeding-ticket-calgary",
