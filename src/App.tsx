@@ -6,20 +6,21 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import TicketFormPage from "./pages/TicketFormPage";
 import HowItWorks from "./pages/HowItWorks";
-import About from "./pages/About";
-import Services from "./pages/Services";
-import TestimonialsPage from "./pages/TestimonialsPage";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentCanceled from "./pages/PaymentCanceled";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import Contact from "./pages/Contact";
-import FAQ from "./pages/FAQ";
-import NotFound from "./pages/NotFound";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
-import AEODashboard from "./pages/AEODashboard";
+ import About from "./pages/About";
+ import Services from "./pages/Services";
+ import TestimonialsPage from "./pages/TestimonialsPage";
+ import PaymentSuccess from "./pages/PaymentSuccess";
+ import PaymentCanceled from "./pages/PaymentCanceled";
+ import PrivacyPolicy from "./pages/PrivacyPolicy";
+ import TermsOfService from "./pages/TermsOfService";
+ import Contact from "./pages/Contact";
+ import FAQ from "./pages/FAQ";
+ import NotFound from "./pages/NotFound";
+ import AdminLogin from "./pages/AdminLogin";
+ import AdminDashboard from "./pages/AdminDashboard";
+ import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
+ import AEODashboard from "./pages/AEODashboard";
+ import TicketAnalysis from "./pages/TicketAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -43,8 +44,9 @@ const App = () => (
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/ticket-analysis" element={<TicketAnalysis />} />
+           {/* Admin Routes */}
+           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
