@@ -95,6 +95,7 @@ function detectViolationType(violationText: string): string {
 }
 
 export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerProps) {
+  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
   const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
@@ -133,12 +134,22 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
       if (ocrError) throw ocrError;
 
-      setTicketData(ocrData);
       toast.success("Ticket scanned successfully!");
+      
+      // Store data and navigate to analysis page
+      const key = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      const payload = {
+        ticketData: ocrData,
+        monthlyPremium: monthlyPremium
+      };
+      localStorage.setItem(`ticket-analysis:${key}`, JSON.stringify(payload));
+      
+      // Close dialog and navigate
+      onOpenChange(false);
+      navigate(`/ticket-analysis?k=${key}`);
     } catch (error) {
       console.error('Error processing ticket:', error);
       toast.error("Failed to process ticket. Please try again.");
-    } finally {
       setIsProcessing(false);
     }
   };
