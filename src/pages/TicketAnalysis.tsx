@@ -315,29 +315,37 @@ const TicketAnalysis = () => {
               </CardContent>
             </Card>
 
-            {/* CTA Section */}
-            <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
+            {/* Prominent CTA Section */}
+            <Card className="border-2 border-primary bg-gradient-to-br from-primary via-primary to-primary/80">
               <CardContent className="p-8 text-center">
-                <Shield className="h-16 w-16 mx-auto mb-4 text-primary" />
-                <h2 className="text-3xl font-bold mb-4">🛡️ Zero-Risk Guarantee</h2>
-                <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+                <h2 className="text-4xl font-bold mb-4 text-white">Ready to Fight Your Ticket?</h2>
+                <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                  Save ${result.financials.potentialSavings.toFixed(0)} with {result.financials.roi.toFixed(0)}% ROI
+                </p>
+                <Link to="/ticket-form">
+                  <Button size="lg" variant="secondary" className="text-xl px-12 py-8 h-auto font-bold shadow-xl hover:scale-105 transition-transform">
+                    Get My Ticket Dismissed
+                    <ArrowLeft className="ml-3 h-6 w-6 rotate-180" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Zero-Risk Guarantee */}
+            <Card className="border-2">
+              <CardContent className="p-8 text-center">
+                <Shield className="h-12 w-12 mx-auto mb-4 text-primary" />
+                <h3 className="text-2xl font-bold mb-3">🛡️ Zero-Risk Guarantee</h3>
+                <p className="text-lg text-muted-foreground mb-4 max-w-2xl mx-auto">
                   {result.isEligible 
                     ? "With our no-win, no-fee guarantee, you only pay if we save you money. Start now and protect your driving record!"
                     : "Even with limited savings potential, our zero-risk guarantee means you pay nothing if we don't reduce your costs. Why not try?"}
                 </p>
-                <div className="flex gap-4 justify-center flex-wrap">
-                  <Link to="/ticket-form">
-                    <Button size="lg" className="text-lg px-8 py-6 h-auto">
-                      Get Started Now
-                      <ArrowLeft className="ml-2 h-5 w-5 rotate-180" />
-                    </Button>
-                  </Link>
-                  <Link to="/">
-                    <Button size="lg" variant="outline" className="text-lg px-8 py-6 h-auto">
-                      Scan Another Ticket
-                    </Button>
-                  </Link>
-                </div>
+                <Link to="/">
+                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 h-auto">
+                    Scan Another Ticket
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
