@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, FileText, Zap, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AILeadCapture from "./AILeadCapture";
 
 interface InstantTicketAnalyzerProps {
   ticketImage: File | null;
@@ -199,15 +200,11 @@ const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, city, date 
             </div>
 
             {/* CTA */}
-            <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-lg p-6 text-center">
-              <p className="font-semibold mb-3">Ready to dispute your ticket?</p>
-              <Button size="lg" className="w-full md:w-auto">
-                Continue to Full Application
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">
-                Get a free human review within 24 hours
-              </p>
-            </div>
+            <AILeadCapture 
+              variant="open"
+              ticketType={violation}
+              aiAnswer={aiAnswer.hook}
+            />
           </div>
         ) : null}
       </CardContent>
