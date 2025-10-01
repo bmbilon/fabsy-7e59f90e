@@ -131,50 +131,29 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Admin email sent successfully:", emailResponse);
 
-    // Fetch the consent PDF from the site origin to attach it
+    // Fetch the dynamically generated consent form from storage
     let pdfBuffer: ArrayBuffer | null = null;
-    let consentFormPath: string | null = null;
     
     try {
-      const pdfResponse = await fetch(`${siteOrigin}/forms/Form-SRA12675-Written-Consent.pdf`);
-      if (pdfResponse.ok) {
-        pdfBuffer = await pdfResponse.arrayBuffer();
-        console.log("Consent PDF fetched successfully");
+      if (ticketData.submissionId) {
+        const fileName = `${ticketData.submissionId}/consent-form.pdf`;
         
-        // Upload consent form to storage if we have a submission ID
-        if (ticketData.submissionId && pdfBuffer) {
-          const fileName = `${ticketData.submissionId}/consent-form.pdf`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('consent-forms')
-            .upload(fileName, pdfBuffer, {
-              contentType: 'application/pdf',
-              upsert: true
-            });
-          
-          if (uploadError) {
-            console.error("Error uploading consent form to storage:", uploadError);
-          } else {
-            consentFormPath = fileName;
-            console.log("Consent form uploaded to storage:", fileName);
-            
-            // Update the ticket submission with the consent form path
-            const { error: updateError } = await supabase
-              .from('ticket_submissions')
-              .update({ consent_form_path: consentFormPath })
-              .eq('id', ticketData.submissionId);
-            
-            if (updateError) {
-              console.error("Error updating submission with consent form path:", updateError);
-            } else {
-              console.log("Ticket submission updated with consent form path");
-            }
-          }
+        // Download the consent form from storage
+        const { data: pdfData, error: downloadError } = await supabase.storage
+          .from('consent-forms')
+          .download(fileName);
+        
+        if (downloadError) {
+          console.error("Error downloading consent form from storage:", downloadError);
+        } else if (pdfData) {
+          pdfBuffer = await pdfData.arrayBuffer();
+          console.log("Consent form fetched successfully from storage");
         }
       } else {
-        console.error("Failed to fetch consent PDF:", pdfResponse.status);
+        console.warn("No submission ID provided, cannot fetch consent form");
       }
     } catch (pdfError: any) {
-      console.error("Error fetching consent PDF:", pdfError.message);
+      console.error("Error fetching consent form from storage:", pdfError.message);
     }
 
     // SECURITY: Send CLIENT confirmation email - contains ONLY this client's own data
