@@ -1,57 +1,51 @@
-#!/usr/bin/env node
-
 /**
- * Generate route definitions from page JSON files
- * This creates the routing configuration for SSG
+ * Generate src/content/routes-manifest.json from src/content/pages/*.json
+ * This runs during prebuild after sync-pages-from-db.js
  */
+const fs = require('fs');
+const path = require('path');
 
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const pagesDir = path.resolve('./src/content/pages');
+const outFile = path.resolve('./src/content/routes-manifest.json');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+console.log('📋 Generating routes manifest...');
 
-async function generateRoutes() {
-  console.log('🔄 Generating routes from page content...');
-
-  try {
-    const pagesDir = path.resolve(__dirname, '../src/content/pages');
-    const files = await fs.readdir(pagesDir);
-    
-    const jsonFiles = files.filter(f => f.endsWith('.json'));
-    
-    if (jsonFiles.length === 0) {
-      console.log('⚠️  No page JSON files found');
-      return;
-    }
-
-    const routes = [];
-    
-    for (const file of jsonFiles) {
-      const filePath = path.join(pagesDir, file);
-      const content = await fs.readFile(filePath, 'utf8');
-      const pageData = JSON.parse(content);
-      
-      if (pageData.slug) {
-        routes.push({
-          slug: pageData.slug,
-          path: `/${pageData.slug}`,
-          meta_title: pageData.meta_title,
-        });
-      }
-    }
-
-    // Write routes manifest
-    const manifestPath = path.resolve(__dirname, '../src/content/routes-manifest.json');
-    await fs.writeFile(manifestPath, JSON.stringify(routes, null, 2), 'utf8');
-    
-    console.log(`✅ Generated ${routes.length} route(s)`);
-    console.log(`  Routes: ${routes.map(r => r.path).join(', ')}`);
-  } catch (error) {
-    console.error('❌ Route generation failed:', error.message);
-    process.exit(1);
-  }
+if (!fs.existsSync(pagesDir)) {
+  console.warn('⚠️  No pages directory found at', pagesDir);
+  fs.writeFileSync(outFile, JSON.stringify({ routes: [] }, null, 2), 'utf8');
+  console.log('✓ Created empty routes manifest');
+  process.exit(0);
 }
 
-generateRoutes();
+const files = fs.readdirSync(pagesDir).filter(f => f.endsWith('.json'));
+
+if (files.length === 0) {
+  console.warn('⚠️  No JSON files found in', pagesDir);
+  fs.writeFileSync(outFile, JSON.stringify({ routes: [] }, null, 2), 'utf8');
+  console.log('✓ Created empty routes manifest');
+  process.exit(0);
+}
+
+const routes = files.map(file => {
+  const slug = path.basename(file, '.json');
+  const filePath = path.join(pagesDir, file);
+  const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  
+  return {
+    path: `/content/${slug}`,
+    slug: slug,
+    meta_title: content.meta_title || '',
+    meta_description: content.meta_description || '',
+    h1: content.h1 || ''
+  };
+});
+
+const manifest = {
+  generated: new Date().toISOString(),
+  count: routes.length,
+  routes: routes
+};
+
+fs.writeFileSync(outFile, JSON.stringify(manifest, null, 2), 'utf8');
+console.log(`✅ Generated routes manifest: ${routes.length} route(s)`);
+routes.forEach(r => console.log(`   ${r.path}`));

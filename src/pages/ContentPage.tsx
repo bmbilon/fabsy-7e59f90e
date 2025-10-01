@@ -1,61 +1,104 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { generateFaqJsonLd, generateVideoJsonLd } from '@/utils/generate-json-ld';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle, ArrowRight } from "lucide-react";
+import { generateFaqJsonLd, generateVideoJsonLd } from "@/utils/generate-json-ld";
 
-interface FAQ {
-  q: string;
-  a: string;
-}
-
-interface ContentPageData {
+interface PageContent {
+  slug: string;
   meta_title: string;
   meta_description: string;
-  slug: string;
   h1: string;
   hook: string;
   bullets: string[];
   what: string;
   how: string;
   next: string;
-  faqs: FAQ[];
-  video?: {
-    youtubeUrl?: string;
-    transcript?: string;
-  };
+  faqs: Array<{ q: string; a: string }>;
+  video: { youtubeUrl?: string; transcript?: string } | null;
 }
 
-interface ContentPageProps {
-  pageData: ContentPageData;
-}
+const ContentPage = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const [pageData, setPageData] = useState<PageContent | null>(null);
+  const [loading, setLoading] = useState(true);
 
-/**
- * SSG-ready content page template
- * Renders hook-first structure with exact FAQ matching
- * JSON-LD injected from same source data
- */
-export default function ContentPage({ pageData }: ContentPageProps) {
-  const { meta_title, meta_description, h1, hook, bullets, what, how, next, faqs, video } = pageData;
+  useEffect(() => {
+    const loadPage = async () => {
+      try {
+        // Try to load from build-time generated content
+        const content = await import(`../content/pages/${slug}.json`);
+        setPageData(content.default || content);
+      } catch (error) {
+        console.error('Failed to load page content:', error);
+        setPageData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Generate JSON-LD from EXACT same FAQ data (single source of truth)
-  const faqJsonLd = generateFaqJsonLd(faqs);
-  
-  // Generate video JSON-LD if video data exists
-  const videoJsonLd = video?.youtubeUrl ? generateVideoJsonLd({
-    youtubeUrl: video.youtubeUrl,
-    transcript: video.transcript,
-    title: h1
-  }) : null;
+    if (slug) {
+      loadPage();
+    }
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
+  if (!pageData) {
+    return (
+      <main className="min-h-screen">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-4xl font-bold mb-4">Page Not Found</h1>
+          <p className="text-muted-foreground mb-8">The page you're looking for doesn't exist.</p>
+          <Link to="/">
+            <Button>Go Home</Button>
+          </Link>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
+  const faqJsonLd = generateFaqJsonLd(pageData.faqs || []);
+  const videoJsonLd = pageData.video?.youtubeUrl 
+    ? generateVideoJsonLd({
+        youtubeUrl: pageData.video.youtubeUrl,
+        transcript: pageData.video.transcript,
+        title: pageData.h1
+      })
+    : null;
 
   return (
     <>
       <Helmet>
-        <title>{meta_title}</title>
-        <meta name="description" content={meta_description} />
-        <script type="application/ld+json">
-          {JSON.stringify(faqJsonLd)}
-        </script>
+        <title>{pageData.meta_title}</title>
+        <meta name="description" content={pageData.meta_description} />
+        <meta property="og:title" content={pageData.meta_title} />
+        <meta property="og:description" content={pageData.meta_description} />
+        <meta property="og:type" content="article" />
+        <link rel="canonical" href={`https://fabsy.ca/content/${pageData.slug}`} />
+        
+        {faqJsonLd && (
+          <script type="application/ld+json">
+            {JSON.stringify(faqJsonLd)}
+          </script>
+        )}
         {videoJsonLd && (
           <script type="application/ld+json">
             {JSON.stringify(videoJsonLd)}
@@ -63,78 +106,106 @@ export default function ContentPage({ pageData }: ContentPageProps) {
         )}
       </Helmet>
 
-      <div className="min-h-screen flex flex-col">
+      <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
         <Header />
-        
-        <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
-          {/* Hook: First visible text - CRITICAL for AEO */}
-          <h1 className="text-4xl font-bold mb-4">{h1}</h1>
-          <p className="text-xl text-muted-foreground mb-8 font-medium aeo-hook">
-            {hook}
-          </p>
 
-          {/* Key Facts */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Key facts</h2>
-            <ul className="space-y-2">
-              {bullets.map((bullet, i) => (
-                <li key={i} className="flex items-start">
-                  <span className="text-primary mr-2">•</span>
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <article className="container mx-auto px-4 py-12">
+          {/* Hero Section */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{pageData.h1}</h1>
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              {pageData.hook}
+            </p>
+          </div>
 
-          {/* What Section */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">What</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: what }} />
-          </section>
+          {/* Key Points */}
+          {pageData.bullets && pageData.bullets.length > 0 && (
+            <Card className="max-w-4xl mx-auto mb-12">
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-bold mb-6">Key Points</h2>
+                <ul className="space-y-3">
+                  {pageData.bullets.map((bullet, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-lg">{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* How Section */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">How</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: how }} />
-          </section>
+          {/* Content Sections */}
+          <div className="max-w-4xl mx-auto space-y-12">
+            {pageData.what && (
+              <section>
+                <h2 className="text-3xl font-bold mb-4">What You Need to Know</h2>
+                <div 
+                  className="prose prose-lg max-w-none dark:prose-invert" 
+                  dangerouslySetInnerHTML={{ __html: pageData.what }} 
+                />
+              </section>
+            )}
 
-          {/* Next Steps Section */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Next steps</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: next }} />
-          </section>
+            {pageData.how && (
+              <section>
+                <h2 className="text-3xl font-bold mb-4">How It Works</h2>
+                <div 
+                  className="prose prose-lg max-w-none dark:prose-invert" 
+                  dangerouslySetInnerHTML={{ __html: pageData.how }} 
+                />
+              </section>
+            )}
 
-          {/* FAQs - CRITICAL: Exact same text as JSON-LD */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-6">Frequently asked questions</h2>
-            <div className="space-y-4">
-              {faqs.map((faq, idx) => (
-                <details key={idx} className="border rounded-lg p-4 cursor-pointer hover:bg-accent/5 transition-colors">
-                  <summary className="font-semibold text-lg">
-                    {faq.q}
-                  </summary>
-                  <p className="mt-3 text-muted-foreground">
-                    {faq.a}
-                  </p>
-                </details>
-              ))}
-            </div>
-          </section>
+            {pageData.next && (
+              <section>
+                <h2 className="text-3xl font-bold mb-4">Next Steps</h2>
+                <div 
+                  className="prose prose-lg max-w-none dark:prose-invert" 
+                  dangerouslySetInnerHTML={{ __html: pageData.next }} 
+                />
+              </section>
+            )}
 
-          {/* CTA */}
-          <section className="bg-primary/10 rounded-lg p-8 text-center">
-            <h3 className="text-2xl font-semibold mb-4">Call to action</h3>
-            <a 
-              href="/ticket-form" 
-              className="inline-block bg-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-            >
-              Get a free eligibility check
-            </a>
-          </section>
-        </main>
+            {/* FAQs */}
+            {pageData.faqs && pageData.faqs.length > 0 && (
+              <section>
+                <h2 className="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
+                <div className="space-y-4">
+                  {pageData.faqs.map((faq, i) => (
+                    <Card key={i}>
+                      <CardContent className="p-6">
+                        <h3 className="text-xl font-semibold mb-3">{faq.q}</h3>
+                        <p className="text-muted-foreground leading-relaxed">{faq.a}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* CTA */}
+            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20">
+              <CardContent className="p-8 text-center">
+                <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+                <p className="text-xl text-muted-foreground mb-6">
+                  Get a free eligibility check and see if your ticket is worth fighting
+                </p>
+                <Link to="/">
+                  <Button size="lg" className="text-lg px-8">
+                    Free Eligibility Check
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </article>
 
         <Footer />
-      </div>
+      </main>
     </>
   );
-}
+};
+
+export default ContentPage;
