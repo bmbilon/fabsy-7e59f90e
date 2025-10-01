@@ -214,7 +214,7 @@ const TicketAnalysis = () => {
               </Card>
 
               {/* Insurance Premium Input */}
-              <Card className="border-2 border-primary/20 bg-primary/5">
+              <Card className="border-2">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="p-3 rounded-lg bg-primary/10">
