@@ -8,12 +8,21 @@ import SavingsCalculator from "@/components/SavingsCalculator";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ChatWidget from "@/components/ChatWidget";
+import AIQuestionWidget from "@/components/AIQuestionWidget";
 
 const Index = () => {
   return (
     <main className="min-h-screen">
       <Header />
       <Hero />
+      
+      {/* AI Question Widget Section */}
+      <section className="py-16 px-4 bg-gradient-soft">
+        <div className="container mx-auto">
+          <AIQuestionWidget />
+        </div>
+      </section>
+
       <InsuranceLogoMarquee />
       <TrustBar />
       <HowItWorks />
