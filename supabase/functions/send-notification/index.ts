@@ -88,7 +88,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // SECURITY: This email contains ALL client data and should ONLY go to verified admin users
     const emailResponse = await resend.emails.send({
-      from: "Fabsy Notifications <onboarding@resend.dev>",
+      from: "Fabsy <hello@fabsy.ca>",
+      reply_to: "brett@execom.ca",
       to: adminEmails,
       subject: `${isTestUser ? '[TEST] ' : ''}New Ticket Submission - ${ticketData.firstName} ${ticketData.lastName}`,
       html: `
@@ -179,7 +180,8 @@ const handler = async (req: Request): Promise<Response> => {
     // SECURITY: Send CLIENT confirmation email - contains ONLY this client's own data
     // Client should NEVER receive other clients' information or admin-only data
     const clientEmailResponse = await resend.emails.send({
-      from: "Fabsy <onboarding@resend.dev>",
+      from: "Fabsy <hello@fabsy.ca>",
+      reply_to: "brett@execom.ca",
       to: [ticketData.email],
       subject: "Your Ticket Submission Confirmation",
       html: `
