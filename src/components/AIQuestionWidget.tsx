@@ -17,6 +17,7 @@ interface AIAnswer {
 }
 
 const AIQuestionWidget = () => {
+  console.log("AIQuestionWidget rendering");
   const [question, setQuestion] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiAnswer, setAiAnswer] = useState<AIAnswer | null>(null);
