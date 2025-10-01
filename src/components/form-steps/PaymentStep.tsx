@@ -39,125 +39,56 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
     setIsProcessing(true);
     try {
-      // Step 1: Check if client exists or create new client
-      console.log('[Payment] Checking for existing client...');
-      let clientId: string;
-      
-      const { data: existingClient, error: clientLookupError } = await supabase
-        .from('clients')
-        .select('id')
-        .eq('drivers_license', formData.driversLicense)
-        .maybeSingle();
-      
-      if (clientLookupError) {
-        console.error('[Payment] Client lookup error:', clientLookupError);
-        toast({
-          title: 'Submission Error',
-          description: 'Failed to process your information. Please try again.',
-          variant: 'destructive',
-        });
-        setIsProcessing(false);
-        return;
-      }
-
-      if (existingClient) {
-        console.log('[Payment] Found existing client:', existingClient.id);
-        clientId = existingClient.id;
-        
-        // Update client information with latest data
-        const { error: updateError } = await supabase
-          .from('clients')
-          .update({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            address: formData.address,
-            city: formData.city,
-            postal_code: formData.postalCode,
-            date_of_birth: formData.dateOfBirth?.toISOString().split('T')[0],
-            sms_opt_in: formData.smsOptIn,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', clientId);
+      // Step 1: Submit ticket through secure backend endpoint
+      // This prevents direct database manipulation and validates input server-side
+      console.log('[Payment] Submitting ticket through backend...');
+      const { data: submissionResult, error: submissionError } = await supabase.functions.invoke('submit-ticket', {
+        body: {
+          // Client info
+          driversLicense: formData.driversLicense,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          dateOfBirth: formData.dateOfBirth?.toISOString().split('T')[0],
+          smsOptIn: formData.smsOptIn,
           
-        if (updateError) {
-          console.error('[Payment] Client update error:', updateError);
-        }
-      } else {
-        // Create new client
-        console.log('[Payment] Creating new client...');
-        const { data: newClient, error: createClientError } = await supabase
-          .from('clients')
-          .insert({
-            drivers_license: formData.driversLicense,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            address: formData.address,
-            city: formData.city,
-            postal_code: formData.postalCode,
-            date_of_birth: formData.dateOfBirth?.toISOString().split('T')[0],
-            sms_opt_in: formData.smsOptIn
-          })
-          .select('id')
-          .single();
-
-        if (createClientError || !newClient) {
-          console.error('[Payment] Client creation error:', createClientError);
-          toast({
-            title: 'Submission Error',
-            description: 'Failed to create client record. Please try again.',
-            variant: 'destructive',
-          });
-          setIsProcessing(false);
-          return;
-        }
-        
-        clientId = newClient.id;
-        console.log('[Payment] Client created:', clientId);
-      }
-
-      // Step 2: Create ticket submission linked to client
-      console.log('[Payment] Saving ticket submission to database...');
-      const { data: submissionData, error: submissionError } = await supabase
-        .from('ticket_submissions')
-        .insert({
-          client_id: clientId,
-          ticket_number: formData.ticketNumber,
+          // Ticket info
+          ticketNumber: formData.ticketNumber,
           violation: formData.violation,
-          fine_amount: formData.fineAmount,
-          violation_date: formData.issueDate?.toISOString().split('T')[0],
-          court_location: formData.courtJurisdiction,
-          court_date: formData.courtDate?.toISOString().split('T')[0],
-          defense_strategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
-          additional_notes: formData.additionalNotes,
-          coupon_code: formData.couponCode,
-          insurance_company: formData.insuranceCompany,
-          status: 'pending'
-        } as any)
-        .select('id')
-        .single();
+          fineAmount: formData.fineAmount,
+          violationDate: formData.issueDate?.toISOString().split('T')[0],
+          courtLocation: formData.courtJurisdiction,
+          courtDate: formData.courtDate?.toISOString().split('T')[0],
+          defenseStrategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
+          additionalNotes: formData.additionalNotes,
+          couponCode: formData.couponCode,
+          insuranceCompany: formData.insuranceCompany
+        }
+      });
 
-      if (submissionError || !submissionData) {
-        console.error('[Payment] Database error:', submissionError);
+      if (submissionError || !submissionResult?.success) {
+        console.error('[Payment] Submission error:', submissionError);
         toast({
           title: 'Submission Error',
-          description: 'Failed to save your submission. Please try again.',
+          description: submissionError?.message || 'Failed to submit your ticket. Please try again.',
           variant: 'destructive',
         });
         setIsProcessing(false);
         return;
       }
 
-      console.log('[Payment] Submission saved successfully:', submissionData.id);
+      const submissionId = submissionResult.submissionId;
+      console.log('[Payment] Submission created successfully:', submissionId);
 
-      // Step 3: Generate consent form PDF
+      // Step 2: Generate consent form PDF
       console.log('[Payment] Generating consent form PDF...');
       const { data: consentData, error: consentError } = await supabase.functions.invoke('generate-consent-form', {
         body: {
-          submissionId: submissionData.id,
+          submissionId: submissionId,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
@@ -189,11 +120,11 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
-      // Step 4: Send notification email and SMS
+      // Step 3: Send notification email and SMS
       console.log('[Payment] Sending notification email and SMS...');
       const { error: notificationError } = await supabase.functions.invoke('send-notification', {
         body: {
-          submissionId: submissionData.id,
+          submissionId: submissionId,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
