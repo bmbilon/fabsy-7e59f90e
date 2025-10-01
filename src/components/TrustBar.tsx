@@ -1,4 +1,4 @@
-import { Shield, Clock, Users, Phone } from "lucide-react";
+import { Shield, Clock, Users, Phone, CheckCircle, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const TrustBar = () => {
@@ -10,15 +10,15 @@ const TrustBar = () => {
       color: "text-primary"
     },
     {
-      icon: Users,
-      stat: "1,000+",
-      detail: "Alberta women served",
-      color: "text-secondary"
+      icon: CheckCircle,
+      stat: "100% Success Rate",
+      detail: "Every case we've handled has been reduced or dismissed",
+      color: "text-green-600"
     },
     {
-      icon: Clock,
-      stat: "48-72 Hours",
-      detail: "Average response time",
+      icon: Zap,
+      stat: "Instant Analysis, Free",
+      detail: "Get your results in under 60 seconds",
       color: "text-primary"
     }
   ];
