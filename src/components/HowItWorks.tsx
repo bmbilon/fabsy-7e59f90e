@@ -1,7 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Upload, Users, Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HowItWorks = () => {
+  const navigate = useNavigate();
   const steps = [
     {
       number: 1,
@@ -52,8 +54,15 @@ const HowItWorks = () => {
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {steps.map((step, index) => {
             const Icon = step.icon;
+            const isFirstStep = index === 0;
             return (
-              <Card key={index} className="relative p-8 text-center bg-gradient-card shadow-fab border-primary/10 hover:shadow-elevated transition-smooth">
+              <Card 
+                key={index} 
+                className={`relative p-8 text-center bg-gradient-card shadow-fab border-primary/10 hover:shadow-elevated transition-smooth ${
+                  isFirstStep ? 'cursor-pointer' : ''
+                }`}
+                onClick={isFirstStep ? () => navigate('/submit-ticket') : undefined}
+              >
                 {/* Step number */}
                 <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
                   <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-glow">
