@@ -94,42 +94,83 @@ const HowItWorks = () => {
         <div className="mb-20">
           <div className="grid gap-8">
             {steps.map((step, index) => (
-              <Card key={index} className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
-                <div className="flex flex-col md:flex-row items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center shadow-glow">
-                      <step.icon className="h-8 w-8 text-white" />
+              index === 0 ? (
+                <Link to="/submit-ticket" key={index} className="block">
+                  <Card className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm cursor-pointer">
+                    <div className="flex flex-col md:flex-row items-start gap-6">
+                      <div className="flex-shrink-0">
+                        <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center shadow-glow">
+                          <step.icon className="h-8 w-8 text-white" />
+                        </div>
+                        <div className="mt-3 text-center">
+                          <Badge variant="outline" className="text-xs font-medium">
+                            Step {index + 1}
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                          <h3 className="text-2xl font-bold text-card-foreground">
+                            {step.title}
+                          </h3>
+                          <div className="flex items-center gap-2 text-primary">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-sm font-medium">{step.time}</span>
+                          </div>
+                        </div>
+                        
+                        <p className="text-lg text-muted-foreground leading-relaxed">
+                          {step.description}
+                        </p>
+                      </div>
+                      
+                      {index < steps.length - 1 && (
+                        <div className="hidden md:block">
+                          <ArrowRight className="h-6 w-6 text-primary/50" />
+                        </div>
+                      )}
                     </div>
-                    <div className="mt-3 text-center">
-                      <Badge variant="outline" className="text-xs font-medium">
-                        Step {index + 1}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                      <h3 className="text-2xl font-bold text-card-foreground">
-                        {step.title}
-                      </h3>
-                      <div className="flex items-center gap-2 text-primary">
-                        <Clock className="h-4 w-4" />
-                        <span className="text-sm font-medium">{step.time}</span>
+                  </Card>
+                </Link>
+              ) : (
+                <Card key={index} className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
+                  <div className="flex flex-col md:flex-row items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center shadow-glow">
+                        <step.icon className="h-8 w-8 text-white" />
+                      </div>
+                      <div className="mt-3 text-center">
+                        <Badge variant="outline" className="text-xs font-medium">
+                          Step {index + 1}
+                        </Badge>
                       </div>
                     </div>
                     
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                  
-                  {index < steps.length - 1 && (
-                    <div className="hidden md:block">
-                      <ArrowRight className="h-6 w-6 text-primary/50" />
+                    <div className="flex-1">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h3 className="text-2xl font-bold text-card-foreground">
+                          {step.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-primary">
+                          <Clock className="h-4 w-4" />
+                          <span className="text-sm font-medium">{step.time}</span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-lg text-muted-foreground leading-relaxed">
+                        {step.description}
+                      </p>
                     </div>
-                  )}
-                </div>
-              </Card>
+                    
+                    {index < steps.length - 1 && (
+                      <div className="hidden md:block">
+                        <ArrowRight className="h-6 w-6 text-primary/50" />
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )
             ))}
           </div>
         </div>
