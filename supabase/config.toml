@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.generate-faqs]
 verify_jwt = false
+
+[functions.generate-social-posts]
+verify_jwt = false
