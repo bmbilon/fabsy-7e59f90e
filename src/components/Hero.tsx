@@ -44,9 +44,14 @@ const Hero = () => {
                   Free eligibility check — start now
                   <ArrowRight className="ml-3 h-6 w-6" />
                 </Button>
-                <p className="text-sm text-white/80 max-w-md mx-auto lg:mx-0 leading-relaxed">
-                  No-cost review. 24-hour response. Not legal advice—human follow-up available.
-                </p>
+                <div className="space-y-2 max-w-md mx-auto lg:mx-0">
+                  <p className="text-sm text-white/80 leading-relaxed">
+                    No-cost review. 24-hour response. Not legal advice—human follow-up available.
+                  </p>
+                  <p className="text-xs text-white/60 leading-relaxed">
+                    Disclaimer: This tool provides general information only and is not legal advice. Results are probabilistic. For case-specific legal advice, request a free human review from Fabsy or consult a licensed professional.
+                  </p>
+                </div>
               </div>
 
               {/* Upload Your Ticket Box */}
