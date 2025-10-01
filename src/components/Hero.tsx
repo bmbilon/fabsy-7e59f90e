@@ -29,6 +29,9 @@ const Hero = () => {
                 If you got a traffic ticket in Alberta, you may be able to dispute it — start a{" "}
                 <span className="text-primary">free eligibility check</span>.
               </h1>
+              <p className="text-xl lg:text-2xl text-white/95 font-semibold leading-relaxed">
+                Protect your insurance rates from skyrocketing — one ticket can cost you thousands in premium increases
+              </p>
             </div>
             
             <div className="space-y-6">
