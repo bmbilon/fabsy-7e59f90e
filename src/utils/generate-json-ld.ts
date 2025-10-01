@@ -9,18 +9,39 @@ interface FAQ {
   a: string;
 }
 
+/**
+ * Generate FAQ Page schema with EXACT text matching
+ * The strings in JSON-LD are verbatim equal to HTML FAQ text
+ */
 export function generateFaqJsonLd(faqs: FAQ[]) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": faqs.map(faq => ({
+    "mainEntity": faqs.map(f => ({
       "@type": "Question",
-      "name": faq.q, // EXACT same text as HTML
+      "name": f.q,  // EXACT same text as HTML
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": faq.a // EXACT same text as HTML
+        "text": f.a  // EXACT same text as HTML
       }
     }))
+  };
+}
+
+/**
+ * Generate Video Object schema with transcript for AEO
+ */
+export function generateVideoJsonLd({ youtubeUrl, transcript, title }: {
+  youtubeUrl: string;
+  transcript?: string;
+  title: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": title,
+    "embedUrl": youtubeUrl,
+    "transcript": transcript || ""
   };
 }
 
@@ -65,24 +86,35 @@ export function generateProfessionalServiceJsonLd(data: {
   };
 }
 
-export function generateVideoObjectJsonLd(data: {
-  name: string;
+export function generateArticleJsonLd(data: {
+  headline: string;
   description: string;
-  thumbnailUrl: string;
-  uploadDate: string;
-  duration?: string;
-  transcript?: string;
-  contentUrl?: string;
+  author?: string;
+  datePublished: string;
+  dateModified?: string;
+  image?: string;
+  url?: string;
 }) {
   return {
     "@context": "https://schema.org",
-    "@type": "VideoObject",
-    "name": data.name,
+    "@type": "Article",
+    "headline": data.headline,
     "description": data.description,
-    "thumbnailUrl": data.thumbnailUrl,
-    "uploadDate": data.uploadDate,
-    "duration": data.duration,
-    "transcript": data.transcript,
-    "contentUrl": data.contentUrl
+    "author": {
+      "@type": "Organization",
+      "name": data.author || "Fabsy"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Fabsy",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://fabsy.ca/logo.png"
+      }
+    },
+    "datePublished": data.datePublished,
+    "dateModified": data.dateModified || data.datePublished,
+    "image": data.image || "",
+    "url": data.url || ""
   };
 }
