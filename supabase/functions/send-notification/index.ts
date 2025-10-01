@@ -109,7 +109,7 @@ const handler = async (req: Request): Promise<Response> => {
             <h2 style="color: #4CAF50; margin-top: 0;">Quick Details</h2>
             <p><strong>Ticket Number:</strong> ${ticketData.ticketNumber}</p>
             <p><strong>Violation:</strong> ${ticketData.violation}</p>
-            <p><strong>Fine Amount:</strong> $${ticketData.fineAmount}</p>
+            <p><strong>Fine Amount:</strong> ${ticketData.fineAmount}</p>
           </div>
           
       <div style="background-color: #e8f5e9; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
@@ -208,7 +208,7 @@ const handler = async (req: Request): Promise<Response> => {
             <h2 style="color: #4CAF50; margin-top: 0;">Your Ticket Information</h2>
             <p><strong>Ticket Number:</strong> ${ticketData.ticketNumber}</p>
             <p><strong>Violation:</strong> ${ticketData.violation}</p>
-            <p><strong>Fine Amount:</strong> $${ticketData.fineAmount}</p>
+            <p><strong>Fine Amount:</strong> ${ticketData.fineAmount}</p>
           </div>
           
           <div style="background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;">
@@ -247,7 +247,7 @@ const handler = async (req: Request): Promise<Response> => {
     // TODO: Consider storing admin phone numbers in database for better security
     let adminSmsResponse = null;
     try {
-      const adminSmsMessage = `${isTestUser ? '[TEST] ' : ''}New Ticket Submission!\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: $${ticketData.fineAmount}`;
+      const adminSmsMessage = `${isTestUser ? '[TEST] ' : ''}New Ticket Submission!\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: ${ticketData.fineAmount}`;
       
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
       const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
