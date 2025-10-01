@@ -269,6 +269,7 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
   };
 
   const progress = (currentStep / steps.length) * 100;
+  const isTestUser = formData.couponCode?.toUpperCase() === "TESTUSER";
 
   return (
     <section className="py-20 bg-gradient-soft min-h-screen">
@@ -339,15 +340,16 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
                 <ArrowLeft className="h-4 w-4" />
                 Previous
               </Button>
-              
-              <Button 
-                onClick={nextStep}
-                disabled={!isStepValid()}
-                className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
-              >
-                Continue
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              {!((currentStep === 5) && isTestUser) && (
+                <Button 
+                  onClick={nextStep}
+                  disabled={!isStepValid()}
+                  className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
+                >
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           )}
 
@@ -365,15 +367,16 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
                 <ArrowLeft className="h-4 w-4" />
                 Previous
               </Button>
-              
-              <Button 
-                onClick={nextStep}
-                disabled={!isStepValid()}
-                className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
-              >
-                Continue
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              {!((currentStep === 5) && isTestUser) && (
+                <Button 
+                  onClick={nextStep}
+                  disabled={!isStepValid()}
+                  className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
+                >
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           )}
         </Card>

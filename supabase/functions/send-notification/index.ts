@@ -13,7 +13,7 @@ const corsHeaders = {
 };
 
 interface TicketNotification {
-  submissionId: string;
+  submissionId?: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -33,6 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const ticketData: TicketNotification = await req.json();
+    const siteOrigin = req.headers.get("origin") || "https://fabsy.ca";
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
@@ -60,14 +61,14 @@ const handler = async (req: Request): Promise<Response> => {
             <p><strong>Fine Amount:</strong> $${ticketData.fineAmount}</p>
           </div>
           
-          <div style="background-color: #e8f5e9; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
-            <p style="margin: 0 0 15px 0; font-weight: bold;">View Full Case Details</p>
-            <a href="${origin}/admin/submissions/${ticketData.submissionId}" 
-               style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; 
-                      text-decoration: none; border-radius: 5px; font-weight: bold;">
-              Open Admin Portal
-            </a>
-          </div>
+      <div style="background-color: #e8f5e9; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
+        <p style="margin: 0 0 15px 0; font-weight: bold;">View Full Case Details</p>
+        <a href="${ticketData.submissionId ? `${siteOrigin}/admin/submissions/${ticketData.submissionId}` : `${siteOrigin}/admin/dashboard`}" 
+           style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; 
+                  text-decoration: none; border-radius: 5px; font-weight: bold;">
+          Open Admin Portal
+        </a>
+      </div>
           
           <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px;">
             <strong>Submitted:</strong> ${ticketData.submittedAt}<br>
@@ -79,11 +80,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Admin email sent successfully:", emailResponse);
 
-    // Fetch the consent PDF from the origin to attach it
-    const origin = req.headers.get("origin") || "https://gcasbisxfrssonllpqrw.supabase.co";
+    // Fetch the consent PDF from the site origin to attach it
     let pdfBuffer: ArrayBuffer | null = null;
     try {
-      const pdfResponse = await fetch(`${origin}/forms/Form-SRA12675-Written-Consent.pdf`);
+      const pdfResponse = await fetch(`${siteOrigin}/forms/Form-SRA12675-Written-Consent.pdf`);
       if (pdfResponse.ok) {
         pdfBuffer = await pdfResponse.arrayBuffer();
         console.log("Consent PDF fetched successfully");

@@ -65,9 +65,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           coupon_code: formData.couponCode,
           insurance_company: formData.insuranceCompany,
           status: 'pending'
-        })
-        .select()
-        .single();
+        });
 
       if (submissionError) {
         console.error('[Payment] Database error:', submissionError);
@@ -80,13 +78,12 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
         return;
       }
 
-      console.log('[Payment] Submission saved successfully:', submissionData.id);
+      console.log('[Payment] Submission saved successfully');
 
       // Send notification email and SMS
       console.log('[Payment] Sending notification email and SMS...');
       const { error: notificationError } = await supabase.functions.invoke('send-notification', {
         body: {
-          submissionId: submissionData.id,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
