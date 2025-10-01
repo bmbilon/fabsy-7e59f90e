@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -125,6 +126,8 @@ const handler = async (req: Request): Promise<Response> => {
             <strong>Submitted:</strong> ${ticketData.submittedAt}<br>
             This is an automated notification from your Fabsy case management system.
           </p>
+          
+          ${getFabsyEmailSignature()}
         </div>
       `,
     });
@@ -233,6 +236,8 @@ const handler = async (req: Request): Promise<Response> => {
           <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px;">
             Submitted on ${ticketData.submittedAt}
           </p>
+          
+          ${getFabsyEmailSignature()}
         </div>
       `,
       attachments: pdfBuffer ? [{

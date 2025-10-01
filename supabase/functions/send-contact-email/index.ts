@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -88,10 +89,12 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <p style="margin-bottom: 0;"><strong>The Fabsy Team</strong><br>
                 <span style="color: #6b7280;">Alberta's Traffic Ticket Specialists</span></p>
+                
+                ${getFabsyEmailSignature()}
               </div>
               
               <div class="footer">
-                <p style="margin: 5px 0;">📧 hello@fabsy.ca | 📞 (403) 123-4567</p>
+                <p style="margin: 5px 0;">📧 hello@fabsy.ca | 📞 403-669-5353</p>
                 <p style="margin: 5px 0;">Monday-Friday: 9 AM - 6 PM MST | Saturday: 10 AM - 4 PM MST</p>
                 <p style="margin: 15px 0 5px 0; font-size: 12px;">© ${new Date().getFullYear()} Fabsy. All rights reserved.</p>
               </div>
