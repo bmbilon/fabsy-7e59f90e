@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Shield, Calculator } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-woman-driver-new.jpg";
+import { EligibilityChecker } from "./EligibilityChecker";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const [eligibilityOpen, setEligibilityOpen] = useState(false);
+  
   const handleHeroFile = (file?: File | null) => {
     if (!file) return;
     navigate("/submit-ticket", { state: { ticketImage: file } });
@@ -27,7 +31,12 @@ const Hero = () => {
               </div>
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight text-white drop-shadow-lg">
                 If you got a traffic ticket in Alberta, you may be able to dispute it — start a{" "}
-                <span className="text-primary">free eligibility check</span>.
+                <button 
+                  onClick={() => setEligibilityOpen(true)}
+                  className="text-primary hover:text-primary-glow underline decoration-2 underline-offset-4 cursor-pointer transition-colors"
+                >
+                  free eligibility check
+                </button>.
               </h1>
               <p className="text-xl lg:text-2xl text-white/95 font-semibold leading-relaxed">
                 Protect your insurance rates from skyrocketing — one ticket can cost you thousands in premium increases
@@ -166,6 +175,8 @@ const Hero = () => {
           </div>
         </div>
       </div>
+      
+      <EligibilityChecker open={eligibilityOpen} onOpenChange={setEligibilityOpen} />
     </section>
   );
 };
