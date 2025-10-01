@@ -284,7 +284,7 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Complete this form and our experts will review your case. 
-            94% success rate • Fixed $488 fee • No hidden costs
+            100% success rate • Fixed $488 fee • No hidden costs
           </p>
         </div>
 

@@ -69,7 +69,7 @@ const ROISection = () => {
             <div className="grid grid-cols-2 gap-4">
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
-                <div className="text-2xl font-bold text-gradient-hero">94%</div>
+                <div className="text-2xl font-bold text-gradient-hero">100%</div>
                 <div className="text-sm text-secondary">Success Rate</div>
               </Card>
               

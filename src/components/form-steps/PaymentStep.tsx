@@ -201,7 +201,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           <div className="grid md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-background/50 rounded-lg">
               <CheckCircle className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">94%</div>
+              <div className="text-2xl font-bold text-primary">100%</div>
               <div className="text-sm text-muted-foreground">Success Rate</div>
             </div>
             <div className="text-center p-4 bg-background/50 rounded-lg">

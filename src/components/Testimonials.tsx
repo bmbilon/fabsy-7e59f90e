@@ -28,7 +28,7 @@ const Testimonials = () => {
   ];
 
   const stats = [
-    { number: "94%", label: "Success Rate" },
+    { number: "100%", label: "Success Rate" },
     { number: "$993", label: "avg saved" },
     { number: "4.9/5", label: "Client Rating" }
   ];
