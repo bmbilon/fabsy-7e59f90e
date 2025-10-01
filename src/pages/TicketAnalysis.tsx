@@ -162,18 +162,11 @@ const TicketAnalysis = () => {
                   </h1>
                 </div>
                 
-                <div className="grid md:grid-cols-3 gap-6 mt-8">
+                <div className="grid md:grid-cols-2 gap-6 mt-8">
                   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                     <p className="text-white/80 text-sm font-medium mb-2">Your Potential Savings</p>
                     <p className="text-5xl font-bold">${result.financials.potentialSavings.toFixed(0)}</p>
                   </div>
-                  
-                  {result.financials.roi > 0 && (
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                      <p className="text-white/80 text-sm font-medium mb-2">Return on Investment</p>
-                      <p className="text-5xl font-bold">{result.financials.roi.toFixed(0)}%</p>
-                    </div>
-                  )}
                   
                   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                     <p className="text-white/80 text-sm font-medium mb-2">Service Fee</p>
@@ -331,14 +324,6 @@ const TicketAnalysis = () => {
                         <span className="font-bold text-lg">Your Savings</span>
                         <span className="font-bold text-2xl text-primary">${result.financials.potentialSavings.toFixed(0)}</span>
                       </div>
-                      {result.financials.roi > 0 && (
-                        <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border-2 border-green-500/20 text-center">
-                          <p className="text-sm font-medium text-green-700 dark:text-green-300 mb-1">Return on Investment</p>
-                          <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-                            {result.financials.roi.toFixed(0)}% ROI
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -350,7 +335,7 @@ const TicketAnalysis = () => {
               <CardContent className="p-8 text-center">
                 <h2 className="text-4xl font-bold mb-4 text-white">Ready to Fight Your Ticket?</h2>
                 <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                  Save ${result.financials.potentialSavings.toFixed(0)} with {result.financials.roi.toFixed(0)}% ROI
+                  Save ${result.financials.potentialSavings.toFixed(0)} with our expert help
                 </p>
                 <Link to="/ticket-form">
                   <Button size="lg" variant="secondary" className="text-xl px-12 py-8 h-auto font-bold shadow-xl hover:scale-105 transition-transform">
