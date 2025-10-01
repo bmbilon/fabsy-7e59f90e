@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Upload, Users, Trophy } from "lucide-react";
+import { Upload, Users, Trophy, FileCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const HowItWorks = () => {
@@ -7,33 +7,35 @@ const HowItWorks = () => {
   const steps = [
     {
       number: 1,
-      title: "Snap & Send",
-      description: (
-        <div className="space-y-2">
-          <ul className="text-left space-y-1">
-            <li>1. Photo of your ticket</li>
-            <li>2. Photo of your ID</li>
-            <li>3. Quick voice note or typed explanation</li>
-          </ul>
-          <p className="text-center font-semibold">Total 2min or less</p>
-        </div>
-      ),
+      title: "Instant Assessment",
+      description: "Upload your ticket and get an immediate analysis of your case, including success probability and potential savings.",
+      time: "<1 min",
       icon: Upload,
       color: "primary"
     },
     {
       number: 2,
-      title: "Instant Consult Results",
-      description: "We analyze your case instantly and give you the expected results we can achieve. No time consuming phone conversations or meetings required.",
-      icon: Users,
+      title: "Submit Request for Defense/Dismissal",
+      description: "Upload your ID, provide your information, and sign the consent form to authorize us to represent you.",
+      time: "2-3 min",
+      icon: FileCheck,
       color: "secondary"
     },
     {
       number: 3,
-      title: "We Fight, You Relax",
-      description: "After you've chosen us to represent you, we handle everything else and within 2-6 weeks we'll provide the results to you from the Alberta Court system that we've achieved.",
-      icon: Trophy,
+      title: "We Handle Everything",
+      description: "Our experts review your case, develop a winning strategy, and represent you in court. You don't have to do anything.",
+      time: "2-6 weeks",
+      icon: Users,
       color: "primary"
+    },
+    {
+      number: 4,
+      title: "Resolution",
+      description: "We notify you of the outcome the same day we receive it from the court system.",
+      time: "1 day",
+      icon: Trophy,
+      color: "secondary"
     }
   ];
 
@@ -43,7 +45,7 @@ const HowItWorks = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6">
             From Ticket to Victory in{" "}
-            <span className="text-gradient-primary">3 Steps</span>
+            <span className="text-gradient-primary">4 Steps</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Alberta women: We get 30% of the tickets but fight back less than 25% of the time. 
@@ -51,7 +53,7 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {steps.map((step, index) => {
             const Icon = step.icon;
             const isFirstStep = index === 0;
@@ -85,6 +87,7 @@ const HowItWorks = () => {
 
                   <div className="space-y-3">
                     <h3 className="text-2xl font-bold">{step.title}</h3>
+                    <p className="text-sm font-semibold text-primary mb-2">{step.time}</p>
                     <p className="text-muted-foreground leading-relaxed">
                       {step.description}
                     </p>
@@ -101,9 +104,6 @@ const HowItWorks = () => {
         </div>
 
         <div className="text-center mt-16">
-          <p className="text-lg text-muted-foreground mb-4">
-            <span className="font-semibold text-primary">Average processing time:</span> 2-6 weeks
-          </p>
           <p className="text-sm text-muted-foreground">
             No court dates • No paperwork • No stress • Just results
           </p>
