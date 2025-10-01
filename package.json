@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
-  "prebuild": "node scripts/sync-pages-from-db.js && node scripts/generate-routes.js",
-  "build": "npm run prebuild && vite build",
-  "build:dev": "vite build --mode development",
-  "lint": "eslint .",
-  "preview": "vite preview"
+    "dev": "vite",
+    "prebuild": "node scripts/sync-pages-from-db.js && node scripts/generate-routes.js",
+    "build": "npm run prebuild && vite build",
+    "build:dev": "vite build --mode development",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -62,7 +62,6 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
-    "vite-ssg": "^28.1.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
