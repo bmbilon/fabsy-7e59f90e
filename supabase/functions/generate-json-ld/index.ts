@@ -40,6 +40,23 @@ interface ArticleData {
   url?: string;
 }
 
+interface ProfessionalServiceData {
+  name?: string;
+  url?: string;
+  logo?: string;
+  telephone?: string;
+  email?: string;
+  description?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+  };
+  priceRange?: string;
+  areaServed?: string;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -60,6 +77,9 @@ serve(async (req) => {
     switch (type) {
       case 'FAQPage':
         jsonLd = generateFAQPage(data as FAQPageData);
+        break;
+      case 'ProfessionalService':
+        jsonLd = generateProfessionalService(data as ProfessionalServiceData);
         break;
       case 'LocalBusiness':
         jsonLd = generateLocalBusiness(data as LocalBusinessData);
@@ -103,6 +123,8 @@ serve(async (req) => {
 });
 
 function generateFAQPage(data: FAQPageData) {
+  // CRITICAL FOR AEO: FAQ wording in HTML must match JSON-LD exactly
+  // AI engines use exact text matching for featured snippets
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -114,6 +136,32 @@ function generateFAQPage(data: FAQPageData) {
         "text": faq.a
       }
     }))
+  };
+}
+
+function generateProfessionalService(data: ProfessionalServiceData) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": data.name || "Fabsy",
+    "url": data.url || "https://fabsy.ca",
+    "logo": data.logo || "https://fabsy.ca/path/to/logo.png",
+    "telephone": data.telephone || "+1-403-XXX-XXXX",
+    "email": data.email || "",
+    "description": data.description || "Alberta traffic ticket help for women. Expert defense, reduced fines, and peace of mind.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": data.address?.street || "",
+      "addressLocality": data.address?.city || "Calgary",
+      "addressRegion": data.address?.province || "AB",
+      "postalCode": data.address?.postalCode || "",
+      "addressCountry": "CA"
+    },
+    "areaServed": {
+      "@type": "State",
+      "name": data.areaServed || "Alberta"
+    },
+    "priceRange": data.priceRange || "$"
   };
 }
 
