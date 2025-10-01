@@ -7,7 +7,6 @@ import { Zap, Upload, Send, CheckCircle, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AILeadCapture from "./AILeadCapture";
-import { useNavigate } from "react-router-dom";
 import { trackAIQuery } from "@/hooks/useAEOAnalytics";
 
 interface AIAnswer {
@@ -22,7 +21,6 @@ const AIQuestionWidget = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiAnswer, setAiAnswer] = useState<AIAnswer | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const handleAskQuestion = async () => {
     if (!question.trim()) {
@@ -80,7 +78,11 @@ const AIQuestionWidget = () => {
   };
 
   const handleUploadTicket = () => {
-    navigate("/ticket-form");
+    // Trigger the same file upload as the Hero section
+    const uploadInput = document.getElementById('drag-upload') as HTMLInputElement;
+    if (uploadInput) {
+      uploadInput.click();
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
