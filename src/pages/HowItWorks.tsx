@@ -20,33 +20,27 @@ const HowItWorks = () => {
   const steps = [
     {
       icon: Upload,
-      title: "Upload Your Ticket",
-      description: "Simply upload a photo of your traffic ticket through our secure online form. Takes less than 2 minutes.",
-      time: "2 minutes"
-    },
-    {
-      icon: Search,
-      title: "Expert Review",
-      description: "Our experienced team analyzes your ticket for legal defenses, procedural errors, and technicalities.",
-      time: "24 hours"
+      title: "Instant Assessment",
+      description: "Upload your ticket and get an immediate analysis of your case, including success probability and potential savings.",
+      time: "<1 min"
     },
     {
       icon: FileCheck,
-      title: "Strategy Development",
-      description: "We craft a personalized defense strategy based on your specific case circumstances and Alberta traffic regulations.",
-      time: "1-2 days"
+      title: "Submit Request for Defense/Dismissal",
+      description: "Upload your ID, provide your information, and sign the consent form to authorize us to represent you.",
+      time: "2-3 min"
     },
     {
       icon: Gavel,
-      title: "Court Representation",
-      description: "We handle all court proceedings on your behalf. No need for you to take time off work or appear in court.",
+      title: "We Handle Everything",
+      description: "Expert review, strategy development, and full court representation — we handle it all while you relax.",
       time: "2-6 weeks"
     },
     {
       icon: CheckCircle,
       title: "Resolution",
-      description: "Get notified of the outcome. Most cases result in dismissal or reduced charges, protecting your driving record.",
-      time: "Same day"
+      description: "We notify you of the outcome the same day we receive it from the court system.",
+      time: "1 day"
     }
   ];
 
@@ -79,7 +73,7 @@ const HowItWorks = () => {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Simple 5-Step Process
+            Simple 4-Step Process
           </Badge>
           <h1 className="text-4xl lg:text-6xl font-bold text-white drop-shadow-lg mb-6">
             How <span className="text-gradient-hero font-script">Fabsy</span> Works
