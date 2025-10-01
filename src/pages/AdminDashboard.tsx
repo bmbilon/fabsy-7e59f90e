@@ -36,27 +36,33 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (!session) {
-          navigate('/admin');
-        }
-      }
-    );
-
-    // THEN check for existing session and load data
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (session) {
+      // Do not navigate here to avoid race conditions during token refresh
+      if (event === 'TOKEN_REFRESHED' && session?.user) {
+        // Defer any Supabase calls from within the callback
+        setTimeout(() => checkAuthAndFetchData(session.user), 0);
+      }
+    });
+
+    // THEN check for existing session and load data
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
         checkAuthAndFetchData(session.user);
+        return;
+      }
+      // Try a silent refresh to recover transient session timeouts
+      const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshed.session?.user && !refreshError) {
+        setSession(refreshed.session);
+        setUser(refreshed.session.user);
+        checkAuthAndFetchData(refreshed.session.user);
       } else {
-        navigate('/admin');
         setIsLoading(false);
+        navigate('/admin');
       }
     });
 
@@ -97,7 +103,6 @@ export default function AdminDashboard() {
           description: "You don't have permission to access this page",
           variant: "destructive",
         });
-        await supabase.auth.signOut();
         navigate('/admin');
         return;
       }
