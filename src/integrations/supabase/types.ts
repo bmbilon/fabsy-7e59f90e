@@ -14,12 +14,61 @@ export type Database = {
   }
   public: {
     Tables: {
+      clients: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          date_of_birth: string | null
+          drivers_license: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          phone: string
+          postal_code: string | null
+          sms_opt_in: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          drivers_license: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          phone: string
+          postal_code?: string | null
+          sms_opt_in?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          drivers_license?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string
+          postal_code?: string | null
+          sms_opt_in?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ticket_submissions: {
         Row: {
           additional_notes: string | null
           address: string | null
           assigned_to: string | null
           city: string | null
+          client_id: string
           consent_form_path: string | null
           coupon_code: string | null
           court_date: string | null
@@ -50,6 +99,7 @@ export type Database = {
           address?: string | null
           assigned_to?: string | null
           city?: string | null
+          client_id: string
           consent_form_path?: string | null
           coupon_code?: string | null
           court_date?: string | null
@@ -80,6 +130,7 @@ export type Database = {
           address?: string | null
           assigned_to?: string | null
           city?: string | null
+          client_id?: string
           consent_form_path?: string | null
           coupon_code?: string | null
           court_date?: string | null
@@ -105,7 +156,15 @@ export type Database = {
           violation_date?: string | null
           violation_time?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ticket_submissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

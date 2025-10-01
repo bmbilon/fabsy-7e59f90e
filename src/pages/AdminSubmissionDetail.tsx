@@ -99,16 +99,45 @@ export default function AdminSubmissionDetail() {
         return;
       }
 
-      // Fetch submission
+      // Fetch submission with client data
       const { data, error } = await supabase
         .from('ticket_submissions')
-        .select('*')
+        .select(`
+          *,
+          clients (
+            first_name,
+            last_name,
+            email,
+            phone,
+            address,
+            city,
+            postal_code,
+            date_of_birth,
+            drivers_license,
+            sms_opt_in
+          )
+        `)
         .eq('id', id)
         .single();
 
       if (error) throw error;
 
-      setSubmission(data);
+      // Transform data to match existing interface
+      const transformedData = {
+        ...data,
+        first_name: data.clients?.first_name || '',
+        last_name: data.clients?.last_name || '',
+        email: data.clients?.email || '',
+        phone: data.clients?.phone || '',
+        address: data.clients?.address || '',
+        city: data.clients?.city || '',
+        postal_code: data.clients?.postal_code || '',
+        date_of_birth: data.clients?.date_of_birth || '',
+        drivers_license: data.clients?.drivers_license || '',
+        sms_opt_in: data.clients?.sms_opt_in || false
+      };
+
+      setSubmission(transformedData);
     } catch (error: any) {
       console.error('Error fetching submission:', error);
       toast({

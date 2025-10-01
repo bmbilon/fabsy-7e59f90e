@@ -109,16 +109,39 @@ export default function AdminDashboard() {
 
       setUserRole(roleData.role);
 
-      // Fetch submissions
+      // Fetch submissions with client data
       const { data, error } = await supabase
         .from('ticket_submissions')
-        .select('*')
+        .select(`
+          *,
+          clients (
+            first_name,
+            last_name,
+            email,
+            phone,
+            drivers_license
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setSubmissions(data || []);
-      setFilteredSubmissions(data || []);
+      // Transform data to match existing interface
+      const transformedData = data?.map(sub => ({
+        id: sub.id,
+        first_name: sub.clients?.first_name || '',
+        last_name: sub.clients?.last_name || '',
+        email: sub.clients?.email || '',
+        phone: sub.clients?.phone || '',
+        ticket_number: sub.ticket_number,
+        violation: sub.violation,
+        fine_amount: sub.fine_amount,
+        status: sub.status,
+        created_at: sub.created_at
+      })) || [];
+
+      setSubmissions(transformedData);
+      setFilteredSubmissions(transformedData);
     } catch (error: any) {
       console.error('Error fetching data:', error);
       toast({

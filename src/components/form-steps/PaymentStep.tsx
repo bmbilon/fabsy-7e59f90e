@@ -39,20 +39,92 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
     setIsProcessing(true);
     try {
-      // Save ticket submission to database FIRST
+      // Step 1: Check if client exists or create new client
+      console.log('[Payment] Checking for existing client...');
+      let clientId: string;
+      
+      const { data: existingClient, error: clientLookupError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('drivers_license', formData.driversLicense)
+        .maybeSingle();
+      
+      if (clientLookupError) {
+        console.error('[Payment] Client lookup error:', clientLookupError);
+        toast({
+          title: 'Submission Error',
+          description: 'Failed to process your information. Please try again.',
+          variant: 'destructive',
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      if (existingClient) {
+        console.log('[Payment] Found existing client:', existingClient.id);
+        clientId = existingClient.id;
+        
+        // Update client information with latest data
+        const { error: updateError } = await supabase
+          .from('clients')
+          .update({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+            city: formData.city,
+            postal_code: formData.postalCode,
+            date_of_birth: formData.dateOfBirth?.toISOString().split('T')[0],
+            sms_opt_in: formData.smsOptIn,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', clientId);
+          
+        if (updateError) {
+          console.error('[Payment] Client update error:', updateError);
+        }
+      } else {
+        // Create new client
+        console.log('[Payment] Creating new client...');
+        const { data: newClient, error: createClientError } = await supabase
+          .from('clients')
+          .insert({
+            drivers_license: formData.driversLicense,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+            city: formData.city,
+            postal_code: formData.postalCode,
+            date_of_birth: formData.dateOfBirth?.toISOString().split('T')[0],
+            sms_opt_in: formData.smsOptIn
+          })
+          .select('id')
+          .single();
+
+        if (createClientError || !newClient) {
+          console.error('[Payment] Client creation error:', createClientError);
+          toast({
+            title: 'Submission Error',
+            description: 'Failed to create client record. Please try again.',
+            variant: 'destructive',
+          });
+          setIsProcessing(false);
+          return;
+        }
+        
+        clientId = newClient.id;
+        console.log('[Payment] Client created:', clientId);
+      }
+
+      // Step 2: Create ticket submission linked to client
       console.log('[Payment] Saving ticket submission to database...');
       const { data: submissionData, error: submissionError } = await supabase
         .from('ticket_submissions')
         .insert({
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          postal_code: formData.postalCode,
-          date_of_birth: formData.dateOfBirth?.toISOString().split('T')[0],
-          drivers_license: formData.driversLicense,
+          client_id: clientId,
           ticket_number: formData.ticketNumber,
           violation: formData.violation,
           fine_amount: formData.fineAmount,
@@ -61,13 +133,14 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           court_date: formData.courtDate?.toISOString().split('T')[0],
           defense_strategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
           additional_notes: formData.additionalNotes,
-          sms_opt_in: formData.smsOptIn,
           coupon_code: formData.couponCode,
           insurance_company: formData.insuranceCompany,
           status: 'pending'
-        });
+        } as any)
+        .select('id')
+        .single();
 
-      if (submissionError) {
+      if (submissionError || !submissionData) {
         console.error('[Payment] Database error:', submissionError);
         toast({
           title: 'Submission Error',
@@ -78,12 +151,13 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
         return;
       }
 
-      console.log('[Payment] Submission saved successfully');
+      console.log('[Payment] Submission saved successfully:', submissionData.id);
 
-      // Send notification email and SMS
+      // Step 3: Send notification email and SMS
       console.log('[Payment] Sending notification email and SMS...');
       const { error: notificationError } = await supabase.functions.invoke('send-notification', {
         body: {
+          submissionId: submissionData.id,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
