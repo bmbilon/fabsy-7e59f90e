@@ -8,6 +8,7 @@ import TicketFormPage from "./pages/TicketFormPage";
 import HowItWorks from "./pages/HowItWorks";
 import About from "./pages/About";
 import Services from "./pages/Services";
+import TestimonialsPage from "./pages/TestimonialsPage";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -34,7 +35,7 @@ const App = () => (
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
-          <Route path="/testimonials" element={<Index />} />
+          <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
