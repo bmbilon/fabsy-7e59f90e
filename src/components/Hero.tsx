@@ -25,21 +25,29 @@ const Hero = () => {
               <div className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-2 mb-4">
                 <p className="text-sm font-semibold text-white">✓ No Win, No Fee Guarantee</p>
               </div>
-              <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-white drop-shadow-lg">
-                Keep Your Insurance{" "}
-                <span className="text-primary">Rates Low</span>
+              <h1 className="text-4xl lg:text-6xl font-bold leading-tight text-white drop-shadow-lg">
+                Got a ticket in Alberta? You may be able to dispute it — get an instant{" "}
+                <span className="text-primary">AI eligibility check</span>{" "}
+                <span className="text-white/90">(free)</span>.
               </h1>
-              <p className="text-2xl lg:text-3xl font-medium text-white/95 drop-shadow-md">
-                We Fight Your Traffic Ticket
-              </p>
             </div>
             
             <div className="space-y-6">
-              <p className="text-xl lg:text-2xl text-white/95 max-w-2xl drop-shadow-sm leading-relaxed">
-                A <span className="font-bold text-primary shadow-glow">$150 ticket</span> can spike your insurance by{" "}
-                <span className="font-bold text-destructive shadow-glow">$1,200+ per year</span>. Let us handle it—{" "}
-                <span className="font-bold text-primary shadow-glow">94% success rate</span>, zero stress for you.
-              </p>
+              <div className="space-y-3">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary/90 text-white transition-smooth text-xl font-bold px-8 py-6 shadow-glow"
+                  onClick={() => {
+                    document.getElementById('drag-upload')?.click();
+                  }}
+                >
+                  Free eligibility check — start now
+                  <ArrowRight className="ml-3 h-6 w-6" />
+                </Button>
+                <p className="text-sm text-white/80 max-w-md mx-auto lg:mx-0 leading-relaxed">
+                  No-cost review. 24-hour response. Not legal advice—human follow-up available.
+                </p>
+              </div>
 
               {/* Upload Your Ticket Box */}
               <div className="bg-white/90 backdrop-blur-sm border border-white/50 rounded-lg p-6 shadow-glow">
