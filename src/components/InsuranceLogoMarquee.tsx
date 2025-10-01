@@ -19,7 +19,7 @@ const InsuranceLogoMarquee = () => {
     <section className="py-12 bg-white overflow-hidden">
       <div className="container mx-auto px-4 mb-8">
         <h3 className="text-center text-xl font-semibold text-muted-foreground">
-          We Work With All Major Alberta Insurance Providers
+          Direct Benefit to Insurance Policies From all Alberta Providers
         </h3>
       </div>
       
