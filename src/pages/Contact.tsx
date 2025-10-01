@@ -19,14 +19,36 @@ const Contact = () => {
   });
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    setIsSubmitting(true);
+
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message Sent!",
+        description: "We've sent you a confirmation email. We'll get back to you within 24 hours.",
+      });
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Error sending contact email:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again or email us directly at hello@fabsy.ca",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -187,8 +209,8 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Send Message
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>
 
                 <p className="text-sm text-muted-foreground text-center">
