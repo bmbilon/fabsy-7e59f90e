@@ -320,9 +320,9 @@ const TicketAnalysis = () => {
                         <span className="font-medium">Potential Reduction</span>
                         <span className="font-bold text-lg text-primary">-${result.financials.totalCostIfConvicted.toFixed(0)}</span>
                       </div>
-                      <div className="flex justify-between items-center p-4 bg-primary/10 rounded-lg border-2 border-primary/20 mt-8">
-                        <span className="font-bold text-lg">Your Savings</span>
-                        <span className="font-bold text-2xl text-primary">${result.financials.potentialSavings.toFixed(0)}</span>
+                      <div className="flex justify-between items-center p-6 bg-primary/10 rounded-lg border-2 border-primary/20 mt-8">
+                        <span className="text-xl font-bold">Your Savings</span>
+                        <span className="text-4xl font-bold text-primary">${result.financials.potentialSavings.toFixed(0)}</span>
                       </div>
                     </div>
                   </div>
@@ -330,21 +330,20 @@ const TicketAnalysis = () => {
               </CardContent>
             </Card>
 
-            {/* Prominent CTA Section */}
-            <Card className="border-2 border-primary bg-gradient-to-br from-primary via-primary to-primary/80">
-              <CardContent className="p-8 text-center">
-                <h2 className="text-4xl font-bold mb-4 text-white">Ready to Fight Your Ticket?</h2>
-                <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                  Save ${result.financials.potentialSavings.toFixed(0)} with our expert help
-                </p>
-                <Link to="/ticket-form">
-                  <Button size="lg" variant="secondary" className="text-xl px-12 py-8 h-auto font-bold shadow-xl hover:scale-105 transition-transform">
-                    Get My Ticket Dismissed
-                    <ArrowLeft className="ml-3 h-6 w-6 rotate-180" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            {/* CTA Button Section */}
+            <div className="text-center py-12">
+              <h2 className="text-4xl font-bold mb-4">Ready to Fight Your Ticket?</h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Save ${result.financials.potentialSavings.toFixed(0)} with our expert help
+              </p>
+              
+              <Link to="/ticket-form">
+                <Button size="lg" className="text-xl px-12 py-8 h-auto font-bold shadow-xl hover:scale-105 transition-transform bg-gradient-button">
+                  Get My Ticket Dismissed
+                  <ArrowLeft className="ml-3 h-6 w-6 rotate-180" />
+                </Button>
+              </Link>
+            </div>
 
             {/* Zero-Risk Guarantee */}
             <Card className="border-2">
