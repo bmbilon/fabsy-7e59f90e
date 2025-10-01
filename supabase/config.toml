@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.generate-json-ld]
 verify_jwt = false
+
+[functions.generate-page-content]
+verify_jwt = false
