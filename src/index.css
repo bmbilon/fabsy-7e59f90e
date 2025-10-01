@@ -225,3 +225,12 @@ All colors MUST be HSL for proper theming.
     background-clip: text;
   }
 }
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

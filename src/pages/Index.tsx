@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import TrustBar from "@/components/TrustBar";
+import InsuranceLogoMarquee from "@/components/InsuranceLogoMarquee";
 import HowItWorks from "@/components/HowItWorks";
 import Testimonials from "@/components/Testimonials";
 import ROISection from "@/components/ROISection";
@@ -14,6 +15,7 @@ const Index = () => {
       <Header />
       <Hero />
       <TrustBar />
+      <InsuranceLogoMarquee />
       <HowItWorks />
       <Testimonials />
       <ROISection />
