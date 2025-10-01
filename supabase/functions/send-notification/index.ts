@@ -1,11 +1,16 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
 const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
 const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -95,11 +100,43 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Fetch the consent PDF from the site origin to attach it
     let pdfBuffer: ArrayBuffer | null = null;
+    let consentFormPath: string | null = null;
+    
     try {
       const pdfResponse = await fetch(`${siteOrigin}/forms/Form-SRA12675-Written-Consent.pdf`);
       if (pdfResponse.ok) {
         pdfBuffer = await pdfResponse.arrayBuffer();
         console.log("Consent PDF fetched successfully");
+        
+        // Upload consent form to storage if we have a submission ID
+        if (ticketData.submissionId && pdfBuffer) {
+          const fileName = `${ticketData.submissionId}/consent-form.pdf`;
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('consent-forms')
+            .upload(fileName, pdfBuffer, {
+              contentType: 'application/pdf',
+              upsert: true
+            });
+          
+          if (uploadError) {
+            console.error("Error uploading consent form to storage:", uploadError);
+          } else {
+            consentFormPath = fileName;
+            console.log("Consent form uploaded to storage:", fileName);
+            
+            // Update the ticket submission with the consent form path
+            const { error: updateError } = await supabase
+              .from('ticket_submissions')
+              .update({ consent_form_path: consentFormPath })
+              .eq('id', ticketData.submissionId);
+            
+            if (updateError) {
+              console.error("Error updating submission with consent form path:", updateError);
+            } else {
+              console.log("Ticket submission updated with consent form path");
+            }
+          }
+        }
       } else {
         console.error("Failed to fetch consent PDF:", pdfResponse.status);
       }

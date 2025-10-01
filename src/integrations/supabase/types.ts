@@ -20,6 +20,7 @@ export type Database = {
           address: string | null
           assigned_to: string | null
           city: string | null
+          consent_form_path: string | null
           coupon_code: string | null
           court_date: string | null
           court_location: string | null
@@ -49,6 +50,7 @@ export type Database = {
           address?: string | null
           assigned_to?: string | null
           city?: string | null
+          consent_form_path?: string | null
           coupon_code?: string | null
           court_date?: string | null
           court_location?: string | null
@@ -78,6 +80,7 @@ export type Database = {
           address?: string | null
           assigned_to?: string | null
           city?: string | null
+          consent_form_path?: string | null
           coupon_code?: string | null
           court_date?: string | null
           court_location?: string | null
