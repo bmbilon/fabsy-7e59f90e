@@ -25,6 +25,13 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Ensure the image has the proper data URL format
+    const imageUrl = imageBase64.startsWith('data:') 
+      ? imageBase64 
+      : `data:image/jpeg;base64,${imageBase64}`;
+
+    console.log("Processing image with URL format:", imageUrl.substring(0, 50) + "...");
+
     // Call Gemini vision model to extract ticket data
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -58,7 +65,7 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
               {
                 type: "image_url",
                 image_url: {
-                  url: imageBase64,
+                  url: imageUrl,
                 },
               },
             ],
@@ -130,8 +137,15 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
 
     const extractedData = JSON.parse(toolCall.function.arguments);
     
+    // Map to the expected format
     return new Response(
-      JSON.stringify({ success: true, data: extractedData }),
+      JSON.stringify({
+        violation: extractedData.violation,
+        fine: extractedData.fineAmount ? `$${extractedData.fineAmount}` : null,
+        ticketNumber: extractedData.ticketNumber,
+        issueDate: extractedData.issueDate,
+        location: extractedData.location
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
