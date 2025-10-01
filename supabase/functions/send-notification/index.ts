@@ -131,29 +131,55 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Admin email sent successfully:", emailResponse);
 
-    // Fetch the dynamically generated consent form from storage
+    // Fetch the dynamically generated consent form from storage with retry logic
     let pdfBuffer: ArrayBuffer | null = null;
     
-    try {
-      if (ticketData.submissionId) {
-        const fileName = `${ticketData.submissionId}/consent-form.pdf`;
-        
-        // Download the consent form from storage
-        const { data: pdfData, error: downloadError } = await supabase.storage
-          .from('consent-forms')
-          .download(fileName);
-        
-        if (downloadError) {
-          console.error("Error downloading consent form from storage:", downloadError);
-        } else if (pdfData) {
-          pdfBuffer = await pdfData.arrayBuffer();
-          console.log("Consent form fetched successfully from storage");
+    if (ticketData.submissionId) {
+      const fileName = `${ticketData.submissionId}/consent-form.pdf`;
+      let retries = 3;
+      let retryDelay = 1000; // Start with 1 second delay
+      
+      while (retries > 0 && !pdfBuffer) {
+        try {
+          console.log(`Attempting to download consent form (${4 - retries}/3):`, fileName);
+          
+          // Download the consent form from storage
+          const { data: pdfData, error: downloadError } = await supabase.storage
+            .from('consent-forms')
+            .download(fileName);
+          
+          if (downloadError) {
+            console.error(`Error downloading consent form (attempt ${4 - retries}):`, downloadError);
+            retries--;
+            
+            if (retries > 0) {
+              console.log(`Retrying in ${retryDelay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              retryDelay *= 2; // Exponential backoff
+            }
+          } else if (pdfData) {
+            pdfBuffer = await pdfData.arrayBuffer();
+            console.log("Consent form fetched successfully from storage, size:", pdfBuffer.byteLength, "bytes");
+          } else {
+            console.warn("PDF data is null");
+            retries--;
+          }
+        } catch (pdfError: any) {
+          console.error(`Error fetching consent form (attempt ${4 - retries}):`, pdfError.message);
+          retries--;
+          
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            retryDelay *= 2;
+          }
         }
-      } else {
-        console.warn("No submission ID provided, cannot fetch consent form");
       }
-    } catch (pdfError: any) {
-      console.error("Error fetching consent form from storage:", pdfError.message);
+      
+      if (!pdfBuffer) {
+        console.error("Failed to fetch consent form after 3 attempts");
+      }
+    } else {
+      console.warn("No submission ID provided, cannot fetch consent form");
     }
 
     // SECURITY: Send CLIENT confirmation email - contains ONLY this client's own data

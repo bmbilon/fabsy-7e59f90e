@@ -155,7 +155,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
       // Step 3: Generate consent form PDF
       console.log('[Payment] Generating consent form PDF...');
-      const { error: consentError } = await supabase.functions.invoke('generate-consent-form', {
+      const { data: consentData, error: consentError } = await supabase.functions.invoke('generate-consent-form', {
         body: {
           submissionId: submissionData.id,
           firstName: formData.firstName,
@@ -176,9 +176,17 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
       if (consentError) {
         console.error('[Payment] Consent form generation error:', consentError);
-        // Continue even if consent form fails - admin can generate manually
+        toast({
+          title: "Warning",
+          description: "Consent form generation failed. Admin will generate manually.",
+          variant: "destructive",
+        });
+        // Continue with submission even if consent form fails
       } else {
-        console.log('[Payment] Consent form generated successfully');
+        console.log('[Payment] Consent form generated successfully:', consentData);
+        
+        // Wait a moment to ensure storage is consistent
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       // Step 4: Send notification email and SMS

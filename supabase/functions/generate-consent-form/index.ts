@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { jsPDF } from "https://esm.sh/jspdf@2.5.2";
+import { PDFDocument, rgb, StandardFonts } from "https://cdn.skypack.dev/pdf-lib@1.17.1";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -38,135 +38,132 @@ const handler = async (req: Request): Promise<Response> => {
     const formData: ConsentFormData = await req.json();
     
     console.log("Generating consent form for submission:", formData.submissionId);
+    console.log("Client name:", formData.firstName, formData.lastName);
+    console.log("Ticket number:", formData.ticketNumber);
 
-    // Create PDF document
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let yPos = 20;
-
-    // Header
-    doc.setFontSize(18);
-    doc.setFont("helvetica", "bold");
-    doc.text("WRITTEN CONSENT FOR LEGAL REPRESENTATION", pageWidth / 2, yPos, { align: "center" });
+    // Create PDF document using pdf-lib
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([612, 792]); // Letter size
+    const { width, height } = page.getSize();
     
-    yPos += 15;
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text("Fabsy Traffic Ticket Defense Services", pageWidth / 2, yPos, { align: "center" });
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     
-    yPos += 20;
+    let yPosition = height - 50;
+    const leftMargin = 50;
+    const fontSize = 11;
+    const titleSize = 16;
+    const sectionSize = 13;
 
-    // Client Information Section
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("CLIENT INFORMATION", 20, yPos);
-    yPos += 10;
+    // Helper function to add text
+    const addText = (text: string, size: number, fontType: any, x: number, y: number) => {
+      page.drawText(text, {
+        x,
+        y,
+        size,
+        font: fontType,
+        color: rgb(0, 0, 0),
+      });
+    };
 
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Name: ${formData.firstName} ${formData.lastName}`, 20, yPos);
-    yPos += 7;
-    doc.text(`Email: ${formData.email}`, 20, yPos);
-    yPos += 7;
-    doc.text(`Phone: ${formData.phone}`, 20, yPos);
-    yPos += 7;
-    doc.text(`Address: ${formData.address}, ${formData.city}, ${formData.province} ${formData.postalCode}`, 20, yPos);
-    yPos += 7;
-    doc.text(`Driver's License: ${formData.driversLicense}`, 20, yPos);
-    yPos += 15;
+    // Title
+    addText("WRITTEN CONSENT FOR LEGAL REPRESENTATION", fontSize + 2, boldFont, 100, yPosition);
+    yPosition -= 20;
+    addText("Fabsy Traffic Ticket Defense Services", fontSize, font, 150, yPosition);
+    yPosition -= 30;
 
-    // Ticket Information Section
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("TICKET INFORMATION", 20, yPos);
-    yPos += 10;
+    // Client Information
+    addText("CLIENT INFORMATION", sectionSize, boldFont, leftMargin, yPosition);
+    yPosition -= 20;
+    addText(`Name: ${formData.firstName} ${formData.lastName}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Email: ${formData.email}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Phone: ${formData.phone}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Address: ${formData.address}, ${formData.city}, ${formData.province}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Postal Code: ${formData.postalCode}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Driver's License: ${formData.driversLicense}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 25;
 
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Ticket Number: ${formData.ticketNumber}`, 20, yPos);
-    yPos += 7;
-    doc.text(`Violation: ${formData.violation}`, 20, yPos);
-    yPos += 7;
-    doc.text(`Issue Date: ${formData.issueDate}`, 20, yPos);
-    yPos += 15;
+    // Ticket Information
+    addText("TICKET INFORMATION", sectionSize, boldFont, leftMargin, yPosition);
+    yPosition -= 20;
+    addText(`Ticket Number: ${formData.ticketNumber}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Violation: ${formData.violation}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Issue Date: ${formData.issueDate}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 25;
 
-    // Authorization Section
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("AUTHORIZATION FOR REPRESENTATION", 20, yPos);
-    yPos += 10;
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    const authText = [
-      "I, the undersigned, hereby authorize Fabsy and its designated agents to represent me in all matters",
-      "related to the traffic violation referenced above. This authorization includes, but is not limited to:",
+    // Authorization
+    addText("AUTHORIZATION FOR REPRESENTATION", sectionSize, boldFont, leftMargin, yPosition);
+    yPosition -= 20;
+    
+    const authLines = [
+      "I, the undersigned, hereby authorize Fabsy and its designated agents to represent",
+      "me in all matters related to the traffic violation referenced above. This includes:",
       "",
-      "• Appearing on my behalf at all court proceedings related to this matter",
-      "• Filing and submitting all necessary legal documents and pleadings",
+      "• Appearing on my behalf at all court proceedings",
+      "• Filing and submitting all necessary legal documents",
       "• Negotiating with prosecutors and court officials on my behalf",
       "• Making decisions regarding plea negotiations and trial strategy",
-      "• Accessing my driving record and related information as needed for my defense",
+      "• Accessing my driving record and related information as needed",
       "",
       "I understand that:",
       "• Fabsy will make reasonable efforts to achieve the best possible outcome",
       "• No specific outcome can be guaranteed",
       "• I am responsible for the service fee regardless of outcome",
-      "• I may be entitled to a refund under the money-back guarantee policy if applicable"
+      "• I may be entitled to a refund under the money-back guarantee policy"
     ];
 
-    authText.forEach(line => {
-      if (yPos > 250) {
-        doc.addPage();
-        yPos = 20;
+    authLines.forEach(line => {
+      if (yPosition < 100) {
+        // Would need new page, but keeping simple for now
+        return;
       }
-      doc.text(line, 20, yPos, { maxWidth: pageWidth - 40 });
-      yPos += 6;
+      addText(line, fontSize - 1, font, leftMargin, yPosition);
+      yPosition -= 14;
     });
 
-    yPos += 10;
+    yPosition -= 10;
 
-    // Signature Section
-    if (yPos > 230) {
-      doc.addPage();
-      yPos = 20;
-    }
+    // Signature
+    addText("CLIENT SIGNATURE", sectionSize, boldFont, leftMargin, yPosition);
+    yPosition -= 20;
+    addText(`Digital Signature: ${formData.digitalSignature}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 15;
+    addText(`Date: ${new Date().toLocaleDateString()}`, fontSize, font, leftMargin, yPosition);
+    yPosition -= 25;
 
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("CLIENT SIGNATURE", 20, yPos);
-    yPos += 10;
-
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Digital Signature: ${formData.digitalSignature}`, 20, yPos);
-    yPos += 7;
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, yPos);
-    yPos += 15;
-
-    // Data Processing Consent
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "italic");
-    const consentText = [
-      "By signing this form, I consent to the processing of my personal information as outlined in Fabsy's",
-      "Privacy Policy. I understand my data will be used solely for the purpose of legal representation",
-      "and will not be shared with third parties except as required by law."
+    // Consent text
+    const consentLines = [
+      "By signing this form, I consent to the processing of my personal information",
+      "as outlined in Fabsy's Privacy Policy. I understand my data will be used solely",
+      "for legal representation and will not be shared with third parties except as",
+      "required by law."
     ];
-    
-    consentText.forEach(line => {
-      doc.text(line, 20, yPos, { maxWidth: pageWidth - 40 });
-      yPos += 5;
+
+    consentLines.forEach(line => {
+      if (yPosition > 50) {
+        addText(line, fontSize - 2, font, leftMargin, yPosition);
+        yPosition -= 12;
+      }
     });
 
-    // Generate PDF as base64
-    const pdfBase64 = doc.output('datauristring').split(',')[1];
-    const pdfBuffer = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0));
+    // Save PDF
+    const pdfBytes = await pdfDoc.save();
+    console.log("PDF generated, size:", pdfBytes.length, "bytes");
 
     // Upload to storage
     const fileName = `${formData.submissionId}/consent-form.pdf`;
+    console.log("Uploading to storage:", fileName);
+    
     const { error: uploadError } = await supabase.storage
       .from('consent-forms')
-      .upload(fileName, pdfBuffer, {
+      .upload(fileName, pdfBytes, {
         contentType: 'application/pdf',
         upsert: true
       });
@@ -176,7 +173,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw uploadError;
     }
 
-    console.log("Consent form uploaded successfully:", fileName);
+    console.log("Consent form uploaded successfully to storage:", fileName);
 
     // Update ticket submission with consent form path
     const { error: updateError } = await supabase
