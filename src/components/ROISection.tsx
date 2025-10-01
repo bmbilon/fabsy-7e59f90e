@@ -60,7 +60,7 @@ const ROISection = () => {
                 <div className="bg-gradient-accent p-4 rounded-lg border border-white/20 text-center">
                   <div className="text-3xl font-bold text-gradient-hero mb-2">2-3x Savings</div>
                   <div className="text-sm text-secondary">
-                    Save 2-3 times what you invest with us
+                    Save 2-3 times the price of investing in our service fee
                   </div>
                 </div>
               </div>
