@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Calendar, MapPin, Shield, FileText, Phone, Mail, User as UserIcon } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Shield, FileText, Phone, Mail, User as UserIcon, Download } from "lucide-react";
 import { format } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -34,6 +34,7 @@ interface TicketSubmission {
   coupon_code: string;
   insurance_company: string;
   status: string;
+  consent_form_path: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -147,6 +148,40 @@ export default function AdminSubmissionDetail() {
       });
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const downloadConsentForm = async () => {
+    if (!submission?.consent_form_path) return;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from('consent-forms')
+        .download(submission.consent_form_path);
+
+      if (error) throw error;
+
+      // Create a download link
+      const url = window.URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `consent-form-${submission.ticket_number}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Download Started",
+        description: "Consent form is being downloaded",
+      });
+    } catch (error: any) {
+      console.error('Error downloading consent form:', error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download consent form",
+        variant: "destructive",
+      });
     }
   };
 
@@ -373,6 +408,28 @@ export default function AdminSubmissionDetail() {
                       <p className="font-medium whitespace-pre-wrap">{submission.additional_notes}</p>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Documents */}
+            {submission.consent_form_path && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={downloadConsentForm}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Consent Form
+                  </Button>
                 </CardContent>
               </Card>
             )}
