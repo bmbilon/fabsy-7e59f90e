@@ -14,6 +14,9 @@ interface TicketData {
   ticketNumber?: string;
   issueDate?: string;
   location?: string;
+  section?: string;
+  subsection?: string;
+  offenseDescription?: string;
 }
 
 interface StoredPayload {
@@ -193,6 +196,33 @@ const TicketAnalysis = () => {
                   </div>
                   
                   <div className="space-y-4">
+                    {(payload.ticketData.section || payload.ticketData.subsection || payload.ticketData.offenseDescription) && (
+                      <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4 space-y-3 mb-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <h4 className="font-semibold text-sm">OCR Detected Offence</h4>
+                        </div>
+                        {payload.ticketData.section && (
+                          <div className="flex gap-2 text-sm">
+                            <span className="text-muted-foreground font-medium">Section:</span>
+                            <span className="font-semibold">{payload.ticketData.section}</span>
+                          </div>
+                        )}
+                        {payload.ticketData.subsection && (
+                          <div className="flex gap-2 text-sm">
+                            <span className="text-muted-foreground font-medium">Subsection:</span>
+                            <span className="font-semibold">{payload.ticketData.subsection}</span>
+                          </div>
+                        )}
+                        {payload.ticketData.offenseDescription && (
+                          <div className="flex gap-2 text-sm">
+                            <span className="text-muted-foreground font-medium">Description:</span>
+                            <span className="font-semibold">{payload.ticketData.offenseDescription}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
                     <div className="flex justify-between items-center pb-3 border-b">
                       <span className="text-muted-foreground font-medium">Violation</span>
                       <span className="font-bold text-lg">{result.violationType}</span>
