@@ -888,12 +888,12 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </p>
       </div>
 
-      {/* Instant Ticket Analyzer - Only show if no ticket image uploaded yet */}
-      {!formData.ticketImage && (
+      {/* Instant Ticket Analyzer - Shows AI analysis when ticket details are provided */}
+      {formData.ticketImage && formData.fineAmount && formData.offenceDescription && (
         <InstantTicketAnalyzer 
           ticketImage={formData.ticketImage}
           fineAmount={formData.fineAmount}
-          violation={formData.offenceDescription || ""}
+          violation={formData.offenceDescription}
         />
       )}
     </form>
