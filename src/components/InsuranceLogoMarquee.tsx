@@ -29,12 +29,12 @@ const InsuranceLogoMarquee = () => {
           {logos.map((logo, index) => (
             <div
               key={`first-${index}`}
-              className="flex-shrink-0 mx-8 flex items-center justify-center h-20 w-32 grayscale hover:grayscale-0 transition-all duration-300"
+              className="flex-shrink-0 mx-8 flex items-center justify-center h-20 w-32"
             >
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="max-h-full max-w-full object-contain opacity-60 hover:opacity-100 transition-opacity"
+                className="max-h-full max-w-full object-contain"
               />
             </div>
           ))}
@@ -42,12 +42,12 @@ const InsuranceLogoMarquee = () => {
           {logos.map((logo, index) => (
             <div
               key={`second-${index}`}
-              className="flex-shrink-0 mx-8 flex items-center justify-center h-20 w-32 grayscale hover:grayscale-0 transition-all duration-300"
+              className="flex-shrink-0 mx-8 flex items-center justify-center h-20 w-32"
             >
               <img
                 src={logo.src}
                 alt={logo.alt}
-                className="max-h-full max-w-full object-contain opacity-60 hover:opacity-100 transition-opacity"
+                className="max-h-full max-w-full object-contain"
               />
             </div>
           ))}
