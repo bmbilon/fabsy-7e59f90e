@@ -6,6 +6,7 @@ import { CheckCircle, Clock, FileText, Zap, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AILeadCapture from "./AILeadCapture";
+import { usePageImpression, useTrafficSource, trackAIQuery } from "@/hooks/useAEOAnalytics";
 
 interface InstantTicketAnalyzerProps {
   ticketImage: File | null;
@@ -43,6 +44,9 @@ const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, city, date 
   const [aiAnswer, setAiAnswer] = useState<AIAnswer | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Track traffic sources
+  useTrafficSource();
+
   useEffect(() => {
     if (ticketImage && fineAmount && violation) {
       analyzeTicket();
@@ -62,10 +66,15 @@ const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, city, date 
         ...(date && { date })
       };
 
+      const question = `I received a ${violation} ticket in Alberta${city ? ` in ${city}` : ''}. The fine is ${fineAmount}. Can I dispute this?`;
+
+      // Track AI query
+      await trackAIQuery(question, ticketData);
+
       // Call AI analysis function
       const { data, error: functionError } = await supabase.functions.invoke('analyze-ticket-ai', {
         body: {
-          question: `I received a ${violation} ticket in Alberta${city ? ` in ${city}` : ''}. The fine is ${fineAmount}. Can I dispute this?`,
+          question,
           ticketData
         }
       });

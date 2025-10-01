@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Upload, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { trackMicroLead } from "@/hooks/useAEOAnalytics";
 
 interface AILeadCaptureProps {
   variant?: "open" | "gated";
@@ -40,6 +41,14 @@ export default function AILeadCapture({
         setIsSubmitting(false);
         return;
       }
+
+      // Track micro-conversion
+      await trackMicroLead({
+        name: formData.name,
+        email: formData.email,
+        ticketType: formData.ticketType || "Not specified",
+        source: "ai_helper"
+      });
 
       // Send lead capture email
       const { error: emailError } = await supabase.functions.invoke('send-lead-capture', {
