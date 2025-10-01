@@ -133,12 +133,25 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
       if (ocrError) throw ocrError;
 
       setTicketData(ocrData);
+      toast.success("Ticket scanned successfully!");
+    } catch (error) {
+      console.error('Error processing ticket:', error);
+      toast.error("Failed to process ticket. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-      // Step 2: Calculate eligibility based on financial logic (same as calculator)
+  const calculateEligibility = () => {
+    if (!ticketData) return;
+    
+    setIsProcessing(true);
+    try {
+      // Calculate eligibility based on financial logic (same as calculator)
       toast.info("Calculating savings...");
       
-      const fineAmount = parseFloat(ocrData.fine?.replace(/[^0-9.]/g, '') || '0');
-      const violationType = detectViolationType(ocrData.violation || '');
+      const fineAmount = parseFloat(ticketData.fine?.replace(/[^0-9.]/g, '') || '0');
+      const violationType = detectViolationType(ticketData.violation || '');
       const violation = violationImpacts[violationType];
       
       // Use custom premium if provided, otherwise use average
@@ -174,8 +187,8 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
       toast.success("Analysis complete!");
     } catch (error) {
-      console.error('Error processing ticket:', error);
-      toast.error("Failed to process ticket. Please try again.");
+      console.error('Error calculating eligibility:', error);
+      toast.error("Failed to calculate. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -264,6 +277,15 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                           : `Leave blank to use average ($${AVERAGE_PREMIUM}/year)`}
                       </p>
                     </div>
+
+                    <Button 
+                      onClick={calculateEligibility} 
+                      className="w-full" 
+                      size="lg"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? "Calculating..." : "Calculate Eligibility"}
+                    </Button>
                   </div>
                 </div>
               )}
