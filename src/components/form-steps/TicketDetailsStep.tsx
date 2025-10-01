@@ -896,6 +896,12 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           violation={formData.offenceDescription}
           section={formData.offenceSection}
           subsection={formData.offenceSubSection}
+          officer={formData.officer}
+          officerBadge={formData.officerBadge}
+          ticketNumber={formData.ticketNumber}
+          location={formData.location}
+          date={formData.issueDate?.toISOString()}
+          courtDate={formData.courtDate}
         />
       )}
     </form>

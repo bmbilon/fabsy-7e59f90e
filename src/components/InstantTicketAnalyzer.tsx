@@ -16,6 +16,11 @@ interface InstantTicketAnalyzerProps {
   subsection?: string;
   city?: string;
   date?: string;
+  officer?: string;
+  officerBadge?: string;
+  ticketNumber?: string;
+  location?: string;
+  courtDate?: Date;
 }
 
 interface AIAnswer {
@@ -40,7 +45,7 @@ interface PageJSON {
   status: string;
 }
 
-const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, section, subsection, city, date }: InstantTicketAnalyzerProps) => {
+const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, section, subsection, city, date, officer, officerBadge, ticketNumber, location, courtDate }: InstantTicketAnalyzerProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [aiAnswer, setAiAnswer] = useState<AIAnswer | null>(null);
@@ -53,7 +58,7 @@ const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, section, su
     if (ticketImage && fineAmount && violation) {
       analyzeTicket();
     }
-  }, [ticketImage, fineAmount, violation, section, subsection, city, date]);
+  }, [ticketImage, fineAmount, violation, section, subsection, city, date, officer, officerBadge, ticketNumber, location, courtDate]);
 
   const analyzeTicket = async () => {
     setIsAnalyzing(true);
@@ -192,6 +197,56 @@ const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, section, su
                   <div className="flex gap-2 text-sm">
                     <span className="text-muted-foreground font-medium">Description:</span>
                     <span className="text-foreground">{violation}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Officer Details */}
+            {(officer || officerBadge) && (
+              <div className="bg-blue-50 dark:bg-blue-950/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-sm text-foreground mb-2">Officer Details</h4>
+                {officer && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Officer Name:</span>
+                    <span className="text-foreground">{officer}</span>
+                  </div>
+                )}
+                {officerBadge && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Badge Number:</span>
+                    <span className="text-foreground">{officerBadge}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Additional Ticket Information */}
+            {(ticketNumber || location || date || courtDate) && (
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-sm text-foreground mb-2">Ticket Information</h4>
+                {ticketNumber && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Ticket #:</span>
+                    <span className="text-foreground">{ticketNumber}</span>
+                  </div>
+                )}
+                {location && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Location:</span>
+                    <span className="text-foreground">{location}</span>
+                  </div>
+                )}
+                {date && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Issue Date:</span>
+                    <span className="text-foreground">{date}</span>
+                  </div>
+                )}
+                {courtDate && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Court Date:</span>
+                    <span className="text-foreground">{courtDate.toLocaleDateString()}</span>
                   </div>
                 )}
               </div>

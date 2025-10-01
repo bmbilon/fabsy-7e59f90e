@@ -14,9 +14,12 @@ interface TicketData {
   ticketNumber?: string;
   issueDate?: string;
   location?: string;
-  section?: string;
-  subsection?: string;
-  offenseDescription?: string;
+  officer?: string;
+  officerBadge?: string;
+  offenceSection?: string;
+  offenceSubSection?: string;
+  offenceDescription?: string;
+  courtDate?: string;
 }
 
 interface StoredPayload {
@@ -189,28 +192,46 @@ const TicketAnalysis = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    {(payload.ticketData.section || payload.ticketData.subsection || payload.ticketData.offenseDescription) && (
+                    {(payload.ticketData.offenceSection || payload.ticketData.offenceSubSection || payload.ticketData.offenceDescription) && (
                       <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4 space-y-3 mb-4">
                         <div className="flex items-center gap-2 mb-2">
                           <CheckCircle className="h-4 w-4 text-green-600" />
                           <h4 className="font-semibold text-sm">OCR Detected Offence</h4>
                         </div>
-                        {payload.ticketData.section && (
+                        {payload.ticketData.offenceSection && (
                           <div className="flex gap-2 text-sm">
                             <span className="text-muted-foreground font-medium">Section:</span>
-                            <span className="font-semibold">{payload.ticketData.section}</span>
+                            <span className="font-semibold">{payload.ticketData.offenceSection}</span>
                           </div>
                         )}
-                        {payload.ticketData.subsection && (
+                        {payload.ticketData.offenceSubSection && (
                           <div className="flex gap-2 text-sm">
                             <span className="text-muted-foreground font-medium">Subsection:</span>
-                            <span className="font-semibold">{payload.ticketData.subsection}</span>
+                            <span className="font-semibold">{payload.ticketData.offenceSubSection}</span>
                           </div>
                         )}
-                        {payload.ticketData.offenseDescription && (
+                        {payload.ticketData.offenceDescription && (
                           <div className="flex gap-2 text-sm">
                             <span className="text-muted-foreground font-medium">Description:</span>
-                            <span className="font-semibold">{payload.ticketData.offenseDescription}</span>
+                            <span className="font-semibold">{payload.ticketData.offenceDescription}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {(payload.ticketData.officer || payload.ticketData.officerBadge) && (
+                      <div className="bg-blue-50 dark:bg-blue-950/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-2 mb-4">
+                        <h4 className="font-semibold text-sm mb-2">Officer Details</h4>
+                        {payload.ticketData.officer && (
+                          <div className="flex gap-2 text-sm">
+                            <span className="text-muted-foreground font-medium">Officer Name:</span>
+                            <span className="font-semibold">{payload.ticketData.officer}</span>
+                          </div>
+                        )}
+                        {payload.ticketData.officerBadge && (
+                          <div className="flex gap-2 text-sm">
+                            <span className="text-muted-foreground font-medium">Badge Number:</span>
+                            <span className="font-semibold">{payload.ticketData.officerBadge}</span>
                           </div>
                         )}
                       </div>
@@ -228,10 +249,28 @@ const TicketAnalysis = () => {
                       <span className="text-muted-foreground font-medium">Demerit Points</span>
                       <span className="font-bold text-lg">{result.demeritPoints} points</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center pb-3 border-b">
                       <span className="text-muted-foreground font-medium">Ticket Number</span>
                       <span className="font-bold text-lg">{payload.ticketData.ticketNumber || 'N/A'}</span>
                     </div>
+                    {payload.ticketData.issueDate && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <span className="text-muted-foreground font-medium">Issue Date</span>
+                        <span className="font-bold text-lg">{new Date(payload.ticketData.issueDate).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                    {payload.ticketData.location && (
+                      <div className="flex justify-between items-center pb-3 border-b">
+                        <span className="text-muted-foreground font-medium">Location</span>
+                        <span className="font-bold text-lg">{payload.ticketData.location}</span>
+                      </div>
+                    )}
+                    {payload.ticketData.courtDate && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground font-medium">Court Date</span>
+                        <span className="font-bold text-lg">{new Date(payload.ticketData.courtDate).toLocaleDateString()}</span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
