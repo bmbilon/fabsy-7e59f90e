@@ -62,6 +62,57 @@ export type Database = {
         }
         Relationships: []
       }
+      page_content: {
+        Row: {
+          bullets: Json
+          created_at: string
+          faqs: Json
+          h1: string
+          hook: string
+          how: string | null
+          id: string
+          meta_description: string
+          meta_title: string
+          next: string | null
+          slug: string
+          updated_at: string
+          video: Json | null
+          what: string | null
+        }
+        Insert: {
+          bullets?: Json
+          created_at?: string
+          faqs?: Json
+          h1: string
+          hook: string
+          how?: string | null
+          id?: string
+          meta_description: string
+          meta_title: string
+          next?: string | null
+          slug: string
+          updated_at?: string
+          video?: Json | null
+          what?: string | null
+        }
+        Update: {
+          bullets?: Json
+          created_at?: string
+          faqs?: Json
+          h1?: string
+          hook?: string
+          how?: string | null
+          id?: string
+          meta_description?: string
+          meta_title?: string
+          next?: string | null
+          slug?: string
+          updated_at?: string
+          video?: Json | null
+          what?: string | null
+        }
+        Relationships: []
+      }
       ticket_submissions: {
         Row: {
           additional_notes: string | null
