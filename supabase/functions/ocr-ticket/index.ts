@@ -144,7 +144,10 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
         fine: extractedData.fineAmount ? `$${extractedData.fineAmount}` : null,
         ticketNumber: extractedData.ticketNumber,
         issueDate: extractedData.issueDate,
-        location: extractedData.location
+        location: extractedData.location,
+        section: extractedData.offenceSection,
+        subsection: extractedData.offenceSubSection,
+        offenseDescription: extractedData.offenceDescription
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
