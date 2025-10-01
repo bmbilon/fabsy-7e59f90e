@@ -2,8 +2,8 @@
  * Generate src/content/routes-manifest.json from src/content/pages/*.json
  * This runs during prebuild after sync-pages-from-db.js
  */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const pagesDir = path.resolve('./src/content/pages');
 const outFile = path.resolve('./src/content/routes-manifest.json');
