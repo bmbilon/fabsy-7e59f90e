@@ -47,3 +47,9 @@ verify_jwt = false
 
 [functions.validate-page-content]
 verify_jwt = false
+
+[functions.analyze-ticket-ai]
+verify_jwt = false
+
+[functions.upsert-page-content]
+verify_jwt = false
