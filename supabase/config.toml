@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.generate-outreach-sequence]
 verify_jwt = false
+
+[functions.generate-video-script]
+verify_jwt = false
