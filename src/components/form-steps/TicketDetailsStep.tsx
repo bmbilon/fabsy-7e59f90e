@@ -894,6 +894,8 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           ticketImage={formData.ticketImage}
           fineAmount={formData.fineAmount}
           violation={formData.offenceDescription}
+          section={formData.offenceSection}
+          subsection={formData.offenceSubSection}
         />
       )}
     </form>

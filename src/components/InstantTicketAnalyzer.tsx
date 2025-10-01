@@ -12,6 +12,8 @@ interface InstantTicketAnalyzerProps {
   ticketImage: File | null;
   fineAmount: string;
   violation: string;
+  section?: string;
+  subsection?: string;
   city?: string;
   date?: string;
 }
@@ -38,7 +40,7 @@ interface PageJSON {
   status: string;
 }
 
-const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, city, date }: InstantTicketAnalyzerProps) => {
+const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, section, subsection, city, date }: InstantTicketAnalyzerProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [aiAnswer, setAiAnswer] = useState<AIAnswer | null>(null);
@@ -51,7 +53,7 @@ const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, city, date 
     if (ticketImage && fineAmount && violation) {
       analyzeTicket();
     }
-  }, [ticketImage, fineAmount, violation, city, date]);
+  }, [ticketImage, fineAmount, violation, section, subsection, city, date]);
 
   const analyzeTicket = async () => {
     setIsAnalyzing(true);
@@ -167,6 +169,46 @@ const InstantTicketAnalyzer = ({ ticketImage, fineAmount, violation, city, date 
           </div>
         ) : analysisComplete && aiAnswer ? (
           <div className="space-y-6">
+            {/* OCR Detected Offence Details */}
+            {(section || subsection || violation) && (
+              <div className="bg-white dark:bg-white/5 border-2 border-primary/30 rounded-lg p-4 space-y-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <h4 className="font-semibold text-sm text-foreground">OCR Detected Offence</h4>
+                </div>
+                {section && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Section:</span>
+                    <span className="text-foreground">{section}</span>
+                  </div>
+                )}
+                {subsection && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Subsection:</span>
+                    <span className="text-foreground">{subsection}</span>
+                  </div>
+                )}
+                {violation && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-muted-foreground font-medium">Description:</span>
+                    <span className="text-foreground">{violation}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Eligibility Header */}
+            <div className="text-center space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+                <h3 className="text-2xl font-bold text-green-600">ELIGIBLE FOR DISPUTE</h3>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <p className="text-lg font-semibold text-foreground">Analysis: This Ticket is Worth Fighting</p>
+              </div>
+            </div>
+
             {/* Hook - Direct Answer */}
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <p className="text-lg font-semibold text-foreground mb-2">
