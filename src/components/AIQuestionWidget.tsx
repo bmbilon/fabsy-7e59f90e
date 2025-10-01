@@ -107,9 +107,14 @@ const AIQuestionWidget = () => {
             </Badge>
           )}
         </div>
-        <p className="text-sm text-muted-foreground mt-2">
-          Ask a question about your traffic ticket or upload it for instant AI analysis
-        </p>
+        <div className="space-y-2 mt-3">
+          <p className="text-lg font-semibold text-foreground">
+            Protect your insurance rates from going way up
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Ask a question about your traffic ticket or upload it for instant AI analysis
+          </p>
+        </div>
       </CardHeader>
       
       <CardContent className="space-y-4">
