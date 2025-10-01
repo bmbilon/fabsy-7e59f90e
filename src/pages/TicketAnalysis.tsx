@@ -4,7 +4,8 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { CheckCircle, XCircle, DollarSign, ArrowLeft } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle, XCircle, DollarSign, ArrowLeft, TrendingDown, Shield, Calculator, AlertTriangle } from "lucide-react";
 import { useSearchParams, Link } from "react-router-dom";
 
 interface TicketData {
@@ -117,128 +118,228 @@ const TicketAnalysis = () => {
   }, [payload, monthlyPremium]);
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <Header />
 
-      <section className="container mx-auto px-4 py-10">
+      <section className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link to="/" className="inline-flex items-center text-primary hover:underline">
+          <Link to="/" className="inline-flex items-center text-primary hover:underline font-medium">
             <ArrowLeft className="h-4 w-4 mr-2" /> Back to Home
           </Link>
         </div>
 
-        <h1 className="text-3xl font-bold mb-4">Ticket Analysis Results</h1>
-
         {!payload ? (
-          <div className="p-6 rounded-lg border-2 border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
-            <p className="font-medium">No ticket data found.</p>
-            <p className="text-sm text-muted-foreground mt-2">Please try scanning your ticket again.</p>
-          </div>
+          <Card className="border-2 border-warning">
+            <CardContent className="p-8">
+              <div className="flex items-start gap-4">
+                <AlertTriangle className="h-8 w-8 text-warning flex-shrink-0" />
+                <div>
+                  <p className="font-bold text-lg mb-2">No ticket data found</p>
+                  <p className="text-muted-foreground">Please try scanning your ticket again.</p>
+                  <Link to="/">
+                    <Button className="mt-4">Scan Ticket</Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ) : result ? (
           <div className="space-y-6">
-            <div className={`p-6 rounded-lg border-2 ${result.isEligible ? 'border-green-500 bg-green-50 dark:bg-green-950' : 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950'}`}>
-              <div className="flex items-start gap-4">
-                {result.isEligible ? (
-                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
-                ) : (
-                  <XCircle className="h-8 w-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-1" />
-                )}
-                <div>
-                  <h2 className="text-xl font-bold mb-2">
-                    {result.isEligible ? "✅ Worth Fighting!" : "⚠️ Consider Carefully"}
-                  </h2>
-                  <p className="text-lg">{result.reason}</p>
+            {/* Hero ROI Banner */}
+            <div className={`relative overflow-hidden rounded-2xl p-8 ${result.isEligible ? 'bg-gradient-to-br from-green-600 to-emerald-700' : 'bg-gradient-to-br from-orange-500 to-amber-600'} text-white shadow-2xl`}>
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  {result.isEligible ? (
+                    <CheckCircle className="h-12 w-12" />
+                  ) : (
+                    <Shield className="h-12 w-12" />
+                  )}
+                  <h1 className="text-4xl font-bold">
+                    {result.isEligible ? "This Ticket is Worth Fighting!" : "Zero-Risk Guarantee Applies"}
+                  </h1>
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <h3 className="font-semibold mb-3">Ticket Information</h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Violation Type:</span>
-                  <p className="font-medium">{result.violationType}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Demerit Points:</span>
-                  <p className="font-medium">{result.demeritPoints} points</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Fine Amount:</span>
-                  <p className="font-medium">${'{'}result.financials.fine{'}'}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Ticket #:</span>
-                  <p className="font-medium">{payload.ticketData.ticketNumber || 'N/A'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="monthly-premium" className="text-sm font-medium">
-                  Monthly Insurance Premium (Optional)
-                </Label>
-                <Input
-                  id="monthly-premium"
-                  type="number"
-                  placeholder="e.g., 150"
-                  value={monthlyPremium}
-                  onChange={(e) => setMonthlyPremium(e.target.value)}
-                  className="bg-white dark:bg-gray-900"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {monthlyPremium ? `Annual: $${(parseFloat(monthlyPremium || '0') * 12).toFixed(0)}` : `Leave blank to use average ($${AVERAGE_PREMIUM}/year)`}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-muted/50 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <DollarSign className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold">Financial Impact</h3>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Ticket Fine:</span>
-                  <span className="font-medium">${'{'}result.financials.fine{'}'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Annual Insurance Increase:</span>
-                  <span className="font-medium">${'{'}result.financials.estimatedInsuranceIncrease.toFixed(0){'}'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>3-Year Insurance Impact:</span>
-                  <span className="font-medium">${'{'}result.financials.threeYearImpact.toFixed(0){'}'}</span>
-                </div>
-                <div className="border-t pt-2 flex justify-between font-semibold">
-                  <span>Total Cost if Convicted:</span>
-                  <span className="text-destructive">${'{'}result.financials.totalCostIfConvicted.toFixed(0){'}'}</span>
-                </div>
-                <div className="flex justify-between font-semibold">
-                  <span>Our Service Fee:</span>
-                  <span>${'{'}result.financials.serviceFee{'}'}</span>
-                </div>
-                <div className="border-t pt-2 flex justify-between font-bold text-lg">
-                  <span>Your Savings:</span>
-                  <span className="text-primary">${'{'}result.financials.potentialSavings.toFixed(0){'}'}</span>
-                </div>
-                {result.financials.roi > 0 && (
-                  <div className="bg-primary/10 rounded p-2 text-center">
-                    <span className="text-primary font-bold">{result.financials.roi.toFixed(0)}% more than you invest!</span>
+                
+                <div className="grid md:grid-cols-3 gap-6 mt-8">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <p className="text-white/80 text-sm font-medium mb-2">Your Potential Savings</p>
+                    <p className="text-5xl font-bold">${result.financials.potentialSavings.toFixed(0)}</p>
                   </div>
-                )}
+                  
+                  {result.financials.roi > 0 && (
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                      <p className="text-white/80 text-sm font-medium mb-2">Return on Investment</p>
+                      <p className="text-5xl font-bold">{result.financials.roi.toFixed(0)}%</p>
+                    </div>
+                  )}
+                  
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <p className="text-white/80 text-sm font-medium mb-2">Service Fee</p>
+                    <p className="text-5xl font-bold">${result.financials.serviceFee}</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <Link to="/">
-                <Button variant="outline">Scan Another Ticket</Button>
-              </Link>
-              <Link to="/ticket-form">
-                <Button>Get Started</Button>
-              </Link>
+            {/* Side-by-Side Grid */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Ticket Details */}
+              <Card className="border-2">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <AlertTriangle className="h-6 w-6 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold">Ticket Details</h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center pb-3 border-b">
+                      <span className="text-muted-foreground font-medium">Violation</span>
+                      <span className="font-bold text-lg">{result.violationType}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-3 border-b">
+                      <span className="text-muted-foreground font-medium">Fine Amount</span>
+                      <span className="font-bold text-lg text-destructive">${result.financials.fine}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-3 border-b">
+                      <span className="text-muted-foreground font-medium">Demerit Points</span>
+                      <span className="font-bold text-lg">{result.demeritPoints} points</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground font-medium">Ticket Number</span>
+                      <span className="font-bold text-lg">{payload.ticketData.ticketNumber || 'N/A'}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Insurance Premium Input */}
+              <Card className="border-2 border-primary/20 bg-primary/5">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <Calculator className="h-6 w-6 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-bold">Customize Your Analysis</h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="monthly-premium" className="text-base font-semibold mb-3 block">
+                        Monthly Insurance Premium
+                      </Label>
+                      <Input
+                        id="monthly-premium"
+                        type="number"
+                        placeholder="e.g., 150"
+                        value={monthlyPremium}
+                        onChange={(e) => setMonthlyPremium(e.target.value)}
+                        className="h-14 text-lg font-semibold"
+                      />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {monthlyPremium 
+                          ? `Annual premium: $${(parseFloat(monthlyPremium || '0') * 12).toFixed(0)}/year` 
+                          : `Using average: $${AVERAGE_PREMIUM}/year`}
+                      </p>
+                    </div>
+                    
+                    <div className="bg-muted/50 rounded-lg p-4 mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        💡 <strong>Tip:</strong> Enter your actual premium for a more accurate savings calculation
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+
+            {/* Financial Breakdown */}
+            <Card className="border-2">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 rounded-lg bg-destructive/10">
+                    <TrendingDown className="h-6 w-6 text-destructive" />
+                  </div>
+                  <h2 className="text-2xl font-bold">Complete Financial Breakdown</h2>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-muted-foreground mb-4">If Convicted</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                        <span className="font-medium">Ticket Fine</span>
+                        <span className="font-bold text-lg">${result.financials.fine}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                        <span className="font-medium">Annual Insurance Increase</span>
+                        <span className="font-bold text-lg">${result.financials.estimatedInsuranceIncrease.toFixed(0)}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                        <span className="font-medium">3-Year Insurance Impact</span>
+                        <span className="font-bold text-lg">${result.financials.threeYearImpact.toFixed(0)}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 bg-destructive/10 rounded-lg border-2 border-destructive/20">
+                        <span className="font-bold text-lg">Total Cost</span>
+                        <span className="font-bold text-2xl text-destructive">${result.financials.totalCostIfConvicted.toFixed(0)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-muted-foreground mb-4">With Our Help</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                        <span className="font-medium">Our Service Fee</span>
+                        <span className="font-bold text-lg">${result.financials.serviceFee}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                        <span className="font-medium">Potential Reduction</span>
+                        <span className="font-bold text-lg text-primary">-${result.financials.totalCostIfConvicted.toFixed(0)}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 bg-primary/10 rounded-lg border-2 border-primary/20 mt-8">
+                        <span className="font-bold text-lg">Your Savings</span>
+                        <span className="font-bold text-2xl text-primary">${result.financials.potentialSavings.toFixed(0)}</span>
+                      </div>
+                      {result.financials.roi > 0 && (
+                        <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border-2 border-green-500/20 text-center">
+                          <p className="text-sm font-medium text-green-700 dark:text-green-300 mb-1">Return on Investment</p>
+                          <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                            {result.financials.roi.toFixed(0)}% ROI
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* CTA Section */}
+            <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
+              <CardContent className="p-8 text-center">
+                <Shield className="h-16 w-16 mx-auto mb-4 text-primary" />
+                <h2 className="text-3xl font-bold mb-4">🛡️ Zero-Risk Guarantee</h2>
+                <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+                  {result.isEligible 
+                    ? "With our no-win, no-fee guarantee, you only pay if we save you money. Start now and protect your driving record!"
+                    : "Even with limited savings potential, our zero-risk guarantee means you pay nothing if we don't reduce your costs. Why not try?"}
+                </p>
+                <div className="flex gap-4 justify-center flex-wrap">
+                  <Link to="/ticket-form">
+                    <Button size="lg" className="text-lg px-8 py-6 h-auto">
+                      Get Started Now
+                      <ArrowLeft className="ml-2 h-5 w-5 rotate-180" />
+                    </Button>
+                  </Link>
+                  <Link to="/">
+                    <Button size="lg" variant="outline" className="text-lg px-8 py-6 h-auto">
+                      Scan Another Ticket
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         ) : null}
       </section>
