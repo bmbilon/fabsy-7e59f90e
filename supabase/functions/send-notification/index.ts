@@ -52,7 +52,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Fabsy Notifications <onboarding@resend.dev>",
-      to: isTestUser ? ["brett@plume.ca"] : ["brett@execom.ca"],
+      to: ["brett@execom.ca"],
       subject: `${isTestUser ? '[TEST] ' : ''}New Ticket Submission - ${ticketData.firstName} ${ticketData.lastName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -111,7 +111,6 @@ const handler = async (req: Request): Promise<Response> => {
     const clientEmailResponse = await resend.emails.send({
       from: "Fabsy <onboarding@resend.dev>",
       to: [ticketData.email],
-      bcc: isTestUser ? ["brett@plume.ca"] : undefined,
       subject: "Your Ticket Submission Confirmation",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
