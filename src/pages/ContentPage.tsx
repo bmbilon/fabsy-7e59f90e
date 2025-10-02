@@ -151,28 +151,50 @@ const ContentPage = () => {
 
             {/* Content */}
             <div className="prose prose-lg max-w-none">
-              {pageData.content.split('\n\n').map((paragraph: string, idx: number) => {
-                if (paragraph.startsWith('##')) {
-                  return <h2 key={idx} className="text-2xl font-bold mt-8 mb-4">{paragraph.replace('##', '').trim()}</h2>;
-                }
-                if (paragraph.startsWith('###')) {
-                  return <h3 key={idx} className="text-xl font-semibold mt-6 mb-3">{paragraph.replace('###', '').trim()}</h3>;
-                }
-                if (paragraph.startsWith('-')) {
-                  const items = paragraph.split('\n').filter((line: string) => line.startsWith('-'));
-                  return (
-                    <ul key={idx} className="list-disc ml-6 space-y-2 mb-4">
-                      {items.map((item: string, i: number) => (
-                        <li key={i}>{item.replace('-', '').trim()}</li>
-                      ))}
-                    </ul>
-                  );
-                }
-                if (paragraph.trim()) {
-                  return <p key={idx} className="mb-4 text-gray-700 leading-relaxed">{paragraph}</p>;
-                }
-                return null;
-              })}
+              {pageData.hook && (
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                  <p className="text-blue-800 font-medium">{pageData.hook}</p>
+                </div>
+              )}
+              
+              {pageData.what && (
+                <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.what }} />
+              )}
+              
+              {pageData.how && (
+                <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.how }} />
+              )}
+              
+              {pageData.next && (
+                <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.next }} />
+              )}
+              
+              {pageData.content && (
+                <div className="mb-6">
+                  {pageData.content.split('\n\n').map((paragraph: string, idx: number) => {
+                    if (paragraph.startsWith('##')) {
+                      return <h2 key={idx} className="text-2xl font-bold mt-8 mb-4">{paragraph.replace('##', '').trim()}</h2>;
+                    }
+                    if (paragraph.startsWith('###')) {
+                      return <h3 key={idx} className="text-xl font-semibold mt-6 mb-3">{paragraph.replace('###', '').trim()}</h3>;
+                    }
+                    if (paragraph.startsWith('-')) {
+                      const items = paragraph.split('\n').filter((line: string) => line.startsWith('-'));
+                      return (
+                        <ul key={idx} className="list-disc ml-6 space-y-2 mb-4">
+                          {items.map((item: string, i: number) => (
+                            <li key={i}>{item.replace('-', '').trim()}</li>
+                          ))}
+                        </ul>
+                      );
+                    }
+                    if (paragraph.trim()) {
+                      return <p key={idx} className="mb-4 text-gray-700 leading-relaxed">{paragraph}</p>;
+                    }
+                    return null;
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
