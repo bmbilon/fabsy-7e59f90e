@@ -29,5 +29,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What happens if I don't dispute the ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"If you do not dispute the ticket or pay the fine by the due date, you will be convicted, and the full fine will be owed. This may also lead to demerits, depending on the specific violation.\"}},{\"@type\":\"Question\",\"name\":\"Do I need a lawyer to dispute my ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No, you are not required to have a lawyer to dispute a ticket. You can represent yourself, or you can hire a lawyer or an agent to represent you.\"}},{\"@type\":\"Question\",\"name\":\"What is the deadline to dispute my ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The deadline to dispute your ticket is typically indicated on the ticket itself, usually within 30 days of the date the ticket was issued. It's important to act promptly.\"}}]}"
 }

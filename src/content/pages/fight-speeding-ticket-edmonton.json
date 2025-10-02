@@ -21,5 +21,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Can I request disclosure online in Edmonton?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Often yes. Many courts accept online disclosure requests—check the ticket or court site for details.\"}}]}"
 }
