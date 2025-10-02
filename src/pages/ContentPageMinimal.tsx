@@ -10,7 +10,7 @@ const ContentPageMinimal = () => {
   return (
     <main className="min-h-screen">
       <Helmet>
-        <title>Content Page - {slug}</title>
+        <title>{slug ? `Content Page - ${slug}` : 'Content Page - Test'}</title>
         <meta name="description" content="Test content page" />
       </Helmet>
 
@@ -18,7 +18,7 @@ const ContentPageMinimal = () => {
 
       <div className="container mx-auto px-4 py-16">
         <h1 className="text-4xl font-bold mb-4">Content Page Works!</h1>
-        <p className="text-lg mb-4">Slug: {slug}</p>
+        <p className="text-lg mb-4">Slug: {slug || 'undefined (static route)'}</p>
         <p className="text-lg mb-4">This minimal version should work without errors.</p>
         <Link to="/">
           <Button>Go Home</Button>
