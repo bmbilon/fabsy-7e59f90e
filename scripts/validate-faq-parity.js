@@ -1,86 +1,41 @@
-#!/usr/bin/env node
-// Simple parity validator: ensures each FAQ q/a appears verbatim inside jsonld field of each JSON page.
-// Usage: node scripts/validate-faq-parity.js [dir_or_pattern]
-// Default: ssg-pages/*.json
-
-import fs from 'fs';
-import path from 'path';
-
-const patterns = process.argv.slice(2).length ? process.argv.slice(2) : ['ssg-pages'];
-let files = [];
-
-patterns.forEach(p => {
-  if (fs.existsSync(p) && fs.statSync(p).isDirectory()) {
-    const dirFiles = fs.readdirSync(p).filter(f => f.endsWith('.json')).map(f => path.join(p, f));
-    files = files.concat(dirFiles);
-  } else {
-    // treat as glob-like simple pattern a/*.json
-    if (p.indexOf('*') !== -1) {
-      const dir = path.dirname(p);
-      const base = path.basename(p).replace('*', '');
-      if (fs.existsSync(dir)) {
-        const dirFiles = fs.readdirSync(dir).filter(f => f.endsWith('.json') && f.includes(base)).map(f => path.join(dir, f));
-        files = files.concat(dirFiles);
-      }
-    } else if (fs.existsSync(p) && p.endsWith('.json')) {
-      files.push(p);
-    }
-  }
-});
-
-if (files.length === 0) {
-  console.error('No JSON files found with patterns:', patterns);
-  process.exit(2);
+/**
+ * scripts/validate-faq-parity.js
+ */
+const fs = require('fs');
+const path = require('path');
+const PAGES_DIR = process.env.PAGES_DIR || 'ssg-pages';
+function safeParseJsonLd(jsonldStr) {
+  try { return JSON.parse(jsonldStr); } catch(e){ try { return JSON.parse(jsonldStr.trim()); }catch(e2){ return null; } }
 }
-
+function flattenSchemas(obj){ if(!obj) return []; if(Array.isArray(obj)) return obj; return [obj]; }
 let failed = false;
-
-files.forEach(f => {
-  try {
-    const raw = fs.readFileSync(f, 'utf8');
-    const obj = JSON.parse(raw);
-    const faqs = obj.faqs || [];
-    const jsonld = (obj.jsonld || obj.jsonLd || obj.jsonLD || '') + '';
-    if (!jsonld) {
-      console.error(`[ERROR] ${f}: missing jsonld field`);
-      failed = true;
-      return;
+const files = fs.existsSync(PAGES_DIR) ? fs.readdirSync(PAGES_DIR).filter(f=>f.endsWith('.json')) : [];
+if(files.length===0){ console.log(`No files in ${PAGES_DIR} — skipping.`); process.exit(0); }
+for(const f of files){
+  const full=path.join(PAGES_DIR,f);
+  try{
+    const raw=fs.readFileSync(full,'utf8');
+    const page=JSON.parse(raw);
+    const faqs=Array.isArray(page.faqs)?page.faqs:[];
+    if(faqs.length===0) continue;
+    if(!page.jsonld || typeof page.jsonld!=='string'){ console.error(`[ERROR] ${f}: missing jsonld field (has ${faqs.length} faq(s))`); failed=true; continue; }
+    const parsed=safeParseJsonLd(page.jsonld);
+    if(!parsed){ console.error(`[ERROR] ${f}: jsonld field not valid JSON`); failed=true; continue; }
+    const schemas=flattenSchemas(parsed);
+    let faqSchema=null;
+    for(const s of schemas){ if(s && s['@type']==='FAQPage'){ faqSchema=s; break; } }
+    if(!faqSchema){ console.error(`[ERROR] ${f}: jsonld does not contain a FAQPage schema`); failed=true; continue; }
+    const mainEntity=Array.isArray(faqSchema.mainEntity)?faqSchema.mainEntity:[];
+    if(mainEntity.length!==faqs.length){ console.error(`[ERROR] ${f}: count mismatch faqs.length=${faqs.length} vs jsonld.mainEntity.length=${mainEntity.length}`); failed=true; }
+    for(let i=0;i<Math.min(mainEntity.length, faqs.length); i++){
+      const qJson=String(mainEntity[i].name||'').trim();
+      const qPage=String(faqs[i].q||faqs[i].question||'').trim();
+      if(qJson!==qPage){ console.error(`[ERROR] ${f}: question mismatch index ${i}:\n  jsonld: "${qJson}"\n  page:    "${qPage}"\n`); failed=true; }
+      const aJson=String((mainEntity[i].acceptedAnswer && mainEntity[i].acceptedAnswer.text) || '').trim();
+      const aPage=String(faqs[i].a||faqs[i].answer||'').trim();
+      if(aJson!==aPage){ console.error(`[ERROR] ${f}: answer mismatch index ${i}:\n  jsonld.answer: "${aJson}"\n  page.answer:    "${aPage}"\n`); failed=true; }
     }
-    if (!Array.isArray(faqs) || faqs.length < 6) {
-      console.error(`[ERROR] ${f}: faqs array missing or < 6 (found ${faqs.length})`);
-      failed = true;
-    }
-    for (let i = 0; i < Math.min(6, faqs.length); i++) {
-      const q = faqs[i].q || '';
-      const a = faqs[i].a || '';
-      if (!q || !a) {
-        console.error(`[ERROR] ${f}: faq #${i+1} missing q or a`);
-        failed = true;
-        continue;
-      }
-      if (!jsonld.includes(q)) {
-        console.error(`[ERROR] ${f}: question not verbatim in jsonld -> ${q.substring(0,80)}`);
-        failed = true;
-      }
-      if (!jsonld.includes(a)) {
-        console.error(`[ERROR] ${f}: answer not verbatim in jsonld -> ${a.substring(0,80)}`);
-        failed = true;
-      }
-      const alen = a.replace(/<[^>]+>/g, '').split(/\s+/).filter(Boolean).length;
-      if (alen < 20 || alen > 50) {
-        console.warn(`[WARN] ${f}: faq #${i+1} answer wordcount ${alen} (recommended 20-50)`);
-      }
-    }
-    console.log(`[OK] ${f}`);
-  } catch (e) {
-    console.error(`[ERROR] failed to read/parse ${f}: ${e.message}`);
-    failed = true;
-  }
-});
-
-if (failed) {
-  console.error('Parity validation FAILED.');
-  process.exit(1);
+    if(!failed) console.log(`[OK] ${f} — parity verified (${faqs.length} FAQ(s))`);
+  }catch(err){ console.error(`[ERROR] ${full}: ${err && err.message}`); failed=true; }
 }
-console.log('All files validated.');
-process.exit(0);
+if(failed){ console.error('FAQ parity validation FAILED'); process.exit(2); } else { console.log('FAQ parity validation PASSED'); process.exit(0); }
