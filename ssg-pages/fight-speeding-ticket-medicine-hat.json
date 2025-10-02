@@ -1,28 +1,35 @@
 {
   "slug": "fight-speeding-ticket-medicine-hat",
+  "city": "Medicine Hat",
+  "violation": "speeding",
+  "h1": "Fight a Speeding Ticket in Medicine Hat",
   "meta_title": "Fight a Speeding Ticket in Medicine Hat | Fabsy",
-  "meta_description": "Steps to dispute a traffic ticket in Medicine Hat. Request disclosure, collect evidence, and get a free eligibility check.",
-  "h1": "How to Fight a Speeding Ticket in Medicine Hat",
-  "hook": "You may be able to dispute a speeding ticket in Medicine Hat — start with a disclosure request and free eligibility check.",
-  "bullets": [
-    "Request disclosure quickly",
-    "Gather photos and witness statements",
-    "Local court rules vary"
-  ],
-  "what": "<p>Begin by requesting disclosure to understand the evidence and options available to you.</p>",
-  "how": "<p>Collect any evidence and consult Fabsy for a free eligibility review on your options.</p>",
-  "next": "<p>Upload a ticket photo and get a free assessment within 24 hours.</p>",
+  "meta_description": "Local guide to fighting speeding tickets in Medicine Hat. Free eligibility check, disclosure requests, and trusted representation.",
+  "content": "<p>Short intro for Medicine Hat - Speeding ticket guidance.</p>",
+  "stats": {
+    "success_rate": 0.94,
+    "average_savings_cad": 1500,
+    "price_cad": 488,
+    "demerit_points": {
+      "default": 2
+    }
+  },
   "faqs": [
     {
-      "q": "Where do I request disclosure in Medicine Hat?",
-      "a": "Disclosure requests are made to the issuing court; contact the local court office or use Fabsy's free help."
+      "q": "How much does it cost?",
+      "a": "It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money."
+    },
+    {
+      "q": "Do I need to appear in court?",
+      "a": "Usually not — we appear on your behalf for most violations. We will notify you if attendance is required."
+    },
+    {
+      "q": "How long does this take?",
+      "a": "The process typically takes 3-6 months from submission to resolution."
     }
   ],
-  "video": {
-    "youtubeUrl": "",
-    "transcript": ""
-  },
-  "status": "published",
-  "author": "fabsy-seed",
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Where do I request disclosure in Medicine Hat?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Disclosure requests are made to the issuing court; contact the local court office or use Fabsy's free help.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}",
+  "local_info": "Local court: Medicine Hat Provincial Court - example address",
+  "created_at": "2025-10-02T12:39:34.802Z",
+  "updated_at": "2025-10-02T12:39:34.802Z"
 }
