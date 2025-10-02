@@ -35,7 +35,13 @@ CRITICAL RULES:
 6. All content must be plain-language, supportive, conversational
 7. Include local references (court names, highways, enforcement patterns)
 
-Return ONLY a JSON array with NO markdown, NO commentary, NO code fences.`;
+CRITICAL OUTPUT FORMAT:
+- Return ONLY raw JSON
+- NO markdown code fences (no \`\`\`json)
+- NO commentary before or after the JSON
+- NO explanatory text
+- Start directly with { and end with }
+- The JSON must be a single object with a "pages" array`;
 
     const userPrompt = `Generate AEO-optimized page packages for these Alberta cities: ${cities.join(', ')}.
 
@@ -83,7 +89,7 @@ For EACH city produce ONE JSON object with:
 Target keyword template: "${targetKeywordTemplate}"
 Cities: ${cities.join(', ')}
 
-Return ONLY a JSON object: {"pages": [...]}`;;
+CRITICAL: Your response must be ONLY the JSON object starting with { and ending with }. NO markdown, NO commentary, NO code fences. Just pure JSON: {"pages": [...]}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -108,15 +114,18 @@ Return ONLY a JSON object: {"pages": [...]}`;;
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    let content = data.choices[0].message.content.trim();
+    
+    // Remove markdown code fences if present
+    content = content.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/g, '');
+    content = content.trim();
     
     // Parse the JSON response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No valid JSON found in AI response');
-    }
+    const generatedContent = JSON.parse(content);
     
-    const generatedContent = JSON.parse(jsonMatch[0]);
+    if (!generatedContent.pages || !Array.isArray(generatedContent.pages)) {
+      throw new Error('Response must contain a "pages" array');
+    }
 
     return new Response(JSON.stringify(generatedContent), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
