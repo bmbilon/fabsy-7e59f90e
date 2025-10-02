@@ -1,5 +1,4 @@
-import React from "react";
-import { Helmet } from "react-helmet-async";
+import React, { useEffect } from "react";
 
 type Props = {
   headline: string;
@@ -23,31 +22,51 @@ const ArticleSchema: React.FC<Props> = ({
   image = "https://fabsy.ca/og-image.jpg",
   url,
 }) => {
-  if (!headline || !description || !url) return null;
+  useEffect(() => {
+    if (!headline || !description || !url) return;
+    if (typeof document === 'undefined') return;
 
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline,
-    description,
-    image,
-    author: { "@type": "Organization", name: author },
-    publisher: {
-      "@type": "Organization",
-      name: "Fabsy Traffic Services",
-      logo: { "@type": "ImageObject", url: "https://fabsy.ca/logo.png" },
-    },
-    datePublished,
-    dateModified,
-    url,
-    mainEntityOfPage: { "@type": "WebPage", "@id": url },
-  };
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline,
+      description,
+      image,
+      author: { "@type": "Organization", name: author },
+      publisher: {
+        "@type": "Organization",
+        name: "Fabsy Traffic Services",
+        logo: { "@type": "ImageObject", url: "https://fabsy.ca/logo.png" },
+      },
+      datePublished,
+      dateModified,
+      url,
+      mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    };
 
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
-    </Helmet>
-  );
+    // Remove any existing article schema
+    const existing = document.querySelector('script[data-article-schema]');
+    if (existing) {
+      existing.remove();
+    }
+
+    // Add new schema
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-article-schema', 'true');
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+
+    // Cleanup
+    return () => {
+      const toRemove = document.querySelector('script[data-article-schema]');
+      if (toRemove) {
+        toRemove.remove();
+      }
+    };
+  }, [headline, description, author, datePublished, dateModified, image, url]);
+
+  return null; // No DOM rendering needed
 };
 
 export default ArticleSchema;
