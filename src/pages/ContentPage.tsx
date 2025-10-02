@@ -27,7 +27,6 @@ const ContentPage = () => {
           .from('page_content')
           .select('*')
           .eq('slug', slug)
-          .eq('published', true)
           .single();
 
         if (fetchError) throw fetchError;
