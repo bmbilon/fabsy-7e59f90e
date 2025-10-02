@@ -23,6 +23,7 @@ interface PageContent {
   next: string;
   faqs: Array<{ q: string; a: string }>;
   video: { youtubeUrl?: string; transcript?: string } | null;
+  jsonld?: string;
 }
 
 const ContentPage = () => {
