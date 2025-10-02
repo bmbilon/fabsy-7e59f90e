@@ -3,8 +3,8 @@
 // Usage: node scripts/validate-faq-parity.js [dir_or_pattern]
 // Default: ssg-pages/*.json
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const patterns = process.argv.slice(2).length ? process.argv.slice(2) : ['ssg-pages'];
 let files = [];
