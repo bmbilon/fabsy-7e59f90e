@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import { generateFaqJsonLd, generateVideoJsonLd } from "@/utils/generate-json-ld";
+import ArticleSchema from "@/components/ArticleSchema";
+import FAQSection from "@/components/FAQSection";
 
 interface PageContent {
   slug: string;
@@ -106,6 +108,29 @@ const ContentPage = () => {
         )}
       </Helmet>
 
+      {pageData && (
+        <>
+          <Helmet>
+            <title>{pageData.meta_title}</title>
+            <meta name="description" content={pageData.meta_description} />
+          </Helmet>
+
+          <ArticleSchema
+            headline={pageData.h1}
+            description={pageData.meta_description}
+            url={typeof window !== "undefined" ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`}
+          />
+
+          {pageData.faqs && pageData.faqs.length > 0 && (
+            <FAQSection
+              faqs={pageData.faqs.map((f:any) => ({ q: String(f.q), a: String(f.a) }))}
+              pageName={pageData.h1}
+              pageUrl={typeof window !== "undefined" ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`}
+            />
+          )}
+        </>
+      )}
+
       <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
         <Header />
 
@@ -167,8 +192,8 @@ const ContentPage = () => {
               </section>
             )}
 
-            {/* FAQs */}
-            {pageData.faqs && pageData.faqs.length > 0 && (
+            {/* FAQs - Now handled by FAQSection component at top for schema markup */}
+            {/* {pageData.faqs && pageData.faqs.length > 0 && (
               <section>
                 <h2 className="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
                 <div className="space-y-4">
@@ -182,7 +207,7 @@ const ContentPage = () => {
                   ))}
                 </div>
               </section>
-            )}
+            )} */}
 
             {/* CTA */}
             <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20">

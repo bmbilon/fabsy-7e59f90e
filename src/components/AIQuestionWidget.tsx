@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AILeadCapture from "./AILeadCapture";
 import { trackAIQuery } from "@/hooks/useAEOAnalytics";
+import FAQSection from "@/components/FAQSection";
 
 interface AIAnswer {
   hook: string;
@@ -206,17 +207,14 @@ const AIQuestionWidget = () => {
             </div>
 
             {/* FAQs */}
-            {aiAnswer.faqs && aiAnswer.faqs.length > 0 && (
+            {aiAnswer && Array.isArray(aiAnswer.faqs) && aiAnswer.faqs.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm">Common Questions</h4>
-                {aiAnswer.faqs.slice(0, 3).map((faq, idx) => (
-                  <Card key={idx} className="bg-white/50 dark:bg-black/20 border-primary/10">
-                    <CardContent className="p-4 space-y-2">
-                      <p className="font-medium text-sm text-foreground">{faq.q}</p>
-                      <p className="text-sm text-muted-foreground">{faq.a}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+                <FAQSection
+                  faqs={aiAnswer.faqs.slice(0, 3).map((f: any) => ({ q: String(f.q).trim(), a: String(f.a).trim() }))}
+                  pageName={question || "Traffic ticket help"}
+                  pageUrl={typeof window !== "undefined" ? window.location.href : "https://fabsy.ca"}
+                />
               </div>
             )}
 
