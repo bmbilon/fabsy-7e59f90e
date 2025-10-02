@@ -1,275 +1,99 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Upload, 
-  Search, 
-  FileCheck, 
-  Gavel, 
-  CheckCircle, 
-  ArrowRight,
-  Clock,
-  Shield,
-  DollarSign
-} from "lucide-react";
-import { Link } from "react-router-dom";
+import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import HowToSchema from "@/components/HowToSchema";
+import { Helmet } from "react-helmet-async";
+import { Shield, Upload, FileCheck, Scale, Trophy } from "lucide-react";
 
-const HowItWorks = () => {
+/**
+ * HowItWorks — content + schema in sync; short meta for AEO.
+ */
+
+const HowItWorks: React.FC = () => {
   const steps = [
     {
+      name: "Upload your ticket",
+      text: "Take a clear photo of your traffic ticket and upload it. Our AI instantly extracts the violation, fine, and court information — it takes under 2 minutes.",
+      url: "https://fabsy.ca/submit-ticket",
       icon: Upload,
-      title: "Instant Assessment",
-      description: "Upload your ticket and get an immediate analysis of your case, including success probability and potential savings.",
-      time: "<1 min"
     },
     {
+      name: "Get a free analysis",
+      text: "Within minutes, receive a clear analysis showing your chances of success and estimated savings (typically $1,000–$3,000 in insurance increases).",
+      url: "https://fabsy.ca/ticket-analysis",
       icon: FileCheck,
-      title: "Submit Request for Defense/Dismissal",
-      description: "Upload your ID, provide your information, and sign the consent form to authorize us to represent you.",
-      time: "2-3 min"
     },
     {
-      icon: Gavel,
-      title: "We Handle Everything",
-      description: "Expert review, strategy development, and full court representation — we handle it all while you relax.",
-      time: "2-6 weeks"
-    },
-    {
-      icon: CheckCircle,
-      title: "Resolution",
-      description: "We notify you of the outcome the same day we receive it from the court system.",
-      time: "1 day"
-    }
-  ];
-
-  const guarantees = [
-    {
+      name: "Choose your package",
+      text: "Select our $499 zero-risk package. You only pay if we save you money — we handle paperwork, disclosure, and court representation.",
+      url: "https://fabsy.ca/services",
       icon: Shield,
-      title: "Money-Back Guarantee",
-      description: "If we don't improve your ticket outcome, you get a full refund. That's our promise to you.",
-      highlight: "100% Risk-Free"
     },
     {
-      icon: Clock,
-      title: "No Court Appearances",
-      description: "We handle everything so you don't have to miss work or stress about court dates.",
-      highlight: "Save Your Time"
+      name: "We fight your ticket",
+      text: "We request disclosure, review evidence, and represent you in court. Most clients avoid appearing — we handle the legal work so you don't have to.",
+      url: "https://fabsy.ca/how-it-works",
+      icon: Scale,
     },
     {
-      icon: DollarSign,
-      title: "Insurance Protection",
-      description: "Avoid insurance premium increases that can cost you thousands over 3 years.",
-      highlight: "Save Up to 5,000+"
-    }
+      name: "Receive the outcome",
+      text: "94% of clients achieve dismissals, reductions, or amendments that protect insurance. We keep you updated and explain next steps.",
+      url: "https://fabsy.ca/testimonials",
+      icon: Trophy,
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <main className="min-h-screen">
+      <Helmet>
+        <title>How It Works — Fight a Traffic Ticket in Alberta | Fabsy</title>
+        <meta
+          name="description"
+          content="Simple 5-step process: upload your ticket, get a free analysis, choose our $499 zero-risk package, and let Fabsy represent you in Alberta traffic courts."
+        />
+      </Helmet>
+
+      <HowToSchema
+        name="How to Fight a Traffic Ticket in Alberta"
+        description="A clear 5-step process for disputing traffic tickets in Alberta. Protect your insurance and driving record with Fabsy."
+        steps={steps.map((s) => ({ name: s.name, text: s.text, url: s.url }))}
+        totalTime="P3M"
+        estimatedCost="499"
+      />
+
       <Header />
-      
-      <main className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Simple 4-Step Process
-          </Badge>
-          <h1 className="text-4xl lg:text-6xl font-bold text-white drop-shadow-lg mb-6">
-            How <span className="text-gradient-hero font-script">Fabsy</span> Works
-          </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            From ticket upload to case resolution, we've streamlined the entire process 
-            to be as simple and stress-free as possible for busy women.
-          </p>
-        </div>
 
-        {/* Steps Section */}
-        <div className="mb-20">
-          <div className="grid gap-8">
-            {steps.map((step, index) => (
-              index === 0 ? (
-                <Link to="/ticket-analysis" key={index} className="block">
-                  <Card className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm cursor-pointer">
-                    <div className="flex flex-col md:flex-row items-start gap-6">
-                      <div className="flex-shrink-0">
-                        <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center shadow-glow">
-                          <step.icon className="h-8 w-8 text-white" />
-                        </div>
-                        <div className="mt-3 text-center">
-                          <Badge variant="outline" className="text-xs font-medium">
-                            Step {index + 1}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                          <h3 className="text-2xl font-bold text-card-foreground">
-                            {step.title}
-                          </h3>
-                          <div className="flex items-center gap-2 text-primary">
-                            <Clock className="h-4 w-4" />
-                            <span className="text-sm font-medium">{step.time}</span>
-                          </div>
-                        </div>
-                        
-                        <p className="text-lg text-muted-foreground leading-relaxed">
-                          {step.description}
-                        </p>
-                      </div>
-                      
-                      {index < steps.length - 1 && (
-                        <div className="hidden md:block">
-                          <ArrowRight className="h-6 w-6 text-primary/50" />
-                        </div>
-                      )}
+      <section className="py-16 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <h1 className="text-4xl font-bold mb-4">How Fabsy Fights Your Ticket</h1>
+          <p className="text-lg text-muted-foreground mb-8">Five simple steps to protect your insurance and driving record in Alberta.</p>
+
+          <div className="space-y-8">
+            {steps.map((step, idx) => {
+              const Icon = step.icon;
+              return (
+                <div key={idx} className="bg-white rounded-xl p-6 shadow-sm border border-primary/10">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center">
+                      <Icon className="w-6 h-6" />
                     </div>
-                  </Card>
-                </Link>
-              ) : index === 1 ? (
-                <Link to="/ticket-form" key={index} className="block">
-                  <Card className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm cursor-pointer">
-                  <div className="flex flex-col md:flex-row items-start gap-6">
-                    <div className="flex-shrink-0">
-                      <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center shadow-glow">
-                        <step.icon className="h-8 w-8 text-white" />
-                      </div>
-                      <div className="mt-3 text-center">
-                        <Badge variant="outline" className="text-xs font-medium">
-                          Step {index + 1}
-                        </Badge>
-                      </div>
-                    </div>
-                    
                     <div className="flex-1">
-                      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-card-foreground">
-                          {step.title}
-                        </h3>
-                        <div className="flex items-center gap-2 text-primary">
-                          <Clock className="h-4 w-4" />
-                          <span className="text-sm font-medium">{step.time}</span>
-                        </div>
+                      <div className="mb-2">
+                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mr-2">Step {idx + 1}</span>
+                        <h3 className="font-bold text-xl inline-block">{step.name}</h3>
                       </div>
-                      
-                      <p className="text-lg text-muted-foreground leading-relaxed">
-                        {step.description}
-                      </p>
+                      <p className="text-muted-foreground leading-relaxed">{step.text}</p>
                     </div>
-                    
-                    {index < steps.length - 1 && (
-                      <div className="hidden md:block">
-                        <ArrowRight className="h-6 w-6 text-primary/50" />
-                      </div>
-                    )}
-                   </div>
-                  </Card>
-                </Link>
-              ) : (
-                <Card key={index} className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
-                  <div className="flex flex-col md:flex-row items-start gap-6">
-                    <div className="flex-shrink-0">
-                      <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center shadow-glow">
-                        <step.icon className="h-8 w-8 text-white" />
-                      </div>
-                      <div className="mt-3 text-center">
-                        <Badge variant="outline" className="text-xs font-medium">
-                          Step {index + 1}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1">
-                      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-card-foreground">
-                          {step.title}
-                        </h3>
-                        <div className="flex items-center gap-2 text-primary">
-                          <Clock className="h-4 w-4" />
-                          <span className="text-sm font-medium">{step.time}</span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-lg text-muted-foreground leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
-                    
-                    {index < steps.length - 1 && (
-                      <div className="hidden md:block">
-                        <ArrowRight className="h-6 w-6 text-primary/50" />
-                      </div>
-                    )}
                   </div>
-                </Card>
-              )
-             ))}
-          </div>
-        </div>
-
-        {/* Guarantees Section */}
-        <div className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white drop-shadow-lg mb-4">
-              Our <span className="text-gradient-hero">Promises</span> to You
-            </h2>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              We stand behind our service with industry-leading guarantees
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {guarantees.map((guarantee, index) => (
-              <Card key={index} className="p-8 text-center bg-gradient-card shadow-fab border-white/20 backdrop-blur-sm">
-                <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
-                  <guarantee.icon className="h-8 w-8 text-white" />
                 </div>
-                
-                <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-                  {guarantee.highlight}
-                </Badge>
-                
-                <h3 className="text-xl font-bold text-card-foreground mb-4">
-                  {guarantee.title}
-                </h3>
-                
-                <p className="text-muted-foreground leading-relaxed">
-                  {guarantee.description}
-                </p>
-              </Card>
-            ))}
+              );
+            })}
           </div>
         </div>
-
-        {/* CTA Section */}
-        <div className="text-center">
-          <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold text-card-foreground mb-4">
-              Ready to Fight Your Ticket?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of Alberta women who've successfully protected their driving records with Fabsy.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/submit-ticket">
-                <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                  Submit Your Ticket Now
-                </Button>
-              </Link>
-              <Link to="/testimonials">
-                <Button variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 transition-smooth">
-                  Read Success Stories
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        </div>
-      </main>
+      </section>
 
       <Footer />
-    </div>
+    </main>
   );
 };
 
