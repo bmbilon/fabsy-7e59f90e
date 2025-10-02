@@ -1,0 +1,27 @@
+{
+  "slug": "fight-red-light-ticket-fort-mcmurray",
+  "meta_title": "Fight a Red Light Camera Ticket in Fort McMurray | Fabsy",
+  "meta_description": "Local guide to fighting red light tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
+  "h1": "Fight a Red Light Camera Ticket in Fort McMurray",
+  "hook": "",
+  "bullets": [],
+  "what": "",
+  "how": "",
+  "next": "",
+  "faqs": [
+    {
+      "a": "It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.",
+      "q": "How much does it cost?"
+    },
+    {
+      "a": "Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.",
+      "q": "Do I need to appear in court?"
+    },
+    {
+      "a": "The process typically takes 3-6 months from submission to resolution.",
+      "q": "How long does this take?"
+    }
+  ],
+  "video": null,
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}"
+}

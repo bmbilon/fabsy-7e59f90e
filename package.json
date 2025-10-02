@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/sync-pages-from-db.js && node scripts/generate-jsonld.js && node scripts/generate-routes.js",
+    "prebuild": "node scripts/sync-pages-from-db.js && node scripts/generate-jsonld.js && node scripts/generate-sitemap-from-db.js && node scripts/generate-routes.js",
     "build": "npm run prebuild && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
