@@ -1,0 +1,52 @@
+name: "Validate FAQ parity"
+
+# Run on pushes to ssg-pages and on PRs affecting content or the workflow file itself
+on:
+  push:
+    paths:
+      - 'ssg-pages/**'
+      - '.github/workflows/validate-faq-parity.yml'
+      - 'scripts/**'
+  pull_request:
+    paths:
+      - 'ssg-pages/**'
+      - '.github/workflows/validate-faq-parity.yml'
+      - 'scripts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-faq-parity:
+    name: Validate FAQ parity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (if package.json present)
+        run: |
+          if [ -f package.json ]; then
+            npm ci --prefer-offline --no-audit --no-fund
+          else
+            echo "No package.json found — skipping npm install"
+          fi
+
+      - name: Run FAQ parity validator
+        # use .cjs entrypoint (commonjs) since repo previously used that
+        run: |
+          if [ -f scripts/validate-faq-parity.cjs ]; then
+            node scripts/validate-faq-parity.cjs
+          elif [ -f scripts/validate-faq-parity.js ]; then
+            node scripts/validate-faq-parity.js
+          else
+            echo "Validator not found at scripts/validate-faq-parity.cjs or .js"
+            exi   
+          fi
+        env:
+          NODE_OPTIONS: "--unhandled-rejections=strict"
