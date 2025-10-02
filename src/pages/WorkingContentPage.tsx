@@ -44,7 +44,7 @@ const WorkingContentPage = () => {
         const parsedData = {
           ...data,
           faqs: typeof data.faqs === 'string' ? JSON.parse(data.faqs || '[]') : (data.faqs || []),
-          stats: typeof data.stats === 'string' ? JSON.parse(data.stats || '{}') : (data.stats || {}),
+          stats: typeof (data as any).stats === 'string' ? JSON.parse((data as any).stats || '{}') : ((data as any).stats || {}),
         };
 
         setPageData(parsedData);
