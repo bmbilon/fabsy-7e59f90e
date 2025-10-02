@@ -1,5 +1,4 @@
-import React from "react";
-import { Helmet } from "react-helmet-async";
+import React, { useEffect } from "react";
 
 export type FAQItem = {
   q: string; // exact visible question text
@@ -74,6 +73,49 @@ const FAQSchema: React.FC<Props> = ({ faqs = [], pageName = "", pageUrl = "", in
   const faqJsonLdString = JSON.stringify(faqLd);
   const breadcrumbJsonLdString = breadcrumbLd ? JSON.stringify(breadcrumbLd) : null;
 
+  // Safe DOM manipulation for JSON-LD
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    // Remove any existing FAQ schemas
+    const existingFaq = document.querySelector('script[data-faq-schema]');
+    if (existingFaq) {
+      existingFaq.remove();
+    }
+    const existingBreadcrumb = document.querySelector('script[data-breadcrumb-schema]');
+    if (existingBreadcrumb) {
+      existingBreadcrumb.remove();
+    }
+
+    // Add FAQ schema
+    const faqScript = document.createElement('script');
+    faqScript.type = 'application/ld+json';
+    faqScript.setAttribute('data-faq-schema', 'true');
+    faqScript.textContent = faqJsonLdString;
+    document.head.appendChild(faqScript);
+
+    // Add breadcrumb schema if present
+    if (breadcrumbJsonLdString) {
+      const breadcrumbScript = document.createElement('script');
+      breadcrumbScript.type = 'application/ld+json';
+      breadcrumbScript.setAttribute('data-breadcrumb-schema', 'true');
+      breadcrumbScript.textContent = breadcrumbJsonLdString;
+      document.head.appendChild(breadcrumbScript);
+    }
+
+    // Cleanup
+    return () => {
+      const faqToRemove = document.querySelector('script[data-faq-schema]');
+      if (faqToRemove) {
+        faqToRemove.remove();
+      }
+      const breadcrumbToRemove = document.querySelector('script[data-breadcrumb-schema]');
+      if (breadcrumbToRemove) {
+        breadcrumbToRemove.remove();
+      }
+    };
+  }, [faqJsonLdString, breadcrumbJsonLdString]);
+
   return (
     <div className={className ?? "faq-schema"}>
       {/* Visible FAQ HTML (same strings feed JSON-LD) */}
@@ -87,12 +129,6 @@ const FAQSchema: React.FC<Props> = ({ faqs = [], pageName = "", pageUrl = "", in
           </details>
         ))}
       </section>
-
-      {/* JSON-LD in head (server-rendered via Helmet) */}
-      <Helmet>
-        <script type="application/ld+json">{faqJsonLdString}</script>
-        {breadcrumbJsonLdString && <script type="application/ld+json">{breadcrumbJsonLdString}</script>}
-      </Helmet>
     </div>
   );
 };
