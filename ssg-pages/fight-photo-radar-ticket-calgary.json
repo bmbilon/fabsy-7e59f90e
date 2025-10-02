@@ -1,0 +1,34 @@
+{
+  "slug": "fight-photo-radar-ticket-calgary",
+  "meta_title": "Fight Photo Radar Ticket in Calgary | Fabsy",
+  "meta_description": "Learn how to fight a photo radar ticket in Calgary. Understand common defenses and the process for disputing automated enforcement tickets.",
+  "h1": "Fighting a Photo Radar Ticket in Calgary",
+  "hook": "Yes, you can fight a photo radar ticket in Calgary, but the success depends on the specific circumstances and available defenses.",
+  "bullets": [
+    "Photo radar tickets do not carry demerit points.",
+    "You have the right to dispute the ticket in court.",
+    "Evidence like equipment calibration records or signage photos can be helpful."
+  ],
+  "what": "<p>In Calgary, photo radar tickets are issued based on automated enforcement systems that detect speeding violations. Unlike tickets issued by an officer, photo radar tickets do not typically result in demerit points against your driver's license, nor do they usually impact your insurance rates directly. However, they still carry a financial penalty that must be addressed.</p><p>You have the right to dispute any traffic ticket, including photo radar tickets. The process involves requesting a court date and presenting your case to a provincial court judge or negotiating with a prosecutor. It's important to understand the specific legislation governing automated enforcement in Alberta and how it applies to your situation.</p>",
+  "how": "<p>To fight a photo radar ticket in Calgary, you must first indicate your intention to dispute it by the deadline on the ticket. This usually involves selecting the option to appear in court. Once a court date is scheduled, you should prepare your defense. Common strategies include:</p><ul><li><b>Challenging the equipment:</b> Requesting calibration records for the photo radar device to ensure its accuracy.</li><li><b>Questioning signage:</b> Verifying if appropriate speed limit and photo enforcement warning signs were present and clearly visible.</li><li><b>Identity defense:</b> If you were not the driver, you may need to provide evidence to support this claim.</li><li><b>Technical defenses:</b> Looking for any procedural errors or inconsistencies in the ticket or evidence.</li></ul><p>Gathering any supporting evidence, such as photos of the location, dashcam footage, or witness statements, can be crucial for your defense.</p>",
+  "next": "<p>If you've received a photo radar ticket in Calgary and are considering fighting it, the next step is to carefully review the ticket and understand the deadline for action. It's advisable to seek assistance to assess the strength of your case and guide you through the court process.</p><p><b>Ready to fight your ticket?</b> <a href=\"/upload\" class=\"btn btn-primary\">Upload your ticket for a free human review</a> and let Fabsy help you understand your options and next steps.</p>",
+  "faqs": [
+    {
+      "a": "Common defenses include issues with the photo radar equipment's calibration, inadequate or unclear signage, or proving you were not the driver at the time of the offense.",
+      "q": "What are common defenses for a photo radar ticket?"
+    },
+    {
+      "a": "Generally, photo radar tickets do not result in demerit points and therefore typically do not directly impact insurance rates. However, successful disputes can help avoid any potential indirect impacts.",
+      "q": "Will fighting a photo radar ticket increase my insurance rates?"
+    },
+    {
+      "a": "If you don't pay or fight the ticket by the due date, you will be deemed to have pleaded guilty, and the fine will stand. Failure to pay the fine can lead to additional penalties, such as a hold on your vehicle registration renewal.",
+      "q": "What happens if I don't pay or fight the ticket?"
+    }
+  ],
+  "video": {
+    "transcript": "",
+    "youtubeUrl": ""
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What are common defenses for a photo radar ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Common defenses include issues with the photo radar equipment's calibration, inadequate or unclear signage, or proving you were not the driver at the time of the offense.\"}},{\"@type\":\"Question\",\"name\":\"Will fighting a photo radar ticket increase my insurance rates?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Generally, photo radar tickets do not result in demerit points and therefore typically do not directly impact insurance rates. However, successful disputes can help avoid any potential indirect impacts.\"}},{\"@type\":\"Question\",\"name\":\"What happens if I don't pay or fight the ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"If you don't pay or fight the ticket by the due date, you will be deemed to have pleaded guilty, and the fine will stand. Failure to pay the fine can lead to additional penalties, such as a hold on your vehicle registration renewal.\"}}]}"
+}
