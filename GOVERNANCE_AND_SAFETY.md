@@ -218,7 +218,7 @@ Fabsy's AI helper:
 ### Advertising & Marketing
 
 **Truthful Claims**:
-- ✅ "94% success rate" (if documented)
+- ✅ "100% success rate" (if documented)
 - ✅ "Free eligibility check"
 - ✅ "24hr response"
 - ❌ "Guaranteed dismissal"

@@ -47,7 +47,7 @@ export const getFabsyEmailSignature = () => {
             
             <!-- Trust Badge -->
             <div style="margin-top: 12px; padding: 8px 12px; background: linear-gradient(135deg, #FDF2F8 0%, #FAE8FF 100%); border-radius: 6px; display: inline-block;">
-              <span style="font-size: 11px; color: #86198F; font-weight: 600;">✓ 94% Success Rate | No Win, No Fee Guarantee</span>
+              <span style="font-size: 11px; color: #86198F; font-weight: 600;">✓ 100% Success Rate | No Win, No Fee Guarantee</span>
             </div>
           </td>
         </tr>
