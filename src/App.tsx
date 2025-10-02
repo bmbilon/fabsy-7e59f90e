@@ -21,7 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
 import AEODashboard from "./pages/AEODashboard";
 import TicketAnalysis from "./pages/TicketAnalysis";
-import ContentPageMinimal from "./pages/ContentPageMinimal";
+import UltraMinimal from "./pages/UltraMinimal";
 
 const queryClient = new QueryClient();
 
@@ -52,9 +52,9 @@ const App = () => (
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
           {/* Static test route */}
-          <Route path="/test-static-content" element={<ContentPageMinimal />} />
+          <Route path="/test-static-content" element={<UltraMinimal />} />
           {/* Dynamic content pages - must be before catch-all */}
-          <Route path="/content/:slug" element={<ContentPageMinimal />} />
+          <Route path="/content/:slug" element={<UltraMinimal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
