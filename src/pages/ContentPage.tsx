@@ -26,6 +26,9 @@ interface PageContent {
   jsonld?: string;
 }
 
+// Preload all content JSON files via Vite glob so they are included in the build
+const contentModules = import.meta.glob('../content/pages/*.json');
+
 const ContentPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [pageData, setPageData] = useState<PageContent | null>(null);
@@ -34,9 +37,15 @@ const ContentPage = () => {
   useEffect(() => {
     const loadPage = async () => {
       try {
-        // Try to load from build-time generated content
-        const content = await import(`../content/pages/${slug}.json`);
-        setPageData(content.default || content);
+        // Load JSON via Vite glob so it's included in the production build
+        const moduleImporter = contentModules[`../content/pages/${slug}.json`] as (() => Promise<any>) | undefined;
+        if (moduleImporter) {
+          const content = await moduleImporter();
+          setPageData(content.default || content);
+        } else {
+          console.warn('No content module found for slug:', slug);
+          setPageData(null);
+        }
       } catch (error) {
         console.error('Failed to load page content:', error);
         setPageData(null);
