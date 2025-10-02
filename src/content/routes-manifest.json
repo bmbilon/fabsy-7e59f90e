@@ -1,6 +1,6 @@
 {
-  "generated": "2025-10-02T10:28:05.119Z",
-  "count": 13,
+  "generated": "2025-10-02T17:07:56.569Z",
+  "count": 32,
   "routes": [
     {
       "path": "/content/dispute-fail-to-carry-proof-of-reg-lic-plate-alberta",
@@ -24,11 +24,137 @@
       "h1": "Dispute a Fail to Carry Proof of Registration or License Plate Ticket"
     },
     {
+      "path": "/content/fight-careless-ticket-calgary",
+      "slug": "fight-careless-ticket-calgary",
+      "meta_title": "Fight a Careless Driving Ticket in Calgary | Fabsy",
+      "meta_description": "Local guide to fighting careless driving tickets in Calgary. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Careless Driving Ticket in Calgary"
+    },
+    {
+      "path": "/content/fight-careless-ticket-edmonton",
+      "slug": "fight-careless-ticket-edmonton",
+      "meta_title": "Fight a Careless Driving Ticket in Edmonton | Fabsy",
+      "meta_description": "Local guide to fighting careless driving tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Careless Driving Ticket in Edmonton"
+    },
+    {
+      "path": "/content/fight-careless-ticket-fort-mcmurray",
+      "slug": "fight-careless-ticket-fort-mcmurray",
+      "meta_title": "Fight a Careless Driving Ticket in Fort McMurray | Fabsy",
+      "meta_description": "Local guide to fighting careless driving tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Careless Driving Ticket in Fort McMurray"
+    },
+    {
+      "path": "/content/fight-careless-ticket-lethbridge",
+      "slug": "fight-careless-ticket-lethbridge",
+      "meta_title": "Fight a Careless Driving Ticket in Lethbridge | Fabsy",
+      "meta_description": "Local guide to fighting careless driving tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Careless Driving Ticket in Lethbridge"
+    },
+    {
+      "path": "/content/fight-careless-ticket-medicine-hat",
+      "slug": "fight-careless-ticket-medicine-hat",
+      "meta_title": "Fight a Careless Driving Ticket in Medicine Hat | Fabsy",
+      "meta_description": "Local guide to fighting careless driving tickets in Medicine Hat. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Careless Driving Ticket in Medicine Hat"
+    },
+    {
+      "path": "/content/fight-careless-ticket-red-deer",
+      "slug": "fight-careless-ticket-red-deer",
+      "meta_title": "Fight a Careless Driving Ticket in Red Deer | Fabsy",
+      "meta_description": "Local guide to fighting careless driving tickets in Red Deer. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Careless Driving Ticket in Red Deer"
+    },
+    {
+      "path": "/content/fight-distracted-ticket-calgary",
+      "slug": "fight-distracted-ticket-calgary",
+      "meta_title": "Fight a Distracted Driving Ticket in Calgary | Fabsy",
+      "meta_description": "Local guide to fighting distracted driving tickets in Calgary. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Distracted Driving Ticket in Calgary"
+    },
+    {
+      "path": "/content/fight-distracted-ticket-edmonton",
+      "slug": "fight-distracted-ticket-edmonton",
+      "meta_title": "Fight a Distracted Driving Ticket in Edmonton | Fabsy",
+      "meta_description": "Local guide to fighting distracted driving tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Distracted Driving Ticket in Edmonton"
+    },
+    {
+      "path": "/content/fight-distracted-ticket-fort-mcmurray",
+      "slug": "fight-distracted-ticket-fort-mcmurray",
+      "meta_title": "Fight a Distracted Driving Ticket in Fort McMurray | Fabsy",
+      "meta_description": "Local guide to fighting distracted driving tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Distracted Driving Ticket in Fort McMurray"
+    },
+    {
+      "path": "/content/fight-distracted-ticket-lethbridge",
+      "slug": "fight-distracted-ticket-lethbridge",
+      "meta_title": "Fight a Distracted Driving Ticket in Lethbridge | Fabsy",
+      "meta_description": "Local guide to fighting distracted driving tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Distracted Driving Ticket in Lethbridge"
+    },
+    {
+      "path": "/content/fight-distracted-ticket-medicine-hat",
+      "slug": "fight-distracted-ticket-medicine-hat",
+      "meta_title": "Fight a Distracted Driving Ticket in Medicine Hat | Fabsy",
+      "meta_description": "Local guide to fighting distracted driving tickets in Medicine Hat. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Distracted Driving Ticket in Medicine Hat"
+    },
+    {
+      "path": "/content/fight-distracted-ticket-red-deer",
+      "slug": "fight-distracted-ticket-red-deer",
+      "meta_title": "Fight a Distracted Driving Ticket in Red Deer | Fabsy",
+      "meta_description": "Local guide to fighting distracted driving tickets in Red Deer. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Distracted Driving Ticket in Red Deer"
+    },
+    {
       "path": "/content/fight-photo-radar-ticket-calgary",
       "slug": "fight-photo-radar-ticket-calgary",
       "meta_title": "Fight Photo Radar Ticket in Calgary | Fabsy",
       "meta_description": "Learn how to fight a photo radar ticket in Calgary. Understand common defenses and the process for disputing automated enforcement tickets.",
       "h1": "Fighting a Photo Radar Ticket in Calgary"
+    },
+    {
+      "path": "/content/fight-red-light-ticket-calgary",
+      "slug": "fight-red-light-ticket-calgary",
+      "meta_title": "Fight a Red Light Camera Ticket in Calgary | Fabsy",
+      "meta_description": "Local guide to fighting red light tickets in Calgary. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Red Light Camera Ticket in Calgary"
+    },
+    {
+      "path": "/content/fight-red-light-ticket-edmonton",
+      "slug": "fight-red-light-ticket-edmonton",
+      "meta_title": "Fight a Red Light Camera Ticket in Edmonton | Fabsy",
+      "meta_description": "Local guide to fighting red light tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Red Light Camera Ticket in Edmonton"
+    },
+    {
+      "path": "/content/fight-red-light-ticket-fort-mcmurray",
+      "slug": "fight-red-light-ticket-fort-mcmurray",
+      "meta_title": "Fight a Red Light Camera Ticket in Fort McMurray | Fabsy",
+      "meta_description": "Local guide to fighting red light tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Red Light Camera Ticket in Fort McMurray"
+    },
+    {
+      "path": "/content/fight-red-light-ticket-lethbridge",
+      "slug": "fight-red-light-ticket-lethbridge",
+      "meta_title": "Fight a Red Light Camera Ticket in Lethbridge | Fabsy",
+      "meta_description": "Local guide to fighting red light tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Red Light Camera Ticket in Lethbridge"
+    },
+    {
+      "path": "/content/fight-red-light-ticket-medicine-hat",
+      "slug": "fight-red-light-ticket-medicine-hat",
+      "meta_title": "Fight a Red Light Camera Ticket in Medicine Hat | Fabsy",
+      "meta_description": "Local guide to fighting red light tickets in Medicine Hat. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Red Light Camera Ticket in Medicine Hat"
+    },
+    {
+      "path": "/content/fight-red-light-ticket-red-deer",
+      "slug": "fight-red-light-ticket-red-deer",
+      "meta_title": "Fight a Red Light Camera Ticket in Red Deer | Fabsy",
+      "meta_description": "Local guide to fighting red light tickets in Red Deer. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Red Light Camera Ticket in Red Deer"
     },
     {
       "path": "/content/fight-speeding-ticket-calgary",
@@ -43,6 +169,13 @@
       "meta_title": "Fight a Speeding Ticket in Edmonton | Fabsy",
       "meta_description": "Local guide: how to dispute a speeding ticket in Edmonton. Request disclosure, gather evidence, and get a free eligibility check.",
       "h1": "How to Fight a Speeding Ticket in Edmonton"
+    },
+    {
+      "path": "/content/fight-speeding-ticket-fort-mcmurray",
+      "slug": "fight-speeding-ticket-fort-mcmurray",
+      "meta_title": "Fight a Speeding Ticket in Fort McMurray | Fabsy",
+      "meta_description": "Local guide to fighting speeding tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
+      "h1": "Fight a Speeding Ticket in Fort McMurray"
     },
     {
       "path": "/content/fight-speeding-ticket-lethbridge",

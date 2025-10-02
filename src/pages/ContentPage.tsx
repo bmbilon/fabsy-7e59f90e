@@ -228,51 +228,6 @@ const ContentPage = () => {
       <Footer />
     </main>
   );
-                  className="prose prose-lg max-w-none dark:prose-invert" 
-                  dangerouslySetInnerHTML={{ __html: pageData.next }} 
-                />
-              </section>
-            )}
-
-            {/* FAQs - Now handled by FAQSection component at top for schema markup */}
-            {/* {pageData.faqs && pageData.faqs.length > 0 && (
-              <section>
-                <h2 className="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
-                <div className="space-y-4">
-                  {pageData.faqs.map((faq, i) => (
-                    <Card key={i}>
-                      <CardContent className="p-6">
-                        <h3 className="text-xl font-semibold mb-3">{faq.q}</h3>
-                        <p className="text-muted-foreground leading-relaxed">{faq.a}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </section>
-            )} */}
-
-            {/* CTA */}
-            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20">
-              <CardContent className="p-8 text-center">
-                <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-                <p className="text-xl text-muted-foreground mb-6">
-                  Get a free eligibility check and see if your ticket is worth fighting
-                </p>
-                <Link to="/">
-                  <Button size="lg" className="text-lg px-8">
-                    Free Eligibility Check
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </article>
-
-        <Footer />
-      </main>
-    </>
-  );
 };
 
 export default ContentPage;
