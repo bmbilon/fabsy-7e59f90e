@@ -370,11 +370,11 @@ const FAQPage: React.FC = () => {
   const faqs = [
     {
       q: "How much does it cost to fight a traffic ticket in Alberta?",
-      a: "Fabsy's flat fee is $499 with a zero-risk guarantee — you only pay if we save you money. Most clients avoid $1,000–$3,000 in insurance increases over three years."
+      a: "Fabsy's flat fee is $488 with a zero-risk guarantee — you only pay if we save you money. Most clients avoid $1,000–$3,000 in insurance increases over three years."
     },
     {
       q: "What is Fabsy's success rate for traffic tickets?",
-      a: "Our results-based practice wins for 94% of clients — dismissals, reduced charges, or amendments that protect insurance. We focus on outcomes that preserve your driving record."
+      a: "Our results-based practice wins for 100% of clients — dismissals, reduced charges, or amendments that protect insurance. We focus on outcomes that preserve your driving record."
     },
     {
       q: "Will fighting a ticket increase my insurance?",
@@ -462,7 +462,7 @@ const HowItWorks: React.FC = () => {
     },
     {
       name: "Choose your package",
-      text: "Select our $499 zero-risk package. You only pay if we save you money — we handle paperwork, disclosure, and court representation.",
+      text: "Select our $488 zero-risk package. You only pay if we save you money — we handle paperwork, disclosure, and court representation.",
       url: "https://fabsy.ca/services",
       icon: Shield,
     },
@@ -474,7 +474,7 @@ const HowItWorks: React.FC = () => {
     },
     {
       name: "Receive the outcome",
-      text: "94% of clients achieve dismissals, reductions, or amendments that protect insurance. We keep you updated and explain next steps.",
+      text: "100% of clients achieve dismissals, reductions, or amendments that protect insurance. We keep you updated and explain next steps.",
       url: "https://fabsy.ca/testimonials",
       icon: Trophy,
     },
@@ -486,7 +486,7 @@ const HowItWorks: React.FC = () => {
         <title>How It Works — Fight a Traffic Ticket in Alberta | Fabsy</title>
         <meta
           name="description"
-          content="Simple 5-step process: upload your ticket, get a free analysis, choose our $499 zero-risk package, and let Fabsy represent you in Alberta traffic courts."
+          content="Simple 5-step process: upload your ticket, get a free analysis, choose our $488 zero-risk package, and let Fabsy represent you in Alberta traffic courts."
         />
       </Helmet>
 
