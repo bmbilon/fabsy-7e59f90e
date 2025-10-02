@@ -4,14 +4,17 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { trackAIQuery } from "@/hooks/useAEOAnalytics";
 
 interface Message {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+  isLoading?: boolean;
 }
 
 interface ContactForm {
@@ -26,12 +29,13 @@ const ChatWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hi! I'm here to help answer questions about Fabsy's traffic ticket defense services. What would you like to know?",
+      text: "Hi! I'm here to help answer questions about fighting traffic tickets in Alberta. What would you like to know?",
       sender: 'bot',
       timestamp: new Date()
     }
   ]);
   const [currentMessage, setCurrentMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
     email: '',
@@ -39,39 +43,35 @@ const ChatWidget = () => {
   });
   const { toast } = useToast();
 
-  // Simple FAQ bot responses
-  const getBotResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes('cost') || message.includes('price') || message.includes('fee')) {
-      return "Our traffic ticket representation service costs $488. This includes full court representation, court appearances if needed, and expert defense strategies. Most clients save 3-5 times our fee in avoided insurance increases.";
+  const getAIResponse = async (userMessage: string): Promise<string> => {
+    try {
+      // Track the query for AEO analytics
+      await trackAIQuery(userMessage, {});
+
+      // Call the AI analysis function
+      const { data, error } = await supabase.functions.invoke('analyze-ticket-ai', {
+        body: {
+          question: userMessage.trim(),
+          ticketData: {}
+        }
+      });
+
+      if (error) throw error;
+
+      if (data && data.ai_answer) {
+        // Extract the hook (main answer) from the AI response
+        return data.ai_answer.hook || data.ai_answer.explain || "I can help you with that. Could you provide more details about your traffic ticket?";
+      }
+
+      throw new Error('Invalid AI response');
+    } catch (error) {
+      console.error('AI response error:', error);
+      return "I'm having trouble connecting right now. For immediate assistance, please use the 'Leave Message' option or call us at 403-669-5353.";
     }
-    
-    if (message.includes('how') && (message.includes('work') || message.includes('process'))) {
-      return "Here's how it works: 1) Submit your ticket online, 2) We review and build your defense strategy, 3) We represent you in court if needed, 4) You get the results. The whole process typically takes 2-6 weeks.";
-    }
-    
-    if (message.includes('success') || message.includes('win') || message.includes('rate')) {
-      return "We have a 100% success rate in reducing or dismissing traffic tickets. Our experienced traffic representatives specialize in Alberta traffic matters and have handled thousands of cases successfully.";
-    }
-    
-    if (message.includes('insurance') || message.includes('premium')) {
-      return "Traffic tickets can increase your insurance premiums by $1,200-$5,000+ over 3 years. Our defense service helps protect your driving record and keep your insurance rates low.";
-    }
-    
-    if (message.includes('time') || message.includes('long') || message.includes('take')) {
-      return "Most cases are resolved within 2-6 weeks. You don't need to appear in court - we handle everything for you. You'll receive updates throughout the process.";
-    }
-    
-    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-      return "Hello! I'm here to help with any questions about our traffic ticket defense services. What would you like to know?";
-    }
-    
-    return "I'd be happy to help with that! For detailed questions, you can leave a message using the 'Leave Message' option and our team will get back to you within 24 hours. Common topics I can help with include: pricing, process, success rates, and insurance impact.";
   };
 
-  const handleSendMessage = () => {
-    if (!currentMessage.trim()) return;
+  const handleSendMessage = async () => {
+    if (!currentMessage.trim() || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -81,25 +81,53 @@ const ChatWidget = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-
-    // Simulate bot thinking time
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: getBotResponse(currentMessage),
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botResponse]);
-    }, 1000);
-
     setCurrentMessage('');
+    setIsTyping(true);
+
+    // Add typing indicator
+    const typingId = (Date.now() + 1).toString();
+    setMessages(prev => [...prev, {
+      id: typingId,
+      text: '...',
+      sender: 'bot',
+      timestamp: new Date(),
+      isLoading: true
+    }]);
+
+    try {
+      // Get AI response
+      const aiResponse = await getAIResponse(currentMessage);
+
+      // Remove typing indicator and add real response
+      setMessages(prev => {
+        const filtered = prev.filter(m => m.id !== typingId);
+        return [...filtered, {
+          id: Date.now().toString(),
+          text: aiResponse,
+          sender: 'bot',
+          timestamp: new Date()
+        }];
+      });
+    } catch (error) {
+      // Remove typing indicator on error
+      setMessages(prev => {
+        const filtered = prev.filter(m => m.id !== typingId);
+        return [...filtered, {
+          id: Date.now().toString(),
+          text: "I'm having trouble right now. Please try again or leave a message and we'll get back to you within 24 hours.",
+          sender: 'bot',
+          timestamp: new Date()
+        }];
+      });
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically send to your backend
+    // You can save to Supabase or send email here
     console.log('Contact form submitted:', contactForm);
     
     toast({
@@ -136,7 +164,7 @@ const ChatWidget = () => {
           <div className="flex items-center justify-between p-4 border-b bg-gradient-soft">
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5 text-primary" />
-              <span className="font-semibold text-card-foreground">Fabsy Support</span>
+              <span className="font-semibold text-card-foreground">Fabsy AI Assistant</span>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -178,7 +206,22 @@ const ChatWidget = () => {
                           : 'bg-muted text-card-foreground'
                       }`}
                     >
-                      {message.text}
+                      {message.isLoading ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <span>Thinking...</span>
+                        </div>
+                      ) : (
+                        <div className="whitespace-pre-wrap">{message.text}</div>
+                      )}
+                      {!message.isLoading && (
+                        <div className="text-xs mt-1 opacity-70">
+                          {message.timestamp.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      )}
                     </div>
                     {message.sender === 'user' && (
                       <User className="h-6 w-6 text-muted-foreground mt-1 flex-shrink-0" />
@@ -194,11 +237,21 @@ const ChatWidget = () => {
                     value={currentMessage}
                     onChange={(e) => setCurrentMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask about our services..."
+                    placeholder="Ask about your traffic ticket..."
                     className="flex-1"
+                    disabled={isTyping}
                   />
-                  <Button onClick={handleSendMessage} size="icon" className="flex-shrink-0">
-                    <Send className="h-4 w-4" />
+                  <Button 
+                    onClick={handleSendMessage} 
+                    size="icon" 
+                    className="flex-shrink-0"
+                    disabled={isTyping || !currentMessage.trim()}
+                  >
+                    {isTyping ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
