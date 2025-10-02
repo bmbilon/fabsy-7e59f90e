@@ -1,1 +1,97 @@
-[]
+{
+  "generated": "2025-10-02T10:28:05.119Z",
+  "count": 13,
+  "routes": [
+    {
+      "path": "/content/dispute-fail-to-carry-proof-of-reg-lic-plate-alberta",
+      "slug": "dispute-fail-to-carry-proof-of-reg-lic-plate-alberta",
+      "meta_title": "Dispute Fail to Carry Proof of Reg/Lic Plate Ticket Alberta",
+      "meta_description": "Learn how to dispute an Alberta ticket for failing to carry proof of registration or license plate. Understand the process and potential outcomes.",
+      "h1": "Disputing a 'Fail to Carry Proof of Registration or License Plate' Ticket in Alberta"
+    },
+    {
+      "path": "/content/dispute-fail-to-carry-proof-of-registration-alberta",
+      "slug": "dispute-fail-to-carry-proof-of-registration-alberta",
+      "meta_title": "Dispute Fail to Carry Proof of Registration Ticket Alberta",
+      "meta_description": "Learn how to dispute a Fail to Carry Proof of Registration of License Plate ticket in Alberta. Understand your options and next steps.",
+      "h1": "Disputing a 'Fail to Carry Proof of Registration of License Plate' Ticket in Alberta"
+    },
+    {
+      "path": "/content/dispute-fail-to-carry-proof-of-registration-ticket-alberta",
+      "slug": "dispute-fail-to-carry-proof-of-registration-ticket-alberta",
+      "meta_title": "Dispute Fail to Carry Proof of Registration Ticket Alberta",
+      "meta_description": "Learn how to dispute a Fail to Carry Proof of Registration or License Plate ticket in Alberta and understand your options.",
+      "h1": "Dispute a Fail to Carry Proof of Registration or License Plate Ticket"
+    },
+    {
+      "path": "/content/fight-photo-radar-ticket-calgary",
+      "slug": "fight-photo-radar-ticket-calgary",
+      "meta_title": "Fight Photo Radar Ticket in Calgary | Fabsy",
+      "meta_description": "Learn how to fight a photo radar ticket in Calgary. Understand common defenses and the process for disputing automated enforcement tickets.",
+      "h1": "Fighting a Photo Radar Ticket in Calgary"
+    },
+    {
+      "path": "/content/fight-speeding-ticket-calgary",
+      "slug": "fight-speeding-ticket-calgary",
+      "meta_title": "Fight a Speeding Ticket in Calgary | Fabsy",
+      "meta_description": "You can often dispute a speeding ticket in Calgary. Request disclosure, gather evidence, and get a free eligibility check.",
+      "h1": "How to Fight a Speeding Ticket in Calgary"
+    },
+    {
+      "path": "/content/fight-speeding-ticket-edmonton",
+      "slug": "fight-speeding-ticket-edmonton",
+      "meta_title": "Fight a Speeding Ticket in Edmonton | Fabsy",
+      "meta_description": "Local guide: how to dispute a speeding ticket in Edmonton. Request disclosure, gather evidence, and get a free eligibility check.",
+      "h1": "How to Fight a Speeding Ticket in Edmonton"
+    },
+    {
+      "path": "/content/fight-speeding-ticket-lethbridge",
+      "slug": "fight-speeding-ticket-lethbridge",
+      "meta_title": "Fight a Speeding Ticket in Lethbridge | Fabsy",
+      "meta_description": "Local steps to dispute a speeding ticket in Lethbridge. Request disclosure, collect evidence, and get a free eligibility check from Fabsy.",
+      "h1": "How to Fight a Speeding Ticket in Lethbridge"
+    },
+    {
+      "path": "/content/fight-speeding-ticket-medicine-hat",
+      "slug": "fight-speeding-ticket-medicine-hat",
+      "meta_title": "Fight a Speeding Ticket in Medicine Hat | Fabsy",
+      "meta_description": "Steps to dispute a traffic ticket in Medicine Hat. Request disclosure, collect evidence, and get a free eligibility check.",
+      "h1": "How to Fight a Speeding Ticket in Medicine Hat"
+    },
+    {
+      "path": "/content/fight-speeding-ticket-red-deer",
+      "slug": "fight-speeding-ticket-red-deer",
+      "meta_title": "Fight a Speeding Ticket in Red Deer | Fabsy",
+      "meta_description": "How to dispute a speeding or traffic ticket in Red Deer — request disclosure and gather local evidence. Free check from Fabsy.",
+      "h1": "How to Fight a Speeding Ticket in Red Deer"
+    },
+    {
+      "path": "/content/fight-stop-sign-ticket-alberta",
+      "slug": "fight-stop-sign-ticket-alberta",
+      "meta_title": "Fight a Stop Sign Ticket in Alberta | Fabsy Traffic Tickets",
+      "meta_description": "Learn how to fight a stop sign ticket in Alberta. Understand your options, common defenses, and the process for challenging your traffic violation.",
+      "h1": "Can You Fight an Alberta Stop Sign Ticket?"
+    },
+    {
+      "path": "/content/test-seed",
+      "slug": "test-seed",
+      "meta_title": "Test Seed Page",
+      "meta_description": "",
+      "h1": "Test Seed"
+    },
+    {
+      "path": "/content/verify-smoke-1759360172",
+      "slug": "verify-smoke-1759360172",
+      "meta_title": "Verify Smoke",
+      "meta_description": "",
+      "h1": "verify-smoke"
+    },
+    {
+      "path": "/content/verify-smoke-1759360542",
+      "slug": "verify-smoke-1759360542",
+      "meta_title": "Verify Smoke",
+      "meta_description": "",
+      "h1": "verify-smoke"
+    }
+  ]
+}
