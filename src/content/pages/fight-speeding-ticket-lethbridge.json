@@ -21,5 +21,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is a lawyer required to dispute a ticket in Lethbridge?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No—lawyers aren't required, but professional assistance can improve outcomes depending on the charge.\"}}]}"
 }

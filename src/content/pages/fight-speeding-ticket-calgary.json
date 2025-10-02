@@ -21,5 +21,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Do I need to go to court for a traffic ticket in Calgary?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Not always. You can pay the fine, request a trial, or sometimes settle. Request disclosure if you plan to dispute it.\"}}]}"
 }

@@ -5,6 +5,10 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://gcasbisxfrssonllpqrw.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -53,7 +57,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         how: row.how || '',
         next: row.next || '',
         faqs: Array.isArray(row.faqs) ? row.faqs : [],
-        video: row.video || null
+        video: row.video || null,
+        jsonld: row.jsonld || null
       };
       
       fs.writeFileSync(outPath, JSON.stringify(pageObj, null, 2), 'utf8');

@@ -21,5 +21,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Where do I request disclosure in Medicine Hat?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Disclosure requests are made to the issuing court; contact the local court office or use Fabsy's free help.\"}}]}"
 }

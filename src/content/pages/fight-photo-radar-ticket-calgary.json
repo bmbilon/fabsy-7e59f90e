@@ -29,5 +29,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What are common defenses for a photo radar ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Common defenses include issues with the photo radar equipment's calibration, inadequate or unclear signage, or proving you were not the driver at the time of the offense.\"}},{\"@type\":\"Question\",\"name\":\"Will fighting a photo radar ticket increase my insurance rates?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Generally, photo radar tickets do not result in demerit points and therefore typically do not directly impact insurance rates. However, successful disputes can help avoid any potential indirect impacts.\"}},{\"@type\":\"Question\",\"name\":\"What happens if I don't pay or fight the ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"If you don't pay or fight the ticket by the due date, you will be deemed to have pleaded guilty, and the fine will stand. Failure to pay the fine can lead to additional penalties, such as a hold on your vehicle registration renewal.\"}}]}"
 }
