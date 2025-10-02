@@ -1,4 +1,5 @@
-import JSONLDInjector from '@/components/JSONLDInjector';\nimport { useEffect, useState } from "react";
+import JSONLDInjector from '@/components/JSONLDInjector';
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
@@ -106,7 +107,8 @@ const ContentPage = () => {
             {JSON.stringify(videoJsonLd)}
           </script>
         )}
-      </Helmet>\n  <JSONLDInjector jsonld={pageData?.jsonld ?? null} />\n
+      </Helmet>
+      <JSONLDInjector jsonld={pageData?.jsonld ?? null} />
 
       {pageData && (
         <>
