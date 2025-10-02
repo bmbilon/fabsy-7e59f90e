@@ -10,4 +10,4 @@ name: Validate FAQ paname: Validate FAQ paname: Validate FAQ paname: Validate FA
         run: |
           if [ -f package.json ]; then npm ci; fi
       - name: Run FAQ parity validator
-        run: node scripts/validate-faq-parity.js
+        run: node scripts/validate-faq-parity.cjs
