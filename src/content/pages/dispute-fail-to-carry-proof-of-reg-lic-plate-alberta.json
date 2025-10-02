@@ -30,5 +30,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What does 'Fail to Carry Proof of Reg of Lic Plate' mean?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"This charge means you were operating a vehicle without having the required physical or electronic proof of vehicle registration or license plate documentation readily available for inspection by law enforcement.\"}},{\"@type\":\"Question\",\"name\":\"What is the penalty for this ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The penalty typically involves a set fine, which in your case is $462. There are usually no demerit points associated with this type of administrative violation in Alberta.\"}},{\"@type\":\"Question\",\"name\":\"Do I need a lawyer to dispute this ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No, you are not required to have a lawyer to dispute a traffic ticket. You can represent yourself, or you can choose to have an agent or lawyer represent you.\"}}]}"
 }

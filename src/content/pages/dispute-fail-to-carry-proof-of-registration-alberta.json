@@ -29,5 +29,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What happens if I don't dispute the ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"If you do not dispute the ticket or pay the fine by the due date, you will be deemed to have pleaded guilty. This can result in the full fine being enforced, and potentially demerit points if the offense carries them, though this specific offense typically does not.\"}},{\"@type\":\"Question\",\"name\":\"Do I need a lawyer to dispute this ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No, you are not legally required to have a lawyer. You can represent yourself in court. However, having experienced representation can often lead to a better outcome as they understand the legal process and can argue on your behalf effectively.\"}},{\"@type\":\"Question\",\"name\":\"What kind of proof should I bring to court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"You should bring any documentation that proves your vehicle was properly registered at the time of the offense. This could include your physical registration certificate, digital proof, or a detailed record from Alberta Registries.\"}}]}"
 }

@@ -29,5 +29,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What are common defenses for a stop sign ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Common defenses include arguing that the stop sign was obscured, that you made a complete stop but it was not perceived by the officer, or that the signage was improperly placed or missing. You might also challenge the officer's observations or calibration of their equipment.\"}},{\"@type\":\"Question\",\"name\":\"Will fighting a stop sign ticket increase my insurance rates?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Successfully fighting a stop sign ticket means it won't appear on your driving record, thus preventing an increase in your insurance rates. If you plead guilty or are convicted, it likely will.\"}},{\"@type\":\"Question\",\"name\":\"What is the process for fighting a stop sign ticket in Alberta?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process generally involves entering a not guilty plea, attending a first appearance or resolution option to discuss your case, and potentially proceeding to a trial if a resolution isn't reached. You will then present your defence and evidence to the court.\"}}]}"
 }

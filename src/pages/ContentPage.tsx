@@ -1,3 +1,4 @@
+import JSONLDInjector from '@/components/JSONLDInjector';
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -107,6 +108,7 @@ const ContentPage = () => {
           </script>
         )}
       </Helmet>
+      <JSONLDInjector jsonld={pageData?.jsonld ?? null} />
 
       {pageData && (
         <>

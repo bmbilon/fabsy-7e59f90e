@@ -21,5 +21,6 @@
   "video": {
     "transcript": "",
     "youtubeUrl": ""
-  }
+  },
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How long does disclosure take in Red Deer?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Times vary—disclosure requests can take days to weeks depending on the court backlog; request promptly.\"}}]}"
 }
