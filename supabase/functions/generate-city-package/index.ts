@@ -35,17 +35,18 @@ CRITICAL RULES:
 6. All content must be plain-language, supportive, conversational
 7. Include local references (court names, highways, enforcement patterns)
 
-CRITICAL OUTPUT FORMAT:
-- Return ONLY raw JSON
-- NO markdown code fences (no \`\`\`json)
-- NO commentary before or after the JSON
-- NO explanatory text
-- Start directly with { and end with }
-- The JSON must be a single object with a "pages" array`;
+CRITICAL OUTPUT FORMAT - NDJSON:
+- Return ONLY newline-delimited JSON (NDJSON)
+- One complete JSON object per line
+- One city per line
+- NO markdown code fences
+- NO commentary
+- NO arrays wrapping the objects
+- Each line must be a valid JSON object that can be parsed independently`;
 
     const userPrompt = `Generate AEO-optimized page packages for these Alberta cities: ${cities.join(', ')}.
 
-For EACH city produce ONE JSON object with:
+For EACH city produce ONE JSON object per line in NDJSON format:
 {
   "slug": "fight-speeding-ticket-{city-lowercase}",
   "meta_title": "Fight a Speeding Ticket in {City} | Fabsy",
@@ -72,7 +73,7 @@ For EACH city produce ONE JSON object with:
     "transcript": "1-paragraph SEO-friendly transcript summary"
   },
   "social": [
-    {"text": "Social post ≤220 chars", "hashtags": "#FightYourTicket #Alberta #CityName", "image_caption": "Suggested image caption"},
+    {"text": "Social post ≤220 chars", "hashtags": ["#FightYourTicket","#Alberta","#CityName"], "image_caption": "Suggested image caption"},
     // 12 total posts
   ],
   "outreach": [
@@ -89,7 +90,13 @@ For EACH city produce ONE JSON object with:
 Target keyword template: "${targetKeywordTemplate}"
 Cities: ${cities.join(', ')}
 
-CRITICAL: Your response must be ONLY the JSON object starting with { and ending with }. NO markdown, NO commentary, NO code fences. Just pure JSON: {"pages": [...]}`;
+CRITICAL OUTPUT FORMAT:
+- Return NDJSON: one JSON object per line
+- One city per line in the same order as listed
+- NO markdown code fences
+- NO commentary
+- NO array wrapping
+- Each line must be a complete, valid JSON object`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -120,14 +127,22 @@ CRITICAL: Your response must be ONLY the JSON object starting with { and ending 
     content = content.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/g, '');
     content = content.trim();
     
-    // Parse the JSON response
-    const generatedContent = JSON.parse(content);
+    // Parse NDJSON - one JSON object per line
+    const lines = content.split('\n').filter(line => line.trim());
+    const pages = lines.map(line => {
+      try {
+        return JSON.parse(line.trim());
+      } catch (e) {
+        console.error('Failed to parse line:', line);
+        throw new Error(`Invalid JSON in line: ${line.substring(0, 100)}...`);
+      }
+    });
     
-    if (!generatedContent.pages || !Array.isArray(generatedContent.pages)) {
-      throw new Error('Response must contain a "pages" array');
+    if (pages.length === 0) {
+      throw new Error('No valid pages generated');
     }
 
-    return new Response(JSON.stringify(generatedContent), {
+    return new Response(JSON.stringify({ pages }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
