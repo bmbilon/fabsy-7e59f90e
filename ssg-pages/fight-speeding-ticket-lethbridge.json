@@ -1,28 +1,35 @@
 {
   "slug": "fight-speeding-ticket-lethbridge",
+  "city": "Lethbridge",
+  "violation": "speeding",
+  "h1": "Fight a Speeding Ticket in Lethbridge",
   "meta_title": "Fight a Speeding Ticket in Lethbridge | Fabsy",
-  "meta_description": "Local steps to dispute a speeding ticket in Lethbridge. Request disclosure, collect evidence, and get a free eligibility check from Fabsy.",
-  "h1": "How to Fight a Speeding Ticket in Lethbridge",
-  "hook": "You may be able to dispute a speeding ticket in Lethbridge — request disclosure and start a free eligibility check.",
-  "bullets": [
-    "Request disclosure from court",
-    "Collect photos and witness info",
-    "Many cases resolve without trial"
-  ],
-  "what": "<p>Fighting a ticket involves obtaining disclosure and evaluating the evidence to decide next steps.</p>",
-  "how": "<p>Request disclosure, gather evidence, and consider Fabsy's free review for next steps.</p>",
-  "next": "<p>Upload your ticket photo for a free check within 24 hours.</p>",
+  "meta_description": "Local guide to fighting speeding tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
+  "content": "<p>Short intro for Lethbridge - Speeding ticket guidance.</p>",
+  "stats": {
+    "success_rate": 0.94,
+    "average_savings_cad": 1500,
+    "price_cad": 488,
+    "demerit_points": {
+      "default": 2
+    }
+  },
   "faqs": [
     {
-      "q": "Is a lawyer required to dispute a ticket in Lethbridge?",
-      "a": "No—lawyers aren't required, but professional assistance can improve outcomes depending on the charge."
+      "q": "How much does it cost?",
+      "a": "It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money."
+    },
+    {
+      "q": "Do I need to appear in court?",
+      "a": "Usually not — we appear on your behalf for most violations. We will notify you if attendance is required."
+    },
+    {
+      "q": "How long does this take?",
+      "a": "The process typically takes 3-6 months from submission to resolution."
     }
   ],
-  "video": {
-    "youtubeUrl": "",
-    "transcript": ""
-  },
-  "status": "published",
-  "author": "fabsy-seed",
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is a lawyer required to dispute a ticket in Lethbridge?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No—lawyers aren't required, but professional assistance can improve outcomes depending on the charge.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}",
+  "local_info": "Local court: Lethbridge Provincial Court - example address",
+  "created_at": "2025-10-02T12:39:34.802Z",
+  "updated_at": "2025-10-02T12:39:34.802Z"
 }

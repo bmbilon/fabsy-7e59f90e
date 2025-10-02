@@ -1,11 +1,11 @@
 {
-  "slug": "fight-speeding-ticket-edmonton",
+  "slug": "fight-red-light-ticket-edmonton",
   "city": "Edmonton",
-  "violation": "speeding",
-  "h1": "Fight a Speeding Ticket in Edmonton",
-  "meta_title": "Fight a Speeding Ticket in Edmonton | Fabsy",
-  "meta_description": "Local guide to fighting speeding tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
-  "content": "<p>Short intro for Edmonton - Speeding ticket guidance.</p>",
+  "violation": "red-light",
+  "h1": "Fight a Red Light Camera Ticket in Edmonton",
+  "meta_title": "Fight a Red Light Camera Ticket in Edmonton | Fabsy",
+  "meta_description": "Local guide to fighting red light tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
+  "content": "<p>Short intro for Edmonton - Red light ticket guidance.</p>",
   "stats": {
     "success_rate": 0.94,
     "average_savings_cad": 1500,

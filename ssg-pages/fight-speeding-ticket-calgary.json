@@ -1,28 +1,35 @@
 {
   "slug": "fight-speeding-ticket-calgary",
+  "city": "Calgary",
+  "violation": "speeding",
+  "h1": "Fight a Speeding Ticket in Calgary",
   "meta_title": "Fight a Speeding Ticket in Calgary | Fabsy",
-  "meta_description": "You can often dispute a speeding ticket in Calgary. Request disclosure, gather evidence, and get a free eligibility check.",
-  "h1": "How to Fight a Speeding Ticket in Calgary",
-  "hook": "You may be able to dispute a speeding ticket in Calgary — start with a free eligibility check.",
-  "bullets": [
-    "Request disclosure to review evidence",
-    "Gather photos or dashcam footage",
-    "Many cases resolve without trial"
-  ],
-  "what": "<p>Fighting a speeding ticket means formally disputing the charge — request disclosure, review evidence, then decide how to proceed.</p>",
-  "how": "<p>Request disclosure, gather photos/witnesses, and consider Fabsy's free eligibility review to determine next steps.</p>",
-  "next": "<p>Upload a photo of your ticket for a free check.</p>",
+  "meta_description": "Local guide to fighting speeding tickets in Calgary. Free eligibility check, disclosure requests, and trusted representation.",
+  "content": "<p>Short intro for Calgary - Speeding ticket guidance.</p>",
+  "stats": {
+    "success_rate": 0.94,
+    "average_savings_cad": 1500,
+    "price_cad": 488,
+    "demerit_points": {
+      "default": 2
+    }
+  },
   "faqs": [
     {
-      "q": "Do I need to go to court for a traffic ticket in Calgary?",
-      "a": "Not always. You can pay the fine, request a trial, or sometimes settle. Request disclosure if you plan to dispute it."
+      "q": "How much does it cost?",
+      "a": "It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money."
+    },
+    {
+      "q": "Do I need to appear in court?",
+      "a": "Usually not — we appear on your behalf for most violations. We will notify you if attendance is required."
+    },
+    {
+      "q": "How long does this take?",
+      "a": "The process typically takes 3-6 months from submission to resolution."
     }
   ],
-  "video": {
-    "youtubeUrl": "",
-    "transcript": ""
-  },
-  "status": "published",
-  "author": "fabsy-seed",
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Do I need to go to court for a traffic ticket in Calgary?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Not always. You can pay the fine, request a trial, or sometimes settle. Request disclosure if you plan to dispute it.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}",
+  "local_info": "Local court: Calgary Provincial Court - example address",
+  "created_at": "2025-10-02T12:39:34.802Z",
+  "updated_at": "2025-10-02T12:39:34.802Z"
 }
