@@ -1,0 +1,13 @@
+name: Validate FAQ paname: Validate FAQ paname: Validate FAQ paname: Validate FAQ paname: Validate FAQ paname: Validate FAQ paname: Validate FAQ paname: Validate FAQ palatest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps (if present)
+        run: |
+          if [ -f package.json ]; then npm ci; fi
+      - name: Run FAQ parity validator
+        run: node scripts/validate-faq-parity.js
