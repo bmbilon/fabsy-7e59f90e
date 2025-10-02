@@ -51,6 +51,8 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
+          {/* Static test route */}
+          <Route path="/test-static-content" element={<ContentPageMinimal />} />
           {/* Dynamic content pages - must be before catch-all */}
           <Route path="/content/:slug" element={<ContentPageMinimal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
