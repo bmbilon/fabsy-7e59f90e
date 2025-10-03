@@ -1,0 +1,9 @@
+# Headers for bot detection and prerendering
+
+/faq
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+  
+/prerendered/*
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=86400
