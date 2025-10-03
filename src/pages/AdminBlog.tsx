@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { FileText, TrendingUp, CheckCircle, Edit, Trash2 } from 'lucide-react';
 
+// AdminBlog component for managing blog posts and content
+
 const AdminBlog = () => {
   const [drafts, setDrafts] = useState([]);
   const [published, setPublished] = useState([]);
