@@ -98,7 +98,7 @@ const BlogPost = () => {
           </header>
           
           <div 
-            className="prose prose-lg max-w-none"
+            className="prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h2:text-3xl prose-h3:text-2xl prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </article>
