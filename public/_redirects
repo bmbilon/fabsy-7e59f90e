@@ -1,1 +1,17 @@
+# Bot detection - serve prerendered content to crawlers
+/faq  /prerendered/faq.html  200  User-Agent: *bot*
+/faq  /prerendered/faq.html  200  User-Agent: *crawler*
+/faq  /prerendered/faq.html  200  User-Agent: *spider*
+/faq  /prerendered/faq.html  200  User-Agent: *Googlebot*
+/faq  /prerendered/faq.html  200  User-Agent: *Bingbot*
+/faq  /prerendered/faq.html  200  User-Agent: *facebookexternalhit*
+/faq  /prerendered/faq.html  200  User-Agent: *Twitterbot*
+/faq  /prerendered/faq.html  200  User-Agent: *LinkedInBot*
+/faq  /prerendered/faq.html  200  User-Agent: *GPTBot*
+/faq  /prerendered/faq.html  200  User-Agent: *ChatGPT-User*
+/faq  /prerendered/faq.html  200  User-Agent: *CCBot*
+/faq  /prerendered/faq.html  200  User-Agent: *anthropic*
+/faq  /prerendered/faq.html  200  User-Agent: *Claude-Web*
+
+# Fallback for all other requests
 /*    /index.html   200
