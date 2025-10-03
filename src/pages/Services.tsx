@@ -15,8 +15,54 @@ import {
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import useSafeHead from "@/hooks/useSafeHead";
 
 const Services = () => {
+  useSafeHead({
+    title: "Traffic Ticket Defense Services | Fabsy Alberta",
+    description: "Complete traffic ticket defense for speeding, red light violations, careless driving, and more. 100% success rate. Serving all Alberta cities.",
+    canonical: "https://fabsy.ca/services",
+    keywords: "traffic ticket services Alberta, fight speeding ticket, careless driving defense, distracted driving lawyer",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Traffic Ticket Defense Services",
+      "description": "Complete list of traffic ticket defense services offered by Fabsy",
+      "itemListElement": [
+        {
+          "@type": "Service",
+          "position": 1,
+          "name": "Speeding Ticket Defense",
+          "description": "Defense against all speeding violations including excessive speeding charges"
+        },
+        {
+          "@type": "Service",
+          "position": 2,
+          "name": "Red Light Violation Defense",
+          "description": "Defense against red light camera and officer-issued red light tickets"
+        },
+        {
+          "@type": "Service",
+          "position": 3,
+          "name": "Distracted Driving Defense",
+          "description": "Defense against phone use and distracted driving charges"
+        },
+        {
+          "@type": "Service",
+          "position": 4,
+          "name": "Careless Driving Defense",
+          "description": "Defense against careless and dangerous driving charges"
+        },
+        {
+          "@type": "Service",
+          "position": 5,
+          "name": "Stop Sign Violation Defense",
+          "description": "Defense against failure to stop at stop signs"
+        }
+      ]
+    }
+  });
+
   const ticketTypes = [
     {
       icon: Zap,
