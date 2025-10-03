@@ -2,12 +2,7 @@ import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FAQSection from "@/components/FAQSection";
-import { Helmet } from "react-helmet-async";
-
-/**
- * FAQ page — visible copy is concise and AEO-first (hook-first tone).
- * Meta lengths are intentionally kept within limits (title ≤60, description ≤155).
- */
+import useSafeHead from "@/hooks/useSafeHead";
 
 const FAQPage: React.FC = () => {
   const faqs = [
@@ -45,29 +40,37 @@ const FAQPage: React.FC = () => {
     }
   ];
 
+  useSafeHead({
+    title: "Traffic Ticket FAQ — Alberta | Fabsy",
+    description: "Answers to common questions about fighting traffic tickets in Alberta. Learn about costs, success rates, insurance impact, and our zero-risk guarantee.",
+    canonical: "https://fabsy.ca/faq",
+    keywords: "Alberta traffic ticket FAQ, fight ticket questions, traffic court Alberta, insurance impact tickets",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.a
+        }
+      }))
+    }
+  });
+
   return (
     <main className="min-h-screen">
-      <Helmet>
-        <title>Traffic Ticket FAQ — Alberta | Fabsy</title>
-        <meta
-          name="description"
-          content="Answers to common questions about fighting traffic tickets in Alberta. Learn about costs, success rates, insurance impact, and our zero-risk guarantee."
-        />
-      </Helmet>
-
       <Header />
-
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
           <p className="text-lg text-muted-foreground mb-8">
             Clear, direct answers to help you decide whether to fight your ticket — local to Alberta.
           </p>
-
           <FAQSection faqs={faqs} pageName="FAQ" pageUrl="https://fabsy.ca/faq" />
         </div>
       </section>
-
       <Footer />
     </main>
   );
