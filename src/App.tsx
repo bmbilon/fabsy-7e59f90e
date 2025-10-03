@@ -14,9 +14,10 @@ import HowItWorks from "./pages/HowItWorks";
  import PrivacyPolicy from "./pages/PrivacyPolicy";
  import TermsOfService from "./pages/TermsOfService";
  import Contact from "./pages/Contact";
- import FAQ from "./pages/FAQ";
- import NotFound from "./pages/NotFound";
- import AdminLogin from "./pages/AdminLogin";
+import FAQ from "./pages/FAQ";
+import AIInfo from "./pages/AIInfo";
+import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
 import AEODashboard from "./pages/AEODashboard";
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/ai-info" element={<AIInfo />} />
           <Route path="/ticket-analysis" element={<TicketAnalysis />} />
            {/* Admin Routes */}
            <Route path="/admin" element={<AdminLogin />} />
