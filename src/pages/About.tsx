@@ -14,8 +14,35 @@ import {
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import useSafeHead from "@/hooks/useSafeHead";
 
 const About = () => {
+  useSafeHead({
+    title: "About Fabsy | Alberta Traffic Ticket Defense",
+    description: "Learn about Fabsy's mission to help Alberta drivers fight traffic tickets with 100% success rate. Expert legal team serving Calgary, Edmonton, and all Alberta.",
+    canonical: "https://fabsy.ca/about",
+    keywords: "about Fabsy, traffic ticket defense Alberta, Alberta traffic lawyers",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Fabsy Traffic Services",
+      "description": "Professional traffic ticket defense services for Alberta drivers with 100% success rate",
+      "url": "https://fabsy.ca",
+      "logo": "https://fabsy.ca/logo.png",
+      "telephone": "403-669-5353",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Calgary",
+        "addressRegion": "AB",
+        "addressCountry": "CA"
+      },
+      "areaServed": {
+        "@type": "State",
+        "name": "Alberta"
+      }
+    }
+  });
+
   const stats = [
     { number: "100%", label: "Success Rate", icon: Award },
     { number: "$1.2M+", label: "Insurance Savings", icon: TrendingUp },
