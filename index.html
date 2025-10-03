@@ -125,7 +125,7 @@
     </script>
     
     <!-- FAQ Schema for /faq route (visible to crawlers immediately) -->
-    <script type="application/ld+json" id="faq-schema" style="display:none">
+    <script type="application/ld+json" id="faq-schema">
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -198,20 +198,30 @@
     }
     </script>
     
-    <!-- Conditional Schema Script -->
+    <!-- FAQ Schema is now always visible to crawlers -->
     <script>
-      // Only show FAQ schema when on /faq route
+      // Update page metadata when on /faq route
       if (window.location.pathname === '/faq') {
+        // Update page title for better SEO
+        document.title = 'Traffic Ticket FAQ — Alberta | Fabsy';
+        // Update meta description
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.content = 'Answers to common questions about fighting traffic tickets in Alberta. Learn about costs, success rates, insurance impact, and our zero-risk guarantee.';
+        }
+        // Update canonical URL
+        let canonical = document.querySelector('link[rel="canonical"]');
+        if (!canonical) {
+          canonical = document.createElement('link');
+          canonical.rel = 'canonical';
+          document.head.appendChild(canonical);
+        }
+        canonical.href = 'https://fabsy.ca/faq';
+      } else {
+        // Hide FAQ schema on non-FAQ pages (optional, but cleaner)
         const faqSchema = document.getElementById('faq-schema');
         if (faqSchema) {
-          faqSchema.style.display = 'block';
-          // Also update page title for crawlers
-          document.title = 'Traffic Ticket FAQ — Alberta | Fabsy';
-          // Update meta description
-          let metaDesc = document.querySelector('meta[name="description"]');
-          if (metaDesc) {
-            metaDesc.content = 'Answers to common questions about fighting traffic tickets in Alberta. Learn about costs, success rates, insurance impact, and our zero-risk guarantee.';
-          }
+          faqSchema.style.display = 'none';
         }
       }
     </script>
