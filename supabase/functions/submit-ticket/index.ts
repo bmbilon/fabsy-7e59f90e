@@ -5,6 +5,11 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+// Rate limiting: Track submissions by IP
+const submissionTracker = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const MAX_SUBMISSIONS_PER_HOUR = 5;
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -43,11 +48,41 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Rate limiting by IP address
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0] || 
+                     req.headers.get("x-real-ip") || 
+                     "unknown";
+    
+    const now = Date.now();
+    const tracker = submissionTracker.get(clientIP);
+    
+    if (tracker) {
+      if (now < tracker.resetAt) {
+        if (tracker.count >= MAX_SUBMISSIONS_PER_HOUR) {
+          console.warn(`[Submit Ticket] Rate limit exceeded for IP: ${clientIP.substring(0, 10)}...`);
+          return new Response(
+            JSON.stringify({ error: "Too many submissions. Please try again later." }),
+            {
+              status: 429,
+              headers: { "Content-Type": "application/json", ...corsHeaders },
+            }
+          );
+        }
+        tracker.count++;
+      } else {
+        // Reset window
+        tracker.count = 1;
+        tracker.resetAt = now + RATE_LIMIT_WINDOW;
+      }
+    } else {
+      submissionTracker.set(clientIP, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    }
+
     const formData: SubmissionData = await req.json();
     
-    console.log("[Submit Ticket] Processing submission for DL:", formData.driversLicense);
+    console.log("[Submit Ticket] Processing submission");
 
-    // Input validation
+    // Comprehensive input validation with length limits
     if (!formData.driversLicense || !formData.firstName || !formData.lastName || 
         !formData.email || !formData.phone || !formData.ticketNumber) {
       return new Response(
@@ -59,11 +94,45 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Email validation (basic)
+    // Length validation to prevent DoS
+    if (formData.firstName.length > 100 || formData.lastName.length > 100 ||
+        formData.email.length > 255 || formData.phone.length > 20 ||
+        formData.driversLicense.length > 50 || formData.ticketNumber.length > 50 ||
+        formData.violation.length > 500 || formData.fineAmount.length > 20 ||
+        (formData.address && formData.address.length > 500) ||
+        (formData.city && formData.city.length > 100) ||
+        (formData.postalCode && formData.postalCode.length > 20) ||
+        (formData.courtLocation && formData.courtLocation.length > 200) ||
+        (formData.defenseStrategy && formData.defenseStrategy.length > 1000) ||
+        (formData.additionalNotes && formData.additionalNotes.length > 2000) ||
+        (formData.couponCode && formData.couponCode.length > 50) ||
+        (formData.insuranceCompany && formData.insuranceCompany.length > 200)) {
+      return new Response(
+        JSON.stringify({ error: "Input field exceeds maximum length" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       return new Response(
         JSON.stringify({ error: "Invalid email address" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Phone validation (basic format check)
+    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    if (!phoneRegex.test(formData.phone)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid phone number format" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -87,7 +156,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (existingClient) {
       // Update existing client
-      console.log('[Submit Ticket] Updating existing client:', existingClient.id);
+      console.log('[Submit Ticket] Updating existing client');
       clientId = existingClient.id;
       
       const { error: updateError } = await supabase
@@ -136,7 +205,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
       
       clientId = newClient.id;
-      console.log('[Submit Ticket] Client created:', clientId);
+      console.log('[Submit Ticket] Client created');
     }
 
     // Step 2: Create ticket submission
@@ -174,7 +243,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Failed to create ticket submission');
     }
 
-    console.log('[Submit Ticket] Submission created successfully:', submissionData.id);
+    console.log('[Submit Ticket] Submission created successfully');
 
     return new Response(JSON.stringify({ 
       success: true,

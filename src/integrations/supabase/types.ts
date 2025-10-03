@@ -98,50 +98,68 @@ export type Database = {
       page_content: {
         Row: {
           bullets: Json
+          city: string | null
+          content: string | null
           created_at: string
           faqs: Json
           h1: string
-          hook: string
+          hook: string | null
           how: string | null
           id: string
+          jsonld: string | null
+          local_info: string | null
           meta_description: string
           meta_title: string
           next: string | null
           slug: string
+          stats: Json | null
           updated_at: string
           video: Json | null
+          violation: string | null
           what: string | null
         }
         Insert: {
           bullets?: Json
+          city?: string | null
+          content?: string | null
           created_at?: string
           faqs?: Json
           h1: string
-          hook: string
+          hook?: string | null
           how?: string | null
           id?: string
+          jsonld?: string | null
+          local_info?: string | null
           meta_description: string
           meta_title: string
           next?: string | null
           slug: string
+          stats?: Json | null
           updated_at?: string
           video?: Json | null
+          violation?: string | null
           what?: string | null
         }
         Update: {
           bullets?: Json
+          city?: string | null
+          content?: string | null
           created_at?: string
           faqs?: Json
           h1?: string
-          hook?: string
+          hook?: string | null
           how?: string | null
           id?: string
+          jsonld?: string | null
+          local_info?: string | null
           meta_description?: string
           meta_title?: string
           next?: string | null
           slug?: string
+          stats?: Json | null
           updated_at?: string
           video?: Json | null
+          violation?: string | null
           what?: string | null
         }
         Relationships: []
