@@ -28,19 +28,19 @@ const AdminBlog = () => {
   }, []);
 
   async function fetchAll() {
-    const { data: draftData } = await supabase
+    const { data: draftData } = await (supabase as any)
       .from('blog_posts')
       .select('*')
       .eq('status', 'draft')
       .order('aeo_score', { ascending: false });
     
-    const { data: publishedData } = await supabase
+    const { data: publishedData } = await (supabase as any)
       .from('blog_posts')
       .select('*')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
     
-    const { data: topicData } = await supabase
+    const { data: topicData } = await (supabase as any)
       .from('blog_topics')
       .select('*')
       .order('priority_score', { ascending: false });
@@ -51,7 +51,7 @@ const AdminBlog = () => {
   }
 
   async function publishPost() {
-    await supabase
+    await (supabase as any)
       .from('blog_posts')
       .update({
         status: 'published',
@@ -73,7 +73,7 @@ const AdminBlog = () => {
   }
 
   async function deletePost(id: string) {
-    await supabase.from('blog_posts').delete().eq('id', id);
+    await (supabase as any).from('blog_posts').delete().eq('id', id);
     toast({ title: "Deleted", description: "Post removed." });
     fetchAll();
   }
@@ -82,7 +82,7 @@ const AdminBlog = () => {
     const topic = prompt("Enter new topic:");
     if (!topic) return;
     
-    await supabase.from('blog_topics').insert({
+    await (supabase as any).from('blog_topics').insert({
       topic,
       priority_score: 75,
       source: 'manual'
@@ -275,7 +275,7 @@ const AdminBlog = () => {
                     variant="outline"
                     onClick={() => {
                       // Save draft
-                      supabase.from('blog_posts').update({
+                      (supabase as any).from('blog_posts').update({
                         title: editedTitle,
                         content: editedContent,
                         meta_description: editedMetaDesc

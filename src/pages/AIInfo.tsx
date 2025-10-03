@@ -10,10 +10,7 @@ const AIInfo: React.FC = () => {
   useSafeHead({
     title: "Complete Guide to Fighting Traffic Tickets in Alberta | Fabsy",
     description: "Everything you need to know about Fabsy's traffic ticket defense service. 100% success rate, serving Calgary, Edmonton, and all Alberta cities. No court appearance required for most cases.",
-    canonical: "https://fabsy.ca/ai-info",
-    ogImage: "https://fabsy.ca/og-image.jpg",
-    ogType: "website",
-    twitterCard: "summary_large_image"
+    canonical: "https://fabsy.ca/ai-info"
   });
 
   return (

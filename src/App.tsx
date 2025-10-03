@@ -24,6 +24,7 @@ import AdminBlog from "./pages/AdminBlog";
 import AEODashboard from "./pages/AEODashboard";
 import TicketAnalysis from "./pages/TicketAnalysis";
 import WorkingContentPage from "./pages/WorkingContentPage";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,8 @@ const App = () => (
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
           <Route path="/admin/blog" element={<AdminBlog />} />
+          {/* Blog routes */}
+          <Route path="/blog/:slug" element={<BlogPost />} />
           {/* Static test route */}
           <Route path="/test-static-content" element={<WorkingContentPage />} />
           {/* Dynamic content pages - must be before catch-all */}
