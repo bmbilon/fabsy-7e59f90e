@@ -47,6 +47,102 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_posts: {
+        Row: {
+          aeo_score: number | null
+          ai_generated_at: string | null
+          author: string | null
+          category: string | null
+          content: string
+          created_at: string | null
+          id: string
+          keywords: string[] | null
+          meta_description: string | null
+          published_at: string | null
+          reviewed_at: string | null
+          slug: string
+          source_data: Json | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          aeo_score?: number | null
+          ai_generated_at?: string | null
+          author?: string | null
+          category?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          keywords?: string[] | null
+          meta_description?: string | null
+          published_at?: string | null
+          reviewed_at?: string | null
+          slug: string
+          source_data?: Json | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          aeo_score?: number | null
+          ai_generated_at?: string | null
+          author?: string | null
+          category?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          keywords?: string[] | null
+          meta_description?: string | null
+          published_at?: string | null
+          reviewed_at?: string | null
+          slug?: string
+          source_data?: Json | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      blog_topics: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_checked: string | null
+          priority_score: number | null
+          search_volume: number | null
+          source: string | null
+          topic: string
+          trend_direction: string | null
+          used: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_checked?: string | null
+          priority_score?: number | null
+          search_volume?: number | null
+          source?: string | null
+          topic: string
+          trend_direction?: string | null
+          used?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_checked?: string | null
+          priority_score?: number | null
+          search_volume?: number | null
+          source?: string | null
+          topic?: string
+          trend_direction?: string | null
+          used?: boolean | null
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           address: string | null
