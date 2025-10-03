@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
+import AdminBlog from "./pages/AdminBlog";
 import AEODashboard from "./pages/AEODashboard";
 import TicketAnalysis from "./pages/TicketAnalysis";
 import WorkingContentPage from "./pages/WorkingContentPage";
@@ -49,10 +50,11 @@ const App = () => (
           <Route path="/ai-info" element={<AIInfo />} />
           <Route path="/ticket-analysis" element={<TicketAnalysis />} />
            {/* Admin Routes */}
-           <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
+          <Route path="/admin/blog" element={<AdminBlog />} />
           {/* Static test route */}
           <Route path="/test-static-content" element={<WorkingContentPage />} />
           {/* Dynamic content pages - must be before catch-all */}
