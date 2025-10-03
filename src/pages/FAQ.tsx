@@ -43,8 +43,7 @@ const FAQPage: React.FC = () => {
   useSafeHead({
     title: "Traffic Ticket FAQ — Alberta | Fabsy",
     description: "Answers to common questions about fighting traffic tickets in Alberta. Learn about costs, success rates, insurance impact, and our zero-risk guarantee.",
-    canonical: "https://fabsy.ca/faq",
-    keywords: "Alberta traffic ticket FAQ, fight ticket questions, traffic court Alberta, insurance impact tickets"
+    canonical: "https://fabsy.ca/faq"
     // Schema removed - FAQSection component already handles FAQPage structured data
   });
 

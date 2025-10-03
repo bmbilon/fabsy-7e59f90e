@@ -11,7 +11,6 @@ const AIInfo: React.FC = () => {
     title: "Complete Guide to Fighting Traffic Tickets in Alberta | Fabsy",
     description: "Everything you need to know about Fabsy's traffic ticket defense service. 100% success rate, serving Calgary, Edmonton, and all Alberta cities. No court appearance required for most cases.",
     canonical: "https://fabsy.ca/ai-info",
-    keywords: "Alberta traffic tickets, fight speeding ticket Alberta, traffic court Calgary Edmonton, traffic ticket defense service, Alberta traffic lawyer",
     ogImage: "https://fabsy.ca/og-image.jpg",
     ogType: "website",
     twitterCard: "summary_large_image"
