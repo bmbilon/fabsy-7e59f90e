@@ -5,8 +5,28 @@ import { Star, Quote, TrendingDown, Shield, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import useSafeHead from "@/hooks/useSafeHead";
 
 const TestimonialsPage = () => {
+  useSafeHead({
+    title: "Client Success Stories | Fabsy Traffic Ticket Defense",
+    description: "Read real testimonials from Alberta drivers who successfully fought their traffic tickets with Fabsy. 100% success rate across Calgary, Edmonton, and all Alberta.",
+    canonical: "https://fabsy.ca/testimonials",
+    keywords: "Fabsy reviews, traffic ticket success stories Alberta, client testimonials Calgary Edmonton",
+    schema: {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Fabsy Traffic Services",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "247",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    }
+  });
+
   const featuredStories = [
     {
       name: "Sarah M.",
