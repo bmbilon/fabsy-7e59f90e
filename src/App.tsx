@@ -36,6 +36,7 @@ import DemeritsInsurance from "./pages/hubs/DemeritsInsurance";
 import CourtOptionsDeadlines from "./pages/hubs/CourtOptionsDeadlines";
 import CityQuirks from "./pages/hubs/CityQuirks";
 import ThankYou from "./pages/ThankYou";
+import Analytics from "./components/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,8 @@ const App = () => (
         <Sonner />
         <GlobalSchema />
         <BrowserRouter>
+        {/* Analytics must be inside the router to track SPA route changes */}
+        <Analytics />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />

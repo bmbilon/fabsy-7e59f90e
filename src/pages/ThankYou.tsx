@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
@@ -18,6 +18,29 @@ const ThankYou: React.FC = () => {
     datePublished: published,
     dateModified: published,
   } as const;
+
+  useEffect(() => {
+    // Fire GA4 event (configure in GA to count as conversion)
+    try {
+      const gtag = (window as any).gtag as undefined | ((...args: any[]) => void);
+      if (typeof gtag === 'function' && (import.meta as any).env?.VITE_GA4_MEASUREMENT_ID) {
+        const params: any = {
+          page_path: '/thank-you',
+        };
+        gtag('event', 'generate_lead', params);
+      }
+      // Optionally fire Google Ads conversion if configured
+      const gadsId = (import.meta as any).env?.VITE_GADS_ID;
+      const gadsLabel = (import.meta as any).env?.VITE_GADS_CONVERSION_LABEL;
+      if (typeof gtag === 'function' && gadsId && gadsLabel) {
+        gtag('event', 'conversion', {
+          send_to: `${gadsId}/${gadsLabel}`,
+        });
+      }
+    } catch (e) {
+      // no-op
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-background">
