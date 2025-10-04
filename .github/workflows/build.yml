@@ -42,6 +42,25 @@ jobs:
       
       - name: Build (SSG)
         run: npm run build
+
+      - name: Install Playwright browsers (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Start preview server (serve dist)
+        run: |
+          nohup npx serve -s dist -l 4173 >/dev/null 2>&1 &
+          sleep 3
+
+      - name: Prerender critical routes to static HTML
+        env:
+          PRERENDER_BASE_URL: http://127.0.0.1:4173
+          PRERENDER_OUT_DIR: public/prerendered
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/prerender-all.js
+
+      - name: Copy prerendered snapshots into dist
+        run: node scripts/copy-prerendered.js
       
       # Add your deployment step here
       # - name: Deploy
