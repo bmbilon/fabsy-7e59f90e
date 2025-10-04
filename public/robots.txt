@@ -18,5 +18,5 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
+# Canonical sitemap index
 Sitemap: https://fabsy.ca/sitemap.xml
-Sitemap: https://fabsy.ca/sitemap-prerendered.xml
