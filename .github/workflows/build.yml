@@ -23,12 +23,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Sync pages from Supabase
-        if: ${{ secrets.SUPABASE_URL && secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Sync pages from Supabase (guarded)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/sync-pages-from-db.js
+        run: |
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
+            echo "Supabase secrets not set; skipping sync."
+            exit 0
+          fi
+          node scripts/sync-pages-from-db.js
       
       - name: Generate routes
         run: node scripts/generate-routes.js
