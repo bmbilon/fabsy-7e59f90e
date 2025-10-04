@@ -44,7 +44,7 @@ const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gradient-to-b from-purple-50/30 via-white to-white">
       <Helmet>
         <title>How It Works — Fight a Traffic Ticket in Alberta | Fabsy</title>
         <meta
@@ -63,7 +63,7 @@ const HowItWorks: React.FC = () => {
 
       <Header />
 
-      <section className="py-16 px-4 bg-gradient-to-b from-background via-primary/5 to-background">
+      <section className="py-16 px-4 bg-gradient-to-b from-purple-100/40 to-white border-b border-purple-100">
         <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl font-bold mb-4 text-foreground">How Fabsy Fights Your Ticket</h1>
           <p className="text-lg text-muted-foreground mb-8">Five simple steps to protect your insurance and driving record in Alberta.</p>
