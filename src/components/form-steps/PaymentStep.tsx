@@ -159,7 +159,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
         });
         // Redirect to success page after short delay
         setTimeout(() => {
-          window.location.href = "/payment-success?test=true";
+          window.location.href = "/thank-you?test=true";
         }, 1500);
         return;
       }

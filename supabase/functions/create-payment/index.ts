@@ -38,7 +38,7 @@ serve(async (req) => {
       tax_id_collection: {
         enabled: false,
       },
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${req.headers.get("origin")}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/payment-canceled`,
       metadata: {
         ticket_number: formData?.ticketNumber || "",
