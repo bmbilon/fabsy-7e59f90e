@@ -139,6 +139,12 @@ The project uses Supabase with these main tables:
 - **Manual**: Check Lovable dashboard if auto-deploy doesn't trigger
 - **Local Testing**: Always test with `npm run dev` before pushing
 
+### Indexing & Sitemaps (Live)
+- Sitemap index live at: https://fabsy.ca/sitemap.xml
+  - Segmented sitemaps: `/sitemaps/sitemap-pages.xml`, `/sitemaps/sitemap-content.xml`, `/sitemaps/sitemap-faq.xml`
+- Submitted to Google and Bing (pinged via `npm run notify:search` and ready for Search Console/Webmaster Tools)
+- Bing verification file is deployed: https://fabsy.ca/BingSiteAuth.xml
+
 ### Spec-Kit Framework Files
 - `.specify/memory/constitution.md` - Project principles and guidelines
 - `.specify/templates/` - Development templates for specs, plans, tasks
