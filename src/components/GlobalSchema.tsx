@@ -6,13 +6,18 @@ const GlobalSchema = () => {
       '@type': 'Organization',
       'name': 'Fabsy',
       'url': 'https://fabsy.ca',
-      'logo': 'https://fabsy.ca/logo.png'
+      'logo': 'https://fabsy.ca/_assets/logo.png',
+      'sameAs': [
+        'https://www.google.com/search?q=Fabsy+Alberta',
+        'https://www.facebook.com/fabsyca',
+        'https://www.instagram.com/fabsy.ca'
+      ]
     },
     {
       '@type': 'LegalService',
       'name': 'Fabsy Traffic Ticket Defense',
       'url': 'https://fabsy.ca',
-      'image': 'https://fabsy.ca/logo.png',
+      'image': 'https://fabsy.ca/_assets/logo.png',
       'priceRange': '$$',
       'areaServed': [
         { '@type': 'AdministrativeArea', 'name': 'Alberta, CA' },
@@ -28,7 +33,7 @@ const GlobalSchema = () => {
       },
       'serviceType': 'Traffic Ticket Defense'
     }
-  ];
+  ];'}],
 
   const jsonLd = {
     '@context': 'https://schema.org',
