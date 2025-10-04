@@ -8,10 +8,10 @@ All colors MUST be HSL for proper theming.
 
 @layer base {
   :root {
-    /* Broad sweeping pink to purple gradient background */
-    --background: linear-gradient(135deg, hsl(320 70% 75%) 0%, hsl(290 65% 70%) 25%, hsl(260 60% 75%) 50%, hsl(280 65% 80%) 75%, hsl(310 70% 85%) 100%);
-    --background-solid: 320 70% 75%;
-    --foreground: 0 0% 100%;
+    /* Clean white background for readability */
+    --background: 0 0% 100%;
+    --background-solid: 0 0% 100%;
+    --foreground: 280 30% 20%;
 
     --card: 0 0% 100%;
     --card-foreground: 280 30% 25%;

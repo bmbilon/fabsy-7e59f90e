@@ -80,9 +80,9 @@ const BlogPost = () => {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-background">
+      <main className="min-h-screen bg-gradient-to-b from-purple-50/30 via-white to-white">
         {/* Hero Section with subtle background */}
-        <div className="bg-gradient-to-b from-muted/30 to-background border-b">
+        <div className="bg-gradient-to-b from-purple-100/40 to-white border-b border-purple-100">
           <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
             <div className="inline-block px-3 py-1 mb-4 text-xs font-semibold uppercase tracking-wide rounded-md bg-primary text-primary-foreground">
               {post.category || 'Article'}
