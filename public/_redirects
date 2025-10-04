@@ -1,17 +1,36 @@
-# Bot detection - serve prerendered content to crawlers
-/faq  /prerendered/faq.html  200  User-Agent: *bot*
-/faq  /prerendered/faq.html  200  User-Agent: *crawler*
-/faq  /prerendered/faq.html  200  User-Agent: *spider*
-/faq  /prerendered/faq.html  200  User-Agent: *Googlebot*
-/faq  /prerendered/faq.html  200  User-Agent: *Bingbot*
-/faq  /prerendered/faq.html  200  User-Agent: *facebookexternalhit*
-/faq  /prerendered/faq.html  200  User-Agent: *Twitterbot*
-/faq  /prerendered/faq.html  200  User-Agent: *LinkedInBot*
-/faq  /prerendered/faq.html  200  User-Agent: *GPTBot*
-/faq  /prerendered/faq.html  200  User-Agent: *ChatGPT-User*
-/faq  /prerendered/faq.html  200  User-Agent: *CCBot*
-/faq  /prerendered/faq.html  200  User-Agent: *anthropic*
-/faq  /prerendered/faq.html  200  User-Agent: *Claude-Web*
+# Bot/AI: serve prerendered snapshots for critical routes
+/faq                 /prerendered/faq.html                      200  User-Agent: *bot*
+/faq                 /prerendered/faq.html                      200  User-Agent: *crawler*
+/faq                 /prerendered/faq.html                      200  User-Agent: *spider*
+/faq                 /prerendered/faq.html                      200  User-Agent: *Googlebot*
+/faq                 /prerendered/faq.html                      200  User-Agent: *Bingbot*
+/faq                 /prerendered/faq.html                      200  User-Agent: *facebookexternalhit*
+/faq                 /prerendered/faq.html                      200  User-Agent: *Twitterbot*
+/faq                 /prerendered/faq.html                      200  User-Agent: *LinkedInBot*
+/faq                 /prerendered/faq.html                      200  User-Agent: *GPTBot*
+/faq                 /prerendered/faq.html                      200  User-Agent: *ChatGPT-User*
+/faq                 /prerendered/faq.html                      200  User-Agent: *CCBot*
+/faq                 /prerendered/faq.html                      200  User-Agent: *anthropic*
+/faq                 /prerendered/faq.html                      200  User-Agent: *Claude-Web*
+
+# Blog listing and posts
+/blog                /prerendered/blog/index.html               200  User-Agent: *bot*
+/blog/*              /prerendered/blog/:splat/index.html        200  User-Agent: *bot*
+/blog                /prerendered/blog/index.html               200  User-Agent: *Googlebot*
+/blog/*              /prerendered/blog/:splat/index.html        200  User-Agent: *Googlebot*
+/blog                /prerendered/blog/index.html               200  User-Agent: *Bingbot*
+/blog/*              /prerendered/blog/:splat/index.html        200  User-Agent: *Bingbot*
+/blog                /prerendered/blog/index.html               200  User-Agent: *GPTBot*
+/blog/*              /prerendered/blog/:splat/index.html        200  User-Agent: *GPTBot*
+/blog                /prerendered/blog/index.html               200  User-Agent: *Claude-Web*
+/blog/*              /prerendered/blog/:splat/index.html        200  User-Agent: *Claude-Web*
+
+# Content pages
+/content/*           /prerendered/content/:splat/index.html     200  User-Agent: *bot*
+/content/*           /prerendered/content/:splat/index.html     200  User-Agent: *Googlebot*
+/content/*           /prerendered/content/:splat/index.html     200  User-Agent: *Bingbot*
+/content/*           /prerendered/content/:splat/index.html     200  User-Agent: *GPTBot*
+/content/*           /prerendered/content/:splat/index.html     200  User-Agent: *Claude-Web*
 
 # Fallback for all other requests
 /*    /index.html   200

@@ -10,7 +10,9 @@
     "postbuild": "node scripts/copy-prerendered.js",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+"preview": "vite preview",
+    "prerender:all": "PRERENDER_BASE_URL=${PRERENDER_BASE_URL:-https://fabsy.ca} PRERENDER_OUT_DIR=public/prerendered node scripts/prerender-all.js",
+    "notify:search": "node scripts/notify-search-engines.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import GlobalSchema from "@/components/GlobalSchema";
 import Index from "./pages/Index";
 import TicketFormPage from "./pages/TicketFormPage";
 import HowItWorks from "./pages/HowItWorks";
@@ -37,6 +38,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <GlobalSchema />
         <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
