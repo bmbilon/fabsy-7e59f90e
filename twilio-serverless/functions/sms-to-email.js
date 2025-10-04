@@ -1,26 +1,22 @@
 // functions/sms-to-email.js
-// Twilio Functions handler to forward inbound SMS to email via SendGrid
+// Twilio Functions handler to forward inbound SMS to email via Resend
 // Configure environment variables in the Function Service:
-//  - SENDGRID_API_KEY
+//  - RESEND_API_KEY
 //  - EMAIL_TO (comma-separated)
 //  - EMAIL_FROM (e.g., no-reply@fabsy.ca)
 
-const sgMail = require('@sendgrid/mail');
+const { Resend } = require('resend');
 
 exports.handler = async function (context, event, callback) {
   try {
-    const SG_KEY = context.SENDGRID_API_KEY;
+    const RESEND_KEY = context.RESEND_API_KEY;
     const EMAIL_TO = (context.EMAIL_TO || 'brett@execom.ca,hello@fabsy.ca')
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
     const EMAIL_FROM = context.EMAIL_FROM || 'no-reply@fabsy.ca';
 
-    if (!SG_KEY) {
-      console.log('SENDGRID_API_KEY not set; skipping email send');
-    } else {
-      sgMail.setApiKey(SG_KEY);
-    }
+    const resend = RESEND_KEY ? new Resend(RESEND_KEY) : null;
 
     const from = event.From || '';
     const to = event.To || '';
@@ -50,16 +46,17 @@ exports.handler = async function (context, event, callback) {
       </html>
     `;
 
-    if (SG_KEY) {
-      await sgMail.send({
+    if (resend) {
+      await resend.emails.send({
         to: EMAIL_TO,
         from: EMAIL_FROM,
         subject: `SMS → Email: ${from} → ${to}`,
         html,
       });
+    } else {
+      console.log('RESEND_API_KEY not set; skipping email send');
     }
 
-    // Twilio Functions must callback; return 200 OK
     const twiml = new Twilio.twiml.MessagingResponse();
     return callback(null, twiml);
   } catch (err) {

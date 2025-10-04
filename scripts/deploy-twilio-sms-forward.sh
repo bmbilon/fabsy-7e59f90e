@@ -4,13 +4,13 @@ set -euo pipefail
 # Deploy Twilio Serverless Functions for SMS→Email and set the phone number webhook
 # Requirements:
 #  - twilio CLI logged in (twilio login or API key profile)
-#  - SendGrid API key ready
+#  - Resend API key ready
 #  - Run from repo root
 #
 # Usage:
 #  export TWILIO_PHONE_E164="+18252532279"  # your Twilio number
 #  export TWILIO_ACCOUNT_SID="AC..."         # optional if not using default profile
-#  export SENDGRID_API_KEY="SG..."
+#  export RESEND_API_KEY="re_..."
 #  export EMAIL_TO="brett@execom.ca,hello@fabsy.ca"
 #  export EMAIL_FROM="no-reply@fabsy.ca"
 #  scripts/deploy-twilio-sms-forward.sh
@@ -26,9 +26,9 @@ fi
 
 # Prepare env for serverless deploy
 cp -n "$SRV_DIR/.env.example" "$SRV_DIR/.env" || true
-awk -v sg="${SENDGRID_API_KEY:-}" -v to="${EMAIL_TO:-brett@execom.ca,hello@fabsy.ca}" -v from="${EMAIL_FROM:-no-reply@fabsy.ca}" '
+awk -v rk="${RESEND_API_KEY:-}" -v to="${EMAIL_TO:-brett@execom.ca,hello@fabsy.ca}" -v from="${EMAIL_FROM:-no-reply@fabsy.ca}" '
   BEGIN { FS=OFS="=" }
-  $1=="SENDGRID_API_KEY" { $2=sg; print; next }
+  $1=="RESEND_API_KEY" { $2=rk; print; next }
   $1=="EMAIL_TO" { $2=to; print; next }
   $1=="EMAIL_FROM" { $2=from; print; next }
   { print }
