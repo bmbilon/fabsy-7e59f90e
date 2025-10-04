@@ -7,10 +7,9 @@ const GlobalSchema = () => {
       'name': 'Fabsy',
       'url': 'https://fabsy.ca',
       'logo': 'https://fabsy.ca/_assets/logo.png',
-      'sameAs': [
+'sameAs': [
         'https://www.google.com/search?q=Fabsy+Alberta',
-        'https://www.facebook.com/fabsyca',
-        'https://www.instagram.com/fabsy.ca'
+        'https://www.instagram.com/fabsy.alberta'
       ]
     },
     {
