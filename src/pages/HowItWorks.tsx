@@ -63,24 +63,24 @@ const HowItWorks: React.FC = () => {
 
       <Header />
 
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-gradient-to-b from-background via-primary/5 to-background">
         <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold mb-4">How Fabsy Fights Your Ticket</h1>
+          <h1 className="text-4xl font-bold mb-4 text-foreground">How Fabsy Fights Your Ticket</h1>
           <p className="text-lg text-muted-foreground mb-8">Five simple steps to protect your insurance and driving record in Alberta.</p>
 
           <div className="space-y-8">
             {steps.map((step, idx) => {
               const Icon = step.icon;
               return (
-                <div key={idx} className="bg-white rounded-xl p-6 shadow-sm border border-primary/10">
+                <div key={idx} className="bg-card rounded-xl p-6 shadow-elegant border border-primary/20 hover:shadow-glow transition-smooth">
                   <div className="flex items-start gap-4">
-                    <div className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center">
+                    <div className="bg-gradient-primary text-white rounded-full w-12 h-12 flex items-center justify-center shadow-md">
                       <Icon className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
                       <div className="mb-2">
                         <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mr-2">Step {idx + 1}</span>
-                        <h3 className="font-bold text-xl inline-block">{step.name}</h3>
+                        <h3 className="font-bold text-xl inline-block text-foreground">{step.name}</h3>
                       </div>
                       <p className="text-muted-foreground leading-relaxed">{step.text}</p>
                     </div>
