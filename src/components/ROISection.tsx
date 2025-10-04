@@ -12,11 +12,12 @@ const ROISection = () => {
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
             Smart Financial Move
           </Badge>
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-white drop-shadow-lg">
-            <span className="text-gradient-hero">Pay $488</span> to Save{" "}
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-foreground drop-shadow-lg">
+            <span className="text-gradient-hero">Pay $488</span>{" "}
+            <span className="text-gradient-primary">to Save</span>{" "}
             <span className="text-gradient-hero">$1,650</span>
           </h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm mb-6">
+          <p className="text-xl text-foreground/90 max-w-3xl mx-auto drop-shadow-sm mb-6">
             That's not just smart — that's <span className="font-semibold text-primary shadow-glow font-script text-2xl">fabulous</span> financial planning.
             Invest in yourself and protect your driving record.
           </p>
@@ -84,10 +85,10 @@ const ROISection = () => {
           {/* Right side - Value proposition */}
           <div className="space-y-8">
             <div className="space-y-6">
-              <h3 className="text-3xl font-bold text-white drop-shadow-lg">
+              <h3 className="text-3xl font-bold text-foreground drop-shadow-lg">
                 You Work Hard for Your Money
               </h3>
-              <p className="text-lg text-white/90 leading-relaxed drop-shadow-sm">
+              <p className="text-lg text-foreground/90 leading-relaxed drop-shadow-sm">
                 Don't let one moment of going 10 over cost you $1,650 over three years. 
                 Our expert team has helped over 5,000 Alberta women protect their driving records 
                 and keep their insurance rates low.
@@ -99,7 +100,7 @@ const ROISection = () => {
                 <Shield className="h-6 w-6 text-primary mt-1" />
                 <div>
                   <h4 className="font-semibold text-primary mb-1">Protected Driving Record</h4>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-foreground/80">
                     Keep your abstract clean and maintain your good driver status
                   </p>
                 </div>
@@ -109,7 +110,7 @@ const ROISection = () => {
                 <DollarSign className="h-6 w-6 text-secondary mt-1" />
                 <div>
                   <h4 className="font-semibold text-secondary mb-1">Lower Insurance Premiums</h4>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-foreground/80">
                     Avoid the 3-year insurance penalty that can cost $200-$500 annually
                   </p>
                 </div>
@@ -119,7 +120,7 @@ const ROISection = () => {
                 <Clock className="h-6 w-6 text-primary mt-1" />
                 <div>
                   <h4 className="font-semibold text-primary mb-1">Time & Stress Free</h4>
-                  <p className="text-sm text-white/90">
+                  <p className="text-sm text-foreground/80">
                     No court dates, no paperwork, no dealing with bureaucracy
                   </p>
                 </div>
