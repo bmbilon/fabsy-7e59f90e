@@ -1,3 +1,41 @@
+import React from 'react';
+import StaticJsonLd from '@/components/StaticJsonLd';
+
+type HowToStep = {
+  name: string;
+  text: string;
+};
+
+type Props = {
+  name: string;
+  description?: string;
+  url: string;
+  steps: HowToStep[];
+  totalTime?: string; // e.g., PT3M
+};
+
+const HowToSchema: React.FC<Props> = ({ name, description, url, steps, totalTime = 'PT3M' }) => {
+  if (!name || !url || !Array.isArray(steps) || steps.length === 0) return null;
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    totalTime,
+    step: steps.map((s) => ({
+      '@type': 'HowToStep',
+      name: s.name,
+      text: s.text,
+    })),
+    url,
+  };
+
+  return <StaticJsonLd schema={schema} dataAttr="howto" />;
+};
+
+export default HowToSchema;
+
 import React from "react";
 import { Helmet } from "react-helmet-async";
 

@@ -7,6 +7,7 @@ import FAQSection from '@/components/FAQSection';
 import ArticleSchema from '@/components/ArticleSchema';
 import ServiceSchema from '@/components/ServiceSchema';
 import StaticJsonLd from '@/components/StaticJsonLd';
+import HowToSchema from '@/components/HowToSchema';
 import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -96,6 +97,11 @@ const WorkingContentPage = () => {
   const serviceName: string = pageData.h1 || `Traffic Ticket Dispute${cityName ? ` in ${cityName}` : ''}`;
   const serviceType = 'Traffic ticket dispute';
 
+  // Derive offense/violation for answer box and HowTo
+  const offense: string = (pageData.violation
+    || (pageData.h1 && (/Fight\s+(?:a|an)\s+(.+?)\s+in\s+/i.exec(pageData.h1)?.[1]?.trim()))
+    || 'traffic ticket');
+
   // FAQ JSON-LD (if FAQs present)
   const faqEntities = Array.isArray(pageData.faqs)
     ? pageData.faqs
@@ -125,6 +131,18 @@ const WorkingContentPage = () => {
         offerDescription="Zero-risk: pay only if we win"
         price="0"
         priceCurrency="CAD"
+      />
+      {/* HowTo for cornerstone flows */}
+      <HowToSchema
+        name={`How to fight a ${offense.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'} (3 steps)`}
+        description={`Fast, proven process to fight a ${offense.toLowerCase()}${cityName ? ` in ${cityName}` : ''}.`}
+        url={currentUrl}
+        steps={[
+          { name: 'Upload your ticket', text: 'Send us a photo or PDF of your ticket and basic details.' },
+          { name: 'We check the court file', text: 'We obtain and review disclosure for errors and defenses.' },
+          { name: 'Confirm the plan', text: 'We represent you and work to keep demerits off your record.' },
+        ]}
+        totalTime="PT3M"
       />
       {faqEntities.length > 0 && (
         <StaticJsonLd
@@ -161,9 +179,33 @@ const WorkingContentPage = () => {
             )}
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-foreground leading-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground leading-tight">
             {pageData.h1 || pageData.slug}
           </h1>
+
+          {/* Answer Box (60-second summary) */}
+          <div className="mb-8 rounded-xl border bg-card shadow-sm p-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground mb-2">Can I fight it?</h2>
+                <p className="text-foreground">Yes — most {offense.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'} can be fought. You’re more likely to qualify if you act within 7 days, request disclosure, and avoid admitting fault.</p>
+                <h3 className="mt-4 text-sm font-semibold text-foreground">What to do now (3 steps)</h3>
+                <ol className="mt-2 list-decimal ml-5 space-y-1 text-foreground">
+                  <li>Upload your ticket</li>
+                  <li>We check the court file and disclosure</li>
+                  <li>Confirm the plan (we represent you)</li>
+                </ol>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">Outcome expectations</h3>
+                <p className="text-foreground">Keep demerits off your record; avoid ${pageData.stats?.avgSavings || 1650}–$7,000 in lifetime insurance costs.</p>
+                <h3 className="mt-3 text-sm font-semibold text-foreground">Risk</h3>
+                <p className="text-foreground">Zero-risk: you pay only if we win.</p>
+                <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>
+                <p className="text-foreground">{cityName || 'Alberta'} • {offense.charAt(0).toUpperCase() + offense.slice(1)}</p>
+              </div>
+            </div>
+          </div>
 
           {/* Stats Grid */}
           {pageData.stats && Object.keys(pageData.stats).length > 0 && (
