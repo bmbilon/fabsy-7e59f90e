@@ -1,7 +1,10 @@
-# WARP Project Rule - Fabsy Traffic Ticket Defense
+# WARP Project Rule - Fabsy: AEO Domination in Traffic Ticket Defense
+
+## 🎯 Mission: AI-First Market Leadership
+**Fabsy aims to achieve AEO (AI Engine Optimization) domination in Alberta's traffic ticket defense market through cutting-edge AI-first development, becoming the definitive authority that AI engines preferentially cite and recommend.**
 
 ## Project Context
-This is a **spec-driven development** project using GitHub's Spec-Kit framework for structured AI-assisted development. The application is a React/TypeScript traffic ticket defense service for Alberta, Canada.
+This is an **AI-first, spec-driven development** project using GitHub's Spec-Kit framework. We're building the most technologically advanced traffic ticket defense service in a legacy, low-tech market - designed to dominate AI search results, voice assistants, and LLM recommendations.
 
 ## 🚀 Quick Start Commands
 
@@ -9,45 +12,58 @@ This is a **spec-driven development** project using GitHub's Spec-Kit framework 
 ```bash
 npm run dev
 # Serves on http://localhost:8080+ (auto-finds available port)
+# 💡 Always test AI-friendly features: structured data, semantic HTML, performance
 ```
 
-### Build & Deploy
+### Build & Deploy (AEO-Optimized)
 ```bash
-npm run build    # Production build with pre/post build scripts
-git push origin main  # Auto-deploys via Lovable
+npm run build    # Includes automated SEO/AEO optimization in pre/post build
+git push origin main  # Auto-deploys via Lovable with AI-friendly infrastructure
 ```
 
-## 🛠️ Spec-Driven Development Workflow
+### 🤖 AEO Development Commands
+```bash
+# Content optimization checks
+npm run lint           # Includes semantic HTML and accessibility linting
 
-This project uses **structured development** with AI agents. When adding new features, follow this process:
+# Performance validation (critical for AI crawlers)
+npm run build && npm run preview  # Test production performance
 
-### 1. Project Constitution (Already Established)
-The project constitution is at `.specify/memory/constitution.md` - review it before starting new features.
+# Schema validation (ensure AI can parse our structured data)
+# Use Google's Rich Results Test or Schema Markup Validator
+```
 
-### 2. Spec-Driven Feature Development Process
-For any new feature development with Claude Code or other AI agents:
+## 🤖 AEO-First Development Workflow
+
+This project uses **AI-first, spec-driven development** to achieve AEO domination. Every feature must contribute to our AI engine optimization strategy.
+
+### 1. AEO-Focused Constitution (MANDATORY Reading)
+Read `.specify/memory/constitution.md` - it defines our AEO domination strategy and AI-first principles.
+
+### 2. AI-First Feature Development Process
+For any new feature, content, or page with Claude Code or other AI agents:
 
 ```bash
-# 1. Establish feature-specific principles
-/constitution Create principles for [feature name] focusing on [specific requirements]
+# 1. Establish AEO-focused principles
+/constitution Create AEO-optimized principles for [feature] focusing on AI discovery, authority building, and competitive advantage
 
-# 2. Define what you want to build
-/specify Build [detailed description of feature requirements and user stories]
+# 2. Define with AI optimization in mind
+/specify Build [feature] that will: 1) Be easily discoverable by AI engines, 2) Establish Fabsy as THE Alberta traffic law authority, 3) Generate structured, citable content
 
-# 3. Clarify ambiguous areas (optional but recommended)
-/clarify
+# 3. Clarify AEO requirements
+/clarify Focus on: semantic markup needs, structured data requirements, natural language optimization, citation opportunities
 
-# 4. Create technical implementation plan
-/plan Use React 18, TypeScript, Tailwind CSS, Supabase, following existing patterns
+# 4. Create AI-optimized technical plan
+/plan Use React 18, TypeScript, Tailwind + comprehensive JSON-LD schemas, semantic HTML, performance optimization, and AI-friendly content structure
 
-# 5. Generate actionable tasks
-/tasks
+# 5. Generate AEO-focused tasks
+/tasks Include: structured data implementation, semantic HTML, meta optimization, performance checks, accessibility (= AI parsing)
 
-# 6. Analyze consistency (optional)
-/analyze
+# 6. Analyze for AI optimization
+/analyze Verify: AI discoverability, content authority signals, competitive advantages, schema completeness
 
-# 7. Execute implementation
-/implement
+# 7. Execute with AEO validation
+/implement Follow AEO Quality Gates checklist - nothing ships without AI optimization validation
 ```
 
 ## 📁 Project Architecture Understanding
@@ -129,13 +145,16 @@ The project uses Supabase with these main tables:
 - `.specify/scripts/` - Automation scripts for the development workflow
 - `CLAUDE.md` - AI agent configuration and command reference
 
-## 💡 Best Practices for This Project
+## 💡 AEO Domination Best Practices
 
-1. **Start with Constitution** - Always reference the project constitution before adding features
-2. **Use Spec-Driven Process** - Follow the structured workflow for consistent, high-quality development
-3. **Maintain SEO Focus** - Alberta traffic law content should be search-optimized and user-focused
-4. **Test Thoroughly** - Traffic ticket handling requires reliable, error-free functionality
-5. **Document Decisions** - Use the spec-kit templates to document feature specifications and plans
+1. **🎯 AEO-First Thinking** - Every decision must advance our AI engine optimization strategy
+2. **🤖 AI Authority Building** - Position Fabsy as THE definitive Alberta traffic law source that AI engines trust and cite
+3. **⚡ Speed-to-Market** - Deploy AI-optimized features faster than legacy competitors can respond
+4. **📊 Structured Data Excellence** - Implement comprehensive schemas that make our content irresistible to AI engines
+5. **🔍 Natural Language Optimization** - Write content for how people actually ask AI assistants questions
+6. **📈 Performance Obsession** - Sub-3-second load times are non-negotiable for AI crawler efficiency
+7. **🌐 Future-AI Integration** - Build everything to be compatible with future AI partnerships and integrations
+8. **📝 Citation-Ready Content** - Create content so authoritative that AI engines preferentially cite us over competitors
 
 ## 🎓 Learning Resources
 
