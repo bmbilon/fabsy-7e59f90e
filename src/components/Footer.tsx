@@ -163,9 +163,9 @@ const Footer = () => {
             </div>
             
             {/* Agent Practice Limitations Column */}
-            <div className="bg-amber-50 p-2 rounded border border-amber-200">
-              <p className="font-semibold text-amber-800 mb-1">Limitations on Agent Practice:</p>
-              <div className="space-y-0.5 text-amber-700">
+            <div className="bg-amber-50 dark:bg-amber-950/20 p-2 rounded border border-amber-200 dark:border-amber-800">
+              <p className="font-semibold text-amber-800 dark:text-amber-200 mb-1">Limitations on Agent Practice:</p>
+              <div className="space-y-0.5 text-amber-700 dark:text-amber-300">
                 <p><strong>What We Cannot Do:</strong></p>
                 <ul className="list-disc ml-3 space-y-0 text-[9px]">
                   <li>Represent clients on summary conviction appeals</li>
