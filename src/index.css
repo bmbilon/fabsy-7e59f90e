@@ -138,7 +138,7 @@ All colors MUST be HSL for proper theming.
   }
 
   body {
-    background: var(--background);
+    background: hsl(var(--background));
     @apply text-foreground;
     font-family: var(--font-body);
   }
