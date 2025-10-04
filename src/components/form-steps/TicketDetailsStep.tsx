@@ -331,6 +331,80 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       {/* Basic Ticket Information */}
       <Card className="p-6 bg-gradient-card border-2 border-primary/10">
         <h3 className="text-lg font-semibold mb-4 text-primary">Ticket Information</h3>
+        
+        {/* Ticket Upload - Show if no image uploaded yet */}
+        {!formData.ticketImage && (
+          <div className="mb-6 p-4 bg-gradient-soft border border-primary/30 rounded-lg">
+            <div className="mb-3">
+              <Label className="font-medium text-primary">Upload Your Ticket</Label>
+              <p className="text-sm text-muted-foreground mt-1">Upload a photo to auto-fill the form fields below</p>
+            </div>
+            <div
+              className={cn(
+                "border-2 border-dashed rounded-lg p-6 text-center transition-smooth cursor-pointer hover:border-primary/50",
+                dragActive ? "border-primary bg-primary/5" : "border-primary/30"
+              )}
+              onClick={openFileDialog}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFileDialog(); } }}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              role="button"
+              tabIndex={0}
+              aria-label="Upload ticket image"
+            >
+              <input
+                id="ticketUploadTop"
+                ref={fileInputRef}
+                type="file"
+                className="sr-only"
+                accept="image/*,.heic,.heif,application/pdf"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handleFileUpload(e.target.files[0]);
+                  }
+                }}
+              />
+              
+              <div className="space-y-2">
+                <Upload className="h-8 w-8 text-primary/70 mx-auto" />
+                <p className="text-sm font-medium text-primary">
+                  Drag & drop your ticket or click to browse
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  JPG, PNG, HEIC, PDF • Max 10MB
+                </p>
+                <p className="text-xs text-primary font-medium">
+                  ✨ We'll automatically fill in the details!
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Show uploaded ticket status if already uploaded */}
+        {formData.ticketImage && (
+          <div className="mb-6 p-3 bg-white/50 dark:bg-white/10 rounded-lg border border-primary/30">
+            <div className="flex items-center gap-3">
+              <FileImage className="h-4 w-4 text-primary" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-primary">Ticket Uploaded</p>
+                <p className="text-xs text-muted-foreground">{formData.ticketImage.name}</p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={openFileDialog}
+                className="text-xs h-8"
+              >
+                Change
+              </Button>
+            </div>
+          </div>
+        )}
+        
         <div className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -796,89 +870,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         )}
       </div>
 
-      {/* File Upload - Only show if no image uploaded yet */}
-      {!formData.ticketImage && (
-        <div className="space-y-2">
-          <Label>Upload Ticket Image (Optional)</Label>
-          <div
-            className={cn(
-              "border-2 border-dashed rounded-lg p-8 text-center transition-smooth cursor-pointer hover:border-primary/50",
-              dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25"
-            )}
-            onClick={openFileDialog}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFileDialog(); } }}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            role="button"
-            tabIndex={0}
-            aria-label="Upload ticket image"
-          >
-            <input
-              id="ticketUpload"
-              ref={fileInputRef}
-              type="file"
-              className="sr-only"
-              accept="image/*,.heic,.heif,application/pdf"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  handleFileUpload(e.target.files[0]);
-                }
-              }}
-            />
-            
-            <div className="space-y-2">
-              <Upload className="h-12 w-12 text-muted-foreground mx-auto" />
-              <p className="text-sm font-medium">
-                Drag & drop your ticket image here, or click to browse
-              </p>
-              <p className="text-xs text-muted-foreground">
-                All image formats supported (JPG, PNG, HEIC, etc.) • Max 10MB
-              </p>
-              <p className="text-xs text-primary font-medium">
-                ✨ We'll automatically fill in the details for you!
-              </p>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            A clear photo of your ticket helps our experts analyze your case more effectively.
-          </p>
-        </div>
-      )}
-
-      {/* Show uploaded ticket status if already uploaded */}
-      {formData.ticketImage && (
-        <div className="p-4 bg-white dark:bg-white rounded-lg border-2 border-primary/30">
-          <div className="flex items-center gap-3">
-            <FileImage className="h-5 w-5 text-primary" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-primary">Ticket Image Uploaded</p>
-              <p className="text-xs text-muted-foreground">{formData.ticketImage.name}</p>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={openFileDialog}
-              className="text-xs"
-            >
-              Change Image
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="sr-only"
-              accept="image/*,.heic,.heif,application/pdf"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  handleFileUpload(e.target.files[0]);
-                }
-              }}
-            />
-          </div>
-        </div>
-      )}
 
 
       <div className="bg-secondary/5 p-4 rounded-lg border border-secondary/10">
