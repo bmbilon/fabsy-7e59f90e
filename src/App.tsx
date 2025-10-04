@@ -26,6 +26,7 @@ import AEODashboard from "./pages/AEODashboard";
 import TicketAnalysis from "./pages/TicketAnalysis";
 import WorkingContentPage from "./pages/WorkingContentPage";
 import BlogPost from "./pages/BlogPost";
+import CompetitorComparison from "./pages/CompetitorComparison";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/ticket-form" element={<TicketFormPage />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/about" element={<About />} />
+          <Route path="/about/comparison" element={<CompetitorComparison />} />
           <Route path="/services" element={<Services />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
