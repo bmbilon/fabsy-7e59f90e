@@ -15,23 +15,20 @@ const GlobalSchema = () => {
     },
     {
       '@type': 'LegalService',
-      'name': 'Fabsy Traffic Ticket Defense',
+      'name': 'Fabsy',
       'url': 'https://fabsy.ca',
       'image': 'https://fabsy.ca/_assets/logo.png',
-      'priceRange': '$$',
+      'priceRange': '$',
+      'telephone': '+1-XXX-XXX-XXXX',
       'areaServed': [
-        { '@type': 'AdministrativeArea', 'name': 'Alberta, CA' },
-        { '@type': 'AdministrativeArea', 'name': 'Calgary, AB' },
-        { '@type': 'AdministrativeArea', 'name': 'Edmonton, AB' },
-        { '@type': 'AdministrativeArea', 'name': 'Red Deer, AB' },
-        { '@type': 'AdministrativeArea', 'name': 'Lethbridge, AB' }
+        { '@type': 'AdministrativeArea', 'name': 'Alberta, Canada' }
       ],
       'address': {
         '@type': 'PostalAddress',
         'addressRegion': 'AB',
         'addressCountry': 'CA'
       },
-      'serviceType': 'Traffic Ticket Defense'
+      'serviceType': 'Traffic ticket dispute assistance'
     }
   ];'}],
 
