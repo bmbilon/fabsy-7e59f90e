@@ -70,7 +70,7 @@ const ROISection = () => {
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
                 <div className="text-2xl font-bold text-gradient-hero">100%</div>
-                <div className="text-sm text-secondary">Success Rate</div>
+                <div className="text-sm text-secondary"><a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">Success Rate</a></div>
               </Card>
               
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">

@@ -185,7 +185,11 @@ const TestimonialsPage = () => {
                   {stat.number}
                 </div>
                 <div className="text-lg font-semibold text-white/90 mb-1">
-                  {stat.label}
+                  {stat.label === 'Success Rate' ? (
+                    <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">{stat.label}</a>
+                  ) : (
+                    stat.label
+                  )}
                 </div>
                 <div className="text-sm text-white/70">
                   {stat.description}
@@ -306,7 +310,7 @@ const TestimonialsPage = () => {
               Join hundreds of Alberta women who chose to fight back
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              100% success rate • No win, no fee guarantee • Average 3-week turnaround
+              <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">100% success rate</a> • No win, no fee guarantee • Average 3-week turnaround
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

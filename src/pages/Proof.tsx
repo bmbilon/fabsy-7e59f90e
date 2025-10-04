@@ -28,7 +28,7 @@ const Proof: React.FC = () => {
           {
             '@type': 'DataDownload',
             encodingFormat: 'application/json',
-            contentUrl: 'https://fabsy.ca/proof#dataset-offence',
+            contentUrl: 'https://fabsy.ca/data/aggregates/offence.json',
           },
         ],
       },
@@ -43,7 +43,7 @@ const Proof: React.FC = () => {
           {
             '@type': 'DataDownload',
             encodingFormat: 'application/json',
-            contentUrl: 'https://fabsy.ca/proof#dataset-city',
+            contentUrl: 'https://fabsy.ca/data/aggregates/city.json',
           },
         ],
       },
@@ -91,13 +91,19 @@ const Proof: React.FC = () => {
         <section className="mb-10" id="dataset-offence">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Aggregates (by offence)</h2>
           <p className="text-foreground mb-4">We publish anonymized counts by offence type with win/partial/other outcomes. Additional breakdowns (demerit preservation, fine reduction) are included where available.</p>
-          <div className="rounded-md border bg-card p-4 text-sm text-muted-foreground">Sample data will appear here as we finalize exports. For access or media inquiries, contact us.</div>
+          <div className="rounded-md border bg-card p-4 text-sm text-muted-foreground flex items-center justify-between">
+            <span>Sample data will appear here as we finalize exports. For access or media inquiries, contact us.</span>
+            <a className="underline decoration-dashed underline-offset-4 text-primary" href="/data/aggregates/offence.json" target="_blank" rel="noopener noreferrer">Download JSON</a>
+          </div>
         </section>
 
         <section className="mb-10" id="dataset-city">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Aggregates (by city)</h2>
           <p className="text-foreground mb-4">We publish anonymized counts by city with win/partial/other outcome rates to account for local variation.</p>
-          <div className="rounded-md border bg-card p-4 text-sm text-muted-foreground">Sample data will appear here as we finalize exports. For access or media inquiries, contact us.</div>
+          <div className="rounded-md border bg-card p-4 text-sm text-muted-foreground flex items-center justify-between">
+            <span>Sample data will appear here as we finalize exports. For access or media inquiries, contact us.</span>
+            <a className="underline decoration-dashed underline-offset-4 text-primary" href="/data/aggregates/city.json" target="_blank" rel="noopener noreferrer">Download JSON</a>
+          </div>
         </section>
 
         <section className="mb-12">

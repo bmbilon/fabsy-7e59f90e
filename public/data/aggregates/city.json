@@ -1,0 +1,11 @@
+{
+  "generated": "2025-10-04T17:14:15Z",
+  "window": "Rolling 12 months ending on the last completed month",
+  "definitions": {
+    "win": "Demerits preserved (no demerit points on abstract) OR withdrawal/dismissal OR material reduction that avoids insurance-triggering threshold",
+    "partial": "Improved outcome that reduces points or fine but may not fully avoid insurance impact",
+    "other": "Outcomes outside win/partial (e.g., administrative, pending)"
+  },
+  "columns": ["city", "wins", "partials", "other", "demerit_preserved_rate", "avg_fine_reduction"],
+  "rows": []
+}

@@ -152,7 +152,7 @@ const ContentPage = () => {
                     <div className="text-green-600 text-2xl font-bold">
                       {pageData.stats.successRate}%
                     </div>
-                    <div className="text-xs text-green-700">Success Rate</div>
+                    <div className="text-xs text-green-700"><a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">Success Rate</a></div>
                   </div>
                 )}
                 {pageData.stats.avgSavings && (
@@ -248,8 +248,8 @@ const ContentPage = () => {
             <h2 className="text-3xl font-bold mb-3">
               Ready to Fight Your {pageData.violation || 'Traffic'} Ticket?
             </h2>
-            <p className="text-xl mb-6 text-green-50">
-              Zero-risk guarantee • {pageData.stats?.successRate || 94}% success rate • Save ${pageData.stats?.avgSavings || 1650}+
+              <p className="text-xl mb-6 text-green-50">
+              Zero-risk guarantee • <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-white">{pageData.stats?.successRate || 94}% success rate</a> • Save ${pageData.stats?.avgSavings || 1650}+
             </p>
             <Link to="/submit-ticket">
               <Button 

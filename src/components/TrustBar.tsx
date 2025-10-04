@@ -1,5 +1,6 @@
 import { Shield, Clock, Users, Phone, CheckCircle, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const TrustBar = () => {
   const trustPoints = [
@@ -37,7 +38,15 @@ const TrustBar = () => {
                 className="bg-white/80 backdrop-blur-sm border-2 border-primary/20 p-6 text-center hover:border-primary/40 transition-smooth shadow-fab"
               >
                 <Icon className={`h-10 w-10 ${point.color} mx-auto mb-3`} />
-                <h3 className="text-2xl font-bold text-gray-800 mb-1">{point.stat}</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mb-1">
+                  {point.stat.includes('Success Rate') ? (
+                    <Link to="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">
+                      {point.stat}
+                    </Link>
+                  ) : (
+                    point.stat
+                  )}
+                </h3>
                 <p className="text-gray-600 font-medium">{point.detail}</p>
               </Card>
             );

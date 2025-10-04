@@ -128,7 +128,9 @@ const Services = () => {
                     {ticket.title}
                   </h3>
                   <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-                    {ticket.successRate} Success Rate
+                    <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">
+                      {ticket.successRate} Success Rate
+                    </a>
                   </Badge>
                 </div>
               </div>
