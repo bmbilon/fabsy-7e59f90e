@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.get-checkout-session]
 verify_jwt = false
 
+[functions.sms-to-email]
+verify_jwt = false
+
 [functions.send-notification]
 verify_jwt = false
 
