@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FAQSection from '@/components/FAQSection';
 import ArticleSchema from '@/components/ArticleSchema';
+import ServiceSchema from '@/components/ServiceSchema';
 import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -89,6 +90,11 @@ const WorkingContentPage = () => {
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`;
 
+  // Derive Service schema fields
+  const cityName: string | undefined = pageData.city || (pageData.h1 && /\bin\s+([A-Za-z\-\s]+)$/.exec(pageData.h1)?.[1]?.trim());
+  const serviceName: string = pageData.h1 || `Traffic Ticket Dispute${cityName ? ` in ${cityName}` : ''}`;
+  const serviceType = 'Traffic ticket dispute';
+
   return (
     <main className="min-h-screen bg-background">
       <ArticleSchema 
@@ -97,6 +103,15 @@ const WorkingContentPage = () => {
         url={currentUrl}
         datePublished={pageData.created_at}
         dateModified={pageData.updated_at}
+      />
+      <ServiceSchema 
+        name={serviceName}
+        serviceType={serviceType}
+        url={currentUrl}
+        cityName={cityName}
+        offerDescription="Zero-risk: pay only if we win"
+        price="0"
+        priceCurrency="CAD"
       />
 
       <Header />
