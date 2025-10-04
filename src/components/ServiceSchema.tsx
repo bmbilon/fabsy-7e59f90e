@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import StaticJsonLd from '@/components/StaticJsonLd';
 
 type Props = {
   name: string;
@@ -26,50 +27,30 @@ const ServiceSchema: React.FC<Props> = ({
   price = '0',
   priceCurrency = 'CAD',
 }) => {
-  useEffect(() => {
-    if (!name || !serviceType || !url) return;
-    if (typeof document === 'undefined') return;
+  if (!name || !serviceType || !url) return null;
 
-    const serviceNode: any = {
-      '@context': 'https://schema.org',
-      '@type': 'Service',
-      name,
-      serviceType,
-      provider: { '@type': 'LegalService', name: providerName, url: providerUrl },
-      url,
-      offers: {
-        '@type': 'Offer',
-        price,
-        priceCurrency,
-        description: offerDescription,
-      },
-    };
+  const serviceNode: any = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name,
+    serviceType,
+    provider: { '@type': 'LegalService', name: providerName, url: providerUrl },
+    url,
+    offers: {
+      '@type': 'Offer',
+      price,
+      priceCurrency,
+      description: offerDescription,
+    },
+  };
 
-    if (cityName) {
-      serviceNode.areaServed = { '@type': 'City', name: cityName };
-    } else {
-      // Fallback to provincial scope if city is unknown
-      serviceNode.areaServed = { '@type': 'AdministrativeArea', name: 'Alberta, Canada' };
-    }
+  if (cityName) {
+    serviceNode.areaServed = { '@type': 'City', name: cityName };
+  } else {
+    serviceNode.areaServed = { '@type': 'AdministrativeArea', name: 'Alberta, Canada' };
+  }
 
-    // Remove any existing service schema
-    const existing = document.querySelector('script[data-service-schema]');
-    if (existing) existing.remove();
-
-    // Add new schema
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.setAttribute('data-service-schema', 'true');
-    script.textContent = JSON.stringify(serviceNode);
-    document.head.appendChild(script);
-
-    return () => {
-      const toRemove = document.querySelector('script[data-service-schema]');
-      if (toRemove) toRemove.remove();
-    };
-  }, [name, serviceType, url, providerName, providerUrl, cityName, offerDescription, price, priceCurrency]);
-
-  return null;
+  return <StaticJsonLd schema={serviceNode} dataAttr="service" />;
 };
 
 export default ServiceSchema;
