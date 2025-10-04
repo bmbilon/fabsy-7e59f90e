@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import FAQSection from '@/components/FAQSection';
 import ArticleSchema from '@/components/ArticleSchema';
 import ServiceSchema from '@/components/ServiceSchema';
+import StaticJsonLd from '@/components/StaticJsonLd';
 import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -95,6 +96,18 @@ const WorkingContentPage = () => {
   const serviceName: string = pageData.h1 || `Traffic Ticket Dispute${cityName ? ` in ${cityName}` : ''}`;
   const serviceType = 'Traffic ticket dispute';
 
+  // FAQ JSON-LD (if FAQs present)
+  const faqEntities = Array.isArray(pageData.faqs)
+    ? pageData.faqs
+        .map((f: any) => ({ q: typeof f.q === 'string' ? f.q.trim() : '', a: typeof f.a === 'string' ? f.a.trim() : '' }))
+        .filter((f: any) => f.q && f.a)
+        .map((f: any) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        }))
+    : [];
+
   return (
     <main className="min-h-screen bg-background">
       <ArticleSchema 
@@ -113,6 +126,16 @@ const WorkingContentPage = () => {
         price="0"
         priceCurrency="CAD"
       />
+      {faqEntities.length > 0 && (
+        <StaticJsonLd
+          schema={{
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqEntities,
+          }}
+          dataAttr="faq"
+        />
+      )}
 
       <Header />
 
