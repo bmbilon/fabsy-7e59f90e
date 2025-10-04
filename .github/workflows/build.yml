@@ -41,6 +41,11 @@ jobs:
         run: node ci/validate-faq-jsonld.js
       
       - name: Build (SSG)
+        env:
+          VITE_GA4_MEASUREMENT_ID: ${{ secrets.VITE_GA4_MEASUREMENT_ID }}
+          VITE_GADS_ID: ${{ secrets.VITE_GADS_ID }}
+          VITE_GADS_CONVERSION_LABEL: ${{ secrets.VITE_GADS_CONVERSION_LABEL }}
+          VITE_GADS_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PURCHASE_LABEL }}
         run: npm run build
 
       - name: Install Playwright browsers (Chromium)
