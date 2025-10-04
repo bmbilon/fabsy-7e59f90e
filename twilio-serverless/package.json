@@ -1,0 +1,9 @@
+{
+  "name": "fabsy-twilio-sms-email",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Twilio Serverless project to forward inbound SMS to email via SendGrid",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.0"
+  }
+}
