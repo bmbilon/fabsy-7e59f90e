@@ -137,18 +137,35 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
 
     const extractedData = JSON.parse(toolCall.function.arguments);
     
-    // Map to the expected format
-    return new Response(
-      JSON.stringify({
-        violation: extractedData.violation,
+    // Map to a stable, backward-compatible shape expected by clients
+    // Returns both a wrapper { success, data } and mirrored legacy keys within data
+    const payload = {
+      success: true,
+      data: {
+        // Canonical fields used by the form
+        ticketNumber: extractedData.ticketNumber ?? null,
+        issueDate: extractedData.issueDate ?? null,
+        location: extractedData.location ?? null,
+        officer: extractedData.officer ?? null,
+        officerBadge: extractedData.officerBadge ?? null,
+        offenceSection: extractedData.offenceSection ?? null,
+        offenceSubSection: extractedData.offenceSubSection ?? null,
+        offenceDescription: extractedData.offenceDescription ?? null,
+        violation: extractedData.violation ?? null,
+        // Provide fineAmount as numeric/string without currency symbol for client to format
+        fineAmount: extractedData.fineAmount ?? null,
+        courtDate: extractedData.courtDate ?? null,
+        // Compatibility mirrors (legacy consumers)
+        section: extractedData.offenceSection ?? null,
+        subsection: extractedData.offenceSubSection ?? null,
+        offenseDescription: extractedData.offenceDescription ?? null,
+        // Convenience formatted fine string for consumers that display directly
         fine: extractedData.fineAmount ? `$${extractedData.fineAmount}` : null,
-        ticketNumber: extractedData.ticketNumber,
-        issueDate: extractedData.issueDate,
-        location: extractedData.location,
-        section: extractedData.offenceSection,
-        subsection: extractedData.offenceSubSection,
-        offenseDescription: extractedData.offenceDescription
-      }),
+      },
+    };
+
+    return new Response(
+      JSON.stringify(payload),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
