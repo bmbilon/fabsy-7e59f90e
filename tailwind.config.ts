@@ -54,6 +54,21 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // High-contrast brand palette (WCAG-aware)
+        brand: {
+          DEFAULT: "#5b3ac7", // primary brand purple
+          dark: "#2d1b69", // deep purple for text
+          hover: "#7c4fea",
+        },
+        text: {
+          primary: "#1a1a1a",
+          secondary: "#4a4a4a",
+          inverse: "#ffffff",
+        },
+        surface: {
+          primary: "#ffffff",
+          dark: "#1a1a1a",
+        },
         "fabsy-red": {
           DEFAULT: "#dc2626", // red-600
           50: "#fef2f2",

@@ -1,0 +1,94 @@
+/* Contrast Fix - Global Overrides */
+
+/* Base text on light backgrounds */
+html, body {
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+/* Prefer strong body text color */
+body, p, li, dd, dt, small, span {
+  color: #1a1a1a !important;
+}
+
+/* Fix the "to Save" text that's invisible */
+.hero-section h1,
+.hero-section .headline {
+  color: #2d1b69 !important;
+  text-shadow: none !important;
+}
+
+/* Light background heuristics → dark text */
+.light-bg, 
+.pastel-bg,
+[class*="bg-white"],
+[class*="bg-zinc-50"],
+[class*="bg-neutral-50"],
+[class*="bg-gray-50"],
+[class*="bg-slate-50"],
+[class*="bg-stone-50"],
+[style*="background: rgb(255"],
+[style*="background: #f"],
+[style*="background: #e"] {
+  color: #1a1a1a !important;
+}
+
+/* Override ambiguous/pale text with readable purple */
+[class*="text-white/"],
+[class*="text-zinc-100"],
+[class*="text-neutral-100"],
+[class*="text-gray-100"],
+[class*="text-slate-100"],
+[class*="text-stone-100"],
+.text-purple,
+.text-pink-300,
+.text-pink-200,
+.text-pink-100 {
+  color: #2d1b69 !important;
+}
+
+/* Button contrast enforcement */
+button, .btn, a.button, [role="button"], .shadcn-button {
+  color: #ffffff !important;
+  background: #5b3ac7 !important;
+  border: 2px solid #5b3ac7 !important;
+}
+button:hover, .btn:hover, a.button:hover, [role="button"]:hover {
+  background: #7c4fea !important;
+  border-color: #7c4fea !important;
+}
+/* Inverse buttons on dark backgrounds */
+.dark button, .dark .btn, .dark a.button, footer button, footer .btn {
+  color: #1a1a1a !important;
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+/* Ensure all headings are dark on light backgrounds */
+h1, h2, h3, h4, h5, h6 {
+  color: #1a1a1a !important;
+}
+
+/* Navigation links */
+nav a, .nav-link, a.nav-link, header nav a {
+  color: #2d1b69 !important;
+}
+nav a:hover, .nav-link:hover, header nav a:hover {
+  color: #5b3ac7 !important;
+}
+
+/* Links default */
+a { color: #2d1b69; }
+a:hover { color: #5b3ac7; }
+
+/* Inputs and placeholders */
+input, textarea, select { color: #1a1a1a !important; background: #ffffff !important; }
+::placeholder { color: #4a4a4a !important; opacity: 1; }
+
+/* Footer contrast */
+footer {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+}
+footer a { color: #ffffff !important; }
+footer a:hover { color: #e5e5e5 !important; }
