@@ -366,7 +366,7 @@ const WorkingContentPage = () => {
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-primary mt-0.5 font-bold">✓</span>
-                    <span className="text-foreground leading-relaxed">{pageData.stats?.successRate || 94}% success rate</span>
+<span className="text-foreground leading-relaxed"><Link to="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">{pageData.stats?.successRate || 94}% success rate</Link></span>
                   </li>
                 </ul>
               </div>
@@ -380,7 +380,7 @@ const WorkingContentPage = () => {
                   Fight Your {pageData.violation || 'Traffic'} Ticket
                 </h3>
                 <p className="text-sm mb-5 opacity-95">
-                  {pageData.stats?.successRate || 94}% success rate • Save ${pageData.stats?.avgSavings || 1650}+ on average
+<Link to="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">{pageData.stats?.successRate || 94}% success rate</Link> • Save ${pageData.stats?.avgSavings || 1650}+ on average
                 </p>
                 <Link to="/submit-ticket">
                   <Button 

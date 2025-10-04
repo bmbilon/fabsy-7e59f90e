@@ -15,18 +15,15 @@ if (!fs.existsSync(publicDir)) {
   process.exit(0);
 }
 
-if (!fs.existsSync(distDir)) {
-  fs.mkdirSync(distDir, { recursive: true });
+// Ensure dist/prerendered exists
+fs.mkdirSync(distDir, { recursive: true });
+
+// Prefer Node's built-in recursive copy to preserve directory structure
+try {
+  // Note: fs.cpSync is available in Node >=16
+  fs.cpSync(publicDir, distDir, { recursive: true, force: true });
+  console.log('✅ Copied prerendered directory recursively');
+} catch (err) {
+  console.error('❌ Failed to copy prerendered files:', err);
+  process.exit(1);
 }
-
-const files = fs.readdirSync(publicDir);
-
-files.forEach(file => {
-  const src = path.join(publicDir, file);
-  const dest = path.join(distDir, file);
-  
-  fs.copyFileSync(src, dest);
-  console.log(`✅ Copied: ${file}`);
-});
-
-console.log(`✅ Copied ${files.length} prerendered file(s) to dist`);
