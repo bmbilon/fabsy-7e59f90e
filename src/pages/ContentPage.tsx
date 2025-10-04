@@ -73,6 +73,21 @@ const ContentPage = () => {
     fetchPage();
   }, [slug]);
 
+  // Set GA4 user properties for AEO context (city, violation) when data loads
+  useEffect(() => {
+    if (pageData?.city || pageData?.violation) {
+      const gtag = (window as any).gtag as undefined | ((...args: any[]) => void);
+      if (typeof gtag === 'function') {
+        try {
+          gtag('set', 'user_properties', {
+            city: pageData?.city || undefined,
+            violation: pageData?.violation || undefined,
+          });
+        } catch {}
+      }
+    }
+  }, [pageData?.city, pageData?.violation]);
+
   if (loading) {
     return (
       <main className="min-h-screen">

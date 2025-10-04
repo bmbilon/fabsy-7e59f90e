@@ -3,6 +3,9 @@ project_id = "gcasbisxfrssonllpqrw"
 [functions.create-payment]
 verify_jwt = false
 
+[functions.get-checkout-session]
+verify_jwt = false
+
 [functions.send-notification]
 verify_jwt = false
 

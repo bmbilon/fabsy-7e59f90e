@@ -37,6 +37,7 @@ import CourtOptionsDeadlines from "./pages/hubs/CourtOptionsDeadlines";
 import CityQuirks from "./pages/hubs/CityQuirks";
 import ThankYou from "./pages/ThankYou";
 import Analytics from "./components/Analytics";
+import AcquisitionTracker from "./components/AcquisitionTracker";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
         <BrowserRouter>
         {/* Analytics must be inside the router to track SPA route changes */}
         <Analytics />
+        <AcquisitionTracker />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />

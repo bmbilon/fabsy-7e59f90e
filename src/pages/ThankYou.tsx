@@ -3,6 +3,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Helmet } from 'react-helmet-async';
 
 const ThankYou: React.FC = () => {
   const url = 'https://fabsy.ca/thank-you';
@@ -20,30 +22,86 @@ const ThankYou: React.FC = () => {
   } as const;
 
   useEffect(() => {
-    // Fire GA4 event (configure in GA to count as conversion)
-    try {
-      const gtag = (window as any).gtag as undefined | ((...args: any[]) => void);
-      if (typeof gtag === 'function' && (import.meta as any).env?.VITE_GA4_MEASUREMENT_ID) {
-        const params: any = {
-          page_path: '/thank-you',
-        };
-        gtag('event', 'generate_lead', params);
-      }
-      // Optionally fire Google Ads conversion if configured
-      const gadsId = (import.meta as any).env?.VITE_GADS_ID;
-      const gadsLabel = (import.meta as any).env?.VITE_GADS_CONVERSION_LABEL;
-      if (typeof gtag === 'function' && gadsId && gadsLabel) {
-        gtag('event', 'conversion', {
-          send_to: `${gadsId}/${gadsLabel}`,
-        });
-      }
-    } catch (e) {
-      // no-op
+    const params = new URLSearchParams(window.location.search);
+    const isTest = params.get('test') === 'true';
+    const sessionId = params.get('session_id');
+    const gtag = (window as any).gtag as undefined | ((...args: any[]) => void);
+
+    // Always record a generate_lead for GA4 (you can mark as conversion in GA)
+    if (typeof gtag === 'function') {
+      try {
+        gtag('event', 'generate_lead', { page_path: '/thank-you', test_mode: isTest });
+      } catch {}
     }
+
+    // If Stripe session exists, fetch details and fire purchase
+    (async () => {
+      if (sessionId && typeof gtag === 'function') {
+        try {
+          const { data, error } = await supabase.functions.invoke('get-checkout-session', {
+            body: { sessionId },
+          });
+          if (error) throw error;
+          const value = (data?.amount_total ?? 0) / 100;
+          const currency = (data?.currency || 'cad').toUpperCase();
+          const transaction_id = data?.id || sessionId;
+
+          // Attach stored acquisition parameters if present
+          let acq: any = {};
+          try {
+            acq = JSON.parse(localStorage.getItem('fabsy_marketing') || '{}');
+          } catch {}
+
+          // GA4 purchase event
+          gtag('event', 'purchase', {
+            transaction_id,
+            value,
+            currency,
+            tax: (data?.total_details?.amount_tax ?? 0) / 100,
+            items: (data?.line_items || []).map((li: any) => ({
+              item_name: li.description,
+              quantity: li.quantity,
+              price: (li.amount_total ?? 0) / 100,
+              currency: (li.currency || currency).toUpperCase(),
+            })),
+            ...(['gclid','utm_source','utm_medium','utm_campaign','utm_term','utm_content'].reduce((acc: any, k) => {
+              if (acq && acq[k]) acc[k] = acq[k];
+              return acc;
+            }, {})),
+          });
+
+          // Google Ads conversion (purchase) if configured
+          const gadsId = (import.meta as any).env?.VITE_GADS_ID;
+          const gadsPurchaseLabel = (import.meta as any).env?.VITE_GADS_PURCHASE_LABEL;
+          if (gadsId && gadsPurchaseLabel) {
+            gtag('event', 'conversion', {
+              send_to: `${gadsId}/${gadsPurchaseLabel}`,
+              value,
+              currency,
+              transaction_id,
+            });
+          }
+        } catch (e) {
+          // swallow errors in analytics path
+        }
+      } else if (isTest && typeof gtag === 'function') {
+        // Optionally also fire Ads lead conversion for test mode if label provided
+        const gadsId = (import.meta as any).env?.VITE_GADS_ID;
+        const gadsLeadLabel = (import.meta as any).env?.VITE_GADS_CONVERSION_LABEL;
+        if (gadsId && gadsLeadLabel) {
+          try {
+            gtag('event', 'conversion', { send_to: `${gadsId}/${gadsLeadLabel}` });
+          } catch {}
+        }
+      }
+    })();
   }, []);
 
   return (
     <main className="min-h-screen bg-background">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <StaticJsonLd schema={webPageSchema} dataAttr="webpage" />
       <Header />
       <div className="container mx-auto px-4 py-16 max-w-3xl text-center">
