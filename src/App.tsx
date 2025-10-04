@@ -35,6 +35,7 @@ import PhotoRadarVsOfficer from "./pages/hubs/PhotoRadarVsOfficer";
 import DemeritsInsurance from "./pages/hubs/DemeritsInsurance";
 import CourtOptionsDeadlines from "./pages/hubs/CourtOptionsDeadlines";
 import CityQuirks from "./pages/hubs/CityQuirks";
+import ThankYou from "./pages/ThankYou";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ const App = () => (
           {/* Dynamic content pages - must be before catch-all */}
           <Route path="/content/:slug" element={<WorkingContentPage />} />
           <Route path="/proof" element={<Proof />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           {/* Hubs */}
           <Route path="/hubs/alberta-tickets-101" element={<AlbertaTickets101 />} />
           <Route path="/hubs/photo-radar-vs-officer-issued" element={<PhotoRadarVsOfficer />} />
