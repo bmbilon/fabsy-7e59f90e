@@ -58,6 +58,8 @@ async function generateSitemap() {
     { loc: '/testimonials', priority: '0.7', changefreq: 'weekly' },
     { loc: '/contact', priority: '0.8', changefreq: 'monthly' },
     { loc: '/blog', priority: '0.8', changefreq: 'daily' },
+    // Thank You page: included by request for QA/analytics visibility; remains noindex via meta
+    { loc: '/thank-you', priority: '0.1', changefreq: 'yearly' },
   ];
 
   const pageContentUrls = pages.map(p => ({

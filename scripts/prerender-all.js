@@ -56,7 +56,7 @@ async function prerenderRoute(browser, route) {
 async function fetchDynamicRoutes() {
   const routes = new Set();
   // Static pages
-  ['/', '/faq', '/how-it-works', '/about', '/services', '/contact', '/blog']
+  ['/', '/faq', '/how-it-works', '/about', '/services', '/contact', '/blog', '/thank-you']
     .forEach(r => routes.add(r));
 
   if (!supabase) {
