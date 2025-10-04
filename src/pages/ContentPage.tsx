@@ -14,6 +14,7 @@ const ContentPage = () => {
   const [pageData, setPageData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [relatedPages, setRelatedPages] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchPage() {
@@ -41,6 +42,26 @@ const ContentPage = () => {
         };
 
         setPageData(parsedData);
+
+        // Fetch related pages in same city with different offences
+        try {
+          const { data: related, error: relErr } = await supabase
+            .from('page_content')
+            .select('slug, city, violation, h1')
+            .eq('city', parsedData.city)
+            .neq('slug', parsedData.slug)
+            .limit(20);
+          if (!relErr && Array.isArray(related)) {
+            // Pick two with different violation than current
+            const currentViolation = (parsedData.violation || '').toLowerCase();
+            const filtered = related.filter((r) => (r.violation || '').toLowerCase() !== currentViolation);
+            setRelatedPages(filtered.slice(0, 2));
+          } else {
+            setRelatedPages([]);
+          }
+        } catch (_) {
+          setRelatedPages([]);
+        }
       } catch (err) {
         console.error('Error fetching page:', err);
         setError(err instanceof Error ? err.message : 'Failed to load page');
@@ -82,6 +103,19 @@ const ContentPage = () => {
   }
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`;
+
+  // Select 1–2 hub links based on context
+  const slugStr = String(pageData.slug || '').toLowerCase();
+  const isPhotoRadar = slugStr.includes('photo-radar');
+  const hubLinks = isPhotoRadar
+    ? [
+        { to: '/hubs/photo-radar-vs-officer-issued', label: 'Photo-Radar vs Officer-Issued' },
+        { to: '/hubs/alberta-tickets-101', label: 'Alberta Tickets 101' },
+      ]
+    : [
+        { to: '/hubs/alberta-tickets-101', label: 'Alberta Tickets 101' },
+        { to: '/hubs/demerits-and-insurance', label: 'Demerits & Insurance' },
+      ];
 
   return (
     <main className="min-h-screen">
@@ -214,6 +248,40 @@ const ContentPage = () => {
               )}
             </div>
           </div>
+
+          {/* Related in City */}
+          {relatedPages.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+              <h2 className="text-3xl font-bold mb-6 text-gray-900">
+                Related in {pageData.city}
+              </h2>
+              <ul className="list-disc ml-6 space-y-2 text-gray-800">
+                {relatedPages.slice(0, 2).map((r) => (
+                  <li key={r.slug}>
+                    <Link to={`/content/${r.slug}`} className="underline decoration-dashed underline-offset-4 hover:text-primary">
+                      {(r.h1 || r.violation || r.slug).toString()}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Explore Hubs */}
+          {hubLinks.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+              <h2 className="text-3xl font-bold mb-6 text-gray-900">Explore Hubs</h2>
+              <ul className="list-disc ml-6 space-y-2 text-gray-800">
+                {hubLinks.map((h) => (
+                  <li key={h.to}>
+                    <Link to={h.to} className="underline decoration-dashed underline-offset-4 hover:text-primary">
+                      {h.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* FAQs Section */}
           {pageData.faqs && pageData.faqs.length > 0 && (

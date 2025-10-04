@@ -30,6 +30,11 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import CompetitorComparison from "./pages/CompetitorComparison";
 import Proof from "./pages/Proof";
+import AlbertaTickets101 from "./pages/hubs/AlbertaTickets101";
+import PhotoRadarVsOfficer from "./pages/hubs/PhotoRadarVsOfficer";
+import DemeritsInsurance from "./pages/hubs/DemeritsInsurance";
+import CourtOptionsDeadlines from "./pages/hubs/CourtOptionsDeadlines";
+import CityQuirks from "./pages/hubs/CityQuirks";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +79,12 @@ const App = () => (
           {/* Dynamic content pages - must be before catch-all */}
           <Route path="/content/:slug" element={<WorkingContentPage />} />
           <Route path="/proof" element={<Proof />} />
+          {/* Hubs */}
+          <Route path="/hubs/alberta-tickets-101" element={<AlbertaTickets101 />} />
+          <Route path="/hubs/photo-radar-vs-officer-issued" element={<PhotoRadarVsOfficer />} />
+          <Route path="/hubs/demerits-and-insurance" element={<DemeritsInsurance />} />
+          <Route path="/hubs/court-options-and-deadlines" element={<CourtOptionsDeadlines />} />
+          <Route path="/hubs/city-specific-quirks" element={<CityQuirks />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
