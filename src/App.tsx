@@ -29,6 +29,7 @@ import WorkingContentPage from "./pages/WorkingContentPage";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import CompetitorComparison from "./pages/CompetitorComparison";
+import Proof from "./pages/Proof";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
           <Route path="/test-static-content" element={<WorkingContentPage />} />
           {/* Dynamic content pages - must be before catch-all */}
           <Route path="/content/:slug" element={<WorkingContentPage />} />
+          <Route path="/proof" element={<Proof />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
