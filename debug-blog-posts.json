@@ -1,0 +1,92 @@
+{
+  "name": "Debug Blog Posts",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "id,title,featured_image,status,created_at"
+            },
+            {
+              "name": "order",
+              "value": "created_at.desc"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            }
+          ]
+        }
+      },
+      "id": "check-all-posts",
+      "name": "Check All Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = $input.all();\n\nconsole.log(`Total posts found: ${posts.length}`);\nconsole.log('\\n=== BLOG POST ANALYSIS ===\\n');\n\nlet withImages = 0;\nlet withoutImages = 0;\n\nposts.forEach((post, index) => {\n  const data = post.json;\n  const hasImage = data.featured_image ? 'YES' : 'NO';\n  \n  if (data.featured_image) {\n    withImages++;\n  } else {\n    withoutImages++;\n  }\n  \n  console.log(`${index + 1}. ${data.title}`);\n  console.log(`   - ID: ${data.id}`);\n  console.log(`   - Has Image: ${hasImage}`);\n  console.log(`   - Status: ${data.status}`);\n  console.log(`   - Created: ${data.created_at}`);\n  if (data.featured_image) {\n    console.log(`   - Image URL: ${data.featured_image.substring(0, 50)}...`);\n  }\n  console.log('');\n});\n\nconsole.log(`\\n=== SUMMARY ===`);\nconsole.log(`Posts with images: ${withImages}`);\nconsole.log(`Posts without images: ${withoutImages}`);\nconsole.log(`Total posts: ${posts.length}`);\n\nreturn {\n  total: posts.length,\n  with_images: withImages,\n  without_images: withoutImages,\n  posts: posts.map(p => ({\n    id: p.json.id,\n    title: p.json.title,\n    has_image: !!p.json.featured_image,\n    status: p.json.status\n  }))\n};"
+      },
+      "id": "analyze-posts",
+      "name": "Analyze Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check All Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check All Posts": {
+      "main": [
+        [
+          {
+            "node": "Analyze Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

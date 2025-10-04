@@ -1,0 +1,277 @@
+{
+  "name": "Add Images to Existing Blog Posts",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "id,title,content,keywords"
+            },
+            {
+              "name": "featured_image",
+              "value": "is.null"
+            },
+            {
+              "name": "status",
+              "value": "neq.archived"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "fetch-blogs-without-images",
+      "name": "Fetch Blogs Without Images",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate search queries based on blog content\nconst blogs = $input.all();\nconst processedBlogs = [];\n\nfor (const blog of blogs) {\n  const blogData = blog.json;\n  \n  // Extract search terms from title and keywords\n  let searchQuery = '';\n  \n  // Check title for traffic-related terms\n  const title = blogData.title.toLowerCase();\n  if (title.includes('speeding')) {\n    searchQuery = 'highway traffic Alberta speed';\n  } else if (title.includes('distracted') || title.includes('phone')) {\n    searchQuery = 'smartphone driver distracted driving';\n  } else if (title.includes('red light') || title.includes('photo radar')) {\n    searchQuery = 'traffic light intersection red light';\n  } else if (title.includes('parking')) {\n    searchQuery = 'parking violation ticket';\n  } else if (title.includes('dui') || title.includes('impaired')) {\n    searchQuery = 'impaired driving breathalyzer';\n  } else if (title.includes('calgary')) {\n    searchQuery = 'Calgary Alberta highway traffic';\n  } else if (title.includes('edmonton')) {\n    searchQuery = 'Edmonton Alberta highway traffic';\n  } else {\n    // Generic fallback\n    searchQuery = 'Alberta highway traffic tickets';\n  }\n  \n  processedBlogs.push({\n    ...blogData,\n    search_query: searchQuery\n  });\n}\n\nreturn processedBlogs;"
+      },
+      "id": "generate-search-queries",
+      "name": "Generate Search Queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.unsplash.com/search/photos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.search_query }}"
+            },
+            {
+              "name": "per_page",
+              "value": "3"
+            },
+            {
+              "name": "orientation",
+              "value": "landscape"
+            },
+            {
+              "name": "client_id",
+              "value": "jFZDtvgMbpy9ZIwnt5nmo0rU2GKTviC5ZIypiqwMEvM"
+            }
+          ]
+        }
+      },
+      "id": "fetch-image-for-blog",
+      "name": "Fetch Image for Blog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [800, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge blog data with image data\nconst blogData = $input.item.json;\nconst imageResults = $input.item.json.results;\n\n// Safety checks for blog data\nif (!blogData || !blogData.id) {\n  console.log('Invalid blog data, skipping');\n  return {\n    id: 'unknown',\n    title: 'Unknown',\n    featured_image: null,\n    skip_update: true\n  };\n}\n\n// Get best image (highest likes)\nconst bestImage = imageResults && imageResults.length > 0 \n  ? imageResults.sort((a, b) => (b.likes || 0) - (a.likes || 0))[0]\n  : null;\n\nif (!bestImage) {\n  console.log(`No image found for blog: ${blogData.title || 'Unknown'}`);\n  return {\n    id: blogData.id,\n    title: blogData.title || 'Unknown',\n    featured_image: null,\n    skip_update: true\n  };\n}\n\n// Safety check for content\nconst existingContent = blogData.content || '';\nif (!existingContent) {\n  console.log(`Blog has no content, skipping: ${blogData.title || 'Unknown'}`);\n  return {\n    id: blogData.id,\n    title: blogData.title || 'Unknown',\n    featured_image: null,\n    skip_update: true\n  };\n}\n\n// Update the content to include the image at the top\nconst imageMarkdown = `![${blogData.title || 'Blog Image'}](${bestImage.urls.regular})\\n*Photo by [${bestImage.user.name}](${bestImage.user.links.html}) on Unsplash*\\n\\n`;\n\n// Check if content already has an image (starts with ![)\nlet updatedContent = existingContent;\nif (!updatedContent.trim().startsWith('![')) {\n  updatedContent = imageMarkdown + updatedContent;\n}\n\nreturn {\n  id: blogData.id,\n  title: blogData.title || 'Unknown',\n  content: updatedContent,\n  featured_image: bestImage.urls.regular,\n  skip_update: false\n};"
+      },
+      "id": "merge-blog-image",
+      "name": "Merge Blog + Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip_update",
+              "leftValue": "={{ $json.skip_update }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEqual"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-if-update-needed",
+      "name": "Check If Update Needed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "eq.{{ $json.id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": {{ JSON.stringify($json.content) }},\n  \"featured_image\": {{ JSON.stringify($json.featured_image) }}\n}"
+      },
+      "id": "update-blog-with-image",
+      "name": "Update Blog with Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1400, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "const updated = $('Update Blog with Image').all();\nconst skipped = $('Merge Blog + Image').all().filter(item => item.json.skip_update);\n\nconsole.log(`✅ Updated ${updated.length} blog posts with images`);\nconsole.log(`⏭️ Skipped ${skipped.length} blog posts (no suitable images found)`);\n\nif (updated.length > 0) {\n  console.log('Updated posts:');\n  updated.forEach(item => {\n    const post = Array.isArray(item.json) ? item.json[0] : item.json;\n    console.log(`- ${post.title || 'Unknown'}`);\n  });\n}\n\nreturn {\n  success: true,\n  updated_count: updated.length,\n  skipped_count: skipped.length,\n  message: `Successfully added images to ${updated.length} existing blog posts`\n};"
+      },
+      "id": "success-summary",
+      "name": "Success Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1600, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Blogs Without Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Blogs Without Images": {
+      "main": [
+        [
+          {
+            "node": "Generate Search Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Search Queries": {
+      "main": [
+        [
+          {
+            "node": "Fetch Image for Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Image for Blog": {
+      "main": [
+        [
+          {
+            "node": "Merge Blog + Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Blog + Image": {
+      "main": [
+        [
+          {
+            "node": "Check If Update Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Update Needed": {
+      "main": [
+        [
+          {
+            "node": "Update Blog with Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Update Blog with Image": {
+      "main": [
+        [
+          {
+            "node": "Success Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

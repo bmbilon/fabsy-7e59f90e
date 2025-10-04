@@ -1,0 +1,76 @@
+{
+  "name": "Fabsy Content Generator - Simple",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return [\n  { id: \"1\", topic: \"speeding tickets Calgary\", priority_score: 90, used: false },\n  { id: \"2\", topic: \"red light camera Edmonton\", priority_score: 85, used: false },\n  { id: \"3\", topic: \"distracted driving Alberta\", priority_score: 80, used: false }\n];"
+      },
+      "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      "name": "Get Topics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "id": "b2c3d4e5-f6g7-8901-2345-67890abcdef1",
+      "name": "Split Topics",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "key", "value": "AIzaSyDlDJkBDh6hdyh8Xr4yxrGI2VxahSy_RXE" },
+            { "name": "cx", "value": "52a1bf245e7b447cc" },
+            { "name": "q", "value": "={{ $json.topic }} Alberta traffic 2025" },
+            { "name": "num", "value": "5" }
+          ]
+        }
+      },
+      "id": "c3d4e5f6-g7h8-9012-3456-7890abcdef12",
+      "name": "Google Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8" },
+            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "jsonBody": "={\n  \"title\": \"Test Blog Post - {{ $('Split Topics').item.json.topic }}\",\n  \"slug\": \"test-{{ $('Split Topics').item.json.id }}\",\n  \"content\": \"This is a test blog post about {{ $('Split Topics').item.json.topic }} generated from search data.\",\n  \"meta_description\": \"Test meta description for {{ $('Split Topics').item.json.topic }}\",\n  \"keywords\": [\"test\", \"{{ $('Split Topics').item.json.topic }}\", \"alberta\"],\n  \"category\": \"test\",\n  \"status\": \"draft\"\n}"
+      },
+      "id": "d4e5f6g7-h8i9-0123-4567-890abcdef123",
+      "name": "Save Blog Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "a1b2c3d4-e5f6-7890-1234-567890abcdef": {
+      "main": [[{"node": "b2c3d4e5-f6g7-8901-2345-67890abcdef1", "type": "main", "index": 0}]]
+    },
+    "b2c3d4e5-f6g7-8901-2345-67890abcdef1": {
+      "main": [[{"node": "c3d4e5f6-g7h8-9012-3456-7890abcdef12", "type": "main", "index": 0}]]
+    },
+    "c3d4e5f6-g7h8-9012-3456-7890abcdef12": {
+      "main": [[{"node": "d4e5f6g7-h8i9-0123-4567-890abcdef123", "type": "main", "index": 0}]]
+    }
+  }
+}

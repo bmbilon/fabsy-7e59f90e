@@ -1,0 +1,95 @@
+{
+  "name": "Publish Blog Post",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "slug",
+              "value": "eq.alberta-traffic-ticket-comparison-guide"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"status\": \"published\",\n  \"published_at\": \"{{ new Date().toISOString() }}\"\n}"
+      },
+      "id": "publish-post",
+      "name": "Publish Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.item.json;\n\nif (Array.isArray(result) && result.length > 0) {\n  const post = result[0];\n  console.log('✅ Post published successfully!');\n  console.log(`📝 Title: ${post.title}`);\n  console.log(`🔗 URL: https://fabsy.ca/blog/${post.slug}`);\n  console.log(`📅 Published at: ${post.published_at}`);\n  \n  return {\n    success: true,\n    title: post.title,\n    slug: post.slug,\n    url: `https://fabsy.ca/blog/${post.slug}`,\n    published_at: post.published_at\n  };\n} else {\n  console.log('❌ No post found to publish with that slug');\n  return {\n    success: false,\n    message: 'No post found with that slug'\n  };\n}"
+      },
+      "id": "success-log",
+      "name": "Success Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Publish Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Post": {
+      "main": [
+        [
+          {
+            "node": "Success Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

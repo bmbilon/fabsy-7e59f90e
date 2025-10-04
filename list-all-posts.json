@@ -1,0 +1,84 @@
+{
+  "name": "List All Blog Posts",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger", 
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "id,title,slug,status,content"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization", 
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            }
+          ]
+        }
+      },
+      "id": "get-all-posts",
+      "name": "Get All Posts",
+      "type": "n8n-nodes-base.httpRequest", 
+      "typeVersion": 4.1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = $input.all();\n\nconsole.log('=== ALL BLOG POSTS ===');\nconsole.log(`Total posts found: ${posts.length}`);\n\nposts.forEach((post, index) => {\n  const data = post.json;\n  console.log(`\\n${index + 1}. \"${data.title}\"`);\n  console.log(`   - Slug: ${data.slug}`);\n  console.log(`   - Status: ${data.status}`);\n  console.log(`   - ID: ${data.id}`);\n  console.log(`   - Content length: ${data.content ? data.content.length : 0} chars`);\n  \n  // Check the actual URL that would work\n  console.log(`   - URL: https://fabsy.ca/blog/${data.slug}`);\n  \n  if (data.slug === 'alberta-traffic-ticket-comparison-guide' || \n      data.title.toLowerCase().includes('alberta traffic') ||\n      data.title.toLowerCase().includes('comparison')) {\n    console.log('   🎯 THIS IS LIKELY THE COMPARISON POST!');\n  }\n});\n\nreturn { total_posts: posts.length, posts: posts.map(p => ({ title: p.json.title, slug: p.json.slug, id: p.json.id })) };"
+      },
+      "id": "list-posts",
+      "name": "List All Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get All Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Posts": {
+      "main": [
+        [
+          {
+            "node": "List All Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "name": "Debug Specific Blog Post",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "*"
+            },
+            {
+              "name": "slug",
+              "value": "eq.alberta-traffic-ticket-comparison-guide"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            }
+          ]
+        }
+      },
+      "id": "check-specific-post",
+      "name": "Check Specific Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = $input.all();\n\nconsole.log('=== POST ANALYSIS ===');\nconsole.log(`Found ${posts.length} post(s) with slug: alberta-traffic-ticket-comparison-guide`);\n\nif (posts.length === 0) {\n  console.log('❌ No post found with this slug!');\n  \n  // Let's also search for similar slugs\n  console.log('\\n=== Searching for similar posts ===');\n  return {\n    found: false,\n    message: 'No post found with that slug',\n    suggestion: 'Check if the slug is correct or if the post exists'\n  };\n}\n\nconst post = posts[0].json;\n\nconsole.log('\\n=== POST DETAILS ===');\nconsole.log(`📝 Title: ${post.title}`);\nconsole.log(`🔗 Slug: ${post.slug}`);\nconsole.log(`📊 Status: ${post.status}`);\nconsole.log(`📅 Created: ${post.created_at}`);\nconsole.log(`📅 Published: ${post.published_at}`);\nconsole.log(`👤 Author: ${post.author}`);\nconsole.log(`🏷️ Category: ${post.category}`);\nconsole.log(`🖼️ Featured Image: ${post.featured_image ? 'YES' : 'NO'}`);\nif (post.featured_image) {\n  console.log(`   Image URL: ${post.featured_image.substring(0, 50)}...`);\n}\nconsole.log(`📄 Content Length: ${post.content ? post.content.length : 0} characters`);\nconsole.log(`📝 Meta Description: ${post.meta_description}`);\nconsole.log(`🔑 Keywords: ${post.keywords ? post.keywords.join(', ') : 'None'}`);\n\nif (!post.content || post.content.trim().length === 0) {\n  console.log('\\n❌ PROBLEM: Post has no content!');\n} else {\n  console.log('\\n✅ Post has content');\n  console.log(`First 200 chars: ${post.content.substring(0, 200)}...`);\n}\n\nif (post.status !== 'published') {\n  console.log(`\\n❌ PROBLEM: Post status is '${post.status}', not 'published'`);\n} else {\n  console.log('\\n✅ Post is published');\n}\n\nreturn {\n  found: true,\n  post: {\n    id: post.id,\n    title: post.title,\n    slug: post.slug,\n    status: post.status,\n    has_content: !!(post.content && post.content.trim()),\n    content_length: post.content ? post.content.length : 0,\n    has_featured_image: !!post.featured_image,\n    published_at: post.published_at\n  }\n};"
+      },
+      "id": "analyze-post",
+      "name": "Analyze Post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Specific Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Specific Post": {
+      "main": [
+        [
+          {
+            "node": "Analyze Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

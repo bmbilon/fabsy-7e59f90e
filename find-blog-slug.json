@@ -1,0 +1,92 @@
+{
+  "name": "Find Blog Post Slug",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "id,title,slug,status,published_at"
+            },
+            {
+              "name": "order",
+              "value": "created_at.desc"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            }
+          ]
+        }
+      },
+      "id": "get-recent-posts",
+      "name": "Get Recent Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = $input.all();\n\nconsole.log('=== RECENT BLOG POSTS ===');\nconsole.log(`Found ${posts.length} recent posts:`);\n\nconst comparisonPosts = [];\n\nposts.forEach((post, index) => {\n  const data = post.json;\n  console.log(`\\n${index + 1}. ${data.title}`);\n  console.log(`   - Slug: ${data.slug}`);\n  console.log(`   - Status: ${data.status}`);\n  console.log(`   - Published: ${data.published_at}`);\n  console.log(`   - ID: ${data.id}`);\n  \n  // Check if this looks like a comparison post\n  const title = data.title.toLowerCase();\n  if (title.includes('comparison') || title.includes('compare') || title.includes('options') || title.includes('alberta traffic')) {\n    comparisonPosts.push(data);\n    console.log('   ⭐ POTENTIAL COMPARISON POST!');\n  }\n});\n\nconsole.log(`\\n=== COMPARISON POSTS FOUND: ${comparisonPosts.length} ===`);\ncomparisonPosts.forEach((post, index) => {\n  console.log(`${index + 1}. \"${post.title}\" - slug: ${post.slug}`);\n});\n\nreturn {\n  total_posts: posts.length,\n  comparison_posts: comparisonPosts\n};"
+      },
+      "id": "analyze-posts",
+      "name": "Analyze Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Recent Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Posts": {
+      "main": [
+        [
+          {
+            "node": "Analyze Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

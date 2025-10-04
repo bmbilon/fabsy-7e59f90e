@@ -7,14 +7,14 @@ import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import TicketFormPage from "./pages/TicketFormPage";
 import HowItWorks from "./pages/HowItWorks";
- import About from "./pages/About";
- import Services from "./pages/Services";
- import TestimonialsPage from "./pages/TestimonialsPage";
- import PaymentSuccess from "./pages/PaymentSuccess";
- import PaymentCanceled from "./pages/PaymentCanceled";
- import PrivacyPolicy from "./pages/PrivacyPolicy";
- import TermsOfService from "./pages/TermsOfService";
- import Contact from "./pages/Contact";
+import About from "./pages/About";
+import Services from "./pages/Services";
+import TestimonialsPage from "./pages/TestimonialsPage";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCanceled from "./pages/PaymentCanceled";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import AIInfo from "./pages/AIInfo";
 import NotFound from "./pages/NotFound";
@@ -25,6 +25,7 @@ import AdminBlog from "./pages/AdminBlog";
 import AEODashboard from "./pages/AEODashboard";
 import TicketAnalysis from "./pages/TicketAnalysis";
 import WorkingContentPage from "./pages/WorkingContentPage";
+import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import CompetitorComparison from "./pages/CompetitorComparison";
 
@@ -32,11 +33,11 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-  <HelmetProvider>
-  <TooltipProvider>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
+    <HelmetProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />
@@ -54,6 +55,9 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/ai-info" element={<AIInfo />} />
           <Route path="/ticket-analysis" element={<TicketAnalysis />} />
+          {/* Blog Routes */}
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
            {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -68,10 +72,10 @@ const App = () => (
           <Route path="/content/:slug" element={<WorkingContentPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  </TooltipProvider>
-  </HelmetProvider>
+        </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </HelmetProvider>
   </QueryClientProvider>
 );
 

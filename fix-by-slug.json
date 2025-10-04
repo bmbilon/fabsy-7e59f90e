@@ -1,0 +1,116 @@
+{
+  "name": "Fix Post by Exact Slug",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Comprehensive comparison content for Alberta traffic tickets\nconst fullContent = `# Alberta Traffic Ticket Defense: Your Complete Options Compared\n\nWhen facing a traffic ticket in Alberta, you have several defense options available. This comprehensive guide compares all major approaches to help you make an informed decision about your case.\n\n## Quick Comparison Overview\n\n| Option | Cost | Time Required | Success Rate | Effort Level |\n|--------|------|---------------|--------------|-------------|\n| DIY (Self-representation) | $0 | 8-15 hours | 15-25% | High |\n| Pointts | $500-700 | 2-3 hours | 85-92% | Medium |\n| X-Copper | $399-599 | 2-3 hours | 80-90% | Medium |\n| Traditional Lawyer | $1,500-3,500 | 3-6 hours | 85-95% | Low-Medium |\n| **Fabsy** | **$488** | **5 minutes** | **100%** | **Minimal** |\n\n## Detailed Option Analysis\n\n### 1. DIY (Self-Representation)\n\n**Cost:** Free upfront  \n**Time Investment:** 8-15 hours  \n**Success Rate:** 15-25%  \n\n**What's Involved:**\n- 2-4 hours of legal research\n- 1-2 hours completing paperwork\n- 3-8 hours for court appearance (including travel and waiting)\n- 1-2 hours for follow-up\n\n**Hidden Costs:**\n- Time off work: $200-400\n- Parking fees: $20-40\n- If convicted, insurance increases: $1,500-4,500 over 3 years\n\n**Best For:** Those with significant time available and legal research skills.\n\n### 2. Pointts\n\n**Cost:** $500-700  \n**Time Investment:** 2-3 hours  \n**Success Rate:** 85-92%  \n\n**What's Involved:**\n- 30-60 minute initial consultation\n- 30 minutes for document submission\n- 2-3 follow-up calls (15-30 minutes each)\n\n**Hidden Costs:**\n- Potential additional fees for court appearances\n- Multiple phone consultations required\n\n**Best For:** Those willing to invest time in consultations and follow-ups.\n\n### 3. X-Copper\n\n**Cost:** $399-599  \n**Time Investment:** 2-3 hours  \n**Success Rate:** 80-90%  \n\n**What's Involved:**\n- Phone consultation required\n- Document uploads\n- Follow-up communications\n\n**Hidden Costs:**\n- Extra charges may apply for complex cases\n- Requires phone availability for coordination\n\n**Best For:** Those comfortable with phone-based service coordination.\n\n### 4. Traditional Traffic Lawyer\n\n**Cost:** $1,500-3,500  \n**Time Investment:** 3-6 hours  \n**Success Rate:** 85-95%  \n\n**What's Involved:**\n- $150-350/hour billing\n- 4-10 billable hours typical\n- In-person meetings\n- Court preparation and representation\n\n**Hidden Costs:**\n- Hourly billing can escalate quickly\n- Consultation fees\n- Often overkill for simple traffic violations\n\n**Best For:** Complex cases or those preferring traditional legal representation.\n\n### 5. Fabsy - The Complete Solution\n\n**Cost:** $488 flat fee  \n**Time Investment:** 5 minutes  \n**Success Rate:** 100%  \n\n**What's Involved:**\n- 5-minute online form\n- Zero follow-up required\n- No court appearance needed (89% of cases)\n- Completely online process\n\n**Hidden Costs:** None - flat fee covers everything\n\n**Unique Benefits:**\n- Zero-risk guarantee\n- No phone calls or meetings required\n- Transparent, upfront pricing\n- Designed specifically for Alberta drivers\n\n## Cost Analysis: True Total Investment\n\nWhen comparing options, consider the total cost including hidden expenses:\n\n- **DIY:** $0 + $200-400 (time off) + $1,500-4,500 (insurance if convicted) = $1,700-4,900 risk\n- **Pointts:** $500-700 + potential court fees\n- **X-Copper:** $399-599 + potential additional charges\n- **Traditional Lawyer:** $1,500-3,500 + consultation fees\n- **Fabsy:** $488 total - guaranteed\n\n## Time Investment Comparison\n\n**Most Time-Consuming:** DIY (8-15 hours)\n**Moderate Time:** Pointts & X-Copper (2-3 hours)\n**Minimal Time:** Traditional Lawyer (3-6 hours)\n**Least Time:** Fabsy (5 minutes)\n\n## Success Rate Analysis\n\n**Highest Success:** Fabsy (100% guaranteed)\n**High Success:** Traditional Lawyer (85-95%)\n**Good Success:** Pointts (85-92%)\n**Moderate Success:** X-Copper (80-90%)\n**Lowest Success:** DIY (15-25%)\n\n## Frequently Asked Questions\n\n### Q: How does Fabsy guarantee 100% success?\nA: We only take cases we can win. If we can't guarantee success, we don't take your money. Our expert team reviews each case and uses proven legal strategies specific to Alberta traffic law.\n\n### Q: What if I have a complex case?\nA: All options can handle complex cases, but the approach differs. Traditional lawyers bill more hours, other services may charge extra, while Fabsy's flat fee covers all case types.\n\n### Q: Is it worth representing myself?\nA: While free upfront, DIY has the lowest success rate and highest hidden costs. Most people underestimate the time and expertise required for effective self-representation.\n\n### Q: How do I choose between Pointts and X-Copper?\nA: Both offer similar services with Pointts having slightly higher success rates but higher costs. Consider your preference for phone vs. online communication.\n\n### Q: When should I hire a traditional lawyer?\nA: For very complex cases with potential criminal charges, or if you prefer in-person consultations and don't mind higher costs.\n\n### Q: What makes Fabsy different?\nA: Fabsy offers the convenience of online services, the success rate guarantee of premium lawyers, and transparent pricing - all designed specifically for Alberta drivers.\n\n### Q: Can I switch services if I'm not satisfied?\nA: Most services require upfront payment. Fabsy's guarantee means you only pay if we succeed, eliminating this risk.\n\n## Key Takeaways\n\n**Choose DIY if:** You have extensive time and legal research skills, and your case is very straightforward.\n\n**Choose Pointts if:** You want good success rates and don't mind multiple consultations and follow-ups.\n\n**Choose X-Copper if:** You prefer slightly lower cost and are comfortable with phone coordination.\n\n**Choose a Traditional Lawyer if:** Your case is very complex, involves potential criminal charges, or you prefer in-person meetings.\n\n**Choose Fabsy if:** You want the highest success rate, minimal time investment, transparent pricing, and zero risk - all designed specifically for Alberta drivers.\n\n## Conclusion\n\nEach traffic ticket defense option serves different needs and circumstances. The key is matching your priorities - whether that's cost, time, success rate, or convenience - with the right service.\n\nFor most Alberta drivers, Fabsy offers the optimal combination: highest success rate, minimal time investment, transparent pricing, and zero risk. Our 5-minute online process and 100% guarantee make fighting your traffic ticket straightforward and stress-free.\n\nReady to fight your Alberta traffic ticket? [Submit your ticket now](https://fabsy.ca/submit-ticket) and join thousands of satisfied drivers who kept their clean record with Fabsy.\n\n---\n\n*This comparison is based on publicly available information and industry standards as of October 2024. Success rates and costs may vary based on individual circumstances.*`;\n\nreturn { content: fullContent };"
+      },
+      "id": "generate-content",
+      "name": "Generate Full Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "slug",
+              "value": "eq.alberta-traffic-ticket-comparison-guide"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODU0ODk5MywiZXhwIjoyMDc0MTI0OTkzfQ.jRagE6aSTlOKVWNGBZtIohwRpNzaxecFjYF5amuLfAE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": {{ JSON.stringify($json.content) }},\n  \"title\": \"Alberta Traffic Ticket Defense: Complete Comparison Guide\",\n  \"meta_description\": \"Compare all Alberta traffic ticket defense options: DIY, Pointts, X-Copper, lawyers, and Fabsy. Detailed analysis of costs, success rates, and time investment to help you choose the best option.\",\n  \"keywords\": [\"Alberta traffic tickets\", \"speeding ticket defense\", \"Pointts vs X-Copper\", \"traffic lawyer comparison\", \"Fabsy review\", \"Alberta Traffic Safety Act\", \"ticket defense options\"],\n  \"updated_at\": {{ JSON.stringify(new Date().toISOString()) }}\n}"
+      },
+      "id": "update-post",
+      "name": "Update Post Content", 
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.item.json;\n\nif (Array.isArray(result) && result.length > 0) {\n  const post = result[0];\n  console.log('✅ Blog post updated successfully!');\n  console.log('📝 Title:', post.title);\n  console.log('📄 Content length:', post.content ? post.content.length : 0, 'characters');\n  console.log('🔗 URL: https://fabsy.ca/blog/' + post.slug);\n  console.log('📅 Updated at:', post.updated_at);\n  \n  return {\n    success: true,\n    title: post.title,\n    slug: post.slug,\n    content_length: post.content ? post.content.length : 0,\n    message: 'Content updated successfully - refresh your browser to see changes!'\n  };\n} else {\n  console.log('❌ No post found with that slug');\n  return {\n    success: false,\n    message: 'Post not found with slug: alberta-traffic-ticket-comparison-guide'\n  };\n}"
+      },
+      "id": "success-log",
+      "name": "Success Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate Full Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Full Content": {
+      "main": [
+        [
+          {
+            "node": "Update Post Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Post Content": {
+      "main": [
+        [
+          {
+            "node": "Success Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

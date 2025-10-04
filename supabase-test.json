@@ -1,0 +1,106 @@
+{
+  "name": "Supabase Connection Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts?select=*&limit=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "test-read",
+      "name": "Test Read Blog Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 250]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gcasbisxfrssonllpqrw.supabase.co/rest/v1/blog_posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCN9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"title\": \"Test Blog Post\",\n  \"slug\": \"test-blog-post-\" + Date.now(),\n  \"content\": \"# Test Post\\n\\nThis is a test blog post created via N8N.\",\n  \"meta_description\": \"Test meta description\",\n  \"keywords\": [\"test\", \"blog\", \"n8n\"],\n  \"category\": \"test\",\n  \"status\": \"draft\",\n  \"aeo_score\": 75\n}"
+      },
+      "id": "test-insert",
+      "name": "Test Insert Blog Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 350]
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log('=== SUPABASE CONNECTION TEST RESULTS ===');\n\nif ($('Test Read Blog Posts').item.json) {\n  console.log('✅ READ SUCCESS: Can read blog_posts table');\n  console.log('Data:', $('Test Read Blog Posts').item.json);\n} else {\n  console.log('❌ READ FAILED');\n}\n\nif ($('Test Insert Blog Post').item.json) {\n  console.log('✅ INSERT SUCCESS: Can write to blog_posts table');\n  console.log('Inserted:', $('Test Insert Blog Post').item.json.title);\n} else {\n  console.log('❌ INSERT FAILED');\n}\n\nreturn { success: true, message: 'Connection test complete' };"
+      },
+      "id": "test-results",
+      "name": "Test Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {"node": "Test Read Blog Posts", "type": "main", "index": 0},
+          {"node": "Test Insert Blog Post", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Test Read Blog Posts": {
+      "main": [[{"node": "Test Results", "type": "main", "index": 0}]]
+    },
+    "Test Insert Blog Post": {
+      "main": [[{"node": "Test Results", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
