@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import FAQSection from '@/components/FAQSection';
 import ArticleSchema from '@/components/ArticleSchema';
 import useSafeHead from '@/hooks/useSafeHead';
-import { MapPin, AlertTriangle, Shield } from 'lucide-react';
+import { MapPin, AlertTriangle, Shield, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const WorkingContentPage = () => {
@@ -30,7 +30,6 @@ const WorkingContentPage = () => {
       setError(null);
 
       try {
-        // Fixed Supabase query - remove invalid published filter
         const { data, error: fetchError } = await supabase
           .from('page_content')
           .select('*')
@@ -61,7 +60,7 @@ const WorkingContentPage = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-16 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
@@ -74,10 +73,10 @@ const WorkingContentPage = () => {
 
   if (error || !pageData) {
     return (
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl font-bold mb-4">Page Not Found</h1>
+          <h1 className="text-4xl font-bold mb-4 text-foreground">Page Not Found</h1>
           <p className="text-muted-foreground mb-8">{error || "The page you're looking for doesn't exist."}</p>
           <Link to="/">
             <Button>Go Home</Button>
@@ -91,7 +90,7 @@ const WorkingContentPage = () => {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`;
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-background">
       <ArticleSchema 
         headline={pageData.h1 || pageData.slug}
         description={pageData.meta_description || 'Content page'}
@@ -102,165 +101,247 @@ const WorkingContentPage = () => {
 
       <Header />
 
-      <article className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl">
+      {/* Hero Section with subtle background */}
+      <div className="bg-gradient-to-b from-muted/30 to-background border-b">
+        <div className="container mx-auto px-4 py-12 md:py-16 max-w-5xl">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-            <Link to="/" className="hover:text-primary">Home</Link>
+            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
             <span>/</span>
             {pageData.city && (
               <>
                 <MapPin className="w-4 h-4" />
-                <span>{pageData.city}</span>
+                <span className="text-foreground font-medium">{pageData.city}</span>
                 <span>/</span>
               </>
             )}
             {pageData.violation && (
               <>
                 <AlertTriangle className="w-4 h-4" />
-                <span>{pageData.violation}</span>
+                <span className="text-foreground font-medium">{pageData.violation}</span>
               </>
             )}
           </div>
 
-          {/* Hero Section */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-            <h1 className="text-4xl font-bold mb-6 text-gray-900">
-              {pageData.h1 || pageData.slug}
-            </h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-foreground leading-tight">
+            {pageData.h1 || pageData.slug}
+          </h1>
 
-            {/* Stats Grid */}
-            {pageData.stats && Object.keys(pageData.stats).length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                {pageData.stats.avgFine && (
-                  <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                    <div className="text-red-600 text-2xl font-bold">
-                      ${pageData.stats.avgFine}
-                    </div>
-                    <div className="text-xs text-red-700">Fine Amount</div>
+          {/* Stats Grid */}
+          {pageData.stats && Object.keys(pageData.stats).length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {pageData.stats.avgFine && (
+                <div className="bg-card rounded-xl p-4 border shadow-sm">
+                  <div className="text-destructive text-2xl font-bold">
+                    ${pageData.stats.avgFine}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Typical Fine</div>
+                </div>
+              )}
+              {pageData.stats.insuranceIncrease && (
+                <div className="bg-card rounded-xl p-4 border shadow-sm">
+                  <div className="text-orange-600 text-2xl font-bold">
+                    ${pageData.stats.insuranceIncrease}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Insurance Impact</div>
+                </div>
+              )}
+              {pageData.stats.successRate && (
+                <div className="bg-card rounded-xl p-4 border shadow-sm">
+                  <div className="text-primary text-2xl font-bold">
+                    {pageData.stats.successRate}%
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Success Rate</div>
+                </div>
+              )}
+              {pageData.stats.avgSavings && (
+                <div className="bg-card rounded-xl p-4 border shadow-sm">
+                  <div className="text-primary text-2xl font-bold">
+                    ${pageData.stats.avgSavings}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Avg Savings</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <article className="container mx-auto px-4 py-12 md:py-16 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Main Content Column */}
+          <div className="lg:col-span-8 space-y-8">
+            {/* Main Article Content */}
+            <div className="bg-card rounded-xl p-8 md:p-10 shadow-sm border">
+              <div className="prose prose-lg max-w-none
+                prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight
+                prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-border
+                prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
+                prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-2
+                prose-p:text-foreground prose-p:leading-relaxed prose-p:mb-6
+                prose-strong:text-foreground prose-strong:font-semibold
+                prose-ul:my-6 prose-ol:my-6
+                prose-li:text-foreground prose-li:my-2 prose-li:leading-relaxed
+                prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline">
+                
+                {pageData.hook && (
+                  <div className="bg-primary/10 border-l-4 border-primary p-5 rounded-r mb-8">
+                    <p className="text-foreground font-medium mb-0">{pageData.hook}</p>
                   </div>
                 )}
-                {pageData.stats.insuranceIncrease && (
-                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
-                    <div className="text-orange-600 text-2xl font-bold">
-                      ${pageData.stats.insuranceIncrease}
-                    </div>
-                    <div className="text-xs text-orange-700">Insurance Increase</div>
+                
+                {pageData.what && (
+                  <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.what }} />
+                )}
+                
+                {pageData.how && (
+                  <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.how }} />
+                )}
+                
+                {pageData.next && (
+                  <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.next }} />
+                )}
+                
+                {pageData.content && (
+                  <div className="mb-6">
+                    {pageData.content.split('\n\n').map((paragraph: string, idx: number) => {
+                      if (paragraph.startsWith('##')) {
+                        return <h2 key={idx} className="text-3xl font-bold mt-10 mb-4 pb-2 border-b border-border text-foreground">{paragraph.replace('##', '').trim()}</h2>;
+                      }
+                      if (paragraph.startsWith('###')) {
+                        return <h3 key={idx} className="text-2xl font-semibold mt-8 mb-3 text-foreground">{paragraph.replace('###', '').trim()}</h3>;
+                      }
+                      if (paragraph.startsWith('-')) {
+                        const items = paragraph.split('\n').filter((line: string) => line.startsWith('-'));
+                        return (
+                          <ul key={idx} className="list-disc ml-6 space-y-2 mb-6">
+                            {items.map((item: string, i: number) => (
+                              <li key={i} className="text-foreground leading-relaxed">{item.replace('-', '').trim()}</li>
+                            ))}
+                          </ul>
+                        );
+                      }
+                      if (paragraph.trim()) {
+                        return <p key={idx} className="mb-6 text-foreground leading-relaxed">{paragraph}</p>;
+                      }
+                      return null;
+                    })}
                   </div>
                 )}
-                {pageData.stats.successRate && (
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                    <div className="text-green-600 text-2xl font-bold">
-                      {pageData.stats.successRate}%
-                    </div>
-                    <div className="text-xs text-green-700">Success Rate</div>
-                  </div>
-                )}
-                {pageData.stats.avgSavings && (
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                    <div className="text-blue-600 text-2xl font-bold">
-                      ${pageData.stats.avgSavings}
-                    </div>
-                    <div className="text-xs text-blue-700">Avg Savings</div>
-                  </div>
-                )}
+              </div>
+            </div>
+
+            {/* FAQs Section */}
+            {pageData.faqs && pageData.faqs.length > 0 && (
+              <div className="bg-card rounded-xl p-8 md:p-10 shadow-sm border">
+                <h2 className="text-3xl font-bold mb-6 text-foreground">
+                  Frequently Asked Questions
+                </h2>
+                <FAQSection 
+                  faqs={pageData.faqs}
+                  pageName={pageData.h1 || pageData.slug}
+                  pageUrl={currentUrl}
+                />
               </div>
             )}
 
-            {/* Content */}
-            <div className="prose prose-lg max-w-none">
-              {pageData.hook && (
-                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-                  <p className="text-blue-800 font-medium">{pageData.hook}</p>
+            {/* Local Info */}
+            {pageData.local_info && (
+              <div className="bg-card rounded-xl p-8 shadow-sm border">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-foreground">Local {pageData.city || 'Area'} Information</h2>
                 </div>
-              )}
-              
-              {pageData.what && (
-                <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.what }} />
-              )}
-              
-              {pageData.how && (
-                <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.how }} />
-              )}
-              
-              {pageData.next && (
-                <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.next }} />
-              )}
-              
-              {pageData.content && (
-                <div className="mb-6">
-                  {pageData.content.split('\n\n').map((paragraph: string, idx: number) => {
-                    if (paragraph.startsWith('##')) {
-                      return <h2 key={idx} className="text-2xl font-bold mt-8 mb-4">{paragraph.replace('##', '').trim()}</h2>;
-                    }
-                    if (paragraph.startsWith('###')) {
-                      return <h3 key={idx} className="text-xl font-semibold mt-6 mb-3">{paragraph.replace('###', '').trim()}</h3>;
-                    }
-                    if (paragraph.startsWith('-')) {
-                      const items = paragraph.split('\n').filter((line: string) => line.startsWith('-'));
-                      return (
-                        <ul key={idx} className="list-disc ml-6 space-y-2 mb-4">
-                          {items.map((item: string, i: number) => (
-                            <li key={i}>{item.replace('-', '').trim()}</li>
-                          ))}
-                        </ul>
-                      );
-                    }
-                    if (paragraph.trim()) {
-                      return <p key={idx} className="mb-4 text-gray-700 leading-relaxed">{paragraph}</p>;
-                    }
-                    return null;
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* FAQs Section */}
-          {pageData.faqs && pageData.faqs.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-              <h2 className="text-3xl font-bold mb-6 text-gray-900">
-                Frequently Asked Questions
-              </h2>
-              <FAQSection 
-                faqs={pageData.faqs}
-                pageName={pageData.h1 || pageData.slug}
-                pageUrl={currentUrl}
-              />
-            </div>
-          )}
-
-          {/* Local Info */}
-          {pageData.local_info && (
-            <div className="bg-blue-900 text-white rounded-2xl shadow-xl p-8 mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <MapPin className="w-6 h-6" />
-                <h2 className="text-2xl font-bold">Local {pageData.city || 'Area'} Information</h2>
+                <p className="text-foreground leading-relaxed">
+                  {pageData.local_info}
+                </p>
               </div>
-              <p className="text-blue-100 leading-relaxed">
-                {pageData.local_info}
-              </p>
-            </div>
-          )}
-
-          {/* CTA */}
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-2xl p-8 text-white text-center">
-            <Shield className="w-16 h-16 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold mb-3">
-              Ready to Fight Your {pageData.violation || 'Traffic'} Ticket?
-            </h2>
-            <p className="text-xl mb-6 text-green-50">
-              Zero-risk guarantee • {pageData.stats?.successRate || 94}% success rate • Save ${pageData.stats?.avgSavings || 1650}+
-            </p>
-            <Link to="/submit-ticket">
-              <Button 
-                size="lg"
-                className="bg-white text-green-600 hover:bg-green-50 text-lg px-8 py-6"
-              >
-                Get Free Analysis Now
-              </Button>
-            </Link>
+            )}
           </div>
+
+          {/* Sidebar Column */}
+          <aside className="lg:col-span-4">
+            <div className="sticky top-24 space-y-6">
+              {/* Key Highlights Card */}
+              <div className="bg-card rounded-xl p-6 shadow-sm border">
+                <h3 className="text-lg font-bold mb-4 text-foreground flex items-center gap-2">
+                  <span className="text-primary">⚡</span>
+                  Why Act Now
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground leading-relaxed">Only 7 days to file your dispute</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground leading-relaxed">Prevent insurance rate increases</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground leading-relaxed">Protect your driving record</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground leading-relaxed">{pageData.stats?.successRate || 94}% success rate</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* CTA Card */}
+              <div className="bg-primary text-primary-foreground rounded-xl p-6 shadow-elegant">
+                <div className="w-12 h-12 rounded-lg bg-primary-foreground/20 flex items-center justify-center mb-4">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">
+                  Fight Your {pageData.violation || 'Traffic'} Ticket
+                </h3>
+                <p className="text-sm mb-5 opacity-95">
+                  {pageData.stats?.successRate || 94}% success rate • Save ${pageData.stats?.avgSavings || 1650}+ on average
+                </p>
+                <Link to="/submit-ticket">
+                  <Button 
+                    size="lg"
+                    className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
+                  >
+                    Get Free Analysis →
+                  </Button>
+                </Link>
+                <p className="text-xs mt-3 opacity-80 text-center">Free consultation • No win, no fee options</p>
+              </div>
+
+              {/* Related Resources */}
+              <div className="bg-card rounded-xl p-6 shadow-sm border">
+                <h3 className="text-sm font-semibold mb-4 text-foreground uppercase tracking-wide">Helpful Resources</h3>
+                <div className="space-y-3">
+                  <a 
+                    href="https://www.alberta.ca/traffic-safety" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                  >
+                    <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                    <span className="group-hover:underline">Alberta Traffic Safety</span>
+                  </a>
+                  <Link 
+                    to="/how-it-works"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                  >
+                    <span className="group-hover:underline">How We Fight Tickets</span>
+                  </Link>
+                  <Link 
+                    to="/faq"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                  >
+                    <span className="group-hover:underline">Common Questions</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
       </article>
 
