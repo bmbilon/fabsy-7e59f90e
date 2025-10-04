@@ -87,11 +87,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
     }
   }, [formData.ticketImage]);
 
-  const handleFieldUpdate = (field: keyof TicketDetailsSchema | keyof FormData, value: any) => {
+  const handleFieldUpdate = (field: keyof TicketDetailsSchema | keyof FormData, value: unknown) => {
     if (field in formData) {
-      setValue(field as keyof TicketDetailsSchema, value);
+      setValue(field as keyof TicketDetailsSchema, value as TicketDetailsSchema[keyof TicketDetailsSchema]);
     }
-    updateFormData({ [field]: value });
+    updateFormData({ [field]: value } as Partial<FormData>);
   };
 
   const processTicketOCR = async (file: File) => {
@@ -128,43 +128,92 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         throw error;
       }
 
-      if (data?.success && data?.data) {
-        const extracted = data.data;
-        console.log('[OCR] Extracted data:', extracted);
+      // Support both shapes:
+      // 1) { success: true, data: {...} }
+      // 2) { ...extractedFields }
+      const rawUnknown: unknown = data;
+      let extracted: Record<string, unknown> | null = null;
+      if (rawUnknown && typeof rawUnknown === 'object') {
+        const rawObj = rawUnknown as Record<string, unknown>;
+        const success = (rawObj as { success?: boolean }).success === true;
+        if (success && 'data' in rawObj && typeof rawObj.data === 'object' && rawObj.data !== null) {
+          extracted = rawObj.data as Record<string, unknown>;
+        } else {
+          extracted = rawObj;
+        }
+      }
+
+      if (extracted) {
+        // Helpers
+        const getStr = (k: string): string | null => {
+          const v = extracted![k];
+          return typeof v === 'string' && v.trim() ? v : null;
+        };
+        const getNumStr = (k: string): string | null => {
+          const v = extracted![k];
+          if (typeof v === 'number') return String(v);
+          if (typeof v === 'string' && v.trim()) return v.trim();
+          return null;
+        };
+
+        // Normalize keys from edge fn -> form schema
+        const norm = {
+          ticketNumber: getStr('ticketNumber'),
+          issueDate: getStr('issueDate'),
+          location: getStr('location'),
+          officer: getStr('officer'),
+          officerBadge: getStr('officerBadge'),
+          offenceSection: getStr('offenceSection') ?? getStr('section'),
+          offenceSubSection: getStr('offenceSubSection') ?? getStr('subsection'),
+          offenceDescription: getStr('offenceDescription') ?? getStr('offenseDescription'),
+          violation: getStr('violation'),
+          fineAmount: (() => {
+            const fa = getNumStr('fineAmount');
+            const f = getNumStr('fine');
+            const val = fa ?? f;
+            if (!val) return null;
+            return val.startsWith('$') ? val : `$${val}`;
+          })(),
+          courtDate: getStr('courtDate'),
+        } as Record<string, string | null>;
+
+        console.log('[OCR] Extracted normalized data:', norm);
         
-        // Auto-fill fields with extracted data
-        if (extracted.ticketNumber) {
-          handleFieldUpdate('ticketNumber', extracted.ticketNumber);
+        // Auto-fill fields with extracted data if present
+        if (norm.ticketNumber) {
+          handleFieldUpdate('ticketNumber', norm.ticketNumber);
         }
-        if (extracted.issueDate) {
-          handleFieldUpdate('issueDate', new Date(extracted.issueDate));
+        if (norm.issueDate) {
+          const d = new Date(norm.issueDate);
+          if (!isNaN(d.getTime())) handleFieldUpdate('issueDate', d);
         }
-        if (extracted.location) {
-          handleFieldUpdate('location', extracted.location);
+        if (norm.location) {
+          handleFieldUpdate('location', norm.location);
         }
-        if (extracted.officer) {
-          handleFieldUpdate('officer', extracted.officer);
+        if (norm.officer) {
+          handleFieldUpdate('officer', norm.officer);
         }
-        if (extracted.officerBadge) {
-          handleFieldUpdate('officerBadge', extracted.officerBadge);
+        if (norm.officerBadge) {
+          handleFieldUpdate('officerBadge', norm.officerBadge);
         }
-        if (extracted.offenceSection) {
-          handleFieldUpdate('offenceSection', extracted.offenceSection);
+        if (norm.offenceSection) {
+          handleFieldUpdate('offenceSection', norm.offenceSection);
         }
-        if (extracted.offenceSubSection) {
-          handleFieldUpdate('offenceSubSection', extracted.offenceSubSection);
+        if (norm.offenceSubSection) {
+          handleFieldUpdate('offenceSubSection', norm.offenceSubSection);
         }
-        if (extracted.offenceDescription) {
-          handleFieldUpdate('offenceDescription', extracted.offenceDescription);
+        if (norm.offenceDescription) {
+          handleFieldUpdate('offenceDescription', norm.offenceDescription);
         }
-        if (extracted.violation) {
-          handleFieldUpdate('violation', extracted.violation);
+        if (norm.violation) {
+          handleFieldUpdate('violation', norm.violation);
         }
-        if (extracted.fineAmount) {
-          handleFieldUpdate('fineAmount', `$${extracted.fineAmount}`);
+        if (norm.fineAmount) {
+          handleFieldUpdate('fineAmount', norm.fineAmount);
         }
-        if (extracted.courtDate) {
-          handleFieldUpdate('courtDate', new Date(extracted.courtDate));
+        if (norm.courtDate) {
+          const cd = new Date(norm.courtDate);
+          if (!isNaN(cd.getTime())) handleFieldUpdate('courtDate', cd);
         }
 
         toast({
@@ -293,14 +342,18 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
     if (!input) return;
     try {
       // Allow re-selecting the same file name
-      (input as any).value = "";
-    } catch {}
-    const anyInput = input as any;
+      (input as HTMLInputElement).value = "";
+    } catch {
+      // noop
+    }
+    const anyInput = input as HTMLInputElement & { showPicker?: () => void };
     if (typeof anyInput.showPicker === "function") {
       try {
         anyInput.showPicker();
         return;
-      } catch {}
+      } catch {
+        // noop
+      }
     }
     input.click();
   };
