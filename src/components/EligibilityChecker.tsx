@@ -484,8 +484,14 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   console.log(`[EligibilityChecker] Button clicked. Cache key: ${cacheKey}`);
                   console.log(`[EligibilityChecker] Ticket data:`, ticketData);
                   
-                  // Always create backup data regardless of cache key
-                  const backupData = {
+                  // Ensure we have ticket data
+                  if (!ticketData) {
+                    toast.error("No ticket data available. Please scan your ticket again.");
+                    return;
+                  }
+                  
+                  // Create data for form - prioritize fineAmount field for TicketForm compatibility
+                  const formData = {
                     ticketNumber: ticketData?.ticketNumber || '',
                     issueDate: ticketData?.issueDate || '',
                     location: ticketData?.location || '',
@@ -495,30 +501,24 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                     offenceSubSection: ticketData?.offenceSubSection || '',
                     offenceDescription: ticketData?.offenceDescription || '',
                     violation: ticketData?.violation || '',
-                    fineAmount: ticketData?.fineAmount || '',
+                    fineAmount: ticketData?.fineAmount || ticketData?.fine || '', // Prefer fineAmount, fallback to fine
                     courtDate: ticketData?.courtDate || '',
                     courtJurisdiction: ticketData?.courtJurisdiction || '',
                   };
                   
-                  console.log(`[EligibilityChecker] Backup data being stored:`, backupData);
+                  console.log(`[EligibilityChecker] Form data being stored:`, formData);
                   
+                  // Store data in localStorage for immediate reliability
+                  localStorage.setItem('eligibility-ocr-data', JSON.stringify(formData));
+                  
+                  // Also try to cache in Supabase if available (non-blocking)
                   if (cacheKey) {
-                    // Navigate with cache key - data already cached in Supabase
-                    console.log(`[EligibilityChecker] Navigating with cache key: ${cacheKey}`);
                     localStorage.setItem('ticket-cache-key', cacheKey);
-                    toast.success("Navigating to ticket form with cached data!");
-                  } else {
-                    console.log(`[EligibilityChecker] No cache key - using backup localStorage method`);
-                    toast.success("Navigating to ticket form with your data!");
+                    console.log(`[EligibilityChecker] Cache key also stored: ${cacheKey}`);
                   }
                   
-                  // Always store backup data
-                  localStorage.setItem('eligibility-ocr-data-backup', JSON.stringify(backupData));
-                  
-                  // Also store in legacy format for compatibility
-                  localStorage.setItem('eligibility-ocr-data', JSON.stringify(backupData));
-                  
-                  console.log(`[EligibilityChecker] Stored backup data in localStorage`);
+                  console.log(`[EligibilityChecker] Data stored in localStorage, navigating to form`);
+                  toast.success("Navigating to ticket form with your data!");
                   
                   // Close dialog and navigate
                   onOpenChange(false);

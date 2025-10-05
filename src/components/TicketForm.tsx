@@ -142,82 +142,88 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
   const { toast } = useToast();
   const { retrieveTicketData, isValidCacheKey } = useTicketCache();
 
-  // Check for cached ticket data from eligibility checker on mount
+  // Check for ticket data from eligibility checker on mount
   useEffect(() => {
     const loadTicketData = async () => {
       console.log('[TicketForm] Starting ticket data loading process...');
       
-      // First, check for cache key from Supabase ticket cache system
-      const cacheKey = localStorage.getItem('ticket-cache-key');
-      console.log(`[TicketForm] Cache key from localStorage: ${cacheKey}`);
+      // Prioritize direct localStorage first for immediate reliability
+      await tryLocalStorageData();
       
-      if (cacheKey && isValidCacheKey(cacheKey)) {
-        console.log(`[TicketForm] Valid cache key found, attempting to load from Supabase...`);
+      // Then try Supabase cache as enhancement (non-blocking)
+      const cacheKey = localStorage.getItem('ticket-cache-key');
+      if (cacheKey && isValidCacheKey(cacheKey) && retrieveTicketData) {
+        console.log(`[TicketForm] Also attempting Supabase cache with key: ${cacheKey}`);
         setIsLoadingTicketData(true);
         
         try {
           const cachedData = await retrieveTicketData(cacheKey);
-          console.log(`[TicketForm] Retrieved cached data:`, cachedData);
-          
           if (cachedData && Object.keys(cachedData).length > 0) {
-            console.log('[TicketForm] Successfully loaded ticket data from cache:', JSON.stringify(cachedData, null, 2));
+            console.log('[TicketForm] Supabase cache data available, updating form...');
             
-            // Parse dates if they exist and are valid
             const parsedData: Partial<FormData> = {
               ...cachedData,
               issueDate: cachedData.issueDate ? new Date(cachedData.issueDate) : undefined,
               courtDate: cachedData.courtDate ? new Date(cachedData.courtDate) : undefined,
             };
             
-            console.log('[TicketForm] Parsed data for form:', JSON.stringify(parsedData, null, 2));
-            
-            // Update form with cached data
+            // Update form with cached data (may override localStorage)
             setFormData(prev => ({ ...prev, ...parsedData }));
-            
-            // Clean up cache key from localStorage
             localStorage.removeItem('ticket-cache-key');
             
-            toast({
-              title: "Ticket Details Loaded!",
-              description: "Your ticket information has been automatically filled in from the eligibility check.",
-            });
-            return; // Exit early on success
-          } else {
-            console.warn('[TicketForm] Cached data was empty or invalid, trying backup method');
+            console.log('[TicketForm] Form updated with Supabase cache data');
           }
         } catch (error) {
-          console.error('[TicketForm] Error loading cached ticket data:', error);
-          toast({
-            title: "Warning",
-            description: "Could not load cached ticket data. Trying backup method...",
-            variant: "destructive",
-          });
+          console.error('[TicketForm] Supabase cache failed (non-blocking):', error);
         } finally {
           setIsLoadingTicketData(false);
         }
-      } else {
-        console.log('[TicketForm] No valid cache key found or key validation failed');
-        if (cacheKey) {
-          console.log('[TicketForm] Invalid cache key format:', cacheKey);
+      }
+    };
+    
+    const tryLocalStorageData = async () => {
+      console.log('[TicketForm] Checking localStorage for ticket data...');
+      
+      // Check primary localStorage key first
+      const primaryData = localStorage.getItem('eligibility-ocr-data');
+      const backupData = localStorage.getItem('eligibility-ocr-data-backup');
+      
+      console.log('[TicketForm] Primary data available:', !!primaryData);
+      console.log('[TicketForm] Backup data available:', !!backupData);
+      
+      // Try primary data first (most recent format)
+      if (primaryData) {
+        try {
+          const ocrData = JSON.parse(primaryData);
+          console.log('[TicketForm] Loading primary OCR data:', JSON.stringify(ocrData, null, 2));
+          
+          // Parse dates if they exist
+          const parsedData: Partial<FormData> = {
+            ...ocrData,
+            issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
+            courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
+          };
+          
+          console.log('[TicketForm] Parsed primary data:', JSON.stringify(parsedData, null, 2));
+          
+          // Update form with primary data
+          setFormData(prev => ({ ...prev, ...parsedData }));
+          
+          // Clean up primary localStorage
+          localStorage.removeItem('eligibility-ocr-data');
+          
+          toast({
+            title: "Ticket Details Pre-filled!",
+            description: "Your ticket information has been automatically filled in.",
+          });
+          return true; // Success
+        } catch (error) {
+          console.error('[TicketForm] Error parsing primary OCR data:', error);
+          localStorage.removeItem('eligibility-ocr-data');
         }
       }
       
-      // Always try backup methods if cache fails or doesn't exist
-      console.log('[TicketForm] Attempting backup data loading...');
-      await tryBackupData();
-    };
-    
-    const tryBackupData = async () => {
-      console.log('[TicketForm] Trying backup data sources...');
-      
-      // Check all available localStorage keys
-      const backupData = localStorage.getItem('eligibility-ocr-data-backup');
-      const legacyData = localStorage.getItem('eligibility-ocr-data');
-      
-      console.log('[TicketForm] Backup data available:', !!backupData);
-      console.log('[TicketForm] Legacy data available:', !!legacyData);
-      
-      // Try backup data first
+      // Try backup data if primary failed
       if (backupData) {
         try {
           const ocrData = JSON.parse(backupData);
@@ -242,46 +248,15 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
             title: "Ticket Details Pre-filled!",
             description: "Your ticket information has been loaded from backup data.",
           });
-          return; // Exit early on success
+          return true; // Success
         } catch (error) {
           console.error('[TicketForm] Error parsing backup OCR data:', error);
           localStorage.removeItem('eligibility-ocr-data-backup');
         }
       }
       
-      // Try legacy data if backup failed
-      if (legacyData) {
-        try {
-          const ocrData = JSON.parse(legacyData);
-          console.log('[TicketForm] Loading legacy OCR data:', JSON.stringify(ocrData, null, 2));
-          
-          // Parse dates if they exist
-          const parsedData: Partial<FormData> = {
-            ...ocrData,
-            issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
-            courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
-          };
-          
-          console.log('[TicketForm] Parsed legacy data:', JSON.stringify(parsedData, null, 2));
-          
-          // Update form with legacy data
-          setFormData(prev => ({ ...prev, ...parsedData }));
-          
-          // Clean up legacy localStorage
-          localStorage.removeItem('eligibility-ocr-data');
-          
-          toast({
-            title: "Ticket Details Pre-filled!",
-            description: "Your ticket information has been automatically filled in.",
-          });
-          return; // Exit early on success
-        } catch (error) {
-          console.error('[TicketForm] Error parsing legacy OCR data:', error);
-          localStorage.removeItem('eligibility-ocr-data');
-        }
-      }
-      
-      console.log('[TicketForm] No valid backup or legacy data found - form will remain empty');
+      console.log('[TicketForm] No valid localStorage data found - form will remain empty');
+      return false; // No data found
     };
     
     loadTicketData();
