@@ -131,12 +131,33 @@ const steps = [
   { id: 6, title: "Review", description: "Review and submit" }
 ];
 
-const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File | null }) => {
+const TicketForm = ({ initialTicketImage = null, initialPrefill = null }: { initialTicketImage?: File | null, initialPrefill?: Partial<FormData> | null }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>(() => ({
-    ...initialFormData,
-    ticketImage: initialTicketImage ?? null,
-  }));
+  const [formData, setFormData] = useState<FormData>(() => {
+    const coerceDate = (v: unknown) => {
+      if (!v) return undefined as Date | undefined;
+      if (v instanceof Date) return v as Date;
+      if (typeof v === 'string') {
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? undefined : (d as Date);
+      }
+      return undefined as Date | undefined;
+    };
+
+    const pre = initialPrefill ?? null;
+    const preIssue = pre?.issueDate as unknown;
+    const preCourt = pre?.courtDate as unknown;
+
+    return {
+      ...initialFormData,
+      ticketImage: initialTicketImage ?? null,
+      ...(pre ? {
+        ...pre,
+        issueDate: coerceDate(preIssue),
+        courtDate: coerceDate(preCourt),
+      } : {}),
+    } as FormData;
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
   const { toast } = useToast();

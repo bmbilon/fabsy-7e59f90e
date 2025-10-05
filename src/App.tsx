@@ -40,6 +40,7 @@ import Founder from "./pages/Founder";
 import Analytics from "./components/Analytics";
 import AcquisitionTracker from "./components/AcquisitionTracker";
 import ScrollToTop from "./components/ScrollToTop";
+import DisputeConfirmPage from "./pages/DisputeConfirmPage";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />
           <Route path="/ticket-form" element={<TicketFormPage />} />
+          <Route path="/dispute/confirm" element={<DisputeConfirmPage />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/about" element={<About />} />
           <Route path="/about/comparison" element={<CompetitorComparison />} />

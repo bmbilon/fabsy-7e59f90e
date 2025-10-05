@@ -506,23 +506,15 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                     courtJurisdiction: ticketData?.courtJurisdiction || '',
                   };
                   
-                  console.log(`[EligibilityChecker] Form data being stored:`, formData);
+                  console.log(`[EligibilityChecker] Form data being stored for confirm page:`, formData);
                   
-                  // Store data in localStorage for immediate reliability
+                  // Store data in localStorage for resilience
                   localStorage.setItem('eligibility-ocr-data', JSON.stringify(formData));
+                  if (cacheKey) localStorage.setItem('ticket-cache-key', cacheKey);
                   
-                  // Also try to cache in Supabase if available (non-blocking)
-                  if (cacheKey) {
-                    localStorage.setItem('ticket-cache-key', cacheKey);
-                    console.log(`[EligibilityChecker] Cache key also stored: ${cacheKey}`);
-                  }
-                  
-                  console.log(`[EligibilityChecker] Data stored in localStorage, navigating to form`);
-                  toast.success("Navigating to ticket form with your data!");
-                  
-                  // Close dialog and navigate
+                  // Close dialog and navigate to intermediate confirm page, passing state
                   onOpenChange(false);
-                  navigate('/ticket-form');
+                  navigate('/dispute/confirm', { state: { prefillTicketData: formData } });
                 }} className="flex-1">
                   Get My Ticket Dismissed
                 </Button>
