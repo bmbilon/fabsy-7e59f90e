@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Loader2, CheckCircle, XCircle, DollarSign, Camera } from "lucide-react";
+import { Upload, Loader2, CheckCircle, XCircle, DollarSign, Camera, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTicketCache, type TicketData as CachedTicketData } from "@/hooks/useTicketCache";
@@ -341,19 +341,60 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                 </div>
               </div>
 
-              {imagePreview && (
+              {imagePreview && !ticketData && (
                 <div className="rounded-lg overflow-hidden border">
                   <img src={imagePreview} alt="Ticket preview" className="w-full" />
                 </div>
               )}
 
               {ticketData && !eligibilityResult && (
-                <div className="space-y-4">
-                  <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                    <p className="font-semibold">Ticket Details Extracted:</p>
-                    {ticketData.violation && <p>Violation: {ticketData.violation}</p>}
-                    {ticketData.fine && <p>Fine: {ticketData.fine}</p>}
-                    {ticketData.ticketNumber && <p>Ticket #: {ticketData.ticketNumber}</p>}
+                <div className="space-y-6">
+                  <div className="bg-muted/50 rounded-lg p-4 space-y-4">
+                    <p className="font-semibold">Captured Ticket Details</p>
+
+                    {/* Captured fields grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Helper rendering for each field */}
+                      {([
+                        { key: 'ticketNumber', label: 'Ticket #', placeholder: 'e.g., AB1234567' },
+                        { key: 'issueDate', label: 'Issue Date', placeholder: 'YYYY-MM-DD' },
+                        { key: 'location', label: 'Location', placeholder: 'Intersection or address' },
+                        { key: 'officer', label: 'Officer Name', placeholder: 'e.g., J. Smith' },
+                        { key: 'officerBadge', label: 'Badge #', placeholder: 'e.g., 12345' },
+                        { key: 'offenceSection', label: 'Offence Section', placeholder: 'e.g., 115(2)(p)' },
+                        { key: 'offenceSubSection', label: 'Offence Subsection', placeholder: 'e.g., (ii)' },
+                        { key: 'offenceDescription', label: 'Offence Description', placeholder: 'e.g., Exceeded speed limit by 20 km/h' },
+                        { key: 'violation', label: 'Violation Text', placeholder: 'Short violation text' },
+                        { key: 'fineAmount', label: 'Fine Amount', placeholder: '$150.00' },
+                        { key: 'courtDate', label: 'Court Date', placeholder: 'YYYY-MM-DD (if set)' },
+                        { key: 'courtJurisdiction', label: 'Court Jurisdiction', placeholder: 'e.g., Calgary Provincial Court' },
+                      ] as { key: keyof TicketData; label: string; placeholder: string }[]).map(({ key, label, placeholder }) => {
+                        const k = key as keyof TicketData;
+                        const value = ticketData?.[k] as string | undefined;
+                        const present = Boolean(value && String(value).trim().length > 0);
+                        return (
+                          <div key={String(key)} className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              {present ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <Circle className="h-4 w-4 text-red-500" />
+                              )}
+                              <Label className="text-xs font-medium">{label}</Label>
+                            </div>
+                            <Input
+                              value={value || ''}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                setTicketData((prev) => ({ ...(prev || {}), [k]: v } as TicketData));
+                              }}
+                              placeholder={present ? undefined : placeholder}
+                              className={`bg-white dark:bg-gray-900 placeholder:italic placeholder:text-muted-foreground`}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border space-y-3">
