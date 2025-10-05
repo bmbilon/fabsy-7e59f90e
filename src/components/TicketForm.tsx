@@ -131,8 +131,12 @@ const steps = [
   { id: 6, title: "Review", description: "Review and submit" }
 ];
 
-const TicketForm = ({ initialTicketImage = null, initialPrefill = null }: { initialTicketImage?: File | null, initialPrefill?: Partial<FormData> | null }) => {
-  const [currentStep, setCurrentStep] = useState(1);
+const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialStep }: { initialTicketImage?: File | null, initialPrefill?: Partial<FormData> | null, initialStep?: number }) => {
+  const [currentStep, setCurrentStep] = useState<number>(() => {
+    const s = typeof initialStep === 'number' ? initialStep : 1;
+    const clamped = Math.max(1, Math.min(s, steps.length));
+    return clamped;
+  });
   const [formData, setFormData] = useState<FormData>(() => {
     const coerceDate = (v: unknown) => {
       if (!v) return undefined as Date | undefined;

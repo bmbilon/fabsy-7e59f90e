@@ -84,8 +84,8 @@ const DisputeConfirmPage = () => {
       console.warn('[DisputeConfirm] Failed saving localStorage backup', e);
     }
 
-    // Navigate to the ticket form passing prefill through state
-    navigate('/ticket-form', { state: { prefillTicketData: prefill } });
+    // Navigate to the ticket form passing prefill through state and start at step 2
+    navigate('/ticket-form', { state: { prefillTicketData: prefill, startAtStep: 2 } });
   };
 
   const goBack = () => {
