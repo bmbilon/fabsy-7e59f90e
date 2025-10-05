@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -138,6 +138,38 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
   }));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  // Check for OCR data from eligibility checker on mount
+  useEffect(() => {
+    const savedOcrData = localStorage.getItem('eligibility-ocr-data');
+    if (savedOcrData) {
+      try {
+        const ocrData = JSON.parse(savedOcrData);
+        console.log('[TicketForm] Loading OCR data from eligibility checker:', ocrData);
+        
+        // Parse dates if they exist
+        const parsedData: Partial<FormData> = {
+          ...ocrData,
+          issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
+          courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
+        };
+        
+        // Update form with OCR data
+        setFormData(prev => ({ ...prev, ...parsedData }));
+        
+        // Clean up localStorage
+        localStorage.removeItem('eligibility-ocr-data');
+        
+        toast({
+          title: "Ticket Details Pre-filled!",
+          description: "Your ticket information has been automatically filled in from the eligibility check.",
+        });
+      } catch (error) {
+        console.error('[TicketForm] Error parsing OCR data:', error);
+        localStorage.removeItem('eligibility-ocr-data');
+      }
+    }
+  }, []);
 
   const updateFormData = (updates: Partial<FormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));

@@ -142,30 +142,25 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
       toast.success("Ticket scanned successfully!");
       
-      // Store complete data and navigate to analysis page
-      const key = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      // Extract and structure the data
       const extractedData = ocrData?.data || ocrData;
-      const payload = {
-        ticketData: {
-          ticketNumber: extractedData.ticketNumber,
-          issueDate: extractedData.issueDate,
-          location: extractedData.location,
-          officer: extractedData.officer,
-          officerBadge: extractedData.officerBadge,
-          offenceSection: extractedData.offenceSection,
-          offenceSubSection: extractedData.offenceSubSection,
-          offenceDescription: extractedData.offenceDescription,
-          violation: extractedData.violation,
-          fine: extractedData.fineAmount,
-          courtDate: extractedData.courtDate,
-        },
-        monthlyPremium: monthlyPremium
+      const structuredTicketData = {
+        ticketNumber: extractedData.ticketNumber,
+        issueDate: extractedData.issueDate,
+        location: extractedData.location,
+        officer: extractedData.officer,
+        officerBadge: extractedData.officerBadge,
+        offenceSection: extractedData.offenceSection,
+        offenceSubSection: extractedData.offenceSubSection,
+        offenceDescription: extractedData.offenceDescription,
+        violation: extractedData.violation,
+        fine: extractedData.fineAmount,
+        courtDate: extractedData.courtDate,
       };
-      localStorage.setItem(`ticket-analysis:${key}`, JSON.stringify(payload));
       
-      // Close dialog and navigate
-      onOpenChange(false);
-      navigate(`/ticket-analysis?k=${key}`);
+      // Set the local state for eligibility calculation
+      setTicketData(structuredTicketData);
+      setIsProcessing(false);
     } catch (error) {
       console.error('Error processing ticket:', error);
       toast.error("Failed to process ticket. Please try again.");
@@ -451,8 +446,30 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                 <Button onClick={resetChecker} variant="outline" className="flex-1">
                   Check Another Ticket
                 </Button>
-                <Button onClick={() => onOpenChange(false)} className="flex-1">
-                  Get Started
+                <Button onClick={() => {
+                  // Store the OCR data for the ticket form
+                  const ocrData = {
+                    ticketNumber: ticketData?.ticketNumber || '',
+                    issueDate: ticketData?.issueDate || '',
+                    location: ticketData?.location || '',
+                    officer: ticketData?.officer || '',
+                    officerBadge: ticketData?.officerBadge || '',
+                    offenceSection: ticketData?.offenceSection || '',
+                    offenceSubSection: ticketData?.offenceSubSection || '',
+                    offenceDescription: ticketData?.offenceDescription || '',
+                    violation: ticketData?.violation || '',
+                    fineAmount: ticketData?.fine || '',
+                    courtDate: ticketData?.courtDate || '',
+                  };
+                  
+                  // Store in localStorage for the ticket form to pick up
+                  localStorage.setItem('eligibility-ocr-data', JSON.stringify(ocrData));
+                  
+                  // Close dialog and navigate
+                  onOpenChange(false);
+                  navigate('/ticket-form');
+                }} className="flex-1">
+                  Get My Ticket Dismissed
                 </Button>
               </div>
             </div>
