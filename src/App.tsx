@@ -39,6 +39,7 @@ import ThankYou from "./pages/ThankYou";
 import Founder from "./pages/Founder";
 import Analytics from "./components/Analytics";
 import AcquisitionTracker from "./components/AcquisitionTracker";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
         {/* Analytics must be inside the router to track SPA route changes */}
         <Analytics />
         <AcquisitionTracker />
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />
