@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -109,6 +109,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [monthlyPremium, setMonthlyPremium] = useState<string>("");
   const [cacheKey, setCacheKey] = useState<string | null>(null);
+  const dialogScrollRef = useRef<HTMLDivElement | null>(null);
   
   // Use ticket cache hook
   const { cacheTicketData, generateCacheKey } = useTicketCache();
@@ -253,9 +254,17 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
       console.error('Error calculating eligibility:', error);
       toast.error("Failed to calculate. Please try again.");
     } finally {
-      setIsProcessing(false);
+    setIsProcessing(false);
     }
   };
+
+  // When eligibility result is ready, scroll the dialog content to top so the result header is visible
+  useEffect(() => {
+    if (eligibilityResult && dialogScrollRef.current) {
+      // scroll to very top of the dialog content
+      dialogScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [eligibilityResult]);
 
   const resetChecker = () => {
     setTicketData(null);
@@ -269,7 +278,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
       onOpenChange(open);
       if (!open) resetChecker();
     }}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent ref={dialogScrollRef} className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Free Eligibility Check</DialogTitle>
         </DialogHeader>
