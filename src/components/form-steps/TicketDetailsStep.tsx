@@ -95,6 +95,20 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   const issueDate = watch("issueDate");
   const courtDate = watch("courtDate");
 
+  // Determine if OCR data has already populated the form
+  const hasOCRData = Boolean(
+    formData.ticketNumber ||
+    formData.fineAmount ||
+    formData.offenceDescription ||
+    formData.officer ||
+    formData.officerBadge ||
+    formData.offenceSection ||
+    formData.offenceSubSection ||
+    formData.location ||
+    formData.issueDate ||
+    formData.courtDate
+  );
+
   // Process ticket image on mount if it was uploaded from Hero page
   useEffect(() => {
     if (formData.ticketImage && !hasProcessedInitialImage && !formData.ticketNumber) {
@@ -402,8 +416,8 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       <Card className="p-6 bg-gradient-card border-2 border-primary/10">
         <h3 className="text-lg font-semibold mb-4 text-primary">Ticket Information</h3>
         
-        {/* Ticket Upload - Show if no image uploaded yet */}
-        {!formData.ticketImage && (
+        {/* Ticket Upload - Show only when no prior OCR data or image is present */}
+        {!(formData.ticketImage || hasOCRData) && (
           <div className="mb-6 p-4 bg-gradient-soft border border-primary/30 rounded-lg">
             <div className="mb-3">
               <Label className="font-medium text-primary">Upload Your Ticket</Label>
