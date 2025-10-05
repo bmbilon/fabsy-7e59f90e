@@ -168,6 +168,14 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
       
       console.log('[EligibilityChecker] Structured ticket data created:', JSON.stringify(structuredTicketData, null, 2));
       
+      // Persist immediately to localStorage so downstream pages can prefill reliably
+      try {
+        localStorage.setItem('eligibility-ocr-data', JSON.stringify(structuredTicketData));
+        console.log('[EligibilityChecker] Saved structured ticket data to localStorage (eligibility-ocr-data)');
+      } catch (e) {
+        console.warn('[EligibilityChecker] Failed to save OCR data to localStorage', e);
+      }
+
       // IMMEDIATELY CACHE THE DATA TO SUPABASE
       console.log('[EligibilityChecker] Attempting to cache ticket data to Supabase...');
       
