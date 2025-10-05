@@ -141,7 +141,7 @@ const Blog = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-fabsy-red to-red-600 text-white py-16">
+      <section className="bg-gradient-to-r from-sky-200 via-sky-300 to-sky-400 text-gray-900 py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Alberta Traffic Law Blog
@@ -239,10 +239,10 @@ const Blog = () => {
                       </div>
 
                       {/* Read More Link */}
-                      <Link
-                        to={`/blog/${post.slug}`}
-                        className="inline-flex items-center text-fabsy-red font-semibold hover:text-red-700 transition-colors mt-auto"
-                      >
+                        <Link 
+                          to={`/blog/${post.slug}`}
+                          className="inline-flex items-center text-sky-700 font-semibold hover:text-sky-900 transition-colors mt-auto"
+                        >
                         Read Article
                         <ArrowRight className="h-4 w-4 ml-1" />
                       </Link>

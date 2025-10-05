@@ -232,7 +232,7 @@ const BlogPost = () => {
               <div className="mb-8">
                 <Link 
                   to="/blog" 
-                  className="inline-flex items-center text-fabsy-red hover:text-red-700 transition-colors"
+                  className="inline-flex items-center text-sky-700 hover:text-sky-900 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Blog
