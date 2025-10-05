@@ -286,7 +286,7 @@ Fabsy's AI helper:
 ## Contact & Support
 
 **For Users**:
-- Phone: 403-669-5353
+- Phone: (825) 793-2279
 - Email: support@fabsy.ca
 - Response: Within 24 hours
 

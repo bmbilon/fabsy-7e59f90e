@@ -158,7 +158,7 @@ serve(async (req) => {
     console.log("Both AI services failed, using fallback");
     
     const fallbackResponses = [
-      "I'd be happy to help you with your traffic ticket question! For the most accurate and up-to-date information about Alberta traffic law, I'd recommend getting a free consultation from our team at 403-669-5353.",
+      "I'd be happy to help you with your traffic ticket question! For the most accurate and up-to-date information about Alberta traffic law, I'd recommend getting a free consultation from our team at (825) 793-2279.",
       "That's a great question about Alberta traffic tickets. While I can provide general information, each case is unique. Would you like to speak with one of our traffic ticket specialists for personalized advice?",
       "Thanks for your question! Alberta traffic law can be complex, and the best approach often depends on the specific details of your situation. Our team offers free consultations to review your case - would that be helpful?",
     ];
@@ -174,7 +174,7 @@ serve(async (req) => {
     console.error("Error in ai-chat:", error);
     return new Response(
       JSON.stringify({ 
-        error: "I'm having trouble processing your request right now. Please try again or call us at 403-669-5353 for immediate assistance.",
+        error: "I'm having trouble processing your request right now. Please try again or call us at (825) 793-2279 for immediate assistance.",
         details: error instanceof Error ? error.message : "Unknown error"
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -53,7 +53,7 @@ serve(async (req) => {
 
           <div style="background: #fef3c7; padding: 16px; border-left: 4px solid #f59e0b; margin: 20px 0;">
             <p style="margin: 0; font-size: 14px;">
-              <strong>Questions?</strong> Call us at <a href="tel:403-669-5353" style="color: #6366f1;">403-669-5353</a>
+              <strong>Questions?</strong> Call us at <a href="tel:825-793-2279" style="color: #6366f1;">(825) 793-2279</a>
             </p>
           </div>
 

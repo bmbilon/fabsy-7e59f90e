@@ -327,7 +327,7 @@ const TestimonialsPage = () => {
             </div>
             
             <p className="text-sm text-muted-foreground mt-6">
-              Questions? Call us at <a href="tel:403-669-5353" className="font-bold text-primary hover:text-primary/80 transition-smooth">403-669-5353</a>
+              Questions? Call us at <a href="tel:825-793-2279" className="font-bold text-primary hover:text-primary/80 transition-smooth">(825) 793-2279</a>
             </p>
           </Card>
         </div>

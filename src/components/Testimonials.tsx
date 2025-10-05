@@ -105,7 +105,7 @@ const Testimonials = () => {
           </h3>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Don't let one ticket derail your budget or stress you out. Join 1,000+ Alberta women who chose to fight back. 
-            Questions? <a href="tel:403-669-5353" className="font-bold text-primary hover:text-primary-dark transition-smooth underline">Call 403-669-5353</a>
+            Questions? <a href="tel:825-793-2279" className="font-bold text-primary hover:text-primary-dark transition-smooth underline">Call (825) 793-2279</a>
           </p>
         </div>
       </div>

@@ -29,7 +29,7 @@ export const getFabsyEmailSignature = () => {
             <div style="font-size: 13px; color: #374151; line-height: 1.8;">
               <div style="margin-bottom: 4px;">
                 <span style="color: #A78BFA; font-weight: 600;">📞</span>
-                <a href="tel:403-669-5353" style="color: #374151; text-decoration: none; margin-left: 8px;">403-669-5353</a>
+                <a href="tel:825-793-2279" style="color: #374151; text-decoration: none; margin-left: 8px;">(825) 793-2279</a>
               </div>
               <div style="margin-bottom: 4px;">
                 <span style="color: #A78BFA; font-weight: 600;">✉️</span>
@@ -72,5 +72,5 @@ export const getFabsyEmailSignature = () => {
  * Get a simplified signature for SMS notifications
  */
 export const getFabsySMSSignature = () => {
-  return `\n\n---\nFabsy - Traffic Ticket Defense\n📞 403-669-5353 | hello@fabsy.ca\nfabsy.ca`;
+  return `\n\n---\nFabsy - Traffic Ticket Defense\n📞 (825) 793-2279 | hello@fabsy.ca\nfabsy.ca`;
 };

@@ -72,7 +72,7 @@ const ChatWidget = () => {
       throw new Error('Invalid AI response');
     } catch (error) {
       console.error('AI chat error:', error);
-      return "I'm having trouble connecting right now. For immediate assistance, please use the 'Leave Message' option or call us at 403-669-5353.";
+      return "I'm having trouble connecting right now. For immediate assistance, please use the 'Leave Message' option or call us at (825) 793-2279.";
     }
   };
 

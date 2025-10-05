@@ -57,11 +57,11 @@ const TrustBar = () => {
         <div className="text-center mt-8">
           <p className="text-gray-700 text-lg">
             Have questions? <a 
-              href="tel:403-669-5353" 
+              href="tel:825-793-2279" 
               className="font-bold text-primary hover:text-primary-dark transition-smooth inline-flex items-center gap-2"
             >
               <Phone className="h-5 w-5" />
-              Call 403-669-5353
+              Call (825) 793-2279
             </a>
           </p>
         </div>

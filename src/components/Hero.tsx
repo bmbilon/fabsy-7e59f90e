@@ -105,7 +105,7 @@ const Hero = () => {
                   <h3 className="text-xl font-bold text-white">No Win, No Fee—Guaranteed</h3>
                 </div>
                 <p className="text-white/95 leading-relaxed">
-                  If we don't save you money, you pay nothing. Zero risk, zero pressure. Questions? Call us: <a href="tel:403-669-5353" className="font-bold text-primary hover:text-primary-light transition-smooth underline">403-669-5353</a>
+                  If we don't save you money, you pay nothing. Zero risk, zero pressure. Questions? Call us: <a href="tel:825-793-2279" className="font-bold text-primary hover:text-primary-light transition-smooth underline">(825) 793-2279</a>
                 </p>
               </div>
             </div>

@@ -109,7 +109,7 @@ const ThankYou: React.FC = () => {
         <p className="text-lg text-muted-foreground mb-8">
           We received your request and emailed you a confirmation. Our team will review and get back to you within 24 hours.
           If it’s urgent, call us at{' '}
-          <a href="tel:403-669-5353" className="underline decoration-dashed underline-offset-4 text-primary hover:text-primary/80">403-669-5353</a>.
+          <a href="tel:825-793-2279" className="underline decoration-dashed underline-offset-4 text-primary hover:text-primary/80">(825) 793-2279</a>.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-3 text-left">
