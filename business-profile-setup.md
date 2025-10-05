@@ -3,7 +3,7 @@
 ## Standardized NAP Information
 **Use exactly this information across ALL platforms:**
 
-- **Business Name:** Fabsy Traffic Services
+- **Business Name:** Fabsy Traffic Ticket Services
 - **Phone:** (825) 793-2279
 - **Email:** hello@fabsy.ca
 - **Website:** https://fabsy.ca
@@ -111,7 +111,7 @@ Professional traffic ticket defense services for Alberta women drivers. 100% suc
 ## Business Description Template
 Use this consistent description across all platforms:
 
-"Fabsy Traffic Services provides professional traffic ticket defense for Alberta women drivers. With a 100% success rate and zero-risk guarantee, we handle all types of traffic violations including speeding tickets, distracted driving, red light cameras, and photo radar across Alberta cities including Calgary, Edmonton, Red Deer, and more. No court appearance required for most cases. You only pay our $488 fee if we save you money - otherwise you pay nothing. Protect your driving record and insurance rates with Alberta's trusted traffic ticket specialists."
+"Fabsy Traffic Ticket Services provides professional traffic ticket defense for Alberta women drivers. With a 100% success rate and zero-risk guarantee, we handle all types of traffic violations including speeding tickets, distracted driving, red light cameras, and photo radar across Alberta cities including Calgary, Edmonton, Red Deer, and more. No court appearance required for most cases. You only pay our $488 fee if we save you money - otherwise you pay nothing. Protect your driving record and insurance rates with Alberta's trusted traffic ticket specialists."
 
 ## Keywords to Include:
 - Traffic ticket defense Alberta

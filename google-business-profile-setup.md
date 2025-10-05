@@ -9,7 +9,7 @@
 ## Step 2: Add Your Business Information
 
 ### Business Name
-**Exact text:** `Fabsy Traffic Services`
+**Exact text:** `Fabsy Traffic Ticket Services`
 
 ### Business Category
 **Primary:** `Legal Services`
@@ -117,9 +117,17 @@ Create posts about:
 
 ## Step 10: Link to Website
 Ensure your website has consistent NAP:
-- ✅ Footer shows: 403-669-5353 and hello@fabsy.ca
+- ✅ Footer shows: (825) 793-2279 and hello@fabsy.ca
 - ✅ Contact page shows matching info
 - ✅ Schema markup includes same phone/email
+
+## Updated NAP Information:
+**Use this EXACT information across ALL platforms:**
+- **Business Name:** Fabsy Traffic Ticket Services
+- **Phone:** (825) 793-2279
+- **Email:** hello@fabsy.ca
+- **Website:** https://fabsy.ca
+- **Service Area:** Alberta, Canada
 
 ## Important Reminders:
 - **Never show a physical address** (service area business)
