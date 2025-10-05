@@ -94,7 +94,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               
               <div class="footer">
-                <p style="margin: 5px 0;">📧 hello@fabsy.ca | 📞 403-669-5353</p>
+                <p style="margin: 5px 0;">📧 hello@fabsy.ca | 📞 (825) 793-2279</p>
                 <p style="margin: 5px 0;">Monday-Friday: 9 AM - 6 PM MST | Saturday: 10 AM - 4 PM MST</p>
                 <p style="margin: 15px 0 5px 0; font-size: 12px;">© ${new Date().getFullYear()} Fabsy. All rights reserved.</p>
               </div>
@@ -183,11 +183,11 @@ const handler = async (req: Request): Promise<Response> => {
         },
       }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in send-contact-email function:", error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
         success: false 
       }),
       {

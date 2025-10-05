@@ -72,7 +72,7 @@ serve(async (req) => {
       );
     }
 
-    let jsonLd: any;
+    let jsonLd: Record<string, unknown>;
 
     switch (type) {
       case 'FAQPage':
@@ -146,8 +146,8 @@ function generateProfessionalService(data: ProfessionalServiceData) {
     "name": data.name || "Fabsy",
     "url": data.url || "https://fabsy.ca",
     "logo": data.logo || "https://fabsy.ca/path/to/logo.png",
-    "telephone": data.telephone || "+1-403-XXX-XXXX",
-    "email": data.email || "",
+    "telephone": data.telephone || "+1-825-793-2279",
+    "email": data.email || "hello@fabsy.ca",
     "description": data.description || "Alberta traffic ticket help for women. Expert defense, reduced fines, and peace of mind.",
     "address": {
       "@type": "PostalAddress",
@@ -172,8 +172,8 @@ function generateLocalBusiness(data: LocalBusinessData) {
     "name": data.name || "Fabsy - Alberta Traffic Ticket Help",
     "description": data.description || "Professional traffic ticket defense services for women in Alberta",
     "url": data.url || "https://fabsy.ca",
-    "telephone": data.phone || "",
-    "email": data.email || "",
+    "telephone": data.phone || "(825) 793-2279",
+    "email": data.email || "hello@fabsy.ca",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": data.address?.street || "",
@@ -219,7 +219,7 @@ function generateArticle(data: ArticleData) {
   };
 }
 
-function generateOrganization(data: any) {
+function generateOrganization(data: Record<string, unknown>) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -231,7 +231,7 @@ function generateOrganization(data: any) {
   };
 }
 
-function generateWebPage(data: any) {
+function generateWebPage(data: Record<string, unknown>) {
   return {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -247,11 +247,11 @@ function generateWebPage(data: any) {
   };
 }
 
-function generateBreadcrumbs(data: any) {
+function generateBreadcrumbs(data: Record<string, unknown>) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": data.items.map((item: any, index: number) => ({
+    "itemListElement": (data.items as Array<Record<string, unknown>>).map((item: Record<string, unknown>, index: number) => ({
       "@type": "ListItem",
       "position": index + 1,
       "name": item.name,

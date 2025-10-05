@@ -87,7 +87,7 @@ const Contact = () => {
                   <Mail className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">info@fabsy.ca</p>
+                    <p className="text-muted-foreground">hello@fabsy.ca</p>
                     <p className="text-sm text-muted-foreground">We respond within 24 hours</p>
                   </div>
                 </div>
@@ -96,7 +96,7 @@ const Contact = () => {
                   <Phone className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-muted-foreground">(403) 123-4567</p>
+                    <p className="text-muted-foreground">(825) 793-2279</p>
                     <p className="text-sm text-muted-foreground">Monday - Friday, 9 AM - 6 PM MST</p>
                   </div>
                 </div>
@@ -167,7 +167,7 @@ const Contact = () => {
                       type="tel"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="(403) 123-4567"
+                      placeholder="(825) 793-2279"
                     />
                   </div>
                 </div>
