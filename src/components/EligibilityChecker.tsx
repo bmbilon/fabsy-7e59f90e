@@ -482,8 +482,6 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                 </p>
               </div>
 
-              <AILeadCapture ticketType={eligibilityResult.violationType} />
-
               <div className="flex gap-3">
                 <Button onClick={resetChecker} variant="outline" className="flex-1">
                   Check Another Ticket
