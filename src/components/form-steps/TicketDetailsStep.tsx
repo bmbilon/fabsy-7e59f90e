@@ -59,6 +59,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<TicketDetailsSchema>({
     resolver: zodResolver(ticketDetailsSchema),
     defaultValues: {
@@ -74,6 +75,22 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       courtDate: formData.courtDate,
     },
   });
+
+  // Keep RHF form state in sync when parent formData updates (e.g., from OCR/localStorage)
+  useEffect(() => {
+    reset({
+      ticketNumber: formData.ticketNumber,
+      issueDate: formData.issueDate,
+      location: formData.location,
+      officer: formData.officer,
+      officerBadge: formData.officerBadge,
+      offenceSection: formData.offenceSection,
+      offenceSubSection: formData.offenceSubSection,
+      offenceDescription: formData.offenceDescription,
+      fineAmount: formData.fineAmount,
+      courtDate: formData.courtDate,
+    });
+  }, [formData.ticketNumber, formData.issueDate, formData.location, formData.officer, formData.officerBadge, formData.offenceSection, formData.offenceSubSection, formData.offenceDescription, formData.fineAmount, formData.courtDate, reset]);
 
   const issueDate = watch("issueDate");
   const courtDate = watch("courtDate");

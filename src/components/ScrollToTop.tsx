@@ -9,11 +9,15 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    // Prevent the browser from restoring scroll positions automatically
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
     // Scroll to top whenever the route changes
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'instant' // Use 'instant' for immediate scroll, 'smooth' for animated
+      behavior: 'auto' // Use standard value; 'auto' is instant
     });
   }, [pathname]);
 

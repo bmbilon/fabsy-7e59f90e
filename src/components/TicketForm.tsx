@@ -394,6 +394,11 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
   const progress = (currentStep / steps.length) * 100;
   const isTestUser = formData.couponCode?.toUpperCase() === "TESTUSER";
 
+  // Ensure page starts at top when this component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
   return (
     <section className="py-20 bg-gradient-soft min-h-screen">
       <div id="ticket-form-container" className="container mx-auto px-4 max-w-4xl">
