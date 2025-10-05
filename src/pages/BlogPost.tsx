@@ -347,7 +347,7 @@ const BlogPost = () => {
                 </div>
 
                 {/* Call to Action */}
-                <div className="bg-fabsy-red text-white rounded-lg p-8 text-center">
+                <div className="bg-fabsy-red text-white rounded-lg p-8 text-center" style={{backgroundColor: '#dc2626 !important', color: '#ffffff !important'}}>
                   <h3 className="text-2xl font-bold mb-4">Need Help with Your Traffic Ticket?</h3>
                   <p className="text-xl mb-6 opacity-90">
                     Don't let a traffic ticket impact your driving record. Get expert help from Alberta's premier traffic defense service.
@@ -356,7 +356,7 @@ const BlogPost = () => {
                     <Button asChild variant="secondary" size="lg">
                       <Link to="/contact">Get Free Consultation</Link>
                     </Button>
-                    <Button asChild variant="outline" size="lg" className="bg-white text-fabsy-red hover:bg-gray-50">
+                    <Button asChild variant="outline" size="lg" className="bg-white text-fabsy-red hover:bg-gray-50" style={{backgroundColor: '#ffffff', color: '#dc2626'}}>
                       <Link to="/">Learn More</Link>
                     </Button>
                   </div>

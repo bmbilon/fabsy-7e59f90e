@@ -1,0 +1,378 @@
+//
+// Fabsy Theme SCSS — High-Contrast, WCAG-AA Oriented
+// Drop-in: /styles/fabsy-theme.scss
+// -----------------------------------------------------------------------------
+// Design tokens, CSS variables, mixins, and base components.
+// Stays faithful to the "lovable" gradient aesthetic while guaranteeing
+// readable text (no light-on-light or dark-on-dark).
+// -----------------------------------------------------------------------------
+
+/* -----------------------------
+   1) Core Tokens
+------------------------------ */
+
+// Colors
+$fabsy-primary:        #3A6DFF;
+$fabsy-primary-dark:   #2E4DB8;
+$fabsy-accent:         #C653FF;
+$fabsy-surface:        #FFFFFF;
+$fabsy-text:           #1E1E2F;
+$fabsy-text-2:         #4A4A5A;
+$fabsy-success:        #00C48C;
+$fabsy-error:          #FF5C5C;
+$fabsy-warning:        #FFB020;
+$fabsy-info:           #2F80ED;
+
+// Background gradients (page-level)
+$fabsy-grad-1: linear-gradient(180deg, #D8C7FF 0%, #F8B8E9 100%);
+$fabsy-grad-2: linear-gradient(180deg, #C7D9FF 0%, #E4EEFF 100%);
+
+// Elevation
+$shadow-card: 0 8px 20px rgba(0,0,0,0.06);
+$shadow-pop:  0 12px 28px rgba(0,0,0,0.12);
+$shadow-btn:  0 4px 12px rgba(58,109,255,0.25);
+
+// Radii
+$radius-card: 16px;
+$radius-btn:  12px;
+$radius-pill: 999px;
+
+// Spacing (8px baseline)
+$space-1: 8px;
+$space-2: 16px;
+$space-3: 24px;
+$space-4: 32px;
+$space-5: 40px;
+$space-6: 64px;
+
+// Typography
+$font-heading: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+$font-body:    'Inter',   system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+
+$lh-loose: 1.7;
+$lh-base:  1.6;
+$lh-tight: 1.3;
+
+// Breakpoints
+$bp-sm: 480px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;
+
+/* -----------------------------
+   2) CSS Variables (interop)
+------------------------------ */
+:root {
+  --fabsy-primary:       #3A6DFF;
+  --fabsy-primary-dark:  #2E4DB8;
+  --fabsy-accent:        #C653FF;
+  --fabsy-surface:       #FFFFFF;
+  --fabsy-text:          #1E1E2F;
+  --fabsy-text-2:        #4A4A5A;
+  --fabsy-success:       #00C48C;
+  --fabsy-error:         #FF5C5C;
+  --fabsy-warning:       #FFB020;
+  --fabsy-info:          #2F80ED;
+
+  --shadow-card: #{$shadow-card};
+  --radius-card: #{$radius-card};
+  --radius-btn:  #{$radius-btn};
+  --radius-pill: #{$radius-pill};
+
+  --space-1: #{$space-1};
+  --space-2: #{$space-2};
+  --space-3: #{$space-3};
+  --space-4: #{$space-4};
+  --space-5: #{$space-5};
+  --space-6: #{$space-6};
+}
+
+/* -----------------------------
+   3) Helpers & Mixins
+------------------------------ */
+
+// Luminance helpers for contrast-aware text color
+@function luminance($color) {
+  $c: ();
+  @each $ch in red, green, blue {
+    $v: (nth((0.2126, 0.7152, 0.0722), if($ch==red,1, if($ch==green,2,3))));
+    $n: (channel($color, $ch) / 255);
+    $n: if($n < 0.03928, $n / 12.92, pow((($n + 0.055) / 1.055), 2.4));
+    $c: append($c, $n * $v);
+  }
+  @return nth($c,1) + nth($c,2) + nth($c,3);
+}
+
+@function contrast-ratio($c1, $c2) {
+  $l1: luminance($c1) + 0.05;
+  $l2: luminance($c2) + 0.05;
+  @return if($l1 > $l2, $l1 / $l2, $l2 / $l1);
+}
+
+// Returns either dark or white text to hit ~AA contrast
+@function best-text($bg, $dark:#1E1E2F, $light:#FFFFFF) {
+  @return if(contrast-ratio($bg, $dark) >= contrast-ratio($bg, $light), $dark, $light);
+}
+
+@mixin elevation($type: card) {
+  @if $type == card    { box-shadow: $shadow-card; }
+  @else if $type == pop { box-shadow: $shadow-pop; }
+  @else if $type == btn { box-shadow: $shadow-btn; }
+}
+
+// Gradient background with optional overlay for contrast
+@mixin gradient-bg($gradient, $overlay: rgba(0,0,0,0.0)) {
+  background: $gradient;
+  @if alpha($overlay) > 0 {
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: $overlay;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+  }
+}
+
+// Button reset
+@mixin button-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: $radius-btn;
+  padding: 12px 24px;
+  min-height: 44px;
+  transition: transform .06s ease, box-shadow .2s ease, background-color .2s ease;
+  &:active { transform: translateY(1px); }
+}
+
+// Focus ring (accessible)
+@mixin focus-ring($color: #3A6DFF) {
+  outline: 3px solid rgba($color, .35);
+  outline-offset: 2px;
+}
+
+// Card
+@mixin card {
+  background: $fabsy-surface;
+  color: $fabsy-text;
+  border-radius: $radius-card;
+  padding: $space-3 $space-4;
+  @include elevation(card);
+}
+
+/* -----------------------------
+   4) Base Resets & Typography
+------------------------------ */
+
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
+body {
+  font-family: $font-body;
+  color: $fabsy-text;
+  line-height: $lh-base;
+  background: #F7F7FB;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-heading;
+  color: $fabsy-text;
+  line-height: $lh-tight;
+  letter-spacing: 0.2px;
+  margin: 0 0 $space-2;
+}
+
+h1 { font-weight: 700; font-size: clamp(28px, 5vw, 44px); }
+h2 { font-weight: 700; font-size: clamp(24px, 4vw, 32px); }
+h3 { font-weight: 600; font-size: 22px; }
+p  { color: $fabsy-text-2; margin: 0 0 $space-2; }
+
+a { color: $fabsy-primary; text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: $fabsy-primary-dark; }
+
+/* -----------------------------
+   5) Components
+------------------------------ */
+
+// Page banner using gradient, with automatic overlay for contrast
+.fabsy-hero {
+  position: relative;
+  @include gradient-bg($fabsy-grad-1, rgba(0,0,0,0.08)); // subtle overlay to protect contrast
+  color: $fabsy-text;
+  padding: $space-6 0;
+  .hero-title { color: $fabsy-text; }
+  .hero-sub  { color: $fabsy-text-2; max-width: 70ch; }
+}
+
+// Card
+.fabsy-card { @include card; }
+
+// Button Variants
+.btn {
+  @include button-reset;
+  font-family: $font-body;
+  &.is-primary {
+    background: $fabsy-primary;
+    color: #fff; @include elevation(btn);
+    &:hover { background: darken($fabsy-primary, 7%); }
+    &:focus-visible { @include focus-ring($fabsy-primary); }
+  }
+  &.is-secondary {
+    background: #fff;
+    color: $fabsy-primary;
+    border: 1px solid $fabsy-primary;
+    &:hover { background: #EAF0FF; }
+    &:focus-visible { @include focus-ring($fabsy-primary); }
+  }
+  &.is-gradient {
+    background: linear-gradient(90deg, $fabsy-primary 0%, $fabsy-accent 100%);
+    color: #fff; @include elevation(btn);
+    &:hover { filter: saturate(1.1) brightness(0.98); }
+    &:focus-visible { @include focus-ring($fabsy-primary); }
+  }
+  &.is-ghost {
+    background: transparent;
+    color: $fabsy-primary;
+    border: 1px solid rgba($fabsy-primary, .25);
+    &:hover { background: rgba($fabsy-primary, .08); }
+    &:focus-visible { @include focus-ring($fabsy-primary); }
+  }
+}
+
+// Step item (like in screenshot)
+.step {
+  @include card;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: $space-3;
+  .step__icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    background: rgba($fabsy-primary, .12);
+    color: $fabsy-primary;
+    font-weight: 700;
+  }
+  .step__title {
+    font-family: $font-heading; font-weight: 600; font-size: 18px;
+    color: $fabsy-text;
+    margin-bottom: 6px;
+  }
+  .step__meta { color: $fabsy-text-2; }
+}
+
+// Alerts
+.alert {
+  @include card;
+  border-left: 4px solid transparent;
+  &.is-success { border-color: $fabsy-success; }
+  &.is-error   { border-color: $fabsy-error; }
+  &.is-info    { border-color: $fabsy-info; }
+  &.is-warn    { border-color: $fabsy-warning; }
+}
+
+// Forms
+.input, .select, .textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #DADCE3;
+  color: $fabsy-text;
+  font-family: $font-body;
+  &:focus-visible { @include focus-ring($fabsy-primary); }
+  &::placeholder { color: rgba($fabsy-text-2, .8); }
+}
+
+.label { font-weight: 600; color: $fabsy-text; margin-bottom: 8px; display: inline-block; }
+.help  { color: $fabsy-text-2; font-size: 14px; }
+
+// Badges / Pills
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: $radius-pill;
+  font-weight: 600; font-size: 12px; letter-spacing: .2px;
+  &.is-blue  { background: rgba($fabsy-primary, .12); color: $fabsy-primary; }
+  &.is-gray  { background: #F0F2F7; color: $fabsy-text-2; }
+  &.is-green { background: rgba($fabsy-success, .14); color: $fabsy-success; }
+}
+
+// Nav (example)
+.navbar {
+  background: #fff;
+  color: $fabsy-text;
+  border-bottom: 1px solid #EAEAF2;
+  .nav-link {
+    color: $fabsy-text;
+    text-decoration: none;
+    padding: 12px 10px;
+    border-radius: 8px;
+    &:hover { background: #F2F6FF; color: $fabsy-primary; }
+    &:focus-visible { @include focus-ring($fabsy-primary); }
+  }
+  .nav-cta { margin-left: auto; }
+}
+
+// Footer (dark-on-light only for contrast)
+.footer {
+  background: #0F1222;
+  color: #fff;
+  padding: $space-5 0;
+  a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+  .muted { opacity: .8; }
+}
+
+// Tables (AA contrast)
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  th, td { padding: 12px 16px; border-bottom: 1px solid #ECEEF3; }
+  th { background: #F6F8FF; color: $fabsy-text; text-align: left; }
+  td { color: $fabsy-text-2; }
+}
+
+// Utilities
+.mt-0{ margin-top:0 !important; } .mb-0{ margin-bottom:0 !important; }
+.mt-1{ margin-top:$space-1 !important; } .mb-1{ margin-bottom:$space-1 !important; }
+.mt-2{ margin-top:$space-2 !important; } .mb-2{ margin-bottom:$space-2 !important; }
+.mt-3{ margin-top:$space-3 !important; } .mb-3{ margin-bottom:$space-3 !important; }
+.mt-4{ margin-top:$space-4 !important; } .mb-4{ margin-bottom:$space-4 !important; }
+.p-1{ padding:$space-1 !important; } .p-2{ padding:$space-2 !important; }
+.p-3{ padding:$space-3 !important; } .p-4{ padding:$space-4 !important; }
+
+// Motion
+* { transition: color .2s ease, background-color .2s ease, border-color .2s ease; }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* -----------------------------
+   6) Example Layout Blocks
+------------------------------ */
+
+.section {
+  padding: 80px 0;
+  @media (max-width: $bp-md) { padding: 56px 0; }
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+// How-it-works list
+.hiw-list { display: grid; gap: $space-3; }
+@media (min-width: $bp-md) {
+  .hiw-list { gap: $space-4; }
+}

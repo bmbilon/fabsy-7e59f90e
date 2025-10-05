@@ -36,6 +36,7 @@ import DemeritsInsurance from "./pages/hubs/DemeritsInsurance";
 import CourtOptionsDeadlines from "./pages/hubs/CourtOptionsDeadlines";
 import CityQuirks from "./pages/hubs/CityQuirks";
 import ThankYou from "./pages/ThankYou";
+import Founder from "./pages/Founder";
 import Analytics from "./components/Analytics";
 import AcquisitionTracker from "./components/AcquisitionTracker";
 
@@ -67,6 +68,7 @@ const App = () => (
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/founder" element={<Founder />} />
           <Route path="/ai-info" element={<AIInfo />} />
           <Route path="/ticket-analysis" element={<TicketAnalysis />} />
           {/* Blog Routes */}

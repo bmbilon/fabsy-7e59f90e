@@ -29,8 +29,10 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-white/95 backdrop-blur-sm border-t border-muted">
-      <div className="container mx-auto px-4 py-4">
+    <>
+      {/* CONTRAST-GUARD:ALLOW - Brute force white footer with black text has good contrast */}
+      <footer className="bg-white border-t border-gray-200" style={{backgroundColor: '#ffffff !important', color: '#000000 !important'}}>
+        <div className="container mx-auto px-4 py-4" style={{backgroundColor: '#ffffff', color: '#000000'}}>
         {/* Brand Section */}
         <div className="mb-3 text-center flex flex-col items-center">
           <Link to="/" className="flex items-center gap-1.5 mb-2">
@@ -163,9 +165,9 @@ const Footer = () => {
             </div>
             
             {/* Agent Practice Limitations Column */}
-            <div className="bg-amber-50 dark:bg-amber-950/20 p-2 rounded border border-amber-200 dark:border-amber-800">
-              <p className="font-semibold text-amber-800 dark:text-amber-200 mb-1">Limitations on Agent Practice:</p>
-              <div className="space-y-0.5 text-amber-700 dark:text-amber-300">
+            <div className="bg-amber-50 p-2 rounded border border-amber-200">
+              <p className="font-semibold text-amber-800 mb-1">Limitations on Agent Practice:</p>
+              <div className="space-y-0.5 text-amber-700">
                 <p><strong>What We Cannot Do:</strong></p>
                 <ul className="list-disc ml-3 space-y-0 text-[9px]">
                   <li>Represent clients on summary conviction appeals</li>
@@ -191,8 +193,9 @@ const Footer = () => {
         <div className="text-center">
           <p className="text-[10px] text-muted-foreground">© {currentYear} Fabsy Traffic Services. All rights reserved.</p>
         </div>
-      </div>
-    </footer>
+        </div>
+      </footer>
+    </>
   );
 };
 
