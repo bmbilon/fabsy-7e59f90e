@@ -166,17 +166,30 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
         courtJurisdiction: '', // Default empty for form compatibility
       };
       
-      // IMMEDIATELY CACHE THE DATA TO SUPABASE
-      console.log('[EligibilityChecker] Caching extracted ticket data...');
-      const newCacheKey = await cacheTicketData(structuredTicketData);
+      console.log('[EligibilityChecker] Structured ticket data created:', JSON.stringify(structuredTicketData, null, 2));
       
-      if (newCacheKey) {
-        setCacheKey(newCacheKey);
-        console.log(`[EligibilityChecker] Ticket data cached with key: ${newCacheKey}`);
-        toast.success("Ticket data cached successfully!");
+      // IMMEDIATELY CACHE THE DATA TO SUPABASE
+      console.log('[EligibilityChecker] Attempting to cache ticket data to Supabase...');
+      
+      if (cacheTicketData) {
+        try {
+          const newCacheKey = await cacheTicketData(structuredTicketData);
+          
+          if (newCacheKey) {
+            setCacheKey(newCacheKey);
+            console.log(`[EligibilityChecker] Successfully cached ticket data with key: ${newCacheKey}`);
+            toast.success("Ticket scanned and cached successfully!");
+          } else {
+            console.warn('[EligibilityChecker] Cache function returned null - no key generated');
+            toast.success("Ticket scanned! (cache failed, using backup)");
+          }
+        } catch (cacheError) {
+          console.error('[EligibilityChecker] Error during caching:', cacheError);
+          toast.success("Ticket scanned! (cache error, using backup)");
+        }
       } else {
-        console.warn('[EligibilityChecker] Failed to cache ticket data - will fallback to localStorage');
-        toast.warning("Caching failed - using local storage backup");
+        console.warn('[EligibilityChecker] cacheTicketData function not available');
+        toast.success("Ticket scanned! (cache not available, using backup)");
       }
       
       // Set the local state for eligibility calculation
@@ -468,35 +481,44 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   Check Another Ticket
                 </Button>
                 <Button onClick={() => {
+                  console.log(`[EligibilityChecker] Button clicked. Cache key: ${cacheKey}`);
+                  console.log(`[EligibilityChecker] Ticket data:`, ticketData);
+                  
+                  // Always create backup data regardless of cache key
+                  const backupData = {
+                    ticketNumber: ticketData?.ticketNumber || '',
+                    issueDate: ticketData?.issueDate || '',
+                    location: ticketData?.location || '',
+                    officer: ticketData?.officer || '',
+                    officerBadge: ticketData?.officerBadge || '',
+                    offenceSection: ticketData?.offenceSection || '',
+                    offenceSubSection: ticketData?.offenceSubSection || '',
+                    offenceDescription: ticketData?.offenceDescription || '',
+                    violation: ticketData?.violation || '',
+                    fineAmount: ticketData?.fineAmount || '',
+                    courtDate: ticketData?.courtDate || '',
+                    courtJurisdiction: ticketData?.courtJurisdiction || '',
+                  };
+                  
+                  console.log(`[EligibilityChecker] Backup data being stored:`, backupData);
+                  
                   if (cacheKey) {
                     // Navigate with cache key - data already cached in Supabase
-                    console.log(`[EligibilityChecker] Navigating to ticket form with cache key: ${cacheKey}`);
-                    
-                    // Store cache key for ticket form to retrieve
+                    console.log(`[EligibilityChecker] Navigating with cache key: ${cacheKey}`);
                     localStorage.setItem('ticket-cache-key', cacheKey);
-                    
-                    // Also store as backup in case cache lookup fails
-                    const backupData = {
-                      ticketNumber: ticketData?.ticketNumber || '',
-                      issueDate: ticketData?.issueDate || '',
-                      location: ticketData?.location || '',
-                      officer: ticketData?.officer || '',
-                      officerBadge: ticketData?.officerBadge || '',
-                      offenceSection: ticketData?.offenceSection || '',
-                      offenceSubSection: ticketData?.offenceSubSection || '',
-                      offenceDescription: ticketData?.offenceDescription || '',
-                      violation: ticketData?.violation || '',
-                      fineAmount: ticketData?.fineAmount || '',
-                      courtDate: ticketData?.courtDate || '',
-                      courtJurisdiction: '',
-                    };
-                    localStorage.setItem('eligibility-ocr-data-backup', JSON.stringify(backupData));
-                    
-                    toast.success("Navigating to ticket form with your data!");
+                    toast.success("Navigating to ticket form with cached data!");
                   } else {
-                    toast.error("No ticket data available. Please scan your ticket again.");
-                    return;
+                    console.log(`[EligibilityChecker] No cache key - using backup localStorage method`);
+                    toast.success("Navigating to ticket form with your data!");
                   }
+                  
+                  // Always store backup data
+                  localStorage.setItem('eligibility-ocr-data-backup', JSON.stringify(backupData));
+                  
+                  // Also store in legacy format for compatibility
+                  localStorage.setItem('eligibility-ocr-data', JSON.stringify(backupData));
+                  
+                  console.log(`[EligibilityChecker] Stored backup data in localStorage`);
                   
                   // Close dialog and navigate
                   onOpenChange(false);
