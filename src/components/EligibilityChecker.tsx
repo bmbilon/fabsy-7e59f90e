@@ -175,7 +175,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
         console.warn('[EligibilityChecker] Failed to save OCR data to localStorage', e);
       }
 
-      // IMMEDIATELY CACHE THE DATA TO SUPABASE
+      // IMMEDIATELY CACHE THE DATA TO SUPABASE (best effort, silent on failure)
       console.log('[EligibilityChecker] Attempting to cache ticket data to Supabase...');
       
       if (cacheTicketData) {
@@ -185,18 +185,14 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
           if (newCacheKey) {
             setCacheKey(newCacheKey);
             console.log(`[EligibilityChecker] Successfully cached ticket data with key: ${newCacheKey}`);
-            toast.success("Ticket scanned and cached successfully!");
           } else {
             console.warn('[EligibilityChecker] Cache function returned null - no key generated');
-            toast.success("Ticket scanned! (cache failed, using backup)");
           }
         } catch (cacheError) {
-          console.error('[EligibilityChecker] Error during caching:', cacheError);
-          toast.success("Ticket scanned! (cache error, using backup)");
+          console.error('[EligibilityChecker] Error during caching (non-blocking):', cacheError);
         }
       } else {
-        console.warn('[EligibilityChecker] cacheTicketData function not available');
-        toast.success("Ticket scanned! (cache not available, using backup)");
+        console.warn('[EligibilityChecker] cacheTicketData function not available (non-blocking)');
       }
       
       // Set the local state for eligibility calculation
@@ -552,15 +548,15 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                     courtJurisdiction: ticketData?.courtJurisdiction || '',
                   };
                   
-                  console.log(`[EligibilityChecker] Form data being stored for confirm page:`, formData);
+                  console.log(`[EligibilityChecker] Form data being stored for direct navigation:`, formData);
                   
                   // Store data in localStorage for resilience
                   localStorage.setItem('eligibility-ocr-data', JSON.stringify(formData));
                   if (cacheKey) localStorage.setItem('ticket-cache-key', cacheKey);
                   
-                  // Close dialog and navigate to intermediate confirm page, passing state
+                  // Close dialog and navigate directly to Ticket Form step 2 with prefill
                   onOpenChange(false);
-                  navigate('/dispute/confirm', { state: { prefillTicketData: formData } });
+                  navigate('/ticket-form', { state: { prefillTicketData: formData, startAtStep: 2 } });
                 }} className="flex-1">
                   Get My Ticket Dismissed
                 </Button>
