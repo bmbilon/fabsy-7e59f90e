@@ -8,6 +8,7 @@ import { Upload, Loader2, CheckCircle, XCircle, DollarSign, Camera } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AILeadCapture from "./AILeadCapture";
+import { useTicketCache, type TicketData as CachedTicketData } from "@/hooks/useTicketCache";
 
 interface EligibilityCheckerProps {
   open: boolean;
@@ -108,6 +109,10 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
   const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [monthlyPremium, setMonthlyPremium] = useState<string>("");
+  const [cacheKey, setCacheKey] = useState<string | null>(null);
+  
+  // Use ticket cache hook
+  const { cacheTicketData, generateCacheKey } = useTicketCache();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -158,7 +163,21 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
         fine: extractedData.fine, // Use the formatted fine for display
         fineAmount: extractedData.fineAmount, // Store raw amount for calculations and form
         courtDate: extractedData.courtDate,
+        courtJurisdiction: '', // Default empty for form compatibility
       };
+      
+      // IMMEDIATELY CACHE THE DATA TO SUPABASE
+      console.log('[EligibilityChecker] Caching extracted ticket data...');
+      const newCacheKey = await cacheTicketData(structuredTicketData);
+      
+      if (newCacheKey) {
+        setCacheKey(newCacheKey);
+        console.log(`[EligibilityChecker] Ticket data cached with key: ${newCacheKey}`);
+        toast.success("Ticket data cached successfully!");
+      } else {
+        console.warn('[EligibilityChecker] Failed to cache ticket data - will fallback to localStorage');
+        toast.warning("Caching failed - using local storage backup");
+      }
       
       // Set the local state for eligibility calculation
       setTicketData(structuredTicketData);
@@ -449,25 +468,35 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   Check Another Ticket
                 </Button>
                 <Button onClick={() => {
-                  // Store the OCR data for the ticket form
-                  const ocrData = {
-                    ticketNumber: ticketData?.ticketNumber || '',
-                    issueDate: ticketData?.issueDate || '',
-                    location: ticketData?.location || '',
-                    officer: ticketData?.officer || '',
-                    officerBadge: ticketData?.officerBadge || '',
-                    offenceSection: ticketData?.offenceSection || '',
-                    offenceSubSection: ticketData?.offenceSubSection || '',
-                    offenceDescription: ticketData?.offenceDescription || '',
-                    violation: ticketData?.violation || '',
-                    fineAmount: ticketData?.fineAmount || '',
-                    courtDate: ticketData?.courtDate || '',
-                    // Additional fields that TicketForm expects but OCR may not provide
-                    courtJurisdiction: '',
-                  };
-                  
-                  // Store in localStorage for the ticket form to pick up
-                  localStorage.setItem('eligibility-ocr-data', JSON.stringify(ocrData));
+                  if (cacheKey) {
+                    // Navigate with cache key - data already cached in Supabase
+                    console.log(`[EligibilityChecker] Navigating to ticket form with cache key: ${cacheKey}`);
+                    
+                    // Store cache key for ticket form to retrieve
+                    localStorage.setItem('ticket-cache-key', cacheKey);
+                    
+                    // Also store as backup in case cache lookup fails
+                    const backupData = {
+                      ticketNumber: ticketData?.ticketNumber || '',
+                      issueDate: ticketData?.issueDate || '',
+                      location: ticketData?.location || '',
+                      officer: ticketData?.officer || '',
+                      officerBadge: ticketData?.officerBadge || '',
+                      offenceSection: ticketData?.offenceSection || '',
+                      offenceSubSection: ticketData?.offenceSubSection || '',
+                      offenceDescription: ticketData?.offenceDescription || '',
+                      violation: ticketData?.violation || '',
+                      fineAmount: ticketData?.fineAmount || '',
+                      courtDate: ticketData?.courtDate || '',
+                      courtJurisdiction: '',
+                    };
+                    localStorage.setItem('eligibility-ocr-data-backup', JSON.stringify(backupData));
+                    
+                    toast.success("Navigating to ticket form with your data!");
+                  } else {
+                    toast.error("No ticket data available. Please scan your ticket again.");
+                    return;
+                  }
                   
                   // Close dialog and navigate
                   onOpenChange(false);

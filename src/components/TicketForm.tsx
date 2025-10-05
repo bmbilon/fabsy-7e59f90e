@@ -12,6 +12,7 @@ import PaymentStep from "./form-steps/PaymentStep";
 import ReviewStep from "./form-steps/ReviewStep";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTicketCache } from "@/hooks/useTicketCache";
 
 export interface FormData {
   // Personal Information
@@ -137,39 +138,131 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
     ticketImage: initialTicketImage ?? null,
   }));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
   const { toast } = useToast();
+  const { retrieveTicketData, isValidCacheKey } = useTicketCache();
 
-  // Check for OCR data from eligibility checker on mount
+  // Check for cached ticket data from eligibility checker on mount
   useEffect(() => {
-    const savedOcrData = localStorage.getItem('eligibility-ocr-data');
-    if (savedOcrData) {
-      try {
-        const ocrData = JSON.parse(savedOcrData);
-        console.log('[TicketForm] Loading OCR data from eligibility checker:', ocrData);
+    const loadTicketData = async () => {
+      // First, check for cache key from Supabase ticket cache system
+      const cacheKey = localStorage.getItem('ticket-cache-key');
+      
+      if (cacheKey && isValidCacheKey(cacheKey)) {
+        console.log(`[TicketForm] Loading ticket data from cache with key: ${cacheKey}`);
+        setIsLoadingTicketData(true);
         
-        // Parse dates if they exist
-        const parsedData: Partial<FormData> = {
-          ...ocrData,
-          issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
-          courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
-        };
-        
-        // Update form with OCR data
-        setFormData(prev => ({ ...prev, ...parsedData }));
-        
-        // Clean up localStorage
-        localStorage.removeItem('eligibility-ocr-data');
-        
-        toast({
-          title: "Ticket Details Pre-filled!",
-          description: "Your ticket information has been automatically filled in from the eligibility check.",
-        });
-      } catch (error) {
-        console.error('[TicketForm] Error parsing OCR data:', error);
-        localStorage.removeItem('eligibility-ocr-data');
+        try {
+          const cachedData = await retrieveTicketData(cacheKey);
+          
+          if (cachedData) {
+            console.log('[TicketForm] Successfully loaded ticket data from cache:', cachedData);
+            
+            // Parse dates if they exist and are valid
+            const parsedData: Partial<FormData> = {
+              ...cachedData,
+              issueDate: cachedData.issueDate ? new Date(cachedData.issueDate) : undefined,
+              courtDate: cachedData.courtDate ? new Date(cachedData.courtDate) : undefined,
+            };
+            
+            // Update form with cached data
+            setFormData(prev => ({ ...prev, ...parsedData }));
+            
+            // Clean up cache key from localStorage
+            localStorage.removeItem('ticket-cache-key');
+            
+            toast({
+              title: "Ticket Details Loaded!",
+              description: "Your ticket information has been automatically filled in from the eligibility check.",
+            });
+          } else {
+            console.warn('[TicketForm] No cached ticket data found, trying backup method');
+            // Fallback to backup localStorage data
+            await tryBackupData();
+          }
+        } catch (error) {
+          console.error('[TicketForm] Error loading cached ticket data:', error);
+          toast({
+            title: "Warning",
+            description: "Could not load cached ticket data. You may need to fill in the details manually.",
+            variant: "destructive",
+          });
+          
+          // Try backup method as fallback
+          await tryBackupData();
+        } finally {
+          setIsLoadingTicketData(false);
+        }
+      } else {
+        console.log('[TicketForm] No valid cache key found, trying backup data');
+        await tryBackupData();
       }
-    }
-  }, []);
+    };
+    
+    const tryBackupData = async () => {
+      // Fallback: Check for backup OCR data
+      const backupData = localStorage.getItem('eligibility-ocr-data-backup');
+      if (backupData) {
+        try {
+          const ocrData = JSON.parse(backupData);
+          console.log('[TicketForm] Loading backup OCR data:', ocrData);
+          
+          // Parse dates if they exist
+          const parsedData: Partial<FormData> = {
+            ...ocrData,
+            issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
+            courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
+          };
+          
+          // Update form with backup data
+          setFormData(prev => ({ ...prev, ...parsedData }));
+          
+          // Clean up backup localStorage
+          localStorage.removeItem('eligibility-ocr-data-backup');
+          
+          toast({
+            title: "Ticket Details Pre-filled!",
+            description: "Your ticket information has been loaded from backup data.",
+          });
+        } catch (error) {
+          console.error('[TicketForm] Error parsing backup OCR data:', error);
+          localStorage.removeItem('eligibility-ocr-data-backup');
+        }
+      }
+      
+      // Also check legacy localStorage key for backwards compatibility
+      const legacyData = localStorage.getItem('eligibility-ocr-data');
+      if (legacyData) {
+        try {
+          const ocrData = JSON.parse(legacyData);
+          console.log('[TicketForm] Loading legacy OCR data:', ocrData);
+          
+          // Parse dates if they exist
+          const parsedData: Partial<FormData> = {
+            ...ocrData,
+            issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
+            courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
+          };
+          
+          // Update form with legacy data
+          setFormData(prev => ({ ...prev, ...parsedData }));
+          
+          // Clean up legacy localStorage
+          localStorage.removeItem('eligibility-ocr-data');
+          
+          toast({
+            title: "Ticket Details Pre-filled!",
+            description: "Your ticket information has been automatically filled in.",
+          });
+        } catch (error) {
+          console.error('[TicketForm] Error parsing legacy OCR data:', error);
+          localStorage.removeItem('eligibility-ocr-data');
+        }
+      }
+    };
+    
+    loadTicketData();
+  }, [retrieveTicketData, isValidCacheKey, toast]);
 
   const updateFormData = (updates: Partial<FormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -319,6 +412,17 @@ const TicketForm = ({ initialTicketImage = null }: { initialTicketImage?: File |
             100% success rate • Fixed $488 fee • No hidden costs
           </p>
         </div>
+
+        {/* Loading indicator for ticket data */}
+        {isLoadingTicketData && (
+          <Card className="p-6 mb-8 bg-gradient-card shadow-fab border-primary/10">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+              <p className="text-lg font-medium">Loading your ticket details...</p>
+              <p className="text-muted-foreground">We're retrieving the information from your eligibility check.</p>
+            </div>
+          </Card>
+        )}
 
         {/* Progress */}
         <Card className="p-6 mb-8 bg-gradient-card shadow-fab border-primary/10">
