@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Upload, Loader2, CheckCircle, XCircle, DollarSign, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import AILeadCapture from "./AILeadCapture";
 import { useTicketCache, type TicketData as CachedTicketData } from "@/hooks/useTicketCache";
 
 interface EligibilityCheckerProps {
