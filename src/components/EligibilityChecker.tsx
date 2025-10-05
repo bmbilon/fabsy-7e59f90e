@@ -17,6 +17,7 @@ interface EligibilityCheckerProps {
 interface TicketData {
   violation?: string;
   fine?: string;
+  fineAmount?: string;
   ticketNumber?: string;
   issueDate?: string;
   location?: string;
@@ -154,7 +155,8 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
         offenceSubSection: extractedData.offenceSubSection,
         offenceDescription: extractedData.offenceDescription,
         violation: extractedData.violation,
-        fine: extractedData.fineAmount,
+        fine: extractedData.fine, // Use the formatted fine for display
+        fineAmount: extractedData.fineAmount, // Store raw amount for calculations and form
         courtDate: extractedData.courtDate,
       };
       
@@ -176,7 +178,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
       // Calculate eligibility based on financial logic (same as calculator)
       toast.info("Calculating savings...");
       
-      const fineAmount = parseFloat(ticketData.fine?.replace(/[^0-9.]/g, '') || '0');
+      const fineAmount = parseFloat(ticketData.fineAmount?.replace(/[^0-9.]/g, '') || ticketData.fine?.replace(/[^0-9.]/g, '') || '0');
       const violationType = detectViolationType(ticketData.violation || '');
       const violation = violationImpacts[violationType];
       
@@ -458,8 +460,10 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                     offenceSubSection: ticketData?.offenceSubSection || '',
                     offenceDescription: ticketData?.offenceDescription || '',
                     violation: ticketData?.violation || '',
-                    fineAmount: ticketData?.fine || '',
+                    fineAmount: ticketData?.fineAmount || '',
                     courtDate: ticketData?.courtDate || '',
+                    // Additional fields that TicketForm expects but OCR may not provide
+                    courtJurisdiction: '',
                   };
                   
                   // Store in localStorage for the ticket form to pick up
