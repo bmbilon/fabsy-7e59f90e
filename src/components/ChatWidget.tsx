@@ -29,7 +29,7 @@ const ChatWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hi! I'm here to help answer questions about fighting traffic tickets in Alberta. What would you like to know?",
+      text: "Hi! I'm Fabsy's AI assistant. I can help answer questions about Alberta traffic tickets - speeding, red light cameras, distracted driving, court options, and more. What's your situation?",
       sender: 'bot',
       timestamp: new Date()
     }
@@ -48,24 +48,30 @@ const ChatWidget = () => {
       // Track the query for AEO analytics
       await trackAIQuery(userMessage, {});
 
-      // Call the AI analysis function
-      const { data, error } = await supabase.functions.invoke('analyze-ticket-ai', {
+      // Build conversation context (last 6 messages for better conversation flow)
+      const context = messages.slice(-6).filter(m => !m.isLoading);
+
+      // Call the enhanced AI chat function
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: {
-          question: userMessage.trim(),
-          ticketData: {}
+          message: userMessage.trim(),
+          context: context
         }
       });
 
       if (error) throw error;
 
-      if (data && data.ai_answer) {
-        // Extract the hook (main answer) from the AI response
-        return data.ai_answer.hook || data.ai_answer.explain || "I can help you with that. Could you provide more details about your traffic ticket?";
+      if (data && data.reply) {
+        return data.reply;
+      }
+
+      if (data && data.error) {
+        return data.error;
       }
 
       throw new Error('Invalid AI response');
     } catch (error) {
-      console.error('AI response error:', error);
+      console.error('AI chat error:', error);
       return "I'm having trouble connecting right now. For immediate assistance, please use the 'Leave Message' option or call us at 403-669-5353.";
     }
   };
