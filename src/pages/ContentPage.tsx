@@ -12,10 +12,10 @@ import { Button } from '@/components/ui/button';
 
 const ContentPage = () => {
   const { slug } = useParams();
-  const [pageData, setPageData] = useState<any>(null);
+  const [pageData, setPageData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [relatedPages, setRelatedPages] = useState<any[]>([]);
+  const [relatedPages, setRelatedPages] = useState<Record<string, unknown>[]>([]);
 
   useEffect(() => {
     async function fetchPage() {
@@ -39,7 +39,9 @@ const ContentPage = () => {
         const parsedData = {
           ...data,
           faqs: typeof data.faqs === 'string' ? JSON.parse(data.faqs || '[]') : (data.faqs || []),
-          stats: typeof (data as any).stats === 'string' ? JSON.parse((data as any).stats || '{}') : ((data as any).stats || {}),
+          stats: typeof (data as Record<string, unknown>).stats === 'string' 
+            ? JSON.parse((data as Record<string, unknown>).stats as string || '{}') 
+            : ((data as Record<string, unknown>).stats || {}),
         };
 
         setPageData(parsedData);
@@ -77,14 +79,16 @@ const ContentPage = () => {
   // Set GA4 user properties for AEO context (city, violation) when data loads
   useEffect(() => {
     if (pageData?.city || pageData?.violation) {
-      const gtag = (window as any).gtag as undefined | ((...args: any[]) => void);
+      const gtag = (window as Record<string, unknown>).gtag as undefined | ((...args: unknown[]) => void);
       if (typeof gtag === 'function') {
         try {
           gtag('set', 'user_properties', {
             city: pageData?.city || undefined,
             violation: pageData?.violation || undefined,
           });
-        } catch {}
+        } catch {
+          // Silent fail for gtag errors
+        }
       }
     }
   }, [pageData?.city, pageData?.violation]);
@@ -119,6 +123,44 @@ const ContentPage = () => {
   }
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`;
+  
+  // Enhanced city detection for better LocalBusiness schema coverage
+  const detectCityFromSlug = (slug: string): string | null => {
+    const cityPatterns = [
+      { pattern: /calgary/i, city: 'Calgary' },
+      { pattern: /edmonton/i, city: 'Edmonton' },
+      { pattern: /red-deer/i, city: 'Red Deer' },
+      { pattern: /lethbridge/i, city: 'Lethbridge' },
+      { pattern: /medicine-hat/i, city: 'Medicine Hat' },
+      { pattern: /fort-mcmurray/i, city: 'Fort McMurray' },
+      { pattern: /grande-prairie/i, city: 'Grande Prairie' },
+      { pattern: /airdrie/i, city: 'Airdrie' },
+      { pattern: /leduc/i, city: 'Leduc' },
+      { pattern: /okotoks/i, city: 'Okotoks' },
+      { pattern: /brooks/i, city: 'Brooks' },
+      { pattern: /lacombe/i, city: 'Lacombe' },
+      { pattern: /stony-plain/i, city: 'Stony Plain' },
+      { pattern: /jasper/i, city: 'Jasper' },
+      { pattern: /hinton/i, city: 'Hinton' },
+      { pattern: /canmore/i, city: 'Canmore' },
+      { pattern: /banff/i, city: 'Banff' },
+      { pattern: /cochrane/i, city: 'Cochrane' },
+      { pattern: /spruce-grove/i, city: 'Spruce Grove' },
+      { pattern: /lloydminster/i, city: 'Lloydminster' },
+      { pattern: /wetaskiwin/i, city: 'Wetaskiwin' },
+      { pattern: /camrose/i, city: 'Camrose' },
+      { pattern: /cold-lake/i, city: 'Cold Lake' },
+      { pattern: /sylvan-lake/i, city: 'Sylvan Lake' }
+    ];
+    
+    for (const { pattern, city } of cityPatterns) {
+      if (pattern.test(slug)) return city;
+    }
+    return null;
+  };
+  
+  const detectedCity = pageData.city || detectCityFromSlug(pageData.slug as string || '');
+  const shouldRenderLocalBusiness = !!detectedCity;
 
   // Select 1–2 hub links based on context
   const slugStr = String(pageData.slug || '').toLowerCase();
@@ -149,10 +191,10 @@ const ContentPage = () => {
         dateModified={pageData.updated_at}
       />
       {/* Enhanced LocalBusiness schema for Alberta city pages */}
-      {pageData.city && (
+      {shouldRenderLocalBusiness && detectedCity && (
         <LocalBusinessSchema 
           url={currentUrl}
-          cityName={pageData.city}
+          cityName={detectedCity}
           aggregateRating={{
             ratingValue: 4.9,
             reviewCount: pageData.stats?.reviewCount || 127,

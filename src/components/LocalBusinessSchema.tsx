@@ -76,7 +76,7 @@ const LocalBusinessSchema: React.FC<Props> = ({
     '@id': url,
     name: `${name} - ${cityName}`,
     alternateName: [`Fabsy ${cityName}`, `Traffic Ticket Defense ${cityName}`, `Fight Traffic Tickets ${cityName}`],
-    description: `Professional traffic ticket defense services in ${cityName}, Alberta. Expert representation for speeding tickets, red light violations, careless driving, and distracted driving charges. Zero-risk guarantee.`,
+  description: `Yes, you can fight traffic tickets in ${cityName}, Alberta. Professional defense services for speeding, red light, careless driving, and distracted driving charges. Expert representation with zero-risk guarantee - you only pay if we achieve a favorable outcome.`,
     url,
     telephone,
     email,
@@ -242,7 +242,41 @@ const LocalBusinessSchema: React.FC<Props> = ({
         '@type': 'Organization',
         name: 'Government of Alberta'
       }
-    }
+    },
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `Can I fight a speeding ticket in ${cityName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Yes, you can fight a speeding ticket in ${cityName}, Alberta. Most speeding tickets can be successfully disputed through proper legal representation. We help preserve your driving record and prevent insurance increases with our zero-risk service.`
+        }
+      },
+      {
+        '@type': 'Question', 
+        name: `How to fight a red light ticket in ${cityName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `To fight a red light ticket in ${cityName}, you need to dispute it within 7 days and request disclosure. Our expert representatives review camera evidence, timing calibration, and procedural errors to build your defense. We achieve favorable outcomes in most cases.`
+        }
+      },
+      {
+        '@type': 'Question',
+        name: `What happens if I get caught driving without insurance in ${cityName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Driving without insurance in ${cityName} carries serious penalties including fines up to $2,875, license suspension, and vehicle impoundment. However, many charges can be reduced or dismissed with proper legal representation, especially if you had valid coverage that wasn't properly documented.`
+        }
+      },
+      {
+        '@type': 'Question',
+        name: `How to fight a careless driving ticket in ${cityName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Fighting a careless driving ticket in ${cityName} requires challenging the officer's subjective assessment and evidence. Our representatives examine witness statements, road conditions, and procedural compliance to build a strong defense. Careless driving charges often have successful defense strategies.`
+        }
+      }
+    ]
   };
 
   return <StaticJsonLd schema={localBusinessSchema} dataAttr={`localbusiness-${cityName.toLowerCase()}`} />;

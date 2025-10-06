@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 
 const WorkingContentPage = () => {
   const { slug } = useParams();
-  const [pageData, setPageData] = useState<any>(null);
+  const [pageData, setPageData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +47,9 @@ const WorkingContentPage = () => {
         const parsedData = {
           ...data,
           faqs: typeof data.faqs === 'string' ? JSON.parse(data.faqs || '[]') : (data.faqs || []),
-          stats: typeof (data as any).stats === 'string' ? JSON.parse((data as any).stats || '{}') : ((data as any).stats || {}),
+          stats: typeof (data as Record<string, unknown>).stats === 'string' 
+            ? JSON.parse((data as Record<string, unknown>).stats as string || '{}') 
+            : ((data as Record<string, unknown>).stats || {}),
         };
 
         setPageData(parsedData);
@@ -93,8 +95,46 @@ const WorkingContentPage = () => {
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`;
 
-  // Derive Service schema fields
-  const cityName: string | undefined = pageData.city || (pageData.h1 && /\bin\s+([A-Za-z\-\s]+)$/.exec(pageData.h1)?.[1]?.trim());
+  // Derive Service schema fields with enhanced city detection
+  const detectCityFromSlug = (slug: string): string | null => {
+    const cityPatterns = [
+      { pattern: /calgary/i, city: 'Calgary' },
+      { pattern: /edmonton/i, city: 'Edmonton' },
+      { pattern: /red-deer/i, city: 'Red Deer' },
+      { pattern: /lethbridge/i, city: 'Lethbridge' },
+      { pattern: /medicine-hat/i, city: 'Medicine Hat' },
+      { pattern: /fort-mcmurray/i, city: 'Fort McMurray' },
+      { pattern: /grande-prairie/i, city: 'Grande Prairie' },
+      { pattern: /airdrie/i, city: 'Airdrie' },
+      { pattern: /leduc/i, city: 'Leduc' },
+      { pattern: /okotoks/i, city: 'Okotoks' },
+      { pattern: /brooks/i, city: 'Brooks' },
+      { pattern: /lacombe/i, city: 'Lacombe' },
+      { pattern: /stony-plain/i, city: 'Stony Plain' },
+      { pattern: /jasper/i, city: 'Jasper' },
+      { pattern: /hinton/i, city: 'Hinton' },
+      { pattern: /canmore/i, city: 'Canmore' },
+      { pattern: /banff/i, city: 'Banff' },
+      { pattern: /cochrane/i, city: 'Cochrane' },
+      { pattern: /spruce-grove/i, city: 'Spruce Grove' },
+      { pattern: /lloydminster/i, city: 'Lloydminster' },
+      { pattern: /wetaskiwin/i, city: 'Wetaskiwin' },
+      { pattern: /camrose/i, city: 'Camrose' },
+      { pattern: /cold-lake/i, city: 'Cold Lake' },
+      { pattern: /sylvan-lake/i, city: 'Sylvan Lake' }
+    ];
+    
+    for (const { pattern, city } of cityPatterns) {
+      if (pattern.test(slug)) return city;
+    }
+    return null;
+  };
+  
+  const cityName: string | undefined = pageData.city 
+    || detectCityFromSlug(pageData.slug as string || '') 
+    || (pageData.h1 && /\bin\s+([A-Za-z\-\s]+)$/.exec(pageData.h1 as string)?.[1]?.trim()) 
+    || undefined;
+    
   const serviceName: string = pageData.h1 || `Traffic Ticket Dispute${cityName ? ` in ${cityName}` : ''}`;
   const serviceType = 'Traffic ticket dispute';
 
@@ -106,9 +146,12 @@ const WorkingContentPage = () => {
   // FAQ JSON-LD (if FAQs present)
   const faqEntities = Array.isArray(pageData.faqs)
     ? pageData.faqs
-        .map((f: any) => ({ q: typeof f.q === 'string' ? f.q.trim() : '', a: typeof f.a === 'string' ? f.a.trim() : '' }))
-        .filter((f: any) => f.q && f.a)
-        .map((f: any) => ({
+        .map((f: Record<string, unknown>) => ({ 
+          q: typeof f.q === 'string' ? f.q.trim() : '', 
+          a: typeof f.a === 'string' ? f.a.trim() : '' 
+        }))
+        .filter((f: { q: string; a: string }) => f.q && f.a)
+        .map((f: { q: string; a: string }) => ({
           '@type': 'Question',
           name: f.q,
           acceptedAnswer: { '@type': 'Answer', text: f.a },
@@ -158,6 +201,7 @@ const WorkingContentPage = () => {
         ]}
         totalTime="PT3M"
       />
+      {/* Always render FAQPage schema if we have any FAQ data */}
       {faqEntities.length > 0 && (
         <StaticJsonLd
           schema={{
@@ -168,6 +212,13 @@ const WorkingContentPage = () => {
           dataAttr="faq"
         />
       )}
+      {/* Debug: Log FAQ data availability */}
+      {typeof window !== 'undefined' && console.log('FAQ Debug:', {
+        hasFaqs: Array.isArray(pageData.faqs),
+        faqCount: pageData.faqs ? pageData.faqs.length : 0,
+        faqEntityCount: faqEntities.length,
+        sampleFaq: pageData.faqs?.[0]
+      })}
 
       <Header />
 
