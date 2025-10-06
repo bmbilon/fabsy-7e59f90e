@@ -45,7 +45,21 @@ const HowToSchema: React.FC<Props> = ({
             value: estimatedCost,
           },
         }
-      : {}),
+      : {
+          estimatedCost: {
+            '@type': 'MonetaryAmount',
+            currency: 'CAD',
+            value: '0',
+          },
+        }),
+    supply: [{
+      '@type': 'HowToSupply',
+      name: 'Your ticket details (photo or PDF)'
+    }],
+    tool: [{
+      '@type': 'HowToTool',
+      name: 'Fabsy eligibility checker'
+    }],
     step: steps.map((step, idx) => {
       const s: any = {
         '@type': 'HowToStep',

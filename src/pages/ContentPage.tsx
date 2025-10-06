@@ -9,6 +9,7 @@ import LocalBusinessSchema from '@/components/LocalBusinessSchema';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import AnswerBox from '@/components/AnswerBox';
 
 const ContentPage = () => {
   const { slug } = useParams();
@@ -229,11 +230,21 @@ const ContentPage = () => {
 
           {/* Hero Section */}
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-            <h1 className="text-4xl font-bold mb-6 text-gray-900">
-              {pageData.h1 || pageData.slug}
-            </h1>
+          <h1 className="text-4xl font-bold mb-6 text-gray-900">
+            {pageData.h1 || pageData.slug}
+          </h1>
 
-            {/* Stats Grid */}
+          {/* Answer Box - 60-second answer above the fold */}
+          {detectedCity && pageData.violation && (
+            <AnswerBox 
+              offence={pageData.violation as string}
+              city={detectedCity}
+              ctaHref="/submit-ticket"
+              className="mb-8"
+            />
+          )}
+
+          {/* Stats Grid */}
             {pageData.stats && Object.keys(pageData.stats).length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {pageData.stats.avgFine && (

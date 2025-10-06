@@ -12,6 +12,7 @@ import HowToSchema from '@/components/HowToSchema';
 import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import AnswerBox from '@/components/AnswerBox';
 
 const WorkingContentPage = () => {
   const { slug } = useParams();
@@ -139,8 +140,8 @@ const WorkingContentPage = () => {
   const serviceType = 'Traffic ticket dispute';
 
   // Derive offense/violation for answer box and HowTo
-  const offense: string = (pageData.violation
-    || (pageData.h1 && (/Fight\s+(?:a|an)\s+(.+?)\s+in\s+/i.exec(pageData.h1)?.[1]?.trim()))
+  const offence: string = (pageData.violation
+    || (pageData.h1 && (/Fight\s+(?:a|an)\s+(.+?)\s+in\s+/i.exec(pageData.h1 as string)?.[1]?.trim()))
     || 'traffic ticket');
 
   // FAQ JSON-LD (if FAQs present)
@@ -191,8 +192,8 @@ const WorkingContentPage = () => {
       )}
       {/* HowTo for cornerstone flows */}
       <HowToSchema
-        name={`How to fight a ${offense.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'} (3 steps)`}
-        description={`Fast, proven process to fight a ${offense.toLowerCase()}${cityName ? ` in ${cityName}` : ''}.`}
+        name={`How to fight a ${offence.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'} (3 steps)`}
+        description={`Fast, proven process to fight a ${offence.toLowerCase()}${cityName ? ` in ${cityName}` : ''}.`}
         url={currentUrl}
         steps={[
           { name: 'Upload your ticket', text: 'Send us a photo or PDF of your ticket and basic details.' },
@@ -248,12 +249,21 @@ const WorkingContentPage = () => {
             {pageData.h1 || pageData.slug}
           </h1>
 
-          {/* Answer Box (60-second summary) */}
+          {/* Answer Box - 60-second answer above the fold */}
+          {cityName && offence && (
+            <AnswerBox 
+              offence={offence}
+              city={cityName}
+              ctaHref="/submit-ticket"
+            />
+          )}
+
+          {/* Original Answer Box (60-second summary) - keeping as fallback */}
           <div className="mb-8 rounded-xl border bg-card shadow-sm p-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-lg font-semibold text-foreground mb-2">Can I fight it?</h2>
-                <p className="text-foreground">Yes — most {offense.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'} can be fought. You’re more likely to qualify if you act within 7 days, request disclosure, and avoid admitting fault.</p>
+                <p className="text-foreground">Yes — most {offence.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'} can be fought. You're more likely to qualify if you act within 7 days, request disclosure, and avoid admitting fault.</p>
                 <h3 className="mt-4 text-sm font-semibold text-foreground">What to do now (3 steps)</h3>
                 <ol className="mt-2 list-decimal ml-5 space-y-1 text-foreground">
                   <li>Upload your ticket</li>
@@ -267,7 +277,7 @@ const WorkingContentPage = () => {
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Risk</h3>
                 <p className="text-foreground">Zero-risk: you pay only if we win.</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>
-                <p className="text-foreground">{cityName || 'Alberta'} • {offense.charAt(0).toUpperCase() + offense.slice(1)}</p>
+                <p className="text-foreground">{cityName || 'Alberta'} • {offence.charAt(0).toUpperCase() + offence.slice(1)}</p>
               </div>
             </div>
           </div>
