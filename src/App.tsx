@@ -21,8 +21,10 @@ import AIInfo from "./pages/AIInfo";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminCaseManagement from "./pages/AdminCaseManagement";
 import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
 import AdminBlog from "./pages/AdminBlog";
+import AdminUserManagement from "./pages/AdminUserManagement";
 import AEODashboard from "./pages/AEODashboard";
 import TicketAnalysis from "./pages/TicketAnalysis";
 import WorkingContentPage from "./pages/WorkingContentPage";
@@ -79,7 +81,9 @@ const App = () => (
            {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/cases" element={<AdminCaseManagement />} />
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
+          <Route path="/admin/users" element={<AdminUserManagement />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
           <Route path="/admin/blog" element={<AdminBlog />} />
           {/* Blog routes */}
