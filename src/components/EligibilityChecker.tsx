@@ -27,6 +27,7 @@ interface TicketData {
   offenceSubSection?: string;
   offenceDescription?: string;
   courtDate?: string;
+  courtJurisdiction?: string;
 }
 
 interface EligibilityResult {

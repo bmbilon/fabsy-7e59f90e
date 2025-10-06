@@ -78,14 +78,17 @@ export const useTicketCache = () => {
         method: 'GET'
       });
 
-      // For GET requests, we need to use the REST client or construct the URL manually
+      // For GET requests, construct the URL manually with environment variables
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      
       const response = await fetch(
-        `${supabase.supabaseUrl}/functions/v1/cache-ticket-data?cacheKey=${encodeURIComponent(cacheKey)}`,
+        `${supabaseUrl}/functions/v1/cache-ticket-data?cacheKey=${encodeURIComponent(cacheKey)}`,
         {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${supabase.supabaseKey}`,
-            'apikey': supabase.supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
           },
         }
       );

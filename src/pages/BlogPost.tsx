@@ -308,10 +308,13 @@ const BlogPost = () => {
                     em: ({node, ...props}) => <em className="italic" {...props} />,
                     a: ({node, ...props}) => <a className="text-blue-600 hover:text-blue-700 underline" {...props} />,
                     blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-blue-500 pl-4 italic my-6 text-gray-600" {...props} />,
-                    code: ({node, inline, ...props}) => 
-                      inline 
+                    code: ({node, ...props}) => {
+                      const { className } = props as any;
+                      const isInline = !className || !className.includes('language-');
+                      return isInline 
                         ? <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono" {...props} />
-                        : <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg my-6 overflow-x-auto" {...props} />,
+                        : <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg my-6 overflow-x-auto" {...props} />;
+                    },
                     img: ({node, ...props}) => (
                       <img 
                         className="w-full rounded-lg my-8 shadow-lg" 
@@ -347,16 +350,16 @@ const BlogPost = () => {
                 </div>
 
                 {/* Call to Action */}
-                <div className="bg-fabsy-red text-white rounded-lg p-8 text-center" style={{backgroundColor: '#dc2626 !important', color: '#ffffff !important'}}>
-                  <h3 className="text-2xl font-bold mb-4">Need Help with Your Traffic Ticket?</h3>
-                  <p className="text-xl mb-6 opacity-90">
+                <div className="bg-gradient-to-r from-purple-400 to-pink-400 text-white rounded-lg p-8 text-center shadow-lg">
+                  <h3 className="text-2xl font-bold mb-4 text-gray-900">Need Help with Your Traffic Ticket?</h3>
+                  <p className="text-xl mb-6 text-gray-800">
                     Don't let a traffic ticket impact your driving record. Get expert help from Alberta's premier traffic defense service.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild variant="secondary" size="lg">
                       <Link to="/contact">Get Free Consultation</Link>
                     </Button>
-                    <Button asChild variant="outline" size="lg" className="bg-white text-fabsy-red hover:bg-gray-50" style={{backgroundColor: '#ffffff', color: '#dc2626'}}>
+                    <Button asChild variant="outline" size="lg" className="bg-white text-purple-600 hover:bg-gray-50 border-white">
                       <Link to="/">Learn More</Link>
                     </Button>
                   </div>

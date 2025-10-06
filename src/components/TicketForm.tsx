@@ -165,7 +165,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
   const { toast } = useToast();
-  const { retrieveTicketData, isValidCacheKey } = useTicketCache();
+  const { getCachedTicketData, isCacheKeyValid } = useTicketCache();
 
   // Check for ticket data from eligibility checker on mount
   useEffect(() => {
@@ -177,19 +177,19 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
       
       // Then try Supabase cache as enhancement (non-blocking)
       const cacheKey = localStorage.getItem('ticket-cache-key');
-      if (cacheKey && isValidCacheKey(cacheKey) && retrieveTicketData) {
+      if (cacheKey && isCacheKeyValid && getCachedTicketData) {
         console.log(`[TicketForm] Also attempting Supabase cache with key: ${cacheKey}`);
         setIsLoadingTicketData(true);
         
         try {
-          const cachedData = await retrieveTicketData(cacheKey);
-          if (cachedData && Object.keys(cachedData).length > 0) {
+          const cachedData = await getCachedTicketData(cacheKey);
+          if (cachedData?.ticketData && Object.keys(cachedData.ticketData).length > 0) {
             console.log('[TicketForm] Supabase cache data available, updating form...');
             
             const parsedData: Partial<FormData> = {
-              ...cachedData,
-              issueDate: cachedData.issueDate ? new Date(cachedData.issueDate) : undefined,
-              courtDate: cachedData.courtDate ? new Date(cachedData.courtDate) : undefined,
+              ...cachedData.ticketData,
+              issueDate: cachedData.ticketData.issueDate ? new Date(cachedData.ticketData.issueDate) : undefined,
+              courtDate: cachedData.ticketData.courtDate ? new Date(cachedData.ticketData.courtDate) : undefined,
             };
             
             // Update form with cached data (may override localStorage)
@@ -285,7 +285,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
     };
     
     loadTicketData();
-  }, [retrieveTicketData, isValidCacheKey, toast]);
+  }, [getCachedTicketData, isCacheKeyValid, toast]);
 
   const updateFormData = (updates: Partial<FormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
