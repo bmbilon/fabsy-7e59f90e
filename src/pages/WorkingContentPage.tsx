@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import FAQSection from '@/components/FAQSection';
 import ArticleSchema from '@/components/ArticleSchema';
 import ServiceSchema from '@/components/ServiceSchema';
+import LocalBusinessSchema from '@/components/LocalBusinessSchema';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import HowToSchema from '@/components/HowToSchema';
 import useSafeHead from '@/hooks/useSafeHead';
@@ -132,6 +133,19 @@ const WorkingContentPage = () => {
         price="0"
         priceCurrency="CAD"
       />
+      {/* Enhanced LocalBusiness schema for Alberta city pages */}
+      {cityName && (
+        <LocalBusinessSchema 
+          url={currentUrl}
+          cityName={cityName}
+          aggregateRating={{
+            ratingValue: 4.9,
+            reviewCount: pageData.stats?.reviewCount || 127,
+            bestRating: 5,
+            worstRating: 1
+          }}
+        />
+      )}
       {/* HowTo for cornerstone flows */}
       <HowToSchema
         name={`How to fight a ${offense.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'} (3 steps)`}

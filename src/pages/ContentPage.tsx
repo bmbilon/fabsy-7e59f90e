@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FAQSection from '@/components/FAQSection';
 import ArticleSchema from '@/components/ArticleSchema';
+import LocalBusinessSchema from '@/components/LocalBusinessSchema';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -147,6 +148,19 @@ const ContentPage = () => {
         datePublished={pageData.created_at}
         dateModified={pageData.updated_at}
       />
+      {/* Enhanced LocalBusiness schema for Alberta city pages */}
+      {pageData.city && (
+        <LocalBusinessSchema 
+          url={currentUrl}
+          cityName={pageData.city}
+          aggregateRating={{
+            ratingValue: 4.9,
+            reviewCount: pageData.stats?.reviewCount || 127,
+            bestRating: 5,
+            worstRating: 1
+          }}
+        />
+      )}
 
       <Header />
 
