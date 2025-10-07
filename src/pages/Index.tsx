@@ -9,8 +9,14 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ChatWidget from "@/components/ChatWidget";
 import AIQuestionWidget from "@/components/AIQuestionWidget";
+import useSafeHead from "@/hooks/useSafeHead";
 
 const Index = () => {
+  // Set homepage canonical
+  useSafeHead({
+    canonical: 'https://fabsy.ca/'
+  });
+
   return (
     <main className="min-h-screen">
       <Header />
