@@ -1,0 +1,883 @@
+{
+  "created": "2025-10-07T00:45:54.157Z",
+  "task_id": "AEO-EXP-003",
+  "statistics": {
+    "total_new_pages": 29,
+    "total_links_created": 72,
+    "avg_links_per_page": "2.5",
+    "pages_meeting_criteria": 18,
+    "success_rate": "62.1%"
+  },
+  "linking_opportunities": [
+    {
+      "target_page": "/content/speeding-ticket-grande-prairie",
+      "target_city": "Grande Prairie",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "speeding ticket in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "speeding ticket in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "speeding tickets in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "speeding tickets in Grande Prairie",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/red-light-ticket-grande-prairie",
+      "target_city": "Grande Prairie",
+      "target_offence": "red-light",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "red-light ticket in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "red-light ticket in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "red-light tickets in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "red-light tickets in Grande Prairie",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/distracted-driving-ticket-grande-prairie",
+      "target_city": "Grande Prairie",
+      "target_offence": "distracted-driving",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/distracted-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/distracted-driving-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "distracted-driving ticket in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/distracted-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/distracted-driving-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "distracted-driving ticket in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/distracted-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/distracted-driving-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "distracted-driving tickets in Grande Prairie",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/distracted-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/distracted-driving-ticket-grande-prairie",
+          "to_city": "Grande Prairie",
+          "anchor_text": "distracted-driving tickets in Grande Prairie",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/speeding-ticket-spruce-grove",
+      "target_city": "Spruce Grove",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-spruce-grove",
+          "to_city": "Spruce Grove",
+          "anchor_text": "speeding ticket in Spruce Grove",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-spruce-grove",
+          "to_city": "Spruce Grove",
+          "anchor_text": "speeding ticket in Spruce Grove",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-spruce-grove",
+          "to_city": "Spruce Grove",
+          "anchor_text": "speeding tickets in Spruce Grove",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-spruce-grove",
+          "to_city": "Spruce Grove",
+          "anchor_text": "speeding tickets in Spruce Grove",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/seatbelt-ticket-spruce-grove",
+      "target_city": "Spruce Grove",
+      "target_offence": "seatbelt",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/no-insurance-ticket-spruce-grove",
+      "target_city": "Spruce Grove",
+      "target_offence": "no-insurance",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/speeding-ticket-wetaskiwin",
+      "target_city": "Wetaskiwin",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "speeding ticket in Wetaskiwin",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "speeding ticket in Wetaskiwin",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "speeding tickets in Wetaskiwin",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "speeding tickets in Wetaskiwin",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/fail-to-yield-ticket-wetaskiwin",
+      "target_city": "Wetaskiwin",
+      "target_offence": "fail-to-yield",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/careless-driving-ticket-wetaskiwin",
+      "target_city": "Wetaskiwin",
+      "target_offence": "careless-driving",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/careless-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/careless-driving-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "careless-driving ticket in Wetaskiwin",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/careless-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/careless-driving-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "careless-driving ticket in Wetaskiwin",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/careless-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/careless-driving-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "careless-driving tickets in Wetaskiwin",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/careless-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/careless-driving-ticket-wetaskiwin",
+          "to_city": "Wetaskiwin",
+          "anchor_text": "careless-driving tickets in Wetaskiwin",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/speeding-ticket-camrose",
+      "target_city": "Camrose",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-camrose",
+          "to_city": "Camrose",
+          "anchor_text": "speeding ticket in Camrose",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-camrose",
+          "to_city": "Camrose",
+          "anchor_text": "speeding ticket in Camrose",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-camrose",
+          "to_city": "Camrose",
+          "anchor_text": "speeding tickets in Camrose",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-camrose",
+          "to_city": "Camrose",
+          "anchor_text": "speeding tickets in Camrose",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/fail-to-stop-ticket-camrose",
+      "target_city": "Camrose",
+      "target_offence": "fail-to-stop",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/following-too-close-ticket-camrose",
+      "target_city": "Camrose",
+      "target_offence": "following-too-close",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/speeding-ticket-cold-lake",
+      "target_city": "Cold Lake",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "speeding ticket in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "speeding ticket in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "speeding tickets in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "speeding tickets in Cold Lake",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/red-light-ticket-cold-lake",
+      "target_city": "Cold Lake",
+      "target_offence": "red-light",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "red-light ticket in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "red-light ticket in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "red-light tickets in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "red-light tickets in Cold Lake",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/distracted-driving-ticket-cold-lake",
+      "target_city": "Cold Lake",
+      "target_offence": "distracted-driving",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/distracted-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/distracted-driving-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "distracted-driving ticket in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/distracted-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/distracted-driving-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "distracted-driving ticket in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/distracted-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/distracted-driving-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "distracted-driving tickets in Cold Lake",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/distracted-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/distracted-driving-ticket-cold-lake",
+          "to_city": "Cold Lake",
+          "anchor_text": "distracted-driving tickets in Cold Lake",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/speeding-ticket-canmore",
+      "target_city": "Canmore",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-canmore",
+          "to_city": "Canmore",
+          "anchor_text": "speeding ticket in Canmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-canmore",
+          "to_city": "Canmore",
+          "anchor_text": "speeding ticket in Canmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-canmore",
+          "to_city": "Canmore",
+          "anchor_text": "speeding tickets in Canmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-canmore",
+          "to_city": "Canmore",
+          "anchor_text": "speeding tickets in Canmore",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/stunting-ticket-canmore",
+      "target_city": "Canmore",
+      "target_offence": "stunting",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/seatbelt-ticket-canmore",
+      "target_city": "Canmore",
+      "target_offence": "seatbelt",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/speeding-ticket-high-river",
+      "target_city": "High River",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "speeding ticket in High River",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "speeding ticket in High River",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "speeding tickets in High River",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "speeding tickets in High River",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/no-insurance-ticket-high-river",
+      "target_city": "High River",
+      "target_offence": "no-insurance",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/red-light-ticket-high-river",
+      "target_city": "High River",
+      "target_offence": "red-light",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "red-light ticket in High River",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "red-light ticket in High River",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "red-light tickets in High River",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-high-river",
+          "to_city": "High River",
+          "anchor_text": "red-light tickets in High River",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/careless-driving-ticket-okotoks",
+      "target_city": "Okotoks",
+      "target_offence": "careless-driving",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/careless-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/careless-driving-ticket-okotoks",
+          "to_city": "Okotoks",
+          "anchor_text": "careless-driving ticket in Okotoks",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/careless-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/careless-driving-ticket-okotoks",
+          "to_city": "Okotoks",
+          "anchor_text": "careless-driving ticket in Okotoks",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/careless-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/careless-driving-ticket-okotoks",
+          "to_city": "Okotoks",
+          "anchor_text": "careless-driving tickets in Okotoks",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/careless-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/careless-driving-ticket-okotoks",
+          "to_city": "Okotoks",
+          "anchor_text": "careless-driving tickets in Okotoks",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/following-too-close-ticket-okotoks",
+      "target_city": "Okotoks",
+      "target_offence": "following-too-close",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/speeding-ticket-lloydminster",
+      "target_city": "Lloydminster",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "speeding ticket in Lloydminster",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "speeding ticket in Lloydminster",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "speeding tickets in Lloydminster",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "speeding tickets in Lloydminster",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/seatbelt-ticket-lloydminster",
+      "target_city": "Lloydminster",
+      "target_offence": "seatbelt",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/red-light-ticket-lloydminster",
+      "target_city": "Lloydminster",
+      "target_offence": "red-light",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "red-light ticket in Lloydminster",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "red-light ticket in Lloydminster",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/red-light-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "red-light tickets in Lloydminster",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/red-light-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/red-light-ticket-lloydminster",
+          "to_city": "Lloydminster",
+          "anchor_text": "red-light tickets in Lloydminster",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/speeding-ticket-strathmore",
+      "target_city": "Strathmore",
+      "target_offence": "speeding",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "speeding ticket in Strathmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "speeding ticket in Strathmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/speeding-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "speeding tickets in Strathmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/speeding-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/speeding-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "speeding tickets in Strathmore",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    },
+    {
+      "target_page": "/content/fail-to-yield-ticket-strathmore",
+      "target_city": "Strathmore",
+      "target_offence": "fail-to-yield",
+      "links": [],
+      "total_links": 0
+    },
+    {
+      "target_page": "/content/distracted-driving-ticket-strathmore",
+      "target_city": "Strathmore",
+      "target_offence": "distracted-driving",
+      "links": [
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/distracted-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/distracted-driving-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "distracted-driving ticket in Strathmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "same_offence",
+          "from_url": "/content/distracted-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/distracted-driving-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "distracted-driving ticket in Strathmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/distracted-driving-ticket-calgary",
+          "from_city": "Calgary",
+          "to_url": "/content/distracted-driving-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "distracted-driving tickets in Strathmore",
+          "priority": "high"
+        },
+        {
+          "strategy": "hub_to_satellite",
+          "from_url": "/content/distracted-driving-ticket-edmonton",
+          "from_city": "Edmonton",
+          "to_url": "/content/distracted-driving-ticket-strathmore",
+          "to_city": "Strathmore",
+          "anchor_text": "distracted-driving tickets in Strathmore",
+          "priority": "high"
+        }
+      ],
+      "total_links": 4
+    }
+  ],
+  "success_criteria": "Each new city page receives ≥3 internal links from existing landed pages"
+}

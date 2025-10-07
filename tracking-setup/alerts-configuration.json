@@ -1,0 +1,31 @@
+{
+  "alerts": [
+    {
+      "name": "Low Indexation Rate",
+      "condition": "indexed_urls < 50% after 7 days",
+      "severity": "high",
+      "action": "escalate_to_technical_seo"
+    },
+    {
+      "name": "Zero Impressions Alert",
+      "condition": "impressions = 0 after 10 days for any city",
+      "severity": "medium",
+      "action": "check_indexation_status"
+    },
+    {
+      "name": "Ranking Degradation",
+      "condition": "avg_position > 100 for primary queries",
+      "severity": "low",
+      "action": "review_content_quality"
+    }
+  ],
+  "notification_channels": [
+    "slack:#aeo-ops",
+    "email:seo-team@fabsy.com"
+  ],
+  "escalation_schedule": {
+    "0_days": "daily_check",
+    "7_days": "weekly_review",
+    "14_days": "final_assessment"
+  }
+}

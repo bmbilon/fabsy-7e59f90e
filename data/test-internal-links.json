@@ -1,0 +1,103 @@
+{
+  "generated_at": "2025-10-07T00:04:39.823Z",
+  "mock_data_used": true,
+  "total_pages": 5,
+  "total_links": 12,
+  "results": [
+    {
+      "page": "/content/fight-speeding-ticket-calgary",
+      "city": "Calgary",
+      "offence": "speeding",
+      "links": [
+        {
+          "type": "sibling",
+          "url": "/content/fight-red-light-ticket-calgary",
+          "anchor": "Fix a Red Light ticket in Calgary"
+        },
+        {
+          "type": "hub",
+          "url": "/content/demerits-and-insurance-alberta",
+          "anchor": "Learn more: Avoiding insurance hikes"
+        }
+      ]
+    },
+    {
+      "page": "/content/fight-red-light-ticket-calgary",
+      "city": "Calgary",
+      "offence": "red-light",
+      "links": [
+        {
+          "type": "sibling",
+          "url": "/content/fight-careless-driving-ticket-calgary",
+          "anchor": "Fix a Careless Driving ticket in Calgary"
+        },
+        {
+          "type": "sibling",
+          "url": "/content/fight-speeding-ticket-calgary",
+          "anchor": "Fight Speeding in Calgary"
+        },
+        {
+          "type": "hub",
+          "url": "/content/alberta-tickets-101",
+          "anchor": "Learn more: How Alberta traffic tickets actually work"
+        }
+      ]
+    },
+    {
+      "page": "/content/fight-careless-driving-ticket-calgary",
+      "city": "Calgary",
+      "offence": "careless-driving",
+      "links": [
+        {
+          "type": "sibling",
+          "url": "/content/fight-red-light-ticket-calgary",
+          "anchor": "Fix a Red Light ticket in Calgary"
+        },
+        {
+          "type": "sibling",
+          "url": "/content/fight-speeding-ticket-calgary",
+          "anchor": "Calgary Speeding ticket — options"
+        },
+        {
+          "type": "hub",
+          "url": "/content/demerits-and-insurance-alberta",
+          "anchor": "Learn more: Avoiding insurance hikes"
+        }
+      ]
+    },
+    {
+      "page": "/content/fight-speeding-ticket-edmonton",
+      "city": "Edmonton",
+      "offence": "speeding",
+      "links": [
+        {
+          "type": "hub",
+          "url": "/content/demerits-and-insurance-alberta",
+          "anchor": "Learn more: Demerits & insurance in Alberta"
+        }
+      ]
+    },
+    {
+      "page": "/content/fight-distracted-driving-ticket-calgary",
+      "city": "Calgary",
+      "offence": "distracted-driving",
+      "links": [
+        {
+          "type": "sibling",
+          "url": "/content/fight-careless-driving-ticket-calgary",
+          "anchor": "Fix a Careless Driving ticket in Calgary"
+        },
+        {
+          "type": "sibling",
+          "url": "/content/fight-speeding-ticket-calgary",
+          "anchor": "Fix a Speeding ticket in Calgary"
+        },
+        {
+          "type": "hub",
+          "url": "/content/alberta-tickets-101",
+          "anchor": "Learn more: Alberta tickets explained in 5 minutes"
+        }
+      ]
+    }
+  ]
+}

@@ -31,7 +31,7 @@ const HowToSchema: React.FC<Props> = ({
 }) => {
   if (!name || !steps.length) return null;
 
-  const schema: any = {
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name,
@@ -61,7 +61,7 @@ const HowToSchema: React.FC<Props> = ({
       name: 'Fabsy eligibility checker'
     }],
     step: steps.map((step, idx) => {
-      const s: any = {
+      const s: Record<string, unknown> = {
         '@type': 'HowToStep',
         position: idx + 1,
         name: step.name,

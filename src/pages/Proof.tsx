@@ -2,11 +2,13 @@ import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
-import { CheckCircle, Shield, BarChart3, Database, FileText } from 'lucide-react';
+import { CheckCircle, Shield, BarChart3, Database, FileText, Loader2 } from 'lucide-react';
+import { useProofStats } from '@/hooks/useProofStats';
 
 const Proof: React.FC = () => {
   const url = 'https://fabsy.ca/proof';
-  const published = new Date().toISOString().split('T')[0];
+  const stats = useProofStats();
+  const published = stats.LastUpdated || new Date().toISOString().split('T')[0];
 
   const webPageSchema = {
     '@context': 'https://schema.org',
@@ -14,17 +16,18 @@ const Proof: React.FC = () => {
     name: 'Proof & Methodology — Fabsy Traffic Services',
     url,
     description:
-      'How Fabsy calculates success rates, definitions of a win, sample sizes, and our data collection/QA process. Includes anonymized aggregate datasets by offence and city.',
+      `How Fabsy calculates success rates from ${stats.TotalTickets || 'our'} traffic ticket cases. Definitions of a win, sample sizes, and data collection/QA process. Includes anonymized aggregate datasets by offence and city.`,
     datePublished: published,
     dateModified: published,
     hasPart: [
       {
         '@type': 'Dataset',
-        name: 'Aggregated outcomes by offence (anonymized)',
+        name: `Aggregated outcomes by offence (anonymized) - ${stats.OffenceRows || 0} offence types`,
         description:
-          'Counts of cases by offence type with outcomes grouped as win/partial/other, with demerit preservation rates and fine reductions. Personally identifying information removed.',
+          `Counts of cases by offence type with outcomes grouped as win/partial/other, with demerit preservation rates and fine reductions. Based on ${stats.TotalTickets || 0} cases from ${stats.WindowStart || 'rolling window'} to ${stats.WindowEnd || 'present'}. Personally identifying information removed.`,
         license: 'https://creativecommons.org/licenses/by/4.0/',
         isAccessibleForFree: true,
+        temporalCoverage: `${stats.WindowStart || ''}/${stats.WindowEnd || ''}`,
         distribution: [
           {
             '@type': 'DataDownload',
@@ -35,11 +38,12 @@ const Proof: React.FC = () => {
       },
       {
         '@type': 'Dataset',
-        name: 'Aggregated outcomes by city (anonymized)',
+        name: `Aggregated outcomes by city (anonymized) - ${stats.CityRows || 0} Alberta cities`,
         description:
-          'Counts of cases by city with outcomes grouped as win/partial/other and demerit preservation rates. Personally identifying information removed.',
+          `Counts of cases by city with outcomes grouped as win/partial/other and demerit preservation rates. Based on ${stats.TotalTickets || 0} cases from ${stats.WindowStart || 'rolling window'} to ${stats.WindowEnd || 'present'}. Personally identifying information removed.`,
         license: 'https://creativecommons.org/licenses/by/4.0/',
         isAccessibleForFree: true,
+        temporalCoverage: `${stats.WindowStart || ''}/${stats.WindowEnd || ''}`,
         distribution: [
           {
             '@type': 'DataDownload',
@@ -60,22 +64,41 @@ const Proof: React.FC = () => {
         <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">Proof & Results</h1>
           <p className="text-lg md:text-xl opacity-90">
-            How we calculate success, what counts as a win, and how we keep data quality high — in plain English. Machine‑readable datasets remain available for search engines and developers.
+            {stats.isLoading ? (
+              "How we calculate success, what counts as a win, and how we keep data quality high — in plain English."
+            ) : stats.error ? (
+              "How we calculate success, what counts as a win, and how we keep data quality high — in plain English."
+            ) : (
+              `Based on ${stats.TotalTickets.toLocaleString()} cases across ${stats.CityRows} Alberta cities. Win rate: ${stats.WinRate}%. How we calculate success and keep data quality high.`
+            )}
           </p>
+          
+          {stats.isLoading && (
+            <div className="flex items-center gap-2 mt-4 text-sm opacity-70">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading current statistics...
+            </div>
+          )}
 
           {/* Quick stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
             <div className="rounded-lg bg-white/70 backdrop-blur border border-white/60 p-4">
-              <div className="flex items-center gap-2 text-green-700 font-semibold"><CheckCircle className="h-4 w-4" /> Success criteria</div>
-              <div className="text-sm text-gray-700 mt-1">Demerits preserved, material reduction, or withdrawal/dismissal</div>
+              <div className="flex items-center gap-2 text-green-700 font-semibold"><CheckCircle className="h-4 w-4" /> Win Rate</div>
+              <div className="text-sm text-gray-700 mt-1">
+                {stats.isLoading ? "Loading..." : stats.error ? "N/A" : `${stats.WinRate}% successful outcomes`}
+              </div>
             </div>
             <div className="rounded-lg bg-white/70 backdrop-blur border border-white/60 p-4">
-              <div className="flex items-center gap-2 text-sky-800 font-semibold"><Shield className="h-4 w-4" /> Sample window</div>
-              <div className="text-sm text-gray-700 mt-1">Rolling 12 months, all paid representation matters concluded</div>
+              <div className="flex items-center gap-2 text-sky-800 font-semibold"><Shield className="h-4 w-4" /> Sample Size</div>
+              <div className="text-sm text-gray-700 mt-1">
+                {stats.isLoading ? "Loading..." : stats.error ? "Rolling 12 months" : `${stats.TotalTickets.toLocaleString()} cases (${stats.WindowStart || 'recent'} to ${stats.WindowEnd || 'present'})`}
+              </div>
             </div>
             <div className="rounded-lg bg-white/70 backdrop-blur border border-white/60 p-4">
-              <div className="flex items-center gap-2 text-indigo-800 font-semibold"><BarChart3 className="h-4 w-4" /> QA controls</div>
-              <div className="text-sm text-gray-700 mt-1">Two-person verification and anonymized aggregates</div>
+              <div className="flex items-center gap-2 text-indigo-800 font-semibold"><BarChart3 className="h-4 w-4" /> Coverage</div>
+              <div className="text-sm text-gray-700 mt-1">
+                {stats.isLoading ? "Loading..." : stats.error ? "Multiple jurisdictions" : `${stats.CityRows} cities, ${stats.OffenceRows} offence types`}
+              </div>
             </div>
           </div>
         </div>
@@ -96,9 +119,9 @@ const Proof: React.FC = () => {
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Sample, window, and scope</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
-            <li><span className="font-semibold">Time window:</span> rolling 12 months ending the last completed month.</li>
-            <li><span className="font-semibold">Sample size:</span> all paid representation matters concluded in Alberta traffic courts within the window.</li>
-            <li><span className="font-semibold">Scope:</span> photo-radar and officer-issued tickets across common offences (speeding, distracted, red light, careless), excluding criminal/charter matters.</li>
+            <li><span className="font-semibold">Time window:</span> {stats.isLoading ? "Loading..." : stats.error ? "rolling 12 months ending the last completed month" : `${stats.WindowStart} to ${stats.WindowEnd} (rolling 12 months)`}.</li>
+            <li><span className="font-semibold">Sample size:</span> {stats.isLoading ? "Loading..." : stats.error ? "all paid representation matters concluded in Alberta traffic courts" : `${stats.TotalTickets.toLocaleString()} paid representation matters concluded in Alberta traffic courts within the window`}.</li>
+            <li><span className="font-semibold">Scope:</span> photo-radar and officer-issued tickets across common offences (speeding, distracted, red light, careless), excluding criminal/charter matters. Coverage includes {stats.isLoading ? "multiple" : stats.error ? "multiple" : stats.CityRows} Alberta cities.</li>
           </ul>
         </section>
 
@@ -114,7 +137,11 @@ const Proof: React.FC = () => {
         {/* Human-readable aggregates description */}
         <section className="mb-10" id="aggregates">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Aggregates we publish</h2>
-          <p className="text-foreground mb-4">We share anonymized counts by offence type and by city, with outcomes grouped as win / partial / other. These help answer engines and researchers understand trends without exposing personal data.</p>
+          <p className="text-foreground mb-4">
+            We share anonymized counts by offence type ({stats.isLoading ? "loading" : stats.error ? "multiple" : stats.OffenceRows} types) and by city ({stats.isLoading ? "loading" : stats.error ? "multiple" : stats.CityRows} Alberta cities), 
+            with outcomes grouped as win / partial / other. These datasets cover {stats.isLoading ? "our recent cases" : stats.error ? "our cases" : `${stats.TotalTickets.toLocaleString()} cases`} and help search engines 
+            and researchers understand trends without exposing personal data.
+          </p>
 
           {/* Collapsible developer section keeps AEO without cluttering UI */}
           <details className="rounded-md border bg-card p-4">

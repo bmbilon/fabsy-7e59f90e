@@ -1,0 +1,76 @@
+{
+  "indexation_status": {
+    "startDate": "{{START_DATE}}",
+    "endDate": "{{END_DATE}}",
+    "dimensions": [
+      "page"
+    ],
+    "searchType": "web",
+    "dimensionFilterGroups": [
+      {
+        "filters": [
+          {
+            "dimension": "page",
+            "operator": "contains",
+            "expression": "/content/"
+          },
+          {
+            "dimension": "page",
+            "operator": "contains",
+            "expression": "-ticket-"
+          }
+        ]
+      }
+    ]
+  },
+  "city_rankings": {
+    "startDate": "{{START_DATE}}",
+    "endDate": "{{END_DATE}}",
+    "dimensions": [
+      "query",
+      "page"
+    ],
+    "searchType": "web",
+    "dimensionFilterGroups": [
+      {
+        "filters": [
+          {
+            "dimension": "query",
+            "operator": "contains",
+            "expression": "{{CITY_NAME}}"
+          },
+          {
+            "dimension": "query",
+            "operator": "contains",
+            "expression": "ticket"
+          }
+        ]
+      }
+    ]
+  },
+  "performance_overview": {
+    "startDate": "{{START_DATE}}",
+    "endDate": "{{END_DATE}}",
+    "dimensions": [
+      "page"
+    ],
+    "metrics": [
+      "impressions",
+      "clicks",
+      "ctr",
+      "position"
+    ],
+    "searchType": "web",
+    "dimensionFilterGroups": [
+      {
+        "filters": [
+          {
+            "dimension": "page",
+            "operator": "includingRegex",
+            "expression": "/content/.+-ticket-.+"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "indexing_strategy": "Phased submission to avoid overwhelming GSC",
+  "submission_method": "Google Search Console API",
+  "phases": [
+    {
+      "phase": "Phase 1 - Week 1-2",
+      "urls": [
+        "/content/speeding-ticket-grande-prairie",
+        "/content/red-light-ticket-grande-prairie",
+        "/content/distracted-driving-ticket-grande-prairie",
+        "/content/speeding-ticket-spruce-grove",
+        "/content/seatbelt-ticket-spruce-grove",
+        "/content/no-insurance-ticket-spruce-grove",
+        "/content/speeding-ticket-wetaskiwin",
+        "/content/fail-to-yield-ticket-wetaskiwin",
+        "/content/careless-driving-ticket-wetaskiwin",
+        "/content/speeding-ticket-camrose",
+        "/content/fail-to-stop-ticket-camrose",
+        "/content/following-too-close-ticket-camrose",
+        "/content/speeding-ticket-cold-lake",
+        "/content/red-light-ticket-cold-lake",
+        "/content/distracted-driving-ticket-cold-lake"
+      ]
+    },
+    {
+      "phase": "Phase 2 - Week 3-4",
+      "urls": [
+        "/content/speeding-ticket-canmore",
+        "/content/stunting-ticket-canmore",
+        "/content/seatbelt-ticket-canmore",
+        "/content/speeding-ticket-high-river",
+        "/content/no-insurance-ticket-high-river",
+        "/content/red-light-ticket-high-river",
+        "/content/careless-driving-ticket-okotoks",
+        "/content/following-too-close-ticket-okotoks",
+        "/content/speeding-ticket-lloydminster",
+        "/content/seatbelt-ticket-lloydminster",
+        "/content/red-light-ticket-lloydminster",
+        "/content/speeding-ticket-strathmore",
+        "/content/fail-to-yield-ticket-strathmore",
+        "/content/distracted-driving-ticket-strathmore"
+      ]
+    }
+  ],
+  "success_criteria": "All URLs indexed within 14 days of submission",
+  "monitoring_frequency": "Daily for first 7 days, then weekly"
+}

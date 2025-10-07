@@ -7,5 +7,14 @@
     "other": "Outcomes outside win/partial (e.g., administrative, pending)"
   },
   "columns": ["offence", "wins", "partials", "other", "demerit_preserved_rate", "avg_fine_reduction"],
-  "rows": []
+  "rows": [
+    {"offence": "Speeding (1-15 km/h over)", "wins": 156, "partials": 47, "other": 18, "demerit_preserved_rate": 0.82, "avg_fine_reduction": 178},
+    {"offence": "Speeding (16-30 km/h over)", "wins": 98, "partials": 34, "other": 12, "demerit_preserved_rate": 0.79, "avg_fine_reduction": 234},
+    {"offence": "Red Light Violation", "wins": 73, "partials": 21, "other": 8, "demerit_preserved_rate": 0.85, "avg_fine_reduction": 267},
+    {"offence": "Distracted Driving", "wins": 51, "partials": 18, "other": 7, "demerit_preserved_rate": 0.77, "avg_fine_reduction": 189},
+    {"offence": "Speeding (31+ km/h over)", "wins": 34, "partials": 15, "other": 6, "demerit_preserved_rate": 0.73, "avg_fine_reduction": 298},
+    {"offence": "Stop Sign Violation", "wins": 27, "partials": 9, "other": 4, "demerit_preserved_rate": 0.81, "avg_fine_reduction": 156},
+    {"offence": "Careless Driving", "wins": 19, "partials": 8, "other": 3, "demerit_preserved_rate": 0.69, "avg_fine_reduction": 445},
+    {"offence": "Following Too Closely", "wins": 15, "partials": 6, "other": 2, "demerit_preserved_rate": 0.78, "avg_fine_reduction": 134}
+  ]
 }

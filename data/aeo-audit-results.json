@@ -1,0 +1,279 @@
+{
+  "generated_at": "2025-10-07T00:21:21.014Z",
+  "total_pages": 3,
+  "average_score": 77.66666666666667,
+  "results": [
+    {
+      "page": "/content/fight-speeding-ticket-calgary",
+      "title": "Fight Speeding Ticket Calgary",
+      "city": "Calgary",
+      "offence": "speeding",
+      "audit_score": 74,
+      "issues": [
+        {
+          "type": "warning",
+          "category": "AEO",
+          "message": "Title does not match AEO pattern"
+        },
+        {
+          "type": "info",
+          "category": "AEO",
+          "message": "Meta description could be optimized with AEO pattern"
+        },
+        {
+          "type": "warning",
+          "category": "SEO",
+          "message": "Meta description length: 190 chars (should be 120-160)"
+        },
+        {
+          "type": "info",
+          "category": "AEO",
+          "message": "Missing FAQ section for featured snippet optimization"
+        },
+        {
+          "type": "info",
+          "category": "AEO",
+          "message": "Missing Answer Box module"
+        }
+      ],
+      "recommendations": [
+        "Update title to: \"Speeding Ticket in Calgary — Can You Fight It? | Fabsy\"",
+        "Use standardized meta description pattern",
+        "Add 3 FAQs using standardized question bank",
+        "Add Answer Box module directly below H1"
+      ],
+      "standardized_content": {
+        "title": "Speeding Ticket in Calgary — Can You Fight It? | Fabsy",
+        "h1": "Got a Speeding Ticket in Calgary?",
+        "h2_blocks": [
+          "Can I fight a speeding ticket in Calgary?",
+          "What to do next (60-second answer)",
+          "Calgary speeding penalties & demerits",
+          "Your options before court day",
+          "Frequently asked questions — Calgary speeding"
+        ],
+        "meta_description": "Speeding ticket in Calgary? In many cases, Fabsy can keep demerits off your record and help you avoid insurance hikes. Zero-risk: you only pay if we win. Start a free analysis in 60 seconds.",
+        "content_snippet": "Short answer: Yes — many Calgary speeding tickets can be fixed before your court date. Upload your ticket, we pull your court file, then confirm options to protect your record.",
+        "legal_disclaimer": "This page provides general information only and is not legal advice. Outcomes vary by offence and courthouse.",
+        "faqs": [
+          {
+            "q": "Can I fight a speeding ticket in Calgary?",
+            "a": "Often, yes. Many cases can be resolved to avoid a conviction that affects your record or insurance."
+          },
+          {
+            "q": "What if it's photo-radar speeding in Calgary?",
+            "a": "Photo-radar has unique rules and defenses. Upload your notice; we'll check for resolution paths."
+          },
+          {
+            "q": "Can I reduce a speeding fine in Calgary?",
+            "a": "In many cases fines and/or points can be reduced or re-characterized to protect your record."
+          }
+        ],
+        "faq_schema": {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Can I fight a speeding ticket in Calgary?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Often, yes. Many cases can be resolved to avoid a conviction that affects your record or insurance."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What if it's photo-radar speeding in Calgary?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Photo-radar has unique rules and defenses. Upload your notice; we'll check for resolution paths."
+              }
+            }
+          ]
+        },
+        "tokens": {
+          "City": "Calgary",
+          "Offence": "Speeding",
+          "offence": "speeding"
+        }
+      }
+    },
+    {
+      "page": "/content/fight-red-light-ticket-edmonton",
+      "title": "Edmonton Red Light Tickets",
+      "city": "Edmonton",
+      "offence": "red-light",
+      "audit_score": 74,
+      "issues": [
+        {
+          "type": "warning",
+          "category": "AEO",
+          "message": "Title does not match AEO pattern"
+        },
+        {
+          "type": "info",
+          "category": "AEO",
+          "message": "Meta description could be optimized with AEO pattern"
+        },
+        {
+          "type": "warning",
+          "category": "SEO",
+          "message": "Meta description length: 192 chars (should be 120-160)"
+        },
+        {
+          "type": "info",
+          "category": "AEO",
+          "message": "Missing FAQ section for featured snippet optimization"
+        },
+        {
+          "type": "info",
+          "category": "AEO",
+          "message": "Missing Answer Box module"
+        }
+      ],
+      "recommendations": [
+        "Update title to: \"Red Light Ticket in Edmonton — Can You Fight It? | Fabsy\"",
+        "Use standardized meta description pattern",
+        "Add 3 FAQs using standardized question bank",
+        "Add Answer Box module directly below H1"
+      ],
+      "standardized_content": {
+        "title": "Red Light Ticket in Edmonton — Can You Fight It? | Fabsy",
+        "h1": "Got a Red Light Ticket in Edmonton?",
+        "h2_blocks": [
+          "Can I fight a red-light ticket in Edmonton?",
+          "What to do next (60-second answer)",
+          "Edmonton red-light penalties & demerits",
+          "Your options before court day",
+          "Frequently asked questions — Edmonton red-light"
+        ],
+        "meta_description": "Red Light ticket in Edmonton? In many cases, Fabsy can keep demerits off your record and help you avoid insurance hikes. Zero-risk: you only pay if we win. Start a free analysis in 60 seconds.",
+        "content_snippet": "Short answer: Yes — many Edmonton red-light tickets can be fixed before your court date. Upload your ticket, we pull your court file, then confirm options to protect your record.",
+        "legal_disclaimer": "This page provides general information only and is not legal advice. Outcomes vary by offence and courthouse.",
+        "faqs": [
+          {
+            "q": "Can I fight a red-light ticket in Edmonton?",
+            "a": "Often, yes. Many cases can be resolved to avoid a conviction that affects your record or insurance."
+          },
+          {
+            "q": "Is a red-light camera ticket different from officer-issued?",
+            "a": "Yes. Evidentiary and procedural differences can change your options. We assess the exact charge type."
+          },
+          {
+            "q": "Do I have to go to court for a red-light ticket in Edmonton?",
+            "a": "Not always. Depending on the courthouse and offence, resolutions can be reached without you attending."
+          }
+        ],
+        "faq_schema": {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Can I fight a red-light ticket in Edmonton?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Often, yes. Many cases can be resolved to avoid a conviction that affects your record or insurance."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is a red-light camera ticket different from officer-issued?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Evidentiary and procedural differences can change your options. We assess the exact charge type."
+              }
+            }
+          ]
+        },
+        "tokens": {
+          "City": "Edmonton",
+          "Offence": "Red Light",
+          "offence": "red-light"
+        }
+      }
+    },
+    {
+      "page": "/content/fight-distracted-driving-ticket-calgary",
+      "title": "Distracted Driving Ticket in Calgary — Can You Fight It? | Fabsy",
+      "city": "Calgary",
+      "offence": "distracted-driving",
+      "audit_score": 85,
+      "issues": [
+        {
+          "type": "info",
+          "category": "AEO",
+          "message": "Meta description could be optimized with AEO pattern"
+        },
+        {
+          "type": "warning",
+          "category": "SEO",
+          "message": "Title too long: 64 chars (maximum 62)"
+        },
+        {
+          "type": "warning",
+          "category": "SEO",
+          "message": "Meta description length: 200 chars (should be 120-160)"
+        }
+      ],
+      "recommendations": [
+        "Use standardized meta description pattern"
+      ],
+      "standardized_content": {
+        "title": "Distracted Driving Ticket in Calgary — Can You Fight It? | Fabsy",
+        "h1": "Got a Distracted Driving Ticket in Calgary?",
+        "h2_blocks": [
+          "Can I fight a distracted-driving ticket in Calgary?",
+          "What to do next (60-second answer)",
+          "Calgary distracted-driving penalties & demerits",
+          "Your options before court day",
+          "Frequently asked questions — Calgary distracted-driving"
+        ],
+        "meta_description": "Distracted Driving ticket in Calgary? In many cases, Fabsy can keep demerits off your record and help you avoid insurance hikes. Zero-risk: you only pay if we win. Start a free analysis in 60 seconds.",
+        "content_snippet": "Short answer: Yes — many Calgary distracted-driving tickets can be fixed before your court date. Upload your ticket, we pull your court file, then confirm options to protect your record.",
+        "legal_disclaimer": "This page provides general information only and is not legal advice. Outcomes vary by offence and courthouse.",
+        "faqs": [
+          {
+            "q": "Can I fight a distracted-driving ticket in Calgary?",
+            "a": "Often, yes. Many cases can be resolved to avoid a conviction that affects your record or insurance."
+          },
+          {
+            "q": "Can distracted driving be negotiated down?",
+            "a": "Options vary. We review the file for resolution paths that keep your abstract clean."
+          },
+          {
+            "q": "Do I have to go to court for a distracted-driving ticket in Calgary?",
+            "a": "Not always. Depending on the courthouse and offence, resolutions can be reached without you attending."
+          }
+        ],
+        "faq_schema": {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Can I fight a distracted-driving ticket in Calgary?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Often, yes. Many cases can be resolved to avoid a conviction that affects your record or insurance."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can distracted driving be negotiated down?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Options vary. We review the file for resolution paths that keep your abstract clean."
+              }
+            }
+          ]
+        },
+        "tokens": {
+          "City": "Calgary",
+          "Offence": "Distracted Driving",
+          "offence": "distracted-driving"
+        }
+      }
+    }
+  ]
+}

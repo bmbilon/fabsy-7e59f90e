@@ -1,0 +1,25 @@
+{
+  "task_id": "AEO-EXP-001",
+  "created": "2025-10-07T00:47:01.948Z",
+  "total_urls": 29,
+  "phase_1_urls": 15,
+  "phase_2_urls": 14,
+  "sitemap_file": "sitemap-city-expansion.xml",
+  "indexing_strategy": "Phased submission to avoid overwhelming GSC",
+  "success_criteria": "All URLs indexed within 14 days of submission",
+  "files_created": [
+    "sitemap-city-expansion.xml",
+    "gsc-indexing-plan.json",
+    "integrate-sitemap.cjs",
+    "submit-to-gsc.cjs",
+    "robots-txt-additions.txt",
+    "deployment-checklist.md"
+  ],
+  "next_steps": [
+    "Review and approve sitemap integration",
+    "Deploy Phase 1 URLs to production",
+    "Submit sitemap to Google Search Console",
+    "Begin daily indexation monitoring",
+    "Deploy Phase 2 URLs after Week 2"
+  ]
+}

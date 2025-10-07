@@ -1,0 +1,922 @@
+{
+  "sheet_name": "Alberta City Expansion Tracking",
+  "columns": [
+    "Date",
+    "City",
+    "URL",
+    "Indexed (Y/N)",
+    "Impressions",
+    "Clicks",
+    "Avg Position",
+    "Primary Query",
+    "Notes"
+  ],
+  "tracking_rows": [
+    {
+      "row_id": 1,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/speeding-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 2,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/red-light-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 3,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 4,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/careless-driving-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 5,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/seatbelt-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 6,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/no-insurance-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 7,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 8,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 9,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/following-too-close-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 10,
+      "city": "Grande Prairie",
+      "url": "https://fabsy.com/content/stunting-ticket-grande-prairie",
+      "slug": "grande-prairie",
+      "target_query": "grande prairie stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 11,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/speeding-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 12,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/red-light-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 13,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 14,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/careless-driving-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 15,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/seatbelt-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 16,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/no-insurance-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 17,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 18,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 19,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/following-too-close-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 20,
+      "city": "Spruce Grove",
+      "url": "https://fabsy.com/content/stunting-ticket-spruce-grove",
+      "slug": "spruce-grove",
+      "target_query": "spruce grove stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 21,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/speeding-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 22,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/red-light-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 23,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 24,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/careless-driving-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 25,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/seatbelt-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 26,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/no-insurance-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 27,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 28,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 29,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/following-too-close-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 30,
+      "city": "Wetaskiwin",
+      "url": "https://fabsy.com/content/stunting-ticket-wetaskiwin",
+      "slug": "wetaskiwin",
+      "target_query": "wetaskiwin stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 31,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/speeding-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 32,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/red-light-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 33,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 34,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/careless-driving-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 35,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/seatbelt-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 36,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/no-insurance-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 37,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 38,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 39,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/following-too-close-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 40,
+      "city": "Camrose",
+      "url": "https://fabsy.com/content/stunting-ticket-camrose",
+      "slug": "camrose",
+      "target_query": "camrose stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 41,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/speeding-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 42,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/red-light-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 43,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 44,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/careless-driving-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 45,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/seatbelt-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 46,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/no-insurance-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 47,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 48,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 49,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/following-too-close-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 50,
+      "city": "Cold Lake",
+      "url": "https://fabsy.com/content/stunting-ticket-cold-lake",
+      "slug": "cold-lake",
+      "target_query": "cold lake stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 51,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/speeding-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 52,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/red-light-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 53,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 54,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/careless-driving-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 55,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/seatbelt-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 56,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/no-insurance-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 57,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 58,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 59,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/following-too-close-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 60,
+      "city": "Canmore",
+      "url": "https://fabsy.com/content/stunting-ticket-canmore",
+      "slug": "canmore",
+      "target_query": "canmore stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 61,
+      "city": "High River",
+      "url": "https://fabsy.com/content/speeding-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 62,
+      "city": "High River",
+      "url": "https://fabsy.com/content/red-light-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 63,
+      "city": "High River",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 64,
+      "city": "High River",
+      "url": "https://fabsy.com/content/careless-driving-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 65,
+      "city": "High River",
+      "url": "https://fabsy.com/content/seatbelt-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 66,
+      "city": "High River",
+      "url": "https://fabsy.com/content/no-insurance-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 67,
+      "city": "High River",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 68,
+      "city": "High River",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 69,
+      "city": "High River",
+      "url": "https://fabsy.com/content/following-too-close-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 70,
+      "city": "High River",
+      "url": "https://fabsy.com/content/stunting-ticket-high-river",
+      "slug": "high-river",
+      "target_query": "high river stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 71,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/speeding-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 72,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/red-light-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 73,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 74,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/careless-driving-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 75,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/seatbelt-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 76,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/no-insurance-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 77,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 78,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 79,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/following-too-close-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 80,
+      "city": "Okotoks",
+      "url": "https://fabsy.com/content/stunting-ticket-okotoks",
+      "slug": "okotoks",
+      "target_query": "okotoks stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 81,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/speeding-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 82,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/red-light-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 83,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 84,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/careless-driving-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 85,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/seatbelt-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 86,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/no-insurance-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 87,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 88,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 89,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/following-too-close-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 90,
+      "city": "Lloydminster",
+      "url": "https://fabsy.com/content/stunting-ticket-lloydminster",
+      "slug": "lloydminster",
+      "target_query": "lloydminster stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 91,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/speeding-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore speeding ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 92,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/red-light-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore red-light ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 93,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/distracted-driving-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore distracted-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 94,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/careless-driving-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore careless-driving ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 95,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/seatbelt-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore seatbelt ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 96,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/no-insurance-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore no-insurance ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 97,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/fail-to-yield-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore fail-to-yield ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 98,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/fail-to-stop-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore fail-to-stop ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 99,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/following-too-close-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore following-too-close ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    },
+    {
+      "row_id": 100,
+      "city": "Strathmore",
+      "url": "https://fabsy.com/content/stunting-ticket-strathmore",
+      "slug": "strathmore",
+      "target_query": "strathmore stunting ticket",
+      "status": "pending_indexation",
+      "created_date": "2025-10-07"
+    }
+  ],
+  "formulas": {
+    "indexation_rate": "=COUNTIF(D:D,\"Y\")/COUNTA(D:D)*100",
+    "avg_position_all": "=AVERAGE(G:G)",
+    "total_impressions": "=SUM(E:E)",
+    "total_clicks": "=SUM(F:F)"
+  }
+}

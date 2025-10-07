@@ -1,0 +1,18 @@
+
+# Alberta City Expansion Pages - Allow all crawlers
+# Added: 2025-10-07
+
+# Priority crawling for new city pages
+Allow: /content/speeding-ticket-grande-prairie
+Allow: /content/red-light-ticket-grande-prairie
+Allow: /content/distracted-driving-ticket-grande-prairie
+Allow: /content/speeding-ticket-spruce-grove
+Allow: /content/seatbelt-ticket-spruce-grove
+Allow: /content/no-insurance-ticket-spruce-grove
+Allow: /content/speeding-ticket-wetaskiwin
+Allow: /content/fail-to-yield-ticket-wetaskiwin
+Allow: /content/careless-driving-ticket-wetaskiwin
+Allow: /content/speeding-ticket-camrose
+
+# Sitemap reference
+Sitemap: https://fabsy.com/sitemap-content.xml

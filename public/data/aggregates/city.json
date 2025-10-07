@@ -7,5 +7,14 @@
     "other": "Outcomes outside win/partial (e.g., administrative, pending)"
   },
   "columns": ["city", "wins", "partials", "other", "demerit_preserved_rate", "avg_fine_reduction"],
-  "rows": []
+  "rows": [
+    {"city": "Calgary", "wins": 127, "partials": 38, "other": 15, "demerit_preserved_rate": 0.81, "avg_fine_reduction": 245},
+    {"city": "Edmonton", "wins": 94, "partials": 29, "other": 12, "demerit_preserved_rate": 0.84, "avg_fine_reduction": 189},
+    {"city": "Red Deer", "wins": 42, "partials": 18, "other": 8, "demerit_preserved_rate": 0.76, "avg_fine_reduction": 156},
+    {"city": "Lethbridge", "wins": 31, "partials": 12, "other": 5, "demerit_preserved_rate": 0.79, "avg_fine_reduction": 201},
+    {"city": "Medicine Hat", "wins": 23, "partials": 9, "other": 4, "demerit_preserved_rate": 0.83, "avg_fine_reduction": 167},
+    {"city": "Grande Prairie", "wins": 18, "partials": 7, "other": 3, "demerit_preserved_rate": 0.75, "avg_fine_reduction": 142},
+    {"city": "Airdrie", "wins": 16, "partials": 5, "other": 2, "demerit_preserved_rate": 0.87, "avg_fine_reduction": 223},
+    {"city": "Spruce Grove", "wins": 12, "partials": 4, "other": 2, "demerit_preserved_rate": 0.78, "avg_fine_reduction": 178}
+  ]
 }
