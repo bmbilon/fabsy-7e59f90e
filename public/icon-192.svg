@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="fabsyGradient192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M 96 12 L 36 36 L 36 84 C 36 120 60 150 96 180 C 132 150 156 120 156 84 L 156 36 Z" fill="url(#fabsyGradient192)"/>
+  <path d="M 72 66 L 114 66 L 114 78 L 84 78 L 84 93 L 108 93 L 108 105 L 84 105 L 84 126 L 72 126 Z" fill="white"/>
+</svg>
