@@ -1,10 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs>
-    <linearGradient id="fabsyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <path d="M 16 2 L 6 6 L 6 14 C 6 20 10 25 16 30 C 22 25 26 20 26 14 L 26 6 Z" fill="url(#fabsyGradient)"/>
-  <path d="M 12 11 L 19 11 L 19 13 L 14 13 L 14 15.5 L 18 15.5 L 18 17.5 L 14 17.5 L 14 21 L 12 21 Z" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" fill="#ffffff" rx="4"/>
+  <path d="M16 4l8 6v14c0 2-2 4-8 4s-8-2-8-4V10l8-6z" fill="#dc2626"/>
+  <path d="M12 14h8v2h-8v-2zm0 4h6v2h-6v-2z" fill="#ffffff"/>
+  <circle cx="16" cy="12" r="2" fill="#ffffff"/>
 </svg>
