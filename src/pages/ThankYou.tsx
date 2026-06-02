@@ -119,7 +119,7 @@ const ThankYou: React.FC = () => {
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">Zero-risk guarantee</h2>
-            <p className="text-sm text-muted-foreground">You only pay if we save you money. No win, no fee.</p>
+            <p className="text-sm text-muted-foreground">You only pay if we save you money. No win, no admin fee.</p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">Track record</h2>

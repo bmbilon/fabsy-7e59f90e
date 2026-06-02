@@ -43,7 +43,7 @@ const Footer = () => {
           </Link>
           
           <p className="text-[10px] text-muted-foreground mb-2 leading-tight max-w-md">
-            Expert traffic ticket defense for Alberta women.
+            Expert traffic ticket defense for Alberta drivers.
           </p>
           
           <div className="flex gap-4 text-[10px] text-muted-foreground flex-wrap justify-center">
@@ -159,7 +159,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                Results may vary. Past performance does not guarantee future results. 
+                *No Win, No Admin Fee: Admin fees are calculated as a percentage of the fine reduction achieved. For example, a fine of $300 reduced to $100 is a $200 reduction, subject to a standard 30% admin fee ($60). Results may vary. Past performance does not guarantee future results. 
                 Our success rate is based on historical data and individual results may differ.
               </p>
             </div>

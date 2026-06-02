@@ -18,7 +18,7 @@ const ROISection = () => {
             <span className="text-gradient-hero">$1,650</span>
           </h2>
           <p className="text-xl text-foreground/90 max-w-3xl mx-auto drop-shadow-sm mb-6">
-            That's not just smart — that's <span className="font-semibold text-primary shadow-glow font-script text-2xl">fabulous</span> financial planning.
+            That's not just smart — that's smart financial planning.
             Invest in yourself and protect your driving record.
           </p>
           
@@ -70,7 +70,7 @@ const ROISection = () => {
             <div className="grid grid-cols-2 gap-4">
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <TrendingUp className="h-8 w-8 text-primary mx-auto mb-3" />
-                <div className="text-2xl font-bold text-gradient-hero">100%</div>
+                <div className="text-2xl font-bold text-gradient-hero">95%+</div>
                 <div className="text-sm text-secondary"><a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">Success Rate</a></div>
               </Card>
               
@@ -90,7 +90,7 @@ const ROISection = () => {
               </h3>
               <p className="text-lg text-foreground/90 leading-relaxed drop-shadow-sm">
                 Don't let one moment of going 10 over cost you $1,650 over three years. 
-                Our expert team has helped over 5,000 Alberta women protect their driving records 
+                Our expert team has helped over 5,000 Alberta drivers protect their driving records 
                 and keep their insurance rates low.
               </p>
             </div>

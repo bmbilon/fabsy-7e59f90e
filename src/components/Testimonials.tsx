@@ -28,7 +28,7 @@ const Testimonials = () => {
   ];
 
   const stats = [
-    { number: "100%", label: "Success Rate" },
+    { number: "95%+", label: "Success Rate" },
     { number: "$993", label: "avg saved" },
     { number: "4.9/5", label: "Client Rating" }
   ];
@@ -38,13 +38,13 @@ const Testimonials = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Real Results from Real Women
+            Real Results from Real Drivers
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold mb-6">
             Be the next to receive <span className="text-gradient-primary">5-Star Results</span> from Fabsy
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Alberta women are taking control of their finances and fighting back. 
+            Alberta drivers are taking control of their finances and fighting back. 
             Here's what they're saying about their Fabsy experience.
           </p>
         </div>
@@ -101,10 +101,10 @@ const Testimonials = () => {
         {/* Bottom CTA */}
         <div className="text-center mt-16 space-y-6">
           <h3 className="text-2xl font-bold">
-            You Deserve Peace of Mind
+            Straightforward, Start to Finish
           </h3>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Don't let one ticket derail your budget or stress you out. Join 1,000+ Alberta women who chose to fight back. 
+            A single ticket can raise your insurance for years. Join 1,000+ Alberta drivers who chose to fight back. 
             Questions? <a href="tel:825-793-2279" className="font-bold text-primary hover:text-primary-dark transition-smooth underline">Call (825) 793-2279</a>
           </p>
         </div>

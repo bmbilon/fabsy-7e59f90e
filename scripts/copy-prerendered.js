@@ -1,29 +1,21 @@
 /**
- * Copy prerendered files to dist folder after build
- * This ensures the prerendered content is available in production
+ * Copy prerendered snapshots into dist/prerendered.
+ * Merges ./public/prerendered and ./prerendered (the 26 city/violation AEO pages).
  */
 import fs from 'fs';
 import path from 'path';
 
-const publicDir = path.resolve('./public/prerendered');
 const distDir = path.resolve('./dist/prerendered');
+const sources = [path.resolve('./public/prerendered'), path.resolve('./prerendered')];
 
-console.log('📋 Copying prerendered files to dist...');
-
-if (!fs.existsSync(publicDir)) {
-  console.warn('⚠️  No prerendered directory found at', publicDir);
-  process.exit(0);
-}
-
-// Ensure dist/prerendered exists
 fs.mkdirSync(distDir, { recursive: true });
 
-// Prefer Node's built-in recursive copy to preserve directory structure
-try {
-  // Note: fs.cpSync is available in Node >=16
-  fs.cpSync(publicDir, distDir, { recursive: true, force: true });
-  console.log('✅ Copied prerendered directory recursively');
-} catch (err) {
-  console.error('❌ Failed to copy prerendered files:', err);
-  process.exit(1);
+let copied = 0;
+for (const src of sources) {
+  if (!fs.existsSync(src)) { console.warn('skip (missing):', src); continue; }
+  fs.cpSync(src, distDir, { recursive: true, force: true });
+  copied++;
+  console.log('copied', src, '->', distDir);
 }
+if (!copied) { console.warn('No prerendered sources found.'); process.exit(0); }
+console.log('Prerendered merge complete.');

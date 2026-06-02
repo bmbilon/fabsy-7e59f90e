@@ -46,7 +46,7 @@ const HowItWorks: React.FC = () => {
     },
     {
       name: "Receive the outcome",
-      text: "100% of clients achieve dismissals, reductions, or amendments that protect insurance. We keep you updated and explain next steps.",
+      text: "95%+ of clients achieve dismissals, reductions, or amendments that protect insurance. We keep you updated and explain next steps.",
       url: "https://fabsy.ca/testimonials",
       icon: Trophy,
     },

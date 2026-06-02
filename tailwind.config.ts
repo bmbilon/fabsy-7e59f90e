@@ -69,7 +69,7 @@ export default {
         },
       },
       fontFamily: {
-        'script': ['Dancing Script', 'cursive'],
+        'script': ['Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

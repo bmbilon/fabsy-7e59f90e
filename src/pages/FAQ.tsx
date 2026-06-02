@@ -12,7 +12,7 @@ const FAQPage: React.FC = () => {
     },
     {
       q: "What is Fabsy's success rate for traffic tickets?",
-      a: "Our results-based practice wins for 100% of clients — dismissals, reduced charges, or amendments that protect insurance. We focus on outcomes that preserve your driving record."
+      a: "Our results-based practice wins for 95%+ of clients — dismissals, reduced charges, or amendments that protect insurance. We focus on outcomes that preserve your driving record."
     },
     {
       q: "Will fighting a ticket increase my insurance?",

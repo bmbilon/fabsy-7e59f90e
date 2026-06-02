@@ -391,7 +391,7 @@ const TicketAnalysis = () => {
                 <h3 className="text-2xl font-bold mb-3">🛡️ Zero-Risk Guarantee</h3>
                 <p className="text-lg text-muted-foreground mb-4 max-w-2xl mx-auto">
                   {result.isEligible 
-                    ? "With our no-win, no-fee guarantee, you only pay if we save you money. Start now and protect your driving record!"
+                    ? "With our no-win, no-admin-fee guarantee, you only pay if we save you money. Start now and protect your driving record!"
                     : "Even with limited savings potential, our zero-risk guarantee means you pay nothing if we don't reduce your costs. Why not try?"}
                 </p>
                 <Link to="/">

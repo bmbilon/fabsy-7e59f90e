@@ -19,12 +19,12 @@ import useSafeHead from "@/hooks/useSafeHead";
 const About = () => {
   useSafeHead({
     title: "About Fabsy | Alberta Traffic Ticket Defense",
-    description: "Learn about Fabsy's mission to help Alberta drivers fight traffic tickets with 100% success rate. Expert legal team serving Calgary, Edmonton, and all Alberta.",
+    description: "Learn about Fabsy's mission to help Alberta drivers fight traffic tickets with 95%+ success rate. Expert legal team serving Calgary, Edmonton, and all Alberta.",
     canonical: "https://fabsy.ca/about"
   });
 
   const stats = [
-    { number: "100%", label: "Success Rate", icon: Award },
+    { number: "95%+", label: "Success Rate", icon: Award },
     { number: "$1.2M+", label: "Insurance Savings", icon: TrendingUp },
     { number: "10+", label: "Years Experience", icon: Star },
   ];
@@ -32,8 +32,8 @@ const About = () => {
   const values = [
     {
       icon: Heart,
-      title: "Women-Focused Service",
-      description: "We understand the unique challenges women face with traffic tickets and insurance discrimination. Our approach is designed specifically with women's needs in mind."
+      title: "Driver-Focused Service",
+      description: "We understand the challenges drivers face with traffic tickets and insurance discrimination. Our approach is designed specifically with drivers' needs in mind."
     },
     {
       icon: Shield,
@@ -43,7 +43,7 @@ const About = () => {
     {
       icon: Target,
       title: "Results-Driven",
-      description: "Our 100% success rate speaks for itself. We're not satisfied unless we've fought hard for the best possible outcome for your case."
+      description: "Our 95%+ success rate speaks for itself. We're not satisfied unless we've fought hard for the best possible outcome for your case."
     }
   ];
 
@@ -58,13 +58,13 @@ const About = () => {
             About Fabsy
           </Badge>
           <h1 className="text-4xl lg:text-6xl font-bold text-white drop-shadow-lg mb-6">
-            Empowering Women Through 
+            Professional Defense, Backed by 
             <span className="text-gradient-hero font-script block text-5xl lg:text-7xl mt-2">
               Legal Excellence
             </span>
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            Founded by women, for women. We're on a mission to level the playing field 
+            Built for every Alberta driver. We're on a mission to level the playing field 
             when it comes to traffic tickets and insurance fairness in Alberta.
           </p>
         </div>
@@ -93,18 +93,18 @@ const About = () => {
               </h2>
               <div className="space-y-6 text-white/90 text-lg leading-relaxed">
                 <p>
-                  Fabsy was born from a simple frustration: watching too many women accept 
+                  Fabsy was born from a simple frustration: watching too many drivers accept 
                   expensive traffic tickets without fighting back, only to face massive 
                   insurance increases that could have been avoided.
                 </p>
                 <p>
                   As experienced traffic representatives, we saw how the system was stacked against 
-                  everyday drivers, especially women who often face higher insurance premiums 
+                  everyday drivers, everyday drivers who often face higher insurance premiums 
                   and less aggressive court representation.
                 </p>
                 <p>
                   We decided to change that. By focusing exclusively on traffic ticket defense 
-                  and building a service designed around busy women's needs, we've helped 
+                  and building a service designed around busy drivers' needs, we've helped 
                   thousands keep their abstracts clean and their insurance rates low.
                 </p>
               </div>
@@ -117,19 +117,19 @@ const About = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-card-foreground">Our Mission</h3>
-                  <p className="text-muted-foreground">Keeping abstracts fab</p>
+                  <p className="text-muted-foreground">Keeping records clean</p>
                 </div>
               </div>
               
               <p className="text-muted-foreground leading-relaxed mb-6">
-                To provide every Alberta woman with accessible, expert traffic representation 
+                To provide every Alberta driver with accessible, expert traffic representation 
                 against traffic tickets, ensuring fair treatment and protecting their 
                 financial future from insurance discrimination.
               </p>
               
               <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
                 <p className="text-primary font-semibold text-center">
-                  "Every woman deserves a fighting chance in court"
+                  "Every driver deserves a fighting chance in court"
                 </p>
               </div>
             </Card>

@@ -523,7 +523,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                 <h4 className="font-semibold mb-2">🛡️ Zero-Risk Guarantee</h4>
                 <p className="text-sm text-muted-foreground">
                   {eligibilityResult.isEligible 
-                    ? "With our no-win, no-fee guarantee, you only pay if we save you money. This ticket is worth fighting!"
+                    ? "With our no-win, no-admin-fee guarantee, you only pay if we save you money. This ticket is worth fighting!"
                     : "Even if savings are limited, our zero-risk guarantee means you pay nothing if we don't reduce your costs."}
                 </p>
               </div>

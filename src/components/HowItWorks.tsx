@@ -48,8 +48,7 @@ const HowItWorks = () => {
             <span className="text-gradient-primary">4 Steps</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Alberta women: We get 30% of the tickets but fight back less than 25% of the time. 
-            Time to flip that statistic with our simple process.
+            Most Alberta tickets can be disputed, yet fewer than 25% of drivers do. Here's how the process works.
           </p>
         </div>
 

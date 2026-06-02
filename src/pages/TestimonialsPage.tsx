@@ -10,7 +10,7 @@ import useSafeHead from "@/hooks/useSafeHead";
 const TestimonialsPage = () => {
   useSafeHead({
     title: "Client Success Stories | Fabsy Traffic Ticket Defense",
-    description: "Read real testimonials from Alberta drivers who successfully fought their traffic tickets with Fabsy. 100% success rate across Calgary, Edmonton, and all Alberta.",
+    description: "Read real testimonials from Alberta drivers who successfully fought their traffic tickets with Fabsy. 95%+ success rate across Calgary, Edmonton, and all Alberta.",
     canonical: "https://fabsy.ca/testimonials"
   });
 
@@ -137,7 +137,7 @@ const TestimonialsPage = () => {
   const stats = [
     { 
       icon: TrendingDown,
-      number: "100%", 
+      number: "95%+", 
       label: "Success Rate",
       description: "Cases won or reduced"
     },
@@ -163,13 +163,13 @@ const TestimonialsPage = () => {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Real Results from Real Alberta Women
+            Real Results from Real Alberta drivers
           </Badge>
           <h1 className="text-4xl lg:text-6xl font-bold text-white drop-shadow-lg mb-6">
             Success Stories That <span className="text-gradient-hero">Speak for Themselves</span>
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            These Alberta women refused to let one ticket derail their finances. 
+            These Alberta drivers refused to let one ticket derail their finances. 
             You can be next.
           </p>
         </div>
@@ -206,7 +206,7 @@ const TestimonialsPage = () => {
               Featured Success Stories
             </h2>
             <p className="text-lg text-white/80 max-w-2xl mx-auto">
-              Real women, real results. Here's how Fabsy helped them keep their insurance rates low and driving records clean.
+              Real drivers, real results. Here's how Fabsy helped them keep their insurance rates low and driving records clean.
             </p>
           </div>
 
@@ -307,10 +307,10 @@ const TestimonialsPage = () => {
               Ready to Write Your Success Story?
             </h2>
             <p className="text-xl text-muted-foreground mb-2">
-              Join hundreds of Alberta women who chose to fight back
+              Join hundreds of Alberta drivers who chose to fight back
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">100% success rate</a> • No win, no fee guarantee • Average 3-week turnaround
+              <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">95%+ success rate</a> • No win, no admin fee guarantee • Average 3-week turnaround
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

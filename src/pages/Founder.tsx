@@ -7,7 +7,7 @@ const Founder = () => {
     <>
       <Helmet>
         <title>Lauren Bilon - Founder | Fabsy Traffic Services</title>
-        <meta name="description" content="Meet Lauren Bilon, founder of Fabsy Traffic Services. Dedicated to helping Alberta women fight traffic tickets with expert defense strategies." />
+        <meta name="description" content="Meet Lauren Bilon, founder of Fabsy Traffic Services. Dedicated to helping Alberta drivers fight traffic tickets with expert defense strategies." />
       </Helmet>
 
       <div className="fabsy-hero">
@@ -25,9 +25,9 @@ const Founder = () => {
             
             {/* Main content */}
             <div className="fabsy-card">
-              <h2>Empowering Alberta Women Through Expert Traffic Defense</h2>
+              <h2>Expert Traffic Defense for Alberta Drivers</h2>
               <p>
-                Lauren Bilon founded Fabsy Traffic Services with a clear mission: to provide Alberta women 
+                Lauren Bilon founded Fabsy Traffic Services with a clear mission: to provide Alberta drivers 
                 with expert traffic ticket defense that's both accessible and effective. With years of 
                 experience navigating Alberta's traffic court system, Lauren has built a practice focused 
                 on achieving real results for her clients.
@@ -36,8 +36,8 @@ const Founder = () => {
               <h3>The Fabsy Difference</h3>
               <p>
                 What sets Lauren apart is her deep understanding of both the legal landscape and the 
-                unique challenges women face when dealing with traffic violations. She recognized that 
-                many women felt intimidated by the legal process and needed an advocate who would not 
+                challenges drivers face when dealing with traffic violations. She recognized that 
+                many people felt intimidated by the legal process and needed an advocate who would not 
                 only fight for them but also educate them about their rights.
               </p>
               
@@ -102,7 +102,7 @@ const Founder = () => {
             <div className="alert is-info">
               <h3 style={{ marginBottom: '12px' }}>Lauren's Mission</h3>
               <p style={{ marginBottom: '0' }}>
-                "I believe every woman deserves skilled representation when facing traffic charges. 
+                "I believe every driver deserves skilled representation when facing traffic charges. 
                 My commitment is to provide that representation with integrity, expertise, and 
                 unwavering dedication to achieving the best possible outcome for each client."
               </p>

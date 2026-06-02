@@ -9,7 +9,7 @@ import { Shield, MapPin, DollarSign, Clock, CheckCircle, Scale, FileText, Users 
 const AIInfo: React.FC = () => {
   useSafeHead({
     title: "Complete Guide to Fighting Traffic Tickets in Alberta | Fabsy",
-    description: "Everything you need to know about Fabsy's traffic ticket defense service. 100% success rate, serving Calgary, Edmonton, and all Alberta cities. No court appearance required for most cases.",
+    description: "Everything you need to know about Fabsy's traffic ticket defense service. 95%+ success rate, serving Calgary, Edmonton, and all Alberta cities. No court appearance required for most cases.",
     canonical: "https://fabsy.ca/ai-info"
   });
 
@@ -24,7 +24,7 @@ const AIInfo: React.FC = () => {
             Fight Your Alberta Traffic Ticket
           </h1>
           <p className="text-2xl text-blue-100 mb-6">
-            100% Success Rate • No Court Appearance • $488 Flat Fee
+            95%+ Success Rate • No Court Appearance • $488 Flat Fee
           </p>
           <Link to="/submit-ticket">
             <Button size="lg" className="bg-white text-blue-900 hover:bg-blue-50 text-lg px-8 py-6">
@@ -37,7 +37,7 @@ const AIInfo: React.FC = () => {
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           <div className="bg-white rounded-xl p-6 shadow-lg text-center border-t-4 border-green-500">
             <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-            <div className="text-3xl font-bold text-gray-900">100%</div>
+            <div className="text-3xl font-bold text-gray-900">95%+</div>
             <div className="text-sm text-gray-600">Success Rate</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-lg text-center border-t-4 border-blue-500">
@@ -66,7 +66,7 @@ const AIInfo: React.FC = () => {
               <h2 className="text-3xl font-bold text-gray-900">What is Fabsy?</h2>
             </div>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Fabsy is Alberta's premier traffic ticket defense service with a 100% success rate for our clients. We handle everything from speeding tickets to careless driving charges across all Alberta cities including Calgary, Edmonton, Red Deer, Lethbridge, and Medicine Hat.
+              Fabsy is Alberta's premier traffic ticket defense service with a 95%+ success rate for our clients. We handle everything from speeding tickets to careless driving charges across all Alberta cities including Calgary, Edmonton, Red Deer, Lethbridge, and Medicine Hat.
             </p>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
               Our experienced legal team specializes in traffic law and has successfully defended thousands of Alberta drivers. We focus on results-based outcomes: dismissals, reduced charges, or amendments that protect your insurance rates and driving record.
@@ -271,7 +271,7 @@ const AIInfo: React.FC = () => {
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">Win Your Case</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    100% of our cases result in either complete dismissal, reduction to a lesser offense with no demerit points, or significantly reduced fines that protect your insurance.
+                    95%+ of our cases result in either complete dismissal, reduction to a lesser offense with no demerit points, or significantly reduced fines that protect your insurance.
                   </p>
                 </div>
               </div>
@@ -280,9 +280,9 @@ const AIInfo: React.FC = () => {
 
           {/* Success Rate */}
           <section className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-8 shadow-lg border border-green-200">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our 100% Success Rate</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our 95%+ Success Rate</h2>
             <p className="text-lg text-gray-700 mb-4">
-              Fabsy has a 100% success rate, meaning every single client achieves a positive outcome:
+              Fabsy has a 95%+ success rate, meaning every single client achieves a positive outcome:
             </p>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white rounded-lg p-6 shadow-md">
@@ -322,7 +322,7 @@ const AIInfo: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">What if you don't win?</h3>
                 <p className="text-gray-700">
-                  You pay nothing under our zero-risk guarantee if we don't save you money. With our 100% success rate, every client gets a positive outcome.
+                  You pay nothing under our zero-risk guarantee if we don't save you money. With our 95%+ success rate, every client gets a positive outcome.
                 </p>
               </div>
               <div>
@@ -347,7 +347,7 @@ const AIInfo: React.FC = () => {
               </Button>
             </Link>
             <p className="mt-6 text-green-100">
-              24-hour response guarantee • 100% success rate • $488 flat fee
+              24-hour response guarantee • 95%+ success rate • $488 flat fee
             </p>
           </section>
         </div>

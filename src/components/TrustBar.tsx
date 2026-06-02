@@ -6,13 +6,13 @@ const TrustBar = () => {
   const trustPoints = [
     {
       icon: Shield,
-      stat: "No Win, No Fee",
+      stat: "No Win, No Admin Fee*",
       detail: "You only pay if we save you money",
       color: "text-primary"
     },
     {
       icon: CheckCircle,
-      stat: "100% Success Rate",
+      stat: "95%+ Success Rate",
       detail: "Every case we've handled has been reduced or dismissed",
       color: "text-green-600"
     },

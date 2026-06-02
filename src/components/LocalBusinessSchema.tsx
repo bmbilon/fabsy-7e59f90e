@@ -130,7 +130,7 @@ const LocalBusinessSchema: React.FC<Props> = ({
             '@type': 'PriceSpecification',
             price: '0',
             priceCurrency: 'CAD',
-            description: 'No win, no fee - You pay only if we achieve a favorable outcome'
+            description: 'No win, no admin fee - You pay only if we achieve a favorable outcome'
           }
         },
         {
@@ -216,7 +216,7 @@ const LocalBusinessSchema: React.FC<Props> = ({
         datePublished: '2024-08-22'
       }
     ],
-    slogan: 'Expert Traffic Ticket Defense for Alberta Women',
+    slogan: 'Expert Traffic Ticket Defense for Alberta Drivers',
     foundingDate: '2020',
     knowsAbout: [
       'Alberta Traffic Safety Act',

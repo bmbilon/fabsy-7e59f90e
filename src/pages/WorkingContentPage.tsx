@@ -465,7 +465,7 @@ const WorkingContentPage = () => {
                     Get Free Analysis →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">Free consultation • No win, no fee options</p>
+                <p className="text-xs mt-3 opacity-80 text-center">Free consultation • No win, no admin fee options</p>
               </div>
 
               {/* Related Resources */}

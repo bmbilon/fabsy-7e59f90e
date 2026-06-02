@@ -69,7 +69,7 @@ export function generateProfessionalServiceJsonLd(data: {
     "logo": data.logo || "https://fabsy.ca/logo.png",
     "telephone": data.telephone || "",
     "email": data.email || "",
-    "description": data.description || "Alberta traffic ticket help for women",
+    "description": data.description || "Alberta traffic ticket help",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": data.address?.street || "",

@@ -20,7 +20,7 @@ import useSafeHead from "@/hooks/useSafeHead";
 const Services = () => {
   useSafeHead({
     title: "Traffic Ticket Defense Services | Fabsy Alberta",
-    description: "Complete traffic ticket defense for speeding, red light violations, careless driving, and more. 100% success rate. Serving all Alberta cities.",
+    description: "Complete traffic ticket defense for speeding, red light violations, careless driving, and more. 95%+ success rate. Serving all Alberta cities.",
     canonical: "https://fabsy.ca/services"
   });
 
@@ -256,10 +256,10 @@ const Services = () => {
           <Card className="p-8 bg-gradient-accent border-primary/20">
             <div className="text-center">
               <h3 className="text-2xl font-bold text-card-foreground mb-4">
-                Special Note for Women Drivers
+                A Note on Insurance Increases
               </h3>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
-                Research shows that women often face higher insurance premium increases after traffic violations. 
+                A single conviction can raise your insurance premiums for years. 
                 This makes professional ticket defense even more valuable as an investment in your financial future. 
                 Our clients typically save 3-5 times our fee in avoided insurance costs.
               </p>
