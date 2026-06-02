@@ -7,7 +7,7 @@ import { Shield, Upload, FileCheck, Scale, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 /**
- * HowItWorks — content + schema in sync; short meta for AEO.
+ * HowItWorks, content + schema in sync; short meta for AEO.
  */
 
 const HowItWorks: React.FC = () => {
@@ -22,7 +22,7 @@ const HowItWorks: React.FC = () => {
   const steps = [
     {
       name: "Upload your ticket",
-      text: "Take a clear photo of your traffic ticket and upload it. Our AI instantly extracts the violation, fine, and court information — it takes under 2 minutes.",
+      text: "Take a clear photo of your traffic ticket and upload it. Our AI instantly extracts the violation, fine, and court information, it takes under 2 minutes.",
       url: "https://fabsy.ca/submit-ticket",
       icon: Upload,
     },
@@ -34,13 +34,13 @@ const HowItWorks: React.FC = () => {
     },
     {
       name: "Choose your package",
-      text: "Select our $488 zero-risk package. You only pay if we save you money — we handle paperwork, disclosure, and court representation.",
+      text: "Select our flat $488 package to fight your ticket, plus 30% of any fine reduction we win. We handle paperwork, disclosure, and court representation.",
       url: "https://fabsy.ca/services",
       icon: Shield,
     },
     {
       name: "We fight your ticket",
-      text: "We request disclosure, review evidence, and represent you in court. Most clients avoid appearing — we handle the legal work so you don't have to.",
+      text: "We request disclosure, review evidence, and represent you in court. Most clients avoid appearing, we handle the legal work so you don't have to.",
       url: "https://fabsy.ca/how-it-works",
       icon: Scale,
     },
@@ -55,10 +55,10 @@ const HowItWorks: React.FC = () => {
   return (
     <main className="min-h-screen bg-gradient-soft">
       <Helmet>
-        <title>How It Works — Fight a Traffic Ticket in Alberta | Fabsy</title>
+        <title>How It Works, Fight a Traffic Ticket in Alberta | Fabsy</title>
         <meta
           name="description"
-          content="Simple 5-step process: upload your ticket, get a free analysis, choose our $488 zero-risk package, and let Fabsy represent you in Alberta traffic courts."
+          content="Simple 5-step process: upload your ticket, get a free analysis, choose our flat $488 package, and let Fabsy represent you in Alberta traffic courts."
         />
       </Helmet>
 

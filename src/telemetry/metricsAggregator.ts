@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 12: Conversion Layer & Form Telemetry - Metrics Aggregation
  * 
  * Daily aggregation of telemetry data, trend analysis, performance insights,

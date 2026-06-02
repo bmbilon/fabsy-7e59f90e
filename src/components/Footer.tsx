@@ -159,7 +159,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                *No Win, No Admin Fee: Admin fees are calculated as a percentage of the fine reduction achieved. For example, a fine of $300 reduced to $100 is a $200 reduction, subject to a standard 30% admin fee ($60). Results may vary. Past performance does not guarantee future results. 
+                *Pricing: a flat $488 fee to represent you, non-refundable. If we reduce your fine, you also pay 30% of the reduction. Example: a $300 fine cut to $100 is a $200 reduction, so a $60 fee, $548 total. No reduction, no fees beyond the $488. Results may vary. Past performance does not guarantee future results.
                 Our success rate is based on historical data and individual results may differ.
               </p>
             </div>

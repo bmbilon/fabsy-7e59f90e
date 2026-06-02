@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 11: Performance Guardrails - Image Optimization
  * 
  * Implements WebP/AVIF compression, lazy loading, responsive srcset

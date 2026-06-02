@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 10: Alberta "Next 10" City Targets + Prebuilt Pages
  * 
  * Objective: Expand Fabsy Alberta coverage from 12 → 22 indexed cities before Nov 1 2025

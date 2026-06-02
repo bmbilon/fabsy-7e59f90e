@@ -7,21 +7,21 @@ const Testimonials = () => {
     {
       name: "Sarah M.",
       location: "Calgary, AB",
-      quote: "I was worried about how the ticket would affect our family's budget—insurance was already expensive. Fabsy handled everything and kept my record clean. So relieved!",
+      quote: "I was worried about how the ticket would affect our family's budget, insurance was already expensive. Fabsy handled everything and kept my record clean. So relieved!",
       rating: 5,
       savings: "$1,220"
     },
     {
       name: "Jennifer L.",
       location: "Edmonton, AB",
-      quote: "As a working mom, I didn't have time to figure out court dates and paperwork. Fabsy made it effortless—I just uploaded my ticket and they did the rest. Ticket dismissed!",
+      quote: "As a working mom, I didn't have time to figure out court dates and paperwork. Fabsy made it effortless, I just uploaded my ticket and they did the rest. Ticket dismissed!",
       rating: 5,
       savings: "$950"
     },
     {
       name: "Amanda K.",
       location: "Red Deer, AB",
-      quote: "I can't believe how simple it was. No stress, no confusion—just results. My insurance didn't go up and I kept my clean record. Best decision I made!",
+      quote: "I can't believe how simple it was. No stress, no confusion, just results. My insurance didn't go up and I kept my clean record. Best decision I made!",
       rating: 5,
       savings: "$1,500"
     }

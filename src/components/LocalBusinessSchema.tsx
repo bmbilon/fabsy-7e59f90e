@@ -76,7 +76,7 @@ const LocalBusinessSchema: React.FC<Props> = ({
     '@id': url,
     name: `${name} - ${cityName}`,
     alternateName: [`Fabsy ${cityName}`, `Traffic Ticket Defense ${cityName}`, `Fight Traffic Tickets ${cityName}`],
-  description: `Yes, you can fight traffic tickets in ${cityName}, Alberta. Professional defense services for speeding, red light, careless driving, and distracted driving charges. Expert representation with zero-risk guarantee - you only pay if we achieve a favorable outcome.`,
+  description: `Yes, you can fight traffic tickets in ${cityName}, Alberta. Professional defense services for speeding, red light, careless driving, and distracted driving charges. Expert representation for a flat $488 fee plus 30% of any fine reduction we win.`,
     url,
     telephone,
     email,
@@ -130,7 +130,7 @@ const LocalBusinessSchema: React.FC<Props> = ({
             '@type': 'PriceSpecification',
             price: '0',
             priceCurrency: 'CAD',
-            description: 'No win, no admin fee - You pay only if we achieve a favorable outcome'
+            description: 'Flat $488 fee plus 30% of any fine reduction'
           }
         },
         {
@@ -212,7 +212,7 @@ const LocalBusinessSchema: React.FC<Props> = ({
           '@type': 'Person',
           name: 'Jennifer L.'
         },
-        reviewBody: 'Zero-risk guarantee worked exactly as promised. Great outcome for my red light ticket case.',
+        reviewBody: 'The flat-fee pricing worked exactly as described. Great outcome for my red light ticket case.',
         datePublished: '2024-08-22'
       }
     ],
@@ -249,7 +249,7 @@ const LocalBusinessSchema: React.FC<Props> = ({
         name: `Can I fight a speeding ticket in ${cityName}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Yes, you can fight a speeding ticket in ${cityName}, Alberta. Most speeding tickets can be successfully disputed through proper legal representation. We help preserve your driving record and prevent insurance increases with our zero-risk service.`
+          text: `Yes, you can fight a speeding ticket in ${cityName}, Alberta. Most speeding tickets can be successfully disputed through proper legal representation. We help preserve your driving record and prevent insurance increases for a flat $488 fee plus 30% of any fine reduction we win.`
         }
       },
       {

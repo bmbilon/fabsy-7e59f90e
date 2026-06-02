@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 12: Conversion Layer & Form Telemetry - Form Optimization
  * 
  * Progressive enhancement for form completion rates, field analytics,

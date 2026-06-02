@@ -241,7 +241,7 @@ export class ContentStandardizer {
           category: 'AEO',
           message: 'Title does not follow AEO pattern'
         });
-        recommendations.push('Update title to match AEO pattern: "{Offence} Ticket in {City} — Can You Fight It? | Fabsy"');
+        recommendations.push('Update title to match AEO pattern: "{Offence} Ticket in {City}, Can You Fight It? | Fabsy"');
       }
     }
 
@@ -395,7 +395,7 @@ ${JSON.stringify(schema.faq, null, 2)}
     <!-- FAQ Section -->
     <section class="faq-section">
       <div class="container">
-        <h2>Frequently asked questions — ${city} ${offenceSlug}</h2>
+        <h2>Frequently asked questions, ${city} ${offenceSlug}</h2>
         
         <div class="faq-list">
           ${content.faqs.map((faq, index) => `

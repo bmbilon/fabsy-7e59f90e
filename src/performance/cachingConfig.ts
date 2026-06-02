@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 11: Performance Guardrails - Caching & CDN Configuration
  * 
  * Implements cache-first static assets, stale-while-revalidate HTML

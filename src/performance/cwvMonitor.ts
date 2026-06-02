@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 11: Performance Guardrails - Core Web Vitals Monitor
  * 
  * Monitors LCP ≤2.5s, CLS <0.1, INP ≤200ms, TTFB <0.6s for AEO dominance

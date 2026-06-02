@@ -18,14 +18,14 @@ const ROISection = () => {
             <span className="text-gradient-hero">$1,650</span>
           </h2>
           <p className="text-xl text-foreground/90 max-w-3xl mx-auto drop-shadow-sm mb-6">
-            That's not just smart — that's smart financial planning.
+            That's not just smart, that's smart financial planning.
             Invest in yourself and protect your driving record.
           </p>
           
-          {/* Zero Risk Badge */}
+          {/* Pricing Badge */}
           <div className="inline-flex items-center gap-2 bg-blue-600/90 border border-blue-500/50 text-white px-4 py-2 rounded-full text-sm font-medium shadow-md">
             <Shield className="h-4 w-4" />
-            Zero Risk - Money Back if No Savings
+            Flat $488 to fight. 30% only if we win.
           </div>
         </div>
 

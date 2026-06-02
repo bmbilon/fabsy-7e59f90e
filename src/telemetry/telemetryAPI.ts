@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 12: Conversion Layer & Form Telemetry - API Endpoint
  * 
  * Edge KV storage for telemetry events with 30-day retention

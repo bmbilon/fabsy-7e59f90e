@@ -23,7 +23,7 @@ const ServiceSchema: React.FC<Props> = ({
   providerName = 'Fabsy',
   providerUrl = 'https://fabsy.ca',
   cityName,
-  offerDescription = 'Zero-risk: pay only if we win',
+  offerDescription = 'Flat $488 fee plus 30% of any fine reduction',
   price = '0',
   priceCurrency = 'CAD',
 }) => {

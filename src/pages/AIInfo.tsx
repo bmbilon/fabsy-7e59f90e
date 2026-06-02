@@ -84,10 +84,10 @@ const AIInfo: React.FC = () => {
             </div>
             <div className="bg-green-50 border-l-4 border-green-500 p-6 mb-6">
               <p className="text-xl font-semibold text-green-900 mb-2">
-                Flat Fee: $488 with Zero-Risk Guarantee
+                Straightforward flat-fee pricing: $488
               </p>
               <p className="text-green-800">
-                You only pay if we save you money. If we can't secure a dismissal, reduction, or amendment that protects your insurance, there's no fee.
+                A flat $488 to fight your ticket, plus 30% of any fine reduction we win. If we don't reduce your fine, you pay no fees beyond the $488.
               </p>
             </div>
             <div className="space-y-4">
@@ -322,7 +322,7 @@ const AIInfo: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">What if you don't win?</h3>
                 <p className="text-gray-700">
-                  You pay nothing under our zero-risk guarantee if we don't save you money. With our 95%+ success rate, every client gets a positive outcome.
+                  If we don't reduce your fine, you pay no fees beyond the flat $488. With our 95%+ success rate, every client gets a positive outcome.
                 </p>
               </div>
               <div>
@@ -339,7 +339,7 @@ const AIInfo: React.FC = () => {
             <Shield className="w-20 h-20 mx-auto mb-6" />
             <h2 className="text-4xl font-bold mb-4">Ready to Fight Your Ticket?</h2>
             <p className="text-xl mb-8 text-green-50 max-w-2xl mx-auto">
-              Get your free case analysis now. No obligation. Zero risk. Join thousands of satisfied Alberta drivers who protected their records and saved money.
+              Get your free case analysis now. No obligation. Join thousands of satisfied Alberta drivers who protected their records and saved money.
             </p>
             <Link to="/submit-ticket">
               <Button size="lg" className="bg-white text-green-600 hover:bg-green-50 text-xl px-12 py-8 shadow-xl">

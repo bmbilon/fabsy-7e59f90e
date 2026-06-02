@@ -13,7 +13,7 @@ const ThankYou: React.FC = () => {
   const webPageSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Thank You — Fabsy Traffic Services',
+    name: 'Thank You, Fabsy Traffic Services',
     url,
     description:
       'Thank you for contacting Fabsy Traffic Services. We received your submission and will respond within 24 hours.',
@@ -118,8 +118,8 @@ const ThankYou: React.FC = () => {
             <p className="text-sm text-muted-foreground">We’ll confirm your details, request disclosure if needed, and outline the plan.</p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
-            <h2 className="font-semibold text-foreground mb-1">Zero-risk guarantee</h2>
-            <p className="text-sm text-muted-foreground">You only pay if we save you money. No win, no admin fee.</p>
+            <h2 className="font-semibold text-foreground mb-1">How our pricing works</h2>
+            <p className="text-sm text-muted-foreground">A flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488.</p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">Track record</h2>

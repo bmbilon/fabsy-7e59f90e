@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 12: Conversion Layer & Form Telemetry - Warp Dashboard
  * 
  * React dashboard components for conversion metrics visualization

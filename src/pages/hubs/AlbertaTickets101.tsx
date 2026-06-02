@@ -8,17 +8,17 @@ const AlbertaTickets101: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/alberta-tickets-101';
 
   const topCityPages = [
-    { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding Ticket — Calgary' },
-    { url: '/content/fight-distracted-ticket-edmonton', name: 'Distracted Driving — Edmonton' },
-    { url: '/content/fight-red-light-ticket-red-deer', name: 'Red Light Ticket — Red Deer' },
-    { url: '/content/fight-speeding-ticket-lethbridge', name: 'Speeding Ticket — Lethbridge' },
-    { url: '/content/fight-speeding-ticket-medicine-hat', name: 'Speeding Ticket — Medicine Hat' },
+    { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding Ticket, Calgary' },
+    { url: '/content/fight-distracted-ticket-edmonton', name: 'Distracted Driving, Edmonton' },
+    { url: '/content/fight-red-light-ticket-red-deer', name: 'Red Light Ticket, Red Deer' },
+    { url: '/content/fight-speeding-ticket-lethbridge', name: 'Speeding Ticket, Lethbridge' },
+    { url: '/content/fight-speeding-ticket-medicine-hat', name: 'Speeding Ticket, Medicine Hat' },
   ];
 
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Alberta Tickets 101 — Fabsy',
+    name: 'Alberta Tickets 101, Fabsy',
     url,
     description:
       'Overview of Alberta traffic tickets, categories, process, and outcomes. Start here to understand how tickets work, what to expect, and how to protect your driving record and insurance.',

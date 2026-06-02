@@ -236,7 +236,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
         isEligible,
         reason: isEligible 
           ? `This ticket is worth disputing! You could save $${potentialSavings.toFixed(0)} over 3 years.`
-          : `This ticket may not justify representation costs, but our zero-risk guarantee means you have nothing to lose.`,
+          : `This ticket may not justify representation costs. If we don't reduce your fine, you pay no fees beyond the flat $488.`,
         financials: {
           fine: fineAmount,
           estimatedInsuranceIncrease: annualIncrease,
@@ -520,11 +520,11 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
               {/* Risk-Free Guarantee */}
               <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-lg p-4">
-                <h4 className="font-semibold mb-2">🛡️ Zero-Risk Guarantee</h4>
+                <h4 className="font-semibold mb-2">🛡️ How our pricing works</h4>
                 <p className="text-sm text-muted-foreground">
-                  {eligibilityResult.isEligible 
-                    ? "With our no-win, no-admin-fee guarantee, you only pay if we save you money. This ticket is worth fighting!"
-                    : "Even if savings are limited, our zero-risk guarantee means you pay nothing if we don't reduce your costs."}
+                  {eligibilityResult.isEligible
+                    ? "A flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488. This ticket is worth fighting!"
+                    : "If we don't reduce your fine, you pay no fees beyond the flat $488."}
                 </p>
               </div>
 

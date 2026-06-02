@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 11: Performance Guardrails - Asset Optimization
  * 
  * Implements critical CSS inlining, deferred loading, bundle optimization

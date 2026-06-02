@@ -126,12 +126,12 @@ const Contact = () => {
 
             <Card className="bg-primary/5 border-primary/20">
               <CardHeader>
-                <CardTitle className="text-primary">Zero Risk Guarantee</CardTitle>
+                <CardTitle className="text-primary">How our pricing works</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Remember, if we don't save you money on your total ticket costs, you don't pay our fee. 
-                  You'll only pay your original fine plus a 10% processing fee - the same as paying through the court's online system.
+                  A flat $488 to fight your ticket, plus 30% of any fine reduction we win.
+                  If we don't reduce your fine, you pay no fees beyond the flat $488.
                 </p>
               </CardContent>
             </Card>

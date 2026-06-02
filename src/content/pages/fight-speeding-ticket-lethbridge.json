@@ -3,7 +3,7 @@
   "meta_title": "Fight a Speeding Ticket in Lethbridge | Fabsy",
   "meta_description": "Local steps to dispute a speeding ticket in Lethbridge. Request disclosure, collect evidence, and get a free eligibility check from Fabsy.",
   "h1": "How to Fight a Speeding Ticket in Lethbridge",
-  "hook": "You may be able to dispute a speeding ticket in Lethbridge — request disclosure and start a free eligibility check.",
+  "hook": "You may be able to dispute a speeding ticket in Lethbridge, request disclosure and start a free eligibility check.",
   "bullets": [
     "Request disclosure from court",
     "Collect photos and witness info",
@@ -14,7 +14,7 @@
   "next": "<p>Upload your ticket photo for a free check within 24 hours.</p>",
   "faqs": [
     {
-      "a": "No—lawyers aren't required, but professional assistance can improve outcomes depending on the charge.",
+      "a": "No, lawyers aren't required, but professional assistance can improve outcomes depending on the charge.",
       "q": "Is a lawyer required to dispute a ticket in Lethbridge?"
     }
   ],
@@ -22,5 +22,5 @@
     "transcript": "",
     "youtubeUrl": ""
   },
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is a lawyer required to dispute a ticket in Lethbridge?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No—lawyers aren't required, but professional assistance can improve outcomes depending on the charge.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Is a lawyer required to dispute a ticket in Lethbridge?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No, lawyers aren't required, but professional assistance can improve outcomes depending on the charge.\"}}]}"
 }

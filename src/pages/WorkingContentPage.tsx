@@ -173,7 +173,7 @@ const WorkingContentPage = () => {
         serviceType={serviceType}
         url={currentUrl}
         cityName={cityName}
-        offerDescription="Zero-risk: pay only if we win"
+        offerDescription="Flat $488 fee plus 30% of any fine reduction"
         price="0"
         priceCurrency="CAD"
       />
@@ -263,7 +263,7 @@ const WorkingContentPage = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-lg font-semibold text-foreground mb-2">Can I fight it?</h2>
-                <p className="text-foreground">Yes — most {offence.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'} can be fought. You're more likely to qualify if you act within 7 days, request disclosure, and avoid admitting fault.</p>
+                <p className="text-foreground">Yes, most {offence.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'} can be fought. You're more likely to qualify if you act within 7 days, request disclosure, and avoid admitting fault.</p>
                 <h3 className="mt-4 text-sm font-semibold text-foreground">What to do now (3 steps)</h3>
                 <ol className="mt-2 list-decimal ml-5 space-y-1 text-foreground">
                   <li>Upload your ticket</li>
@@ -274,8 +274,8 @@ const WorkingContentPage = () => {
               <div>
                 <h3 className="text-sm font-semibold text-foreground">Outcome expectations</h3>
                 <p className="text-foreground">Keep demerits off your record; avoid ${pageData.stats?.avgSavings || 1650}–$7,000 in lifetime insurance costs.</p>
-                <h3 className="mt-3 text-sm font-semibold text-foreground">Risk</h3>
-                <p className="text-foreground">Zero-risk: you pay only if we win.</p>
+                <h3 className="mt-3 text-sm font-semibold text-foreground">Pricing</h3>
+                <p className="text-foreground">A flat $488 to fight your ticket, plus 30% of any fine reduction we win.</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>
                 <p className="text-foreground">{cityName || 'Alberta'} • {offence.charAt(0).toUpperCase() + offence.slice(1)}</p>
               </div>
@@ -465,7 +465,7 @@ const WorkingContentPage = () => {
                     Get Free Analysis →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">Free consultation • No win, no admin fee options</p>
+                <p className="text-xs mt-3 opacity-80 text-center">Free consultation • Flat $488 to fight, 30% only if we win</p>
               </div>
 
               {/* Related Resources */}

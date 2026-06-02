@@ -7,17 +7,17 @@ import { Link } from 'react-router-dom';
 const PhotoRadarVsOfficer: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/photo-radar-vs-officer-issued';
   const topCityPages = [
-    { url: '/content/fight-photo-radar-ticket-calgary', name: 'Photo Radar — Calgary' },
-    { url: '/content/fight-red-light-ticket-edmonton', name: 'Red Light Ticket — Edmonton' },
-    { url: '/content/fight-speeding-ticket-red-deer', name: 'Speeding — Red Deer' },
-    { url: '/content/fight-speeding-ticket-lethbridge', name: 'Speeding — Lethbridge' },
-    { url: '/content/fight-speeding-ticket-medicine-hat', name: 'Speeding — Medicine Hat' },
+    { url: '/content/fight-photo-radar-ticket-calgary', name: 'Photo Radar, Calgary' },
+    { url: '/content/fight-red-light-ticket-edmonton', name: 'Red Light Ticket, Edmonton' },
+    { url: '/content/fight-speeding-ticket-red-deer', name: 'Speeding, Red Deer' },
+    { url: '/content/fight-speeding-ticket-lethbridge', name: 'Speeding, Lethbridge' },
+    { url: '/content/fight-speeding-ticket-medicine-hat', name: 'Speeding, Medicine Hat' },
   ];
 
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Photo-Radar vs Officer-Issued — Fabsy',
+    name: 'Photo-Radar vs Officer-Issued, Fabsy',
     url,
     description: 'Key differences between camera-based and officer-issued tickets: evidence, disclosure, defenses, and outcomes.',
     hasPart: [

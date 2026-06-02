@@ -399,7 +399,7 @@ const ContentPage = () => {
               Ready to Fight Your {pageData.violation || 'Traffic'} Ticket?
             </h2>
               <p className="text-xl mb-6 text-green-50">
-              Zero-risk guarantee • <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-white">{pageData.stats?.successRate || 94}% success rate</a> • Save ${pageData.stats?.avgSavings || 1650}+
+              Flat $488 to fight, 30% only if we win • <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-white">{pageData.stats?.successRate || 94}% success rate</a> • Save ${pageData.stats?.avgSavings || 1650}+
             </p>
             <Link to="/submit-ticket">
               <Button 

@@ -224,8 +224,8 @@ const SavingsCalculator = () => {
                       </h4>
                       <p className="text-sm">
                 {results.recommendation === 'recommend' 
-                  ? `Fighting this ticket could save you $${results.potentialSavings.toFixed(0)} over 3 years. You'd save ${results.roi.toFixed(0)}% more than what you invest, making representation a smart financial decision. Plus, with our zero-risk guarantee, you only pay if we save you money!`
-                  : `The potential savings may not justify the representation cost. However, with our zero-risk guarantee, you have nothing to lose - if we don't save you money on your total costs, you only pay your original fine plus a 10% processing fee.`
+                  ? `Fighting this ticket could save you $${results.potentialSavings.toFixed(0)} over 3 years. You'd save ${results.roi.toFixed(0)}% more than what you invest, making representation a smart financial decision. Our pricing: a flat $488 to fight your ticket, plus 30% of any fine reduction we win.`
+                  : `The potential savings may not justify the representation cost. Our pricing is a flat $488 to fight your ticket, plus 30% of any fine reduction we win. If we don't reduce your fine, you pay no fees beyond the flat $488.`
                 }
                       </p>
                     </div>

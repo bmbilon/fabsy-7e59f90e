@@ -23,7 +23,7 @@ const CompetitorComparison = () => {
       items: [
         { feature: "Fixed Transparent Pricing", fabsy: true, others: false },
         { feature: "No Hidden Fees", fabsy: true, others: false },
-        { feature: "Money-Back Guarantee", fabsy: true, others: false },
+        { feature: "Success Fee Only If We Win", fabsy: true, others: false },
         { feature: "Free Initial Consultation", fabsy: true, others: true },
       ]
     },

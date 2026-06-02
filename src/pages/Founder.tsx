@@ -44,7 +44,7 @@ const Founder = () => {
               <p>
                 "Every ticket tells a story," Lauren explains. "My job is to examine every detail, 
                 challenge every assumption, and ensure my clients get the fair treatment they deserve. 
-                It's not just about avoiding points on your license—it's about justice."
+                It's not just about avoiding points on your license, it's about justice."
               </p>
             </div>
 

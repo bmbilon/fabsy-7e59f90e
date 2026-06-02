@@ -119,7 +119,7 @@ const TicketAnalysis = () => {
       reason:
         potentialSavings > 0
           ? `This ticket is worth disputing! You could save $${potentialSavings.toFixed(0)} over 3 years.`
-          : `This ticket may not justify representation costs, but our zero-risk guarantee means you have nothing to lose.`,
+          : `This ticket may not justify representation costs. If we don't reduce your fine, you pay no fees beyond the flat $488.`,
     };
   }, [payload, monthlyPremium]);
 
@@ -161,7 +161,7 @@ const TicketAnalysis = () => {
                     <Shield className="h-12 w-12" />
                   )}
                   <h1 className="text-4xl font-bold">
-                    {result.isEligible ? "This Ticket is Worth Fighting!" : "Zero-Risk Guarantee Applies"}
+                    {result.isEligible ? "This Ticket is Worth Fighting!" : "Straightforward Flat-Fee Pricing"}
                   </h1>
                 </div>
                 
@@ -384,15 +384,15 @@ const TicketAnalysis = () => {
               </Link>
             </div>
 
-            {/* Zero-Risk Guarantee */}
+            {/* Pricing */}
             <Card className="border-2">
               <CardContent className="p-8 text-center">
                 <Shield className="h-12 w-12 mx-auto mb-4 text-primary" />
-                <h3 className="text-2xl font-bold mb-3">🛡️ Zero-Risk Guarantee</h3>
+                <h3 className="text-2xl font-bold mb-3">🛡️ How our pricing works</h3>
                 <p className="text-lg text-muted-foreground mb-4 max-w-2xl mx-auto">
-                  {result.isEligible 
-                    ? "With our no-win, no-admin-fee guarantee, you only pay if we save you money. Start now and protect your driving record!"
-                    : "Even with limited savings potential, our zero-risk guarantee means you pay nothing if we don't reduce your costs. Why not try?"}
+                  {result.isEligible
+                    ? "A flat $488 to fight your ticket, plus 30% of any fine reduction we win. Start now and protect your driving record!"
+                    : "A flat $488 to fight your ticket, plus 30% of any fine reduction we win. If we don't reduce your fine, you pay no fees beyond the $488. Why not try?"}
                 </p>
                 <Link to="/">
                   <Button size="lg" variant="outline" className="text-lg px-8 py-6 h-auto">

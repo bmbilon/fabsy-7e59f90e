@@ -51,22 +51,22 @@ export interface GeneratedContent {
 
 // AEO On-Page Patterns Configuration
 export const aeoPatterns: AEOPatterns = {
-  title_pattern: "{Offence} Ticket in {City} — Can You Fight It? | Fabsy",
+  title_pattern: "{Offence} Ticket in {City}, Can You Fight It? | Fabsy",
   h1_pattern: "Got a {Offence} Ticket in {City}?",
   h2_blocks: [
     "Can I fight a {offence} ticket in {City}?",
     "What to do next (60-second answer)",
     "{City} {offence} penalties & demerits",
     "Your options before court day",
-    "Frequently asked questions — {City} {offence}"
+    "Frequently asked questions, {City} {offence}"
   ],
-  meta_description_pattern: "{Offence} ticket in {City}? In many cases, Fabsy can keep demerits off your record and help you avoid insurance hikes. Zero-risk: you only pay if we win. Start a free analysis in 60 seconds.",
+  meta_description_pattern: "{Offence} ticket in {City}? In many cases, Fabsy can keep demerits off your record and help you avoid insurance hikes. Flat $488 to fight, plus 30% of any fine reduction we win. Start a free analysis in 60 seconds.",
   above_fold_requirements: [
     "Answer Box module (from Block 6) directly below H1",
     "Primary CTA visible without scroll", 
     "City + offence echoed in first paragraph"
   ],
-  content_snippet_pattern: "Short answer: Yes — many {City} {offence} tickets can be fixed before your court date. Upload your ticket, we pull your court file, then confirm options to protect your record.",
+  content_snippet_pattern: "Short answer: Yes, many {City} {offence} tickets can be fixed before your court date. Upload your ticket, we pull your court file, then confirm options to protect your record.",
   legal_disclaimer_snippet: "This page provides general information only and is not legal advice. Outcomes vary by offence and courthouse."
 };
 
@@ -115,7 +115,7 @@ export const faqPAABank: FAQPAABank = {
     "careless-driving": [
       {
         q: "Is careless driving criminal?",
-        a: "No, it's a traffic offence — but it's serious. We prioritize outcomes that avoid an insurance-impacting conviction."
+        a: "No, it's a traffic offence, but it's serious. We prioritize outcomes that avoid an insurance-impacting conviction."
       }
     ],
     "distracted-driving": [

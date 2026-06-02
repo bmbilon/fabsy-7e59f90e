@@ -7,17 +7,17 @@ import { Link } from 'react-router-dom';
 const DemeritsInsurance: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/demerits-and-insurance';
   const topCityPages = [
-    { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding — Calgary' },
-    { url: '/content/fight-distracted-ticket-edmonton', name: 'Distracted — Edmonton' },
-    { url: '/content/fight-red-light-ticket-red-deer', name: 'Red Light — Red Deer' },
-    { url: '/content/fight-speeding-ticket-lethbridge', name: 'Speeding — Lethbridge' },
-    { url: '/content/fight-speeding-ticket-medicine-hat', name: 'Speeding — Medicine Hat' },
+    { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding, Calgary' },
+    { url: '/content/fight-distracted-ticket-edmonton', name: 'Distracted, Edmonton' },
+    { url: '/content/fight-red-light-ticket-red-deer', name: 'Red Light, Red Deer' },
+    { url: '/content/fight-speeding-ticket-lethbridge', name: 'Speeding, Lethbridge' },
+    { url: '/content/fight-speeding-ticket-medicine-hat', name: 'Speeding, Medicine Hat' },
   ];
 
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Demerits & Insurance — Fabsy',
+    name: 'Demerits & Insurance, Fabsy',
     url,
     description: 'How demerit points translate into insurance risk, why preserving your abstract matters, and which outcomes avoid premium hikes.',
     hasPart: [

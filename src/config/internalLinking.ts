@@ -146,7 +146,7 @@ export const internalLinkingConfig: InternalLinkingConfig = {
   anchor_templates: {
     to_sibling: [
       "Fix a {OffenceB} ticket in {City}",
-      "{City} {OffenceB} ticket — options",
+      "{City} {OffenceB} ticket, options",
       "Fight {OffenceB} in {City}"
     ],
     to_hub: [

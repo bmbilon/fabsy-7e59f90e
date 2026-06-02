@@ -43,7 +43,7 @@ const AnswerBox: React.FC<Props> = ({
           Can I fight a {displayOffence} ticket in {city}?
         </h2>
         <p className="text-slate-700 font-medium">
-          <span className="text-green-600 font-semibold">Yes</span> — in most cases we can protect your record and avoid insurance hikes.
+          <span className="text-green-600 font-semibold">Yes</span>, in most cases we can protect your record and avoid insurance hikes.
         </p>
       </div>
 
@@ -81,7 +81,7 @@ const AnswerBox: React.FC<Props> = ({
           Get a free analysis →
         </Link>
         <div className="text-xs text-slate-600">
-          <span className="font-semibold text-green-600">Zero-risk:</span> you only pay if we win.
+          <span className="font-semibold text-green-600">Flat $488 to fight.</span> 30% only if we win.
         </div>
       </div>
 

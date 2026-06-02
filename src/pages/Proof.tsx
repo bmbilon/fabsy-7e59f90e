@@ -13,7 +13,7 @@ const Proof: React.FC = () => {
   const webPageSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Proof & Methodology — Fabsy Traffic Services',
+    name: 'Proof & Methodology, Fabsy Traffic Services',
     url,
     description:
       `How Fabsy calculates success rates from ${stats.TotalTickets || 'our'} traffic ticket cases. Definitions of a win, sample sizes, and data collection/QA process. Includes anonymized aggregate datasets by offence and city.`,
@@ -65,9 +65,9 @@ const Proof: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-3">Proof & Results</h1>
           <p className="text-lg md:text-xl opacity-90">
             {stats.isLoading ? (
-              "How we calculate success, what counts as a win, and how we keep data quality high — in plain English."
+              "How we calculate success, what counts as a win, and how we keep data quality high, in plain English."
             ) : stats.error ? (
-              "How we calculate success, what counts as a win, and how we keep data quality high — in plain English."
+              "How we calculate success, what counts as a win, and how we keep data quality high, in plain English."
             ) : (
               `Based on ${stats.TotalTickets.toLocaleString()} cases across ${stats.CityRows} Alberta cities. Win rate: ${stats.WinRate}%. How we calculate success and keep data quality high.`
             )}

@@ -252,7 +252,7 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
         
         <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
           By submitting, you authorize Fabsy to represent you in court and process your payment. 
-          Remember: if we don't successfully dismiss or reduce your ticket, you get a full refund.
+          Remember: the flat $488 covers representation. If we don't reduce your fine, you pay no fees beyond it.
         </p>
       </div>
     </div>

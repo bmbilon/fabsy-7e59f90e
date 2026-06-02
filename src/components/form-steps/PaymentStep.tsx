@@ -259,8 +259,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
           <div className="bg-primary/10 p-3 rounded-lg border border-primary/20">
             <p className="text-sm text-primary text-center">
-              <strong>Money-Back Guarantee:</strong> If we don't successfully dismiss or reduce your ticket, 
-              you get a full refund of our service fee.
+              <strong>How our pricing works:</strong> a flat $488 to fight your ticket, plus 30% of any fine reduction we win. If we don't reduce your fine, you pay no fees beyond the flat $488.
             </p>
           </div>
         </div>

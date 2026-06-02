@@ -10,11 +10,11 @@
   "next": "",
   "faqs": [
     {
-      "a": "It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.",
+      "a": "It costs a flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488.",
       "q": "How much does it cost?"
     },
     {
-      "a": "Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.",
+      "a": "Usually not, we appear on your behalf for most violations. We will notify you if attendance is required.",
       "q": "Do I need to appear in court?"
     },
     {
@@ -23,5 +23,5 @@
     }
   ],
   "video": null,
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs a flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not, we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}"
 }

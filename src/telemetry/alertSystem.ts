@@ -1,5 +1,5 @@
 /**
- * FABSY AEO SNAPSHOT — ALBERTA ONLY
+ * FABSY AEO SNAPSHOT, ALBERTA ONLY
  * Block 12: Conversion Layer & Form Telemetry - Alert System
  * 
  * Automated alerts for conversion rate drops, engagement issues, 

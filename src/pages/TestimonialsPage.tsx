@@ -20,8 +20,8 @@ const TestimonialsPage = () => {
       location: "Calgary, AB",
       age: "32",
       occupation: "Marketing Manager",
-      quote: "I was worried about how the ticket would affect our family's budget—insurance was already expensive. Fabsy handled everything and kept my record clean. So relieved!",
-      story: "I got a speeding ticket on my way to pick up my kids from daycare. The thought of my insurance going up by over $1,200 a year was terrifying. Fabsy made the entire process so easy—I just uploaded my ticket and they handled everything else. No court dates, no stress, and best of all, ticket dismissed!",
+      quote: "I was worried about how the ticket would affect our family's budget, insurance was already expensive. Fabsy handled everything and kept my record clean. So relieved!",
+      story: "I got a speeding ticket on my way to pick up my kids from daycare. The thought of my insurance going up by over $1,200 a year was terrifying. Fabsy made the entire process so easy, I just uploaded my ticket and they handled everything else. No court dates, no stress, and best of all, ticket dismissed!",
       rating: 5,
       savings: "$1,220",
       outcome: "Ticket Dismissed",
@@ -32,8 +32,8 @@ const TestimonialsPage = () => {
       location: "Edmonton, AB",
       age: "28",
       occupation: "Registered Nurse",
-      quote: "As a working mom, I didn't have time to figure out court dates and paperwork. Fabsy made it effortless—I just uploaded my ticket and they did the rest. Ticket dismissed!",
-      story: "Working 12-hour shifts as a nurse, I had zero time to deal with a traffic ticket. I was rolling through a stop sign at 6 AM heading to the hospital. Fabsy took care of everything while I focused on my patients and family. Three weeks later, I got the news—ticket dismissed!",
+      quote: "As a working mom, I didn't have time to figure out court dates and paperwork. Fabsy made it effortless, I just uploaded my ticket and they did the rest. Ticket dismissed!",
+      story: "Working 12-hour shifts as a nurse, I had zero time to deal with a traffic ticket. I was rolling through a stop sign at 6 AM heading to the hospital. Fabsy took care of everything while I focused on my patients and family. Three weeks later, I got the news, ticket dismissed!",
       rating: 5,
       savings: "$950",
       outcome: "Ticket Dismissed",
@@ -44,8 +44,8 @@ const TestimonialsPage = () => {
       location: "Red Deer, AB",
       age: "35",
       occupation: "Small Business Owner",
-      quote: "I can't believe how simple it was. No stress, no confusion—just results. My insurance didn't go up and I kept my clean record. Best decision I made!",
-      story: "As a small business owner, every dollar counts. When I got hit with a photo radar ticket, I knew it would impact my commercial insurance rates. Fabsy fought for me and got it reduced to a non-moving violation—no demerit points, minimal insurance impact. Worth every penny!",
+      quote: "I can't believe how simple it was. No stress, no confusion, just results. My insurance didn't go up and I kept my clean record. Best decision I made!",
+      story: "As a small business owner, every dollar counts. When I got hit with a photo radar ticket, I knew it would impact my commercial insurance rates. Fabsy fought for me and got it reduced to a non-moving violation, no demerit points, minimal insurance impact. Worth every penny!",
       rating: 5,
       savings: "$1,500",
       outcome: "Reduced to Warning",
@@ -69,7 +69,7 @@ const TestimonialsPage = () => {
       age: "26",
       occupation: "Financial Analyst",
       quote: "Best $149 I ever spent. They saved me thousands in insurance increases and kept my driving record clean.",
-      story: "I did the math—paying the ticket would have cost me $3,200+ in insurance increases over three years. Fabsy's fee was a fraction of that, and they actually won my case. As someone who works with numbers all day, this was a no-brainer investment.",
+      story: "I did the math, paying the ticket would have cost me $3,200+ in insurance increases over three years. Fabsy's fee was a fraction of that, and they actually won my case. As someone who works with numbers all day, this was a no-brainer investment.",
       rating: 5,
       savings: "$3,200",
       outcome: "Ticket Dismissed",
@@ -81,7 +81,7 @@ const TestimonialsPage = () => {
       age: "38",
       occupation: "Real Estate Agent",
       quote: "I drive for work every day. Keeping my record clean is essential. Fabsy understood that and fought hard for me.",
-      story: "With my job requiring me to drive clients around daily, I couldn't afford demerit points or insurance increases. Got caught in a school zone speed trap. Fabsy's expertise in Alberta traffic law got my ticket reduced—no points on my license and my insurance stayed the same!",
+      story: "With my job requiring me to drive clients around daily, I couldn't afford demerit points or insurance increases. Got caught in a school zone speed trap. Fabsy's expertise in Alberta traffic law got my ticket reduced, no points on my license and my insurance stayed the same!",
       rating: 5,
       savings: "$1,100",
       outcome: "Reduced Fine, No Points",
@@ -310,7 +310,7 @@ const TestimonialsPage = () => {
               Join hundreds of Alberta drivers who chose to fight back
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">95%+ success rate</a> • No win, no admin fee guarantee • Average 3-week turnaround
+              <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">95%+ success rate</a> • Flat $488 to fight, 30% only if we win • Average 3-week turnaround
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

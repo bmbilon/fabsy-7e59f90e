@@ -20,7 +20,7 @@ const Hero = () => {
           {/* Left: message */}
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1">
-              <span className="text-xs font-medium tracking-wide text-white/80">No win, no admin fee*</span>
+              <span className="text-xs font-medium tracking-wide text-white/80">Flat $488 to fight. 30% only if we win.</span>
             </div>
 
             <div className="space-y-5">

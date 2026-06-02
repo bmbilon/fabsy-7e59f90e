@@ -107,31 +107,31 @@ const DisputeConfirmPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <div className="font-medium">Ticket Number</div>
-                <div className="bg-background/50 p-2 rounded mt-1">{prefill.ticketNumber || '—'}</div>
+                <div className="bg-background/50 p-2 rounded mt-1">{prefill.ticketNumber || '-'}</div>
               </div>
               <div>
                 <div className="font-medium">Fine Amount</div>
-                <div className="bg-background/50 p-2 rounded mt-1">{prefill.fineAmount || '—'}</div>
+                <div className="bg-background/50 p-2 rounded mt-1">{prefill.fineAmount || '-'}</div>
               </div>
               <div>
                 <div className="font-medium">Issue Date</div>
-                <div className="bg-background/50 p-2 rounded mt-1">{prefill.issueDate ? prefill.issueDate.toDateString() : '—'}</div>
+                <div className="bg-background/50 p-2 rounded mt-1">{prefill.issueDate ? prefill.issueDate.toDateString() : '-'}</div>
               </div>
               <div>
                 <div className="font-medium">Court Date</div>
-                <div className="bg-background/50 p-2 rounded mt-1">{prefill.courtDate ? prefill.courtDate.toDateString() : '—'}</div>
+                <div className="bg-background/50 p-2 rounded mt-1">{prefill.courtDate ? prefill.courtDate.toDateString() : '-'}</div>
               </div>
               <div className="md:col-span-2">
                 <div className="font-medium">Location</div>
-                <div className="bg-background/50 p-2 rounded mt-1">{prefill.location || '—'}</div>
+                <div className="bg-background/50 p-2 rounded mt-1">{prefill.location || '-'}</div>
               </div>
               <div>
                 <div className="font-medium">Officer</div>
-                <div className="bg-background/50 p-2 rounded mt-1">{prefill.officer || '—'}</div>
+                <div className="bg-background/50 p-2 rounded mt-1">{prefill.officer || '-'}</div>
               </div>
               <div>
                 <div className="font-medium">Badge</div>
-                <div className="bg-background/50 p-2 rounded mt-1">{prefill.officerBadge || '—'}</div>
+                <div className="bg-background/50 p-2 rounded mt-1">{prefill.officerBadge || '-'}</div>
               </div>
               {(prefill.offenceSection || prefill.offenceSubSection || prefill.offenceDescription) && (
                 <div className="md:col-span-2">

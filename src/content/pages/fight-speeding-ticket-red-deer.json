@@ -1,9 +1,9 @@
 {
   "slug": "fight-speeding-ticket-red-deer",
   "meta_title": "Fight a Speeding Ticket in Red Deer | Fabsy",
-  "meta_description": "How to dispute a speeding or traffic ticket in Red Deer — request disclosure and gather local evidence. Free check from Fabsy.",
+  "meta_description": "How to dispute a speeding or traffic ticket in Red Deer, request disclosure and gather local evidence. Free check from Fabsy.",
   "h1": "How to Fight a Speeding Ticket in Red Deer",
-  "hook": "You may be able to dispute a speeding ticket in Red Deer — start with a disclosure request and free eligibility check.",
+  "hook": "You may be able to dispute a speeding ticket in Red Deer, start with a disclosure request and free eligibility check.",
   "bullets": [
     "Request disclosure quickly",
     "Gather photos or witnesses",
@@ -14,7 +14,7 @@
   "next": "<p>Upload a ticket photo and we'll reply with a free assessment.</p>",
   "faqs": [
     {
-      "a": "Times vary—disclosure requests can take days to weeks depending on the court backlog; request promptly.",
+      "a": "Times vary, disclosure requests can take days to weeks depending on the court backlog; request promptly.",
       "q": "How long does disclosure take in Red Deer?"
     }
   ],
@@ -22,5 +22,5 @@
     "transcript": "",
     "youtubeUrl": ""
   },
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How long does disclosure take in Red Deer?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Times vary—disclosure requests can take days to weeks depending on the court backlog; request promptly.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How long does disclosure take in Red Deer?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Times vary, disclosure requests can take days to weeks depending on the court backlog; request promptly.\"}}]}"
 }
