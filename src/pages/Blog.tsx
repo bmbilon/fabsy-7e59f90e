@@ -83,7 +83,7 @@ const Blog = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-gradient-hero">
         <Header />
         <div className="container mx-auto px-4 py-16">
           <div className="text-center">
@@ -114,11 +114,11 @@ const Blog = () => {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-gradient-hero">
         <Header />
         <div className="container mx-auto px-4 py-16">
           <div className="text-center max-w-md mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Blog</h1>
+            <h1 className="text-3xl font-bold text-white mb-4">Blog</h1>
             <div className="bg-red-50 border border-red-200 rounded-lg p-6">
               <p className="text-red-600 mb-4">Unable to load blog posts</p>
               <p className="text-sm text-red-500">{error}</p>
@@ -137,11 +137,11 @@ const Blog = () => {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-gradient-hero">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-sky-200 via-sky-300 to-sky-400 text-gray-900 py-16">
+      <section className="text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Alberta Traffic Law Blog
@@ -157,23 +157,23 @@ const Blog = () => {
         <div className="container mx-auto px-4">
           {posts.length === 0 ? (
             <div className="text-center max-w-md mx-auto">
-              <h2 className="text-2xl font-semibold text-gray-700 mb-4">No Posts Yet</h2>
-              <p className="text-gray-600">
+              <h2 className="text-2xl font-semibold text-white mb-4">No Posts Yet</h2>
+              <p className="text-white/70">
                 We're working on creating valuable content for Alberta drivers. Check back soon!
               </p>
             </div>
           ) : (
             <>
               <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Latest Articles</h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">
+                <h2 className="text-3xl font-bold text-white mb-4">Latest Articles</h2>
+                <p className="text-white/70 max-w-2xl mx-auto">
                   Stay informed about Alberta traffic laws and learn how to handle tickets effectively
                 </p>
               </div>
 
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
                 {posts.map((post) => (
-                  <Card key={post.id} className="h-full flex flex-col hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+                  <Card key={post.id} className="h-full flex flex-col bg-gradient-card border border-white/20 hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                     {/* Featured Image */}
                     {post.featured_image && (
                       <div className="aspect-video overflow-hidden">

@@ -447,7 +447,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   )}
                   <div>
                     <h3 className="text-xl font-bold mb-2">
-                      {eligibilityResult.isEligible ? "✅ Worth Fighting!" : "⚠️ Consider Carefully"}
+                      {eligibilityResult.isEligible ? "Worth Fighting!" : "Consider Carefully"}
                     </h3>
                     <p className="text-lg">{eligibilityResult.reason}</p>
                   </div>
@@ -520,7 +520,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
               {/* Risk-Free Guarantee */}
               <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-lg p-4">
-                <h4 className="font-semibold mb-2">🛡️ How our pricing works</h4>
+                <h4 className="font-semibold mb-2">How our pricing works</h4>
                 <p className="text-sm text-muted-foreground">
                   {eligibilityResult.isEligible
                     ? "A flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488. This ticket is worth fighting!"

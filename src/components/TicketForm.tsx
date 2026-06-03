@@ -336,7 +336,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
       }
       
       toast({
-        title: "Application Submitted Successfully! 🎉",
+        title: "Application Submitted Successfully!",
         description: "We'll review your case and contact you within 24 hours.",
       });
       
@@ -432,10 +432,10 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
             Fight Your Ticket
           </Badge>
-          <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+          <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
             Let's Get Your <span className="text-gradient-primary">Ticket Dismissed</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-white/80 max-w-3xl mx-auto">
             Complete this form and our experts will review your case. 
             95%+ success rate • Fixed $488 fee • No hidden costs
           </p>
@@ -546,8 +546,8 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
         </Card>
 
         {/* Security Note */}
-        <div className="text-center mt-8 text-sm text-muted-foreground">
-          <p>🔒 Your information is encrypted and secure. We never share your data with third parties.</p>
+        <div className="text-center mt-8 text-sm text-white/70">
+          <p>Your information is encrypted and secure. We never share your data with third parties.</p>
         </div>
       </div>
     </section>

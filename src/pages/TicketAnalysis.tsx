@@ -307,7 +307,7 @@ const TicketAnalysis = () => {
                     
                     <div className="bg-muted/50 rounded-lg p-4 mt-4">
                       <p className="text-sm text-muted-foreground">
-                        💡 <strong>Tip:</strong> Enter your actual premium for a more accurate savings calculation
+                        <strong>Tip:</strong> Enter your actual premium for a more accurate savings calculation
                       </p>
                     </div>
                   </div>
@@ -388,7 +388,7 @@ const TicketAnalysis = () => {
             <Card className="border-2">
               <CardContent className="p-8 text-center">
                 <Shield className="h-12 w-12 mx-auto mb-4 text-primary" />
-                <h3 className="text-2xl font-bold mb-3">🛡️ How our pricing works</h3>
+                <h3 className="text-2xl font-bold mb-3">How our pricing works</h3>
                 <p className="text-lg text-muted-foreground mb-4 max-w-2xl mx-auto">
                   {result.isEligible
                     ? "A flat $488 to fight your ticket, plus 30% of any fine reduction we win. Start now and protect your driving record!"

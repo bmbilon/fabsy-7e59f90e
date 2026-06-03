@@ -140,8 +140,8 @@ const JurisdictionChecker = ({ onResult, initialLocation = "" }: JurisdictionChe
                 <div className="space-y-2">
                   <p className={`font-semibold ${result.agentsPermitted ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}`}>
                     {result.agentsPermitted 
-                      ? `✓ Agents permitted in ${result.location}` 
-                      : `✗ Agents not permitted in ${result.location}`
+                      ? `Agents permitted in ${result.location}`
+                      : `Agents not permitted in ${result.location}`
                     }
                   </p>
                   <p className="text-sm text-muted-foreground">
@@ -163,7 +163,7 @@ const JurisdictionChecker = ({ onResult, initialLocation = "" }: JurisdictionChe
                   {result.agentsPermitted && (
                     <div className="mt-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
                       <p className="text-sm text-primary font-medium">
-                        ✓ We can represent you at this location. Proceed with your ticket submission.
+                        We can represent you at this location. Proceed with your ticket submission.
                       </p>
                     </div>
                   )}

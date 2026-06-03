@@ -3,15 +3,15 @@ import Footer from "@/components/Footer";
 
 const PrivacyPolicy = () => {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gradient-hero">
       <Header />
       <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
-        <p className="text-muted-foreground mb-8">
+        <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
+        <p className="text-white/70 mb-8">
           Last updated: {new Date().toLocaleDateString()}
         </p>
 
-        <div className="prose prose-lg max-w-none space-y-8">
+        <div className="prose prose-lg max-w-none space-y-8 text-white/90">
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Information We Collect</h2>
             <p className="mb-4">
@@ -107,7 +107,7 @@ const PrivacyPolicy = () => {
             <p className="mb-4">
               If you have any questions about this Privacy Policy or our privacy practices, please contact us:
             </p>
-            <div className="bg-muted p-4 rounded-lg">
+            <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
               <p><strong>Fabsy Traffic Services</strong></p>
               <p>Email: info@fabsy.ca</p>
               <p>Phone: (403) 123-4567</p>

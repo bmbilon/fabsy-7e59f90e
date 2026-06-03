@@ -94,19 +94,19 @@ const AIInfo: React.FC = () => {
               <h3 className="text-xl font-semibold text-gray-900">Why Fighting Your Ticket Saves Money:</h3>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-3 mt-1 text-xl">✓</span>
+                  <CheckCircle className="text-green-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" />
                   <span><strong>Avoid insurance increases:</strong> Most clients save $1,000-$3,000 in insurance premiums over three years</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-3 mt-1 text-xl">✓</span>
+                  <CheckCircle className="text-green-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" />
                   <span><strong>No demerit points:</strong> Preserve your clean driving record</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-3 mt-1 text-xl">✓</span>
+                  <CheckCircle className="text-green-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" />
                   <span><strong>Reduced or dismissed fines:</strong> Often pay less than the original ticket amount</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-3 mt-1 text-xl">✓</span>
+                  <CheckCircle className="text-green-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" />
                   <span><strong>Peace of mind:</strong> Professional legal representation with proven results</span>
                 </li>
               </ul>

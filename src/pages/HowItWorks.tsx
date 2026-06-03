@@ -53,7 +53,7 @@ const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <main className="min-h-screen bg-gradient-soft">
+    <main className="min-h-screen bg-gradient-hero">
       <Helmet>
         <title>How It Works, Fight a Traffic Ticket in Alberta | Fabsy</title>
         <meta
@@ -74,8 +74,8 @@ const HowItWorks: React.FC = () => {
 
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold mb-4 text-foreground">How Fabsy Fights Your Ticket</h1>
-          <p className="text-lg text-muted-foreground mb-8">Five simple steps to protect your insurance and driving record in Alberta.</p>
+          <h1 className="text-4xl font-bold mb-4 text-white">How Fabsy Fights Your Ticket</h1>
+          <p className="text-lg text-white/80 mb-8">Five simple steps to protect your insurance and driving record in Alberta.</p>
 
           <div className="space-y-8">
             {steps.map((step, idx) => {

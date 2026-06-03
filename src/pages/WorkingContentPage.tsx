@@ -10,7 +10,7 @@ import LocalBusinessSchema from '@/components/LocalBusinessSchema';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import HowToSchema from '@/components/HowToSchema';
 import useSafeHead from '@/hooks/useSafeHead';
-import { MapPin, AlertTriangle, Shield, ExternalLink } from 'lucide-react';
+import { MapPin, AlertTriangle, Shield, ExternalLink, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnswerBox from '@/components/AnswerBox';
 
@@ -423,24 +423,24 @@ const WorkingContentPage = () => {
               {/* Key Highlights Card */}
               <div className="bg-card rounded-xl p-6 shadow-sm border">
                 <h3 className="text-lg font-bold mb-4 text-foreground flex items-center gap-2">
-                  <span className="text-primary">⚡</span>
+                  <Zap className="h-5 w-5 text-primary" aria-hidden="true" />
                   Why Act Now
                 </h3>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start gap-3">
-                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
                     <span className="text-foreground leading-relaxed">Only 7 days to file your dispute</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
                     <span className="text-foreground leading-relaxed">Prevent insurance rate increases</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
                     <span className="text-foreground leading-relaxed">Protect your driving record</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-primary mt-0.5 font-bold">✓</span>
+                    <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
 <span className="text-foreground leading-relaxed"><Link to="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">{pageData.stats?.successRate || 94}% success rate</Link></span>
                   </li>
                 </ul>

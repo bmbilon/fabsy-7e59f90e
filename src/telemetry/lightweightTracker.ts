@@ -260,7 +260,7 @@ export class LightweightTelemetry {
     };
 
     if (this.config.debug) {
-      console.log('📊 Telemetry:', telemetryEvent);
+      console.log('Telemetry:', telemetryEvent);
     }
 
     this.eventQueue.push(telemetryEvent);
@@ -292,7 +292,7 @@ export class LightweightTelemetry {
       });
     } catch (error) {
       if (this.config.debug) {
-        console.warn('📊 Telemetry send failed:', error);
+        console.warn('Telemetry send failed:', error);
       }
       
       // Re-queue failed events (with limit to prevent memory issues)
@@ -347,7 +347,7 @@ export function generateInlineTracker(config: Partial<TelemetryConfig> = {}): st
         })
       });
     } catch (e) {
-      if (config.debug) console.warn('📊 Send failed:', e);
+      if (config.debug) console.warn('Send failed:', e);
     }
   };
   
@@ -365,7 +365,7 @@ export function generateInlineTracker(config: Partial<TelemetryConfig> = {}): st
       ...data
     };
     
-    if (config.debug) console.log('📊', telemetryEvent);
+    if (config.debug) console.log(telemetryEvent);
     send(telemetryEvent);
   };
   

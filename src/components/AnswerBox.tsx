@@ -87,7 +87,7 @@ const AnswerBox: React.FC<Props> = ({
 
       {/* Local indicator */}
       <div className="mt-4 pt-3 border-t border-sky-200 text-xs text-slate-500">
-        ✓ Serving {city}, Alberta • {capitalizedOffence} ticket defense • 94% success rate
+        Serving {city}, Alberta • {capitalizedOffence} ticket defense • 94% success rate
       </div>
     </section>
   );

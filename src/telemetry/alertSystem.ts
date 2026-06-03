@@ -328,17 +328,17 @@ class ConversionAlertSystem {
     await transporter.sendMail({
       from: this.notifications.email.from_email,
       to: this.notifications.email.recipients.join(', '),
-      subject: `🚨 Conversion Alert: ${alert.title}`,
+      subject: `Conversion Alert: ${alert.title}`,
       html: htmlContent
     });
   }
 
   private async sendSlackAlert(alert: Alert): Promise<void> {
     const severityEmojis = {
-      low: '⚠️',
-      medium: '🟡',
-      high: '🔴', 
-      critical: '🚨'
+      low: '[LOW]',
+      medium: '[MEDIUM]',
+      high: '[HIGH]',
+      critical: '[CRITICAL]'
     };
 
     const payload = {
@@ -409,7 +409,7 @@ class ConversionAlertSystem {
       const payload = {
         channel: this.notifications.slack.channel,
         username: this.notifications.slack.username,
-        text: `✅ Alert resolved: ${alert.title}`,
+        text: `Alert resolved: ${alert.title}`,
         attachments: [
           {
             color: 'good',

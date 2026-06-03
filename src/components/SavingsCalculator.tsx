@@ -220,7 +220,7 @@ const SavingsCalculator = () => {
                         : 'bg-yellow-50 border border-yellow-200'
                     }`}>
                       <h4 className="font-semibold mb-2">
-                        {results.recommendation === 'recommend' ? '✅ Recommended' : '⚠️ Consider Carefully'}
+                        {results.recommendation === 'recommend' ? 'Recommended' : 'Consider Carefully'}
                       </h4>
                       <p className="text-sm">
                 {results.recommendation === 'recommend' 

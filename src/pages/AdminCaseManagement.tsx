@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle, Mail, Phone, Ticket, DollarSign } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -279,10 +279,10 @@ export default function AdminCaseManagement() {
                             {getStatusBadge(submission.status)}
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
-                            <p>📧 {submission.email}</p>
-                            <p>📱 {submission.phone}</p>
-                            <p>🎫 Ticket: {submission.ticket_number}</p>
-                            <p>💰 Fine: ${submission.fine_amount}</p>
+                            <p className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /> {submission.email}</p>
+                            <p className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" /> {submission.phone}</p>
+                            <p className="flex items-center gap-2"><Ticket className="h-4 w-4 shrink-0" aria-hidden="true" /> Ticket: {submission.ticket_number}</p>
+                            <p className="flex items-center gap-2"><DollarSign className="h-4 w-4 shrink-0" aria-hidden="true" /> Fine: ${submission.fine_amount}</p>
                           </div>
                           <p className="text-sm mt-2">
                             <span className="font-medium">Violation:</span> {submission.violation}

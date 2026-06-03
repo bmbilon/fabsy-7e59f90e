@@ -48,12 +48,12 @@ const FAQPage: React.FC = () => {
   });
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gradient-hero">
       <Header />
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
-          <p className="text-lg text-muted-foreground mb-8">
+          <h1 className="text-4xl font-bold mb-4 text-white">Frequently Asked Questions</h1>
+          <p className="text-lg text-white/80 mb-8">
             Clear, direct answers to help you decide whether to fight your ticket, local to Alberta.
           </p>
           <FAQSection faqs={faqs} pageName="FAQ" pageUrl="https://fabsy.ca/faq" />

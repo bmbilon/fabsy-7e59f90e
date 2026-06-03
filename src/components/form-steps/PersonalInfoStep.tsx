@@ -341,7 +341,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                     Driver's license scanned successfully!
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    ✨ Form fields have been auto-filled. Please review for accuracy and correct any errors.
+                    Form fields have been auto-filled. Please review for accuracy and correct any errors.
                   </p>
                 </div>
               </div>
@@ -636,7 +636,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
               onCheckedChange={(checked) => updateFormData({ smsOptIn: checked === true })}
             />
             <Label htmlFor="smsOptIn" className="text-sm font-normal cursor-pointer">
-              📱 Send me SMS updates about my case (recommended)
+              Send me SMS updates about my case (recommended)
             </Label>
           </div>
         </div>

@@ -123,7 +123,7 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
               <span className="font-medium">Court Date</span>
               <div className="bg-muted/30 p-2 rounded mt-1">{formData.courtDate ? format(formData.courtDate, "MMM dd, yyyy") : "Not scheduled"}</div>
             </div>
-            <div><span className="font-medium">Ticket Image:</span> {formData.ticketImage ? "✓ Uploaded" : "Not uploaded"}</div>
+            <div><span className="font-medium">Ticket Image:</span> {formData.ticketImage ? "Uploaded" : "Not uploaded"}</div>
           </div>
         </div>
       </Card>

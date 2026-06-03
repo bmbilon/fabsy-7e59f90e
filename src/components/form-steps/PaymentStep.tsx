@@ -154,7 +154,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
       // If TESTUSER coupon, skip payment and go to success
       if (isTestUser) {
         toast({
-          title: "Test Submission Successful! 🎉",
+          title: "Test Submission Successful!",
           description: "Your ticket has been submitted for review (Test Mode - No Payment Required).",
         });
         // Redirect to success page after short delay
@@ -252,7 +252,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
             )}
             {isTestUser && (
               <p className="text-xs text-green-600 text-center font-semibold">
-                ✓ Test mode activated - No payment required
+                Test mode activated - No payment required
               </p>
             )}
           </div>
@@ -283,7 +283,7 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
             />
             {isTestUser && (
               <p className="text-xs text-green-600 font-semibold">
-                ✓ Valid test user code applied
+                Valid test user code applied
               </p>
             )}
           </div>

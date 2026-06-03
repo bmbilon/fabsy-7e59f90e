@@ -117,7 +117,7 @@ const BlogPost = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-gradient-hero">
         <Header />
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto animate-pulse">
@@ -141,7 +141,7 @@ const BlogPost = () => {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-gradient-hero">
         <Header />
         <div className="container mx-auto px-4 py-16">
           <div className="text-center max-w-md mx-auto">
@@ -222,7 +222,7 @@ const BlogPost = () => {
         </script>
       </Helmet>
 
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-gradient-hero">
         <Header />
         
         <article className="py-16">
@@ -230,9 +230,9 @@ const BlogPost = () => {
             <div className="max-w-4xl mx-auto">
               {/* Back to Blog */}
               <div className="mb-8">
-                <Link 
-                  to="/blog" 
-                  className="inline-flex items-center text-sky-700 hover:text-sky-900 transition-colors"
+                <Link
+                  to="/blog"
+                  className="inline-flex items-center text-primary-light hover:text-white transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Blog
@@ -245,12 +245,12 @@ const BlogPost = () => {
                   <Badge variant="secondary">{post.category}</Badge>
                 </div>
                 
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
                   {post.title}
                 </h1>
 
-                <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-200">
-                  <div className="flex items-center gap-6 text-gray-600">
+                <div className="flex items-center justify-between mb-6 pb-6 border-b border-white/10">
+                  <div className="flex items-center gap-6 text-white/70">
                     <span className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
                       {formatDate(post.published_at)}
@@ -271,7 +271,7 @@ const BlogPost = () => {
                   </Button>
                 </div>
 
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-xl text-white/80 leading-relaxed">
                   {post.meta_description}
                 </p>
               </header>
@@ -297,22 +297,22 @@ const BlogPost = () => {
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    h1: ({node, ...props}) => <h1 className="text-4xl font-bold mt-8 mb-6 text-gray-900" {...props} />,
-                    h2: ({node, ...props}) => <h2 className="text-3xl font-bold mt-12 mb-6 text-gray-900" {...props} />,
-                    h3: ({node, ...props}) => <h3 className="text-2xl font-semibold mt-8 mb-4 text-gray-900" {...props} />,
-                    p: ({node, ...props}) => <p className="mb-6 text-gray-700 leading-relaxed text-lg" {...props} />,
-                    ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-6 space-y-2 text-gray-700" {...props} />,
-                    ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-6 space-y-2 text-gray-700" {...props} />,
+                    h1: ({node, ...props}) => <h1 className="text-4xl font-bold mt-8 mb-6 text-white" {...props} />,
+                    h2: ({node, ...props}) => <h2 className="text-3xl font-bold mt-12 mb-6 text-white" {...props} />,
+                    h3: ({node, ...props}) => <h3 className="text-2xl font-semibold mt-8 mb-4 text-white" {...props} />,
+                    p: ({node, ...props}) => <p className="mb-6 text-white/80 leading-relaxed text-lg" {...props} />,
+                    ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-6 space-y-2 text-white/80" {...props} />,
+                    ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-6 space-y-2 text-white/80" {...props} />,
                     li: ({node, ...props}) => <li className="mb-2" {...props} />,
-                    strong: ({node, ...props}) => <strong className="font-semibold text-gray-900" {...props} />,
+                    strong: ({node, ...props}) => <strong className="font-semibold text-white" {...props} />,
                     em: ({node, ...props}) => <em className="italic" {...props} />,
-                    a: ({node, ...props}) => <a className="text-blue-600 hover:text-blue-700 underline" {...props} />,
-                    blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-blue-500 pl-4 italic my-6 text-gray-600" {...props} />,
+                    a: ({node, ...props}) => <a className="text-primary-light hover:text-white underline" {...props} />,
+                    blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary pl-4 italic my-6 text-white/70" {...props} />,
                     code: ({node, ...props}) => {
                       const { className } = props as any;
                       const isInline = !className || !className.includes('language-');
-                      return isInline 
-                        ? <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono" {...props} />
+                      return isInline
+                        ? <code className="bg-white/10 text-slate-200 px-2 py-1 rounded text-sm font-mono" {...props} />
                         : <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg my-6 overflow-x-auto" {...props} />;
                     },
                     img: ({node, ...props}) => (
@@ -337,9 +337,9 @@ const BlogPost = () => {
               </div>
 
               {/* Keywords */}
-              <footer className="mt-12 pt-8 border-t border-gray-200">
+              <footer className="mt-12 pt-8 border-t border-white/10">
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Topics Covered:</h3>
+                  <h3 className="text-lg font-semibold text-white mb-3">Topics Covered:</h3>
                   <div className="flex flex-wrap gap-2">
                     {post.keywords.map((keyword, index) => (
                       <Badge key={index} variant="outline">
@@ -350,16 +350,16 @@ const BlogPost = () => {
                 </div>
 
                 {/* Call to Action */}
-                <div className="bg-gradient-to-r from-purple-400 to-pink-400 text-white rounded-lg p-8 text-center shadow-lg">
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">Need Help with Your Traffic Ticket?</h3>
-                  <p className="text-xl mb-6 text-gray-800">
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-8 text-center shadow-lg">
+                  <h3 className="text-2xl font-bold mb-4 text-white">Need Help with Your Traffic Ticket?</h3>
+                  <p className="text-xl mb-6 text-white/80">
                     Don't let a traffic ticket impact your driving record. Get expert help from Alberta's premier traffic defense service.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button asChild variant="secondary" size="lg">
+                    <Button asChild size="lg" className="bg-primary text-white hover:bg-primary-dark border-0">
                       <Link to="/contact">Get Free Consultation</Link>
                     </Button>
-                    <Button asChild variant="outline" size="lg" className="bg-white text-purple-600 hover:bg-gray-50 border-white">
+                    <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-primary/20">
                       <Link to="/">Learn More</Link>
                     </Button>
                   </div>

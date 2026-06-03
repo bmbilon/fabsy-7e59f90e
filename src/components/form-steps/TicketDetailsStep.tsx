@@ -460,7 +460,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                   JPG, PNG, HEIC, PDF • Max 10MB
                 </p>
                 <p className="text-xs text-primary font-medium">
-                  ✨ We'll automatically fill in the details!
+                  We'll automatically fill in the details!
                 </p>
               </div>
             </div>
@@ -764,7 +764,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             </PopoverContent>
           </Popover>
           <p className="text-xs text-muted-foreground">
-            💡 Start typing to search by section number or description (e.g., "86", "speeding", "registration")
+            Start typing to search by section number or description (e.g., "86", "speeding", "registration")
           </p>
         </div>
         
@@ -873,7 +873,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         </div>
 
         <p className="text-xs text-muted-foreground">
-          💡 <strong>Tip:</strong> Use the search above or manually enter details from the "DID UNLAWFULLY CONTRAVENE SECTION" area of your ticket.
+          <strong>Tip:</strong> Use the search above or manually enter details from the "DID UNLAWFULLY CONTRAVENE SECTION" area of your ticket.
         </p>
       </div>
 

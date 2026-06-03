@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { GraduationCap, Scale, Handshake, Car } from 'lucide-react';
 import '../styles/fabsy-theme.scss';
 
 const Founder = () => {
@@ -53,7 +54,7 @@ const Founder = () => {
               <h3>Professional Excellence</h3>
               <div className="hiw-list">
                 <div className="step">
-                  <div className="step__icon">🎓</div>
+                  <div className="step__icon"><GraduationCap className="h-8 w-8" aria-hidden="true" /></div>
                   <div>
                     <div className="step__title">Specialized Training</div>
                     <div className="step__meta">
@@ -64,7 +65,7 @@ const Founder = () => {
                 </div>
 
                 <div className="step">
-                  <div className="step__icon">⚖️</div>
+                  <div className="step__icon"><Scale className="h-8 w-8" aria-hidden="true" /></div>
                   <div>
                     <div className="step__title">Proven Track Record</div>
                     <div className="step__meta">
@@ -75,7 +76,7 @@ const Founder = () => {
                 </div>
 
                 <div className="step">
-                  <div className="step__icon">🤝</div>
+                  <div className="step__icon"><Handshake className="h-8 w-8" aria-hidden="true" /></div>
                   <div>
                     <div className="step__title">Client-Centered Approach</div>
                     <div className="step__meta">
@@ -86,7 +87,7 @@ const Founder = () => {
                 </div>
 
                 <div className="step">
-                  <div className="step__icon">🚗</div>
+                  <div className="step__icon"><Car className="h-8 w-8" aria-hidden="true" /></div>
                   <div>
                     <div className="step__title">Comprehensive Coverage</div>
                     <div className="step__meta">

@@ -224,10 +224,10 @@ export class CWVMonitor {
 
 ${metrics.map(m => `
 ### ${m.url}
-- **LCP:** ${m.lcp.toFixed(2)}s ${m.lcp <= CWV_TARGETS.LCP ? '✅' : '❌'}
-- **CLS:** ${m.cls.toFixed(3)} ${m.cls <= CWV_TARGETS.CLS ? '✅' : '❌'} 
-- **INP:** ${m.inp.toFixed(0)}ms ${m.inp <= CWV_TARGETS.INP ? '✅' : '❌'}
-- **TTFB:** ${m.ttfb.toFixed(2)}s ${m.ttfb <= CWV_TARGETS.TTFB ? '✅' : '❌'}
+- **LCP:** ${m.lcp.toFixed(2)}s ${m.lcp <= CWV_TARGETS.LCP ? 'PASS' : 'FAIL'}
+- **CLS:** ${m.cls.toFixed(3)} ${m.cls <= CWV_TARGETS.CLS ? 'PASS' : 'FAIL'}
+- **INP:** ${m.inp.toFixed(0)}ms ${m.inp <= CWV_TARGETS.INP ? 'PASS' : 'FAIL'}
+- **TTFB:** ${m.ttfb.toFixed(2)}s ${m.ttfb <= CWV_TARGETS.TTFB ? 'PASS' : 'FAIL'}
 - **PSI Score:** ${m.psi_score.toFixed(0)}/100
 ${m.field_data ? `- **Field LCP (75th):** ${m.field_data.lcp_p75?.toFixed(2)}s` : ''}
 `).join('')}
@@ -238,7 +238,7 @@ ${passing.length < metrics.length ? `
 ${metrics.filter(m => m.lcp > CWV_TARGETS.LCP).map(m => `- **${m.url}:** LCP ${m.lcp.toFixed(2)}s > ${CWV_TARGETS.LCP}s - Optimize images, reduce server response time`).join('\n')}
 ${metrics.filter(m => m.cls > CWV_TARGETS.CLS).map(m => `- **${m.url}:** CLS ${m.cls.toFixed(3)} > ${CWV_TARGETS.CLS} - Add size attributes to images, avoid dynamic content insertion`).join('\n')}
 ${metrics.filter(m => m.inp > CWV_TARGETS.INP).map(m => `- **${m.url}:** INP ${m.inp.toFixed(0)}ms > ${CWV_TARGETS.INP}ms - Reduce JavaScript execution time, debounce interactions`).join('\n')}
-` : '✅ All pages meeting CWV targets'}
+` : 'All pages meeting CWV targets'}
 `;
 
     return report.trim();

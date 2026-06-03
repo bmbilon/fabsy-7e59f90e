@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Quote, TrendingDown, Shield, Clock } from "lucide-react";
+import { Star, Quote, TrendingUp, Shield, Clock, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,8 +24,7 @@ const TestimonialsPage = () => {
       story: "I got a speeding ticket on my way to pick up my kids from daycare. The thought of my insurance going up by over $1,200 a year was terrifying. Fabsy made the entire process so easy, I just uploaded my ticket and they handled everything else. No court dates, no stress, and best of all, ticket dismissed!",
       rating: 5,
       savings: "$1,220",
-      outcome: "Ticket Dismissed",
-      image: "👩‍💼"
+      outcome: "Ticket Dismissed"
     },
     {
       name: "Jennifer L.",
@@ -36,8 +35,7 @@ const TestimonialsPage = () => {
       story: "Working 12-hour shifts as a nurse, I had zero time to deal with a traffic ticket. I was rolling through a stop sign at 6 AM heading to the hospital. Fabsy took care of everything while I focused on my patients and family. Three weeks later, I got the news, ticket dismissed!",
       rating: 5,
       savings: "$950",
-      outcome: "Ticket Dismissed",
-      image: "👩‍⚕️"
+      outcome: "Ticket Dismissed"
     },
     {
       name: "Amanda K.",
@@ -48,8 +46,7 @@ const TestimonialsPage = () => {
       story: "As a small business owner, every dollar counts. When I got hit with a photo radar ticket, I knew it would impact my commercial insurance rates. Fabsy fought for me and got it reduced to a non-moving violation, no demerit points, minimal insurance impact. Worth every penny!",
       rating: 5,
       savings: "$1,500",
-      outcome: "Reduced to Warning",
-      image: "👩‍💼"
+      outcome: "Reduced to Warning"
     },
     {
       name: "Michelle T.",
@@ -60,8 +57,7 @@ const TestimonialsPage = () => {
       story: "I've been teaching for 15 years with a spotless driving record. One distracted moment led to a failure to yield ticket. I was devastated thinking about how it would affect my insurance. Fabsy's team was professional, responsive, and got my ticket completely dismissed. My record stays clean!",
       rating: 5,
       savings: "$880",
-      outcome: "Ticket Dismissed",
-      image: "👩‍🏫"
+      outcome: "Ticket Dismissed"
     },
     {
       name: "Rachel P.",
@@ -72,8 +68,7 @@ const TestimonialsPage = () => {
       story: "I did the math, paying the ticket would have cost me $3,200+ in insurance increases over three years. Fabsy's fee was a fraction of that, and they actually won my case. As someone who works with numbers all day, this was a no-brainer investment.",
       rating: 5,
       savings: "$3,200",
-      outcome: "Ticket Dismissed",
-      image: "💼"
+      outcome: "Ticket Dismissed"
     },
     {
       name: "Lisa H.",
@@ -84,8 +79,7 @@ const TestimonialsPage = () => {
       story: "With my job requiring me to drive clients around daily, I couldn't afford demerit points or insurance increases. Got caught in a school zone speed trap. Fabsy's expertise in Alberta traffic law got my ticket reduced, no points on my license and my insurance stayed the same!",
       rating: 5,
       savings: "$1,100",
-      outcome: "Reduced Fine, No Points",
-      image: "🏡"
+      outcome: "Reduced Fine, No Points"
     }
   ];
 
@@ -135,9 +129,9 @@ const TestimonialsPage = () => {
   ];
 
   const stats = [
-    { 
-      icon: TrendingDown,
-      number: "95%+", 
+    {
+      icon: TrendingUp,
+      number: "95%+",
       label: "Success Rate",
       description: "Cases won or reduced"
     },
@@ -216,7 +210,15 @@ const TestimonialsPage = () => {
                 <div className="space-y-6">
                   {/* Header */}
                   <div className="flex justify-between items-start">
-                    <div className="text-5xl">{story.image}</div>
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#0F172A] border border-white/15 backdrop-blur-sm">
+                      {story.name?.trim() ? (
+                        <span className="text-xl font-bold text-primary">
+                          {story.name.trim().charAt(0).toUpperCase()}
+                        </span>
+                      ) : (
+                        <User className="h-6 w-6 text-primary" />
+                      )}
+                    </div>
                     <Badge className="bg-primary/10 text-primary border-primary/20">
                       {story.outcome}
                     </Badge>
