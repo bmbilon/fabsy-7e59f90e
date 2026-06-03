@@ -175,23 +175,23 @@ const TestimonialsPage = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="grid md:grid-cols-3 gap-6 mb-20 max-w-4xl mx-auto">
+        <div className="flex flex-wrap justify-center gap-6 mb-20 max-w-4xl mx-auto">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <Card key={index} className="p-6 text-center bg-gradient-card shadow-fab border-white/20 backdrop-blur-sm">
+              <Card key={index} className="p-6 text-center bg-[rgba(15,23,42,0.72)] border border-white/10 shadow-fab backdrop-blur-sm w-full sm:w-[260px]">
                 <Icon className="h-8 w-8 text-primary mx-auto mb-3" />
-                <div className="text-4xl font-bold text-white mb-2 drop-shadow-lg">
+                <div className="text-4xl font-bold text-[#F8FAFC] mb-2">
                   {stat.number}
                 </div>
-                <div className="text-lg font-semibold text-white/90 mb-1">
+                <div className="text-lg font-semibold text-[#94A3B8] mb-1">
                   {stat.label === 'Success Rate' ? (
                     <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">{stat.label}</a>
                   ) : (
                     stat.label
                   )}
                 </div>
-                <div className="text-sm text-white/70">
+                <div className="text-sm text-[#94A3B8]">
                   {stat.description}
                 </div>
               </Card>

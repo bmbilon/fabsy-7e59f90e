@@ -1,39 +1,53 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Calculator, CheckCircle2, FileText } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight, Shield, Calculator, Zap, DollarSign } from "lucide-react";
 import { EligibilityChecker } from "./EligibilityChecker";
 
+const features = [
+  { icon: Zap, title: "Fast & simple", sub: "Upload in minutes" },
+  { icon: Shield, title: "Flat-fee pricing", sub: "$488 + 30% of any reduction" },
+  { icon: DollarSign, title: "Save more", sub: "Avoid hikes and demerits" },
+];
+
+const stats = [
+  { value: "95%+", label: "Success rate" },
+  { value: "$993", label: "Average saved" },
+  { value: "24 hr", label: "Turnaround" },
+  { value: "4.9/5", label: "from 1,200+ drivers", note: "Real results. Real reviews." },
+];
+
 const Hero = () => {
-  const navigate = useNavigate();
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
 
-  const handleHeroFile = (file?: File | null) => {
-    if (!file) return;
-    navigate("/submit-ticket", { state: { ticketImage: file } });
-  };
+  const scrollToSavings = () =>
+    document.getElementById("savings-calculator")?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <section className="relative bg-gradient-hero overflow-hidden">
       <div className="container mx-auto px-4 py-20 lg:py-28 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left: message */}
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          {/* LEFT column */}
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1">
-              <span className="text-xs font-medium tracking-wide text-white/80">Flat $488 to fight. 30% only if we win.</span>
+            {/* Pill badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5">
+              <span className="text-xs font-semibold tracking-wide text-primary-light">
+                Flat $488* to fight. 30% only if we win.
+              </span>
             </div>
 
-            <div className="space-y-5">
-              <h1 className="text-4xl lg:text-5xl font-bold leading-tight text-white">
-                Alberta traffic ticket representation
-              </h1>
-              <p className="text-lg lg:text-xl text-white/70 leading-relaxed max-w-xl">
-                Professional representation for Alberta drivers. Save time, reduce stress,
-                and avoid unnecessary penalties. Upload your ticket and we'll review it and
-                explain your options.
-              </p>
-            </div>
+            {/* Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
+              <span className="block text-white">Keep your record clean.</span>
+              <span className="block text-primary">Without the usual fight.</span>
+            </h1>
 
+            {/* Subcopy */}
+            <p className="text-lg lg:text-xl text-slate-300 leading-relaxed max-w-xl">
+              We handle the clash with the system so you don't have to. Protect your record,
+              avoid demerits, and keep your insurance rates from climbing.
+            </p>
+
+            {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 size="lg"
@@ -45,86 +59,74 @@ const Hero = () => {
               </Button>
               <Button
                 size="lg"
-                variant="link"
-                className="text-white hover:text-primary-light transition-smooth text-base font-semibold"
-                onClick={() => document.getElementById("savings-calculator")?.scrollIntoView({ behavior: "smooth" })}
+                variant="ghost"
+                className="text-white hover:bg-primary/15 hover:text-white transition-smooth text-base font-semibold px-6 py-6"
+                onClick={scrollToSavings}
               >
                 <Calculator className="mr-2 h-5 w-5" />
                 Estimate your savings
               </Button>
             </div>
 
-            {/* Upload */}
-            <div className="rounded-lg border border-white/15 bg-white/5 p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <FileText className="h-5 w-5 text-white/70" />
-                <h2 className="text-sm font-semibold text-white">Upload your ticket</h2>
+            {/* Feature chips */}
+            <div className="grid sm:grid-cols-3 gap-4 pt-2">
+              {features.map(({ icon: Icon, title, sub }) => (
+                <div key={title} className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <div className="text-sm font-bold text-white">{title}</div>
+                    <div className="text-xs text-slate-400">{sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Promise card */}
+            <div className="rounded-xl border border-white/15 bg-white/5 p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-5 w-5 text-primary" />
+                <h2 className="text-base font-semibold text-white">Our promise to you</h2>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <label htmlFor="drag-upload" className="flex flex-col items-center justify-center p-4 rounded-md border border-dashed border-white/25 text-white/70 hover:border-primary hover:text-white transition-colors cursor-pointer">
-                  <span className="text-sm font-medium">Drag &amp; drop</span>
-                  <span className="text-xs text-white/50">or click to browse</span>
-                  <input type="file" accept="image/*,.heic,.heif,.pdf" className="sr-only" id="drag-upload" onChange={(e) => handleHeroFile(e.target.files?.[0])} />
-                </label>
-                <label htmlFor="camera-upload" className="flex flex-col items-center justify-center p-4 rounded-md border border-dashed border-white/25 text-white/70 hover:border-primary hover:text-white transition-colors cursor-pointer">
-                  <span className="text-sm font-medium">Take a photo</span>
-                  <span className="text-xs text-white/50">use your camera</span>
-                  <input type="file" accept="image/*,.heic,.heif" capture="environment" className="sr-only" id="camera-upload" onChange={(e) => handleHeroFile(e.target.files?.[0])} />
-                </label>
-              </div>
-              <p className="mt-3 text-xs text-white/50 leading-relaxed">
-                No-cost review. Reply within 24 hours. Questions?{" "}
-                <a href="tel:403-669-5353" className="text-primary-light hover:text-white transition-colors">403-669-5353</a>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                We fight for the best possible outcome so you can move on with life. No stress.
+                No court visits. No BS.
               </p>
             </div>
-
-            <div className="flex gap-10 pt-2">
-              <div>
-                <div className="text-2xl font-bold text-white">95%+</div>
-                <div className="text-sm text-white/50">success rate</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">$993</div>
-                <div className="text-sm text-white/50">average saved</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">24 hr</div>
-                <div className="text-sm text-white/50">turnaround</div>
-              </div>
-            </div>
           </div>
 
-          {/* Right: outcome document, not a person */}
+          {/* RIGHT column: comparison image */}
           <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-sm rounded-xl border border-white/10 bg-white p-6 shadow-elevated">
-              <div className="flex items-center justify-between border-b border-border pb-4">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-secondary" />
-                  <span className="text-sm font-semibold text-foreground">Driver's Abstract</span>
-                </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(160_84%_39%/0.1)] px-2.5 py-1 text-xs font-medium text-[hsl(160_84%_30%)]">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Cleared
-                </span>
-              </div>
-              <div className="space-y-3 py-5">
-                {["Charge", "Court date", "Representation"].map((k) => (
-                  <div key={k} className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">{k}</span>
-                    <span className="h-2 w-24 rounded-full bg-accent" />
-                  </div>
-                ))}
-              </div>
-              <div className="rounded-lg bg-muted p-4 text-center">
-                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Demerit points</div>
-                <div className="mt-1 text-4xl font-bold text-[hsl(160_84%_30%)]">0</div>
-              </div>
-              <div className="mt-4 flex items-center gap-2 text-sm text-secondary">
-                <Shield className="h-4 w-4 text-primary" />
-                Record kept clean. Insurance protected.
-              </div>
-            </div>
+            <img
+              src="/fight-traffic-ticket-alberta-fabsy-comparison.webp"
+              alt="Fighting an Alberta traffic ticket on your own versus with Fabsy: ticket reviewed, reviewed by experts, best outcome strategy, we handle the process, record protected, low fixed fee."
+              width={1305}
+              height={1205}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-auto max-w-full"
+            />
           </div>
         </div>
+
+        {/* Stats bar */}
+        <div className="mt-16 lg:mt-20 grid grid-cols-2 lg:grid-cols-4 rounded-2xl border border-white/10 divide-x divide-y lg:divide-y-0 divide-white/10">
+          {stats.map(({ value, label, note }) => (
+            <div key={value} className="px-6 py-6 text-center sm:text-left">
+              <div className="text-3xl font-bold text-white">{value}</div>
+              <div className="mt-1 text-sm text-slate-400">{label}</div>
+              {note && <div className="mt-1 text-xs text-slate-500">{note}</div>}
+            </div>
+          ))}
+        </div>
+
+        {/* Fine print */}
+        <p className="mt-8 text-xs text-muted-foreground max-w-3xl leading-relaxed">
+          *$488 is a flat fee to fight your ticket, non-refundable, win or lose. If we reduce
+          your fine, you also pay 30% of the reduction. If there is no reduction, you pay no
+          fees beyond the $488.
+        </p>
       </div>
 
       <EligibilityChecker open={eligibilityOpen} onOpenChange={setEligibilityOpen} />
