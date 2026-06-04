@@ -44,7 +44,7 @@ async function supabaseRest(pathAndQuery, options = {}) {
     ...options,
     headers: {
       apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
+      ...(SERVICE_KEY.startsWith('eyJ') ? { Authorization: `Bearer ${SERVICE_KEY}` } : {}),
       'Content-Type': 'application/json',
       ...(options.headers || {}),
     },
