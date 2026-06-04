@@ -1,0 +1,48 @@
+name: Content Engine
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Override topic (leave blank to use next queued topic)'
+        required: false
+      status:
+        description: 'published or draft'
+        required: false
+        default: 'published'
+  schedule:
+    # Mon/Wed/Fri 14:00 UTC = 7-8am Alberta
+    - cron: '0 14 * * 1,3,5'
+
+concurrency:
+  group: content-engine
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate and publish article
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TOPIC_OVERRIDE: ${{ github.event.inputs.topic }}
+          PUBLISH_STATUS: ${{ github.event.inputs.status || 'published' }}
+        run: node scripts/content-engine/generate-post.mjs
+
+      - name: Commit topic queue state
+        run: |
+          git config user.name "fabsy-content-engine"
+          git config user.email "actions@github.com"
+          git add scripts/content-engine/topics.json
+          git diff --cached --quiet || git commit -m "content-engine: mark topic consumed"
+          git push
