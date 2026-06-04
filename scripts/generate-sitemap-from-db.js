@@ -12,7 +12,7 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   process.env.SUPABASE_ANON_KEY ||
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8';
+  'sb_publishable_KEo-G1wij9RC_IDDzblisw_VISRvwrX';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 

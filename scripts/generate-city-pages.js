@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 const SUPABASE_URL = 'https://gcasbisxfrssonllpqrw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8';
+const SUPABASE_ANON_KEY = 'sb_publishable_KEo-G1wij9RC_IDDzblisw_VISRvwrX';
 
 const cities = ['Calgary', 'Edmonton', 'Red Deer', 'Lethbridge', 'Medicine Hat'];
 const targetKeywordTemplate = 'fight speeding ticket {city}';
