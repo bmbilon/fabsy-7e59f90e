@@ -329,22 +329,36 @@ async function pickTopic(existingTitles) {
 }
 
 // ---------- article generation + validation ----------
+const META_MAX = 150;
 const FORBIDDEN = [
-  { re: /no[\s-]?win/i, label: 'no-win claim' },
-  { re: /no[\s-]?fee/i, label: 'no-fee claim' },
-  { re: /zero[\s-]?risk/i, label: 'zero-risk claim' },
-  { re: /risk[\s-]?free/i, label: 'risk-free claim' },
-  { re: /money[\s-]?back/i, label: 'money-back claim' },
+  // "no win, no fee" / "no-win no-fee" only - not bare "no win"/"window"/"no fee"
+  { re: /no[\s-]?win[\s,-]+no[\s-]?fee/i, label: 'no-win-no-fee claim' },
+  { re: /\bzero[\s-]?risk\b/i, label: 'zero-risk claim' },
+  { re: /\brisk[\s-]?free\b/i, label: 'risk-free claim' },
+  { re: /\bmoney[\s-]?back\b/i, label: 'money-back claim' },
   { re: /\brefund/i, label: 'refund claim' },
-  { re: /\bguarantee/i, label: 'guarantee language' },
+  // promissory guarantee only - allow honest "no outcome can be guaranteed"
+  { re: /\bwe\s+guarantee\b/i, label: 'guarantee promise' },
+  { re: /\bguarantee(s|d)?\s+(you\s+)?(a\s+)?(win|results?|outcomes?|success|dismissal|victory)/i, label: 'guarantee-of-outcome claim' },
 ];
+
+function normalizeMeta(s) {
+  let m = String(s || '').replace(/—/g, ', ').trim();
+  if (m.length > META_MAX) {
+    m = m.slice(0, META_MAX);
+    const sp = m.lastIndexOf(' ');
+    if (sp > 60) m = m.slice(0, sp);
+    m = m.replace(/[\s,;:.]+$/, '');
+  }
+  return m;
+}
 
 function validateArticle(a) {
   const errs = [];
   if (!a.title) errs.push('missing title');
   if (!a.slug) errs.push('missing slug');
   if (!a.meta_description) errs.push('missing meta_description');
-  else if (a.meta_description.length >= 155) errs.push(`meta_description ${a.meta_description.length} >= 155`);
+  else if (a.meta_description.length > META_MAX) errs.push(`meta_description ${a.meta_description.length} > ${META_MAX}`);
   const wc = (a.content || '').split(/\s+/).filter(Boolean).length;
   if (wc < 900) errs.push(`content ${wc} words < 900`);
   const blob = `${a.title} ${a.meta_description} ${a.content}`;
@@ -392,17 +406,18 @@ ${corrective ? `\nFIX THESE ISSUES from the previous attempt: ${corrective}` : '
 These slugs exist, do not reuse: ${existingSlugs.slice(0, 100).join(', ') || 'none'}
 
 Return EXACTLY this JSON, no other text:
-{ "title": "<60-70 chars>", "slug": "<slug>", "meta_description": "<under 155 chars>", "keywords": ["kw1","kw2","kw3"], "category": "<how-to|guide|news|city-guide>", "content": "<markdown>" }`;
+{ "title": "<60-70 chars>", "slug": "<slug>", "meta_description": "<120-150 chars, hard max 150>", "keywords": ["kw1","kw2","kw3"], "category": "<how-to|guide|news|city-guide>", "content": "<markdown>" }`;
 
   const a = parseJsonBlock(await callClaude(prompt, 8000));
-  for (const k of ['title', 'meta_description', 'content']) if (a[k]) a[k] = a[k].replaceAll('—', ', ');
+  for (const k of ['title', 'content']) if (a[k]) a[k] = a[k].replaceAll('—', ', ');
+  if (a.meta_description) a.meta_description = normalizeMeta(a.meta_description);
   if (a.slug) a.slug = slugify(a.slug);
   return a;
 }
 
 async function generateValidArticle(picked, existingSlugs) {
   let corrective = '';
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
     const a = await generateArticleOnce(picked, existingSlugs, corrective);
     const errs = validateArticle(a);
     if (!errs.length) return a;
