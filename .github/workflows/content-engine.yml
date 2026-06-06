@@ -4,15 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Override topic (leave blank to use next queued topic)'
+        description: 'Override topic (leave blank for trending/queue)'
         required: false
       status:
         description: 'published or draft'
         required: false
         default: 'published'
+      trend_mode:
+        description: 'on (trending+fallback) or off (queue only)'
+        required: false
+        default: 'on'
   schedule:
-    # Mon/Wed/Fri 14:00 UTC = 7-8am Alberta
-    - cron: '0 14 * * 1,3,5'
+    # Daily at 14:00 UTC (7-8am Alberta)
+    - cron: '0 14 * * *'
 
 concurrency:
   group: content-engine
@@ -37,12 +41,13 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TOPIC_OVERRIDE: ${{ github.event.inputs.topic }}
           PUBLISH_STATUS: ${{ github.event.inputs.status || 'published' }}
+          TREND_MODE: ${{ github.event.inputs.trend_mode || 'on' }}
         run: node scripts/content-engine/generate-post.mjs
 
-      - name: Commit topic queue state
+      - name: Commit topic queue + trending log
         run: |
           git config user.name "fabsy-content-engine"
           git config user.email "actions@github.com"
-          git add scripts/content-engine/topics.json
-          git diff --cached --quiet || git commit -m "content-engine: mark topic consumed"
+          git add scripts/content-engine/topics.json scripts/content-engine/trending-log.json
+          git diff --cached --quiet || git commit -m "content-engine: update topic state [skip ci]"
           git push
