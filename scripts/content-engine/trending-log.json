@@ -428,5 +428,477 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-06-07T15:23:08.939Z",
+    "chosen": "Can You Fight a Photo Radar Ticket in Alberta?",
+    "published_slug": "fight-photo-radar-ticket-alberta",
+    "fell_back_to": null,
+    "news_hook": "Alberta restricting photo radar to school, playground, and construction zones signals renewed driver interest in how photo radar enforcement works and whether tickets can be challenged.",
+    "topic": "Can You Fight a Photo Radar Ticket in Alberta?",
+    "trend_candidates": [
+      {
+        "title": "'Right thing to do': New all-in-one Alberta drivers' licences July 2 - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 03 Jun 2026 15:34:31 GMT",
+        "score": 9.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Provincial Drivers’ Licence renewals - The City of Calgary",
+        "source": "The City of Calgary",
+        "pubDate": "Fri, 29 May 2026 22:58:06 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "New look coming for Alberta driver’s licences and ID cards - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Wed, 03 Jun 2026 17:01:31 GMT",
+        "score": 9.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta unveils new driver’s licence design - CTV News",
+        "source": "CTV News",
+        "pubDate": "Thu, 04 Jun 2026 00:23:00 GMT",
+        "score": 9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Mark Carney and Alberta: Speeding up pipeline projects and rethinking carbon pricing: Challenges, timelines, and compromises - MSN",
+        "source": "MSN",
+        "pubDate": "Fri, 05 Jun 2026 09:28:42 GMT",
+        "score": 8.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Photo radar to be restricted to School, Playground, and Construction Zones as Alberta ends photo radar era - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Thu, 04 Jun 2026 21:33:26 GMT",
+        "score": 8.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "&amp; Juliet tickets on sale in Edmonton at Northern Alberta Jubilee - TicketNews",
+        "source": "TicketNews",
+        "pubDate": "Mon, 01 Jun 2026 14:33:16 GMT",
+        "score": 8.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta rolling out new licences and ID cards starting July 2 - OkotoksOnline",
+        "source": "OkotoksOnline",
+        "pubDate": "Wed, 03 Jun 2026 15:53:52 GMT",
+        "score": 8.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man misreads Lotto Max ticket, discovers $1M win at the checkout: 'I didn’t have my glasses' - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Fri, 29 May 2026 07:00:00 GMT",
+        "score": 8.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Ticket Holder Wins 15 Million Dollar Lotto Max Jackpot - asatunews.co.id",
+        "source": "asatunews.co.id",
+        "pubDate": "Sun, 07 Jun 2026 11:12:36 GMT",
+        "score": 8.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "&amp; Juliet tickets on sale in Calgary at Southern Alberta Jubilee - TicketNews",
+        "source": "TicketNews",
+        "pubDate": "Wed, 03 Jun 2026 21:02:26 GMT",
+        "score": 8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta merging health care number, proof of citizenship with driver's licence - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Wed, 03 Jun 2026 21:20:00 GMT",
+        "score": 7.95,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Paw Patrol: Whitecourt traffic RCMP recall efforts helping locals and animals during wildfire - Whitecourt Star",
+        "source": "Whitecourt Star",
+        "pubDate": "Mon, 01 Jun 2026 19:38:45 GMT",
+        "score": 6.83,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "COMMENTARY: RCMP officers providing vital public service - The Albertan",
+        "source": "The Albertan",
+        "pubDate": "Mon, 01 Jun 2026 13:30:00 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "‘Stop gaslighting Albertans’: Thousands in Edmonton protest UCP government - CTV News",
+        "source": "CTV News",
+        "pubDate": "Fri, 29 May 2026 07:00:00 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta-based acro dancers and dogs get golden buzzer on America’s Got Talent - CityNews Edmonton",
+        "source": "CityNews Edmonton",
+        "pubDate": "Fri, 05 Jun 2026 00:35:05 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta-based acro dancers and dogs get gold buzzer on America’s Got Talent - CityNews Calgary",
+        "source": "CityNews Calgary",
+        "pubDate": "Fri, 05 Jun 2026 01:17:00 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Bell: Enough is enough! Calgary top cop wants to seize vehicles of big-time speeders - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Thu, 04 Jun 2026 01:21:47 GMT",
+        "score": 5.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Friday's letters: New Alberta ID cards a tax grab - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Fri, 05 Jun 2026 10:05:21 GMT",
+        "score": 5.71,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Be Safe. Stay Alert. - The City of Calgary",
+        "source": "The City of Calgary",
+        "pubDate": "Fri, 29 May 2026 22:58:06 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Heavy rain hampers traffic on several highways in central and northern Alberta - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 02 Jun 2026 18:03:14 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "‘Atmospheric traffic jam’ driving hot Prairie weather, says Alberta weather specialist - CBC",
+        "source": "CBC",
+        "pubDate": "Wed, 27 May 2026 07:00:00 GMT",
+        "score": 5.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Canadian wins $500K after his mom gifted him lottery ticket - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Fri, 29 May 2026 07:00:00 GMT",
+        "score": 5.25,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Dreeshen mulls giving Alberta police the power to impound Alberta speeders' vehicles - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Fri, 05 Jun 2026 21:03:38 GMT",
+        "score": 4.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Person ejected in rollover near Olds, flown to Calgary hospital by STARS - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Mon, 25 May 2026 19:41:37 GMT",
+        "score": 4.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "New Alberta Laws And Rules In June 2026 - INC News",
+        "source": "INC News",
+        "pubDate": "Wed, 03 Jun 2026 22:20:49 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Braid: The latest health card news: How to fill a prescription when dead - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Thu, 04 Jun 2026 21:47:36 GMT",
+        "score": 3.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Memorial signs near Dundurn honour Alberta mother and daughter killed in crash - CTV News",
+        "source": "CTV News",
+        "pubDate": "Sat, 06 Jun 2026 00:31:00 GMT",
+        "score": 3.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Multi-vehicle crash NE of Calgary sends child, adult to hospital - CityNews Calgary",
+        "source": "CityNews Calgary",
+        "pubDate": "Mon, 25 May 2026 17:41:15 GMT",
+        "score": 3.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Behchokǫ̀ RCMP seize approximately 3 kg of suspected cocaine during a traffic stop - RCMP",
+        "source": "RCMP",
+        "pubDate": "Mon, 25 May 2026 07:00:00 GMT",
+        "score": 2.78,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP seize 3kg of cocaine during traffic stop near Behchokǫ̀, N.W.T. - CBC",
+        "source": "CBC",
+        "pubDate": "Mon, 25 May 2026 07:00:00 GMT",
+        "score": 2.75,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Canadian wakes up a multimillionaire after Lotto 6/49 win - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 28 May 2026 07:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Huge lottery wins keep coming to this province in Canada - INsauga",
+        "source": "INsauga",
+        "pubDate": "Thu, 28 May 2026 07:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
