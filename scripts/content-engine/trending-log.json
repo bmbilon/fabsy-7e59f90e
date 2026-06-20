@@ -9434,5 +9434,855 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-06-20T15:44:45.692Z",
+    "chosen": "What Happens If You Get Caught Street Racing as a Teenager in Alberta?",
+    "published_slug": "teenage-street-racing-penalties-alberta",
+    "fell_back_to": null,
+    "news_hook": "Lethbridge police caught two teenagers street racing at 125 km/h and issued 116 tickets in one weekend.",
+    "topic": "What Happens If You Get Caught Street Racing as a Teenager in Alberta?",
+    "trend_candidates": [
+      {
+        "title": "Extreme speeding has more than doubled since photo radar restrictions, city says - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Tue, 09 Jun 2026 07:00:00 GMT",
+        "score": 11.38,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 2,
+          "novelty": 0.69,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Unity RCMP charge Alberta man with impaired driving - WestCentralOnline",
+        "source": "WestCentralOnline",
+        "pubDate": "Thu, 11 Jun 2026 18:03:46 GMT",
+        "score": 11.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 2,
+          "novelty": 0.63,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Including health numbers on Alberta driver's licences raises risk of fraud, privacy commissioner says - CBC",
+        "source": "CBC",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Another $15 million winning Lotto Max ticket bought in rural Alberta - Lethbridge News Now",
+        "source": "Lethbridge News Now",
+        "pubDate": "Tue, 09 Jun 2026 07:00:00 GMT",
+        "score": 9.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lethbridge Police Caught Two Teenagers Street Racing at 125 km/h on Mayor Magrath Drive and Issued 116 Tickets in One Weekend - culturealberta.com",
+        "source": "culturealberta.com",
+        "pubDate": "Wed, 10 Jun 2026 07:00:00 GMT",
+        "score": 9.54,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.77,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lotto Max ticket worth $15M purchased in Alberta—not Calgary or Edmonton - CTV News",
+        "source": "CTV News",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 9.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "$15 million lotto ticket was bought in Alberta - CityNews Calgary",
+        "source": "CityNews Calgary",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 9.43,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "$5M-winning lottery ticket bought in Alberta - CTV News",
+        "source": "CTV News",
+        "pubDate": "Mon, 15 Jun 2026 17:25:00 GMT",
+        "score": 9.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta driver's licence changes could make database a 'lucrative' target - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 09 Jun 2026 07:00:00 GMT",
+        "score": 9.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "$15M LOTTO MAX jackpot won by ticket sold outside Calgary and Edmonton - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 8.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Rural Alberta Ticket Wins Fifteen Million Dollar Lotto Max Jackpot - asatunews.co.id",
+        "source": "asatunews.co.id",
+        "pubDate": "Tue, 09 Jun 2026 21:31:00 GMT",
+        "score": 8.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Ticket Holder Wins 15 Million Dollar Lotto Max Jackpot - asatunews.co.id",
+        "source": "asatunews.co.id",
+        "pubDate": "Sun, 07 Jun 2026 07:00:00 GMT",
+        "score": 8.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Lottery Player Holds $15 Million Winning Ticket - SSBCrack",
+        "source": "SSBCrack",
+        "pubDate": "Tue, 09 Jun 2026 07:00:00 GMT",
+        "score": 8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Check your tickets: $15 million jackpot won in regional Alberta - Airdrie City View",
+        "source": "Airdrie City View",
+        "pubDate": "Mon, 08 Jun 2026 21:11:13 GMT",
+        "score": 7.9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP warn Alberta man he’s “going to be arrested or given another ticket” for dancing on corner - YouTube",
+        "source": "YouTube",
+        "pubDate": "Fri, 19 Jun 2026 17:42:40 GMT",
+        "score": 7.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Paths carved into boreal peatlands for oil and gas exploration could be speeding up climate change: study - CBC",
+        "source": "CBC",
+        "pubDate": "Sat, 20 Jun 2026 14:00:00 GMT",
+        "score": 6.82,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Okotoks RCMP officer honoured after removing 20 impaired drivers in a year - HighRiverOnline",
+        "source": "HighRiverOnline",
+        "pubDate": "Thu, 18 Jun 2026 19:03:06 GMT",
+        "score": 6.8,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wood Buffalo RCMP issue summons for speeding - RCMP",
+        "source": "RCMP",
+        "pubDate": "Tue, 16 Jun 2026 20:24:58 GMT",
+        "score": 6.67,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Kids were unbuckled, on the floor in speeding vehicle: OPP - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 16 Jun 2026 03:33:00 GMT",
+        "score": 6.43,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Maskwacis RCMP find mechanical defects, logbook violations during traffic initiative - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Fri, 19 Jun 2026 16:48:50 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "'I couldn't believe it': Alberta friends split $12.5 million lottery win - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 10 Jun 2026 07:00:00 GMT",
+        "score": 5.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Olds RCMP warning public about traffic text scam - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Sun, 14 Jun 2026 18:02:59 GMT",
+        "score": 5.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP offer summer highway safety advice for drivers - play 103.7",
+        "source": "play 103.7",
+        "pubDate": "Wed, 17 Jun 2026 12:45:28 GMT",
+        "score": 5.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Red Deer RCMP arrest two with drugs and guns in traffic stop - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Tue, 09 Jun 2026 07:00:00 GMT",
+        "score": 5.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Red Deer RCMP Traffic services lead joint forces operation - RCMP",
+        "source": "RCMP",
+        "pubDate": "Fri, 12 Jun 2026 07:00:00 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Friday's letters: New Alberta ID aids discrimination - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Fri, 12 Jun 2026 10:06:02 GMT",
+        "score": 5.71,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Bell: Alberta driver knowledge test only in English? Calgary top cop says Yes - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Wed, 10 Jun 2026 07:00:00 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man wins $1M on Lotto 6-49 - CTV News",
+        "source": "CTV News",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 5.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP: Share roadways with commercial vehicles - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Tue, 16 Jun 2026 18:37:48 GMT",
+        "score": 5.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Airdrie search tied to rural organized crime drug investigation - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Fri, 12 Jun 2026 22:08:44 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Happy Belly Food Group's Heal Wellness QSR Announces the Grand Opening of its Newest Location in Shawnessey Village, Calgary, Alberta - TradingView",
+        "source": "TradingView",
+        "pubDate": "Thu, 18 Jun 2026 10:16:00 GMT",
+        "score": 4.38,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.94,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Update: Deerfoot delays building after traffic incident near Stoney Trail - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 11 Jun 2026 19:32:34 GMT",
+        "score": 4.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Tourism Boom Triggers Severe Travel Chaos as Calgary Airport Braces for 6.1 Million Passengers, Threatening Stampede Tourists With Airport Disruptions and Flight Cancellations: Tourism News - Nomad Lawyer",
+        "source": "Nomad Lawyer",
+        "pubDate": "Wed, 17 Jun 2026 21:13:28 GMT",
+        "score": 4.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "'I couldn't believe it': Alberta friends split $12.5 million lottery win - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Wed, 10 Jun 2026 07:00:00 GMT",
+        "score": 4.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta's new ID card adds health number and citizenship marker - Calgary Citizen",
+        "source": "Calgary Citizen",
+        "pubDate": "Tue, 09 Jun 2026 12:05:20 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Large hail and strong winds: Severe storm threat hits Alberta - MSN",
+        "source": "MSN",
+        "pubDate": "Wed, 10 Jun 2026 18:59:33 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Important Ponoka traffic lights to begin operating Friday - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Thu, 18 Jun 2026 22:01:56 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lacombe police seize cocaine during traffic stop - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Mon, 08 Jun 2026 20:07:19 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lacombe traffic stop results in drug seizure, two arrests - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Thu, 18 Jun 2026 22:46:56 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta flag stolen and replaced by Canadian flag on Lac des Arcs - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Thu, 11 Jun 2026 07:00:00 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Friends Split Millions Following Lotto Max Jackpot Win - sekbernews.id",
+        "source": "sekbernews.id",
+        "pubDate": "Wed, 10 Jun 2026 18:47:00 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Two Alberta Friends Win Twelve Million Dollar Lottery Jackpot - asatunews.co.id",
+        "source": "asatunews.co.id",
+        "pubDate": "Wed, 10 Jun 2026 19:05:00 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Traffic disruptions expected during Highway 53 upgrades - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Road work scheduled for Ponoka this week - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Wed, 17 Jun 2026 18:05:06 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta friends call $12.5M lotto win an ‘emotional rollercoaster’ - CP24",
+        "source": "CP24",
+        "pubDate": "Wed, 10 Jun 2026 07:00:00 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Friday's letters: New Alberta ID cards a tax grab - MSN",
+        "source": "MSN",
+        "pubDate": "Sun, 07 Jun 2026 19:26:21 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Multiple Central Alberta parades causing road closures today - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Sat, 20 Jun 2026 14:02:45 GMT",
+        "score": 4.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta launches road repair project on key Strathmore corridor - StrathmoreNow",
+        "source": "StrathmoreNow",
+        "pubDate": "Thu, 18 Jun 2026 20:58:14 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "E-scooter rider seriously injured on Tuesday - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Thu, 18 Jun 2026 22:13:30 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Calgary council looking for solutions in wake of rising traffic fatalities, pedestrian deaths - CBC",
+        "source": "CBC",
+        "pubDate": "Fri, 12 Jun 2026 07:00:00 GMT",
+        "score": 3.8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Drumheller RCMP assist in major drug trafficking investigation - StrathmoreNow",
+        "source": "StrathmoreNow",
+        "pubDate": "Mon, 15 Jun 2026 21:01:30 GMT",
+        "score": 3,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Fed up in Fort Mac: Residents take Highway 63 road repairs into their own hands - Global News",
+        "source": "Global News",
+        "pubDate": "Thu, 11 Jun 2026 07:00:00 GMT",
+        "score": 2.82,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Jumping Creek to MacDonald Snowshed - B.C. government",
+        "source": "B.C. government",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Parking in the Lake Louise area - Banff National Park - Parks Canada",
+        "source": "Parks Canada",
+        "pubDate": "Tue, 09 Jun 2026 07:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Suspicious house fire under investigation in Empress - WestCentralOnline",
+        "source": "WestCentralOnline",
+        "pubDate": "Thu, 11 Jun 2026 22:06:14 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Canadian buddies split 'emotional' $12.5M Lotto Max win - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Wed, 10 Jun 2026 07:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "There's a neat pedestrian bridge under the last completed link of Anthony Henday Drive - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 18 Jun 2026 21:03:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Two Canadian lottery players won $12 million and $15 million over the weekend - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Mon, 08 Jun 2026 07:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Canadian an instant multimillionaire in weekend lottery draw - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Mon, 15 Jun 2026 14:21:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Sunset Blvd traffic signal changes coming in Cochrane - Cochrane Eagle",
+        "source": "Cochrane Eagle",
+        "pubDate": "Mon, 15 Jun 2026 21:30:00 GMT",
+        "score": 1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
