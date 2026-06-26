@@ -1,5 +1,8 @@
 project_id = "gcasbisxfrssonllpqrw"
 
+[functions.vapi-call-webhook]
+verify_jwt = false
+
 [functions.create-payment]
 verify_jwt = false
 

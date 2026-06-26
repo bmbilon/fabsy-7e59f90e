@@ -42,6 +42,7 @@ import Founder from "./pages/Founder";
 import Analytics from "./components/Analytics";
 import AcquisitionTracker from "./components/AcquisitionTracker";
 import ScrollToTop from "./components/ScrollToTop";
+import CallBar from "./components/CallBar";
 
 const queryClient = new QueryClient();
 
@@ -103,6 +104,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <CallBar />
         </BrowserRouter>
       </TooltipProvider>
     </HelmetProvider>

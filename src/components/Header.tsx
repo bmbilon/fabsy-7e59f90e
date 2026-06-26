@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X, Scale } from "lucide-react";
+import { Menu, X, Scale, Phone } from "lucide-react";
+
+const PHONE_DISPLAY = "(825) 793-2279";
+const PHONE_HREF = "tel:+18257932279";
 import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
@@ -50,7 +53,13 @@ const Header = () => {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-3">
+            <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
+              <Button variant="outline" className="gap-2 border-primary text-primary hover:bg-primary/10 transition-smooth">
+                <Phone className="h-4 w-4" />
+                {PHONE_DISPLAY}
+              </Button>
+            </a>
             <Link to="/submit-ticket">
               <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
                 Submit Your Ticket
@@ -95,9 +104,18 @@ const Header = () => {
                   ))}
                 </nav>
 
-                <div className="mt-auto">
+                <div className="mt-auto space-y-3">
+                  <a href={PHONE_HREF} onClick={() => setIsOpen(false)} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 border-primary text-primary hover:bg-primary/10 transition-smooth"
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call {PHONE_DISPLAY}
+                    </Button>
+                  </a>
                   <Link to="/submit-ticket">
-                    <Button 
+                    <Button
                       className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
                       onClick={() => setIsOpen(false)}
                     >

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Calculator, Zap, DollarSign } from "lucide-react";
+import { ArrowRight, Shield, Calculator, Zap, DollarSign, Phone } from "lucide-react";
 import { EligibilityChecker } from "./EligibilityChecker";
 
 const features = [
@@ -67,6 +67,18 @@ const Hero = () => {
                 Estimate your savings
               </Button>
             </div>
+
+            {/* Call option */}
+            <p className="text-base text-slate-300">
+              Prefer to talk?{" "}
+              <a
+                href="tel:+18257932279"
+                className="inline-flex items-center gap-2 font-semibold text-primary hover:text-primary-light transition-smooth"
+              >
+                <Phone className="h-4 w-4" />
+                Call (825) 793-2279
+              </a>
+            </p>
 
             {/* Feature chips */}
             <div className="grid sm:grid-cols-3 gap-4 pt-2">
