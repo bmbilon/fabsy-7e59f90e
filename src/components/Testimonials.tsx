@@ -50,7 +50,7 @@ const Testimonials = () => {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16 max-w-4xl mx-auto">
           {stats.map((stat, index) => (
             <Card key={index} className="p-6 text-center bg-gradient-card shadow-fab border-primary/10">
               <div className="text-3xl font-bold text-gradient-primary mb-2">
