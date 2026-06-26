@@ -13,7 +13,7 @@ const TrustBar = () => {
     {
       icon: CheckCircle,
       stat: "95%+ Success Rate",
-      detail: "Every case we've handled has been reduced or dismissed",
+      detail: "95% success in getting tickets reduced or dismissed",
       color: "text-green-600"
     },
     {
