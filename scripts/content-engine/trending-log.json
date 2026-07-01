@@ -17164,5 +17164,673 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-07-01T16:24:23.200Z",
+    "chosen": "What Happens If You Get a Fake Traffic Ticket Text or Email Scam in Alberta?",
+    "published_slug": "fake-traffic-ticket-text-email-scam-alberta",
+    "fell_back_to": null,
+    "news_hook": "Lethbridge Police warning about fake text messages claiming residents owe money for unpaid tickets",
+    "topic": "What Happens If You Get a Fake Traffic Ticket Text or Email Scam in Alberta?",
+    "trend_candidates": [
+      {
+        "title": "RCMP charge Red Deer man after high-speed motorcycle flight - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Tue, 30 Jun 2026 17:54:16 GMT",
+        "score": 9.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lethbridge Police Are Warning Residents About a Fake Text Message Claiming You Owe Money for an Unpaid Ticket - culturealberta.com",
+        "source": "culturealberta.com",
+        "pubDate": "Thu, 25 Jun 2026 00:14:22 GMT",
+        "score": 9.69,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.85,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP remind Albertans impaired driving laws apply beyond roads this Canada Day - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Tue, 30 Jun 2026 13:06:40 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder cancellation likely due to poor ticket sales: analyst | Alberta Primetime - CTV News",
+        "source": "CTV News",
+        "pubDate": "Thu, 25 Jun 2026 19:16:32 GMT",
+        "score": 9.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP reminds residents dangers of driving impaired ahead of Canada Day - CHAT News Today",
+        "source": "CHAT News Today",
+        "pubDate": "Mon, 29 Jun 2026 18:22:59 GMT",
+        "score": 9.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP urge motorists to avoid impaired driving this Canada Day - HighRiverOnline",
+        "source": "HighRiverOnline",
+        "pubDate": "Mon, 29 Jun 2026 19:38:31 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Airdrie man checks lottery ticket during grocery trip — then makes sure wife has the car in park - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Mon, 29 Jun 2026 19:26:41 GMT",
+        "score": 8.35,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary venues step up to provide entertainment for Country Thunder ticket holders - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Fri, 26 Jun 2026 21:32:48 GMT",
+        "score": 8.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "SeatGeek registers to lobby Alberta ministries on the future of ticket reselling - Rocky Mountain Outlook",
+        "source": "Rocky Mountain Outlook",
+        "pubDate": "Fri, 26 Jun 2026 20:43:00 GMT",
+        "score": 8.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "SeatGeek lobbying Alberta on ticket reselling laws - Investigative Journalism Foundation",
+        "source": "Investigative Journalism Foundation",
+        "pubDate": "Fri, 26 Jun 2026 11:33:53 GMT",
+        "score": 8.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Paths carved into boreal peatlands for oil and gas exploration could be speeding up climate change: study - CBC",
+        "source": "CBC",
+        "pubDate": "Sat, 20 Jun 2026 07:00:00 GMT",
+        "score": 6.82,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wood Buffalo RCMP lay charges and seize vehicles in racing investigation - RCMP",
+        "source": "RCMP",
+        "pubDate": "Tue, 30 Jun 2026 03:52:26 GMT",
+        "score": 6.75,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Okotoks RCMP officer honoured after removing 20 impaired drivers in a year - HighRiverOnline",
+        "source": "HighRiverOnline",
+        "pubDate": "Thu, 18 Jun 2026 19:03:06 GMT",
+        "score": 6.6,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Preliminary hearing scheduled for woman charged in central Alberta homicide - rdnewsnow.com",
+        "source": "rdnewsnow.com",
+        "pubDate": "Mon, 29 Jun 2026 20:18:14 GMT",
+        "score": 6.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Country Thunder Alberta cancelled as organizers blame construction, sound limitations - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Wed, 24 Jun 2026 21:38:38 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder cancelled in Calgary days before festival was to kick off - CBC",
+        "source": "CBC",
+        "pubDate": "Wed, 24 Jun 2026 23:00:20 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 40 open from Highway 1 as far as Kananaskis Village: Alberta Parks - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 30 Jun 2026 17:07:16 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wood Buffalo RCMP Warn public about fraudulent text messages impersonating “Alberta Registry Services” - cfweradio.ca",
+        "source": "cfweradio.ca",
+        "pubDate": "Mon, 29 Jun 2026 19:53:17 GMT",
+        "score": 5.71,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Southern Alberta man wins a whopping $5M on Lotto 6-49 - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 23 Jun 2026 07:00:00 GMT",
+        "score": 5.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP Rural Organized Crime Team seize weapons and drugs - rdnewsnow.com",
+        "source": "rdnewsnow.com",
+        "pubDate": "Tue, 23 Jun 2026 20:36:35 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "‘Gee whiz’: Alberta man wins $15M lottery - CTV News",
+        "source": "CTV News",
+        "pubDate": "Fri, 26 Jun 2026 20:18:22 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP is reminding Albertans to enjoy Canada Day responsibly - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Mon, 29 Jun 2026 17:46:37 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP remind riders lane splitting is illegal - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Wed, 24 Jun 2026 13:31:28 GMT",
+        "score": 5.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Dare and Derriere tickets on sale in Portland - TicketNews",
+        "source": "TicketNews",
+        "pubDate": "Mon, 29 Jun 2026 22:07:03 GMT",
+        "score": 5.17,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "No more northern commute for Langdon man after $5M Lotto 6/49 win - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Tue, 23 Jun 2026 20:41:27 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Annual traffic control plans return tomorrow for the Ponoka Stampede - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Sun, 21 Jun 2026 18:01:47 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta's new ID card adds health number and citizenship marker - Calgary Citizen",
+        "source": "Calgary Citizen",
+        "pubDate": "Sat, 27 Jun 2026 22:18:22 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Traffic in Airdrie returns to normal after train delay - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 25 Jun 2026 15:22:10 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lacombe traffic stop results in drug seizure, two arrests - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Thu, 18 Jun 2026 22:46:56 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder Alberta cancels 2026 event - My Vegreville Now",
+        "source": "My Vegreville Now",
+        "pubDate": "Thu, 25 Jun 2026 16:58:51 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Man Wins 15 Million Lotto Max Jackpot - asatunews.co.id",
+        "source": "asatunews.co.id",
+        "pubDate": "Sat, 27 Jun 2026 13:17:48 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lacombe police recover stolen vehicle after high-risk traffic stop - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Mon, 22 Jun 2026 15:22:08 GMT",
+        "score": 4.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "WATCH: Alberta independence supporter shoved into traffic at Edmonton intersection - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Mon, 29 Jun 2026 18:34:12 GMT",
+        "score": 4.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder Alberta 2026 cancelled - CochraneNow",
+        "source": "CochraneNow",
+        "pubDate": "Wed, 24 Jun 2026 20:08:42 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Multiple Central Alberta parades causing road closures today - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Sat, 20 Jun 2026 14:02:45 GMT",
+        "score": 4.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Woman with knife fatally shot by police after Deerfoot traffic stop; ASIRT investigating - CityNews Calgary",
+        "source": "CityNews Calgary",
+        "pubDate": "Fri, 26 Jun 2026 17:56:25 GMT",
+        "score": 3.86,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Woman dead following officer-involved shooting during traffic stop in Calgary - Global News",
+        "source": "Global News",
+        "pubDate": "Mon, 22 Jun 2026 07:00:00 GMT",
+        "score": 3.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Maskwacis RCMP conducts commercial vehicle checks along Hwy 2 and 611 East/West - RCMP",
+        "source": "RCMP",
+        "pubDate": "Fri, 19 Jun 2026 07:00:00 GMT",
+        "score": 2.78,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 collision near Banff Park gates cleared, delays remain - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Sun, 28 Jun 2026 23:16:36 GMT",
+        "score": 2.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Canmore woman dies after Highway 1 collision near Banff Park gates - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Sun, 28 Jun 2026 22:56:35 GMT",
+        "score": 2.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Pedestrian and bike traffic safety: Rimbey RCMP - Rimbey Review",
+        "source": "Rimbey Review",
+        "pubDate": "Thu, 25 Jun 2026 21:02:02 GMT",
+        "score": 2.43,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "UPDATE: Highway 1 reopens after crash near Alberta, B.C. border - Rocky Mountain Outlook",
+        "source": "Rocky Mountain Outlook",
+        "pubDate": "Wed, 24 Jun 2026 20:23:00 GMT",
+        "score": 2.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Lloydminster eyes e-scooter rules as safety concerns grow - The Border Pulse -",
+        "source": "The Border Pulse -",
+        "pubDate": "Tue, 23 Jun 2026 13:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Pink-bearded Canadian man's first month playing Lotto Max lands him $15M win - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Fri, 26 Jun 2026 21:34:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Vehicle fire causes traffic delays on Trans-Canada Highway in Banff National Park - Rocky Mountain Outlook",
+        "source": "Rocky Mountain Outlook",
+        "pubDate": "Mon, 29 Jun 2026 20:55:00 GMT",
+        "score": 1.36,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "UPDATE: Highway 1 toward Banff open, traffic expected to clear soon - Rocky Mountain Outlook",
+        "source": "Rocky Mountain Outlook",
+        "pubDate": "Sun, 28 Jun 2026 21:45:00 GMT",
+        "score": 1.33,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 - Ford Road to Tappen Valley Road - Government of BC",
+        "source": "Government of BC",
+        "pubDate": "Fri, 19 Jun 2026 07:00:00 GMT",
+        "score": 1.17,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
