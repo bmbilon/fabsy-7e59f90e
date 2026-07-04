@@ -18832,5 +18832,519 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-07-04T15:03:14.499Z",
+    "chosen": "Can You Be Charged with Impaired Driving Beyond Public Roads in Alberta?",
+    "published_slug": "impaired-driving-beyond-public-roads-alberta",
+    "fell_back_to": null,
+    "news_hook": "RCMP remind Albertans impaired driving laws apply beyond roads this Canada Day",
+    "topic": "Can You Be Charged with Impaired Driving Beyond Public Roads in Alberta?",
+    "trend_candidates": [
+      {
+        "title": "RCMP remind Albertans impaired driving laws apply beyond roads this Canada Day - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Tue, 30 Jun 2026 13:06:40 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Provincial Drivers’ Licence renewals - The City of Calgary",
+        "source": "The City of Calgary",
+        "pubDate": "Mon, 29 Jun 2026 21:44:41 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder cancellation likely due to poor ticket sales: analyst | Alberta Primetime - CTV News",
+        "source": "CTV News",
+        "pubDate": "Thu, 25 Jun 2026 07:00:00 GMT",
+        "score": 9.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lethbridge Police Are Warning Residents About a Fake Text Message Claiming You Owe Money for an Unpaid Ticket - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Thu, 25 Jun 2026 00:14:22 GMT",
+        "score": 9.57,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.79,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Police warning about unpaid tickets text scam - Lethbridge Police Service",
+        "source": "Lethbridge Police Service",
+        "pubDate": "Mon, 22 Jun 2026 07:00:00 GMT",
+        "score": 9.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP urge motorists to avoid impaired driving this Canada Day - OkotoksOnline",
+        "source": "OkotoksOnline",
+        "pubDate": "Mon, 29 Jun 2026 19:38:40 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP reminds residents dangers of driving impaired ahead of Canada Day - rdnewsnow.com",
+        "source": "rdnewsnow.com",
+        "pubDate": "Mon, 29 Jun 2026 18:24:36 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Privacy commissioner warns of risks as Alberta adds health numbers to driver’s licences - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Thu, 02 Jul 2026 17:22:08 GMT",
+        "score": 8.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "SeatGeek registers to lobby Alberta ministries on the future of ticket reselling - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Fri, 26 Jun 2026 20:43:00 GMT",
+        "score": 8.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "SeatGeek lobbying Alberta on ticket reselling laws - Investigative Journalism Foundation",
+        "source": "Investigative Journalism Foundation",
+        "pubDate": "Fri, 26 Jun 2026 11:33:53 GMT",
+        "score": 8.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "New Alberta driver’s licences and ID cards begin today: What Airdrie residents need to know - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 02 Jul 2026 16:57:16 GMT",
+        "score": 8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta's New Driver's Licence With Your Health Card Number and Citizenship Status Is Now Live - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Thu, 02 Jul 2026 19:10:32 GMT",
+        "score": 7.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wood Buffalo RCMP lay charges and seize vehicles in racing investigation - RCMP",
+        "source": "RCMP",
+        "pubDate": "Tue, 30 Jun 2026 01:21:05 GMT",
+        "score": 6.75,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder Alberta cancelled as organizers blame construction, sound limitations - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Wed, 24 Jun 2026 07:00:00 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder cancelled in Calgary days before festival was to kick off - CBC",
+        "source": "CBC",
+        "pubDate": "Wed, 24 Jun 2026 07:00:00 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 40 open from Highway 1 as far as Kananaskis Village: Alberta Parks - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 30 Jun 2026 17:07:16 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Traffic safety tips - The City of Calgary",
+        "source": "The City of Calgary",
+        "pubDate": "Mon, 29 Jun 2026 21:44:41 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP Rural Organized Crime Team seize weapons and drugs - rdnewsnow.com",
+        "source": "rdnewsnow.com",
+        "pubDate": "Tue, 23 Jun 2026 20:36:35 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "‘Gee whiz’: Alberta man wins $15M lottery - CTV News",
+        "source": "CTV News",
+        "pubDate": "Fri, 26 Jun 2026 07:00:00 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP is reminding Albertans to enjoy Canada Day responsibly - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Mon, 29 Jun 2026 17:46:37 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP Rural Organized Crime Team seize weapons and drugs - RCMP",
+        "source": "RCMP",
+        "pubDate": "Fri, 03 Jul 2026 18:22:13 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP remind riders lane splitting is illegal - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Wed, 24 Jun 2026 13:31:28 GMT",
+        "score": 5.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "One card – that’s it! New drivers licence, health number, citizenship ID all in one. - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Fri, 03 Jul 2026 19:50:11 GMT",
+        "score": 5.25,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Dare and Derriere tickets on sale in Portland - TicketNews",
+        "source": "TicketNews",
+        "pubDate": "Tue, 30 Jun 2026 07:07:03 GMT",
+        "score": 5.17,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "No more northern commute for Langdon man after $5M Lotto 6/49 win - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Tue, 23 Jun 2026 20:41:27 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta's new ID card adds health number and citizenship marker - Calgary Citizen",
+        "source": "Calgary Citizen",
+        "pubDate": "Sat, 27 Jun 2026 22:18:22 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Privacy commissioner issues guidance as Alberta’s new ID cards roll out - StrathmoreNow",
+        "source": "StrathmoreNow",
+        "pubDate": "Thu, 02 Jul 2026 17:27:58 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Edmonton traffic stop leads to arrest of man tied to extortion network and murder conspiracy warrants - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Fri, 03 Jul 2026 20:25:58 GMT",
+        "score": 4.19,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.85,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Applications Now Open for $100 Alberta Energy Rebate - To Do Canada",
+        "source": "To Do Canada",
+        "pubDate": "Wed, 01 Jul 2026 17:16:00 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "WATCH: Alberta independence supporter shoved into traffic at Edmonton intersection - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Mon, 29 Jun 2026 18:34:12 GMT",
+        "score": 4.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta applications for $100 payments open, hit website traffic snag - Yahoo! Finance Canada",
+        "source": "Yahoo! Finance Canada",
+        "pubDate": "Wed, 01 Jul 2026 22:05:11 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Country Thunder Alberta 2026 cancelled - StrathmoreNow",
+        "source": "StrathmoreNow",
+        "pubDate": "Thu, 25 Jun 2026 00:08:32 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta applications for $100 payments open, hit website traffic snag - Toronto Star",
+        "source": "Toronto Star",
+        "pubDate": "Wed, 01 Jul 2026 22:05:11 GMT",
+        "score": 4.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta applications for $100 payments open, hit website traffic snag - The Spec",
+        "source": "The Spec",
+        "pubDate": "Wed, 01 Jul 2026 22:05:11 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Woman with knife fatally shot by police after Deerfoot traffic stop; ASIRT investigating - CityNews Calgary",
+        "source": "CityNews Calgary",
+        "pubDate": "Fri, 26 Jun 2026 17:57:14 GMT",
+        "score": 3.86,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Vehicle fire causes traffic delays on Trans-Canada Highway in Banff National Park - Rocky Mountain Outlook",
+        "source": "Rocky Mountain Outlook",
+        "pubDate": "Mon, 29 Jun 2026 20:55:00 GMT",
+        "score": 1.36,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
