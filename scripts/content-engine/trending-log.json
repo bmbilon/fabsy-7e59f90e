@@ -21462,5 +21462,743 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-07-09T16:25:39.734Z",
+    "chosen": "Where Can Alberta Use Photo Radar? Zones, Rules, and Your Rights",
+    "published_slug": "photo-radar-zones-alberta-rules-and-rights",
+    "fell_back_to": null,
+    "news_hook": "Multiple signals around Alberta's photo radar debate, community zone enforcement, and Calgary's July radar locations.",
+    "topic": "Where Can Alberta Use Photo Radar? Zones, Rules, and Your Rights",
+    "trend_candidates": [
+      {
+        "title": "Alberta Court of Appeal assesses where provincial highway overlaps federal criminal law - Law360 Canada",
+        "source": "Law360 Canada",
+        "pubDate": "Thu, 09 Jul 2026 13:26:00 GMT",
+        "score": 9.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Keith Gerein: Photo radar was an annoying expense, but its absence has Edmonton paying a higher cost - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Mon, 06 Jul 2026 12:11:36 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Bell: 'Sticking to our guns' — Danielle Smith UCP won't budge on photo radar - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Wed, 08 Jul 2026 00:58:47 GMT",
+        "score": 9.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wednesday letters: Ending photo radar in Alberta the start of a slippery slope - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 08 Jul 2026 11:07:13 GMT",
+        "score": 9.45,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP reminds residents dangers of driving impaired ahead of Canada Day - rdnewsnow.com",
+        "source": "rdnewsnow.com",
+        "pubDate": "Mon, 29 Jun 2026 18:24:36 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP charge Red Deer man after high-speed motorcycle flight - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Tue, 30 Jun 2026 17:54:16 GMT",
+        "score": 9.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary venues step up to provide entertainment for Country Thunder ticket holders - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Fri, 26 Jun 2026 07:00:00 GMT",
+        "score": 8.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary Stampede already receives 70 noise complaints, Badlands issued ticket - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Tue, 07 Jul 2026 16:13:20 GMT",
+        "score": 8.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Town of Didsbury's enforcement priorities include traffic, bylaw - The Albertan",
+        "source": "The Albertan",
+        "pubDate": "Thu, 09 Jul 2026 12:00:00 GMT",
+        "score": 8.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "These 18 Calgary communities will have photo radar this July - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 02 Jul 2026 15:32:00 GMT",
+        "score": 8.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "SeatGeek registers to lobby Alberta ministries on the future of ticket reselling - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Fri, 26 Jun 2026 20:43:00 GMT",
+        "score": 8.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "SeatGeek lobbying Alberta on ticket reselling laws - Investigative Journalism Foundation",
+        "source": "Investigative Journalism Foundation",
+        "pubDate": "Fri, 26 Jun 2026 11:33:53 GMT",
+        "score": 8.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "New Alberta driver’s licences and ID cards begin today: What Airdrie residents need to know - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 02 Jul 2026 16:57:16 GMT",
+        "score": 7.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Prince Albert driver charged after Alberta RCMP clock vehicle at 222 km/h - paNOW",
+        "source": "paNOW",
+        "pubDate": "Mon, 06 Jul 2026 20:20:40 GMT",
+        "score": 7.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Wood Buffalo RCMP lay charges and seize vehicles in racing investigation - RCMP",
+        "source": "RCMP",
+        "pubDate": "Tue, 30 Jun 2026 03:52:26 GMT",
+        "score": 6.75,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Shift to roadside penalties will 'decriminalize' impaired driving in Sask., lawyer says - CBC",
+        "source": "CBC",
+        "pubDate": "Thu, 09 Jul 2026 11:00:00 GMT",
+        "score": 6.4,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "More than 106K Albertans sign up for $100 affordability rebates as applications open - CityNews Edmonton",
+        "source": "CityNews Edmonton",
+        "pubDate": "Wed, 01 Jul 2026 18:16:37 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Province commits $15M for Highway 63 repairs as residents say action is years overdue - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Mon, 06 Jul 2026 16:15:47 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP warns of traffic ticket scam - Farms.com",
+        "source": "Farms.com",
+        "pubDate": "Tue, 07 Jul 2026 19:56:04 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Braid: Alberta Energy Rebate just the latest dubious data grab - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Tue, 07 Jul 2026 21:35:44 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Sundre RCMP commander shares thoughts on use of OHVs in town - The Albertan",
+        "source": "The Albertan",
+        "pubDate": "Thu, 02 Jul 2026 23:00:00 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Traffic safety tips - The City of Calgary",
+        "source": "The City of Calgary",
+        "pubDate": "Mon, 29 Jun 2026 21:44:41 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "‘Gee whiz’: Alberta man wins $15M lottery - CTV News",
+        "source": "CTV News",
+        "pubDate": "Fri, 26 Jun 2026 07:00:00 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP is reminding Albertans to enjoy Canada Day responsibly - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Mon, 29 Jun 2026 17:46:37 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP Rural Organized Crime Team seize weapons and drugs - RCMP",
+        "source": "RCMP",
+        "pubDate": "Fri, 03 Jul 2026 18:22:13 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man caught going 98km/h in 50 zone on Hwy. 17: OPP - CTV News",
+        "source": "CTV News",
+        "pubDate": "Mon, 29 Jun 2026 07:00:00 GMT",
+        "score": 5.2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Dare and Derriere tickets on sale in Portland - TicketNews",
+        "source": "TicketNews",
+        "pubDate": "Tue, 30 Jun 2026 07:07:03 GMT",
+        "score": 5.17,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Bell: 'Sticking to our guns' — Danielle Smith UCP won't budge on photo radar - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Wed, 08 Jul 2026 00:57:00 GMT",
+        "score": 5.14,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "TEC announces Sundre roundabout project timeline - The Albertan",
+        "source": "The Albertan",
+        "pubDate": "Sat, 04 Jul 2026 23:00:00 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Ponoka cuts ribbon on anticipated Rodeo Drive transformation - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Fri, 26 Jun 2026 23:16:30 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Intersection in Olds failing, council told - The Albertan",
+        "source": "The Albertan",
+        "pubDate": "Sat, 04 Jul 2026 18:00:00 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "British Columbia Aligns with Alberta, Ontario, Washington, California, and Oregon as Cultus Lake Waterpark Targets July Reopening While Safety Investigation and Repairs Continue Ahead of Peak Summer Travel Season: Latest Update - Travel And Tour World",
+        "source": "Travel And Tour World",
+        "pubDate": "Fri, 03 Jul 2026 14:14:35 GMT",
+        "score": 4.36,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Airdrie Registry wait times stretch to 90 minutes during Alberta ID card rollout - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 09 Jul 2026 13:27:17 GMT",
+        "score": 4.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Parks urges people to avoid non-essential travel to Kananaskis Country - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Mon, 29 Jun 2026 07:00:00 GMT",
+        "score": 4.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Rigging Safety Council pushes for national standard - Canadian Occupational Safety",
+        "source": "Canadian Occupational Safety",
+        "pubDate": "Fri, 03 Jul 2026 09:01:03 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta's new ID card adds health number and citizenship marker - Calgary Citizen",
+        "source": "Calgary Citizen",
+        "pubDate": "Sat, 27 Jun 2026 22:18:22 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta and Ontario propose a pipeline to carry western Canada’s oil to the east - DC News Now",
+        "source": "DC News Now",
+        "pubDate": "Mon, 06 Jul 2026 22:59:41 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Privacy commissioner issues guidance as Alberta’s new ID cards roll out - StrathmoreNow",
+        "source": "StrathmoreNow",
+        "pubDate": "Thu, 02 Jul 2026 17:28:17 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Ottawa and Alberta back $35B southern pipeline tied to port expansion - MSN",
+        "source": "MSN",
+        "pubDate": "Fri, 03 Jul 2026 11:08:44 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Government announces $15M for Hwy. 63 after citizen-led repairs - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Tue, 07 Jul 2026 16:25:33 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lotto 6/49: Alberta couple keeps $5M jackpot a secret — even from their son who lives with them - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Wed, 01 Jul 2026 11:30:00 GMT",
+        "score": 4.23,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.87,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Edmonton traffic stop leads to arrest of man tied to extortion network and murder conspiracy warrants - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Fri, 03 Jul 2026 20:25:58 GMT",
+        "score": 4.19,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.85,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 - Kamloops to Alberta - Completed Projects - gov.bc.ca",
+        "source": "gov.bc.ca",
+        "pubDate": "Mon, 29 Jun 2026 07:00:00 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta applications for $100 payments open, hit website traffic snag - Calgary Journal",
+        "source": "Calgary Journal",
+        "pubDate": "Thu, 02 Jul 2026 14:30:00 GMT",
+        "score": 4.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Should Cities Build More Bike Lanes? - Alberta Views",
+        "source": "Alberta Views",
+        "pubDate": "Wed, 01 Jul 2026 07:00:00 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Driver clocked going over 200 km/h on Alberta highway - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Tue, 07 Jul 2026 18:22:00 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 collision near Banff Park gates cleared, delays remain - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Sun, 28 Jun 2026 07:00:00 GMT",
+        "score": 2.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Pedestrian and bike traffic safety: Rimbey RCMP - Rimbey Review",
+        "source": "Rimbey Review",
+        "pubDate": "Thu, 25 Jun 2026 21:02:02 GMT",
+        "score": 2.43,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Proposed oil pipeline to B.C. coast spurs alarm in Washington state - Washington State Standard",
+        "source": "Washington State Standard",
+        "pubDate": "Fri, 03 Jul 2026 04:18:16 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Provincial funding provides new approach to battling organized crime - Wetaskiwin Times",
+        "source": "Wetaskiwin Times",
+        "pubDate": "Thu, 02 Jul 2026 16:50:32 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Vehicle fire causes traffic delays on Trans-Canada Highway in Banff National Park - Rocky Mountain Outlook",
+        "source": "Rocky Mountain Outlook",
+        "pubDate": "Mon, 29 Jun 2026 20:55:00 GMT",
+        "score": 1.36,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 - Ford Road to Tappen Valley Road - gov.bc.ca",
+        "source": "gov.bc.ca",
+        "pubDate": "Mon, 06 Jul 2026 07:00:00 GMT",
+        "score": 1.1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
