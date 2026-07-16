@@ -35,6 +35,16 @@ const MODEL = 'claude-sonnet-4-6';
 const CTA_URL = 'https://fabsy.ca/submit-ticket';
 const QUEUE_MIN = 7;
 const REFILL_COUNT = 20;
+const ALLOWED_CATEGORIES = new Set(['guide', 'how-to']);
+const CATEGORY_ALIASES = new Map([
+  ['city-guide', 'guide'],
+  ['city_guide', 'guide'],
+  ['city guide', 'guide'],
+  ['news', 'guide'],
+  ['howto', 'how-to'],
+  ['how_to', 'how-to'],
+  ['how to', 'how-to'],
+]);
 
 for (const [k, v] of Object.entries({ ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY: SERVICE_KEY })) {
   if (!v) {
@@ -46,6 +56,12 @@ for (const [k, v] of Object.entries({ ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_
 // ---------- helpers ----------
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+}
+
+function normalizeCategory(value) {
+  const category = String(value || '').trim().toLowerCase();
+  if (ALLOWED_CATEGORIES.has(category)) return category;
+  return CATEGORY_ALIASES.get(category) || 'guide';
 }
 
 function tokens(s) {
@@ -406,12 +422,13 @@ ${corrective ? `\nFIX THESE ISSUES from the previous attempt: ${corrective}` : '
 These slugs exist, do not reuse: ${existingSlugs.slice(0, 100).join(', ') || 'none'}
 
 Return EXACTLY this JSON, no other text:
-{ "title": "<60-70 chars>", "slug": "<slug>", "meta_description": "<120-150 chars, hard max 150>", "keywords": ["kw1","kw2","kw3"], "category": "<how-to|guide|news|city-guide>", "content": "<markdown>" }`;
+{ "title": "<60-70 chars>", "slug": "<slug>", "meta_description": "<120-150 chars, hard max 150>", "keywords": ["kw1","kw2","kw3"], "category": "<how-to|guide>", "content": "<markdown>" }`;
 
   const a = parseJsonBlock(await callClaude(prompt, 8000));
   for (const k of ['title', 'content']) if (a[k]) a[k] = a[k].replaceAll('—', ', ');
   if (a.meta_description) a.meta_description = normalizeMeta(a.meta_description);
   if (a.slug) a.slug = slugify(a.slug);
+  a.category = normalizeCategory(a.category);
   return a;
 }
 
