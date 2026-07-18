@@ -28066,5 +28066,827 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-07-18T14:48:28.598Z",
+    "chosen": "What Happens If You Get a Speeding Ticket on a Provincial Highway in Alberta?",
+    "published_slug": "provincial-highway-speeding-ticket-alberta",
+    "fell_back_to": null,
+    "news_hook": "Alberta Court of Appeal assesses where provincial highway overlaps federal criminal law",
+    "topic": "What Happens If You Get a Speeding Ticket on a Provincial Highway in Alberta?",
+    "trend_candidates": [
+      {
+        "title": "Wednesday's letters: New driver's licences jeopardize our privacy - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 15 Jul 2026 10:07:35 GMT",
+        "score": 9.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Keith Gerein: Photo radar was an annoying expense, but its absence has Edmonton paying a higher cost - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Mon, 06 Jul 2026 12:11:36 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Court of Appeal assesses where provincial highway overlaps federal criminal law - Law360 Canada",
+        "source": "Law360 Canada",
+        "pubDate": "Thu, 09 Jul 2026 13:26:00 GMT",
+        "score": 9.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wednesday letters: Ending photo radar in Alberta the start of a slippery slope - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 08 Jul 2026 11:07:13 GMT",
+        "score": 9.45,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary Stampede already receives 70 noise complaints, Badlands issued ticket - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Tue, 07 Jul 2026 16:13:20 GMT",
+        "score": 8.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Town of Didsbury's enforcement priorities include traffic, bylaw - The Albertan",
+        "source": "The Albertan",
+        "pubDate": "Thu, 09 Jul 2026 12:00:00 GMT",
+        "score": 8.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Friday's letters: A lack of photo radar in Edmonton not the only reason collisions have increased - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Fri, 10 Jul 2026 11:05:29 GMT",
+        "score": 7.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Photo radar to be restricted to School, Playground, and Construction Zones as Alberta ends photo radar era - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Mon, 13 Jul 2026 07:00:00 GMT",
+        "score": 7.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.3,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Shift to roadside penalties will 'decriminalize' impaired driving in Sask., lawyer says - CBC",
+        "source": "CBC",
+        "pubDate": "Thu, 09 Jul 2026 07:00:00 GMT",
+        "score": 6.4,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wood Buffalo RCMP stop speeding vehicle, vehicle towed - RCMP",
+        "source": "RCMP",
+        "pubDate": "Fri, 10 Jul 2026 19:29:37 GMT",
+        "score": 6.14,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.57,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Legal local wins life-changing $5 million from Lotto 6/49 - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Fri, 10 Jul 2026 07:00:00 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Power restored to thousands, streets reopened after storm hit Edmonton Friday - CBC",
+        "source": "CBC",
+        "pubDate": "Sat, 11 Jul 2026 18:05:00 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP warns of traffic ticket scam - Farms.com",
+        "source": "Farms.com",
+        "pubDate": "Tue, 07 Jul 2026 19:56:04 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government creates bike lane complaint line ahead of fall legislation - CityNews Edmonton",
+        "source": "CityNews Edmonton",
+        "pubDate": "Wed, 15 Jul 2026 17:33:21 GMT",
+        "score": 5.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government creates bike lane complaint line ahead of fall legislation - Global News",
+        "source": "Global News",
+        "pubDate": "Wed, 15 Jul 2026 19:05:44 GMT",
+        "score": 5.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Massive payload will slow down traffic between Edmonton, Fort McMurray - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Fri, 10 Jul 2026 07:00:00 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Braid: Alberta Energy Rebate just the latest dubious data grab - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Tue, 07 Jul 2026 07:00:00 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Stats show crime not on the rise in this northern Alberta city - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 15 Jul 2026 20:13:34 GMT",
+        "score": 5.8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Rogers cuts 230 jobs, closes radio stations in Vancouver, Calgary, Halifax and Kitchener - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 07 Jul 2026 07:00:00 GMT",
+        "score": 5.8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Corus reportedly shifting Global News Alberta production to Toronto - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 16 Jul 2026 18:19:00 GMT",
+        "score": 5.8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Severe thunderstorm, tornado watch issued for Edmonton, other parts of Alberta - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Tue, 14 Jul 2026 22:24:08 GMT",
+        "score": 5.8,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government launches web portal taking complaints on bike lanes - CBC",
+        "source": "CBC",
+        "pubDate": "Thu, 16 Jul 2026 00:46:00 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta's pipeline deal could allow Canadian oil to reach new countries. But will they want it? - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 07 Jul 2026 07:00:00 GMT",
+        "score": 5.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Fort RCMP warn public of recent Alberta Registry scam - Fort Saskatchewan Record",
+        "source": "Fort Saskatchewan Record",
+        "pubDate": "Mon, 13 Jul 2026 02:34:07 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta woman celebrating $5M lottery win - CTV News",
+        "source": "CTV News",
+        "pubDate": "Fri, 10 Jul 2026 14:22:05 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Charges laid in record cocaine seizure - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Mon, 13 Jul 2026 07:00:00 GMT",
+        "score": 5.17,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Excessive speeding could cost driver nabbed near Diamond Valley - Western Wheel",
+        "source": "Western Wheel",
+        "pubDate": "Tue, 14 Jul 2026 18:30:00 GMT",
+        "score": 5.14,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Bell: 'Sticking to our guns' — Danielle Smith UCP won't budge on photo radar - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Tue, 07 Jul 2026 07:00:00 GMT",
+        "score": 5.14,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Provincial government asks Albertans for complaints about bike lanes in new online portal - Medicine Hat News",
+        "source": "Medicine Hat News",
+        "pubDate": "Fri, 17 Jul 2026 16:28:11 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "27 awesome things to do in Edmonton this week: July 13 to 17 - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Sun, 12 Jul 2026 14:00:00 GMT",
+        "score": 4.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Bike lane complaint portal opens, and legislation could pave the way to tear out existing Calgary lanes - LiveWire Calgary",
+        "source": "LiveWire Calgary",
+        "pubDate": "Thu, 16 Jul 2026 00:23:58 GMT",
+        "score": 4.35,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Is Putting $15 Million Into Highway 63 After Fort McMurray Residents Filled the Potholes Themselves - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Mon, 06 Jul 2026 18:57:30 GMT",
+        "score": 4.35,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Airdrie Registry wait times stretch to 90 minutes during Alberta ID card rollout - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 09 Jul 2026 13:27:48 GMT",
+        "score": 4.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Best Alberta Online Casinos For Pre-Registration: Sign Up to Start Play On July 13 - RotoWire",
+        "source": "RotoWire",
+        "pubDate": "Thu, 09 Jul 2026 07:00:00 GMT",
+        "score": 4.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Tour Alberta for Cancer riders set to roll through Strathmore - StrathmoreNow",
+        "source": "StrathmoreNow",
+        "pubDate": "Wed, 15 Jul 2026 17:02:50 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Road closures planned in Red Deer for Westerner Days Parade - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Mon, 13 Jul 2026 15:00:14 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Edmonton Storm Damage: Telus World of Science and Two Pools Still Closed, Fire Crews Hit Record Call Volume - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Tue, 14 Jul 2026 00:29:12 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary Driver Caught Going 191 km/h on Stoney Trail While Watching a Video, Then Failed a Breathalyzer - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Thu, 16 Jul 2026 22:39:20 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Beyond Local: Southern Alberta community prepares for Calgary Ironman race, traffic closures - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Wed, 15 Jul 2026 15:35:00 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Grande Prairie Driver Clocked at 202 km/h on Highway 43 Near Wembley, Nearly Double the Limit - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Fri, 10 Jul 2026 17:46:24 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Insurers say legal challenges threaten Alberta drivers’ promised auto insurance savings - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Sat, 11 Jul 2026 21:00:00 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Jul 12 to18: Expect Traffic Disruptions from Edmonton to Fort McMurray Due to Super Load Transportation - To Do Canada",
+        "source": "To Do Canada",
+        "pubDate": "Fri, 10 Jul 2026 20:01:28 GMT",
+        "score": 4.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Elections Alberta warns of fake website spoofing official election agency - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Thu, 09 Jul 2026 21:15:05 GMT",
+        "score": 4.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Driver clocked going over 200 km/h on Alberta highway - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Tue, 07 Jul 2026 07:00:00 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lloydminster's Costco Just Confirmed a November Opening. Location, Jobs, Gas Bar and What to Expect - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Sat, 04 Jul 2026 19:07:31 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP investigating reports of ‘multiple fatalities’ in crash near Gibbons - Global News",
+        "source": "Global News",
+        "pubDate": "Fri, 10 Jul 2026 18:45:59 GMT",
+        "score": 3.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Highway 43 speedster caught nearly 100 km/h over limit - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 07 Jul 2026 07:00:00 GMT",
+        "score": 2.71,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "BREAKING: Highway 28 closed north of Gibbons after serious collision - St. Albert Gazette",
+        "source": "St. Albert Gazette",
+        "pubDate": "Thu, 09 Jul 2026 07:00:00 GMT",
+        "score": 2.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Fatal Crash Leads to Reopening of Highway 28 Near Gibbons, Alberta - SSBCrack",
+        "source": "SSBCrack",
+        "pubDate": "Sat, 11 Jul 2026 15:34:27 GMT",
+        "score": 2.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Man shoved into traffic for waving Alberta flag speaks out: 'I could have been killed' - rebelnews.com",
+        "source": "rebelnews.com",
+        "pubDate": "Wed, 15 Jul 2026 23:19:04 GMT",
+        "score": 2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Hwy 41 north of the Elk Point junction closed to overweight and oversized loads - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Fri, 10 Jul 2026 21:14:04 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Six-month detour and full closure of West Broadway at Cambie Street for subway construction begins next week - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Tue, 14 Jul 2026 22:58:00 GMT",
+        "score": 1.37,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "BC chief raises concerns over port expansion and pipeline plans - Canada's National Observer",
+        "source": "Canada's National Observer",
+        "pubDate": "Thu, 09 Jul 2026 00:20:59 GMT",
+        "score": 1.32,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "SiGMA exclusive: Aleksandra Drigo on traffic shifts, transparency, and the future of SEO affiliates - Mynewsdesk",
+        "source": "Mynewsdesk",
+        "pubDate": "Mon, 06 Jul 2026 08:50:20 GMT",
+        "score": 1.3,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 - Ford Road to Tappen Valley Road - gov.bc.ca",
+        "source": "gov.bc.ca",
+        "pubDate": "Mon, 06 Jul 2026 07:00:00 GMT",
+        "score": 1.1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "3 dead after highway crash near Gibbons, Alta., says Sturgeon County - CBC",
+        "source": "CBC",
+        "pubDate": "Fri, 10 Jul 2026 07:00:00 GMT",
+        "score": 1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Another fatal crash near Gibbons renews calls for highway improvements - Global News",
+        "source": "Global News",
+        "pubDate": "Sat, 11 Jul 2026 04:54:10 GMT",
+        "score": 1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "RCMP officer hospitalized after collision with semi-truck north of Westlock - TownAndCountryToday.com",
+        "source": "TownAndCountryToday.com",
+        "pubDate": "Mon, 13 Jul 2026 22:12:00 GMT",
+        "score": 0.82,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      }
+    ]
   }
 ]
