@@ -32872,5 +32872,407 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-07-24T15:23:02.679Z",
+    "chosen": "What Happens If You Get Caught Driving Without a Licence in Alberta?",
+    "published_slug": "driving-without-licence-alberta-penalties",
+    "fell_back_to": null,
+    "news_hook": "Unlicensed Alberta driver caught speeding 230 km/h near Fairmont Hot Springs",
+    "topic": "What Happens If You Get Caught Driving Without a Licence in Alberta?",
+    "trend_candidates": [
+      {
+        "title": "Speed camera revenue: Northern Alberta city brings photo radar program in-house after sweeping crackdown - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Thu, 23 Jul 2026 18:50:45 GMT",
+        "score": 11.63,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 2,
+          "novelty": 0.81,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Unlicensed Alberta driver caught speeding 230 km/h near Fairmont Hot Springs - Global News",
+        "source": "Global News",
+        "pubDate": "Thu, 23 Jul 2026 22:26:06 GMT",
+        "score": 11.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Wednesday's letters: New driver's licences jeopardize our privacy - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 15 Jul 2026 10:07:35 GMT",
+        "score": 9.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Police Fine Alberta Driver Clocked at 230 km h in BC - Akses.co.id",
+        "source": "Akses.co.id",
+        "pubDate": "Fri, 24 Jul 2026 00:42:11 GMT",
+        "score": 7.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Photo radar to be restricted to School, Playground, and Construction Zones as Alberta ends photo radar era - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Fri, 17 Jul 2026 07:00:00 GMT",
+        "score": 7.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.3,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government creates bike lane complaint line ahead of fall legislation - Global News",
+        "source": "Global News",
+        "pubDate": "Wed, 15 Jul 2026 07:00:00 GMT",
+        "score": 5.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government launches web portal taking complaints on bike lanes - CBC",
+        "source": "CBC",
+        "pubDate": "Wed, 15 Jul 2026 07:00:00 GMT",
+        "score": 5.75,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Traffic camera catches tornado in central Alberta; warning cancelled for Clearwater County communities - CTV News",
+        "source": "CTV News",
+        "pubDate": "Sun, 19 Jul 2026 00:27:00 GMT",
+        "score": 5.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man caught driving 230 km/h while under the influence near Fairmont Hot Springs - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Thu, 23 Jul 2026 17:00:40 GMT",
+        "score": 5.45,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Putting an end to the photo radar cash cow - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Fri, 17 Jul 2026 07:00:00 GMT",
+        "score": 4.7,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government announces south Calgary's new Deerfoot Trail bridge set to open at the end of July - LiveWire Calgary",
+        "source": "LiveWire Calgary",
+        "pubDate": "Tue, 21 Jul 2026 21:29:32 GMT",
+        "score": 4.32,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Joint Alberta-Saskatchewan crime crackdown leads to 52 arrest warrants - meadowlakeNOW",
+        "source": "meadowlakeNOW",
+        "pubDate": "Wed, 22 Jul 2026 23:35:24 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Scooter, electric vehicle regulations tough to enforce in Olds - The Albertan",
+        "source": "The Albertan",
+        "pubDate": "Thu, 23 Jul 2026 12:00:00 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Edmonton Storm Damage: Telus World of Science and Two Pools Still Closed, Fire Crews Hit Record Call Volume - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Tue, 14 Jul 2026 00:29:12 GMT",
+        "score": 4.25,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Medicine Hat Police and Alberta Sheriffs to hold joint traffic check stops on July 30 - CHAT News Today",
+        "source": "CHAT News Today",
+        "pubDate": "Fri, 24 Jul 2026 15:10:35 GMT",
+        "score": 4.19,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.85,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Beyond Local: Southern Alberta community prepares for Calgary Ironman race, traffic closures - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Wed, 15 Jul 2026 15:35:00 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Insurers say legal challenges threaten Alberta drivers’ promised auto insurance savings - Western Standard",
+        "source": "Western Standard",
+        "pubDate": "Sat, 11 Jul 2026 21:00:00 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta Driver Caught Going 230 km/h in an 80 Zone Near Fairmont Hot Springs, Police Found Him at a Campground - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Thu, 23 Jul 2026 19:58:19 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta driver caught travelling at an alarming 150 km/h over speed limit in B.C. - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 23 Jul 2026 20:41:00 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man caught going 230 km/h in 80 zone on B.C. highway: Police - Penticton Western News",
+        "source": "Penticton Western News",
+        "pubDate": "Thu, 23 Jul 2026 18:44:37 GMT",
+        "score": 4.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 - Kamloops to Alberta - Travel Delays - gov.bc.ca",
+        "source": "gov.bc.ca",
+        "pubDate": "Mon, 20 Jul 2026 07:00:00 GMT",
+        "score": 3.7,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "New Ivor Strong Bridge to open as Deerfoot Trail upgrades continue - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 21 Jul 2026 21:48:12 GMT",
+        "score": 3,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Months-long Broadway closure begins near Cambie Street - CBC",
+        "source": "CBC",
+        "pubDate": "Mon, 20 Jul 2026 11:00:00 GMT",
+        "score": 2.75,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Man shoved into traffic for waving Alberta flag speaks out: 'I could have been killed' - rebelnews.com",
+        "source": "rebelnews.com",
+        "pubDate": "Wed, 15 Jul 2026 23:19:04 GMT",
+        "score": 2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "AB had 4th lowest vehicle fatality rate in Canada - The Alberta Worker",
+        "source": "The Alberta Worker",
+        "pubDate": "Wed, 22 Jul 2026 10:43:31 GMT",
+        "score": 1.93,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Six-month detour and full closure of West Broadway at Cambie Street for subway construction begins next week - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Tue, 14 Jul 2026 07:00:00 GMT",
+        "score": 1.37,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Two blocks of Broadway now closed for six months for subway construction, with detour route created - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Mon, 20 Jul 2026 22:47:00 GMT",
+        "score": 1.33,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Man clocked at 230 km/h in 80 km/h zone - Castanet",
+        "source": "Castanet",
+        "pubDate": "Thu, 23 Jul 2026 15:38:00 GMT",
+        "score": 0.83,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
