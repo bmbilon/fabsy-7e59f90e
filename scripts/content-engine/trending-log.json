@@ -35994,5 +35994,407 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-07-31T16:00:47.375Z",
+    "chosen": "Long Weekend Speeding Ticket in Alberta: What Drivers Need to Know",
+    "published_slug": "long-weekend-speeding-ticket-alberta-enforcement-guide",
+    "fell_back_to": null,
+    "news_hook": "Alberta RCMP ramping up targeted traffic enforcement over Heritage Day long weekend",
+    "topic": "Long Weekend Speeding Ticket in Alberta: What Drivers Need to Know",
+    "trend_candidates": [
+      {
+        "title": "Speed camera revenue: Northern Alberta city brings photo radar program in-house after sweeping crackdown - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Thu, 23 Jul 2026 07:00:00 GMT",
+        "score": 11.63,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 2,
+          "novelty": 0.81,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Unlicensed Alberta driver caught speeding 230 km/h near Fairmont Hot Springs - Global News",
+        "source": "Global News",
+        "pubDate": "Thu, 23 Jul 2026 22:26:06 GMT",
+        "score": 11.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Grande Prairie Construction Zone Blitz: Nearly Two Dozen Tickets in One Hour as Alberta Fines Climb - culturealberta.com",
+        "source": "culturealberta.com",
+        "pubDate": "Fri, 24 Jul 2026 20:39:45 GMT",
+        "score": 9.88,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 1,
+          "novelty": 0.69,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP urge summer long weekend traffic safety as enforcement ramps up - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Thu, 30 Jul 2026 17:26:56 GMT",
+        "score": 9.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP to conduct targeted traffic enforcement over Heritage Day weekend - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 30 Jul 2026 17:24:08 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP ramping up traffic enforcement Heritage Day weekend - Cochrane Eagle",
+        "source": "Cochrane Eagle",
+        "pubDate": "Fri, 31 Jul 2026 15:17:09 GMT",
+        "score": 9.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Red Deer man charged in dealership test-drive robbery - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Wed, 22 Jul 2026 22:20:53 GMT",
+        "score": 6.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Traffic camera catches tornado in central Alberta; warning cancelled for Clearwater County communities - CTV News",
+        "source": "CTV News",
+        "pubDate": "Sat, 18 Jul 2026 07:00:00 GMT",
+        "score": 5.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP provide road safety tips for Heritage Day long weekend - EverythingGP",
+        "source": "EverythingGP",
+        "pubDate": "Fri, 31 Jul 2026 12:05:04 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man caught going 230 km/h in 80 zone on B.C. highway: Police - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Thu, 23 Jul 2026 18:44:14 GMT",
+        "score": 5.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man caught driving 230 km/h while under the influence near Fairmont Hot Springs - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Thu, 23 Jul 2026 17:00:40 GMT",
+        "score": 5.45,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Medicine Hat police, Alberta Sheriffs running check stop initiative - CTV News",
+        "source": "CTV News",
+        "pubDate": "Mon, 27 Jul 2026 19:50:23 GMT",
+        "score": 5.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "One card – that’s it! New drivers licence, health number, citizenship ID all in one. - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Fri, 31 Jul 2026 02:36:56 GMT",
+        "score": 5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Edmonton Hit-and-Run on Calgary Trail Leaves Pedestrian With Life-Threatening Injuries, Police Seek Witnesses - culturealberta.com",
+        "source": "culturealberta.com",
+        "pubDate": "Sat, 25 Jul 2026 20:30:43 GMT",
+        "score": 4.35,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lacombe police seize motorcycle after failed breath test - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Fri, 24 Jul 2026 17:55:28 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Joint Alberta-Saskatchewan crime crackdown leads to 52 arrest warrants - meadowlakeNOW",
+        "source": "meadowlakeNOW",
+        "pubDate": "Wed, 22 Jul 2026 23:35:24 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Loaded handgun seized in Red Deer traffic stop - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Sat, 25 Jul 2026 07:00:00 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Medicine Hat Police and Alberta Sheriffs to hold joint traffic check stops on July 30 - CHAT News Today",
+        "source": "CHAT News Today",
+        "pubDate": "Fri, 24 Jul 2026 15:10:35 GMT",
+        "score": 4.19,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.85,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "8 Stress-Free Alberta Towns For A Weekend Retreat - WorldAtlas",
+        "source": "WorldAtlas",
+        "pubDate": "Wed, 29 Jul 2026 22:00:00 GMT",
+        "score": 3.93,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta driver caught travelling at an alarming 150 km/h over speed limit in B.C. - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 23 Jul 2026 20:41:00 GMT",
+        "score": 3.9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 - Kamloops to Alberta - Travel Delays - gov.bc.ca",
+        "source": "gov.bc.ca",
+        "pubDate": "Mon, 20 Jul 2026 07:00:00 GMT",
+        "score": 3.7,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "New Ivor Strong Bridge to open as Deerfoot Trail upgrades continue - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 21 Jul 2026 07:00:00 GMT",
+        "score": 3,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "75 of these whales remain. A new West Coast pipeline would be 'devastating' for them, experts say - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 28 Jul 2026 08:00:00 GMT",
+        "score": 2.8,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Months-long Broadway closure begins near Cambie Street - CBC",
+        "source": "CBC",
+        "pubDate": "Mon, 20 Jul 2026 07:00:00 GMT",
+        "score": 2.75,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "AB had 4th lowest vehicle fatality rate in Canada - The Alberta Worker",
+        "source": "The Alberta Worker",
+        "pubDate": "Wed, 22 Jul 2026 10:43:31 GMT",
+        "score": 1.93,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Two blocks of Broadway now closed for six months for subway construction, with detour route created - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Mon, 20 Jul 2026 07:00:00 GMT",
+        "score": 1.33,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Highway 1 - Ford Road to Tappen Valley Road - gov.bc.ca",
+        "source": "gov.bc.ca",
+        "pubDate": "Mon, 27 Jul 2026 07:00:00 GMT",
+        "score": 1.1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Man clocked at 230 km/h in 80 km/h zone - Castanet",
+        "source": "Castanet",
+        "pubDate": "Thu, 23 Jul 2026 15:38:00 GMT",
+        "score": 0.83,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
