@@ -33,17 +33,17 @@ const AnswerBox: React.FC<Props> = ({
         </div>
         <div className="flex items-center gap-1 text-green-600 text-xs">
           <CheckCircle className="w-3 h-3" />
-          <span>Expert verified</span>
+          <span>Ticket-specific guidance</span>
         </div>
       </div>
 
       {/* Main question and answer */}
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-slate-900 mb-2">
-          Can I fight a {displayOffence} ticket in {city}?
+          Can I dispute a {displayOffence} ticket in {city}?
         </h2>
         <p className="text-slate-700 font-medium">
-          <span className="text-green-600 font-semibold">Yes</span>, in most cases we can protect your record and avoid insurance hikes.
+          <span className="text-green-600 font-semibold">Yes.</span> Follow the instructions on your ticket and act by the deadline printed on it.
         </p>
       </div>
 
@@ -53,7 +53,7 @@ const AnswerBox: React.FC<Props> = ({
           <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold mt-0.5 flex-shrink-0">1</span>
             <div>
-              <span className="font-semibold">Eligibility:</span> First-time and many repeat tickets in {city} are often fixable before court.
+              <span className="font-semibold">Deadline:</span> Check the ticket for the date and instructions that apply to your matter.
             </div>
           </li>
           <li className="flex items-start gap-3">
@@ -65,7 +65,7 @@ const AnswerBox: React.FC<Props> = ({
           <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold mt-0.5 flex-shrink-0">3</span>
             <div>
-              <span className="font-semibold">Outcome:</span> Keep demerits off your abstract; minimize fines and premium increases.
+              <span className="font-semibold">Review:</span> We review disclosure, explain the available options, and provide agent representation where permitted.
             </div>
           </li>
         </ol>
@@ -81,13 +81,13 @@ const AnswerBox: React.FC<Props> = ({
           Get a free analysis →
         </Link>
         <div className="text-xs text-slate-600">
-          <span className="font-semibold text-green-600">Flat $488 to fight.</span> 30% only if we win.
+          <span className="font-semibold text-green-600">Pricing is a flat $488 plus 30% of any fine reduction achieved;</span> there is no additional charge if the fine is not reduced.
         </div>
       </div>
 
       {/* Local indicator */}
       <div className="mt-4 pt-3 border-t border-sky-200 text-xs text-slate-500">
-        Serving {city}, Alberta • {capitalizedOffence} ticket defense • 94% success rate
+        Serving {city}, Alberta • {capitalizedOffence} ticket agent service • Representation where permitted
       </div>
     </section>
   );

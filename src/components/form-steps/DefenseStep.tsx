@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FormData } from "../TicketForm";
 import { Scale, Shield, Users, Camera, Mic, MicOff } from "lucide-react";
@@ -22,8 +21,8 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const { toast } = useToast();
 
-  const handleFieldUpdate = (field: keyof FormData, value: any) => {
-    updateFormData({ [field]: value });
+  const handleFieldUpdate = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+    updateFormData({ [field]: value } as Partial<FormData>);
   };
 
   const startRecording = async () => {
@@ -127,19 +126,19 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
     { value: "guilty_explanation", label: "Guilty with Explanation", description: "I committed the violation but have mitigating circumstances" },
     { value: "procedural", label: "Procedural Issues", description: "There were problems with how the ticket was issued" },
     { value: "emergency", label: "Emergency Situation", description: "I was responding to an emergency" },
-    { value: "equipment_error", label: "Equipment Error", description: "The radar/camera was malfunctioning" },
+    { value: "equipment_error", label: "Equipment Concern", description: "I have concerns about the radar or camera evidence" },
   ];
 
-  const commonDefenses = [
-    "Emergency situation (medical, family emergency)",
-    "Speedometer malfunction or inaccuracy", 
-    "Road conditions (construction, unclear signage)",
-    "Weather conditions affecting driving",
-    "Officer error in identification or measurement",
-    "Radar/laser equipment not properly calibrated",
-    "Following traffic flow to avoid unsafe situation",
-    "Prescription medication affecting judgment",
-    "Mechanical failure requiring immediate attention"
+  const caseFactors = [
+    "Emergency circumstances",
+    "Vehicle or equipment concern",
+    "Construction or sign visibility",
+    "Weather or road conditions",
+    "Officer observations you believe are inaccurate",
+    "Ticket details you believe are incorrect",
+    "Questions about camera or radar evidence",
+    "Witnesses or records that support your account",
+    "Other relevant context"
   ];
 
   return (
@@ -149,7 +148,7 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
         <div className="mb-4">
           <Label className="text-lg font-semibold text-primary">How do you wish to plead? *</Label>
           <p className="text-sm text-muted-foreground mt-1">
-            Choose the strategy that best describes your situation
+            Choose the option that best describes your position
           </p>
         </div>
 
@@ -178,11 +177,6 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-semibold">{plea.label}</h4>
-                    {plea.value === 'not_guilty' && (
-                      <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-                        Best Success Rate
-                      </Badge>
-                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">{plea.description}</p>
                 </div>
@@ -243,21 +237,21 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
           Additional Circumstances
         </Label>
         <p className="text-sm text-muted-foreground mb-3">
-          Click to add common circumstances or type your own
+          Add relevant facts or type your own description
         </p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
-          {commonDefenses.map((defense, index) => (
+          {caseFactors.map((factor, index) => (
             <button
               key={index}
               type="button"
               onClick={() => {
                 const current = formData.circumstances;
-                const newText = current ? `${current}\n• ${defense}` : `• ${defense}`;
+                const newText = current ? `${current}\n• ${factor}` : `• ${factor}`;
                 handleFieldUpdate("circumstances", newText);
               }}
               className="text-xs p-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded text-left"
             >
-              + {defense}
+              + {factor}
             </button>
           ))}
         </div>
@@ -281,7 +275,7 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
           <Checkbox
             id="witnesses"
             checked={formData.witnesses}
-            onCheckedChange={(checked) => handleFieldUpdate("witnesses", checked)}
+            onCheckedChange={(checked) => handleFieldUpdate("witnesses", checked === true)}
           />
           <Label htmlFor="witnesses" className="text-sm font-medium">
             I have witnesses who can support my case
@@ -313,7 +307,7 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
           <Checkbox
             id="evidence"
             checked={formData.evidence}
-            onCheckedChange={(checked) => handleFieldUpdate("evidence", checked)}
+            onCheckedChange={(checked) => handleFieldUpdate("evidence", checked === true)}
           />
           <Label htmlFor="evidence" className="text-sm font-medium">
             I have additional evidence (photos, videos, documents, etc.)
@@ -360,10 +354,11 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
         <div className="flex items-start gap-3">
           <Scale className="h-5 w-5 text-primary mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-primary mb-1">Expert Defense Strategy</p>
+            <p className="text-sm font-semibold text-primary mb-1">Case Review</p>
             <p className="text-sm text-muted-foreground">
-              Our legal experts will review your case details and build the strongest possible defense. 
-              Honesty helps us prepare the most effective strategy for your specific situation.
+              Fabsy's agent service will review the facts you provide and assess whether it can assist
+              with your traffic matter. Complete, accurate information supports that review. Fabsy is
+              not a law firm, and case outcomes depend on the facts and process in each matter.
             </p>
           </div>
         </div>

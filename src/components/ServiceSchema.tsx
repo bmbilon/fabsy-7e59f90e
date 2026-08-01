@@ -9,8 +9,6 @@ type Props = {
   providerUrl?: string;
   cityName?: string;
   offerDescription?: string;
-  price?: string;
-  priceCurrency?: string;
 };
 
 /**
@@ -20,26 +18,22 @@ const ServiceSchema: React.FC<Props> = ({
   name,
   serviceType,
   url,
-  providerName = 'Fabsy',
+  providerName = 'Fabsy Traffic Ticket Services',
   providerUrl = 'https://fabsy.ca',
   cityName,
-  offerDescription = 'Flat $488 fee plus 30% of any fine reduction',
-  price = '0',
-  priceCurrency = 'CAD',
+  offerDescription = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.',
 }) => {
   if (!name || !serviceType || !url) return null;
 
-  const serviceNode: any = {
+  const serviceNode: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Service',
     name,
     serviceType,
-    provider: { '@type': 'LegalService', name: providerName, url: providerUrl },
+    provider: { '@type': 'ProfessionalService', name: providerName, url: providerUrl },
     url,
     offers: {
       '@type': 'Offer',
-      price,
-      priceCurrency,
       description: offerDescription,
     },
   };

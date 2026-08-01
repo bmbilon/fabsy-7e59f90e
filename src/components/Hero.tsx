@@ -1,26 +1,26 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Calculator, Zap, DollarSign, Phone } from "lucide-react";
+import { ArrowRight, Shield, Calculator, Zap, DollarSign, Phone, CheckCircle } from "lucide-react";
 import { EligibilityChecker } from "./EligibilityChecker";
 
 const features = [
-  { icon: Zap, title: "Fast & simple", sub: "Upload in minutes" },
-  { icon: Shield, title: "Flat-fee pricing", sub: "$488 + 30% of any reduction" },
-  { icon: DollarSign, title: "Save more", sub: "Avoid hikes and demerits" },
+  { icon: Zap, title: "Online submission", sub: "Upload your ticket" },
+  { icon: Shield, title: "Agent service", sub: "Alberta traffic matters" },
+  { icon: DollarSign, title: "Clear pricing", sub: "Explained before checkout" },
 ];
 
 const stats = [
-  { value: "95%+", label: "Success rate" },
-  { value: "$993", label: "Average saved" },
-  { value: "24 hr", label: "Turnaround" },
-  { value: "4.9/5", label: "from 1,200+ drivers", note: "Real results. Real reviews." },
+  { value: "Alberta", label: "Service area" },
+  { value: "Agent service", label: "Not a law firm" },
+  { value: "Online", label: "Ticket submission" },
+  { value: "95%+", label: "Historical success rate", note: "Past results do not predict future outcomes" },
 ];
 
 const Hero = () => {
   const [eligibilityOpen, setEligibilityOpen] = useState(false);
 
-  const scrollToSavings = () =>
-    document.getElementById("savings-calculator")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToPricing = () =>
+    document.getElementById("pricing-overview")?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <section className="relative bg-gradient-hero overflow-hidden">
@@ -31,20 +31,21 @@ const Hero = () => {
             {/* Pill badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5">
               <span className="text-xs font-semibold tracking-wide text-primary-light">
-                Flat $488* to fight. 30% only if we win.
+                Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is
+                not reduced, there is no additional charge.
               </span>
             </div>
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
-              <span className="block text-white">Keep your record clean.</span>
-              <span className="block text-primary">Without the usual fight.</span>
+              <span className="block text-white">Take the next step{" "}</span>
+              <span className="block text-primary">on your traffic ticket.</span>
             </h1>
 
             {/* Subcopy */}
             <p className="text-lg lg:text-xl text-slate-300 leading-relaxed max-w-xl">
-              We handle the clash with the system so you don't have to. Protect your record,
-              avoid demerits, and keep your insurance rates from climbing.
+              Submit your ticket online for review by Fabsy's traffic ticket agent team. We assess
+              the information available and explain the next steps without promising an outcome.
             </p>
 
             {/* CTAs */}
@@ -54,17 +55,17 @@ const Hero = () => {
                 className="bg-primary hover:bg-primary-dark text-white transition-smooth text-base font-semibold px-6 py-6"
                 onClick={() => setEligibilityOpen(true)}
               >
-                Check if your ticket qualifies
+                Review your ticket
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 size="lg"
                 variant="ghost"
                 className="text-white hover:bg-primary/15 hover:text-white transition-smooth text-base font-semibold px-6 py-6"
-                onClick={scrollToSavings}
+                onClick={scrollToPricing}
               >
                 <Calculator className="mr-2 h-5 w-5" />
-                Estimate your savings
+                Review pricing
               </Button>
             </div>
 
@@ -95,30 +96,41 @@ const Hero = () => {
               ))}
             </div>
 
-            {/* Promise card */}
+            {/* Approach card */}
             <div className="rounded-xl border border-white/15 bg-white/5 p-5">
               <div className="flex items-center gap-2 mb-2">
                 <Shield className="h-5 w-5 text-primary" />
-                <h2 className="text-base font-semibold text-white">Our promise to you</h2>
+                <h2 className="text-base font-semibold text-white">Our approach</h2>
               </div>
               <p className="text-sm text-slate-300 leading-relaxed">
-                We fight for the best possible outcome so you can move on with life. No stress.
-                No court visits. No BS.
+                We review each ticket on its own facts, communicate clearly, and work toward the
+                best available outcome. Fabsy is an agent service, not a law firm.
               </p>
             </div>
           </div>
 
-          {/* RIGHT column: comparison image */}
+          {/* RIGHT column: service overview */}
           <div className="flex justify-center lg:justify-end">
-            <img
-              src="/fight-traffic-ticket-alberta-fabsy-comparison.webp"
-              alt="Fighting an Alberta traffic ticket on your own versus with Fabsy: ticket reviewed, reviewed by experts, best outcome strategy, we handle the process, record protected, low fixed fee."
-              width={1305}
-              height={1205}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-auto max-w-full"
-            />
+            <div className="w-full max-w-xl rounded-2xl border border-white/15 bg-slate-950/50 p-8 shadow-elevated backdrop-blur-sm">
+              <h2 className="text-2xl font-bold text-white">What the service includes</h2>
+              <div className="mt-6 space-y-5">
+                {[
+                  "Review of the ticket details you submit",
+                  "Assessment of agent-service availability",
+                  "A representation plan based on available information",
+                  "Updates as the matter progresses",
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-3">
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <span className="text-slate-200">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-8 border-t border-white/10 pt-5 text-sm leading-relaxed text-slate-400">
+                Service availability and outcomes depend on the ticket, court location, and case
+                circumstances. No specific result is promised.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -133,11 +145,10 @@ const Hero = () => {
           ))}
         </div>
 
-        {/* Fine print */}
+        {/* Pricing details */}
         <p className="mt-8 text-xs text-muted-foreground max-w-3xl leading-relaxed">
-          *$488 is a flat fee to fight your ticket, non-refundable, win or lose. If we reduce
-          your fine, you also pay 30% of the reduction. If there is no reduction, you pay no
-          fees beyond the $488.
+          Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
+          reduced, there is no additional charge.
         </p>
       </div>
 

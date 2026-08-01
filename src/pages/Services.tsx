@@ -19,8 +19,8 @@ import useSafeHead from "@/hooks/useSafeHead";
 
 const Services = () => {
   useSafeHead({
-    title: "Traffic Ticket Defense Services | Fabsy Alberta",
-    description: "Complete traffic ticket defense for speeding, red light violations, careless driving, and more. 95%+ success rate. Serving all Alberta cities.",
+    title: "Traffic Ticket Agent Services | Fabsy Alberta",
+    description: "Alberta traffic ticket agent services for speeding, red light, distracted driving, careless driving, and other provincial traffic matters.",
     canonical: "https://fabsy.ca/services"
   });
 
@@ -28,71 +28,53 @@ const Services = () => {
     {
       icon: Zap,
       title: "Speeding Tickets",
-      description: "Most common traffic violation. We fight these daily with high success rates.",
-      penalty: "3-6 demerits",
-      fine: "$78-$474",
-      successRate: "96%"
+      description: "We review the ticket, available disclosure, and the circumstances you provide."
     },
     {
       icon: AlertTriangle,
       title: "Excessive Speeding",
-      description: "50+ km/h over the limit. Serious charges that can lead to license suspension.",
-      penalty: "6 demerits + suspension",
-      fine: "$474-$2,542",
-      successRate: "89%"
+      description: "We assess the ticket details and explain whether agent representation is available."
     },
     {
       icon: Phone,
       title: "Distracted Driving",
-      description: "Phone use while driving. Heavy penalties and insurance increases.",
-      penalty: "3 demerits",
-      fine: "$300",
-      successRate: "92%"
+      description: "We review the allegation, the available information, and possible next steps."
     },
     {
       icon: Camera,
       title: "Photo Radar",
-      description: "Automated camera tickets. Often have technical defenses available.",
-      penalty: "No demerits*",
-      fine: "$78-$474",
-      successRate: "91%"
+      description: "We review automated-enforcement tickets and the options shown on the ticket."
     },
     {
       icon: Car,
       title: "Careless Driving",
-      description: "Subjective charge that can have serious consequences on your record.",
-      penalty: "6 demerits",
-      fine: "$400",
-      successRate: "87%"
+      description: "We assess service availability and the information relevant to the allegation."
     },
     {
       icon: Clock,
       title: "Other Violations",
-      description: "Running red lights, improper lane changes, and other traffic infractions.",
-      penalty: "2-4 demerits",
-      fine: "$115-$287",
-      successRate: "100%"
+      description: "We also review red-light, lane-change, and other Alberta traffic tickets."
     }
   ];
 
   const benefits = [
     {
       icon: Shield,
-      title: "Protect Your Insurance",
-      description: "Avoid premium increases that can cost $500+ per year for 3 years",
-      value: "Save up to $1,650"
+      title: "Understand the Stakes",
+      description: "Review the ticket and its possible record implications before choosing how to respond.",
+      value: "Informed decisions"
     },
     {
       icon: CheckCircle,
-      title: "Keep Your Record Clean",
-      description: "Maintain your good driver status and avoid demerit point accumulation",
-      value: "Protect your license"
+      title: "Review Your Options",
+      description: "Get a focused assessment of the ticket information and available next steps.",
+      value: "Ticket-specific review"
     },
     {
       icon: DollarSign,
-      title: "Minimize Financial Impact",
-      description: "Often the legal fee is less than the long-term insurance cost",
-      value: "Smart investment"
+      title: "Know the Pricing",
+      description: "Pricing is explained before checkout, including when an additional charge applies.",
+      value: "Clear fee structure"
     }
   ];
 
@@ -110,8 +92,8 @@ const Services = () => {
             What We <span className="text-gradient-hero font-script">Help</span> With
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            Expert defense for all types of Alberta traffic violations. 
-            We've successfully handled thousands of cases across every category.
+            Fabsy provides traffic ticket agent services across Alberta. Fabsy is not a law firm
+            and does not provide legal advice.
           </p>
         </div>
 
@@ -123,32 +105,18 @@ const Services = () => {
                 <div className="w-12 h-12 bg-gradient-button rounded-full flex items-center justify-center shadow-glow flex-shrink-0">
                   <ticket.icon className="h-6 w-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-card-foreground mb-2">
-                    {ticket.title}
-                  </h3>
-                  <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-                    <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">
-                      {ticket.successRate} Success Rate
-                    </a>
-                  </Badge>
-                </div>
+                <h3 className="text-xl font-bold text-card-foreground mb-2">
+                  {ticket.title}
+                </h3>
               </div>
               
               <p className="text-muted-foreground mb-6 leading-relaxed">
                 {ticket.description}
               </p>
               
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-muted">
-                  <span className="text-sm text-muted-foreground">Penalty:</span>
-                  <span className="font-medium text-card-foreground">{ticket.penalty}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-muted">
-                  <span className="text-sm text-muted-foreground">Fine Range:</span>
-                  <span className="font-medium text-card-foreground">{ticket.fine}</span>
-                </div>
-              </div>
+              <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+                Alberta agent service
+              </Badge>
             </Card>
           ))}
         </div>
@@ -160,7 +128,7 @@ const Services = () => {
               Why Fight Your <span className="text-gradient-hero">Ticket</span>?
             </h2>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              The true cost of accepting a ticket goes far beyond the fine
+              A ticket can affect more than the amount printed on it
             </p>
           </div>
 
@@ -192,41 +160,41 @@ const Services = () => {
           <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-card-foreground mb-4">
-                Our <span className="text-gradient-hero">Defense</span> Strategy
+                Our <span className="text-gradient-hero">Review</span> Process
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                We examine every aspect of your case to build the strongest possible defense
+                We examine the information available and identify practical next steps
               </p>
             </div>
             
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <h3 className="text-xl font-bold text-card-foreground">
-                  Legal Technicalities We Review:
+                  Ticket Information We Review:
                 </h3>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Radar/laser device calibration and certification
+                    The allegation and offence details shown on the ticket
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Officer training and qualification records
+                    Available disclosure and supporting material
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Proper service and filing of the ticket
+                    Filing, service, and court information
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Charter rights violations during the stop
+                    Any documents or evidence you provide
                   </li>
                 </ul>
               </div>
               
               <div className="space-y-6">
                 <h3 className="text-xl font-bold text-card-foreground">
-                  Circumstantial Defenses:
+                  Circumstances We Consider:
                 </h3>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-3">
@@ -259,9 +227,9 @@ const Services = () => {
                 A Note on Insurance Increases
               </h3>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
-                A single conviction can raise your insurance premiums for years. 
-                This makes professional ticket defense even more valuable as an investment in your financial future. 
-                Our clients typically save 3-5 times our fee in avoided insurance costs.
+                Insurance consequences vary by driver, conviction, and insurer. Fabsy does not
+                estimate or promise premium savings. Contact your insurer for information about
+                how a particular outcome may affect your policy.
               </p>
             </div>
           </Card>
@@ -271,16 +239,17 @@ const Services = () => {
         <div className="text-center">
           <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
             <h2 className="text-3xl font-bold text-card-foreground mb-4">
-              Don't Let That Ticket Cost You Thousands
+              Get Your Ticket Reviewed
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Upload your ticket now and let our experts fight for the best possible outcome.
+              Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
+              reduced, there is no additional charge.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/submit-ticket">
                 <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                  Submit Your Ticket - $488
+                  Submit Your Ticket
                 </Button>
               </Link>
               <Link to="/how-it-works">

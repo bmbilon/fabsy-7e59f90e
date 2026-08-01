@@ -114,7 +114,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
                 <li>I will provide accurate and complete information regarding my case</li>
                 <li>I authorize digital communication via email and text regarding my case</li>
                 <li>Payment for services is due according to the fee schedule provided</li>
-                <li>Fabsy.ca will make reasonable efforts to defend my ticket but cannot guarantee specific outcomes</li>
+                <li>Fabsy.ca will make reasonable efforts to defend my ticket but does not promise a specific outcome</li>
                 <li>I may withdraw this consent at any time by providing written notice</li>
                 <li>This consent remains valid until the matter is resolved or withdrawn</li>
               </ul>

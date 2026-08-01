@@ -40,9 +40,6 @@ const ContentPage = () => {
         const parsedData = {
           ...data,
           faqs: typeof data.faqs === 'string' ? JSON.parse(data.faqs || '[]') : (data.faqs || []),
-          stats: typeof (data as Record<string, unknown>).stats === 'string' 
-            ? JSON.parse((data as Record<string, unknown>).stats as string || '{}') 
-            : ((data as Record<string, unknown>).stats || {}),
         };
 
         setPageData(parsedData);
@@ -196,12 +193,6 @@ const ContentPage = () => {
         <LocalBusinessSchema 
           url={currentUrl}
           cityName={detectedCity}
-          aggregateRating={{
-            ratingValue: 4.9,
-            reviewCount: pageData.stats?.reviewCount || 127,
-            bestRating: 5,
-            worstRating: 1
-          }}
         />
       )}
 
@@ -243,44 +234,6 @@ const ContentPage = () => {
               className="mb-8"
             />
           )}
-
-          {/* Stats Grid */}
-            {pageData.stats && Object.keys(pageData.stats).length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                {pageData.stats.avgFine && (
-                  <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                    <div className="text-red-600 text-2xl font-bold">
-                      ${pageData.stats.avgFine}
-                    </div>
-                    <div className="text-xs text-red-700">Fine Amount</div>
-                  </div>
-                )}
-                {pageData.stats.insuranceIncrease && (
-                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
-                    <div className="text-orange-600 text-2xl font-bold">
-                      ${pageData.stats.insuranceIncrease}
-                    </div>
-                    <div className="text-xs text-orange-700">Insurance Increase</div>
-                  </div>
-                )}
-                {pageData.stats.successRate && (
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                    <div className="text-green-600 text-2xl font-bold">
-                      {pageData.stats.successRate}%
-                    </div>
-                    <div className="text-xs text-green-700"><a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">Success Rate</a></div>
-                  </div>
-                )}
-                {pageData.stats.avgSavings && (
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                    <div className="text-blue-600 text-2xl font-bold">
-                      ${pageData.stats.avgSavings}
-                    </div>
-                    <div className="text-xs text-blue-700">Avg Savings</div>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Content */}
             <div className="prose prose-lg max-w-none">
@@ -399,7 +352,7 @@ const ContentPage = () => {
               Ready to Fight Your {pageData.violation || 'Traffic'} Ticket?
             </h2>
               <p className="text-xl mb-6 text-green-50">
-              Flat $488 to fight, 30% only if we win • <a href="/proof" className="underline decoration-dashed underline-offset-4 hover:text-white">{pageData.stats?.successRate || 94}% success rate</a> • Save ${pageData.stats?.avgSavings || 1650}+
+              Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
             </p>
             <Link to="/submit-ticket">
               <Button 

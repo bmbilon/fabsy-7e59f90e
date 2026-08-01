@@ -2,14 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Users, 
   Award, 
   Target, 
   Heart, 
   Scale,
-  TrendingUp,
-  Shield,
-  Star
+  Shield
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
@@ -18,32 +15,32 @@ import useSafeHead from "@/hooks/useSafeHead";
 
 const About = () => {
   useSafeHead({
-    title: "About Fabsy | Alberta Traffic Ticket Defense",
-    description: "Learn about Fabsy's mission to help Alberta drivers fight traffic tickets with 95%+ success rate. Expert legal team serving Calgary, Edmonton, and all Alberta.",
+    title: "About Fabsy | Alberta Traffic Ticket Agent Service",
+    description: "Learn about Fabsy Traffic Ticket Services, an agent service supporting Alberta drivers with provincial traffic ticket matters.",
     canonical: "https://fabsy.ca/about"
   });
 
   const stats = [
-    { number: "95%+", label: "Success Rate", icon: Award },
-    { number: "$1.2M+", label: "Insurance Savings", icon: TrendingUp },
-    { number: "10+", label: "Years Experience", icon: Star },
+    { number: "Alberta", label: "Service Area", icon: Award },
+    { number: "Agent Service", label: "Not a Law Firm", icon: Scale },
+    { number: "Clear Pricing", label: "Explained Up Front", icon: Shield },
   ];
 
   const values = [
     {
       icon: Heart,
       title: "Driver-Focused Service",
-      description: "We understand the challenges drivers face with traffic tickets and insurance discrimination. Our approach is designed specifically with drivers' needs in mind."
+      description: "We understand the practical concerns that can follow a traffic ticket. Our approach is designed around drivers' needs."
     },
     {
       icon: Shield,
       title: "Complete Transparency",
-      description: "No hidden fees, no surprises. We believe in honest communication and keeping you informed every step of the way."
+      description: "We explain the service fees, limitations, and next steps clearly before you proceed."
     },
     {
       icon: Target,
       title: "Results-Driven",
-      description: "Our 95%+ success rate speaks for itself. We're not satisfied unless we've fought hard for the best possible outcome for your case."
+      description: "We review each ticket on its own facts and work toward the best available outcome without promising a particular result."
     }
   ];
 
@@ -58,14 +55,13 @@ const About = () => {
             About Fabsy
           </Badge>
           <h1 className="text-4xl lg:text-6xl font-bold text-white drop-shadow-lg mb-6">
-            Professional Defense, Backed by 
+            Focused Representation for
             <span className="text-gradient-hero font-script block text-5xl lg:text-7xl mt-2">
-              Legal Excellence
+              Alberta Drivers
             </span>
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            Built for every Alberta driver. We're on a mission to level the playing field 
-            when it comes to traffic tickets and insurance fairness in Alberta.
+            Built for Alberta drivers who want a clearer way to respond to a provincial traffic ticket.
           </p>
         </div>
 
@@ -93,19 +89,17 @@ const About = () => {
               </h2>
               <div className="space-y-6 text-white/90 text-lg leading-relaxed">
                 <p>
-                  Fabsy was born from a simple frustration: watching too many drivers accept 
-                  expensive traffic tickets without fighting back, only to face massive 
-                  insurance increases that could have been avoided.
+                  Fabsy was built to make responding to an Alberta traffic ticket clearer and
+                  more manageable for busy drivers.
                 </p>
                 <p>
-                  As experienced traffic representatives, we saw how the system was stacked against 
-                  everyday drivers, everyday drivers who often face higher insurance premiums 
-                  and less aggressive court representation.
+                  Our traffic ticket agents focus on reviewing ticket details, explaining the
+                  service process, and providing representation where agent services are permitted.
                 </p>
                 <p>
-                  We decided to change that. By focusing exclusively on traffic ticket defense 
-                  and building a service designed around busy drivers' needs, we've helped 
-                  thousands keep their abstracts clean and their insurance rates low.
+                  The service is designed around online ticket submission, clear communication,
+                  and ticket-specific next steps. Fabsy is an agent service, not a law firm, and
+                  does not provide legal advice.
                 </p>
               </div>
             </div>
@@ -117,19 +111,18 @@ const About = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-card-foreground">Our Mission</h3>
-                  <p className="text-muted-foreground">Keeping records clean</p>
+                  <p className="text-muted-foreground">Ticket-focused representation</p>
                 </div>
               </div>
               
               <p className="text-muted-foreground leading-relaxed mb-6">
-                To provide every Alberta driver with accessible, expert traffic representation 
-                against traffic tickets, ensuring fair treatment and protecting their 
-                financial future from insurance discrimination.
+                To provide Alberta drivers with accessible traffic ticket agent services,
+                straightforward communication, and careful review of the information available.
               </p>
               
               <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
                 <p className="text-primary font-semibold text-center">
-                  "Every driver deserves a fighting chance in court"
+                  "Alberta drivers deserve clear information and careful representation"
                 </p>
               </div>
             </Card>
@@ -170,34 +163,34 @@ const About = () => {
         <div className="mb-16">
           <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm text-center">
             <h2 className="text-4xl font-bold text-card-foreground mb-6">
-              Expert <span className="text-gradient-hero">Team</span>
+              Focused <span className="text-gradient-hero">Team</span>
             </h2>
             
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-card-foreground">
-                  Experienced Representatives
+                  Traffic Ticket Agents
                 </h3>
                 <p className="text-muted-foreground">
-                  Our team includes experienced traffic representatives with over 10 years of experience specifically 
-                  in Alberta traffic matters, having handled thousands of cases successfully.
+                  Our team focuses on Alberta provincial traffic ticket matters and assesses
+                  whether agent representation is available for each submission.
                 </p>
               </div>
               
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-card-foreground">
-                  Specialized Knowledge
+                  Focused Review
                 </h3>
                 <p className="text-muted-foreground">
-                  We stay current with all changes to Alberta traffic regulations and court procedures 
-                  to ensure the strongest possible representation for every client.
+                  We review the ticket, available documents, and relevant court information to
+                  identify practical next steps for each client.
                 </p>
               </div>
             </div>
             
             <div className="bg-primary/10 p-6 rounded-lg border border-primary/20">
               <p className="text-primary font-semibold text-lg">
-                Licensed to practice in all Alberta courts and committed to fighting for your rights
+                Service is available across Alberta where paid agent representation is permitted
               </p>
             </div>
           </Card>
@@ -210,7 +203,7 @@ const About = () => {
               Ready to Experience the Fabsy Difference?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of satisfied clients who've kept their driving records clean and their insurance rates low.
+              Submit your ticket for review and learn whether Fabsy's agent service is available for your matter.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

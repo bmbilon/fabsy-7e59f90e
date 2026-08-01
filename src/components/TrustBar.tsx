@@ -1,25 +1,24 @@
-import { Shield, Clock, Users, Phone, CheckCircle, Zap } from "lucide-react";
+import { CheckCircle, Phone, Scale, Shield } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Link } from "react-router-dom";
 
 const TrustBar = () => {
   const trustPoints = [
     {
       icon: Shield,
-      stat: "Flat $488 + 30%*",
-      detail: "30% applies only to a fine reduction we win",
+      stat: "Straightforward Pricing",
+      detail: "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.",
       color: "text-primary"
     },
     {
       icon: CheckCircle,
-      stat: "95%+ Success Rate",
-      detail: "95% success in getting tickets reduced or dismissed",
+      stat: "95%+ Historical Rate",
+      detail: "Fabsy's published historical success rate. Individual outcomes vary.",
       color: "text-green-600"
     },
     {
-      icon: Zap,
-      stat: "Instant Analysis, Free",
-      detail: "Get your results in under 60 seconds",
+      icon: Scale,
+      stat: "Traffic Ticket Agent",
+      detail: "Fabsy is an agent service, not a law firm.",
       color: "text-primary"
     }
   ];
@@ -30,22 +29,16 @@ const TrustBar = () => {
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {trustPoints.map((point, index) => {
+          {trustPoints.map((point) => {
             const Icon = point.icon;
             return (
               <Card 
-                key={index}
+                key={point.stat}
                 className="bg-white/80 backdrop-blur-sm border-2 border-primary/20 p-6 text-center hover:border-primary/40 transition-smooth shadow-fab"
               >
                 <Icon className={`h-10 w-10 ${point.color} mx-auto mb-3`} />
                 <h3 className="text-2xl font-bold text-gray-800 mb-1">
-                  {point.stat.includes('Success Rate') ? (
-                    <Link to="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">
-                      {point.stat}
-                    </Link>
-                  ) : (
-                    point.stat
-                  )}
+                  {point.stat}
                 </h3>
                 <p className="text-gray-600 font-medium">{point.detail}</p>
               </Card>
@@ -56,8 +49,8 @@ const TrustBar = () => {
         {/* Quick Contact */}
         <div className="text-center mt-8">
           <p className="text-gray-700 text-lg">
-            Have questions? <a 
-              href="tel:825-793-2279" 
+            Have questions? <a
+              href="tel:+18257932279"
               className="font-bold text-primary hover:text-primary-dark transition-smooth inline-flex items-center gap-2"
             >
               <Phone className="h-5 w-5" />

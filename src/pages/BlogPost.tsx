@@ -9,6 +9,8 @@ import { Calendar, Clock, ArrowLeft, Share2, Eye } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { guardPublishedBlogPost } from '@/lib/published-content-guardrails';
+import useSafeHead from '@/hooks/useSafeHead';
 
 interface BlogPost {
   id: string;
@@ -26,12 +28,29 @@ interface BlogPost {
   featured_image?: string;
 }
 
+const blogSeoTitle = (title: string): string => {
+  const suffix = ' | Fabsy';
+  const maxTitleLength = 60 - suffix.length;
+  const candidate = title.slice(0, maxTitleLength).trim();
+  const lastSpace = candidate.lastIndexOf(' ');
+  const shortened = title.length > maxTitleLength && lastSpace > Math.floor(maxTitleLength / 2)
+    ? candidate.slice(0, lastSpace).trim()
+    : candidate;
+  return `${shortened}${suffix}`;
+};
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  useSafeHead({
+    title: post ? blogSeoTitle(post.title) : null,
+    description: post?.meta_description,
+    canonical: post ? `https://fabsy.ca/blog/${post.slug}` : null,
+    ogType: post ? 'article' : null,
+  });
 
   useEffect(() => {
     if (slug) {
@@ -56,7 +75,7 @@ const BlogPost = () => {
           setError(`Database error: ${error.message}`);
         }
       } else if (data) {
-        setPost(data);
+        setPost(guardPublishedBlogPost(data as BlogPost));
         // Update view count
         updateViewCount(data.id, data.view_count);
       }
@@ -169,14 +188,14 @@ const BlogPost = () => {
     "description": post.meta_description,
     "author": {
       "@type": "Organization",
-      "name": post.author
+      "name": "Fabsy Traffic Ticket Services"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Fabsy",
+      "name": "Fabsy Traffic Ticket Services",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://fabsy.ca/logo.png"
+        "url": "https://fabsy.ca/favicon.svg"
       }
     },
     "datePublished": post.published_at,
@@ -192,28 +211,18 @@ const BlogPost = () => {
   return (
     <>
       <Helmet>
-        <title>{post.title} | Fabsy - Alberta Traffic Ticket Defense</title>
-        <meta name="description" content={post.meta_description} />
         <meta name="keywords" content={post.keywords.join(", ")} />
-        <link rel="canonical" href={`https://fabsy.ca/blog/${post.slug}`} />
         
         {/* Open Graph */}
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.meta_description} />
-        <meta property="og:url" content={`https://fabsy.ca/blog/${post.slug}`} />
-        <meta property="og:type" content="article" />
         {post.featured_image && <meta property="og:image" content={post.featured_image} />}
         <meta property="article:published_time" content={post.published_at} />
-        <meta property="article:author" content={post.author} />
+        <meta property="article:author" content="Fabsy Traffic Ticket Services" />
         <meta property="article:section" content={post.category} />
         {post.keywords.map((keyword) => (
           <meta key={keyword} property="article:tag" content={keyword} />
         ))}
         
         {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.meta_description} />
         {post.featured_image && <meta name="twitter:image" content={post.featured_image} />}
         
         {/* Structured Data */}
@@ -308,12 +317,11 @@ const BlogPost = () => {
                     em: ({node, ...props}) => <em className="italic" {...props} />,
                     a: ({node, ...props}) => <a className="text-primary-light hover:text-white underline" {...props} />,
                     blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary pl-4 italic my-6 text-white/70" {...props} />,
-                    code: ({node, ...props}) => {
-                      const { className } = props as any;
+                    code: ({node, className, ...props}) => {
                       const isInline = !className || !className.includes('language-');
                       return isInline
                         ? <code className="bg-white/10 text-slate-200 px-2 py-1 rounded text-sm font-mono" {...props} />
-                        : <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg my-6 overflow-x-auto" {...props} />;
+                        : <code className={`block bg-gray-900 text-gray-100 p-4 rounded-lg my-6 overflow-x-auto ${className}`} {...props} />;
                     },
                     img: ({node, ...props}) => (
                       <img 
@@ -353,11 +361,11 @@ const BlogPost = () => {
                 <div className="bg-primary/10 border border-primary/20 rounded-lg p-8 text-center shadow-lg">
                   <h3 className="text-2xl font-bold mb-4 text-white">Need Help with Your Traffic Ticket?</h3>
                   <p className="text-xl mb-6 text-white/80">
-                    Don't let a traffic ticket impact your driving record. Get expert help from Alberta's premier traffic defense service.
+                    Ask Fabsy to assess the ticket and explain whether agent services are permitted and available for the matter.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg" className="bg-primary text-white hover:bg-primary-dark border-0">
-                      <Link to="/contact">Get Free Consultation</Link>
+                      <Link to="/submit-ticket">Request a Free Ticket Assessment</Link>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-primary/20">
                       <Link to="/">Learn More</Link>

@@ -14,7 +14,6 @@ type Props = {
   url?: string;
   steps: HowToStep[];
   totalTime?: string; // e.g., PT3M
-  estimatedCost?: string | number;
 };
 
 /**
@@ -26,8 +25,7 @@ const HowToSchema: React.FC<Props> = ({
   description,
   url,
   steps = [],
-  totalTime = 'PT3M',
-  estimatedCost,
+  totalTime,
 }) => {
   if (!name || !steps.length) return null;
 
@@ -37,21 +35,6 @@ const HowToSchema: React.FC<Props> = ({
     name,
     ...(description ? { description } : {}),
     ...(totalTime ? { totalTime } : {}),
-    ...(typeof estimatedCost !== 'undefined'
-      ? {
-          estimatedCost: {
-            '@type': 'MonetaryAmount',
-            currency: 'CAD',
-            value: estimatedCost,
-          },
-        }
-      : {
-          estimatedCost: {
-            '@type': 'MonetaryAmount',
-            currency: 'CAD',
-            value: '0',
-          },
-        }),
     supply: [{
       '@type': 'HowToSupply',
       name: 'Your ticket details (photo or PDF)'

@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { assertGeneratedContentSafe, EXACT_FABSY_PRICING } from "../_shared/generated-content-guardrails.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +31,7 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are an AEO content writer for fabsy.ca, helping Alberta women with traffic tickets.
+    const systemPrompt = `You are an AEO content writer for fabsy.ca, helping Alberta drivers with traffic tickets.
 
 Generate 6 concise, helpful FAQs optimized for voice search and featured snippets.
 
@@ -40,7 +41,10 @@ CRITICAL RULES:
 3. Use simple, supportive language
 4. Focus on practical, actionable info
 5. Alberta-specific context
-6. Female-friendly tone`;
+6. Do not gender the audience or make gender-based assumptions
+7. Do not invent testimonials, ratings, outcomes, fines, demerit counts, deadlines, legal dates, speed thresholds, or insurance figures
+8. Fabsy is an agent service, not a law firm. Do not claim lawyer status or legal advice
+9. If pricing is relevant, use exactly: "${EXACT_FABSY_PRICING}"`;
 
     const userPrompt = `Generate 6 FAQs about: "${topic}"
 
@@ -92,6 +96,7 @@ Requirements:
     
     // Handle if the response is wrapped in an object
     const faqs = Array.isArray(parsed) ? parsed : (parsed.faqs || []);
+    assertGeneratedContentSafe(faqs);
     
     console.log(`Generated ${faqs.length} FAQs successfully`);
 

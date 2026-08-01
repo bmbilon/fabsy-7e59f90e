@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { assertGeneratedContentSafe, EXACT_FABSY_PRICING } from "../_shared/generated-content-guardrails.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,8 +35,8 @@ serve(async (req) => {
 
 Create engaging 60-90 second video scripts optimized for social media and landing pages.
 
-TONE: Friendly, clear, empowering, conversational
-AUDIENCE: Women in Alberta dealing with traffic tickets
+TONE: Friendly, clear, supportive, plain-language, empowering, conversational
+AUDIENCE: Alberta drivers dealing with traffic tickets
 FORMAT: Short-form video (Instagram Reels, TikTok, YouTube Shorts)
 
 CRITICAL RULES:
@@ -48,7 +49,11 @@ CRITICAL RULES:
 7. Write for voice/audio (conversational, not essay-like)
 8. Include timing markers
 9. Generate WebVTT captions with timestamps
-10. Create 1-paragraph transcript for SEO`;
+10. Create 1-paragraph transcript for SEO
+11. Do not gender the audience or make gender-based assumptions
+12. Do not invent testimonials, ratings, outcomes, fines, demerit counts, deadlines, legal dates, speed thresholds, or insurance figures
+13. Fabsy is an agent service, not a law firm. Do not claim lawyer status or legal advice
+14. If pricing is relevant, use exactly: "${EXACT_FABSY_PRICING}"`;
 
     const userPrompt = `Create a video script about: "${topic}"
 
@@ -78,7 +83,7 @@ Return ONLY valid JSON with this exact structure:
   "transcript": "One paragraph transcript"
 }
 
-Make the hook compelling and the CTA actionable for Alberta women.`;
+Make the hook compelling and the CTA actionable for Alberta drivers.`;
 
     console.log(`Generating video script for: ${topic}`);
 
@@ -111,6 +116,7 @@ Make the hook compelling and the CTA actionable for Alberta women.`;
     const data = await response.json();
     const generatedContent = data.choices[0].message.content;
     const content = JSON.parse(generatedContent);
+    assertGeneratedContentSafe(content);
     
     console.log('Video script generated successfully');
 

@@ -1,37 +1,38 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CheckCircle, CreditCard, DollarSign, Shield } from "lucide-react";
 import { FormData } from "../TicketForm";
-import { CreditCard, Shield, DollarSign, Clock, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface PaymentStepProps {
   formData: FormData;
   updateFormData: (updates: Partial<FormData>) => void;
 }
 
+interface SubmissionResponse {
+  success?: boolean;
+  submissionId?: string;
+}
+
+interface PaymentResponse {
+  url?: string;
+}
+
 const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  
-  const isTestUser = formData.couponCode?.toUpperCase() === "TESTUSER";
-  const displayPrice = isTestUser ? "$0.00" : "$488.00";
-
-  const handleFieldUpdate = (field: keyof FormData, value: any) => {
-    updateFormData({ [field]: value });
-  };
 
   const handleStripeCheckout = async () => {
     if (!agreedToTerms) {
       toast({
-        title: "Agreement Required",
-        description: "Please agree to the terms and conditions to proceed.",
+        title: "Agreement required",
+        description: "Please agree to the Terms of Service and Privacy Policy to continue.",
         variant: "destructive",
       });
       return;
@@ -39,56 +40,61 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
 
     setIsProcessing(true);
     try {
-      // Step 1: Submit ticket through secure backend endpoint
-      // This prevents direct database manipulation and validates input server-side
-      console.log('[Payment] Submitting ticket through backend...');
-      const { data: submissionResult, error: submissionError } = await supabase.functions.invoke('submit-ticket', {
-        body: {
-          // Client info
-          driversLicense: formData.driversLicense,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          postalCode: formData.postalCode,
-          dateOfBirth: formData.dateOfBirth?.toISOString().split('T')[0],
-          smsOptIn: formData.smsOptIn,
-          
-          // Ticket info
-          ticketNumber: formData.ticketNumber,
-          violation: formData.violation,
-          fineAmount: formData.fineAmount,
-          violationDate: formData.issueDate?.toISOString().split('T')[0],
-          courtLocation: formData.courtJurisdiction,
-          courtDate: formData.courtDate?.toISOString().split('T')[0],
-          defenseStrategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
-          additionalNotes: formData.additionalNotes,
-          couponCode: formData.couponCode,
-          insuranceCompany: formData.insuranceCompany
-        }
-      });
-
-      if (submissionError || !submissionResult?.success) {
-        console.error('[Payment] Submission error:', submissionError);
-        toast({
-          title: 'Submission Error',
-          description: submissionError?.message || 'Failed to submit your ticket. Please try again.',
-          variant: 'destructive',
+      const { data: submission, error: submissionError } =
+        await supabase.functions.invoke<SubmissionResponse>("submit-ticket", {
+          body: {
+            driversLicense: formData.driversLicense,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+            city: formData.city,
+            postalCode: formData.postalCode,
+            dateOfBirth: formData.dateOfBirth?.toISOString().split("T")[0],
+            smsOptIn: formData.smsOptIn,
+            ticketNumber: formData.ticketNumber,
+            violation: formData.violation,
+            fineAmount: formData.fineAmount,
+            violationDate: formData.issueDate?.toISOString().split("T")[0],
+            courtLocation: formData.courtJurisdiction,
+            courtDate: formData.courtDate?.toISOString().split("T")[0],
+            defenseStrategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
+            additionalNotes: formData.additionalNotes,
+            insuranceCompany: formData.insuranceCompany,
+          },
         });
-        setIsProcessing(false);
-        return;
+
+      if (submissionError || !submission?.success || !submission.submissionId) {
+        throw submissionError || new Error("Ticket submission could not be created.");
       }
 
-      const submissionId = submissionResult.submissionId;
-      console.log('[Payment] Submission created successfully:', submissionId);
+      const submissionId = submission.submissionId;
+      const customerName = `${formData.firstName} ${formData.lastName}`.trim();
+      const { data: paymentData, error: paymentError } =
+        await supabase.functions.invoke<PaymentResponse>("create-payment", {
+          body: {
+            submissionId,
+            customerEmail: formData.email,
+            customerName,
+            ticketNumber: formData.ticketNumber,
+            // Keep the current production Edge Function contract working
+            // until the hardened function below is deployed.
+            formData: {
+              email: formData.email,
+              fullName: customerName,
+              ticketNumber: formData.ticketNumber,
+            },
+          },
+        });
 
-      // Step 2: Generate consent form PDF
-      console.log('[Payment] Generating consent form PDF...');
-      const { data: consentData, error: consentError } = await supabase.functions.invoke('generate-consent-form', {
+      if (paymentError || !paymentData?.url) {
+        throw paymentError || new Error("Secure checkout could not be created.");
+      }
+
+      const { error: consentError } = await supabase.functions.invoke("generate-consent-form", {
         body: {
-          submissionId: submissionId,
+          submissionId,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
@@ -100,31 +106,15 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           driversLicense: formData.driversLicense,
           ticketNumber: formData.ticketNumber,
           violation: formData.violation,
-          issueDate: formData.issueDate?.toLocaleDateString() || '',
-          digitalSignature: formData.digitalSignature
-        }
+          issueDate: formData.issueDate?.toLocaleDateString() || "",
+          digitalSignature: formData.digitalSignature,
+        },
       });
+      if (consentError) console.error("Consent form generation failed", consentError);
 
-      if (consentError) {
-        console.error('[Payment] Consent form generation error:', consentError);
-        toast({
-          title: "Warning",
-          description: "Consent form generation failed. Admin will generate manually.",
-          variant: "destructive",
-        });
-        // Continue with submission even if consent form fails
-      } else {
-        console.log('[Payment] Consent form generated successfully:', consentData);
-        
-        // Wait a moment to ensure storage is consistent
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-
-      // Step 3: Send notification email and SMS
-      console.log('[Payment] Sending notification email and SMS...');
-      const { error: notificationError } = await supabase.functions.invoke('send-notification', {
+      const { error: notificationError } = await supabase.functions.invoke("send-notification", {
         body: {
-          submissionId: submissionId,
+          submissionId,
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
@@ -134,233 +124,113 @@ const PaymentStep = ({ formData, updateFormData }: PaymentStepProps) => {
           fineAmount: formData.fineAmount,
           submittedAt: new Date().toLocaleString(),
           smsOptIn: formData.smsOptIn,
-          couponCode: formData.couponCode
-        }
+        },
       });
+      if (notificationError) console.error("Submission notification failed", notificationError);
 
-      if (notificationError) {
-        console.error('[Payment] Notification error:', notificationError);
-        toast({
-          title: "Notification Error",
-          description: "Failed to send notifications. Please contact support.",
-          variant: "destructive",
-        });
-        setIsProcessing(false);
-        return;
-      }
-
-      console.log('[Payment] Notifications sent successfully');
-
-      // If TESTUSER coupon, skip payment and go to success
-      if (isTestUser) {
-        toast({
-          title: "Test Submission Successful!",
-          description: "Your ticket has been submitted for review (Test Mode - No Payment Required).",
-        });
-        // Redirect to success page after short delay
-        setTimeout(() => {
-          window.location.href = "/thank-you?test=true";
-        }, 1500);
-        return;
-      }
-
-      // Regular Stripe payment flow
-      console.log('[Payment] Creating Stripe checkout session...');
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { formData }
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        console.log('[Payment] Redirecting to Stripe checkout...');
-        window.location.href = data.url;
-      }
+      window.location.assign(paymentData.url);
     } catch (error) {
-      console.error('[Payment] Payment error:', error);
+      console.error("Payment checkout failed", error);
       toast({
-        title: "Payment Error",
-        description: "Unable to process payment. Please try again.",
+        title: "Payment unavailable",
+        description: "We could not open secure checkout. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsProcessing(false);
     }
   };
 
   return (
     <div className="space-y-8">
-      {/* Service Summary */}
-      <Card className="p-6 bg-gradient-card shadow-fab border-primary/10">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
+      <Card className="border-primary/10 bg-gradient-card p-6 shadow-fab">
+        <div className="space-y-5">
+          <div className="flex items-center gap-3">
             <DollarSign className="h-6 w-6 text-primary" />
-            <h3 className="text-xl font-bold">Service Summary</h3>
+            <h3 className="text-xl font-bold">Service and Payment Summary</h3>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-background/50 rounded-lg">
-              <CheckCircle className="h-8 w-8 text-primary mx-auto mb-2" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg bg-background/50 p-4 text-center">
+              <CheckCircle className="mx-auto mb-2 h-8 w-8 text-primary" />
               <div className="text-2xl font-bold text-primary">95%+</div>
-              <div className="text-sm text-muted-foreground">Success Rate</div>
+              <div className="text-sm text-muted-foreground">Historical success rate</div>
+              <div className="mt-1 text-xs text-muted-foreground">Individual outcomes vary</div>
             </div>
-            <div className="text-center p-4 bg-background/50 rounded-lg">
-              <Clock className="h-8 w-8 text-secondary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-secondary">2-6</div>
-              <div className="text-sm text-muted-foreground">Weeks Process</div>
-            </div>
-            <div className="text-center p-4 bg-background/50 rounded-lg">
-              <Shield className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">$993</div>
-              <div className="text-sm text-muted-foreground">avg saved</div>
+            <div className="rounded-lg bg-background/50 p-4 text-center">
+              <Shield className="mx-auto mb-2 h-8 w-8 text-secondary" />
+              <div className="font-bold text-secondary">Agent Service</div>
+              <div className="mt-1 text-sm text-muted-foreground">Fabsy is not a law firm</div>
             </div>
           </div>
 
-          <div className="border-t pt-4 space-y-3">
+          <div className="space-y-3 border-t pt-4">
             <div className="flex justify-between text-lg">
-              <span>Fabsy Flat Fee Service</span>
-              <span className={`font-semibold ${isTestUser ? 'line-through text-muted-foreground' : ''}`}>$488.00 CAD</span>
+              <span>Flat service fee</span>
+              <span className="font-semibold">$488.00 CAD</span>
             </div>
-            {isTestUser && (
-              <div className="flex justify-between text-lg">
-                <span className="text-green-600 font-semibold">Test User Discount</span>
-                <span className="font-semibold text-green-600">-$488.00 CAD</span>
-              </div>
-            )}
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Processing Fee</span>
-              <span>$0.00</span>
+            <div className="flex justify-between border-t pt-3 text-xl font-bold">
+              <span>Amount Due Today</span>
+              <span className="text-primary">$488.00 CAD</span>
             </div>
-            {!isTestUser && (
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>GST (5%)</span>
-                <span>+ Tax as applicable</span>
-              </div>
-            )}
-            <div className="border-t pt-2">
-              <div className="flex justify-between text-xl font-bold">
-                <span>Total Amount</span>
-                <span className={`${isTestUser ? 'text-green-600' : 'text-primary'}`}>
-                  {displayPrice} CAD {!isTestUser && '+ Tax'}
-                </span>
-              </div>
-            </div>
-            {!isTestUser && (
-              <p className="text-xs text-muted-foreground text-center">
-                Final amount with applicable taxes will be calculated at checkout
-              </p>
-            )}
-            {isTestUser && (
-              <p className="text-xs text-green-600 text-center font-semibold">
-                Test mode activated - No payment required
-              </p>
-            )}
-          </div>
-
-          <div className="bg-primary/10 p-3 rounded-lg border border-primary/20">
-            <p className="text-sm text-primary text-center">
-              <strong>How our pricing works:</strong> a flat $488 to fight your ticket, plus 30% of any fine reduction we win. If we don't reduce your fine, you pay no fees beyond the flat $488.
+            <p className="rounded-lg border border-primary/20 bg-primary/10 p-3 text-center text-sm text-primary">
+              Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional
+              charge if the fine is not reduced.
             </p>
           </div>
         </div>
       </Card>
 
-      {/* Payment Method */}
       <Card className="p-6">
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <CreditCard className="h-6 w-6 text-primary" />
-            <h3 className="text-xl font-bold">Payment Information</h3>
+            <h3 className="text-xl font-bold">Secure Payment</h3>
           </div>
 
           <div className="space-y-2">
-            <Label>Coupon Code (Optional)</Label>
+            <Label htmlFor="insurance-company">Insurance company, optional</Label>
             <Input
-              value={formData.couponCode}
-              onChange={(e) => handleFieldUpdate("couponCode", e.target.value)}
-              placeholder="Enter coupon code"
-              className="transition-smooth focus:ring-2 focus:ring-primary/20 uppercase"
-            />
-            {isTestUser && (
-              <p className="text-xs text-green-600 font-semibold">
-                Valid test user code applied
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label>Insurance Company (Optional)</Label>
-            <Input
+              id="insurance-company"
               value={formData.insuranceCompany}
-              onChange={(e) => handleFieldUpdate("insuranceCompany", e.target.value)}
-              placeholder="e.g., Intact, TD Insurance, etc."
-              className="transition-smooth focus:ring-2 focus:ring-primary/20"
+              onChange={(event) => updateFormData({ insuranceCompany: event.target.value })}
+              placeholder="Current insurance company"
             />
-            <p className="text-xs text-muted-foreground">
-              This helps us calculate your potential insurance savings.
-            </p>
           </div>
 
-          {/* Terms and Conditions */}
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
+          <div className="rounded-lg border bg-muted/30 p-4">
+            <div className="flex items-start gap-3">
               <Checkbox
-                id="terms"
+                id="payment-terms"
                 checked={agreedToTerms}
-                onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
-                className="mt-1"
+                onCheckedChange={(value) => setAgreedToTerms(value === true)}
+                className="mt-0.5"
               />
-              <div className="space-y-1">
-                <Label htmlFor="terms" className="text-sm font-medium leading-relaxed">
-                  I agree to the{" "}
-                  <a href="#" className="text-primary hover:underline">Terms of Service</a>
-                  {" "}and{" "}
-                  <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+              <div>
+                <Label htmlFor="payment-terms" className="cursor-pointer leading-relaxed">
+                  I agree to the <a href="/terms-of-service" className="text-primary underline">Terms of Service</a> and <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a>.
                 </Label>
-                <p className="text-xs text-muted-foreground">
-                  By proceeding, you authorize Fabsy to represent you in fighting your traffic ticket.
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Payment confirms the selected Fabsy agent service described above.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Stripe Checkout Button */}
-          <Button 
+          <Button
             onClick={handleStripeCheckout}
             disabled={!agreedToTerms || isProcessing}
-            className="w-full min-h-12 h-auto text-base sm:text-lg font-semibold whitespace-normal py-3"
+            className="min-h-12 w-full py-3 text-base font-semibold sm:text-lg"
             size="lg"
           >
-            {isProcessing ? (
-              "Processing..."
-            ) : isTestUser ? (
-              <span className="flex items-center justify-center gap-2 flex-wrap">
-                <CheckCircle className="h-5 w-5 flex-shrink-0" />
-                <span>Submit Test Application (No Payment)</span>
-              </span>
-            ) : (
-              <span className="flex items-center justify-center gap-2 flex-wrap">
-                <CreditCard className="h-5 w-5 flex-shrink-0" />
-                <span>Pay {displayPrice} CAD + Tax with Stripe</span>
-              </span>
-            )}
+            <CreditCard className="mr-2 h-5 w-5" />
+            {isProcessing ? "Opening secure checkout..." : "Pay $488 CAD with Stripe"}
           </Button>
 
-          <div className="bg-secondary/5 p-4 rounded-lg border border-secondary/10">
-            <div className="flex items-start gap-3">
-              <Shield className="h-5 w-5 text-secondary mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-secondary mb-1">
-                  {isTestUser ? "Test Mode Active" : "Secure Payment Processing"}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {isTestUser 
-                    ? "You're submitting in test mode. Your ticket and contact info will be submitted without payment."
-                    : "Powered by Stripe. Your payment information is encrypted and processed securely. Promo codes accepted at checkout."
-                  }
-                </p>
-              </div>
-            </div>
+          <div className="flex items-start gap-3 rounded-lg border border-secondary/15 bg-secondary/5 p-4">
+            <Shield className="mt-0.5 h-5 w-5 shrink-0 text-secondary" />
+            <p className="text-sm text-muted-foreground">
+              Stripe processes the payment securely. Fabsy does not receive or store your complete card details.
+            </p>
           </div>
         </div>
       </Card>

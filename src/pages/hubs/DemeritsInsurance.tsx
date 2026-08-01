@@ -3,9 +3,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
+import useSafeHead from '@/hooks/useSafeHead';
 
 const DemeritsInsurance: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/demerits-and-insurance';
+  useSafeHead({
+    title: 'Alberta Demerits and Insurance | Fabsy',
+    description: 'Read a cautious overview of Alberta demerit points, driving abstracts, and questions to ask your insurer about a traffic conviction.',
+    canonical: url,
+  });
   const topCityPages = [
     { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding, Calgary' },
     { url: '/content/fight-distracted-ticket-edmonton', name: 'Distracted, Edmonton' },
@@ -19,7 +25,7 @@ const DemeritsInsurance: React.FC = () => {
     '@type': 'WebPage',
     name: 'Demerits & Insurance, Fabsy',
     url,
-    description: 'How demerit points translate into insurance risk, why preserving your abstract matters, and which outcomes avoid premium hikes.',
+    description: 'A cautious overview of Alberta demerit points, driving abstracts, and questions to ask an insurer about a traffic conviction.',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -40,15 +46,24 @@ const DemeritsInsurance: React.FC = () => {
       <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Demerits & Insurance</h1>
         <p className="text-muted-foreground mb-8">
-          Understand how demerit points impact premiums, and which resolutions protect your insurance.
+          Learn how Alberta demerit points are recorded and where to verify current rules. Insurance
+          effects depend on the insurer and the individual record.
         </p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Key points</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
-            <li>Demerits on your abstract are visible to insurers and often trigger multi-year surcharges.</li>
-            <li>Wins that preserve your abstract (no demerits) typically avoid premium increases.</li>
-            <li>Even partial reductions can meaningfully reduce risk depending on thresholds.</li>
+            <li>Alberta assigns demerit points after convictions for specified offences.</li>
+            <li>Photo radar tickets carry no demerit points and do not appear on the driving abstract.</li>
+            <li>Ask your insurer how a particular conviction may affect its underwriting or pricing. Fabsy does not predict insurance outcomes.</li>
+          </ul>
+        </section>
+
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-3 text-foreground">Official information</h2>
+          <ul className="list-disc ml-6 space-y-2 text-foreground">
+            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/demerit-driving-suspension">Alberta demerit point suspensions</a></li>
+            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/photo-radar-alberta">Alberta photo radar rules</a></li>
           </ul>
         </section>
 

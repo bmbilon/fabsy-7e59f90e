@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { assertGeneratedContentSafe, EXACT_FABSY_PRICING } from "../_shared/generated-content-guardrails.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,12 +31,12 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are an AEO content writer for fabsy.ca, an Alberta service helping women with traffic tickets.
+    const systemPrompt = `You are an AEO content writer for fabsy.ca, an Alberta service helping drivers with traffic tickets.
 
 Create complete page content optimized for AI search engines and featured snippets.
 
-TONE: Supportive, plain-language, conversational, female-friendly
-AUDIENCE: Women in Alberta dealing with traffic tickets
+TONE: Supportive, plain-language, conversational
+AUDIENCE: Alberta drivers dealing with traffic tickets
 SEO GOAL: Rank #1 in AI queries, beat all competitors
 
 CRITICAL AEO RULES:
@@ -45,7 +46,11 @@ CRITICAL AEO RULES:
 4. Use exact wording in FAQs that matches common voice queries
 5. Alberta-specific examples and references
 6. Practical, actionable advice
-7. FAQ answers: 20-50 words, start with direct answer`;
+7. FAQ answers: 20-50 words, start with direct answer
+8. Do not gender the audience or make gender-based assumptions
+9. Do not invent testimonials, ratings, outcomes, fines, demerit counts, deadlines, legal dates, speed thresholds, or insurance figures
+10. Fabsy is an agent service, not a law firm. Do not claim lawyer status or legal advice
+11. If pricing is relevant, use exactly: "${EXACT_FABSY_PRICING}"`;
 
     const userPrompt = `Generate complete page content for: "${topic}"
 ${city ? `\nCity focus: ${city}` : ''}
@@ -75,7 +80,7 @@ Create content for this exact template structure:
 
 **Frequently asked questions**
 {{faq1.q}} through {{faq6.q}} - 6 Q&A pairs
-- Questions must sound like real queries women ask
+- Questions must sound like real queries Alberta drivers ask
 - Answers: 20-50 words, direct answer first
 - At least 3 must be Alberta/city-specific
 
@@ -133,6 +138,7 @@ Return ONLY valid JSON with this exact structure:
     const data = await response.json();
     const generatedContent = data.choices[0].message.content;
     const content = JSON.parse(generatedContent);
+    assertGeneratedContentSafe(content);
     
     console.log('Page content generated successfully');
 

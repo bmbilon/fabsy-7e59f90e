@@ -6,6 +6,8 @@ import Footer from '@/components/Footer';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
+import useSafeHead from '@/hooks/useSafeHead';
+import { guardPublishedBlogPost } from '@/lib/published-content-guardrails';
 
 interface BlogPost {
   id: string;
@@ -24,6 +26,11 @@ interface BlogPost {
 }
 
 const Blog = () => {
+  useSafeHead({
+    title: 'Alberta Traffic Ticket Articles | Fabsy',
+    description: 'Read general information about Alberta traffic tickets, enforcement, and response options from Fabsy Traffic Ticket Services.',
+    canonical: 'https://fabsy.ca/blog',
+  });
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +51,7 @@ const Blog = () => {
         console.error('Supabase error:', error);
         setError(`Database error: ${error.message}`);
       } else {
-        setPosts(data || []);
+        setPosts((data || []).map((post) => guardPublishedBlogPost(post as BlogPost)));
       }
     } catch (err) {
       console.error('Fetch error:', err);
@@ -144,10 +151,10 @@ const Blog = () => {
       <section className="text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Alberta Traffic Law Blog
+            Alberta Traffic Ticket Blog
           </h1>
           <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">
-            Expert insights on Alberta traffic laws, penalties, and how to protect your driving record
+            General information about Alberta traffic tickets, enforcement, and response options
           </p>
         </div>
       </section>

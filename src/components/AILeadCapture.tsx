@@ -36,7 +36,7 @@ export default function AILeadCapture({
             Request Received!
           </h3>
           <p className="text-sm text-green-800 dark:text-green-200">
-            We'll review your eligibility and email you within 24 hours.
+            Our team will review the request and follow up using the contact information you provided.
           </p>
         </CardContent>
       </Card>
@@ -48,9 +48,9 @@ export default function AILeadCapture({
       <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
         <CardContent className="p-8 text-center space-y-4">
           <div className="space-y-2">
-            <h3 className="text-2xl font-bold">Get an Instant Analysis</h3>
+            <h3 className="text-2xl font-bold">Prepare Your Ticket for Review</h3>
             <p className="text-sm text-muted-foreground">
-              Upload your ticket and get immediate AI-powered analysis with potential savings calculation
+              Upload your ticket to capture its details and prepare them for review by Fabsy's agent service.
             </p>
           </div>
 
@@ -60,11 +60,12 @@ export default function AILeadCapture({
             size="lg"
           >
             <Zap className="h-5 w-5 mr-2" />
-            Start Instant Analysis
+            Start Ticket Review
           </Button>
 
           <p className="text-xs text-muted-foreground">
-            No cost • Instant results • See your potential savings
+            There is no charge to use this upload tool. If Fabsy can assist, pricing is a flat $488
+            plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
           </p>
         </CardContent>
       </Card>

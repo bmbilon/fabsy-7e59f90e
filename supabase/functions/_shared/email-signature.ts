@@ -17,12 +17,12 @@ export const getFabsyEmailSignature = () => {
           <td style="vertical-align: top;">
             <!-- Company Name -->
             <div style="font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #E879F9 0%, #C084FC 50%, #A78BFA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px;">
-              Fabsy
+              Fabsy Traffic Ticket Services
             </div>
             
             <!-- Tagline -->
             <div style="font-size: 13px; color: #6B7280; margin-bottom: 12px; font-weight: 500;">
-              Expert Traffic Ticket Defense for Alberta Women
+              Traffic ticket agent services for Alberta drivers
             </div>
             
             <!-- Contact Info -->
@@ -45,9 +45,9 @@ export const getFabsyEmailSignature = () => {
               </div>
             </div>
             
-            <!-- Trust Badge -->
+            <!-- Pricing -->
             <div style="margin-top: 12px; padding: 8px 12px; background: linear-gradient(135deg, #FDF2F8 0%, #FAE8FF 100%); border-radius: 6px; display: inline-block;">
-              <span style="font-size: 11px; color: #86198F; font-weight: 600;">✓ 100% Success Rate | No Win, No Fee Guarantee</span>
+              <span style="font-size: 11px; color: #86198F; font-weight: 600;">Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</span>
             </div>
           </td>
         </tr>
@@ -60,8 +60,7 @@ export const getFabsyEmailSignature = () => {
           If you are not the intended recipient, please delete this email and notify the sender immediately.
         </p>
         <p style="margin: 0;">
-          <strong>Legal Disclaimer:</strong> This communication does not constitute legal advice and does not create a solicitor-client relationship. 
-          For specific legal advice, please consult with a qualified legal professional.
+          <strong>Service Disclaimer:</strong> Fabsy is an agent service for Alberta traffic matters, not a law firm. This communication is general information and does not constitute legal advice or create a solicitor-client relationship.
         </p>
       </div>
     </div>
@@ -72,5 +71,5 @@ export const getFabsyEmailSignature = () => {
  * Get a simplified signature for SMS notifications
  */
 export const getFabsySMSSignature = () => {
-  return `\n\n---\nFabsy - Traffic Ticket Defense\n📞 (825) 793-2279 | hello@fabsy.ca\nfabsy.ca`;
+  return `\n\n---\nFabsy Traffic Ticket Services\n📞 (825) 793-2279 | hello@fabsy.ca\nfabsy.ca`;
 };

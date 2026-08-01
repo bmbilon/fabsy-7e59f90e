@@ -3,9 +3,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
+import useSafeHead from '@/hooks/useSafeHead';
 
 const AlbertaTickets101: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/alberta-tickets-101';
+  useSafeHead({
+    title: 'Alberta Traffic Tickets 101 | Fabsy',
+    description: 'Start with the instructions and deadline printed on your Alberta traffic ticket, then review general response options and related Fabsy pages.',
+    canonical: url,
+  });
 
   const topCityPages = [
     { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding Ticket, Calgary' },
@@ -21,7 +27,7 @@ const AlbertaTickets101: React.FC = () => {
     name: 'Alberta Tickets 101, Fabsy',
     url,
     description:
-      'Overview of Alberta traffic tickets, categories, process, and outcomes. Start here to understand how tickets work, what to expect, and how to protect your driving record and insurance.',
+      'Overview of Alberta traffic tickets, common issuing methods, response instructions, and links to current official information.',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -48,9 +54,17 @@ const AlbertaTickets101: React.FC = () => {
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">What to know</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
-            <li>Tickets fall into camera-based (photo radar) and officer-issued. Evidence and defenses differ.</li>
-            <li>Outcomes that preserve your abstract (no demerits) typically avoid insurance hikes.</li>
-            <li>Deadlines matter: filing disputes and disclosure requests promptly preserves options.</li>
+            <li>A notice may be issued through automated enforcement or directly by an officer.</li>
+            <li>The alleged offence and available material differ by ticket. Review the notice and any disclosure before deciding how to respond.</li>
+            <li>The response deadline is printed on the ticket. Follow the stated instructions before that date.</li>
+          </ul>
+        </section>
+
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-3 text-foreground">Official information</h2>
+          <ul className="list-disc ml-6 space-y-2 text-foreground">
+            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/fine-payment">Alberta fine payment and traffic ticket information</a></li>
+            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/photo-radar-alberta">Alberta photo radar rules</a></li>
           </ul>
         </section>
 

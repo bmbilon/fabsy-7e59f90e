@@ -11,7 +11,6 @@ import ConsentStep from "./form-steps/ConsentStep";
 import PaymentStep from "./form-steps/PaymentStep";
 import ReviewStep from "./form-steps/ReviewStep";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useTicketCache } from "@/hooks/useTicketCache";
 
 export interface FormData {
@@ -65,7 +64,6 @@ export interface FormData {
   insuranceCompany: string;
   vehicleDetails: string;
   additionalNotes: string;
-  couponCode: string;
 }
 
 const initialFormData: FormData = {
@@ -118,17 +116,16 @@ const initialFormData: FormData = {
   // Additional Info
   insuranceCompany: "",
   vehicleDetails: "",
-  additionalNotes: "",
-  couponCode: ""
+  additionalNotes: ""
 };
 
 const steps = [
   { id: 1, title: "Ticket Details", description: "Information about your ticket" },
   { id: 2, title: "Personal Info", description: "Your basic information" },
-  { id: 3, title: "Your Defense", description: "Why you want to fight this ticket" },
+  { id: 3, title: "Your Account", description: "Your account of what happened" },
   { id: 4, title: "Consent Form", description: "Authorization for representation" },
-  { id: 5, title: "Payment", description: "Secure payment processing" },
-  { id: 6, title: "Review", description: "Review and submit" }
+  { id: 5, title: "Review", description: "Review your information" },
+  { id: 6, title: "Payment", description: "Secure payment processing" }
 ];
 
 const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialStep }: { initialTicketImage?: File | null, initialPrefill?: Partial<FormData> | null, initialStep?: number }) => {
@@ -162,7 +159,6 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
       } : {}),
     } as FormData;
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
   const { toast } = useToast();
   const { getCachedTicketData, isCacheKeyValid } = useTicketCache();
@@ -312,48 +308,6 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
     }
   };
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      // Send notification email and SMS
-      const { error: emailError } = await supabase.functions.invoke('send-notification', {
-        body: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          ticketNumber: formData.ticketNumber,
-          violation: formData.violation,
-          fineAmount: formData.fineAmount,
-          submittedAt: new Date().toLocaleString(),
-          smsOptIn: formData.smsOptIn
-        }
-      });
-
-      if (emailError) {
-        console.error("Email notification error:", emailError);
-        // Continue with submission even if email fails
-      }
-      
-      toast({
-        title: "Application Submitted Successfully!",
-        description: "We'll review your case and contact you within 24 hours.",
-      });
-      
-      // Reset form or redirect
-      setCurrentStep(1);
-      setFormData(initialFormData);
-    } catch (error) {
-      toast({
-        title: "Submission Failed",
-        description: "Please try again or contact support.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -365,9 +319,9 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
       case 4:
         return <ConsentStep formData={formData} updateFormData={updateFormData} />;
       case 5:
-        return <PaymentStep formData={formData} updateFormData={updateFormData} />;
+        return <ReviewStep formData={formData} onSubmit={nextStep} />;
       case 6:
-        return <ReviewStep formData={formData} onSubmit={handleSubmit} isSubmitting={isSubmitting} />;
+        return <PaymentStep formData={formData} updateFormData={updateFormData} />;
       default:
         return null;
     }
@@ -407,9 +361,9 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
           formData.consentGiven &&
           formData.digitalSignature
         );
-      case 5: // Payment
-        return true; // Payment step doesn't have required fields to advance
-      case 6: // Review
+      case 5: // Review
+        return true;
+      case 6: // Payment
         return true;
       default:
         return false;
@@ -417,8 +371,6 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
   };
 
   const progress = (currentStep / steps.length) * 100;
-  const isTestUser = formData.couponCode?.toUpperCase() === "TESTUSER";
-
   // Ensure page starts at top when this component mounts
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -433,11 +385,12 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
             Fight Your Ticket
           </Badge>
           <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
-            Let's Get Your <span className="text-gradient-primary">Ticket Dismissed</span>
+            Get Your <span className="text-gradient-primary">Ticket Assessed</span>
           </h1>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Complete this form and our experts will review your case. 
-            95%+ success rate • Fixed $488 fee • No hidden costs
+            Complete this form and our team will review your ticket. Pricing is a flat $488 plus
+            30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
+            Fabsy is an agent service, not a law firm.
           </p>
         </div>
 
@@ -493,8 +446,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
           </div>
 
           {/* Navigation - Top */}
-          {currentStep < 6 && (
-            <div className="flex justify-between mb-8 pb-6 border-b">
+          <div className="flex justify-between mb-8 pb-6 border-b">
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
@@ -504,7 +456,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
                 <ArrowLeft className="h-4 w-4" />
                 Previous
               </Button>
-              {!((currentStep === 5) && isTestUser) && (
+              {currentStep !== 5 && currentStep < 6 && (
                 <Button 
                   onClick={nextStep}
                   disabled={!isStepValid()}
@@ -514,14 +466,12 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               )}
-            </div>
-          )}
+          </div>
 
           {renderStep()}
 
           {/* Navigation - Bottom */}
-          {currentStep < 6 && (
-            <div className="flex justify-between mt-8 pt-6 border-t">
+          <div className="flex justify-between mt-8 pt-6 border-t">
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
@@ -531,7 +481,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
                 <ArrowLeft className="h-4 w-4" />
                 Previous
               </Button>
-              {!((currentStep === 5) && isTestUser) && (
+              {currentStep !== 5 && currentStep < 6 && (
                 <Button 
                   onClick={nextStep}
                   disabled={!isStepValid()}
@@ -541,13 +491,12 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               )}
-            </div>
-          )}
+          </div>
         </Card>
 
         {/* Security Note */}
         <div className="text-center mt-8 text-sm text-white/70">
-          <p>Your information is encrypted and secure. We never share your data with third parties.</p>
+          <p>Your information is handled according to our Privacy Policy and processed by the service providers used to manage submissions.</p>
         </div>
       </div>
     </section>

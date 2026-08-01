@@ -43,7 +43,7 @@ const Footer = () => {
           </Link>
           
           <p className="text-[10px] text-muted-foreground mb-2 leading-tight max-w-md">
-            Expert traffic ticket defense for Alberta drivers.
+            Alberta traffic ticket agent services where permitted.
           </p>
           
           <div className="flex gap-4 text-[10px] text-muted-foreground flex-wrap justify-center">
@@ -141,8 +141,7 @@ const Footer = () => {
         {/* Service Description */}
         <div className="text-[10px] text-center text-muted-foreground mb-2">
           <p>
-            Authorized traffic ticket representatives in Alberta, Canada. 
-            Professional representation services for traffic ticket defense.
+            Traffic ticket agent services in Alberta, Canada, where representation is permitted and available.
           </p>
         </div>
 
@@ -159,8 +158,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                *Pricing: a flat $488 fee to represent you, non-refundable. If we reduce your fine, you also pay 30% of the reduction. Example: a $300 fine cut to $100 is a $200 reduction, so a $60 fee, $548 total. No reduction, no fees beyond the $488. Results may vary. Past performance does not guarantee future results.
-                Our success rate is based on historical data and individual results may differ.
+                Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Fabsy reports a 95%+ historical success rate across past matters. Results vary, and past performance does not predict future results.
               </p>
             </div>
             
@@ -168,15 +166,7 @@ const Footer = () => {
             <div className="bg-amber-50 p-2 rounded border border-amber-200">
               <p className="font-semibold text-amber-800 mb-1">Limitations on Agent Practice:</p>
               <div className="space-y-0.5 text-amber-700">
-                <p><strong>What We Cannot Do:</strong></p>
-                <ul className="list-disc ml-3 space-y-0 text-[9px]">
-                  <li>Represent clients on summary conviction appeals</li>
-                  <li>Appear on hybrid criminal matters</li>
-                  <li>Represent clients facing potential imprisonment exceeding six months without approved program participation</li>
-                </ul>
-                
-                <p className="mt-1"><strong>Geographic Restrictions:</strong></p>
-                <p className="text-[9px]">Some Alberta court locations do not permit paid non-lawyer agents to provide representation. This varies by jurisdiction within the province. We will verify if representation is permitted at your specific court location.</p>
+                <p>Fabsy confirms whether paid traffic ticket agent representation is permitted and available for each submitted matter. Fabsy is not a law firm and does not provide legal advice. A matter outside the permitted agent scope may require a lawyer.</p>
               </div>
             </div>
           </div>
@@ -191,7 +181,7 @@ const Footer = () => {
         
         {/* Copyright - Bottom */}
         <div className="text-center">
-          <p className="text-[10px] text-muted-foreground">© {currentYear} Fabsy Traffic Services. All rights reserved.</p>
+          <p className="text-[10px] text-muted-foreground">© {currentYear} Fabsy Traffic Ticket Services. All rights reserved.</p>
         </div>
         </div>
       </footer>

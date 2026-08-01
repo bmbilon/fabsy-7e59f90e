@@ -91,9 +91,9 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   };
 
   // Auto-save on blur
-  const handleFieldUpdate = (field: keyof PersonalInfoSchema, value: any) => {
+  const handleFieldUpdate = <K extends keyof PersonalInfoSchema>(field: K, value: PersonalInfoSchema[K]) => {
     setValue(field, value);
-    updateFormData({ [field]: value });
+    updateFormData({ [field]: value } as Partial<FormData>);
   };
 
   // Generate year options (current year - 18 down to 1920)
@@ -117,9 +117,9 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
 
   // Handle date component changes
   const handleDateChange = (type: 'year' | 'month' | 'day', value: string) => {
-    let newYear = type === 'year' ? value : dobYear;
-    let newMonth = type === 'month' ? value : dobMonth;
-    let newDay = type === 'day' ? value : dobDay;
+    const newYear = type === 'year' ? value : dobYear;
+    const newMonth = type === 'month' ? value : dobMonth;
+    const newDay = type === 'day' ? value : dobDay;
 
     if (type === 'year') setDobYear(value);
     if (type === 'month') setDobMonth(value);
@@ -619,7 +619,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                 id="phone"
                 type="tel"
                 {...register("phone")}
-                placeholder="(403) 555-0123"
+                placeholder="Enter your phone number"
                 onBlur={(e) => handleFieldUpdate("phone", e.target.value)}
                 className="h-11"
               />

@@ -8,8 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import useSafeHead from "@/hooks/useSafeHead";
 
 const Contact = () => {
+  useSafeHead({
+    title: "Contact Fabsy | Alberta Traffic Ticket Agent",
+    description: "Contact Fabsy Traffic Ticket Services about an Alberta traffic ticket or a submitted matter. Fabsy is an agent service, not a law firm.",
+    canonical: "https://fabsy.ca/contact",
+  });
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,7 +42,7 @@ const Contact = () => {
 
       toast({
         title: "Message Sent!",
-        description: "We've sent you a confirmation email. We'll get back to you within 24 hours.",
+        description: "We've sent you a confirmation email and will respond as soon as we can.",
       });
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch (error) {
@@ -88,7 +94,7 @@ const Contact = () => {
                   <div>
                     <h3 className="font-semibold mb-1">Email</h3>
                     <p className="text-muted-foreground">hello@fabsy.ca</p>
-                    <p className="text-sm text-muted-foreground">We respond within 24 hours</p>
+                    <p className="text-sm text-muted-foreground">We respond as soon as we can</p>
                   </div>
                 </div>
 
@@ -130,8 +136,8 @@ const Contact = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  A flat $488 to fight your ticket, plus 30% of any fine reduction we win.
-                  If we don't reduce your fine, you pay no fees beyond the flat $488.
+                  Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no
+                  additional charge if the fine is not reduced.
                 </p>
               </CardContent>
             </Card>
@@ -214,7 +220,7 @@ const Contact = () => {
                 </Button>
 
                 <p className="text-sm text-muted-foreground text-center">
-                  * Required fields. We'll respond within 24 hours during business days.
+                  * Required fields. We'll respond as soon as we can during business days.
                 </p>
               </form>
             </CardContent>

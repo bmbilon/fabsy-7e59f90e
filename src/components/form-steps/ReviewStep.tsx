@@ -7,7 +7,6 @@ import {
   User, 
   FileText, 
   Scale, 
-  CreditCard, 
   CheckCircle, 
   Clock,
   Mail,
@@ -20,10 +19,9 @@ import {
 interface ReviewStepProps {
   formData: FormData;
   onSubmit: () => void;
-  isSubmitting: boolean;
 }
 
-const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
+const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -33,7 +31,8 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
         </div>
         <h2 className="text-3xl font-bold">Review Your Application</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Please review all information below. Once submitted, our legal experts will begin working on your case immediately.
+          Please review the information below before continuing to secure payment. Fabsy's traffic
+          ticket agent team will review the paid submission and confirm the next steps.
         </p>
       </div>
 
@@ -163,7 +162,7 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
         </div>
       </Card>
 
-      {/* Payment Summary */}
+      {/* Payment summary */}
       <Card className="p-6 bg-gradient-card shadow-fab border-primary/10">
         <div className="flex items-center gap-3 mb-4">
           <DollarSign className="h-5 w-5 text-primary" />
@@ -171,17 +170,13 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
         </div>
         <div className="space-y-3">
           <div className="flex justify-between">
-            <span>Fabsy Defense Service</span>
+            <span>Fabsy traffic ticket agent service</span>
             <span>$488.00</span>
-          </div>
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Alberta HST (5%)</span>
-            <span>$24.40</span>
           </div>
           <div className="border-t pt-3">
             <div className="flex justify-between text-lg font-bold">
-              <span>Total Amount</span>
-              <span className="text-primary">$512.40</span>
+              <span>Amount Due Today</span>
+              <span className="text-primary">$488.00 CAD</span>
             </div>
           </div>
           {formData.insuranceCompany && (
@@ -189,6 +184,10 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
               <span className="font-medium">Insurance:</span> {formData.insuranceCompany}
             </div>
           )}
+          <p className="border-t pt-3 text-sm text-muted-foreground">
+            Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional
+            charge if the fine is not reduced.
+          </p>
         </div>
       </Card>
 
@@ -202,29 +201,29 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
             <div>
-              <div className="font-medium">Immediate Confirmation</div>
-              <div className="text-muted-foreground">You'll receive an email confirmation within 5 minutes</div>
+              <div className="font-medium">Secure Payment</div>
+              <div className="text-muted-foreground">Continue to Stripe to pay the flat service fee</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
             <div>
-              <div className="font-medium">Expert Review (24-48 hours)</div>
-              <div className="text-muted-foreground">Our expert team reviews your case and develops a defense strategy</div>
+              <div className="font-medium">Agent Review</div>
+              <div className="text-muted-foreground">Our traffic ticket agent team reviews the information you provided</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
             <div>
-              <div className="font-medium">Court Representation (2-6 weeks)</div>
-              <div className="text-muted-foreground">We handle all court proceedings and keep you updated</div>
+              <div className="font-medium">Representation Planning</div>
+              <div className="text-muted-foreground">We outline the next steps and applicable court requirements</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
             <div>
               <div className="font-medium">Results Notification</div>
-              <div className="text-muted-foreground">You'll be notified of the outcome immediately</div>
+              <div className="text-muted-foreground">We keep you informed as the matter progresses</div>
             </div>
           </div>
         </div>
@@ -234,25 +233,15 @@ const ReviewStep = ({ formData, onSubmit, isSubmitting }: ReviewStepProps) => {
       <div className="text-center space-y-4">
         <Button
           onClick={onSubmit}
-          disabled={isSubmitting}
           size="lg"
           className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow px-12 py-4 text-lg"
         >
-          {isSubmitting ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-              Processing Application...
-            </>
-          ) : (
-            <>
-              Submit Application & Process Payment
-            </>
-          )}
+          Continue to Payment
         </Button>
         
         <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-          By submitting, you authorize Fabsy to represent you in court and process your payment. 
-          Remember: the flat $488 covers representation. If we don't reduce your fine, you pay no fees beyond it.
+          By continuing, you confirm the information above and proceed to the payment step. Fabsy is
+          an agent service, not a law firm. Individual outcomes vary.
         </p>
       </div>
     </div>

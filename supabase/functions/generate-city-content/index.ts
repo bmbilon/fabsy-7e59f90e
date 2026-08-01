@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { assertGeneratedContentSafe, EXACT_FABSY_PRICING } from "../_shared/generated-content-guardrails.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,12 +31,12 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are an AEO content writer for fabsy.ca, a service helping Alberta women with traffic tickets.
+    const systemPrompt = `You are an AEO content writer for fabsy.ca, a service helping Alberta drivers with traffic tickets.
 
 Your task is to rewrite content for specific cities in Alberta, making it feel local and relevant.
 
-TONE: Supportive, plain-language, conversational, female-friendly
-AUDIENCE: Women in Alberta dealing with traffic tickets
+TONE: Supportive, plain-language, conversational
+AUDIENCE: Alberta drivers dealing with traffic tickets
 SEO: Answer-first (AEO), simple sentences, local examples
 
 IMPORTANT RULES:
@@ -44,7 +45,11 @@ IMPORTANT RULES:
 3. Replace generic examples with city-specific ones
 4. Add 3 city-specific FAQs
 5. Use simple, supportive language
-6. Focus on practical, actionable advice`;
+6. Focus on practical, actionable advice
+7. Do not gender the audience or make gender-based assumptions
+8. Do not invent testimonials, ratings, outcomes, fines, demerit counts, deadlines, legal dates, speed thresholds, or insurance figures
+9. Fabsy is an agent service, not a law firm. Do not claim lawyer status or legal advice
+10. If pricing is relevant, use exactly: "${EXACT_FABSY_PRICING}"`;
 
     const userPrompt = `Rewrite the following traffic ticket content for ${cityName}, Alberta.
 
@@ -69,7 +74,7 @@ Generate a complete AEO page with:
 Use local examples like:
 - "${localCourt}" instead of generic courts
 - Local streets/areas in ${cityName}
-- "${cityName} drivers" or "women in ${cityName}"
+- "${cityName} drivers" or "people driving in ${cityName}"
 
 Return ONLY valid JSON with this exact structure:
 {
@@ -120,11 +125,13 @@ Return ONLY valid JSON with this exact structure:
 
     const data = await response.json();
     const generatedContent = data.choices[0].message.content;
+    const content = JSON.parse(generatedContent);
+    assertGeneratedContentSafe(content);
     
     console.log('Content generated successfully for', cityName);
 
     return new Response(
-      JSON.stringify({ content: JSON.parse(generatedContent) }),
+      JSON.stringify({ content }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

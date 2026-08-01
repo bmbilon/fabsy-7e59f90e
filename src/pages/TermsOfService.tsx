@@ -15,7 +15,9 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Service Description</h2>
             <p className="mb-4">
-              Fabsy Traffic Services provides traffic ticket representation services for non-criminal provincial traffic offences in Alberta, Canada. Our services include:
+              Fabsy Traffic Ticket Services is an agent service that provides traffic ticket
+              representation for eligible non-criminal provincial traffic offences in Alberta,
+              Canada. Our services include:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Court representation for traffic violations</li>
@@ -31,11 +33,10 @@ const TermsOfService = () => {
             <h2 className="text-2xl font-semibold mb-4">2. Limitations on Agent Practice</h2>
             <p className="mb-4">Our traffic representatives cannot and do not:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Represent clients on summary conviction appeals</li>
-              <li>Appear on hybrid criminal matters</li>
-              <li>Represent clients facing potential imprisonment exceeding six months</li>
               <li>Provide legal advice or practice law</li>
-              <li>Guarantee specific outcomes or results</li>
+              <li>Identify themselves as lawyers or Fabsy as a law firm</li>
+              <li>Accept matters outside the permitted scope of agent representation</li>
+              <li>Promise specific outcomes or results</li>
             </ul>
           </section>
 
@@ -49,21 +50,15 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">4. How Our Pricing Works</h2>
             <p className="mb-4">
-              We use straightforward flat-fee pricing:
+              Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
+              reduced, there is no additional charge.
             </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>A flat $488 fee to represent you and fight your ticket. This fee is non-refundable and is charged whether we win or lose.</li>
-              <li>If we reduce your fine, you also pay 30% of the fine reduction (the dollar amount your fine drops).</li>
-              <li>If we do not reduce your fine, you pay no fees beyond the $488.</li>
-            </ul>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">5. Fees and Payment</h2>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Our standard representation fee is a flat $488, non-refundable, charged whether we win or lose</li>
-              <li>If we reduce your fine, you also pay 30% of the fine reduction (the dollar amount your fine drops)</li>
-              <li>If we do not reduce your fine, you pay no fees beyond the $488</li>
+              <li>Service fees are charged according to the pricing terms in Section 4</li>
               <li>Additional court costs or fines beyond our control remain the client's responsibility</li>
               <li>All fees are quoted in Canadian dollars</li>
             </ul>
@@ -82,28 +77,30 @@ const TermsOfService = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">6. No Guarantee of Results</h2>
+            <h2 className="text-2xl font-semibold mb-4">7. No Promised Result</h2>
             <p>
-              While we strive to achieve the best possible outcome for each client, we cannot and do not guarantee specific results. Court decisions are ultimately at the discretion of the presiding judicial officer.
+              While we strive to achieve the best possible outcome for each client, we cannot and do not promise specific results. Court decisions are ultimately at the discretion of the presiding judicial officer.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">7. Confidentiality</h2>
+            <h2 className="text-2xl font-semibold mb-4">8. Confidentiality</h2>
             <p>
-              We maintain confidentiality of client information in accordance with professional standards and applicable privacy laws. Information may be disclosed only as required for court proceedings or as mandated by law.
+              We protect client information through internal privacy practices and applicable
+              privacy obligations. Information may be disclosed as required for court proceedings
+              or as mandated by law.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Limitation of Liability</h2>
+            <h2 className="text-2xl font-semibold mb-4">9. Limitation of Liability</h2>
             <p>
               Our liability is limited to the amount of fees paid for our services. We are not liable for indirect, consequential, or punitive damages arising from our representation services.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">9. Termination</h2>
+            <h2 className="text-2xl font-semibold mb-4">10. Termination</h2>
             <p className="mb-4">Either party may terminate the representation agreement:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>By mutual agreement</li>
@@ -114,7 +111,7 @@ const TermsOfService = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Website Use</h2>
+            <h2 className="text-2xl font-semibold mb-4">11. Website Use</h2>
             <p className="mb-4">Use of our website constitutes acceptance of these terms. You agree not to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Use the website for unlawful purposes</li>
@@ -125,29 +122,29 @@ const TermsOfService = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">11. Governing Law</h2>
+            <h2 className="text-2xl font-semibold mb-4">12. Governing Law</h2>
             <p>
               These terms are governed by the laws of Alberta, Canada. Any disputes will be subject to the jurisdiction of the courts of Alberta.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">12. Changes to Terms</h2>
+            <h2 className="text-2xl font-semibold mb-4">13. Changes to Terms</h2>
             <p>
               We reserve the right to modify these terms at any time. Changes will be posted on this page with an updated revision date. Continued use of our services after changes constitutes acceptance of the modified terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">13. Contact Information</h2>
+            <h2 className="text-2xl font-semibold mb-4">14. Contact Information</h2>
             <p className="mb-4">
               For questions about these Terms of Service, please contact us:
             </p>
             <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
-              <p><strong>Fabsy Traffic Services</strong></p>
-              <p>Email: info@fabsy.ca</p>
-              <p>Phone: (403) 123-4567</p>
-              <p>Address: Calgary, Alberta, Canada</p>
+              <p><strong>Fabsy Traffic Ticket Services</strong></p>
+              <p>Email: <a href="mailto:hello@fabsy.ca" className="underline">hello@fabsy.ca</a></p>
+              <p>Phone: <a href="tel:+18257932279" className="underline">(825) 793-2279</a></p>
+              <p>Service area: Alberta</p>
             </div>
           </section>
         </div>

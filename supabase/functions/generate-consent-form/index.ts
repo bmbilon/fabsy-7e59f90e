@@ -56,7 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
     const sectionSize = 13;
 
     // Helper function to add text
-    const addText = (text: string, size: number, fontType: any, x: number, y: number) => {
+    const addText = (text: string, size: number, fontType: typeof font, x: number, y: number) => {
       page.drawText(text, {
         x,
         y,
@@ -67,9 +67,9 @@ const handler = async (req: Request): Promise<Response> => {
     };
 
     // Title
-    addText("WRITTEN CONSENT FOR LEGAL REPRESENTATION", fontSize + 2, boldFont, 100, yPosition);
+    addText("CLIENT CONSENT FOR TRAFFIC TICKET AGENT SERVICES", fontSize + 2, boldFont, 70, yPosition);
     yPosition -= 20;
-    addText("Fabsy Traffic Ticket Defense Services", fontSize, font, 150, yPosition);
+    addText("Fabsy Traffic Ticket Defense", fontSize, font, 190, yPosition);
     yPosition -= 30;
 
     // Client Information
@@ -99,24 +99,27 @@ const handler = async (req: Request): Promise<Response> => {
     yPosition -= 25;
 
     // Authorization
-    addText("AUTHORIZATION FOR REPRESENTATION", sectionSize, boldFont, leftMargin, yPosition);
+    addText("AUTHORIZATION FOR AGENT SERVICES", sectionSize, boldFont, leftMargin, yPosition);
     yPosition -= 20;
     
     const authLines = [
-      "I, the undersigned, hereby authorize Fabsy and its designated agents to represent",
-      "me in all matters related to the traffic violation referenced above. This includes:",
+      "I authorize Fabsy Traffic Ticket Defense and its designated agents to assist with",
+      "the ticket identified above, if the matter is eligible for Fabsy's agent services.",
       "",
-      "• Appearing on my behalf at all court proceedings",
-      "• Filing and submitting all necessary legal documents",
-      "• Negotiating with prosecutors and court officials on my behalf",
-      "• Making decisions regarding plea negotiations and trial strategy",
-      "• Accessing my driving record and related information as needed",
+      "Within the scope permitted by applicable law and court or tribunal rules, I authorize",
+      "Fabsy's agents to:",
+      "• Communicate with authorized court, tribunal, and prosecution contacts about this ticket",
+      "• Submit permitted forms or information for this ticket using my instructions",
+      "• Attend or arrange an appearance only when permitted and agreed with me",
+      "• Take steps I have instructed Fabsy to take within the permitted agent scope",
       "",
       "I understand that:",
-      "• Fabsy will make reasonable efforts to achieve the best possible outcome",
-      "• No specific outcome can be guaranteed",
-      "• I am responsible for the service fee regardless of outcome",
-      "• I may be entitled to a refund under the money-back guarantee policy"
+      "• Fabsy is an agent service, not a law firm, and does not provide legal advice",
+      "• Fabsy will not choose or change a plea or strategy without my instructions",
+      "• Fabsy may access only information actually needed and lawfully available for this matter",
+      "• Outcomes vary and Fabsy does not promise a particular result",
+      "• Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no",
+      "  additional charge if the fine is not reduced"
     ];
 
     authLines.forEach(line => {
@@ -141,9 +144,9 @@ const handler = async (req: Request): Promise<Response> => {
     // Consent text
     const consentLines = [
       "By signing this form, I consent to the processing of my personal information",
-      "as outlined in Fabsy's Privacy Policy. I understand my data will be used solely",
-      "for legal representation and will not be shared with third parties except as",
-      "required by law."
+      "for this ticket matter as described in Fabsy's Privacy Policy. Fabsy may use only",
+      "the information it actually accesses for the requested service and may disclose it",
+      "to authorized service providers or public bodies when needed or required by law."
     ];
 
     consentLines.forEach(line => {
@@ -198,10 +201,11 @@ const handler = async (req: Request): Promise<Response> => {
         ...corsHeaders,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in generate-consent-form function:", error);
+    const errorMessage = error instanceof Error ? error.message : "Consent form generation failed";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

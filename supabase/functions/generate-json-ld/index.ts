@@ -57,6 +57,69 @@ interface ProfessionalServiceData {
   areaServed?: string;
 }
 
+const FABSY = {
+  name: "Fabsy Traffic Ticket Services",
+  url: "https://fabsy.ca",
+  logo: "https://fabsy.ca/favicon.svg",
+  telephone: "(825) 793-2279",
+  email: "hello@fabsy.ca",
+  areaServed: "Alberta, Canada",
+} as const;
+
+const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
+const SERVICE_DESCRIPTION = `Traffic ticket agent services for Alberta drivers. Fabsy is not a law firm. ${EXACT_PRICING}`;
+
+const unsafeClaimReplacements: Array<[RegExp, string]> = [
+  [/\b(?:no[- ]win[- ]no[- ]fee|money[- ]back|risk[- ]free|zero[- ]risk)\b/gi, "case-specific service"],
+  [/\b(?:women|woman|female|girls?|gender-targeted)\b/gi, "Alberta drivers"],
+  [/\b(?:lawyers?|attorneys?)\b/gi, "traffic ticket agents"],
+  [/\bexpertise\b/gi, "service"],
+  [/\bexperts?\b/gi, "traffic ticket agents"],
+  [/\bguarantee(?:d|s|ing)?\b/gi, "case-specific"],
+];
+
+const pricingSignal = /(?:\$|\b(?:price|pricing|fee|fees|cost|costs)\b|\b30\s*%|\b488\b)/i;
+
+function sanitizeText(value: unknown, fallback = ""): string {
+  let text = typeof value === "string" ? value : fallback;
+
+  text = text.replace(/\u2014/g, ",");
+  for (const [pattern, replacement] of unsafeClaimReplacements) {
+    text = text.replace(pattern, replacement);
+  }
+
+  return text
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/\s{2,}/g, " ")
+    .trim() || fallback;
+}
+
+function sanitizeProse(value: unknown, fallback = ""): string {
+  const text = sanitizeText(value, fallback);
+
+  if (!pricingSignal.test(text)) {
+    return text;
+  }
+
+  const nonPricingSentences = text
+    .split(/(?<=[.!?])\s+/)
+    .filter(sentence => !pricingSignal.test(sentence))
+    .join(" ")
+    .trim();
+
+  return `${nonPricingSentences ? `${nonPricingSentences} ` : ""}${EXACT_PRICING}`;
+}
+
+function optionalPublicUrl(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+
+  const url = value.trim();
+  if (!/^https?:\/\//i.test(url)) return undefined;
+  if (/(?:placeholder|path\/to|example\.com|dummy|fake)/i.test(url)) return undefined;
+
+  return url;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -123,111 +186,111 @@ serve(async (req) => {
 });
 
 function generateFAQPage(data: FAQPageData) {
-  // CRITICAL FOR AEO: FAQ wording in HTML must match JSON-LD exactly
-  // AI engines use exact text matching for featured snippets
+  // Visible FAQ copy should use the same guarded source text so HTML and JSON-LD stay aligned.
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": data.faqs.map(faq => ({
       "@type": "Question",
-      "name": faq.q,
+      "name": sanitizeText(faq.q, "Fabsy traffic ticket services"),
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": faq.a
+        "text": sanitizeProse(faq.a, "Information depends on the ticket and court instructions.")
       }
     }))
   };
 }
 
-function generateProfessionalService(data: ProfessionalServiceData) {
+function generateProfessionalService(_data: ProfessionalServiceData) {
   return {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    "name": data.name || "Fabsy",
-    "url": data.url || "https://fabsy.ca",
-    "logo": data.logo || "https://fabsy.ca/path/to/logo.png",
-    "telephone": data.telephone || "+1-825-793-2279",
-    "email": data.email || "hello@fabsy.ca",
-    "description": data.description || "Alberta traffic ticket help for women. Expert defense, reduced fines, and peace of mind.",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": data.address?.street || "",
-      "addressLocality": data.address?.city || "Calgary",
-      "addressRegion": data.address?.province || "AB",
-      "postalCode": data.address?.postalCode || "",
-      "addressCountry": "CA"
-    },
+    "@id": `${FABSY.url}/#organization`,
+    "name": FABSY.name,
+    "url": FABSY.url,
+    "logo": FABSY.logo,
+    "telephone": FABSY.telephone,
+    "email": FABSY.email,
+    "description": SERVICE_DESCRIPTION,
     "areaServed": {
-      "@type": "State",
-      "name": data.areaServed || "Alberta"
+      "@type": "AdministrativeArea",
+      "name": FABSY.areaServed
     },
-    "priceRange": data.priceRange || "$"
+    "priceRange": EXACT_PRICING
   };
 }
 
-function generateLocalBusiness(data: LocalBusinessData) {
+function generateLocalBusiness(_data: LocalBusinessData) {
   return {
     "@context": "https://schema.org",
-    "@type": "LegalService",
-    "name": data.name || "Fabsy - Alberta Traffic Ticket Help",
-    "description": data.description || "Professional traffic ticket defense services for women in Alberta",
-    "url": data.url || "https://fabsy.ca",
-    "telephone": data.phone || "(825) 793-2279",
-    "email": data.email || "hello@fabsy.ca",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": data.address?.street || "",
-      "addressLocality": data.address?.city || "Alberta",
-      "addressRegion": data.address?.province || "AB",
-      "postalCode": data.address?.postalCode || "",
-      "addressCountry": "CA"
-    },
+    "@type": "ProfessionalService",
+    "@id": `${FABSY.url}/#organization`,
+    "name": FABSY.name,
+    "description": SERVICE_DESCRIPTION,
+    "url": FABSY.url,
+    "logo": FABSY.logo,
+    "telephone": FABSY.telephone,
+    "email": FABSY.email,
     "areaServed": {
-      "@type": "State",
-      "name": "Alberta"
+      "@type": "AdministrativeArea",
+      "name": FABSY.areaServed
     },
-    "priceRange": "$$"
+    "priceRange": EXACT_PRICING
   };
 }
 
 function generateArticle(data: ArticleData) {
+  const image = optionalPublicUrl(data.image);
+  const url = optionalPublicUrl(data.url);
+
   return {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": data.headline,
-    "description": data.description,
+    "headline": sanitizeText(data.headline, "Alberta traffic ticket information"),
+    "description": sanitizeProse(data.description, "General information about Alberta traffic tickets and agent services."),
     "author": {
       "@type": "Organization",
-      "name": data.author || "Fabsy"
+      "name": FABSY.name,
+      "url": FABSY.url
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Fabsy",
+      "name": FABSY.name,
       "logo": {
         "@type": "ImageObject",
-        "url": "https://fabsy.ca/logo.png"
+        "url": FABSY.logo
       }
     },
     "datePublished": data.datePublished,
     "dateModified": data.dateModified || data.datePublished,
-    "image": data.image || "",
-    "url": data.url || "",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": data.url || ""
-    }
+    ...(image ? { "image": image } : {}),
+    ...(url ? {
+      "url": url,
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": url
+      }
+    } : {})
   };
 }
 
 function generateOrganization(data: Record<string, unknown>) {
+  const socialLinks = Array.isArray(data.socialLinks)
+    ? data.socialLinks.map(optionalPublicUrl).filter((url): url is string => Boolean(url))
+    : [];
+
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": data.name || "Fabsy",
-    "url": data.url || "https://fabsy.ca",
-    "logo": data.logo || "https://fabsy.ca/logo.png",
-    "description": data.description || "Alberta traffic ticket help for women",
-    "sameAs": data.socialLinks || []
+    "@id": `${FABSY.url}/#organization`,
+    "name": FABSY.name,
+    "url": FABSY.url,
+    "logo": FABSY.logo,
+    "telephone": FABSY.telephone,
+    "email": FABSY.email,
+    "description": SERVICE_DESCRIPTION,
+    "areaServed": FABSY.areaServed,
+    "sameAs": socialLinks
   };
 }
 
@@ -235,14 +298,14 @@ function generateWebPage(data: Record<string, unknown>) {
   return {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": data.title,
-    "description": data.description,
-    "url": data.url,
+    "name": sanitizeText(data.title, "Fabsy Traffic Ticket Services"),
+    "description": sanitizeProse(data.description, "Traffic ticket agent services for Alberta drivers. Fabsy is not a law firm."),
+    "url": optionalPublicUrl(data.url) || FABSY.url,
     "inLanguage": "en-CA",
     "isPartOf": {
       "@type": "WebSite",
-      "name": "Fabsy",
-      "url": "https://fabsy.ca"
+      "name": FABSY.name,
+      "url": FABSY.url
     }
   };
 }
@@ -254,8 +317,8 @@ function generateBreadcrumbs(data: Record<string, unknown>) {
     "itemListElement": (data.items as Array<Record<string, unknown>>).map((item: Record<string, unknown>, index: number) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "name": item.name,
-      "item": item.url
+      "name": sanitizeText(item.name, "Fabsy"),
+      "item": optionalPublicUrl(item.url) || FABSY.url
     }))
   };
 }

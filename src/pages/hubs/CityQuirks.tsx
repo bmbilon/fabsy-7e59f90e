@@ -3,9 +3,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
+import useSafeHead from '@/hooks/useSafeHead';
 
 const CityQuirks: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/city-specific-quirks';
+  useSafeHead({
+    title: 'Alberta Ticket Information by City | Fabsy',
+    description: 'Find related Alberta traffic ticket pages by city and confirm the court, response choices, and deadline printed on your own ticket.',
+    canonical: url,
+  });
   const topCityPages = [
     { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding, Calgary' },
     { url: '/content/fight-distracted-ticket-edmonton', name: 'Distracted, Edmonton' },
@@ -17,9 +23,9 @@ const CityQuirks: React.FC = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'City-specific quirks, Fabsy',
+    name: 'Alberta Traffic Ticket Information by City, Fabsy',
     url,
-    description: 'Local variations and venue nuances across Alberta cities that can affect traffic ticket outcomes and strategy.',
+    description: 'Related Alberta traffic ticket information by city, with a reminder to confirm the instructions printed on each ticket.',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -38,22 +44,23 @@ const CityQuirks: React.FC = () => {
       <StaticJsonLd schema={schema} dataAttr="webpage" />
       <Header />
       <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">City-specific quirks</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Alberta Traffic Ticket Information by City</h1>
         <p className="text-muted-foreground mb-8">
-          Cities can differ on disclosure logistics, prosecutor practices, and scheduling, here’s what to know.
+          Court locations, municipal enforcement programs, and filing instructions can differ.
+          Confirm the information printed on your ticket and current official instructions.
         </p>
 
         <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-3 text-foreground">Examples</h2>
+          <h2 className="text-2xl font-bold mb-3 text-foreground">What may differ</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
-            <li>Disclosure pickup methods and timelines vary by city.</li>
-            <li>Venue capacity and docket congestion can influence adjournments.</li>
-            <li>Enforcement priorities differ, e.g., school zones vs. photo radar corridors.</li>
+            <li>The court location and response instructions printed on the ticket.</li>
+            <li>Municipal automated-enforcement programs and published locations.</li>
+            <li>Whether Fabsy can provide paid agent representation for the matter and court location.</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-3 text-foreground">Expert trails: top city pages</h2>
+          <h2 className="text-2xl font-bold mb-3 text-foreground">Related city pages</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
             {topCityPages.map((p) => (
               <li key={p.url}>

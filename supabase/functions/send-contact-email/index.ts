@@ -52,14 +52,14 @@ const handler = async (req: Request): Promise<Response> => {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0;">Welcome to Fabsy!</h1>
-                <p style="margin: 10px 0 0 0; opacity: 0.9;">Alberta's Trusted Traffic Ticket Representation</p>
+                <h1 style="margin: 0;">Fabsy Traffic Ticket Services</h1>
+                <p style="margin: 10px 0 0 0; opacity: 0.9;">Traffic ticket agent services for Alberta drivers</p>
               </div>
               
               <div class="content">
                 <h2 style="color: #667eea; margin-top: 0;">Thank you for contacting us, ${name}!</h2>
                 
-                <p>We've received your message and one of our traffic ticket specialists will review it shortly. We typically respond within 24 hours during business days.</p>
+                <p>We've received your message. A member of our team will review it and respond using the contact information you provided.</p>
                 
                 <div class="highlight">
                   <strong>Your Message Summary:</strong><br>
@@ -74,21 +74,21 @@ const handler = async (req: Request): Promise<Response> => {
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
                 
                 <h3 style="color: #667eea;">Ready to Submit Your Ticket?</h3>
-                <p>If you have a traffic ticket you'd like us to handle, you can submit it online through our secure form. We'll analyze your case and fight to reduce or eliminate your fines.</p>
+                <p>If you have an Alberta traffic ticket, you can submit it online for assessment. Fabsy will review the ticket and confirm whether agent representation is permitted for the matter and court location.</p>
                 
                 <center>
                   <a href="https://fabsy.ca/ticket-form" class="button">Submit Your Ticket Now</a>
                 </center>
                 
                 <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                  <strong style="color: #92400e;">💰 Zero Risk Guarantee</strong><br>
-                  <span style="color: #92400e;">If we don't save you money on your total ticket costs, you don't pay our fee!</span>
+                  <strong style="color: #92400e;">Pricing</strong><br>
+                  <span style="color: #92400e;">Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</span>
                 </div>
                 
                 <p style="margin-top: 30px;">Have questions? Simply reply to this email or call us during business hours.</p>
                 
                 <p style="margin-bottom: 0;"><strong>The Fabsy Team</strong><br>
-                <span style="color: #6b7280;">Alberta's Traffic Ticket Specialists</span></p>
+                <span style="color: #6b7280;">Agent services for Alberta traffic matters. Fabsy is not a law firm.</span></p>
                 
                 ${getFabsyEmailSignature()}
               </div>

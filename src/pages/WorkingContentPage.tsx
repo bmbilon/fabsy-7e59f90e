@@ -7,24 +7,216 @@ import FAQSection from '@/components/FAQSection';
 import ArticleSchema from '@/components/ArticleSchema';
 import ServiceSchema from '@/components/ServiceSchema';
 import LocalBusinessSchema from '@/components/LocalBusinessSchema';
-import StaticJsonLd from '@/components/StaticJsonLd';
 import HowToSchema from '@/components/HowToSchema';
 import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnswerBox from '@/components/AnswerBox';
 
+type PageRecord = Record<string, unknown>;
+
+const BANNED_CONTENT_RE = /(?:no\s+win\s+no\s+fee|risk[\s-]*free|money\s+back|guarantee|zero[\s-]*risk)/i;
+const SEMANTIC_OVER_CAP_RE = /\b(?:above|greater\s+than|more\s+than|over)\s+95\s*%\+?|\b95\s*%\+?\s+(?:or\s+(?:higher|more)|and\s+above)\b/i;
+const LAWYER_STATUS_RE = /\b(?:Fabsy(?:'s)?|our(?:\s+\w+){0,3})\s+(?:lawyers?|attorneys?|legal\s+team)\b|\b(?:lawyers?|attorneys?)\s+(?:at|from)\s+Fabsy\b|\bFabsy\s+(?:is|operates\s+as)\s+(?!not\b)(?:an?\s+)?law\s+firm\b|\b(?:Fabsy|we)\s+(?:provides?|offers?)\s+legal\s+advice\b/i;
+const UNSAFE_HTML_RE = /<\s*\/?\s*(?:base|button|embed|form|iframe|input|link|math|meta|object|option|script|select|style|svg|textarea)\b|\b(?:formaction|on[a-z]+|src|srcdoc|srcset|style|xlink:href)\s*=|\b(?:data|javascript|vbscript)\s*:|\bexpression\s*\(|\burl\s*\(/i;
+const ALLOWED_CONTENT_TAGS = new Set(['a', 'b', 'h2', 'li', 'p', 'strong', 'ul']);
+let curatedSlugsPromise: Promise<Set<string>> | null = null;
+
+const text = (value: unknown): string => typeof value === 'string' ? value.trim() : '';
+
+const hasUnsafeHtml = (value: string): boolean => {
+  if (UNSAFE_HTML_RE.test(value)) return true;
+  for (const match of value.matchAll(/<\s*\/?\s*([a-z][a-z0-9-]*)\b[^>]*>/gi)) {
+    if (!ALLOWED_CONTENT_TAGS.has(match[1].toLowerCase())) return true;
+  }
+  return false;
+};
+
+const hasOverCapPercentage = (value: string): boolean => {
+  if (SEMANTIC_OVER_CAP_RE.test(value)) return true;
+  for (const match of value.matchAll(/\b(\d{1,3}(?:\.\d+)?)\s*%\+?/g)) {
+    if (Number(match[1]) > 95) return true;
+  }
+  return false;
+};
+
+const hasFabsyPricingSignal = (value: string): boolean =>
+  /\$\s*488\b|\bflat\s+\$\s*\d|\b(?:admin|base|contingency|representation|service)\s+fee\b|\bFabsy\b[^.!?\n]{0,100}(?:\$\s*\d|\b(?:charges?|costs?|fees?|pricing)\b)|\b(?:pricing|fee\s+structure|only\s+pay)\b|\b30\s*(?:%|percent)\b[^.!?\n]{0,100}\bfine\s+reduction\b/i.test(value);
+
+const hasCompleteFabsyPricing = (value: string): boolean =>
+  /\$\s*488\b/i.test(value)
+  && /\b30\s*(?:%|percent)\b/i.test(value)
+  && /\bfine\s+reduction\b/i.test(value)
+  && /\bno\s+additional\s+charge\b/i.test(value)
+  && /\bfine\s+is\s+not\s+reduced\b/i.test(value);
+
+const pricingClaimsAreComplete = (page: PageRecord): boolean => {
+  const fields: string[] = [
+    text(page.meta_title),
+    text(page.meta_description),
+    text(page.h1),
+    text(page.hook),
+    text(page.what),
+    text(page.how),
+    text(page.next),
+    ...(Array.isArray(page.bullets) ? page.bullets.map(text) : []),
+    ...(Array.isArray(page.faqs)
+      ? page.faqs.map((faq) => {
+          if (!faq || typeof faq !== 'object') return '';
+          const item = faq as Record<string, unknown>;
+          return `${text(item.q)} ${text(item.a)}`.trim();
+        })
+      : []),
+  ].filter(Boolean);
+
+  return fields.every((field) => !hasFabsyPricingSignal(field) || hasCompleteFabsyPricing(field));
+};
+
+const loadCuratedSlugs = async (): Promise<Set<string>> => {
+  if (!curatedSlugsPromise) {
+    curatedSlugsPromise = fetch('/prerendered/content-manifest.json')
+      .then(async response => {
+        if (!response.ok) return new Set<string>();
+        const manifest = await response.json() as { curatedSlugs?: unknown };
+        return new Set(
+          Array.isArray(manifest.curatedSlugs)
+            ? manifest.curatedSlugs.filter((value): value is string => typeof value === 'string')
+            : []
+        );
+      })
+      .catch(() => new Set<string>());
+  }
+  return curatedSlugsPromise;
+};
+
+const hasReviewedCuratedBody = (page: PageRecord): boolean => {
+  const body = [page.hook, page.what, page.how, page.next].map(text);
+  if (body.some(value => !value)) return false;
+  const htmlFields = [
+    text(page.what),
+    text(page.how),
+    text(page.next),
+    ...(Array.isArray(page.faqs)
+      ? page.faqs.map((faq) => {
+          if (!faq || typeof faq !== 'object') return '';
+          return text((faq as Record<string, unknown>).a);
+        })
+      : []),
+  ];
+  if (htmlFields.some(hasUnsafeHtml)) return false;
+
+  const searchable = JSON.stringify({
+    meta_title: page.meta_title,
+    meta_description: page.meta_description,
+    h1: page.h1,
+    hook: page.hook,
+    bullets: page.bullets,
+    what: page.what,
+    how: page.how,
+    next: page.next,
+    faqs: page.faqs,
+  });
+  return !BANNED_CONTENT_RE.test(searchable)
+    && !searchable.includes('\u2014')
+    && !hasOverCapPercentage(searchable)
+    && !LAWYER_STATUS_RE.test(searchable)
+    && pricingClaimsAreComplete(page);
+};
+
+const safeLegacyH1 = (page: PageRecord): string => {
+  const candidate = text(page.h1)
+    .replace(/\s*\|\s*\d{1,3}%\+?\s+success(?:\s+rate)?\s*$/i, '')
+    .trim();
+  if (
+    !candidate ||
+    BANNED_CONTENT_RE.test(candidate) ||
+    candidate.includes('\u2014') ||
+    /\$\s*\d|\b\d+\s*(?:demerit|days?|months?|years?)\b/i.test(candidate)
+  ) {
+    const city = text(page.city);
+    return city ? `Traffic Ticket Options in ${city}` : 'Alberta Traffic Ticket Options';
+  }
+  return candidate;
+};
+
+const safeLegacyPage = (page: PageRecord): PageRecord => {
+  const city = text(page.city);
+  const violation = text(page.violation);
+  const h1 = safeLegacyH1(page);
+  const titleBase = h1.replace(/\s*\|\s*Fabsy\s*$/i, '');
+  const metaTitle = `${titleBase.slice(0, 52).trim()} | Fabsy`;
+  const ticketLabel = violation ? `${violation.toLowerCase()} ticket` : 'traffic ticket';
+  const place = city ? ` in ${city}` : ' in Alberta';
+  const pricing = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.';
+
+  return {
+    ...page,
+    meta_title: metaTitle,
+    meta_description: `Review options for a ${ticketLabel}${place}, check the deadline printed on the ticket, and request a Fabsy assessment.`,
+    h1,
+    hook: `Check the dispute deadline printed on your ${ticketLabel} and review your options before deciding how to respond.`,
+    bullets: [
+      'The dispute deadline is printed on the ticket.',
+      'Keep the ticket and any relevant photos, video, or documents.',
+      'Fabsy is an Alberta traffic ticket agent service, not a law firm.',
+    ],
+    what: `<h2>What to do next</h2><p>Follow the instructions and deadline printed on the ticket. Keep a copy and gather any relevant documents before choosing how to respond.</p>`,
+    how: `<h2>How Fabsy can help</h2><p>Fabsy can assess the ticket, explain the available options, and provide agent representation where permitted.</p>`,
+    next: `<h2>Pricing</h2><p>${pricing}</p>`,
+    content: '',
+    local_info: city ? `Fabsy serves ${city} where paid traffic ticket agent representation is permitted.` : '',
+    stats: {},
+    faqs: [
+      {
+        q: 'What should I do after receiving an Alberta traffic ticket?',
+        a: 'Check the dispute deadline printed on the ticket, keep a copy, and gather any relevant photos, video, or documents before choosing how to respond.',
+      },
+      {
+        q: 'How much does Fabsy charge for representation?',
+        a: pricing,
+      },
+      {
+        q: 'Is Fabsy a law firm?',
+        a: 'No. Fabsy is an agent service for Alberta traffic matters, not a law firm.',
+      },
+    ],
+  };
+};
+
+const normalizePageForDisplay = (page: PageRecord, curated: boolean): PageRecord => {
+  let faqs: unknown = page.faqs || [];
+  let faqsValid = Array.isArray(faqs);
+  if (typeof page.faqs === 'string') {
+    try {
+      faqs = JSON.parse(page.faqs || '[]');
+      faqsValid = Array.isArray(faqs);
+    } catch {
+      faqs = [];
+      faqsValid = false;
+    }
+  }
+  const parsed = {
+    ...page,
+    faqs,
+  };
+  return curated && faqsValid && hasReviewedCuratedBody(parsed) ? parsed : safeLegacyPage(parsed);
+};
+
 const WorkingContentPage = () => {
   const { slug } = useParams();
   const [pageData, setPageData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const canonicalUrl = slug ? `https://fabsy.ca/content/${slug}` : undefined;
 
   // Safe head management (replaces React Helmet)
   useSafeHead({
     title: pageData?.meta_title || pageData?.h1 || `Content - ${slug}` || 'Fabsy',
     description: pageData?.meta_description || 'Trusted traffic ticket defence in Alberta',
-    canonical: slug ? `https://fabsy.ca/content/${slug}` : undefined
+    canonical: canonicalUrl,
+    robots: slug && /^(?:test(?:-|$)|verify-smoke(?:-|$))/.test(slug)
+      ? 'noindex, nofollow'
+      : 'index, follow',
   });
 
   useEffect(() => {
@@ -35,25 +227,20 @@ const WorkingContentPage = () => {
       setError(null);
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from('page_content')
-          .select('*')
-          .eq('slug', slug)
-          .single();
+        const [pageResult, curatedSlugs] = await Promise.all([
+          supabase
+            .from('page_content')
+            .select('*')
+            .eq('slug', slug)
+            .single(),
+          loadCuratedSlugs(),
+        ]);
+        const { data, error: fetchError } = pageResult;
 
         if (fetchError) throw fetchError;
         if (!data) throw new Error('Page not found');
 
-        // Parse JSON fields if they exist
-        const parsedData = {
-          ...data,
-          faqs: typeof data.faqs === 'string' ? JSON.parse(data.faqs || '[]') : (data.faqs || []),
-          stats: typeof (data as Record<string, unknown>).stats === 'string' 
-            ? JSON.parse((data as Record<string, unknown>).stats as string || '{}') 
-            : ((data as Record<string, unknown>).stats || {}),
-        };
-
-        setPageData(parsedData);
+        setPageData(normalizePageForDisplay(data, curatedSlugs.has(slug)));
       } catch (err) {
         console.error('Error fetching page:', err);
         setError(err instanceof Error ? err.message : 'Failed to load page');
@@ -94,7 +281,7 @@ const WorkingContentPage = () => {
     );
   }
 
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : `https://fabsy.ca/content/${pageData.slug}`;
+  const currentUrl = canonicalUrl || `https://fabsy.ca/content/${String(pageData.slug)}`;
 
   // Derive Service schema fields with enhanced city detection
   const detectCityFromSlug = (slug: string): string | null => {
@@ -144,21 +331,6 @@ const WorkingContentPage = () => {
     || (pageData.h1 && (/Fight\s+(?:a|an)\s+(.+?)\s+in\s+/i.exec(pageData.h1 as string)?.[1]?.trim()))
     || 'traffic ticket');
 
-  // FAQ JSON-LD (if FAQs present)
-  const faqEntities = Array.isArray(pageData.faqs)
-    ? pageData.faqs
-        .map((f: Record<string, unknown>) => ({ 
-          q: typeof f.q === 'string' ? f.q.trim() : '', 
-          a: typeof f.a === 'string' ? f.a.trim() : '' 
-        }))
-        .filter((f: { q: string; a: string }) => f.q && f.a)
-        .map((f: { q: string; a: string }) => ({
-          '@type': 'Question',
-          name: f.q,
-          acceptedAnswer: { '@type': 'Answer', text: f.a },
-        }))
-    : [];
-
   return (
     <main className="min-h-screen bg-background">
       <ArticleSchema 
@@ -173,54 +345,26 @@ const WorkingContentPage = () => {
         serviceType={serviceType}
         url={currentUrl}
         cityName={cityName}
-        offerDescription="Flat $488 fee plus 30% of any fine reduction"
-        price="0"
-        priceCurrency="CAD"
+        offerDescription="Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
       />
       {/* Enhanced LocalBusiness schema for Alberta city pages */}
       {cityName && (
         <LocalBusinessSchema 
           url={currentUrl}
           cityName={cityName}
-          aggregateRating={{
-            ratingValue: 4.9,
-            reviewCount: pageData.stats?.reviewCount || 127,
-            bestRating: 5,
-            worstRating: 1
-          }}
         />
       )}
       {/* HowTo for cornerstone flows */}
       <HowToSchema
         name={`How to fight a ${offence.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'} (3 steps)`}
-        description={`Fast, proven process to fight a ${offence.toLowerCase()}${cityName ? ` in ${cityName}` : ''}.`}
+        description={`Three-step process to dispute a ${offence.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'}.`}
         url={currentUrl}
         steps={[
           { name: 'Upload your ticket', text: 'Send us a photo or PDF of your ticket and basic details.' },
           { name: 'We check the court file', text: 'We obtain and review disclosure for errors and defenses.' },
-          { name: 'Confirm the plan', text: 'We represent you and work to keep demerits off your record.' },
+          { name: 'Confirm the plan', text: 'We explain the options and provide agent representation where permitted.' },
         ]}
-        totalTime="PT3M"
       />
-      {/* Always render FAQPage schema if we have any FAQ data */}
-      {faqEntities.length > 0 && (
-        <StaticJsonLd
-          schema={{
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: faqEntities,
-          }}
-          dataAttr="faq"
-        />
-      )}
-      {/* Debug: Log FAQ data availability */}
-      {typeof window !== 'undefined' && console.log('FAQ Debug:', {
-        hasFaqs: Array.isArray(pageData.faqs),
-        faqCount: pageData.faqs ? pageData.faqs.length : 0,
-        faqEntityCount: faqEntities.length,
-        sampleFaq: pageData.faqs?.[0]
-      })}
-
       <Header />
 
       {/* Hero Section with subtle background */}
@@ -262,8 +406,8 @@ const WorkingContentPage = () => {
           <div className="mb-8 rounded-xl border bg-card shadow-sm p-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-lg font-semibold text-foreground mb-2">Can I fight it?</h2>
-                <p className="text-foreground">Yes, most {offence.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'} can be fought. You're more likely to qualify if you act within 7 days, request disclosure, and avoid admitting fault.</p>
+                <h2 className="text-lg font-semibold text-foreground mb-2">Can I dispute it?</h2>
+                <p className="text-foreground">You can dispute a {offence.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'}. Follow the instructions on the ticket and act by the deadline printed on it.</p>
                 <h3 className="mt-4 text-sm font-semibold text-foreground">What to do now (3 steps)</h3>
                 <ol className="mt-2 list-decimal ml-5 space-y-1 text-foreground">
                   <li>Upload your ticket</li>
@@ -272,53 +416,16 @@ const WorkingContentPage = () => {
                 </ol>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-foreground">Outcome expectations</h3>
-                <p className="text-foreground">Keep demerits off your record; avoid ${pageData.stats?.avgSavings || 1650}–$7,000 in lifetime insurance costs.</p>
+                <h3 className="text-sm font-semibold text-foreground">What happens next</h3>
+                <p className="text-foreground">We review the ticket and disclosure, explain the available options, and provide agent representation where permitted.</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Pricing</h3>
-                <p className="text-foreground">A flat $488 to fight your ticket, plus 30% of any fine reduction we win.</p>
+                <p className="text-foreground">Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>
                 <p className="text-foreground">{cityName || 'Alberta'} • {offence.charAt(0).toUpperCase() + offence.slice(1)}</p>
               </div>
             </div>
           </div>
 
-          {/* Stats Grid */}
-          {pageData.stats && Object.keys(pageData.stats).length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {pageData.stats.avgFine && (
-                <div className="bg-card rounded-xl p-4 border shadow-sm">
-                  <div className="text-destructive text-2xl font-bold">
-                    ${pageData.stats.avgFine}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Typical Fine</div>
-                </div>
-              )}
-              {pageData.stats.insuranceIncrease && (
-                <div className="bg-card rounded-xl p-4 border shadow-sm">
-                  <div className="text-orange-600 text-2xl font-bold">
-                    ${pageData.stats.insuranceIncrease}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Insurance Impact</div>
-                </div>
-              )}
-              {pageData.stats.successRate && (
-                <div className="bg-card rounded-xl p-4 border shadow-sm">
-                  <div className="text-primary text-2xl font-bold">
-                    {pageData.stats.successRate}%
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Success Rate</div>
-                </div>
-              )}
-              {pageData.stats.avgSavings && (
-                <div className="bg-card rounded-xl p-4 border shadow-sm">
-                  <div className="text-primary text-2xl font-bold">
-                    ${pageData.stats.avgSavings}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Avg Savings</div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
@@ -429,19 +536,19 @@ const WorkingContentPage = () => {
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start gap-3">
                     <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-                    <span className="text-foreground leading-relaxed">Only 7 days to file your dispute</span>
+                    <span className="text-foreground leading-relaxed">Act by the deadline printed on your ticket</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-                    <span className="text-foreground leading-relaxed">Prevent insurance rate increases</span>
+                    <span className="text-foreground leading-relaxed">Keep the ticket and related documents</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-                    <span className="text-foreground leading-relaxed">Protect your driving record</span>
+                    <span className="text-foreground leading-relaxed">Request and review disclosure</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-<span className="text-foreground leading-relaxed"><Link to="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">{pageData.stats?.successRate || 94}% success rate</Link></span>
+                    <span className="text-foreground leading-relaxed">Confirm whether agent representation is permitted</span>
                   </li>
                 </ul>
               </div>
@@ -455,7 +562,7 @@ const WorkingContentPage = () => {
                   Fight Your {pageData.violation || 'Traffic'} Ticket
                 </h3>
                 <p className="text-sm mb-5 opacity-95">
-<Link to="/proof" className="underline decoration-dashed underline-offset-4 hover:text-primary">{pageData.stats?.successRate || 94}% success rate</Link> • Save ${pageData.stats?.avgSavings || 1650}+ on average
+                  Start with a free ticket analysis. Representation is available where paid agent representation is permitted.
                 </p>
                 <Link to="/submit-ticket">
                   <Button 
@@ -465,7 +572,7 @@ const WorkingContentPage = () => {
                     Get Free Analysis →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">Free consultation • Flat $488 to fight, 30% only if we win</p>
+                <p className="text-xs mt-3 opacity-80 text-center">Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</p>
               </div>
 
               {/* Related Resources */}

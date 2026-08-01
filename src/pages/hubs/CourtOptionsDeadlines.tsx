@@ -3,9 +3,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
+import useSafeHead from '@/hooks/useSafeHead';
 
 const CourtOptionsDeadlines: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/court-options-and-deadlines';
+  useSafeHead({
+    title: 'Ticket Options and Deadlines | Fabsy Alberta',
+    description: 'Check the response choices and deadline printed on your Alberta traffic ticket, keep the ticket, and confirm current court instructions.',
+    canonical: url,
+  });
   const topCityPages = [
     { url: '/content/fight-speeding-ticket-calgary', name: 'Speeding, Calgary' },
     { url: '/content/fight-distracted-ticket-edmonton', name: 'Distracted, Edmonton' },
@@ -17,9 +23,9 @@ const CourtOptionsDeadlines: React.FC = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Court Options & Deadlines, Fabsy',
+    name: 'Ticket Options and Deadlines, Fabsy',
     url,
-    description: 'Your options after receiving a ticket in Alberta and key deadlines (dispute filing, disclosure, court dates).',
+    description: 'General information about checking the choices and deadline printed on an Alberta traffic ticket and confirming current court instructions.',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -38,22 +44,23 @@ const CourtOptionsDeadlines: React.FC = () => {
       <StaticJsonLd schema={schema} dataAttr="webpage" />
       <Header />
       <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Court Options & Deadlines</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Ticket Options and Deadlines</h1>
         <p className="text-muted-foreground mb-8">
-          Avoid missed deadlines. Learn your choices: pay, dispute, disclosure, negotiation, trial, and what each means.
+          Start with the response choices and deadline printed on the ticket. Court processes and
+          available options depend on the ticket and current instructions.
         </p>
 
         <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-3 text-foreground">Key timelines</h2>
+          <h2 className="text-2xl font-bold mb-3 text-foreground">What to check</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
-            <li>Dispute filing deadline (on your ticket): missing it reduces options substantially.</li>
-            <li>Disclosure request should be prompt to allow time for review.</li>
-            <li>Court dates: appearance scheduling and adjournment rules vary by venue.</li>
+            <li>Read the response choices and deadline printed on the ticket.</li>
+            <li>Keep the ticket and any relevant photos, video, or documents.</li>
+            <li>Confirm current filing, disclosure, and appearance instructions with the court or an authorized service provider.</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-3 text-foreground">Expert trails: top city pages</h2>
+          <h2 className="text-2xl font-bold mb-3 text-foreground">Related city pages</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
             {topCityPages.map((p) => (
               <li key={p.url}>

@@ -1,125 +1,66 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { GraduationCap, Scale, Handshake, Car } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import '../styles/fabsy-theme.scss';
+import useSafeHead from '@/hooks/useSafeHead';
 
 const Founder = () => {
+  useSafeHead({
+    title: 'Lauren Bilon, Fabsy Founder | Alberta Agent Service',
+    description: 'Meet Lauren Bilon, founder of Fabsy Traffic Ticket Services, an Alberta traffic ticket agent service that is not a law firm.',
+    canonical: 'https://fabsy.ca/founder',
+  });
   return (
     <>
-      <Helmet>
-        <title>Lauren Bilon - Founder | Fabsy Traffic Services</title>
-        <meta name="description" content="Meet Lauren Bilon, founder of Fabsy Traffic Services. Dedicated to helping Alberta drivers fight traffic tickets with expert defense strategies." />
-      </Helmet>
-
       <div className="fabsy-hero">
         <div className="container">
           <h1 className="hero-title">Meet Lauren Bilon</h1>
           <p className="hero-sub">
-            Founder & Lead Traffic Defense Specialist at Fabsy Traffic Services
+            Founder at Fabsy Traffic Ticket Services
           </p>
         </div>
       </div>
 
       <div className="section">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '32px' }}>
+          <div className="grid grid-cols-1 gap-8">
             
             {/* Main content */}
             <div className="fabsy-card">
-              <h2>Expert Traffic Defense for Alberta Drivers</h2>
+              <h2>About Lauren</h2>
               <p>
-                Lauren Bilon founded Fabsy Traffic Services with a clear mission: to provide Alberta drivers 
-                with expert traffic ticket defense that's both accessible and effective. With years of 
-                experience navigating Alberta's traffic court system, Lauren has built a practice focused 
-                on achieving real results for her clients.
+                Lauren Bilon is the founder of Fabsy Traffic Ticket Services, an Alberta traffic ticket
+                agent service.
               </p>
-              
-              <h3>The Fabsy Difference</h3>
               <p>
-                What sets Lauren apart is her deep understanding of both the legal landscape and the 
-                challenges drivers face when dealing with traffic violations. She recognized that 
-                many people felt intimidated by the legal process and needed an advocate who would not 
-                only fight for them but also educate them about their rights.
-              </p>
-              
-              <p>
-                "Every ticket tells a story," Lauren explains. "My job is to examine every detail, 
-                challenge every assumption, and ensure my clients get the fair treatment they deserve. 
-                It's not just about avoiding points on your license, it's about justice."
+                Fabsy is not a law firm and does not provide legal advice. It provides traffic ticket
+                agent services where permitted and available.
               </p>
             </div>
 
-            {/* Experience section */}
+            {/* Mission section */}
             <div className="fabsy-card">
-              <h3>Professional Excellence</h3>
-              <div className="hiw-list">
-                <div className="step">
-                  <div className="step__icon"><GraduationCap className="h-8 w-8" aria-hidden="true" /></div>
-                  <div>
-                    <div className="step__title">Specialized Training</div>
-                    <div className="step__meta">
-                      Certified in Alberta traffic law with ongoing professional development 
-                      in defense strategies and court procedures.
-                    </div>
-                  </div>
-                </div>
-
-                <div className="step">
-                  <div className="step__icon"><Scale className="h-8 w-8" aria-hidden="true" /></div>
-                  <div>
-                    <div className="step__title">Proven Track Record</div>
-                    <div className="step__meta">
-                      Successfully defended hundreds of traffic tickets across Alberta, 
-                      with a focus on challenging evidence and procedural errors.
-                    </div>
-                  </div>
-                </div>
-
-                <div className="step">
-                  <div className="step__icon"><Handshake className="h-8 w-8" aria-hidden="true" /></div>
-                  <div>
-                    <div className="step__title">Client-Centered Approach</div>
-                    <div className="step__meta">
-                      Provides personalized service with clear communication throughout 
-                      the entire defense process.
-                    </div>
-                  </div>
-                </div>
-
-                <div className="step">
-                  <div className="step__icon"><Car className="h-8 w-8" aria-hidden="true" /></div>
-                  <div>
-                    <div className="step__title">Comprehensive Coverage</div>
-                    <div className="step__meta">
-                      Handles all types of traffic violations including speeding, 
-                      red light cameras, distracted driving, and more.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mission statement */}
-            <div className="alert is-info">
-              <h3 style={{ marginBottom: '12px' }}>Lauren's Mission</h3>
-              <p style={{ marginBottom: '0' }}>
-                "I believe every driver deserves skilled representation when facing traffic charges. 
-                My commitment is to provide that representation with integrity, expertise, and 
-                unwavering dedication to achieving the best possible outcome for each client."
+              <h2>Fabsy's Mission</h2>
+              <p>
+                Fabsy's mission is to make Alberta traffic ticket agent services easier to understand
+                and access. The service begins with a review of the ticket information submitted by
+                the client.
+              </p>
+              <p>
+                Availability and scope depend on the matter, the court location, and whether agent
+                representation is permitted.
               </p>
             </div>
 
             {/* Call to action */}
-            <div className="fabsy-card" style={{ textAlign: 'center' }}>
-              <h3>Ready to Fight Your Traffic Ticket?</h3>
+            <div className="fabsy-card text-center">
+              <h3>Ready to Submit Your Ticket?</h3>
               <p>
-                Get Lauren's expertise on your side. Contact Fabsy Traffic Services today 
-                for a free consultation about your traffic defense options.
+                Send Fabsy the ticket information for review. Submission does not mean the matter
+                has been accepted.
               </p>
               
-              <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '24px' }}>
-                <a href="/contact" className="btn is-primary">Get Free Consultation</a>
-                <a href="/how-it-works" className="btn is-secondary">Learn Our Process</a>
+              <div className="mt-6 flex flex-wrap justify-center gap-4">
+                <Link to="/submit-ticket" className="btn is-primary">Submit Your Ticket</Link>
+                <Link to="/how-it-works" className="btn is-secondary">Learn the Process</Link>
               </div>
             </div>
 

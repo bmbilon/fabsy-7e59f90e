@@ -9,88 +9,39 @@ type Props = {
   priceRange?: string;
   telephone?: string;
   email?: string;
-  address?: {
-    streetAddress?: string;
-    addressLocality: string;
-    addressRegion: string;
-    postalCode?: string;
-    addressCountry: string;
-  };
-  geo?: {
-    latitude: number;
-    longitude: number;
-  };
-  aggregateRating?: {
-    ratingValue: number;
-    reviewCount: number;
-    bestRating?: number;
-    worstRating?: number;
-  };
-  openingHours?: string[];
-  sameAs?: string[];
-  paymentAccepted?: string[];
-  currenciesAccepted?: string;
 };
 
 /**
- * LocalBusinessSchema emits enhanced LocalBusiness + LegalService JSON-LD 
- * for Alberta city-specific landing pages with AEO optimization
+ * LocalBusinessSchema emits service-area business data for city landing pages.
  */
 const LocalBusinessSchema: React.FC<Props> = ({
-  name = 'Fabsy Traffic Services',
+  name = 'Fabsy Traffic Ticket Services',
   url,
   cityName,
-  serviceArea = `${cityName}, Alberta, Canada`,
-  priceRange = '$',
-  telephone = '+1-825-793-2279',
-  email = 'hello@fabsy.ca',
-  address = {
-    addressLocality: cityName,
-    addressRegion: 'AB',
-    addressCountry: 'CA'
-  },
-  geo,
-  aggregateRating = {
-    ratingValue: 4.9,
-    reviewCount: 127,
-    bestRating: 5,
-    worstRating: 1
-  },
-  openingHours = [
-    'Mo-Fr 08:00-18:00',
-    'Sa 09:00-17:00'
-  ],
-  sameAs = [
-    'https://www.instagram.com/fabsy.alberta',
-    'https://www.google.com/search?q=Fabsy+Alberta+traffic+tickets',
-    'https://www.facebook.com/fabsy.alberta'
-  ],
-  paymentAccepted = ['Cash', 'Credit Card', 'Debit Card', 'Check', 'Invoice'],
-  currenciesAccepted = 'CAD'
+  serviceArea = 'Alberta, Canada',
+  priceRange = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.',
+  telephone = '(825) 793-2279',
+  email = 'hello@fabsy.ca'
 }) => {
   if (!url || !cityName) return null;
 
+  const pricing = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.';
+  const services = [
+    'Speeding ticket agent representation',
+    'Red light ticket agent representation',
+    'Careless driving ticket agent representation',
+    'Distracted driving ticket agent representation'
+  ];
+
   const localBusinessSchema = {
     '@context': 'https://schema.org',
-    '@type': ['LocalBusiness', 'LegalService', 'ProfessionalService'],
-    '@id': url,
-    name: `${name} - ${cityName}`,
-    alternateName: [`Fabsy ${cityName}`, `Traffic Ticket Defense ${cityName}`, `Fight Traffic Tickets ${cityName}`],
-  description: `Yes, you can fight traffic tickets in ${cityName}, Alberta. Professional defense services for speeding, red light, careless driving, and distracted driving charges. Expert representation for a flat $488 fee plus 30% of any fine reduction we win.`,
+    '@type': ['LocalBusiness', 'ProfessionalService'],
+    '@id': `${url}#business`,
+    name,
+    description: `Traffic ticket agent representation in ${cityName}, Alberta, where paid agent representation is permitted. Fabsy is not a law firm. ${pricing}`,
     url,
     telephone,
     email,
-    address: {
-      '@type': 'PostalAddress',
-      ...address
-    },
-    ...(geo && {
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: geo.latitude,
-        longitude: geo.longitude
-      }
-    }),
     areaServed: [
       {
         '@type': 'City',
@@ -109,174 +60,20 @@ const LocalBusinessSchema: React.FC<Props> = ({
         name: serviceArea
       }
     ],
-    serviceType: [
-      'Traffic ticket defense',
-      'Provincial offences representation',
-      'Motor vehicle dispute resolution',
-      'Legal representation services'
-    ],
+    serviceType: services,
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: `Traffic Ticket Services in ${cityName}`,
-      itemListElement: [
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: `Speeding Ticket Defense - ${cityName}`,
-            description: `Expert defense for speeding violations in ${cityName}. Protect your driving record and prevent insurance increases.`
-          },
-          priceSpecification: {
-            '@type': 'PriceSpecification',
-            price: '0',
-            priceCurrency: 'CAD',
-            description: 'Flat $488 fee plus 30% of any fine reduction'
-          }
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: `Red Light Ticket Defense - ${cityName}`,
-            description: `Professional representation for red light camera violations in ${cityName}.`
-          },
-          priceSpecification: {
-            '@type': 'PriceSpecification',
-            price: '0',
-            priceCurrency: 'CAD',
-            description: 'Risk-free representation'
-          }
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: `Careless Driving Defense - ${cityName}`,
-            description: `Expert defense against careless driving charges in ${cityName}, Alberta.`
-          }
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: `Distracted Driving Defense - ${cityName}`,
-            description: `Professional representation for distracted driving tickets in ${cityName}.`
-          }
+      itemListElement: services.map(serviceName => ({
+        '@type': 'Offer',
+        description: pricing,
+        itemOffered: {
+          '@type': 'Service',
+          name: serviceName
         }
-      ]
+      }))
     },
-    priceRange,
-    paymentAccepted,
-    currenciesAccepted,
-    openingHours,
-    sameAs,
-    logo: {
-      '@type': 'ImageObject',
-      url: 'https://fabsy.ca/logo.png',
-      width: 300,
-      height: 100
-    },
-    image: {
-      '@type': 'ImageObject',
-      url: 'https://fabsy.ca/og-image.jpg',
-      width: 1200,
-      height: 630
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ...aggregateRating
-    },
-    review: [
-      {
-        '@type': 'Review',
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: 5,
-          bestRating: 5
-        },
-        author: {
-          '@type': 'Person',
-          name: 'Sarah M.'
-        },
-        reviewBody: `Excellent service in ${cityName}. They got my speeding ticket reduced and kept the demerits off my record. Professional and communicative throughout.`,
-        datePublished: '2024-09-15'
-      },
-      {
-        '@type': 'Review',
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: 5,
-          bestRating: 5
-        },
-        author: {
-          '@type': 'Person',
-          name: 'Jennifer L.'
-        },
-        reviewBody: 'The flat-fee pricing worked exactly as described. Great outcome for my red light ticket case.',
-        datePublished: '2024-08-22'
-      }
-    ],
-    slogan: 'Expert Traffic Ticket Defense for Alberta Drivers',
-    foundingDate: '2020',
-    knowsAbout: [
-      'Alberta Traffic Safety Act',
-      'Provincial Offences Procedure Act',
-      'Photo radar regulations',
-      'Traffic court procedures',
-      'Insurance demerit systems',
-      `${cityName} traffic enforcement`,
-      'Motor vehicle legislation'
-    ],
-    memberOf: {
-      '@type': 'Organization',
-      name: 'Alberta Paralegal Association'
-    },
-    certifications: [
-      'Alberta Traffic Ticket Representative',
-      'Provincial Offences Agent Certification'
-    ],
-    hasCredential: {
-      '@type': 'EducationalOccupationalCredential',
-      credentialCategory: 'Professional Certification',
-      recognizedBy: {
-        '@type': 'Organization',
-        name: 'Government of Alberta'
-      }
-    },
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: `Can I fight a speeding ticket in ${cityName}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `Yes, you can fight a speeding ticket in ${cityName}, Alberta. Most speeding tickets can be successfully disputed through proper legal representation. We help preserve your driving record and prevent insurance increases for a flat $488 fee plus 30% of any fine reduction we win.`
-        }
-      },
-      {
-        '@type': 'Question', 
-        name: `How to fight a red light ticket in ${cityName}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `To fight a red light ticket in ${cityName}, you need to dispute it within 7 days and request disclosure. Our expert representatives review camera evidence, timing calibration, and procedural errors to build your defense. We achieve favorable outcomes in most cases.`
-        }
-      },
-      {
-        '@type': 'Question',
-        name: `What happens if I get caught driving without insurance in ${cityName}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `Driving without insurance in ${cityName} carries serious penalties including fines up to $2,875, license suspension, and vehicle impoundment. However, many charges can be reduced or dismissed with proper legal representation, especially if you had valid coverage that wasn't properly documented.`
-        }
-      },
-      {
-        '@type': 'Question',
-        name: `How to fight a careless driving ticket in ${cityName}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `Fighting a careless driving ticket in ${cityName} requires challenging the officer's subjective assessment and evidence. Our representatives examine witness statements, road conditions, and procedural compliance to build a strong defense. Careless driving charges often have successful defense strategies.`
-        }
-      }
-    ]
+    priceRange
   };
 
   return <StaticJsonLd schema={localBusinessSchema} dataAttr={`localbusiness-${cityName.toLowerCase()}`} />;

@@ -16,10 +16,10 @@ type Props = {
 const ArticleSchema: React.FC<Props> = ({
   headline,
   description,
-  author = "Fabsy Traffic Services",
+  author = "Fabsy Traffic Ticket Services",
   datePublished = new Date().toISOString(),
   dateModified = new Date().toISOString(),
-  image = "https://fabsy.ca/og-image.jpg",
+  image,
   url,
 }) => {
   useEffect(() => {
@@ -31,12 +31,12 @@ const ArticleSchema: React.FC<Props> = ({
       "@type": "Article",
       headline,
       description,
-      image,
+      ...(image ? { image } : {}),
       author: { "@type": "Organization", name: author },
       publisher: {
         "@type": "Organization",
-        name: "Fabsy Traffic Services",
-        logo: { "@type": "ImageObject", url: "https://fabsy.ca/logo.png" },
+        name: "Fabsy Traffic Ticket Services",
+        logo: { "@type": "ImageObject", url: "https://fabsy.ca/favicon.svg" },
       },
       datePublished,
       dateModified,

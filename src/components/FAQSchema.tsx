@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { faqAnswerHtml } from '@/lib/faq-format';
 
 export type FAQItem = {
   q: string; // exact visible question text
@@ -10,39 +11,24 @@ type Props = {
   pageName?: string;
   pageUrl?: string;
   includeBreadcrumb?: boolean;
-  className?: string;
 };
 
 /**
  * FAQSchema
- * - Renders visible FAQ HTML and server-side JSON-LD (via Helmet).
- * - Uses the SAME strings for visible HTML and JSON-LD to guarantee exact-match parity.
+ * - Injects FAQ JSON-LD for FAQSection.
+ * - Uses the same answer formatter as the visible FAQ UI to enforce exact-match parity.
  *
  * IMPORTANT:
  * - Do NOT mutate faq q/a strings after generation (smart quotes, trimming, formatting).
  * - This component is SSR-friendly and should be included in the SSG/SSR render so JSON-LD is present in initial HTML.
  */
-const FAQSchema: React.FC<Props> = ({ faqs = [], pageName = "", pageUrl = "", includeBreadcrumb = true, className }) => {
-  if (!Array.isArray(faqs) || faqs.length === 0) return null;
-
-  // Use up to 10 FAQs visually but at least 6 are recommended for AEO; JSON-LD will include the first 6.
-  const visualFaqs = faqs.slice(0, 10);
-  const ldFaqs = faqs.slice(0, Math.min(6, faqs.length));
-
-  // Convert a plain-text answer to consistent HTML; if raw contains tags, treat as HTML and use verbatim.
-  function toAnswerHtml(raw: string) {
-    if (!raw) return "";
-    if (/<[a-z][\s\S]*>/i.test(raw)) return raw;
-    const paragraphs = raw
-      .split(/\n{2,}/)
-      .map((p) => `<p>${escapeHtml(p.trim()).replace(/\n/g, "<br/>")}</p>`)
-      .join("");
-    return paragraphs;
-  }
+const FAQSchema: React.FC<Props> = ({ faqs = [], pageName = "", pageUrl = "", includeBreadcrumb = true }) => {
+  const hasFaqs = Array.isArray(faqs) && faqs.length > 0;
+  const safeFaqs = hasFaqs ? faqs : [];
 
   // Build mainEntity array for JSON-LD using exact HTML strings that will appear on the page.
-  const mainEntity = ldFaqs.map((f) => {
-    const visibleAnswerHtml = toAnswerHtml(f.a);
+  const mainEntity = safeFaqs.map((f) => {
+    const visibleAnswerHtml = faqAnswerHtml(f.a);
     return {
       "@type": "Question",
       name: f.q,
@@ -87,6 +73,8 @@ const FAQSchema: React.FC<Props> = ({ faqs = [], pageName = "", pageUrl = "", in
       existingBreadcrumb.remove();
     }
 
+    if (!hasFaqs) return;
+
     // Add FAQ schema
     const faqScript = document.createElement('script');
     faqScript.type = 'application/ld+json';
@@ -114,33 +102,9 @@ const FAQSchema: React.FC<Props> = ({ faqs = [], pageName = "", pageUrl = "", in
         breadcrumbToRemove.remove();
       }
     };
-  }, [faqJsonLdString, breadcrumbJsonLdString]);
+  }, [faqJsonLdString, breadcrumbJsonLdString, hasFaqs]);
 
-  return (
-    <div className={className ?? "faq-schema"}>
-      {/* Visible FAQ HTML (same strings feed JSON-LD) */}
-      <section className="faq-list" aria-label="Frequently asked questions">
-        {visualFaqs.map((f, i) => (
-          <details key={i} className="faq-item" data-faq-index={i}>
-            <summary className="faq-question" role="button" aria-expanded="false">
-              {f.q}
-            </summary>
-            <div className="faq-answer" dangerouslySetInnerHTML={{ __html: toAnswerHtml(f.a) }} />
-          </details>
-        ))}
-      </section>
-    </div>
-  );
+  return null;
 };
 
 export default FAQSchema;
-
-/* helpers */
-function escapeHtml(str: string) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}

@@ -559,7 +559,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                 {...register("fineAmount")}
                 onBlur={(e) => handleFieldUpdate("fineAmount", e.target.value)}
                 className="h-11"
-                placeholder="$150"
+                placeholder="Enter the amount shown on the ticket"
               />
               {errors.fineAmount && (
                 <p className="text-sm text-destructive">{errors.fineAmount.message}</p>

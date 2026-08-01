@@ -2,9 +2,9 @@ import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HowToSchema from "@/components/HowToSchema";
-import { Helmet } from "react-helmet-async";
 import { Shield, Upload, FileCheck, Scale, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import useSafeHead from "@/hooks/useSafeHead";
 
 /**
  * HowItWorks, content + schema in sync; short meta for AEO.
@@ -12,6 +12,11 @@ import { useNavigate } from "react-router-dom";
 
 const HowItWorks: React.FC = () => {
   const navigate = useNavigate();
+  useSafeHead({
+    title: "How Fabsy Works | Alberta Traffic Ticket Help",
+    description: "See Fabsy's five-step Alberta traffic ticket process, from ticket submission and assessment through agent representation where permitted.",
+    canonical: "https://fabsy.ca/how-it-works",
+  });
   
   // Handle file upload and navigate to submit-ticket page
   const handleTicketUpload = (file?: File | null) => {
@@ -22,31 +27,31 @@ const HowItWorks: React.FC = () => {
   const steps = [
     {
       name: "Upload your ticket",
-      text: "Take a clear photo of your traffic ticket and upload it. Our AI instantly extracts the violation, fine, and court information, it takes under 2 minutes.",
+      text: "Upload a clear image or PDF of the ticket so Fabsy can review the information you provide.",
       url: "https://fabsy.ca/submit-ticket",
       icon: Upload,
     },
     {
       name: "Get a free analysis",
-      text: "Within minutes, receive a clear analysis showing your chances of success and estimated savings (typically $1,000–$3,000 in insurance increases).",
-      url: "https://fabsy.ca/ticket-analysis",
+      text: "Fabsy reviews the submitted ticket and explains whether the service is available and what next steps may be considered. Keep following the instructions and deadlines printed on the ticket unless Fabsy confirms otherwise.",
+      url: "https://fabsy.ca/submit-ticket",
       icon: FileCheck,
     },
     {
-      name: "Choose your package",
-      text: "Select our flat $488 package to fight your ticket, plus 30% of any fine reduction we win. We handle paperwork, disclosure, and court representation.",
+      name: "Review the service scope",
+      text: "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Fabsy confirms the available service scope before the matter proceeds.",
       url: "https://fabsy.ca/services",
       icon: Shield,
     },
     {
-      name: "We fight your ticket",
-      text: "We request disclosure, review evidence, and represent you in court. Most clients avoid appearing, we handle the legal work so you don't have to.",
+      name: "Proceed with the accepted service",
+      text: "If Fabsy accepts the matter, it provides traffic ticket agent services where permitted and available. Court requirements and client attendance depend on the matter.",
       url: "https://fabsy.ca/how-it-works",
       icon: Scale,
     },
     {
       name: "Receive the outcome",
-      text: "95%+ of clients achieve dismissals, reductions, or amendments that protect insurance. We keep you updated and explain next steps.",
+      text: "Fabsy communicates the outcome information it receives and explains any next steps within the accepted service scope. Individual outcomes vary.",
       url: "https://fabsy.ca/testimonials",
       icon: Trophy,
     },
@@ -54,34 +59,26 @@ const HowItWorks: React.FC = () => {
 
   return (
     <main className="min-h-screen bg-gradient-hero">
-      <Helmet>
-        <title>How It Works, Fight a Traffic Ticket in Alberta | Fabsy</title>
-        <meta
-          name="description"
-          content="Simple 5-step process: upload your ticket, get a free analysis, choose our flat $488 package, and let Fabsy represent you in Alberta traffic courts."
-        />
-      </Helmet>
-
       <HowToSchema
         name="How to Fight a Traffic Ticket in Alberta"
-        description="A clear 5-step process for disputing traffic tickets in Alberta. Protect your insurance and driving record with Fabsy."
+        description="A clear five-step process for submitting an Alberta traffic ticket, reviewing available options, and receiving agent representation where permitted."
         steps={steps.map((s) => ({ name: s.name, text: s.text, url: s.url }))}
-        totalTime="P3M"
-        estimatedCost="499"
       />
 
       <Header />
 
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold mb-4 text-white">How Fabsy Fights Your Ticket</h1>
-          <p className="text-lg text-white/80 mb-8">Five simple steps to protect your insurance and driving record in Alberta.</p>
+          <h1 className="text-4xl font-bold mb-4 text-white">How Fabsy's Ticket Review Process Works</h1>
+          <p className="text-lg text-white/80 mb-8">
+            Five steps from ticket submission through the scope and outcome of an accepted agent service.
+          </p>
 
           <div className="space-y-8">
             {steps.map((step, idx) => {
               const Icon = step.icon;
               return (
-                <div key={idx} className="bg-card rounded-xl p-6 shadow-elegant border border-primary/20 hover:shadow-glow transition-smooth">
+                <div key={step.name} className="bg-card rounded-xl p-6 shadow-elegant border border-primary/20 hover:shadow-glow transition-smooth">
                   <div className="flex items-start gap-4">
                     <div className="bg-gradient-primary text-white rounded-full w-12 h-12 flex items-center justify-center shadow-md">
                       <Icon className="w-6 h-6" />

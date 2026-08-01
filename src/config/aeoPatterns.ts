@@ -60,14 +60,14 @@ export const aeoPatterns: AEOPatterns = {
     "Your options before court day",
     "Frequently asked questions, {City} {offence}"
   ],
-  meta_description_pattern: "{Offence} ticket in {City}? In many cases, Fabsy can keep demerits off your record and help you avoid insurance hikes. Flat $488 to fight, plus 30% of any fine reduction we win. Start a free analysis in 60 seconds.",
+  meta_description_pattern: "{Offence} ticket in {City}? Review the process, response options, and information to keep before the deadline printed on the ticket.",
   above_fold_requirements: [
     "Answer Box module (from Block 6) directly below H1",
     "Primary CTA visible without scroll", 
     "City + offence echoed in first paragraph"
   ],
-  content_snippet_pattern: "Short answer: Yes, many {City} {offence} tickets can be fixed before your court date. Upload your ticket, we pull your court file, then confirm options to protect your record.",
-  legal_disclaimer_snippet: "This page provides general information only and is not legal advice. Outcomes vary by offence and courthouse."
+  content_snippet_pattern: "Short answer: Check the deadline printed on the ticket and review the available response options. Fabsy can assess the submitted information and provide agent services where permitted.",
+  legal_disclaimer_snippet: "This page provides general information only. Fabsy is an agent service, not a law firm. Outcomes vary by matter and court."
 };
 
 // FAQ/PAA Question Bank
@@ -75,23 +75,23 @@ export const faqPAABank: FAQPAABank = {
   generic: [
     {
       q: "Can I fight a {offence} ticket in {City}?",
-      a: "Often, yes. Many cases can be resolved to avoid a conviction that affects your record or insurance."
+      a: "You may dispute the ticket by following its response instructions before the printed deadline. The available options depend on the charge, evidence, and court process."
     },
     {
       q: "Do I have to go to court for a {offence} ticket in {City}?", 
-      a: "Not always. Depending on the courthouse and offence, resolutions can be reached without you attending."
+      a: "Attendance requirements depend on the charge and the instructions for the matter. Check the ticket and confirm the requirements that apply before relying on an agent to appear."
     },
     {
       q: "How many demerits for {offence} in {City}?",
-      a: "Demerits depend on the specific charge. Our goal is to resolve your ticket to keep demerits off your abstract."
+      a: "Demerits depend on the exact offence and disposition. Use the charge shown on the ticket when checking the current Alberta demerit schedule."
     },
     {
       q: "Will my insurance go up for a {offence} ticket?",
-      a: "A conviction can lead to higher premiums. We focus on outcomes that avoid insurance-impacting convictions."
+      a: "Insurance treatment depends on the insurer, policy, driving history, and final disposition. Ask your insurer or broker about your specific policy."
     },
     {
       q: "What's the deadline to act on a {offence} ticket?",
-      a: "Deadlines vary; acting before the first appearance/court date preserves more options. Start with a free analysis."
+      a: "Use the response deadline printed on the ticket and follow its instructions before that date."
     }
   ],
 
@@ -99,35 +99,35 @@ export const faqPAABank: FAQPAABank = {
     speeding: [
       {
         q: "What if it's photo-radar speeding in {City}?",
-        a: "Photo-radar has unique rules and defenses. Upload your notice; we'll check for resolution paths."
+        a: "Photo radar notices are issued to the registered owner and do not add demerits. Review the notice, images, location, and printed response instructions."
       },
       {
         q: "Can I reduce a speeding fine in {City}?",
-        a: "In many cases fines and/or points can be reduced or re-characterized to protect your record."
+        a: "A reduction is not certain. The available response depends on the allegation, evidence, and court process."
       }
     ],
     "red-light": [
       {
         q: "Is a red-light camera ticket different from officer-issued?",
-        a: "Yes. Evidentiary and procedural differences can change your options. We assess the exact charge type."
+        a: "The ticket type affects who receives the notice and whether demerits apply. Review the exact charge and evidence before choosing a response."
       }
     ],
     "careless-driving": [
       {
         q: "Is careless driving criminal?",
-        a: "No, it's a traffic offence, but it's serious. We prioritize outcomes that avoid an insurance-impacting conviction."
+        a: "Review the exact charge shown on the ticket. Fabsy can assess whether agent representation is permitted, but it is not a law firm and does not provide legal advice."
       }
     ],
     "distracted-driving": [
       {
         q: "Can distracted driving be negotiated down?",
-        a: "Options vary. We review the file for resolution paths that keep your abstract clean."
+        a: "A particular resolution is not certain. The available response depends on the allegation, evidence, and court process."
       }
     ],
     seatbelt: [
       {
         q: "Can a seatbelt ticket impact insurance?",
-        a: "A conviction can. We look for outcomes that prevent insurance-impacting records."
+        a: "Insurance treatment depends on the insurer, policy, driving history, and final disposition. Ask your insurer or broker about your specific policy."
       }
     ]
   },
@@ -254,7 +254,7 @@ export function validateH1(h1: string): { valid: boolean; issues: string[] } {
   };
 }
 
-export function generateFAQSchema(faqs: FAQQuestion[]): Record<string, any> {
+export function generateFAQSchema(faqs: FAQQuestion[]): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",

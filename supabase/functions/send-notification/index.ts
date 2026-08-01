@@ -19,6 +19,9 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : String(error);
+
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -40,7 +43,6 @@ interface TicketNotification {
   fineAmount: string;
   submittedAt: string;
   smsOptIn?: boolean;
-  couponCode?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -52,9 +54,8 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const ticketData: TicketNotification = await req.json();
     const siteOrigin = req.headers.get("origin") || "https://fabsy.ca";
-    const isTestUser = ticketData.couponCode?.toUpperCase() === "TESTUSER";
     
-    console.log("Sending notification email for ticket:", ticketData.ticketNumber, "| Test User:", isTestUser);
+    console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
     // SECURITY: Fetch admin users from database to ensure only authorized users receive client data
     const { data: adminUsers, error: adminError } = await supabase
@@ -92,11 +93,11 @@ const handler = async (req: Request): Promise<Response> => {
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "brett@execom.ca",
       to: adminEmails,
-      subject: `${isTestUser ? '[TEST] ' : ''}New Ticket Submission - ${ticketData.firstName} ${ticketData.lastName}`,
+      subject: `Payment Pending - ${ticketData.firstName} ${ticketData.lastName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
-            🎫 New Ticket Submission Alert
+            🎫 Payment-Pending Ticket Submission
           </h1>
           
           <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
@@ -167,8 +168,8 @@ const handler = async (req: Request): Promise<Response> => {
             console.warn("PDF data is null");
             retries--;
           }
-        } catch (pdfError: any) {
-          console.error(`Error fetching consent form (attempt ${4 - retries}):`, pdfError.message);
+        } catch (pdfError: unknown) {
+          console.error(`Error fetching consent form (attempt ${4 - retries}):`, getErrorMessage(pdfError));
           retries--;
           
           if (retries > 0) {
@@ -203,8 +204,9 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
           
           <p style="font-size: 14px; color: #555; line-height: 1.6;">
-            We've received your ticket submission and our team will begin reviewing your case right away. 
-            Below is a summary of your submission, and attached you'll find a copy of the written consent form.
+            We've received your ticket submission. Complete Stripe Checkout before Fabsy begins
+            service on the matter. Below is a summary of your submission, and attached you'll find
+            a copy of the written consent form.
           </p>
           
           <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
@@ -217,10 +219,11 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <h3 style="color: #333; margin-top: 0;">What Happens Next?</h3>
             <ul style="color: #555; line-height: 1.8;">
-              <li>Our legal team will review your ticket within 24 hours</li>
-              <li>We'll analyze the best defense strategy for your case</li>
+              <li>Complete the Stripe Checkout payment opened after submission</li>
+              <li>After payment is confirmed, Fabsy's agent service will review your ticket information and court location</li>
+              <li>We'll confirm whether Fabsy can assist with the matter</li>
               <li>You'll receive updates via email${ticketData.smsOptIn ? ' and SMS' : ''}</li>
-              <li>We'll keep you informed every step of the way</li>
+              <li>Case outcomes depend on the facts and process in each matter</li>
             </ul>
           </div>
           
@@ -252,7 +255,7 @@ const handler = async (req: Request): Promise<Response> => {
     // TODO: Consider storing admin phone numbers in database for better security
     let adminSmsResponse = null;
     try {
-      const adminSmsMessage = `${isTestUser ? '[TEST] ' : ''}New Ticket Submission!\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: ${ticketData.fineAmount}`;
+      const adminSmsMessage = `Payment-pending ticket submission. Do not begin service until payment is confirmed.\nName: ${ticketData.firstName} ${ticketData.lastName}\nTicket: ${ticketData.ticketNumber}\nViolation: ${ticketData.violation}\nFine: ${ticketData.fineAmount}`;
       
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
       const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
@@ -277,8 +280,8 @@ const handler = async (req: Request): Promise<Response> => {
         adminSmsResponse = await adminSmsResult.json();
         console.log("Admin SMS sent successfully:", adminSmsResponse);
       }
-    } catch (smsError: any) {
-      console.error("Error sending admin SMS:", smsError.message);
+    } catch (smsError: unknown) {
+      console.error("Error sending admin SMS:", getErrorMessage(smsError));
       // Continue even if SMS fails
     }
 
@@ -287,7 +290,7 @@ const handler = async (req: Request): Promise<Response> => {
     let clientSmsResponse = null;
     if (ticketData.smsOptIn) {
       try {
-        const clientSmsMessage = `Hi ${ticketData.firstName}! Your ticket submission has been received. We've emailed you copies of your forms and consent agreement. Our team will review your case within 24 hours. - Fabsy`;
+        const clientSmsMessage = `Hi ${ticketData.firstName}! Your ticket submission has been received. Complete Stripe Checkout before service begins. We've emailed copies of your forms and consent agreement. - Fabsy`;
         
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
         const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
@@ -312,8 +315,8 @@ const handler = async (req: Request): Promise<Response> => {
           clientSmsResponse = await clientSmsResult.json();
           console.log("Client SMS sent successfully:", clientSmsResponse);
         }
-      } catch (smsError: any) {
-        console.error("Error sending client SMS:", smsError.message);
+      } catch (smsError: unknown) {
+        console.error("Error sending client SMS:", getErrorMessage(smsError));
         // Continue even if SMS fails
       }
     } else {
@@ -333,10 +336,10 @@ const handler = async (req: Request): Promise<Response> => {
         ...corsHeaders,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in send-notification function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: getErrorMessage(error) }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

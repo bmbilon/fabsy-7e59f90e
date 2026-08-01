@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { assertGeneratedContentSafe } from "../_shared/generated-content-guardrails.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,21 +31,23 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are a professional outreach writer for fabsy.ca, an Alberta-based service helping women with traffic tickets.
+    const systemPrompt = `You are a professional outreach writer for fabsy.ca, an Alberta-based service helping drivers with traffic tickets.
 
 Write a 3-step email sequence to pitch a guest Q&A post to local Alberta blogs.
 
-TONE: Friendly, professional, respectful, value-focused
+TONE: Friendly, plain-language, supportive, professional, respectful, value-focused
 GOAL: Get a "yes" to publish a helpful Q&A post
 
 CRITICAL RULES:
 1. Each email body: maximum 120 words
 2. Subject lines: short, intriguing, not salesy
 3. Email 1 (Initial): Introduce value, make specific pitch
-4. Email 2 (Follow-up): Gentle reminder, add social proof
+4. Email 2 (Follow-up): Gentle reminder, restate the practical value
 5. Email 3 (Final nudge): Last friendly check-in, easy out
 6. No pushy language, respect their time
-7. Emphasize value to their audience (Alberta women readers)`;
+7. Emphasize value to their audience (Alberta readers)
+8. Do not gender the publication's audience or make gender-based assumptions
+9. Do not invent social proof, testimonials, ratings, outcomes, legal numbers, or deadlines`;
 
     const userPrompt = `Create a 3-step email outreach sequence for:
 
@@ -53,7 +56,7 @@ ${blogFocus ? `Blog Focus: ${blogFocus}` : ''}
 ${recipientName ? `Recipient: ${recipientName}` : 'Recipient: [Blog Editor]'}
 ${topicIdea ? `Topic Idea: ${topicIdea}` : ''}
 
-Purpose: Pitch a guest Q&A post about traffic tickets in Alberta, aimed at helping their women readers.
+Purpose: Pitch a guest Q&A post about traffic tickets in Alberta, aimed at helping their readers.
 
 Return ONLY valid JSON with this exact structure:
 {
@@ -109,6 +112,7 @@ Each email should:
     const data = await response.json();
     const generatedContent = data.choices[0].message.content;
     const sequence = JSON.parse(generatedContent);
+    assertGeneratedContentSafe(sequence);
     
     console.log('Outreach sequence generated successfully');
 

@@ -64,25 +64,17 @@ export function generateProfessionalServiceJsonLd(data: {
   return {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    "name": data.name || "Fabsy",
+    "name": data.name || "Fabsy Traffic Ticket Services",
     "url": data.url || "https://fabsy.ca",
-    "logo": data.logo || "https://fabsy.ca/logo.png",
-    "telephone": data.telephone || "",
-    "email": data.email || "",
-    "description": data.description || "Alberta traffic ticket help",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": data.address?.street || "",
-      "addressLocality": data.address?.city || "Calgary",
-      "addressRegion": data.address?.province || "AB",
-      "postalCode": data.address?.postalCode || "",
-      "addressCountry": "CA"
-    },
+    "logo": data.logo || "https://fabsy.ca/favicon.svg",
+    "telephone": data.telephone || "(825) 793-2279",
+    "email": data.email || "hello@fabsy.ca",
+    "description": data.description || "Traffic ticket agent services for Alberta drivers. Fabsy is not a law firm.",
     "areaServed": {
-      "@type": "State",
+      "@type": "AdministrativeArea",
       "name": data.areaServed || "Alberta"
     },
-    "priceRange": data.priceRange || "$"
+    "priceRange": data.priceRange || "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
   };
 }
 
@@ -102,19 +94,19 @@ export function generateArticleJsonLd(data: {
     "description": data.description,
     "author": {
       "@type": "Organization",
-      "name": data.author || "Fabsy"
+      "name": data.author || "Fabsy Traffic Ticket Services"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Fabsy",
+      "name": "Fabsy Traffic Ticket Services",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://fabsy.ca/logo.png"
+        "url": "https://fabsy.ca/favicon.svg"
       }
     },
     "datePublished": data.datePublished,
     "dateModified": data.dateModified || data.datePublished,
-    "image": data.image || "",
-    "url": data.url || ""
+    ...(data.image ? { "image": data.image } : {}),
+    ...(data.url ? { "url": data.url } : {})
   };
 }

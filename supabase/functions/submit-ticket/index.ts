@@ -38,7 +38,6 @@ interface SubmissionData {
   courtDate?: string;
   defenseStrategy: string;
   additionalNotes?: string;
-  couponCode?: string;
   insuranceCompany?: string;
 }
 
@@ -105,7 +104,6 @@ const handler = async (req: Request): Promise<Response> => {
         (formData.courtLocation && formData.courtLocation.length > 200) ||
         (formData.defenseStrategy && formData.defenseStrategy.length > 1000) ||
         (formData.additionalNotes && formData.additionalNotes.length > 2000) ||
-        (formData.couponCode && formData.couponCode.length > 50) ||
         (formData.insuranceCompany && formData.insuranceCompany.length > 200)) {
       return new Response(
         JSON.stringify({ error: "Input field exceeds maximum length" }),
@@ -129,7 +127,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Phone validation (basic format check)
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    const phoneRegex = /^[\d\s+()-]+$/;
     if (!phoneRegex.test(formData.phone)) {
       return new Response(
         JSON.stringify({ error: "Invalid phone number format" }),
@@ -208,7 +206,8 @@ const handler = async (req: Request): Promise<Response> => {
       console.log('[Submit Ticket] Client created');
     }
 
-    // Step 2: Create ticket submission
+    // Step 2: Create the ticket submission. Payment confirmation remains a
+    // separate Stripe concern until a signature-verified webhook is deployed.
     console.log('[Submit Ticket] Creating ticket submission');
     const { data: submissionData, error: submissionError } = await supabase
       .from('ticket_submissions')
@@ -231,7 +230,6 @@ const handler = async (req: Request): Promise<Response> => {
         court_date: formData.courtDate,
         defense_strategy: formData.defenseStrategy,
         additional_notes: formData.additionalNotes,
-        coupon_code: formData.couponCode,
         insurance_company: formData.insuranceCompany,
         status: 'pending'
       })
@@ -256,10 +254,12 @@ const handler = async (req: Request): Promise<Response> => {
         ...corsHeaders,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[Submit Ticket] Error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Submission failed" }),
+      JSON.stringify({
+        error: error instanceof Error ? error.message : "Submission failed",
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

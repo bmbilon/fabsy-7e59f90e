@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -39,9 +40,9 @@ serve(async (req) => {
           
           <h2 style="color: #333; font-size: 18px;">What happens next?</h2>
           <ul style="line-height: 1.8;">
-            <li>Our team will review your case within 24 hours</li>
-            <li>You'll receive a detailed email with your eligibility assessment</li>
-            <li>If qualified, we'll explain your options and next steps</li>
+            <li>Fabsy's agent service will review the ticket information you submitted</li>
+            <li>We'll contact you using the email address you provided</li>
+            <li>If Fabsy can assist, we'll explain the available service and next steps</li>
           </ul>
 
           ${aiAnswer ? `
@@ -58,13 +59,15 @@ serve(async (req) => {
           </div>
 
           <p style="color: #666; font-size: 14px;">
-            This is general information only and not legal advice. A licensed professional will review your specific case.
+            This is general information only and not legal advice. Fabsy is an agent service, not a law firm.
           </p>
 
-          <p style="margin-top: 30px;">
-            Best regards,<br>
-            <strong>The Fabsy Team</strong>
+          <p style="font-size: 14px; color: #555; line-height: 1.6;">
+            If Fabsy can assist, pricing is a flat $488 plus 30% of any fine reduction achieved;
+            there is no additional charge if the fine is not reduced.
           </p>
+
+          ${getFabsyEmailSignature()}
         </div>
       `,
     });
@@ -97,7 +100,7 @@ serve(async (req) => {
           ` : ''}
 
           <p style="background: #fef3c7; padding: 16px; border-left: 4px solid #f59e0b;">
-            <strong>Action Required:</strong> Review this case and respond within 24 hours.
+            <strong>Action Required:</strong> Review this request and follow up using the submitted contact information.
           </p>
         </div>
       `,

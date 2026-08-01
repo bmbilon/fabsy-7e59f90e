@@ -3,10 +3,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLocation } from "react-router-dom";
 import type { FormData } from "@/components/TicketForm";
+import useSafeHead from "@/hooks/useSafeHead";
 
 type LocationState = { state?: { ticketImage?: File | null; prefillTicketData?: Partial<FormData> | null; startAtStep?: number } };
 
 const TicketFormPage = () => {
+  useSafeHead({
+    title: "Submit an Alberta Traffic Ticket | Fabsy",
+    description: "Submit an Alberta traffic ticket for review by Fabsy Traffic Ticket Services. Fabsy is an agent service, not a law firm.",
+    canonical: "https://fabsy.ca/submit-ticket",
+  });
   const location = useLocation() as unknown as LocationState;
   const initialTicketImage = location?.state?.ticketImage ?? null;
   const prefillTicketData = location?.state?.prefillTicketData ?? null;

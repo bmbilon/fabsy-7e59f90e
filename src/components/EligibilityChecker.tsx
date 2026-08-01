@@ -4,10 +4,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Loader2, CheckCircle, XCircle, DollarSign, Camera, Circle } from "lucide-react";
+import { Upload, Loader2, CheckCircle, Camera, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useTicketCache, type TicketData as CachedTicketData } from "@/hooks/useTicketCache";
+import { useTicketCache } from "@/hooks/useTicketCache";
 
 interface EligibilityCheckerProps {
   open: boolean;
@@ -31,75 +31,8 @@ interface TicketData {
 }
 
 interface EligibilityResult {
-  isEligible: boolean;
   reason: string;
-  financials: {
-    fine: number;
-    estimatedInsuranceIncrease: number;
-    threeYearImpact: number;
-    totalCostIfConvicted: number;
-    serviceFee: number;
-    potentialSavings: number;
-    roi: number;
-  };
   violationType: string;
-  demeritPoints: number;
-}
-
-// Same violation impacts as calculator
-const violationImpacts: Record<string, { increase: number; points: number; description: string }> = {
-  'speeding-minor': { increase: 0.15, points: 2, description: 'Minor Speeding (1-15 km/h over)' },
-  'speeding-major': { increase: 0.25, points: 3, description: 'Major Speeding (16-30 km/h over)' },
-  'speeding-excessive': { increase: 0.35, points: 4, description: 'Excessive Speeding (31+ km/h over)' },
-  'careless-driving': { increase: 0.40, points: 6, description: 'Careless/Reckless Driving' },
-  'distracted-driving': { increase: 0.30, points: 3, description: 'Distracted Driving' },
-  'running-light': { increase: 0.20, points: 3, description: 'Running Red Light/Stop Sign' },
-  'following-too-close': { increase: 0.15, points: 2, description: 'Following Too Closely' },
-  'improper-lane-change': { increase: 0.10, points: 2, description: 'Improper Lane Change' },
-  'other': { increase: 0.15, points: 2, description: 'Other Traffic Violation' }
-};
-
-const SERVICE_FEE = 488;
-const AVERAGE_PREMIUM = 1800; // Alberta average
-
-// Map violation text to violation type
-function detectViolationType(violationText: string): string {
-  const text = violationText.toLowerCase();
-  
-  if (text.includes('speed')) {
-    if (text.includes('excessive') || text.match(/\d{2,}\s*km/)) {
-      const match = text.match(/(\d+)\s*km/);
-      if (match) {
-        const speed = parseInt(match[1]);
-        if (speed > 30) return 'speeding-excessive';
-        if (speed > 15) return 'speeding-major';
-      }
-      return 'speeding-major';
-    }
-    return 'speeding-minor';
-  }
-  
-  if (text.includes('careless') || text.includes('reckless') || text.includes('dangerous')) {
-    return 'careless-driving';
-  }
-  
-  if (text.includes('distract') || text.includes('phone') || text.includes('cell')) {
-    return 'distracted-driving';
-  }
-  
-  if (text.includes('red light') || text.includes('stop sign') || text.includes('traffic control')) {
-    return 'running-light';
-  }
-  
-  if (text.includes('follow') && text.includes('close')) {
-    return 'following-too-close';
-  }
-  
-  if (text.includes('lane') && text.includes('change')) {
-    return 'improper-lane-change';
-  }
-  
-  return 'other';
 }
 
 export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerProps) {
@@ -108,12 +41,11 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
   const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [monthlyPremium, setMonthlyPremium] = useState<string>("");
   const [cacheKey, setCacheKey] = useState<string | null>(null);
   const dialogScrollRef = useRef<HTMLDivElement | null>(null);
   
   // Use ticket cache hook
-  const { cacheTicketData, generateCacheKey } = useTicketCache();
+  const { cacheTicketData } = useTicketCache();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -207,53 +139,22 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
     }
   };
 
-  const calculateEligibility = () => {
+  const reviewEligibility = () => {
     if (!ticketData) return;
     
     setIsProcessing(true);
     try {
-      // Calculate eligibility based on financial logic (same as calculator)
-      toast.info("Calculating savings...");
-      
-      const fineAmount = parseFloat(ticketData.fineAmount?.replace(/[^0-9.]/g, '') || ticketData.fine?.replace(/[^0-9.]/g, '') || '0');
-      const violationType = detectViolationType(ticketData.violation || '');
-      const violation = violationImpacts[violationType];
-      
-      // Use custom premium if provided, otherwise use average
-      const userPremium = monthlyPremium ? parseFloat(monthlyPremium) * 12 : AVERAGE_PREMIUM;
-      
-      // Calculate insurance impact
-      const annualIncrease = userPremium * violation.increase;
-      const threeYearImpact = annualIncrease * 3;
-      const totalCostIfConvicted = fineAmount + threeYearImpact;
-      const potentialSavings = totalCostIfConvicted - SERVICE_FEE;
-      const roi = ((potentialSavings - SERVICE_FEE) / SERVICE_FEE) * 100;
-      
-      // Ticket is eligible if fighting it saves money
-      const isEligible = potentialSavings > 0;
-      
+      toast.info("Preparing your ticket for review...");
+
       setEligibilityResult({
-        isEligible,
-        reason: isEligible 
-          ? `This ticket is worth disputing! You could save $${potentialSavings.toFixed(0)} over 3 years.`
-          : `This ticket may not justify representation costs. If we don't reduce your fine, you pay no fees beyond the flat $488.`,
-        financials: {
-          fine: fineAmount,
-          estimatedInsuranceIncrease: annualIncrease,
-          threeYearImpact,
-          totalCostIfConvicted,
-          serviceFee: SERVICE_FEE,
-          potentialSavings,
-          roi
-        },
-        violationType: violation.description,
-        demeritPoints: violation.points
+        reason: "Your captured ticket details are ready for an agent review. Service availability and possible options depend on the ticket, court location, and case circumstances.",
+        violationType: ticketData.offenceDescription || ticketData.violation || "Traffic ticket",
       });
 
-      toast.success("Analysis complete!");
+      toast.success("Ticket details ready for review!");
     } catch (error) {
-      console.error('Error calculating eligibility:', error);
-      toast.error("Failed to calculate. Please try again.");
+      console.error('Error preparing ticket review:', error);
+      toast.error("Failed to prepare the review. Please try again.");
     } finally {
     setIsProcessing(false);
     }
@@ -271,7 +172,6 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
     setTicketData(null);
     setEligibilityResult(null);
     setImagePreview(null);
-    setMonthlyPremium("");
   };
 
   return (
@@ -281,7 +181,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
     }}>
       <DialogContent ref={dialogScrollRef} className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Free Eligibility Check</DialogTitle>
+          <DialogTitle className="text-2xl">Ticket Eligibility Review</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -371,7 +271,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                         { key: 'offenceSubSection', label: 'Offence Subsection', placeholder: 'e.g., (ii)' },
                         { key: 'offenceDescription', label: 'Offence Description', placeholder: 'e.g., Exceeded speed limit by 20 km/h' },
                         { key: 'violation', label: 'Violation Text', placeholder: 'Short violation text' },
-                        { key: 'fineAmount', label: 'Fine Amount', placeholder: '$150.00' },
+                        { key: 'fineAmount', label: 'Fine Amount', placeholder: 'Amount shown on ticket' },
                         { key: 'courtDate', label: 'Court Date', placeholder: 'YYYY-MM-DD (if set)' },
                         { key: 'courtJurisdiction', label: 'Court Jurisdiction', placeholder: 'e.g., Calgary Provincial Court' },
                       ] as { key: keyof TicketData; label: string; placeholder: string }[]).map(({ key, label, placeholder }) => {
@@ -404,32 +304,17 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   </div>
 
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border space-y-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="monthly-premium" className="text-sm font-medium">
-                        Monthly Insurance Premium (Optional)
-                      </Label>
-                      <Input
-                        id="monthly-premium"
-                        type="number"
-                        placeholder="e.g., 150"
-                        value={monthlyPremium}
-                        onChange={(e) => setMonthlyPremium(e.target.value)}
-                        className="bg-white dark:bg-gray-900"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        {monthlyPremium 
-                          ? `Annual: $${(parseFloat(monthlyPremium) * 12).toFixed(0)}` 
-                          : `Leave blank to use average ($${AVERAGE_PREMIUM}/year)`}
-                      </p>
-                    </div>
-
-                    <Button 
-                      onClick={calculateEligibility} 
-                      className="w-full" 
+                    <p className="text-sm text-muted-foreground">
+                      Continue to review the captured information. This tool does not estimate
+                      insurance changes, savings, demerits, or a likely case outcome.
+                    </p>
+                    <Button
+                      onClick={reviewEligibility}
+                      className="w-full"
                       size="lg"
                       disabled={isProcessing}
                     >
-                      {isProcessing ? "Calculating..." : "Calculate Eligibility"}
+                      {isProcessing ? "Reviewing..." : "Review Ticket Details"}
                     </Button>
                   </div>
                 </div>
@@ -438,17 +323,11 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
           ) : (
             <div className="space-y-6">
               {/* Eligibility Status */}
-              <div className={`p-6 rounded-lg border-2 ${eligibilityResult.isEligible ? 'border-green-500 bg-green-50 dark:bg-green-950' : 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950'}`}>
+              <div className="p-6 rounded-lg border-2 border-green-500 bg-green-50 dark:bg-green-950">
                 <div className="flex items-start gap-4">
-                  {eligibilityResult.isEligible ? (
-                    <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
-                  ) : (
-                    <XCircle className="h-8 w-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-1" />
-                  )}
+                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl font-bold mb-2">
-                      {eligibilityResult.isEligible ? "Worth Fighting!" : "Consider Carefully"}
-                    </h3>
+                    <h3 className="text-xl font-bold mb-2">Ready for Agent Review</h3>
                     <p className="text-lg">{eligibilityResult.reason}</p>
                   </div>
                 </div>
@@ -463,68 +342,26 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                     <p className="font-medium">{eligibilityResult.violationType}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Demerit Points:</span>
-                    <p className="font-medium">{eligibilityResult.demeritPoints} points</p>
+                    <span className="text-muted-foreground">Ticket #:</span>
+                    <p className="font-medium">{ticketData?.ticketNumber || 'Not captured'}</p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Fine Amount:</span>
-                    <p className="font-medium">${eligibilityResult.financials.fine}</p>
+                    <p className="font-medium">{ticketData?.fineAmount || ticketData?.fine || 'Not captured'}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Ticket #:</span>
-                    <p className="font-medium">{ticketData?.ticketNumber || 'N/A'}</p>
+                    <span className="text-muted-foreground">Court Jurisdiction:</span>
+                    <p className="font-medium">{ticketData?.courtJurisdiction || 'Not captured'}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Financial Breakdown */}
-              <div className="bg-muted/50 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <DollarSign className="h-5 w-5 text-primary" />
-                  <h4 className="font-semibold">Financial Impact</h4>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Ticket Fine:</span>
-                    <span className="font-medium">${eligibilityResult.financials.fine}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Annual Insurance Increase:</span>
-                    <span className="font-medium">${eligibilityResult.financials.estimatedInsuranceIncrease.toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>3-Year Insurance Impact:</span>
-                    <span className="font-medium">${eligibilityResult.financials.threeYearImpact.toFixed(0)}</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between font-semibold">
-                    <span>Total Cost if Convicted:</span>
-                    <span className="text-destructive">${eligibilityResult.financials.totalCostIfConvicted.toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between font-semibold">
-                    <span>Our Service Fee:</span>
-                    <span>${eligibilityResult.financials.serviceFee}</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between font-bold text-lg">
-                    <span>Your Savings:</span>
-                    <span className="text-primary">${eligibilityResult.financials.potentialSavings.toFixed(0)}</span>
-                  </div>
-                  {eligibilityResult.financials.roi > 0 && (
-                    <div className="bg-primary/10 rounded p-2 text-center">
-                      <span className="text-primary font-bold">
-                        {eligibilityResult.financials.roi.toFixed(0)}% more than you invest!
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Risk-Free Guarantee */}
+              {/* Pricing explanation */}
               <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-lg p-4">
                 <h4 className="font-semibold mb-2">How our pricing works</h4>
                 <p className="text-sm text-muted-foreground">
-                  {eligibilityResult.isEligible
-                    ? "A flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488. This ticket is worth fighting!"
-                    : "If we don't reduce your fine, you pay no fees beyond the flat $488."}
+                  Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is
+                  not reduced, there is no additional charge.
                 </p>
               </div>
 
@@ -568,7 +405,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   onOpenChange(false);
                   navigate('/ticket-form', { state: { prefillTicketData: formData, startAtStep: 2 } });
                 }} className="flex-1">
-                  Get My Ticket Dismissed
+                  Continue to Ticket Form
                 </Button>
               </div>
             </div>

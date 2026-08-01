@@ -7,42 +7,42 @@ import useSafeHead from "@/hooks/useSafeHead";
 const FAQPage: React.FC = () => {
   const faqs = [
     {
-      q: "How much does it cost to fight a traffic ticket in Alberta?",
-      a: "Fabsy's fee is a flat $488 to fight your ticket, plus 30% of any fine reduction we win. If we don't reduce your fine, you pay no fees beyond the $488. Most clients avoid $1,000–$3,000 in insurance increases over three years."
+      q: "How much does Fabsy charge?",
+      a: "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
     },
     {
-      q: "What is Fabsy's success rate for traffic tickets?",
-      a: "Our results-based practice wins for 95%+ of clients, dismissals, reduced charges, or amendments that protect insurance. We focus on outcomes that preserve your driving record."
+      q: "Is Fabsy a law firm?",
+      a: "No. Fabsy is an Alberta traffic ticket agent service, not a law firm, and does not provide legal advice. Service availability and scope depend on the matter and court location."
     },
     {
-      q: "Will fighting a ticket increase my insurance?",
-      a: "No, fighting prevents insurance hikes. A conviction often raises premiums $500–$1,500 yearly for three years; our goal is to avoid that outcome by disputing charges effectively."
+      q: "What does Fabsy's 95%+ figure mean?",
+      a: "Fabsy reports a 95%+ historical success rate across past matters. It is an aggregate past figure, not a prediction for a particular ticket. Outcomes depend on the facts, evidence, and available options."
     },
     {
-      q: "How long does it take to resolve a ticket?",
-      a: "The average process is 3–6 months from filing to resolution. Fabsy handles disclosure, filings, and court representation so you can keep living your life."
+      q: "Will disputing a ticket affect my insurance?",
+      a: "Disputing a ticket does not itself create a conviction. Insurance treatment may depend on the final outcome, your driving record, and your insurer's underwriting rules. Ask your insurer about your circumstances."
     },
     {
-      q: "Do I have to appear in court if I hire Fabsy?",
-      a: "Usually no. We appear on your behalf for most Alberta traffic matters, handling negotiations and courtroom representation so you don't need to attend."
+      q: "How long will my matter take?",
+      a: "Timing varies by matter, court, and available process. The response deadline is printed on the ticket. Follow the ticket instructions before that date."
     },
     {
-      q: "What tickets does Fabsy handle?",
-      a: "We fight speeding, careless driving, distracted driving, red light camera issues, license suspensions, commercial violations, and more across Alberta, Calgary, Edmonton, Red Deer, Lethbridge, Medicine Hat."
+      q: "Will I have to attend court?",
+      a: "Attendance depends on the matter, court requirements, and the scope of any permitted representation. Some clients may need to attend or complete steps personally. Fabsy will explain the expected process after reviewing the ticket."
     },
     {
-      q: "What happens if Fabsy doesn't win my case?",
-      a: "If we don't reduce your fine, you pay no fees beyond the flat $488. We focus on dismissals, reductions, or amendments that protect your insurance."
+      q: "What matters does Fabsy review?",
+      a: "Fabsy reviews Alberta traffic ticket matters and may offer traffic ticket agent representation where permitted and available. Scope depends on the ticket, court location, and circumstances. Submitting a ticket does not mean the matter has been accepted."
     },
     {
-      q: "How do demerit points affect insurance?",
-      a: "Demerit points make convictions visible to insurers and often trigger premium increases. Accumulate 15 points and you risk license suspension in Alberta."
+      q: "What happens after I submit my ticket?",
+      a: "Fabsy reviews the information and documents you provide, then explains whether the service is available and what the next steps may be. Keep following every instruction and deadline printed on the ticket unless Fabsy confirms otherwise."
     }
   ];
 
   useSafeHead({
     title: "Traffic Ticket FAQ, Alberta | Fabsy",
-    description: "Answers to common questions about fighting traffic tickets in Alberta. Learn about costs, success rates, insurance impact, and our flat-fee pricing.",
+    description: "Conservative answers about Fabsy's Alberta traffic ticket agent service, pricing, attendance, insurance, scope, and next steps.",
     canonical: "https://fabsy.ca/faq"
     // Schema removed - FAQSection component already handles FAQPage structured data
   });
@@ -54,7 +54,7 @@ const FAQPage: React.FC = () => {
         <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl font-bold mb-4 text-white">Frequently Asked Questions</h1>
           <p className="text-lg text-white/80 mb-8">
-            Clear, direct answers to help you decide whether to fight your ticket, local to Alberta.
+            Clear answers about Fabsy's Alberta ticket review and traffic ticket agent service.
           </p>
           <FAQSection faqs={faqs} pageName="FAQ" pageUrl="https://fabsy.ca/faq" />
         </div>

@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { assertGeneratedContentSafe } from "../_shared/generated-content-guardrails.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,22 +31,24 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are a social media content writer for fabsy.ca, a service helping Alberta women with traffic tickets.
+    const systemPrompt = `You are a social media content writer for fabsy.ca, a service helping Alberta drivers with traffic tickets.
 
 Generate engaging social media posts optimized for platforms like Instagram, Facebook, and LinkedIn.
 
-TONE: Friendly, urgent, supportive, local (Alberta)
-AUDIENCE: Women in Alberta dealing with traffic tickets
+TONE: Friendly, plain-language, supportive, urgent, local (Alberta)
+AUDIENCE: Alberta drivers dealing with traffic tickets
 GOAL: Drive engagement and action
 
 CRITICAL RULES:
 1. Each post: maximum 220 characters (including spaces)
-2. Mix of formats: questions, tips, urgency, testimonials, facts
+2. Mix of formats: questions, tips, practical next steps, facts
 3. Include 3 relevant hashtags per post
 4. Provide image caption for each post
 5. Use friendly, conversational language
 6. Create urgency without being pushy
-7. Alberta-specific references`;
+7. Alberta-specific references
+8. Do not gender the audience or make gender-based assumptions
+9. Use only the supplied source content for factual claims. Do not invent testimonials, ratings, outcomes, legal numbers, or deadlines`;
 
     const userPrompt = `Create 12 social media posts from this content:
 
@@ -59,7 +62,7 @@ ${cta ? `CTA: ${cta}` : ''}
 Generate 12 different posts with variety:
 - 3 question-based posts
 - 3 tip/advice posts
-- 3 urgency/deadline posts
+- 3 practical next-step posts
 - 3 empowerment/support posts
 
 Each post should:
@@ -115,7 +118,8 @@ Return ONLY valid JSON with this exact structure:
     const posts = parsed.posts || [];
     
     // Validate character count
-    const validPosts = posts.filter((post: any) => post.text && post.text.length <= 220);
+    const validPosts = posts.filter((post: { text?: string }) => post.text && post.text.length <= 220);
+    assertGeneratedContentSafe(validPosts);
     
     console.log(`Generated ${validPosts.length} valid social posts`);
 

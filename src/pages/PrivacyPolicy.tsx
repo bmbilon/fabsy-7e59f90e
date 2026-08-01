@@ -15,7 +15,7 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Information We Collect</h2>
             <p className="mb-4">
-              We collect information you provide directly to us when using our traffic ticket representation services:
+              We collect information you provide directly to us when using our traffic ticket agent services:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Personal identification information (name, address, phone number, email)</li>
@@ -57,14 +57,20 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">4. Data Security</h2>
             <p>
-              We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet or electronic storage is 100% secure.
+              We implement appropriate technical and organizational security measures to protect
+              your personal information against unauthorized access, alteration, disclosure, or
+              destruction. However, no method of internet transmission or electronic storage
+              eliminates all security risk.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">5. Data Retention</h2>
             <p>
-              We retain your personal information for as long as necessary to provide our services and as required by applicable laws and regulations. Case files are typically retained for a minimum of 7 years after case completion.
+              We retain personal information only for as long as reasonably necessary to provide
+              our services, meet applicable legal requirements, resolve disputes, and maintain
+              appropriate business records. Retention periods depend on the type of information
+              and the reason it was collected.
             </p>
           </section>
 
@@ -108,10 +114,10 @@ const PrivacyPolicy = () => {
               If you have any questions about this Privacy Policy or our privacy practices, please contact us:
             </p>
             <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
-              <p><strong>Fabsy Traffic Services</strong></p>
-              <p>Email: info@fabsy.ca</p>
-              <p>Phone: (403) 123-4567</p>
-              <p>Address: Calgary, Alberta, Canada</p>
+              <p><strong>Fabsy Traffic Ticket Services</strong></p>
+              <p>Email: <a href="mailto:hello@fabsy.ca" className="underline">hello@fabsy.ca</a></p>
+              <p>Phone: <a href="tel:+18257932279" className="underline">(825) 793-2279</a></p>
+              <p>Service area: Alberta</p>
             </div>
           </section>
         </div>

@@ -28,7 +28,7 @@ serve(async (req) => {
       expand: ["line_items", "payment_intent"],
     });
 
-    const lineItems = (session.line_items?.data || []).map((li: any) => ({
+    const lineItems = (session.line_items?.data || []).map((li) => ({
       id: li.id,
       description: li.description,
       quantity: li.quantity,
@@ -41,11 +41,11 @@ serve(async (req) => {
     const response = {
       id: session.id,
       amount_total: session.amount_total,
-      amount_subtotal: (session as any).amount_subtotal ?? null,
+      amount_subtotal: session.amount_subtotal ?? null,
       currency: session.currency,
       payment_status: session.payment_status,
-      total_details: (session as any).total_details || null,
-      discounts: (session as any).discounts || null,
+      total_details: session.total_details || null,
+      discounts: session.discounts || null,
       invoice: session.invoice || null,
       payment_intent: typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id,
       customer_email: session.customer_email || null,
@@ -56,9 +56,11 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("get-checkout-session error:", error);
-    return new Response(JSON.stringify({ error: (error as any)?.message || "Unknown error" }), {
+    return new Response(JSON.stringify({
+      error: error instanceof Error ? error.message : "Unknown error",
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

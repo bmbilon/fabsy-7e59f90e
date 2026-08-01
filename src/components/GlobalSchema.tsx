@@ -4,34 +4,13 @@ const GlobalSchema = () => {
   const organization = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Fabsy',
+    name: 'Fabsy Traffic Ticket Services',
     url: 'https://fabsy.ca',
-    logo: 'https://fabsy.ca/_assets/logo.png',
-    sameAs: [
-      'https://www.google.com/search?q=Fabsy+Alberta',
-      'https://www.instagram.com/fabsy.alberta',
-    ],
+    logo: 'https://fabsy.ca/favicon.svg',
+    sameAs: ['https://www.instagram.com/fabsy.alberta'],
   };
 
-  const legalService = {
-    '@context': 'https://schema.org',
-    '@type': 'LegalService',
-    name: 'Fabsy',
-    url: 'https://fabsy.ca',
-    image: 'https://fabsy.ca/_assets/logo.png',
-    priceRange: '$',
-    telephone: '+1-XXX-XXX-XXXX',
-    areaServed: [{ '@type': 'AdministrativeArea', name: 'Alberta, Canada' }],
-    address: { '@type': 'PostalAddress', addressRegion: 'AB', addressCountry: 'CA' },
-    serviceType: 'Traffic ticket dispute assistance',
-  };
-
-  return (
-    <>
-      <StaticJsonLd schema={organization} dataAttr="org" />
-      <StaticJsonLd schema={legalService} dataAttr="legalservice" />
-    </>
-  );
+  return <StaticJsonLd schema={organization} dataAttr="org" />;
 };
 
 export default GlobalSchema;

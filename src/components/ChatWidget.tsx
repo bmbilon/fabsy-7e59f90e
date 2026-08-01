@@ -120,7 +120,7 @@ const ChatWidget = () => {
         const filtered = prev.filter(m => m.id !== typingId);
         return [...filtered, {
           id: Date.now().toString(),
-          text: "I'm having trouble right now. Please try again or leave a message and we'll get back to you within 24 hours.",
+          text: "I'm having trouble right now. Please try again or leave a message and we'll respond as soon as we can.",
           sender: 'bot',
           timestamp: new Date()
         }];
@@ -138,7 +138,7 @@ const ChatWidget = () => {
     
     toast({
       title: "Message Sent!",
-      description: "Thank you for your message. We'll get back to you within 24 hours.",
+      description: "Thank you for your message. We'll respond as soon as we can.",
     });
 
     setContactForm({ name: '', email: '', message: '' });
