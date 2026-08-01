@@ -1,30 +1,16 @@
-# Welcome to your Lovable project
+# Fabsy Traffic Ticket Services
 
-## Project info
+Fabsy is an Alberta traffic ticket agent service, not a law firm.
 
-**URL**: https://lovable.dev/projects/6a3100f1-d7f6-4575-b9f0-dad0357920ab
+## Local development
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/6a3100f1-d7f6-4575-b9f0-dad0357920ab) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Use your preferred IDE. Node.js and npm are required; [install Node with nvm](https://github.com/nvm-sh/nvm#installing-and-updating) if needed.
 
 Follow these steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Step 1: Clone the repository.
+git clone <REPOSITORY_URL>
 
 # Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
@@ -50,7 +36,7 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Technology
 
 This project is built with:
 
@@ -62,12 +48,8 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/6a3100f1-d7f6-4575-b9f0-dad0357920ab) and click on Share -> Publish.
+Production deploys to Cloudflare. Use Vercel for staging and preview validation before a production deployment.
 
-## Can I connect a custom domain to my Lovable project?
+## Custom domain
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+The production domain is managed through Cloudflare.

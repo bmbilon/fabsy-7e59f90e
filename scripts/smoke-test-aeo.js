@@ -44,7 +44,7 @@ async function smokeTest() {
         ticketData: {
           city: 'Calgary',
           charge: 'Speeding 20km over',
-          fine: '$150',
+          fine: 'Use the amount shown on the ticket',
           date: '2025-09-15'
         }
       }

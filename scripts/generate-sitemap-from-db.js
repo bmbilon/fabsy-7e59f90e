@@ -15,43 +15,102 @@ const SUPABASE_KEY =
   'sb_publishable_KEo-G1wij9RC_IDDzblisw_VISRvwrX';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const PAGE_SIZE = 1000;
+const PAGE_CONTENT_DIR = path.resolve(
+  process.env.PAGE_CONTENT_DIR || path.join(process.cwd(), 'src/content/pages')
+);
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+async function fetchAllRows(table, columns, configure = query => query) {
+  const rows = [];
+
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const to = from + PAGE_SIZE - 1;
+    const query = configure(
+      supabase
+        .from(table)
+        .select(columns)
+        .order('slug')
+        .range(from, to)
+    );
+    const { data, error } = await query;
+
+    if (error) throw new Error(`Error fetching ${table}: ${error.message}`);
+
+    const batch = data || [];
+    rows.push(...batch);
+    if (batch.length < PAGE_SIZE) break;
+  }
+
+  return rows;
+}
 
 function ensureDir(p) {
   const dir = path.dirname(p);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
+function loadCachedPages() {
+  if (!fs.existsSync(PAGE_CONTENT_DIR)) {
+    throw new Error(`Local page_content cache is missing: ${PAGE_CONTENT_DIR}`);
+  }
+
+  const pages = [];
+  const seen = new Set();
+  for (const filename of fs.readdirSync(PAGE_CONTENT_DIR).filter(file => file.endsWith('.json')).sort()) {
+    const fileSlug = path.basename(filename, '.json');
+    const page = JSON.parse(fs.readFileSync(path.join(PAGE_CONTENT_DIR, filename), 'utf8'));
+    const slug = typeof page?.slug === 'string' ? page.slug.trim() : '';
+    if (!SLUG_RE.test(slug) || slug !== fileSlug || seen.has(slug)) {
+      throw new Error(`Invalid or duplicate page_content cache entry: ${filename}`);
+    }
+    seen.add(slug);
+    pages.push({ slug, updated_at: page.updated_at || undefined });
+  }
+
+  if (!pages.length) throw new Error('Local page_content cache contains zero pages');
+  return pages;
+}
+
+function escapeXml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
+
 function urlset(urls) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url>\n    <loc>https://fabsy.ca${u.loc}</loc>\n    ${u.changefreq ? `<changefreq>${u.changefreq}</changefreq>` : ''}\n    ${u.priority ? `<priority>${u.priority}</priority>` : ''}\n    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}\n  </url>`).join('\n')}\n</urlset>`;
+  const entries = urls.map(u => {
+    const fields = [`<loc>${escapeXml(`https://fabsy.ca${u.loc}`)}</loc>`];
+    if (u.changefreq) fields.push(`<changefreq>${escapeXml(u.changefreq)}</changefreq>`);
+    if (u.priority) fields.push(`<priority>${escapeXml(u.priority)}</priority>`);
+    if (u.lastmod) fields.push(`<lastmod>${escapeXml(u.lastmod)}</lastmod>`);
+    return `  <url>\n${fields.map(field => `    ${field}`).join('\n')}\n  </url>`;
+  });
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
 }
 
 function sitemapIndex(entries) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.map(loc => `  <sitemap><loc>${loc}</loc></sitemap>`).join('\n')}\n</sitemapindex>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.map(loc => `  <sitemap><loc>${escapeXml(loc)}</loc></sitemap>`).join('\n')}\n</sitemapindex>\n`;
 }
 
 async function generateSitemap() {
-  console.log('📊 Fetching pages and blog posts from database...');
+  console.log('📊 Loading cached pages and fetching published blog posts...');
 
-  // Content pages
-  const { data: pages, error: pagesErr } = await supabase
-    .from('page_content')
-    .select('slug, updated_at')
-    .order('slug');
-  if (pagesErr) {
-    console.error('Error fetching page_content:', pagesErr);
-    process.exit(1);
-  }
+  // sync-pages-from-db.js runs immediately before this script when credentials
+  // are available. Using that same cache keeps sitemap and snapshot coverage
+  // coherent in staging and pull-request builds where live sync is skipped.
+  const pages = loadCachedPages();
 
   // Blog posts
-  const { data: posts, error: postsErr } = await supabase
-    .from('blog_posts')
-    .select('slug, published_at, status')
-    .eq('status', 'published')
-    .order('slug');
-  if (postsErr) {
-    console.error('Error fetching blog_posts:', postsErr);
-    process.exit(1);
-  }
+  const posts = await fetchAllRows(
+    'blog_posts',
+    'slug, published_at, status',
+    query => query.eq('status', 'published')
+  );
 
   console.log(`✅ Found ${pages.length} content page(s), ${posts.length} blog post(s)`);
 
@@ -64,11 +123,8 @@ async function generateSitemap() {
     { loc: '/testimonials', priority: '0.7', changefreq: 'weekly' },
     { loc: '/contact', priority: '0.8', changefreq: 'monthly' },
     { loc: '/blog', priority: '0.8', changefreq: 'daily' },
-    // Thank You page: included by request for QA/analytics visibility; remains noindex via meta
-    { loc: '/thank-you', priority: '0.1', changefreq: 'yearly' },
-    { loc: '/faq', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/ai-info', priority: '0.8', changefreq: 'monthly' },
     { loc: '/founder', priority: '0.5', changefreq: 'monthly' },
-    { loc: '/proof', priority: '0.6', changefreq: 'weekly' },
     { loc: '/about/comparison', priority: '0.7', changefreq: 'monthly' },
     { loc: '/submit-ticket', priority: '0.9', changefreq: 'monthly' },
     { loc: '/hubs/alberta-tickets-101', priority: '0.8', changefreq: 'monthly' },
@@ -78,7 +134,9 @@ async function generateSitemap() {
     { loc: '/hubs/city-specific-quirks', priority: '0.8', changefreq: 'monthly' },
   ];
 
-  const pageContentUrls = pages.filter(p => !/^test[-_]/.test(p.slug) && p.slug !== 'test-seed').map(p => ({
+  const pageContentUrls = pages.filter(
+    p => !/^(?:test(?:[-_]|$)|verify-smoke(?:[-_]|$))/.test(p.slug)
+  ).map(p => ({
     loc: `/content/${p.slug}`,
     priority: '0.8',
     changefreq: 'monthly',
@@ -119,6 +177,12 @@ async function generateSitemap() {
   const contentPaths = contentChunks.map((_, i) =>
     i === 0 ? 'public/sitemaps/sitemap-content.xml' : `public/sitemaps/sitemap-content-${i + 1}.xml`
   );
+  const expectedContentFiles = new Set(contentPaths.map(contentPath => path.basename(contentPath)));
+  for (const filename of fs.readdirSync(path.dirname(contentXmlPath))) {
+    if (/^sitemap-content(?:-\d+)?\.xml$/.test(filename) && !expectedContentFiles.has(filename)) {
+      fs.unlinkSync(path.join(path.dirname(contentXmlPath), filename));
+    }
+  }
   contentChunks.forEach((chunk, i) => fs.writeFileSync(contentPaths[i], urlset(chunk)));
 
   fs.writeFileSync(faqXmlPath, urlset(faqUrls));
@@ -135,7 +199,7 @@ async function generateSitemap() {
   console.log('✅ Sitemaps written:');
   console.log('   -', indexXmlPath);
   console.log('   -', pagesXmlPath);
-  console.log('   -', contentXmlPath);
+  contentPaths.forEach(contentPath => console.log('   -', contentPath));
   console.log('   -', faqXmlPath);
 }
 

@@ -12,7 +12,17 @@ const path = require('path');
 
 const PAGES_DIR = process.env.PAGES_DIR || 'ssg-pages';
 const PRERENDER_DIR = process.env.PRERENDER_DIR || 'public/prerendered/content';
+const MANIFEST_PATH =
+  process.env.SNAPSHOT_MANIFEST || path.join(path.dirname(PRERENDER_DIR), 'content-manifest.json');
 const FIX = String(process.env.FIX || '') === '1';
+let quarantinedCurated = new Set();
+
+if (fs.existsSync(MANIFEST_PATH)) {
+  const manifest = safeJSONParse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+  if (Array.isArray(manifest?.quarantinedCuratedSlugs)) {
+    quarantinedCurated = new Set(manifest.quarantinedCuratedSlugs);
+  }
+}
 
 function safeJSONParse(s) {
   try { return JSON.parse(s); } catch(e){ return null; }
@@ -28,6 +38,23 @@ function canonicalFAQSchemaFromArray(faqs) {
     }
   }));
   return { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": mainEntity };
+}
+
+function findFAQSchema(value) {
+  if (!value || typeof value !== 'object') return null;
+  if (value['@type'] === 'FAQPage') return value;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = findFAQSchema(item);
+      if (found) return found;
+    }
+    return null;
+  }
+  for (const nested of Object.values(value)) {
+    const found = findFAQSchema(nested);
+    if (found) return found;
+  }
+  return null;
 }
 
 if (!fs.existsSync(PAGES_DIR)) {
@@ -50,11 +77,8 @@ for (const file of files) {
 
   const slug = obj.slug || path.basename(file, '.json');
 
-  if (!obj.hook || !obj.hook.trim()) {
-    // legacy stub with no body content - generate-static-snapshots.cjs skips
-    // these by design, so there's no snapshot to validate against
-    continue;
-  }
+  const usesGuardedFallback =
+    !obj.hook || !obj.hook.trim() || quarantinedCurated.has(slug);
 
   const faqs = Array.isArray(obj.faqs) ? obj.faqs.filter(Boolean) : [];
 
@@ -80,6 +104,12 @@ for (const file of files) {
     }
   }
 
+  if (usesGuardedFallback) {
+    // The source FAQ schema must remain canonical, while its deployed snapshot
+    // intentionally uses the conservative fallback FAQ set.
+    continue;
+  }
+
   // 2) Check prerendered HTML
   const htmlPath = path.join(PRERENDER_DIR, slug, 'index.html');
   if (!fs.existsSync(htmlPath)) {
@@ -89,15 +119,26 @@ for (const file of files) {
 
   let html = fs.readFileSync(htmlPath, 'utf8');
   let foundFAQ = false;
+  let htmlMismatchRecorded = false;
   const scriptRegex = /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   let newHtml = html.replace(scriptRegex, (m, inner) => {
     const parsed = safeJSONParse(inner.trim());
     if (!parsed) return m; // keep as-is
-    const check = (obj) => obj && obj['@type'] === 'FAQPage';
-    const hasFAQ = (Array.isArray(parsed) && parsed.some(check)) || check(parsed) || (typeof parsed === 'object' && Object.values(parsed).some(v => check(v)));
-    if (hasFAQ) {
+    const faqSchema = findFAQSchema(parsed);
+    if (faqSchema) {
       foundFAQ = true;
-      return `<script type="application/ld+json" id="faq-jsonld">\n${canonicalStr}\n</script>`;
+      if (JSON.stringify(faqSchema) !== canonicalStr && !htmlMismatchRecorded) {
+        parityIssues.push({
+          file: htmlPath,
+          type: 'html_jsonld_mismatch',
+          slug,
+          note: 'prerendered FAQ JSON-LD differs from the source FAQ array',
+        });
+        htmlMismatchRecorded = true;
+      }
+      return FIX
+        ? `<script type="application/ld+json" id="faq-jsonld">\n${canonicalStr}\n</script>`
+        : m;
     }
     return m;
   });

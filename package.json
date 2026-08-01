@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "contrast:guard": "node scripts/contrast-guard.cjs",
-    "prebuild": "node scripts/contrast-guard.cjs && node scripts/sync-pages-from-db.js && node scripts/generate-jsonld.js && node scripts/generate-sitemap-from-db.js && node scripts/generate-routes.js",
-    "build": "npm run prebuild && vite build && npm run postbuild",
+    "prebuild": "node scripts/contrast-guard.cjs && node scripts/test-published-content-guardrails.mjs && node scripts/test-supabase-generated-content-guardrails.mjs && node scripts/sync-pages-from-db.js && node scripts/generate-jsonld.js && node scripts/generate-sitemap-from-db.js && node scripts/generate-routes.js && node scripts/generate-static-snapshots.cjs && node scripts/validate-snapshot-guardrails.cjs",
+    "build": "vite build",
     "postbuild": "node scripts/copy-prerendered.js",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

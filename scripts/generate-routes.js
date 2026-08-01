@@ -17,7 +17,7 @@ if (!fs.existsSync(pagesDir)) {
   process.exit(0);
 }
 
-const files = fs.readdirSync(pagesDir).filter(f => f.endsWith('.json'));
+const files = fs.readdirSync(pagesDir).filter(f => f.endsWith('.json')).sort();
 
 if (files.length === 0) {
   console.warn('⚠️  No JSON files found in', pagesDir);
@@ -28,15 +28,9 @@ if (files.length === 0) {
 
 const routes = files.map(file => {
   const slug = path.basename(file, '.json');
-  const filePath = path.join(pagesDir, file);
-  const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  
   return {
     path: `/content/${slug}`,
-    slug: slug,
-    meta_title: content.meta_title || '',
-    meta_description: content.meta_description || '',
-    h1: content.h1 || ''
+    slug,
   };
 });
 
@@ -48,4 +42,3 @@ const manifest = {
 
 fs.writeFileSync(outFile, JSON.stringify(manifest, null, 2), 'utf8');
 console.log(`✅ Generated routes manifest: ${routes.length} route(s)`);
-routes.forEach(r => console.log(`   ${r.path}`));

@@ -26,7 +26,7 @@ if command -v lsof >/dev/null 2>&1; then
     echo "not listening"
   fi
 else
-  echo "lsof not available — skipping port checks"
+  echo "lsof not available; skipping port checks"
 fi
 
 # If preview is already running on PORT, ask user to kill it or we will reuse it.

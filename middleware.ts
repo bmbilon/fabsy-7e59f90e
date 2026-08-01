@@ -34,6 +34,6 @@ export default function middleware(request: Request) {
   // Rewrite to the snapshot; if the file does not exist Vercel serves the SPA
   // fallback per vercel.json rewrites, so bots degrade to the app shell.
   return rewrite(new URL(target, request.url), {
-    headers: { "x-prerendered": "true", "x-robots-tag": "index, follow" },
+    headers: { "x-prerendered": "true" },
   });
 }

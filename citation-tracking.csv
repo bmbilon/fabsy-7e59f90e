@@ -1,13 +1,12 @@
-Platform Name,Platform URL,Category Used,Submission Date,Status,Login Email,Login Password,Listing URL,Last Updated,Notes,Business Name
-NOTE: Use 'Fabsy Traffic Ticket Services' as business name everywhere
-Google Business Profile,https://business.google.com,Legal Services,,Pending,,,,,Primary citation - most important
-Apple Maps,https://mapsconnect.apple.com,Legal Services,,Pending,,,,,Apple ecosystem visibility
-Bing Places,https://www.bingplaces.com,Legal Services,,Pending,,,,,Microsoft ecosystem
-Yelp for Business,https://biz.yelp.com,Traffic Ticketing Service,,Pending,,,,,Review platform
-Better Business Bureau,https://www.bbb.org,Legal Services - Other,,Pending,,,,,Trust signals
-YellowPages Canada,https://www.yellowpages.ca,Legal Services,,Pending,,,,,Directory listing
-Foursquare,https://business.foursquare.com,Legal Service,,Pending,,,,,Location data provider
-Cylex Canada,https://www.cylex-canada.ca,Legal Services,,Pending,,,,,Canadian directory
-Hotfrog Canada,https://ca.hotfrog.com,Legal Services,,Pending,,,,,Business directory
-Webwiki Canada,https://ca.webwiki.com,Legal Services,,Pending,,,,,Web directory
-NiceLocal Canada,https://ca.nicelocal.com,Legal Services,,Pending,,,,,Local business directory
+Platform Name,Platform URL,Category Used,Submission Date,Status,Login Email,Listing URL,Last Updated,Notes,Business Name
+Google Business Profile,https://business.google.com,Legal Services,,Pending,,,,Primary citation - most important,Fabsy Traffic Ticket Services
+Apple Business Connect,https://businessconnect.apple.com,Legal Services,,Pending,,,,Apple ecosystem visibility,Fabsy Traffic Ticket Services
+Bing Places,https://www.bingplaces.com,Legal Services,,Pending,,,,Microsoft ecosystem,Fabsy Traffic Ticket Services
+Yelp for Business,https://biz.yelp.com,Traffic Ticketing Service,,Pending,,,,Review platform,Fabsy Traffic Ticket Services
+Better Business Bureau,https://www.bbb.org,Legal Services - Other,,Pending,,,,Trust signals,Fabsy Traffic Ticket Services
+YellowPages Canada,https://www.yellowpages.ca,Legal Services,,Pending,,,,Canadian directory,Fabsy Traffic Ticket Services
+Foursquare,https://business.foursquare.com,Legal Service,,Pending,,,,Location data provider,Fabsy Traffic Ticket Services
+Cylex Canada,https://www.cylex-canada.ca,Legal Services,,Pending,,,,Canadian directory,Fabsy Traffic Ticket Services
+Hotfrog Canada,https://ca.hotfrog.com,Legal Services,,Pending,,,,Business directory,Fabsy Traffic Ticket Services
+Webwiki Canada,https://ca.webwiki.com,Legal Services,,Pending,,,,Web directory,Fabsy Traffic Ticket Services
+NiceLocal Canada,https://ca.nicelocal.com,Legal Services,,Pending,,,,Local business directory,Fabsy Traffic Ticket Services

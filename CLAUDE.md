@@ -1,7 +1,7 @@
-# Claude Code Configuration - Fabsy Traffic Ticket Defense
+# Claude Code Configuration - Fabsy Traffic Ticket Services
 
 ## Project Overview
-This is a React/TypeScript application for traffic ticket defense services in Alberta, Canada. The application includes:
+This is a React/TypeScript application for an Alberta traffic ticket agent service. Fabsy is not a law firm. The application includes:
 
 - **Blog functionality** with full markdown support and SEO optimization
 - **Ticket submission and analysis** features
@@ -39,7 +39,7 @@ Execute all tasks to build the feature according to the plan.
 - **Frontend**: React 18, TypeScript, Vite
 - **Styling**: Tailwind CSS with shadcn/ui components
 - **Backend**: Supabase (PostgreSQL + Auth + Storage)
-- **Deployment**: Lovable (auto-deploy from git)
+- **Deployment**: Cloudflare production; Vercel staging and preview deployments
 - **Blog**: ReactMarkdown with remark-gfm for rich content
 - **SEO**: React Helmet Async for meta tags and structured data
 

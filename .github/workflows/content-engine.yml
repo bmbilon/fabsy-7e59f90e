@@ -34,6 +34,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Validate publication guardrails
+        run: |
+          node scripts/test-published-content-guardrails.mjs
+          node scripts/content-engine/test-generate-post-validation.mjs
+
       - name: Generate and publish article
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -49,5 +54,6 @@ jobs:
           git config user.name "fabsy-content-engine"
           git config user.email "actions@github.com"
           git add scripts/content-engine/topics.json scripts/content-engine/trending-log.json
-          git diff --cached --quiet || git commit -m "content-engine: update topic state [skip ci]"
-          git push
+          git diff --cached --quiet || git commit -m "content-engine: update topic state"
+          git pull --rebase origin main
+          git push origin HEAD:main

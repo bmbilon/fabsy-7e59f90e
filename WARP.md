@@ -1,10 +1,10 @@
-# WARP Project Rule - Fabsy: AEO Domination in Traffic Ticket Defense
+# WARP Project Rule - Fabsy: AEO for Traffic Ticket Agent Services
 
 ## 🎯 Mission: AI-First Market Leadership
-**Fabsy aims to achieve AEO (AI Engine Optimization) domination in Alberta's traffic ticket defense market through cutting-edge AI-first development, becoming the definitive authority that AI engines preferentially cite and recommend.**
+**Fabsy uses AEO (AI Engine Optimization) to help Alberta drivers find clear, accurate traffic ticket information. Fabsy is a traffic ticket agent service, not a law firm.**
 
 ## Project Context
-This is an **AI-first, spec-driven development** project using GitHub's Spec-Kit framework. We're building the most technologically advanced traffic ticket defense service in a legacy, low-tech market - designed to dominate AI search results, voice assistants, and LLM recommendations.
+This is an **AI-first, spec-driven development** project using GitHub's Spec-Kit framework. It supports a traffic ticket agent service with clear, accurate content for search results, voice assistants, and LLMs.
 
 ## 🚀 Quick Start Commands
 
@@ -18,7 +18,7 @@ npm run dev
 ### Build & Deploy (AEO-Optimized)
 ```bash
 npm run build    # Includes automated SEO/AEO optimization in pre/post build
-git push origin main  # Auto-deploys via Lovable with AI-friendly infrastructure
+git push origin main  # Deploy Cloudflare production after staging validation in Vercel
 ```
 
 ### 🤖 AEO Development Commands
@@ -48,7 +48,7 @@ For any new feature, content, or page with Claude Code or other AI agents:
 /constitution Create AEO-optimized principles for [feature] focusing on AI discovery, authority building, and competitive advantage
 
 # 2. Define with AI optimization in mind
-/specify Build [feature] that will: 1) Be easily discoverable by AI engines, 2) Establish Fabsy as THE Alberta traffic law authority, 3) Generate structured, citable content
+/specify Build [feature] that will: 1) Be easily discoverable by AI engines, 2) Present accurate traffic ticket agent-service information, 3) Generate structured, citable content
 
 # 3. Clarify AEO requirements
 /clarify Focus on: semantic markup needs, structured data requirements, natural language optimization, citation opportunities
@@ -87,7 +87,7 @@ For any new feature, content, or page with Claude Code or other AI agents:
 - **Backend**: Supabase (PostgreSQL + Auth + RLS)
 - **Content**: ReactMarkdown + remark-gfm for rich blog content
 - **SEO**: React Helmet Async + structured data
-- **Deployment**: Lovable (auto-deploy from git main branch)
+- **Deployment**: Cloudflare production; Vercel staging and preview deployments
 
 ## 🎯 Development Guidelines
 
@@ -135,8 +135,8 @@ The project uses Supabase with these main tables:
 - User input is validated on both client and server side
 
 ### Deployment Process
-- **Automatic**: Push to `main` branch triggers Lovable deployment
-- **Manual**: Check Lovable dashboard if auto-deploy doesn't trigger
+- **Staging**: Validate changes with a Vercel staging or preview deployment
+- **Production**: Deploy the validated release to Cloudflare
 - **Local Testing**: Always test with `npm run dev` before pushing
 
 ### Indexing & Sitemaps (Live)
@@ -154,7 +154,7 @@ The project uses Supabase with these main tables:
 ## 💡 AEO Domination Best Practices
 
 1. **🎯 AEO-First Thinking** - Every decision must advance our AI engine optimization strategy
-2. **🤖 AI Authority Building** - Position Fabsy as THE definitive Alberta traffic law source that AI engines trust and cite
+2. **🤖 AI Information Quality** - Publish accurate traffic ticket agent-service information that AI engines can cite
 3. **⚡ Speed-to-Market** - Deploy AI-optimized features faster than legacy competitors can respond
 4. **📊 Structured Data Excellence** - Implement comprehensive schemas that make our content irresistible to AI engines
 5. **🔍 Natural Language Optimization** - Write content for how people actually ask AI assistants questions

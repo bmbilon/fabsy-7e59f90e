@@ -5,5 +5,5 @@
   Cache-Control: public, max-age=3600
   
 /prerendered/*
-  X-Robots-Tag: index, follow
+  X-Robots-Tag: noindex, nofollow
   Cache-Control: public, max-age=86400

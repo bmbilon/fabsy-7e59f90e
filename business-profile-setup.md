@@ -1,173 +1,45 @@
-# Fabsy Google Business Profile & Citations Setup Guide
+# Fabsy Business Profile and Citation Guide
 
-## Standardized NAP Information
-**Use exactly this information across ALL platforms:**
+## Canonical NAP
 
-- **Business Name:** Fabsy Traffic Ticket Services
-- **Phone:** (825) 793-2279
-- **Email:** hello@fabsy.ca
-- **Website:** https://fabsy.ca
-- **Service Area:** Alberta, Canada (no physical address - service area business)
+Use this information without variations on every listing:
 
-## Google Business Profile Setup
+- Business name: `Fabsy Traffic Ticket Services`
+- Phone: `(825) 793-2279`
+- Email: `hello@fabsy.ca`
+- Website: `https://fabsy.ca`
+- Service area: Alberta, Canada
+- Physical address: do not publish one; Fabsy is a service-area business
 
-### Primary Category: Legal Services
-### Additional Categories:
-- Traffic Ticket Service
-- Legal Consultation Service
+## Description
 
-### Service Areas (Alberta Cities):
-- Calgary
-- Edmonton
-- Red Deer
-- Lethbridge
-- Medicine Hat
-- Fort McMurray
-- Grande Prairie
-- Airdrie
-- Camrose
-- Spruce Grove
-- Leduc
-- St. Albert
-- Sherwood Park
-- Cochrane
-- Okotoks
+> Traffic ticket agent services for Alberta drivers. Fabsy reviews speeding, distracted driving, red-light, careless driving, and other provincial traffic matters. Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Serving Calgary, Edmonton, Red Deer, Lethbridge, Medicine Hat, Fort McMurray, Grande Prairie, and other Alberta locations where agent representation is permitted. Fabsy is not a law firm.
 
-### Business Description:
-Professional traffic ticket defense services for Alberta women drivers. 100% success rate with zero-risk guarantee - you only pay if we save you money. We handle speeding tickets, distracted driving, red light violations, and all traffic citations across Alberta. No court appearance required for most cases.
+## Hours
 
-### Business Hours:
-- Monday-Friday: 9:00 AM - 6:00 PM MST
-- Saturday: 10:00 AM - 4:00 PM MST  
+- Monday to Friday: 9:00 AM to 6:00 PM Mountain Time
+- Saturday: 10:00 AM to 4:00 PM Mountain Time
 - Sunday: Closed
 
-### Services to Add:
-- Traffic Ticket Defense
-- Speeding Ticket Representation
-- Distracted Driving Defense
-- Red Light Ticket Disputes
-- Photo Radar Ticket Defense
-- Careless Driving Representation
-- Insurance Protection Services
+## Citation order
 
-### Attributes to Enable:
-- Women-owned business: Yes
-- Online appointments: Yes
-- Free consultations: Yes
-- Serves Alberta: Yes
+1. Google Business Profile
+2. Apple Business Connect
+3. Bing Places
+4. Yelp for Business
+5. Better Business Bureau
+6. YellowPages Canada
+7. Foursquare
+8. Cylex Canada
+9. Hotfrog Canada
+10. Webwiki Canada
 
-## 10 Priority Citations to Submit
+For each submission, use the canonical NAP and description above. Record the submission date, status, and public listing URL in `citation-tracking.csv`. Never store a password in that file.
 
-### 1. Apple Maps
-- URL: https://mapsconnect.apple.com
-- Category: Legal Services
-- Submit with exact NAP above
+## Listing quality rules
 
-### 2. Bing Places for Business
-- URL: https://www.bingplaces.com
-- Category: Legal Services
-- Add service area: Alberta, Canada
-
-### 3. Yelp for Business
-- URL: https://biz.yelp.com
-- Category: Traffic Ticketing Service
-- Add photos and business description
-
-### 4. Better Business Bureau (BBB)
-- URL: https://www.bbb.org
-- Industry: Legal Services - Other
-- Request accreditation if desired
-
-### 5. YellowPages Canada
-- URL: https://www.yellowpages.ca
-- Category: Legal Services
-- Include service keywords
-
-### 6. Foursquare for Business
-- URL: https://business.foursquare.com
-- Category: Legal Service
-- Add Alberta service area
-
-### 7. Cylex Canada
-- URL: https://www.cylex-canada.ca
-- Category: Legal Services
-- Include detailed business description
-
-### 8. Hotfrog Canada
-- URL: https://ca.hotfrog.com
-- Category: Legal Services
-- Add service area and keywords
-
-### 9. Webwiki Canada
-- URL: https://ca.webwiki.com
-- Category: Legal Services
-- Include business hours and description
-
-### 10. NiceLocal Canada
-- URL: https://ca.nicelocal.com
-- Category: Legal Services
-- Add comprehensive business information
-
-## Business Description Template
-Use this consistent description across all platforms:
-
-"Fabsy Traffic Ticket Services provides professional traffic ticket defense for Alberta women drivers. With a 100% success rate and zero-risk guarantee, we handle all types of traffic violations including speeding tickets, distracted driving, red light cameras, and photo radar across Alberta cities including Calgary, Edmonton, Red Deer, and more. No court appearance required for most cases. You only pay our $488 fee if we save you money - otherwise you pay nothing. Protect your driving record and insurance rates with Alberta's trusted traffic ticket specialists."
-
-## Keywords to Include:
-- Traffic ticket defense Alberta
-- Alberta speeding ticket lawyer
-- Calgary traffic ticket help
-- Edmonton traffic violations
-- Red light ticket defense
-- Photo radar ticket disputes
-- Distracted driving defense Alberta
-- Traffic ticket lawyer women
-- Alberta driving record protection
-- Insurance rate protection
-
-## Photos to Upload:
-1. Professional headshot of founder/team
-2. Alberta driver's license close-up (stock image)
-3. Traffic ticket example (generic/stock)
-4. Alberta highway/cityscape
-5. Professional office setup (even if virtual)
-6. Before/after driving abstract examples
-7. Success statistics infographic
-8. Logo variations
-
-## Structured Data Updates Needed
-
-Update the following files to match GBP NAP:
-- `src/components/Footer.tsx` ✅ (already correct)
-- `src/pages/Contact.tsx` ✅ (fixed above)
-- `supabase/functions/generate-json-ld/index.ts` (update phone numbers)
-- Any other structured data schemas
-
-## Citation Tracking Spreadsheet Columns:
-1. Platform Name
-2. URL
-3. Category Used
-4. Submission Date
-5. Status (Pending/Approved/Live)
-6. Login Email
-7. Login Password
-8. Listing URL (once live)
-9. Last Updated
-10. Notes
-
-## Next Steps:
-1. ✅ Fix NAP inconsistencies on website
-2. ⏳ Set up Google Business Profile
-3. ⏳ Submit all 10 citations with identical NAP
-4. ⏳ Update website structured data
-5. ⏳ Create citation tracking system
-6. Monitor and respond to any reviews
-7. Regularly update business hours/info across all platforms
-
-## Important Notes:
-- Use EXACT same business name, phone, and email across ALL platforms
-- Service-area business = hide physical address, show service areas only
-- Upload consistent photos across platforms
-- Respond to all reviews professionally and promptly
-- Keep business hours updated, especially during holidays
-- Add posts/updates to GBP regularly for better visibility
+- Describe Fabsy as an agent service, not a law firm.
+- Use the complete pricing formula whenever pricing is shown.
+- Use only authentic photos and substantiated business attributes.
+- Do not claim a specific result for an individual matter.
+- Keep hours, phone, website, service area, and business name identical across platforms.

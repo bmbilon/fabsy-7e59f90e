@@ -21,6 +21,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { articleViolations } from '../../src/lib/published-content-guardrails-core.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOPICS_FILE = path.join(__dirname, 'topics.json');
@@ -46,10 +47,13 @@ const CATEGORY_ALIASES = new Map([
   ['how to', 'how-to'],
 ]);
 
-for (const [k, v] of Object.entries({ ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY: SERVICE_KEY })) {
-  if (!v) {
-    console.error(`Missing required env: ${k}`);
-    process.exit(1);
+function validateRequiredEnvironment() {
+  for (const [key, value] of Object.entries({
+    ANTHROPIC_API_KEY,
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY: SERVICE_KEY,
+  })) {
+    if (!value) throw new Error(`Missing required env: ${key}`);
   }
 }
 
@@ -353,9 +357,7 @@ const FORBIDDEN = [
   { re: /\brisk[\s-]?free\b/i, label: 'risk-free claim' },
   { re: /\bmoney[\s-]?back\b/i, label: 'money-back claim' },
   { re: /\brefund/i, label: 'refund claim' },
-  // promissory guarantee only - allow honest "no outcome can be guaranteed"
-  { re: /\bwe\s+guarantee\b/i, label: 'guarantee promise' },
-  { re: /\bguarantee(s|d)?\s+(you\s+)?(a\s+)?(win|results?|outcomes?|success|dismissal|victory)/i, label: 'guarantee-of-outcome claim' },
+  { re: /\bguarantee(?:s|d|ing)?\b/i, label: 'guarantee wording' },
 ];
 
 function normalizeMeta(s) {
@@ -369,7 +371,7 @@ function normalizeMeta(s) {
   return m;
 }
 
-function validateArticle(a) {
+export function validateArticle(a) {
   const errs = [];
   if (!a.title) errs.push('missing title');
   if (!a.slug) errs.push('missing slug');
@@ -380,9 +382,44 @@ function validateArticle(a) {
   const blob = `${a.title} ${a.meta_description} ${a.content}`;
   if (blob.includes('—')) errs.push('contains em-dash');
   for (const f of FORBIDDEN) if (f.re.test(blob)) errs.push(`forbidden: ${f.label}`);
+  for (const match of blob.matchAll(/(\d{1,3})%\+?\s+(?:success|win|favourable|favorable)/gi)) {
+    if (Number(match[1]) > 95) errs.push('outcome rate exceeds 95%');
+  }
+  for (const match of blob.matchAll(/(?:success|win|favourable|favorable)(?:\s+rate)?[^\d]{0,12}(\d{1,3})%\+?/gi)) {
+    if (Number(match[1]) > 95) errs.push('outcome rate exceeds 95%');
+  }
+  if (/\b(?:women?|men|mothers?|moms?|fathers?|dads?|female|male)\b/i.test(blob)) {
+    errs.push('gendered audience wording');
+  }
+  const unsupportedCurrency = [...blob.matchAll(/\$\d[\d,]*(?:\.\d{2})?/g)]
+    .map((match) => match[0])
+    .filter((amount) => amount !== '$488');
+  if (unsupportedCurrency.length) errs.push('contains an unverified money amount');
+  if (/\b\d+\s+demerit(?:\s+points?)?\b|\bdemerit(?:\s+points?)?[^\n.]{0,20}\b\d+\b/i.test(blob)) {
+    errs.push('contains an unverified demerit count');
+  }
+  if (/(?:deadline|response period)[^\n.]{0,40}\b\d+\b|\b\d+\s+(?:days?|hours?|months?)[^\n.]{0,40}(?:deadline|respond|file|dispute)/i.test(blob)) {
+    errs.push('contains an unverified deadline');
+  }
+  if (/\$488/.test(blob)) {
+    for (const phrase of [
+      'flat $488',
+      '30% of any fine reduction achieved',
+      'no additional charge if the fine is not reduced',
+    ]) {
+      if (!blob.toLowerCase().includes(phrase)) errs.push(`incomplete pricing: missing "${phrase}"`);
+    }
+  }
+  for (const violation of articleViolations({
+    title: a.title,
+    meta_description: a.meta_description,
+    content: a.content,
+  })) {
+    errs.push(`publication guard: ${violation}`);
+  }
   if (!(a.content || '').includes('fabsy.ca/submit-ticket')) errs.push('missing CTA URL');
   if (!['published', 'draft'].includes(PUBLISH_STATUS)) errs.push(`bad status: ${PUBLISH_STATUS}`);
-  return errs;
+  return [...new Set(errs)];
 }
 
 async function generateArticleOnce(picked, existingSlugs, corrective) {
@@ -393,8 +430,8 @@ async function generateArticleOnce(picked, existingSlugs, corrective) {
 
 Business facts (must respect exactly):
 - Service: Fabsy fights traffic tickets for Alberta drivers.
-- Pricing: flat $488 admin fee plus 30% contingency on fines saved.
-- Never use "no win, no fee", "no-fee", "zero risk", "risk-free", "money back", "refund", or any guarantee-of-outcome language.
+- Pricing (use exactly): "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
+- Never use "no win, no fee", "no-fee", "zero risk", "risk-free", "money back", "refund", or the word "guarantee" in any form.
 - Success rate: 95%+ of tickets resolved favourably. Do not inflate.
 - Audience: Alberta drivers generally. Do not gender the audience.
 - CTA: direct readers to submit their ticket at ${CTA_URL}
@@ -441,11 +478,12 @@ async function generateValidArticle(picked, existingSlugs) {
     corrective = errs.join('; ');
     console.log(`Validation failed (attempt ${attempt}): ${corrective}`);
   }
-  throw new Error(`Article failed validation after 2 attempts: ${corrective}`);
+  throw new Error(`Article failed validation after 3 attempts: ${corrective}`);
 }
 
 // ---------- main ----------
-(async () => {
+async function main() {
+  validateRequiredEnvironment();
   const existing = await supabaseRest('blog_posts?select=slug,title&limit=500');
   const existingSlugs = existing.map((r) => r.slug);
   const existingTitles = existing.map((r) => r.title).filter(Boolean);
@@ -457,6 +495,13 @@ async function generateValidArticle(picked, existingSlugs) {
 
   const article = await generateValidArticle(picked, existingSlugs);
   if (existingSlugs.includes(article.slug)) article.slug = `${article.slug}-${new Date().toISOString().slice(0, 10)}`;
+
+  // Defense in depth: validate the exact record fields again immediately
+  // before constructing or inserting the publication row.
+  const finalValidationErrors = validateArticle(article);
+  if (finalValidationErrors.length) {
+    throw new Error(`Article failed final pre-insert validation: ${finalValidationErrors.join('; ')}`);
+  }
 
   const wordCount = article.content.split(/\s+/).filter(Boolean).length;
   const now = new Date().toISOString();
@@ -497,7 +542,12 @@ async function generateValidArticle(picked, existingSlugs) {
       trend_candidates: picked.candidates,
     });
   }
-})().catch((err) => {
-  console.error(err.message || err);
-  process.exit(1);
-});
+}
+
+const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  main().catch((err) => {
+    console.error(err.message || err);
+    process.exit(1);
+  });
+}

@@ -75,7 +75,7 @@ Already configured in `.github/workflows/build.yml`. Add these secrets to your G
   "meta_title": "Fight a Speeding Ticket in Calgary | Fabsy",
   "meta_description": "Dispute a speeding ticket in Calgary. Get a free eligibility check.",
   "h1": "How to Fight a Speeding Ticket in Calgary",
-  "hook": "You may be able to dispute your speeding ticket — start with a free eligibility check.",
+  "hook": "You may be able to dispute your speeding ticket; start with a free eligibility check.",
   "bullets": [
     "Request disclosure to review evidence",
     "Gather photos and witness details",

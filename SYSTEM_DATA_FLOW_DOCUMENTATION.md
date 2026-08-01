@@ -98,14 +98,14 @@
   - Agreement checkbox (required)
   - Displays consent terms and data processing agreement
 
-- **Step 5: Payment**
-  - Coupon code (optional) - "TESTUSER" bypasses payment
+- **Step 5: Review**
+  - Shows summary of all entered data
+  - Continue button advances to payment
+
+- **Step 6: Payment**
   - Insurance company (optional)
   - Terms and conditions checkbox (required)
-
-- **Step 6: Review**
-  - Shows summary of all entered data
-  - Submit button triggers submission
+  - Redirects to Stripe Checkout for the $488 CAD flat service fee
 
 **Data Storage During Form Fill:**
 ```typescript
@@ -126,7 +126,7 @@ interface FormData {
 
 **Location:** `src/components/form-steps/PaymentStep.tsx` (line 40+)
 
-**Trigger:** User clicks "Submit" button (or "Pay with Stripe" for regular users)
+**Trigger:** User clicks "Continue to Secure Stripe Checkout"
 
 **What Happens:**
 1. Frontend validates terms checkbox is checked
@@ -159,7 +159,6 @@ const { data: submissionResult, error: submissionError } =
       courtDate: formData.courtDate?.toISOString().split('T')[0],
       defenseStrategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
       additionalNotes: formData.additionalNotes,
-      couponCode: formData.couponCode,
       insuranceCompany: formData.insuranceCompany
     }
   });
@@ -322,7 +321,6 @@ const { data: submissionData, error: submissionError } =
       court_date: formData.courtDate,
       defense_strategy: formData.defenseStrategy,
       additional_notes: formData.additionalNotes,
-      coupon_code: formData.couponCode,
       insurance_company: formData.insuranceCompany,
       status: 'pending'
     })
@@ -344,9 +342,9 @@ INSERT INTO ticket_submissions (
   court_date,           -- '2024-05-23'
   defense_strategy,     -- 'not_guilty\n\nExplanation: I was not speeding...'
   additional_notes,     -- 'Additional context...'
-  coupon_code,          -- 'TESTUSER' (or NULL)
+  coupon_code,          -- NULL for current website submissions
   insurance_company,    -- 'Intact Insurance' (or NULL)
-  status,               -- 'pending'
+  status,               -- 'pending' for the existing case-management workflow
   consent_form_path,    -- NULL (will be filled in next step)
   assigned_to,          -- NULL
   search_vector,        -- Auto-generated for full-text search
@@ -374,13 +372,19 @@ return new Response(JSON.stringify({
 
 **Database State After Step 4:**
 - 1 record in `clients` table (new or updated)
-- 1 new record in `ticket_submissions` table with status 'pending'
+- 1 new record in `ticket_submissions` with status `pending`
 - `ticket_submissions.client_id` references `clients.id`
 - `ticket_submissions.consent_form_path` is still NULL
 
 ---
 
-### Step 5: Consent Form PDF Generation
+### Step 5: Stripe Checkout Session Creation
+
+The frontend creates or reuses an idempotent Stripe Checkout session tied to the submission ID.
+The $488 CAD flat fee is defined server-side. Stripe remains the payment source of truth; database
+status changes must not depend on the customer returning to the browser success page.
+
+### Step 6: Consent Form PDF Generation
 
 **Location:** Frontend calls `supabase/functions/generate-consent-form/index.ts`
 
@@ -425,8 +429,8 @@ const page = pdfDoc.addPage([612, 792]); // Letter size (8.5" x 11")
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                                                              │
-│        WRITTEN CONSENT FOR LEGAL REPRESENTATION            │
-│           Fabsy Traffic Ticket Defense Services             │
+│     WRITTEN CONSENT FOR TRAFFIC TICKET AGENT REPRESENTATION │
+│           Fabsy Traffic Ticket Services                     │
 │                                                              │
 ├─────────────────────────────────────────────────────────────┤
 │  CLIENT INFORMATION                                          │
@@ -453,7 +457,7 @@ const page = pdfDoc.addPage([612, 792]); // Letter size (8.5" x 11")
 │  to the traffic violation referenced above. This includes:  │
 │                                                              │
 │  • Appearing on my behalf at all court proceedings         │
-│  • Filing and submitting all necessary legal documents     │
+│  • Filing and submitting applicable court documents        │
 │  • Negotiating with prosecutors and court officials        │
 │  • Making decisions regarding plea negotiations            │
 │  • Accessing my driving record and related information     │
@@ -461,11 +465,12 @@ const page = pdfDoc.addPage([612, 792]); // Letter size (8.5" x 11")
 │  I understand that:                                         │
 │  • Fabsy will make reasonable efforts to achieve the best  │
 │    possible outcome                                         │
-│  • No specific outcome can be guaranteed                   │
+│  • Outcomes vary by case                                   │
 │  • I am responsible for the service fee regardless of      │
 │    outcome                                                  │
-│  • I may be entitled to a refund under the money-back      │
-│    guarantee policy                                         │
+│  • Pricing is a flat $488 plus 30% of any fine reduction   │
+│    achieved; there is no additional charge if the fine is  │
+│    not reduced                                               │
 │                                                              │
 ├─────────────────────────────────────────────────────────────┤
 │  CLIENT SIGNATURE                                            │
@@ -476,8 +481,9 @@ const page = pdfDoc.addPage([612, 792]); // Letter size (8.5" x 11")
 ├─────────────────────────────────────────────────────────────┤
 │  By signing this form, I consent to the processing of my    │
 │  personal information as outlined in Fabsy's Privacy Policy.│
-│  I understand my data will be used solely for legal         │
-│  representation and will not be shared with third parties   │
+│  I understand my data will be used solely for traffic ticket│
+│  agent representation. Fabsy is not a law firm. It will not│
+│  be shared with third parties                               │
 │  except as required by law.                                 │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -530,7 +536,7 @@ WHERE id = '9d1a9369-fa48-4fea-882d-99a5b3a7ab44';
 
 ---
 
-### Step 6: Email Notification System
+### Step 7: Payment-Pending Notification System
 
 **Location:** Frontend calls `supabase/functions/send-notification/index.ts`
 
@@ -554,8 +560,7 @@ const { error: notificationError } =
       violation: formData.violation,
       fineAmount: formData.fineAmount,
       submittedAt: new Date().toLocaleString(),
-      smsOptIn: formData.smsOptIn,
-      couponCode: formData.couponCode
+      smsOptIn: formData.smsOptIn
     }
   });
 ```
@@ -605,7 +610,7 @@ const emailResponse = await resend.emails.send({
   from: "Fabsy <hello@fabsy.ca>",
   reply_to: "brett@execom.ca",
   to: adminEmails,
-  subject: `${isTestUser ? '[TEST] ' : ''}New Ticket Submission - ${ticketData.firstName} ${ticketData.lastName}`,
+  subject: `Payment Pending - ${ticketData.firstName} ${ticketData.lastName}`,
   html: `... HTML email template ...`
 });
 ```
@@ -614,7 +619,7 @@ const emailResponse = await resend.emails.send({
 ```html
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
   <h1 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
-    🎫 New Ticket Submission Alert
+    🎫 Payment-Pending Ticket Submission
   </h1>
   
   <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
@@ -651,7 +656,7 @@ const emailResponse = await resend.emails.send({
 - **From:** Fabsy <hello@fabsy.ca>
 - **Reply-To:** brett@execom.ca
 - **To:** All admin emails
-- **Subject:** [TEST] New Ticket Submission - Brett Bilon (if test user)
+- **Subject:** Payment Pending - Brett Bilon
 - **Attachments:** None for admin email
 - **API:** Resend API
 
@@ -779,8 +784,8 @@ const clientEmailResponse = await resend.emails.send({
   <div style="background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;">
     <h3 style="color: #333; margin-top: 0;">What Happens Next?</h3>
     <ul style="color: #555; line-height: 1.8;">
-      <li>Our legal team will review your ticket within 24 hours</li>
-      <li>We'll analyze the best defense strategy for your case</li>
+      <li>Our agent team will review your ticket within 24 hours</li>
+      <li>We'll review the available options for your ticket</li>
       <li>You'll receive updates via email and SMS</li>
       <li>We'll keep you informed every step of the way</li>
     </ul>
@@ -817,7 +822,7 @@ const clientEmailResponse = await resend.emails.send({
 ```typescript
 // Line 222-270: Send SMS to admin via Twilio
 const adminSmsMessage = 
-  `${isTestUser ? '[TEST] ' : ''}New Ticket Submission!
+  `Payment-pending ticket submission. Do not begin service until payment is confirmed.
 Name: ${ticketData.firstName} ${ticketData.lastName}
 Ticket: ${ticketData.ticketNumber}
 Violation: ${ticketData.violation}
@@ -842,7 +847,7 @@ const adminSmsResult = await fetch(twilioUrl, {
 
 **Admin SMS Example:**
 ```
-[TEST] New Ticket Submission!
+Payment-pending ticket submission. Do not begin service until payment is confirmed.
 Name: Brett Bilon
 Ticket: A08645033J
 Violation: Speeding 30km over limit
@@ -934,30 +939,21 @@ return new Response(JSON.stringify({
 
 ---
 
-### Step 7: Frontend Success Handling
+### Step 8: Frontend Checkout Redirect and Verified Return
 
 **Location:** `src/components/form-steps/PaymentStep.tsx` (line 195+)
 
 **What Happens:**
 
 ```typescript
-// If TESTUSER coupon, skip payment and show success
-if (isTestUser) {
-  toast({
-    title: "Test Submission Successful! 🎉",
-    description: "Your ticket has been submitted for review (Test Mode - No Payment Required).",
-  });
-  
-  // Redirect to success page after short delay
-  setTimeout(() => {
-    window.location.href = "/payment-success?test=true";
-  }, 1500);
-  return;
-}
-
-// For regular users, proceed to Stripe payment
+// Create the fixed-price Stripe Checkout session.
 const { data, error } = await supabase.functions.invoke('create-payment', {
-  body: { formData }
+  body: {
+    submissionId,
+    customerEmail: formData.email,
+    customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+    ticketNumber: formData.ticketNumber
+  }
 });
 
 if (data?.url) {
@@ -965,12 +961,13 @@ if (data?.url) {
 }
 ```
 
-**Success Page:** `/payment-success?test=true`
+**Success Page:** `/thank-you?session_id={CHECKOUT_SESSION_ID}`
 
 **User Experience:**
-1. Shows success toast notification
-2. After 1.5 seconds, redirects to success page
-3. Success page confirms submission and next steps
+1. Redirect to Stripe Checkout
+2. Stripe returns the customer to `/thank-you`
+3. `get-checkout-session` reads the payment status from Stripe for confirmation and analytics
+4. The read endpoint does not mutate case status
 
 ---
 
@@ -1116,7 +1113,7 @@ CREATE TRIGGER update_ticket_submissions_updated_at
   "court_date": "2024-05-23",
   "defense_strategy": "not_guilty\n\nExplanation: I was not speeding...\n\nCircumstances: ...",
   "additional_notes": "Additional context about the incident",
-  "coupon_code": "TESTUSER",
+  "coupon_code": null,
   "insurance_company": "Intact Insurance",
   "status": "pending",
   "consent_form_path": "9d1a9369-fa48-4fea-882d/consent-form.pdf",
@@ -1230,7 +1227,6 @@ $$;
   courtDate?: string;         // YYYY-MM-DD format
   defenseStrategy: string;    // Combined plea + explanation + circumstances
   additionalNotes?: string;
-  couponCode?: string;
   insuranceCompany?: string;
 }
 ```
@@ -1352,7 +1348,6 @@ $$;
   fineAmount: string;
   submittedAt: string;        // Formatted datetime
   smsOptIn?: boolean;
-  couponCode?: string;
 }
 ```
 
@@ -1410,7 +1405,10 @@ $$;
 **Request Body:**
 ```typescript
 {
-  formData: FormData  // Complete form data object
+  submissionId: string;
+  customerEmail: string;
+  customerName: string;
+  ticketNumber: string;
 }
 ```
 
@@ -1422,12 +1420,11 @@ $$;
 ```
 
 **Process Flow:**
-1. Calculate payment amount based on coupon code
-2. Create Stripe checkout session
-3. Set success/cancel URLs
-4. Return checkout URL for redirect
-
-**Note:** Not used for TESTUSER submissions (payment skipped)
+1. Create a Stripe Checkout session for the $488 CAD flat service fee
+2. Reuse the session idempotently for retries of the same submission
+3. Attach the submission ID as server-controlled metadata
+4. Set validated success/cancel URLs
+5. Return the checkout URL for redirect
 
 ---
 
@@ -1435,7 +1432,7 @@ $$;
 
 ### Admin Notification Email
 
-**Subject:** [TEST] New Ticket Submission - [First Name] [Last Name]
+**Subject:** Payment Pending - [First Name] [Last Name]
 
 **From:** Fabsy <hello@fabsy.ca>
 
@@ -1444,7 +1441,7 @@ $$;
 **Template Structure:**
 ```
 ┌───────────────────────────────────────────────────┐
-│ 🎫 New Ticket Submission Alert                   │
+│ 🎫 Payment-Pending Ticket Submission             │
 ├───────────────────────────────────────────────────┤
 │ Client Information                                │
 │ • Name: [Full Name]                               │
@@ -1494,8 +1491,8 @@ $$;
 │ • Fine Amount: $[Amount]                          │
 ├───────────────────────────────────────────────────┤
 │ What Happens Next?                                │
-│ • Legal team reviews within 24 hours             │
-│ • We analyze best defense strategy               │
+│ • Agent team reviews within 24 hours             │
+│ • We review the available ticket options         │
 │ • You receive updates via email[/SMS]            │
 │ • We keep you informed every step                │
 ├───────────────────────────────────────────────────┤
@@ -1723,7 +1720,7 @@ WHERE ticket_submissions.id = '[submission-id]';
 - Complete client information
 - Full ticket details
 - Defense strategy and notes
-- Payment information (coupon, insurance)
+- Payment status and insurance information
 - Status dropdown (can update)
 - Download consent form button
 - Submission metadata (created, updated)
@@ -1957,7 +1954,7 @@ const downloadConsentForm = async () => {
 │    └─ Query: user_roles + auth.users            │
 │                                                  │
 │ B. Send admin email (Resend API)                │
-│    └─ Subject: New Ticket Submission            │
+│    └─ Subject: Payment Pending                   │
 │    └─ Link to admin portal                      │
 │    └─ No attachments                            │
 │                                                  │
@@ -1974,7 +1971,7 @@ const downloadConsentForm = async () => {
 │                                                  │
 │ E. Send admin SMS (Twilio API)                  │
 │    └─ To: +14036695353 (hardcoded)              │
-│    └─ Body: New submission summary              │
+│    └─ Body: Payment-pending submission summary  │
 │                                                  │
 │ F. Send client SMS (if opted in)                │
 │    └─ To: Client's phone                        │
@@ -1991,9 +1988,7 @@ const downloadConsentForm = async () => {
        ▼
 ┌──────────────────────────────────────────────────┐
 │ SUCCESS RESPONSE TO BROWSER                      │
-│ • Show success toast                             │
-│ • If TESTUSER: Redirect to success page          │
-│ • If regular: Redirect to Stripe checkout        │
+│ • Redirect to Stripe Checkout                    │
 └──────────────────────────────────────────────────┘
 
 

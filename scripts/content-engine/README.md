@@ -31,4 +31,4 @@ Copy into the repo root, preserving paths:
 ## Notes
 
 - GitHub disables cron workflows after 60 days of repo inactivity. The engine's own state commits count as activity, so it keeps itself alive.
-- Generation prompt enforces: flat $488 + 30% contingency (no zero-risk/refund claims), 95%+ success rate, degendered audience, no em-dashes, no invented fine amounts.
+- Generation prompt enforces the exact pricing formula, bans all prohibited claim wording, caps success wording at 95%+, uses a non-gendered audience, avoids em dashes, and prohibits invented fine amounts.

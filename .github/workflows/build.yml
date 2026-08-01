@@ -23,30 +23,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Sync pages from Supabase (guarded)
+      - name: Build guarded snapshots and app
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: |
-          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
-            echo "Supabase secrets not set; skipping sync."
-            exit 0
-          fi
-          node scripts/sync-pages-from-db.js
-      
-      - name: Generate routes
-        run: node scripts/generate-routes.js
-      
-      - name: Validate FAQ JSON-LD equality
-        run: node ci/validate-faq-jsonld.js
-      
-      - name: Build (SSG)
-        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           VITE_GA4_MEASUREMENT_ID: ${{ secrets.VITE_GA4_MEASUREMENT_ID }}
           VITE_GADS_ID: ${{ secrets.VITE_GADS_ID }}
           VITE_GADS_CONVERSION_LABEL: ${{ secrets.VITE_GADS_CONVERSION_LABEL }}
           VITE_GADS_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PURCHASE_LABEL }}
+          REQUIRE_PAGE_SYNC: ${{ github.event_name == 'push' && '1' || '0' }}
+          REQUIRE_PAGE_SYNC_MANIFEST: ${{ github.event_name == 'push' && '1' || '0' }}
+          REQUIRE_SNAPSHOT_MANIFEST: '1'
         run: npm run build
+
+      - name: Validate FAQ JSON-LD equality
+        run: |
+          node ci/validate-faq-jsonld.js
+          node scripts/validate-faq-parity.cjs
 
       - name: Install Playwright browsers (Chromium)
         run: npx playwright install --with-deps chromium
@@ -60,11 +54,21 @@ jobs:
         env:
           PRERENDER_BASE_URL: http://127.0.0.1:4173
           PRERENDER_OUT_DIR: public/prerendered
+          PRERENDER_CONTENT_ROUTES: '0'
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: node scripts/prerender-all.js
 
+      - name: Validate all prerendered HTML guardrails
+        env:
+          VALIDATE_ALL_PRERENDERED: '1'
+        run: |
+          node scripts/validate-snapshot-guardrails.cjs
+          node scripts/validate-blog-snapshot-guardrails.mjs
+
       - name: Copy prerendered snapshots into dist
+        env:
+          REQUIRE_SNAPSHOT_MANIFEST: '1'
         run: node scripts/copy-prerendered.js
 
       - name: Deploy to Cloudflare Pages

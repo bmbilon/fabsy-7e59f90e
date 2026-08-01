@@ -3,10 +3,42 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/fight-careless-ticket-calgary", "destination": "/content/fight-careless-ticket-calgary", "permanent": true },
+    { "source": "/fight-careless-ticket-edmonton", "destination": "/content/fight-careless-ticket-edmonton", "permanent": true },
+    { "source": "/fight-careless-ticket-fort-mcmurray", "destination": "/content/fight-careless-ticket-fort-mcmurray", "permanent": true },
+    { "source": "/fight-careless-ticket-lethbridge", "destination": "/content/fight-careless-ticket-lethbridge", "permanent": true },
+    { "source": "/fight-careless-ticket-medicine-hat", "destination": "/content/fight-careless-ticket-medicine-hat", "permanent": true },
+    { "source": "/fight-careless-ticket-red-deer", "destination": "/content/fight-careless-ticket-red-deer", "permanent": true },
+    { "source": "/fight-distracted-ticket-calgary", "destination": "/content/fight-distracted-ticket-calgary", "permanent": true },
+    { "source": "/fight-distracted-ticket-edmonton", "destination": "/content/fight-distracted-ticket-edmonton", "permanent": true },
+    { "source": "/fight-distracted-ticket-fort-mcmurray", "destination": "/content/fight-distracted-ticket-fort-mcmurray", "permanent": true },
+    { "source": "/fight-distracted-ticket-lethbridge", "destination": "/content/fight-distracted-ticket-lethbridge", "permanent": true },
+    { "source": "/fight-distracted-ticket-medicine-hat", "destination": "/content/fight-distracted-ticket-medicine-hat", "permanent": true },
+    { "source": "/fight-distracted-ticket-red-deer", "destination": "/content/fight-distracted-ticket-red-deer", "permanent": true },
+    { "source": "/fight-photo-radar-ticket-calgary", "destination": "/content/fight-photo-radar-ticket-calgary", "permanent": true },
+    { "source": "/fight-red-light-ticket-calgary", "destination": "/content/fight-red-light-ticket-calgary", "permanent": true },
+    { "source": "/fight-red-light-ticket-edmonton", "destination": "/content/fight-red-light-ticket-edmonton", "permanent": true },
+    { "source": "/fight-red-light-ticket-fort-mcmurray", "destination": "/content/fight-red-light-ticket-fort-mcmurray", "permanent": true },
+    { "source": "/fight-red-light-ticket-lethbridge", "destination": "/content/fight-red-light-ticket-lethbridge", "permanent": true },
+    { "source": "/fight-red-light-ticket-medicine-hat", "destination": "/content/fight-red-light-ticket-medicine-hat", "permanent": true },
+    { "source": "/fight-red-light-ticket-red-deer", "destination": "/content/fight-red-light-ticket-red-deer", "permanent": true },
+    { "source": "/fight-speeding-ticket-calgary", "destination": "/content/fight-speeding-ticket-calgary", "permanent": true },
+    { "source": "/fight-speeding-ticket-edmonton", "destination": "/content/fight-speeding-ticket-edmonton", "permanent": true },
+    { "source": "/fight-speeding-ticket-fort-mcmurray", "destination": "/content/fight-speeding-ticket-fort-mcmurray", "permanent": true },
+    { "source": "/fight-speeding-ticket-lethbridge", "destination": "/content/fight-speeding-ticket-lethbridge", "permanent": true },
+    { "source": "/fight-speeding-ticket-medicine-hat", "destination": "/content/fight-speeding-ticket-medicine-hat", "permanent": true },
+    { "source": "/fight-speeding-ticket-red-deer", "destination": "/content/fight-speeding-ticket-red-deer", "permanent": true },
+    { "source": "/fight-stop-sign-ticket-alberta", "destination": "/content/fight-stop-sign-ticket-alberta", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/((?!assets|prerendered|api|sitemaps|.*\\..*).*)", "destination": "/index.html" }
   ],
   "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
     {
       "source": "/prerendered/(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]

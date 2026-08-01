@@ -8,7 +8,7 @@ This guide explains how to generate and publish AEO-optimized content pages usin
 Use this exact prompt in your AI tool to generate content JSON:
 
 ```
-You are an AEO content generator for fabsy.ca (Alberta traffic-ticket help for women).
+You are an AEO content generator for fabsy.ca (Alberta traffic-ticket agent services).
 Produce EXACT JSON only (no extra text) with these fields:
 
 {
@@ -31,6 +31,9 @@ Rules:
 3) No HTML tags inside FAQ q/a strings (plain text only).
 4) Keep meta lengths under the limits.
 5) Output valid JSON only, minified or pretty is OK.
+6) Fabsy is an agent service, not a law firm.
+7) If pricing is mentioned, use exactly: "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
+8) Do not use "no win no fee", "risk-free", "money back", "guarantee", "zero-risk", or em dashes. Do not invent fines, demerits, deadlines, insurance figures, turnaround times, or outcomes.
 
 Example topic: "How to fight a traffic ticket in Alberta"
 ```
@@ -78,7 +81,7 @@ console.log(result);
   "meta_title": "How to Fight a Traffic Ticket in Alberta | Fabsy",
   "meta_description": "Start here: how to dispute a traffic ticket in Alberta with a free eligibility check from Fabsy.",
   "h1": "How to Fight a Traffic Ticket in Alberta",
-  "hook": "You may be able to dispute a traffic ticket in Alberta — start with a free eligibility check.",
+  "hook": "You may be able to dispute a traffic ticket in Alberta; start with a free eligibility check.",
   "bullets": [
     "Request disclosure to review evidence",
     "Gather photos, dashcam, and witness details",
@@ -86,16 +89,16 @@ console.log(result);
     "Local courts have specific timelines",
     "Fabsy provides a free eligibility read"
   ],
-  "what": "<p>Fighting a ticket means formally disputing the charge — request disclosure to see the evidence, then decide whether to plea, negotiate or go to trial.</p>",
+  "what": "<p>Fighting a ticket means formally disputing the charge. Request disclosure to see the evidence, then decide how to respond.</p>",
   "how": "<p>Step 1: Request disclosure. Step 2: Gather any evidence (photos, witnesses, dashcam). Step 3: Prepare your defence or consult Fabsy for a free eligibility review.</p>",
-  "next": "<p>Upload a photo of your ticket and we'll do a free eligibility check within 24 hours. If disputing, we'll guide you through disclosure and next steps.</p>",
+  "next": "<p>Upload a photo of your ticket for a free eligibility check. After review, Fabsy will explain whether agent services are permitted and available.</p>",
   "faqs": [
     {"q":"Do I need to go to court for a traffic ticket in Alberta?","a":"Not always. You can pay the fine, request a trial, or sometimes settle. Request disclosure if you plan to dispute it."},
     {"q":"How long do I have to request disclosure?","a":"Time limits vary by ticket type; check your ticket and request disclosure promptly to avoid missing deadlines."},
-    {"q":"Will fighting a ticket affect my insurance?","a":"Possibly—insurance impacts depend on your insurer and outcome. Disputing may avoid points if successful; confirm with your provider."},
-    {"q":"Can I get a reduced fine without a trial?","a":"Yes. Many cases settle or result in reductions after disclosure or negotiation — outcomes depend on the evidence and charge."},
+    {"q":"Will fighting a ticket affect my insurance?","a":"Possibly. Insurance impacts depend on your insurer, driving history, and outcome. Confirm the effect with your provider."},
+    {"q":"Can I get a reduced fine without a trial?","a":"It may be possible. Available outcomes depend on the allegation, evidence, current procedure, and individual circumstances."},
     {"q":"What evidence helps my case?","a":"Photos, dashcam footage, witness statements, and accurate timestamps are the most useful forms of evidence when disputing a ticket."},
-    {"q":"How long does the process take?","a":"Timeline varies—requesting disclosure and initial review can take days to weeks; court dates vary by jurisdiction."}
+    {"q":"How long does the process take?","a":"Timing varies by matter, court location, and current procedure. Check the ticket and current official court information."}
   ],
   "video": {"youtubeUrl":"","transcript":""}
 }
@@ -108,7 +111,7 @@ console.log(result);
   "meta_title": "Fight a Speeding Ticket in Calgary | Fabsy",
   "meta_description": "Local guide to fighting a speeding ticket in Calgary. Request disclosure, gather evidence, and get a free eligibility check.",
   "h1": "How to Fight a Speeding Ticket in Calgary",
-  "hook": "You may be able to dispute a speeding ticket in Calgary — request disclosure and start a free eligibility check.",
+  "hook": "You may be able to dispute a speeding ticket in Calgary; request disclosure and start a free eligibility check.",
   "bullets": [
     "Request disclosure from Calgary Traffic Court",
     "Local court names and addresses included",
@@ -118,11 +121,11 @@ console.log(result);
   ],
   "what": "<p>Localize: mention Calgary Traffic Court, local highways like Deerfoot Trail, and common local enforcement patterns.</p>",
   "how": "<p>Request disclosure, gather city-specific evidence, and consider local representation or Fabsy's free review for Calgary-specific steps.</p>",
-  "next": "<p>Upload your ticket photo for a free Calgary eligibility read—expect reply within 24 hours.</p>",
+  "next": "<p>Upload your ticket photo for a free Calgary eligibility review. Fabsy will explain whether agent services are permitted and available.</p>",
   "faqs": [
-    {"q":"What court deals with traffic tickets in Calgary?","a":"Calgary Traffic Court handles most city infractions. Local procedures vary—check the ticket or contact the court office."},
-    {"q":"Can I request disclosure online in Calgary?","a":"Yes, in many cases you can request disclosure online or via the court—check the local court site or ask Fabsy to help."},
-    {"q":"Are Calgary speed camera tickets disputable?","a":"Sometimes—disputability depends on evidence and issuer. Request disclosure and review the photos before deciding."}
+    {"q":"What court deals with traffic tickets in Calgary?","a":"The court location is shown on the ticket. Procedures can change, so check the notice and current Alberta Court of Justice information."},
+    {"q":"Can I request disclosure online in Calgary?","a":"Available disclosure channels depend on the matter and current court process. Check current official information or ask Fabsy to assess whether it can assist."},
+    {"q":"Are Calgary speed camera tickets disputable?","a":"Sometimes. Available response options depend on the notice, evidence, issuer, and current procedure. Review the ticket before deciding."}
   ],
   "video": {"youtubeUrl":"","transcript":""}
 }

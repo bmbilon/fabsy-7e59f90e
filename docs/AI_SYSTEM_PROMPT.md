@@ -62,7 +62,7 @@ REQUIREMENTS:
     "faqs": [
       {
         "q": "How long do I have to dispute a ticket in Calgary?",
-        "a": "You typically have 30 days from the ticket date to request disclosure or enter a plea. Missing this deadline can limit your options."
+        "a": "The response deadline is printed on the ticket. Check the notice and current official court information before deciding how to respond."
       },
       {
         "q": "What is disclosure?",
@@ -82,19 +82,19 @@ REQUIREMENTS:
     "h1": "How to Dispute a Speeding Ticket in Calgary",
     "hook": "You may be able to dispute a speeding ticket in Calgary by requesting disclosure and reviewing the evidence.",
     "bullets": [
-      "Request disclosure within 30 days",
+      "Check the response deadline printed on the ticket",
       "Calgary Traffic Court handles most tickets",
       "Review radar calibration and officer notes",
       "Many cases settle without trial",
       "Free eligibility check available"
     ],
-    "what": "<p>Disputing a speeding ticket in Calgary involves formally challenging the charge through Calgary Traffic Court. The process begins by requesting disclosure—the evidence the prosecution has against you.</p><p>This evidence includes radar gun readings, officer notes, calibration certificates, and any photos or videos. Reviewing this information helps identify weaknesses in the case against you.</p>",
-    "how": "<p>Step 1: Request disclosure from Calgary Traffic Court within 30 days of your ticket date. You can do this online or by mail.</p><p>Step 2: Review the disclosure package carefully. Look for procedural errors, equipment calibration issues, or inconsistencies in the officer's notes.</p><p>Step 3: Decide whether to negotiate with the prosecutor or proceed to trial. Many Calgary tickets are resolved through pre-trial meetings where fines and demerits can be reduced.</p>",
-    "next": "<p>Ready to dispute your Calgary speeding ticket? Upload a photo of your ticket for a free eligibility assessment from Fabsy.</p><p>Our team reviews hundreds of Calgary tickets monthly and knows what works in local courts. We'll assess your case within 24 hours and explain your best options—completely free, with no obligation.</p>",
+    "what": "<p>Disputing a speeding ticket in Calgary involves formally responding to the charge. Requesting disclosure can provide access to the evidence the prosecution intends to rely on.</p><p>The available material depends on the matter. Review the ticket and current official court information before deciding what to do.</p>",
+    "how": "<p>Step 1: Check the response deadline and instructions printed on the ticket.</p><p>Step 2: Request and review any available disclosure using current court procedures.</p><p>Step 3: Consider the available response options based on the allegation, evidence, and current rules.</p>",
+    "next": "<p>Upload a photo of your ticket for a free eligibility assessment from Fabsy.</p><p>After review, Fabsy will explain whether agent services are permitted and available for the matter.</p>",
     "faqs": [
       {
         "q": "How long do I have to dispute a ticket in Calgary?",
-        "a": "You typically have 30 days from the ticket date to request disclosure or enter a plea. Missing this deadline can limit your options."
+        "a": "The response deadline is printed on the ticket. Check the notice and current official court information before deciding how to respond."
       },
       {
         "q": "What is disclosure?",

@@ -1,2 +1,30 @@
+# Permanent redirects for legacy bare content paths.
+/fight-careless-ticket-calgary  /content/fight-careless-ticket-calgary  301
+/fight-careless-ticket-edmonton  /content/fight-careless-ticket-edmonton  301
+/fight-careless-ticket-fort-mcmurray  /content/fight-careless-ticket-fort-mcmurray  301
+/fight-careless-ticket-lethbridge  /content/fight-careless-ticket-lethbridge  301
+/fight-careless-ticket-medicine-hat  /content/fight-careless-ticket-medicine-hat  301
+/fight-careless-ticket-red-deer  /content/fight-careless-ticket-red-deer  301
+/fight-distracted-ticket-calgary  /content/fight-distracted-ticket-calgary  301
+/fight-distracted-ticket-edmonton  /content/fight-distracted-ticket-edmonton  301
+/fight-distracted-ticket-fort-mcmurray  /content/fight-distracted-ticket-fort-mcmurray  301
+/fight-distracted-ticket-lethbridge  /content/fight-distracted-ticket-lethbridge  301
+/fight-distracted-ticket-medicine-hat  /content/fight-distracted-ticket-medicine-hat  301
+/fight-distracted-ticket-red-deer  /content/fight-distracted-ticket-red-deer  301
+/fight-photo-radar-ticket-calgary  /content/fight-photo-radar-ticket-calgary  301
+/fight-red-light-ticket-calgary  /content/fight-red-light-ticket-calgary  301
+/fight-red-light-ticket-edmonton  /content/fight-red-light-ticket-edmonton  301
+/fight-red-light-ticket-fort-mcmurray  /content/fight-red-light-ticket-fort-mcmurray  301
+/fight-red-light-ticket-lethbridge  /content/fight-red-light-ticket-lethbridge  301
+/fight-red-light-ticket-medicine-hat  /content/fight-red-light-ticket-medicine-hat  301
+/fight-red-light-ticket-red-deer  /content/fight-red-light-ticket-red-deer  301
+/fight-speeding-ticket-calgary  /content/fight-speeding-ticket-calgary  301
+/fight-speeding-ticket-edmonton  /content/fight-speeding-ticket-edmonton  301
+/fight-speeding-ticket-fort-mcmurray  /content/fight-speeding-ticket-fort-mcmurray  301
+/fight-speeding-ticket-lethbridge  /content/fight-speeding-ticket-lethbridge  301
+/fight-speeding-ticket-medicine-hat  /content/fight-speeding-ticket-medicine-hat  301
+/fight-speeding-ticket-red-deer  /content/fight-speeding-ticket-red-deer  301
+/fight-stop-sign-ticket-alberta  /content/fight-stop-sign-ticket-alberta  301
+
 # SPA fallback. Crawler -> prerendered routing is handled by functions/_middleware.ts.
 /*    /index.html   200

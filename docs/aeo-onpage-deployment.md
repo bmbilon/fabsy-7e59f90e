@@ -17,11 +17,11 @@ The AEO On-Page system creates consistent, search engine optimized patterns for 
 
 ### **Title Pattern**
 ```
-{Offence} Ticket in {City} — Can You Fight It? | Fabsy
+{Offence} Ticket in {City}: Can You Fight It? | Fabsy
 ```
 **Examples:**
-- "Speeding Ticket in Calgary — Can You Fight It? | Fabsy" ✅ 55 chars
-- "Red Light Ticket in Edmonton — Can You Fight It? | Fabsy" ✅ 58 chars
+- "Speeding Ticket in Calgary: Can You Fight It? | Fabsy" ✅ 55 chars
+- "Red Light Ticket in Edmonton: Can You Fight It? | Fabsy" ✅ 58 chars
 
 ### **H1 Pattern**
 ```
@@ -36,11 +36,11 @@ Got a {Offence} Ticket in {City}?
 2. `What to do next (60-second answer)`
 3. `{City} {offence} penalties & demerits`
 4. `Your options before court day`
-5. `Frequently asked questions — {City} {offence}`
+5. `Frequently asked questions: {City} {offence}`
 
 ### **Meta Description Pattern**
 ```
-{Offence} ticket in {City}? In many cases, Fabsy can keep demerits off your record and help you avoid insurance hikes. Zero-risk: you only pay if we win. Start a free analysis in 60 seconds.
+{Offence} ticket in {City}? Fabsy is a traffic ticket agent service, not a law firm. Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
 ```
 
 ## 📚 **FAQ/PAA Question Bank**
@@ -150,8 +150,8 @@ Every AEO-optimized page includes:
 
 ```html
 <div class="answer-box" data-city="Calgary" data-offence="speeding">
-  <p>Short answer: Yes — many Calgary speeding tickets can be fixed before your court date. Upload your ticket, we pull your court file, then confirm options to protect your record.</p>
-  <button class="cta-primary">Get a free analysis →</button>
+  <p>Short answer: Options may be available for a Calgary speeding ticket before your court date. Upload your ticket and Fabsy can review the available information and discuss next steps.</p>
+  <button class="cta-primary">Request a ticket review</button>
 </div>
 ```
 
@@ -173,7 +173,7 @@ Every AEO-optimized page includes:
 - **Minimum 500 Words:** Adequate coverage without bloat
 - **Scannable Format:** Clear H2 structure and bullet points
 - **Legal Compliance:** Consistent disclaimers
-- **CTA Optimization:** Strategic placement and zero-risk messaging
+- **CTA Optimization:** Strategic placement with clear, compliant messaging
 
 ## 🚀 **Deployment Checklist**
 
@@ -235,7 +235,7 @@ const content = generatePageContent({
 });
 
 console.log(content.title);
-// "Careless Driving Ticket in Red Deer — Can You Fight It? | Fabsy"
+// "Careless Driving Ticket in Red Deer: Can You Fight It? | Fabsy"
 ```
 
 ### **Audit Existing Page**
