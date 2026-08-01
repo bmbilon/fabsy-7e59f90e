@@ -66,9 +66,19 @@ async function generateSitemap() {
     { loc: '/blog', priority: '0.8', changefreq: 'daily' },
     // Thank You page: included by request for QA/analytics visibility; remains noindex via meta
     { loc: '/thank-you', priority: '0.1', changefreq: 'yearly' },
+    { loc: '/faq', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/founder', priority: '0.5', changefreq: 'monthly' },
+    { loc: '/proof', priority: '0.6', changefreq: 'weekly' },
+    { loc: '/about/comparison', priority: '0.7', changefreq: 'monthly' },
+    { loc: '/submit-ticket', priority: '0.9', changefreq: 'monthly' },
+    { loc: '/hubs/alberta-tickets-101', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/hubs/photo-radar-vs-officer-issued', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/hubs/demerits-and-insurance', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/hubs/court-options-and-deadlines', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/hubs/city-specific-quirks', priority: '0.8', changefreq: 'monthly' },
   ];
 
-  const pageContentUrls = pages.map(p => ({
+  const pageContentUrls = pages.filter(p => !/^test[-_]/.test(p.slug) && p.slug !== 'test-seed').map(p => ({
     loc: `/content/${p.slug}`,
     priority: '0.8',
     changefreq: 'monthly',
@@ -97,14 +107,27 @@ async function generateSitemap() {
   ensureDir(faqXmlPath);
 
   fs.writeFileSync(pagesXmlPath, urlset([...staticPages, ...blogPostUrls]));
-  fs.writeFileSync(contentXmlPath, urlset(pageContentUrls));
+
+  // Chunk content URLs: Google caps sitemaps at 50,000 URLs, but we chunk at 1,000
+  // to keep files small and diffable. First chunk keeps the legacy filename.
+  const CHUNK = 1000;
+  const contentChunks = [];
+  for (let i = 0; i < pageContentUrls.length; i += CHUNK) {
+    contentChunks.push(pageContentUrls.slice(i, i + CHUNK));
+  }
+  if (contentChunks.length === 0) contentChunks.push([]);
+  const contentPaths = contentChunks.map((_, i) =>
+    i === 0 ? 'public/sitemaps/sitemap-content.xml' : `public/sitemaps/sitemap-content-${i + 1}.xml`
+  );
+  contentChunks.forEach((chunk, i) => fs.writeFileSync(contentPaths[i], urlset(chunk)));
+
   fs.writeFileSync(faqXmlPath, urlset(faqUrls));
 
   // Write sitemap index at root
   const indexXmlPath = 'public/sitemap.xml';
   const index = sitemapIndex([
     'https://fabsy.ca/sitemaps/sitemap-pages.xml',
-    'https://fabsy.ca/sitemaps/sitemap-content.xml',
+    ...contentPaths.map(p => 'https://fabsy.ca' + p.replace('public', '')),
     'https://fabsy.ca/sitemaps/sitemap-faq.xml',
   ]);
   fs.writeFileSync(indexXmlPath, index);

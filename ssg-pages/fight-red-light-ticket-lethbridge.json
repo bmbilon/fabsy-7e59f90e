@@ -10,11 +10,11 @@
   "next": "",
   "faqs": [
     {
-      "a": "It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.",
+      "a": "It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.",
       "q": "How much does it cost?"
     },
     {
-      "a": "Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.",
+      "a": "Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.",
       "q": "Do I need to appear in court?"
     },
     {
@@ -23,5 +23,5 @@
     }
   ],
   "video": null,
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs $488 for our core package with a zero-risk guarantee; you only pay if we save you money.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not — we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}"
+  "jsonld": "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"How much does it cost?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.\"}}, {\"@type\": \"Question\", \"name\": \"Do I need to appear in court?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.\"}}, {\"@type\": \"Question\", \"name\": \"How long does this take?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"The process typically takes 3-6 months from submission to resolution.\"}}]}"
 }
