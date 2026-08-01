@@ -131,7 +131,7 @@ async function prerenderRoute(browser, route) {
 
       await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(500);
-      const html = await page.content();
+      const html = (await page.content()).replace(/[ \t]+$/gm, '');
       const outPath = toOutPath(route);
       await fs.mkdir(path.dirname(outPath), { recursive: true });
       await fs.writeFile(outPath, html, 'utf8');

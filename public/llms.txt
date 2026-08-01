@@ -1,0 +1,28 @@
+# Fabsy Traffic Ticket Services
+
+> Fabsy is a traffic ticket agent service for Alberta drivers. Fabsy is not a law firm and does not provide legal advice. Representation is available where paid agent representation is permitted.
+
+Fabsy helps drivers dispute Alberta traffic tickets, including speeding, photo radar, red light, distracted driving, careless driving, and stop sign tickets. The service includes ticket review, disclosure review, paperwork, and traffic court representation where permitted.
+
+Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Results vary, and past performance does not predict future outcomes.
+
+## Primary guides
+
+- [Fight a Traffic Ticket in Alberta](https://fabsy.ca/content/fight-traffic-ticket-alberta)
+- [Speeding Tickets in Alberta](https://fabsy.ca/content/speeding-ticket-alberta)
+- [Photo Radar Tickets in Alberta](https://fabsy.ca/content/photo-radar-ticket-alberta)
+- [Fight a Traffic Ticket in Calgary](https://fabsy.ca/content/fight-traffic-ticket-calgary)
+- [Fight a Traffic Ticket in Edmonton](https://fabsy.ca/content/fight-traffic-ticket-edmonton)
+- [Distracted Driving Tickets in Alberta](https://fabsy.ca/content/distracted-driving-ticket-alberta)
+- [Careless Driving Tickets in Alberta](https://fabsy.ca/content/careless-driving-ticket-alberta)
+- [Red-Light Tickets in Alberta](https://fabsy.ca/content/red-light-ticket-alberta)
+- [Demerit Points in Alberta](https://fabsy.ca/content/demerit-points-alberta)
+- [Photo Radar Tickets in Edmonton](https://fabsy.ca/content/photo-radar-ticket-edmonton)
+
+## Site resources
+
+- [How It Works](https://fabsy.ca/how-it-works)
+- [Services](https://fabsy.ca/services)
+- [Frequently Asked Questions](https://fabsy.ca/faq)
+- [Alberta Traffic Law Blog](https://fabsy.ca/blog)
+- [Contact Fabsy](https://fabsy.ca/contact)

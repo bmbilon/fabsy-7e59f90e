@@ -2,5 +2,6 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-pages.xml</loc></sitemap>
   <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-content.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-content-2.xml</loc></sitemap>
   <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-faq.xml</loc></sitemap>
 </sitemapindex>

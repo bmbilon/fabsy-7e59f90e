@@ -1,28 +1,28 @@
 {
   "slug": "fight-speeding-ticket-lethbridge",
   "meta_title": "Fight a Speeding Ticket in Lethbridge | Fabsy",
-  "meta_description": "Local guide to fighting speeding tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
+  "meta_description": "Review a Lethbridge speeding ticket, its printed deadline, available disclosure, and whether Fabsy's agent service can assist.",
   "h1": "Fight a Speeding Ticket in Lethbridge",
-  "hook": "You may be able to dispute a speeding ticket in Lethbridge. request disclosure and start a free eligibility check.",
+  "hook": "If you want to dispute a speeding ticket in Lethbridge, follow its printed instructions and request the available disclosure; Fabsy offers a free eligibility review.",
   "bullets": [
     "Request disclosure from court",
     "Collect photos and witness info",
-    "Many cases resolve without trial"
+    "Disclosure review helps identify the available response options"
   ],
   "what": "<p>Fighting a ticket involves obtaining disclosure and evaluating the evidence to decide next steps.</p>",
   "how": "<p>Request disclosure, gather evidence, and consider Fabsy's free review for next steps.</p>",
-  "next": "<p>Upload your ticket photo for a free check within 24 hours.</p>",
+  "next": "<p>Upload your ticket photo for a free eligibility review.</p>",
   "faqs": [
     {
-      "a": "It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.",
+      "a": "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.",
       "q": "How much does it cost?"
     },
     {
-      "a": "Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.",
+      "a": "Attendance requirements depend on the charge, the court, and what happens in the matter. We will tell you if personal attendance is required.",
       "q": "Do I need to appear in court?"
     },
     {
-      "a": "The process typically takes 3-6 months from submission to resolution.",
+      "a": "Timing depends on the court, disclosure, and the path the matter takes. We will keep you updated as it progresses.",
       "q": "How long does this take?"
     }
   ],
@@ -30,5 +30,5 @@
     "transcript": "",
     "youtubeUrl": ""
   },
-  "jsonld": "{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"How much does it cost?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.\"}}, {\"@type\": \"Question\", \"name\": \"Do I need to appear in court?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.\"}}, {\"@type\": \"Question\", \"name\": \"How long does this take?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"The process typically takes 3-6 months from submission to resolution.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Attendance requirements depend on the charge, the court, and what happens in the matter. We will tell you if personal attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Timing depends on the court, disclosure, and the path the matter takes. We will keep you updated as it progresses.\"}}]}"
 }

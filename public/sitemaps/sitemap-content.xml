@@ -7,6 +7,12 @@
     <lastmod>2025-10-02T16:47:56.92354+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/careless-driving-ticket-alberta</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-banff</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -17,12 +23,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:12.240837+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/careless-driving-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:41.966351+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-calgary-commercial-driver</loc>
@@ -73,6 +73,12 @@
     <lastmod>2025-10-02T16:48:38.776496+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/careless-driving-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:41.966351+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -95,12 +101,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:14.46088+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/careless-driving-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:46.731848+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-edmonton-commercial-driver</loc>
@@ -151,10 +151,10 @@
     <lastmod>2025-10-02T16:48:57.001114+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/careless-driving-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/careless-driving-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:52.718617+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:46.731848+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-fort-mcmurray-commercial-driver</loc>
@@ -205,6 +205,12 @@
     <lastmod>2025-10-02T16:47:16.528961+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/careless-driving-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:52.718617+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -233,12 +239,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:03.154877+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/careless-driving-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:48.436437+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-lethbridge-commercial-driver</loc>
@@ -289,16 +289,16 @@
     <lastmod>2025-10-02T16:49:03.014131+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/careless-driving-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:48.436437+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:07.731679+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/careless-driving-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:50.67809+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-medicine-hat-commercial-driver</loc>
@@ -349,16 +349,16 @@
     <lastmod>2025-10-02T16:49:54.045133+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/careless-driving-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:50.67809+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:01.137538+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/careless-driving-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:47.069687+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-red-deer-commercial-driver</loc>
@@ -409,6 +409,12 @@
     <lastmod>2025-10-02T16:49:15.795848+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/careless-driving-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:47.069687+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/careless-driving-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -431,6 +437,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:16.834798+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://fabsy.ca/content/demerit-points-alberta</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/dispute-fail-to-carry-proof-of-reg-lic-plate-alberta</loc>
@@ -457,6 +469,12 @@
     <lastmod>2025-10-02T16:47:56.7731+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/distracted-driving-ticket-alberta</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-banff</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -467,12 +485,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:12.094901+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:41.805855+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-calgary-commercial-driver</loc>
@@ -523,6 +535,12 @@
     <lastmod>2025-10-02T16:48:37.668517+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/distracted-driving-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:41.805855+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -545,12 +563,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:14.317375+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:46.587932+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-edmonton-commercial-driver</loc>
@@ -601,10 +613,10 @@
     <lastmod>2025-10-02T16:48:25.557546+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/distracted-driving-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:52.589514+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:46.587932+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-fort-mcmurray-commercial-driver</loc>
@@ -655,6 +667,12 @@
     <lastmod>2025-10-02T16:47:16.528961+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/distracted-driving-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:52.589514+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -683,12 +701,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:03.03333+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:48.306477+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-lethbridge-commercial-driver</loc>
@@ -739,16 +751,16 @@
     <lastmod>2025-10-02T16:49:34.131143+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/distracted-driving-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:48.306477+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:07.594244+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:50.528417+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-medicine-hat-commercial-driver</loc>
@@ -799,16 +811,16 @@
     <lastmod>2025-10-02T16:49:52.875211+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/distracted-driving-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:50.528417+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:01.001372+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:46.860406+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-red-deer-commercial-driver</loc>
@@ -859,6 +871,12 @@
     <lastmod>2025-10-02T16:49:14.233621+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/distracted-driving-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:46.860406+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -899,12 +917,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:12.951817+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-stop-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:45.125512+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-calgary-commercial-driver</loc>
@@ -955,6 +967,12 @@
     <lastmod>2025-10-02T16:48:45.594288+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-stop-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:45.125512+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -977,12 +995,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:15.239076+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-stop-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:43.078679+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-edmonton-commercial-driver</loc>
@@ -1033,10 +1045,10 @@
     <lastmod>2025-10-02T16:48:32.585635+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/fail-to-stop-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/fail-to-stop-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:53.407319+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:43.078679+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-fort-mcmurray-commercial-driver</loc>
@@ -1087,6 +1099,12 @@
     <lastmod>2025-10-02T16:47:16.739547+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-stop-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:53.407319+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1115,12 +1133,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:03.818471+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-stop-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:49.144805+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-lethbridge-commercial-driver</loc>
@@ -1171,16 +1183,16 @@
     <lastmod>2025-10-02T16:49:42.270939+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-stop-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:49.144805+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:08.470425+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-stop-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:51.347805+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-medicine-hat-commercial-driver</loc>
@@ -1231,16 +1243,16 @@
     <lastmod>2025-10-02T16:50:00.050057+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-stop-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:51.347805+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:01.844568+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-stop-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:40.379241+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-red-deer-commercial-driver</loc>
@@ -1291,6 +1303,12 @@
     <lastmod>2025-10-02T16:49:22.182129+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-stop-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:40.379241+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-stop-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1331,12 +1349,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:13.403667+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-yield-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:45.641868+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-calgary-commercial-driver</loc>
@@ -1387,6 +1399,12 @@
     <lastmod>2025-10-02T16:48:49.276019+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-yield-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:45.641868+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1409,12 +1427,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:15.804359+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-yield-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:39.076001+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-edmonton-commercial-driver</loc>
@@ -1465,10 +1477,10 @@
     <lastmod>2025-10-02T16:49:06.63098+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/fail-to-yield-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/fail-to-yield-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:53.804614+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:39.076001+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-fort-mcmurray-commercial-driver</loc>
@@ -1519,6 +1531,12 @@
     <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-yield-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:53.804614+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1547,12 +1565,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:04.229882+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-yield-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:49.673829+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-lethbridge-commercial-driver</loc>
@@ -1603,16 +1615,16 @@
     <lastmod>2025-10-02T16:49:46.117074+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-yield-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:49.673829+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:09.010216+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-yield-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:51.784462+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-medicine-hat-commercial-driver</loc>
@@ -1663,16 +1675,16 @@
     <lastmod>2025-10-02T16:50:04.332963+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-yield-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:51.784462+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:02.245808+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/fail-to-yield-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:41.045748+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-red-deer-commercial-driver</loc>
@@ -1723,6 +1735,12 @@
     <lastmod>2025-10-02T16:49:26.02119+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/fail-to-yield-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:41.045748+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/fail-to-yield-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1750,157 +1768,175 @@
     <loc>https://fabsy.ca/content/fight-careless-ticket-calgary</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:38.793877+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:13.117495+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-careless-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:37.238338+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:13.908025+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-careless-ticket-fort-mcmurray</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:41.367679+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:14.231766+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-careless-ticket-lethbridge</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:40.221431+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:14.439841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-careless-ticket-medicine-hat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:37.476159+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:14.571805+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-careless-ticket-red-deer</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:41.520405+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:14.68376+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-distracted-ticket-calgary</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:38.942041+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:14.817862+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-distracted-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:39.221652+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:15.091502+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-distracted-ticket-fort-mcmurray</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:43.337339+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:15.26435+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-distracted-ticket-lethbridge</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:37.619864+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:15.651458+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-distracted-ticket-medicine-hat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:37.765623+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:15.780765+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-distracted-ticket-red-deer</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:37.905196+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:16.020776+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-photo-radar-ticket-calgary</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T15:38:12.239832+00:00</lastmod>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-red-light-ticket-calgary</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:38.04768+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:16.247098+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-red-light-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:38.198088+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:16.384204+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-red-light-ticket-fort-mcmurray</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:38.360661+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:16.540071+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-red-light-ticket-lethbridge</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:38.50361+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:16.670208+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-red-light-ticket-medicine-hat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:43.475899+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:16.79414+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-red-light-ticket-red-deer</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:43.609886+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:16.915557+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-speeding-ticket-calgary</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:43.744683+00:00</lastmod>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-speeding-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:43.87914+00:00</lastmod>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-speeding-ticket-fort-mcmurray</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:44.024395+00:00</lastmod>
+    <lastmod>2026-08-01T17:40:17.292283+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-speeding-ticket-lethbridge</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:44.160129+00:00</lastmod>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-speeding-ticket-medicine-hat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:44.541531+00:00</lastmod>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-speeding-ticket-red-deer</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:44.671801+00:00</lastmod>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/fight-stop-sign-ticket-alberta</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T15:38:12.239832+00:00</lastmod>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://fabsy.ca/content/fight-traffic-ticket-alberta</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://fabsy.ca/content/fight-traffic-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://fabsy.ca/content/fight-traffic-ticket-edmonton</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-airdrie</loc>
@@ -1919,12 +1955,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:13.256095+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/following-too-close-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:45.419236+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-calgary-commercial-driver</loc>
@@ -1975,6 +2005,12 @@
     <lastmod>2025-10-02T16:48:48.044587+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/following-too-close-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:45.419236+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1997,12 +2033,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:15.640165+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/following-too-close-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:38.650132+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-edmonton-commercial-driver</loc>
@@ -2053,10 +2083,10 @@
     <lastmod>2025-10-02T16:49:05.294091+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/following-too-close-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/following-too-close-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:53.671298+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:38.650132+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-fort-mcmurray-commercial-driver</loc>
@@ -2107,6 +2137,12 @@
     <lastmod>2025-10-02T16:47:16.739547+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/following-too-close-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:53.671298+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2135,12 +2171,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:04.095674+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/following-too-close-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:49.537266+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-lethbridge-commercial-driver</loc>
@@ -2191,16 +2221,16 @@
     <lastmod>2025-10-02T16:49:44.570703+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/following-too-close-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:49.537266+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:08.860453+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/following-too-close-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:51.626329+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-medicine-hat-commercial-driver</loc>
@@ -2251,16 +2281,16 @@
     <lastmod>2025-10-02T16:50:02.715836+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/following-too-close-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:51.626329+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:02.111096+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/following-too-close-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:40.784439+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-red-deer-commercial-driver</loc>
@@ -2311,6 +2341,12 @@
     <lastmod>2025-10-02T16:49:24.768108+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/following-too-close-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:40.784439+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/following-too-close-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2351,12 +2387,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:13.546104+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/improper-turn-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:45.771678+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-calgary-commercial-driver</loc>
@@ -2407,6 +2437,12 @@
     <lastmod>2025-10-02T16:48:50.404209+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/improper-turn-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:45.771678+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2429,12 +2465,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:15.962535+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/improper-turn-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:39.379334+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-edmonton-commercial-driver</loc>
@@ -2485,10 +2515,10 @@
     <lastmod>2025-10-02T16:49:07.846147+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/improper-turn-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/improper-turn-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:53.938915+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:39.379334+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-fort-mcmurray-commercial-driver</loc>
@@ -2539,6 +2569,12 @@
     <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/improper-turn-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:53.938915+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2567,12 +2603,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:04.403574+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/improper-turn-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:49.803317+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-lethbridge-commercial-driver</loc>
@@ -2623,16 +2653,16 @@
     <lastmod>2025-10-02T16:49:47.369831+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/improper-turn-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:49.803317+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:09.14845+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/improper-turn-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:51.923673+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-medicine-hat-commercial-driver</loc>
@@ -2683,16 +2713,16 @@
     <lastmod>2025-10-02T16:50:05.536905+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/improper-turn-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:51.923673+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:02.377688+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/improper-turn-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:41.224484+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-red-deer-commercial-driver</loc>
@@ -2743,6 +2773,12 @@
     <lastmod>2025-10-02T16:49:27.451188+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/improper-turn-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:41.224484+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/improper-turn-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2783,12 +2819,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:12.37446+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-insurance-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:42.127704+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-calgary-commercial-driver</loc>
@@ -2839,6 +2869,12 @@
     <lastmod>2025-10-02T16:48:39.9398+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-insurance-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:42.127704+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2861,12 +2897,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:14.64651+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-insurance-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:42.545405+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-edmonton-commercial-driver</loc>
@@ -2917,10 +2947,10 @@
     <lastmod>2025-10-02T16:48:58.126478+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/no-insurance-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/no-insurance-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:52.858554+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:42.545405+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-fort-mcmurray-commercial-driver</loc>
@@ -2971,6 +3001,12 @@
     <lastmod>2025-10-02T16:47:16.528961+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-insurance-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:52.858554+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2999,12 +3035,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:03.293875+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-insurance-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:48.599566+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-lethbridge-commercial-driver</loc>
@@ -3055,16 +3085,16 @@
     <lastmod>2025-10-02T16:49:37.417061+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-insurance-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:48.599566+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:07.862027+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-insurance-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:50.810292+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-medicine-hat-commercial-driver</loc>
@@ -3115,16 +3145,16 @@
     <lastmod>2025-10-02T16:49:55.261616+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-insurance-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:50.810292+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:01.307492+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-insurance-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:47.217031+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-red-deer-commercial-driver</loc>
@@ -3175,6 +3205,12 @@
     <lastmod>2025-10-02T16:49:17.199131+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-insurance-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:47.217031+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-insurance-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3215,12 +3251,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:13.711015+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-seatbelt-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:45.920754+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-calgary-commercial-driver</loc>
@@ -3271,6 +3301,12 @@
     <lastmod>2025-10-02T16:48:51.502695+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-seatbelt-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:45.920754+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3293,12 +3329,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:16.113188+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-seatbelt-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:39.529112+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-edmonton-commercial-driver</loc>
@@ -3349,10 +3379,10 @@
     <lastmod>2025-10-02T16:49:09.057285+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/no-seatbelt-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/no-seatbelt-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:54.066617+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:39.529112+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-fort-mcmurray-commercial-driver</loc>
@@ -3403,6 +3433,12 @@
     <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-seatbelt-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:54.066617+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3431,12 +3467,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:04.550793+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-seatbelt-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:49.943372+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-lethbridge-commercial-driver</loc>
@@ -3487,16 +3517,16 @@
     <lastmod>2025-10-02T16:49:48.536347+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-seatbelt-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:49.943372+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:09.286303+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-seatbelt-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:52.067001+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-medicine-hat-commercial-driver</loc>
@@ -3547,16 +3577,16 @@
     <lastmod>2025-10-02T16:49:35.454068+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-seatbelt-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:52.067001+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:02.519419+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/no-seatbelt-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:47.76407+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-red-deer-commercial-driver</loc>
@@ -3607,6 +3637,12 @@
     <lastmod>2025-10-02T16:49:28.715484+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/no-seatbelt-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:47.76407+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/no-seatbelt-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3631,6 +3667,18 @@
     <lastmod>2025-10-02T16:48:18.70449+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/photo-radar-ticket-alberta</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://fabsy.ca/content/photo-radar-ticket-edmonton</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/racing-ticket-airdrie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3647,12 +3695,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:12.799568+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/racing-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:44.816969+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/racing-ticket-calgary-commercial-driver</loc>
@@ -3703,6 +3745,12 @@
     <lastmod>2025-10-02T16:48:44.45543+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/racing-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:44.816969+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/racing-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3725,12 +3773,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:15.091632+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/racing-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:42.954114+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/racing-ticket-edmonton-commercial-driver</loc>
@@ -3781,10 +3823,10 @@
     <lastmod>2025-10-02T16:49:01.831772+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/racing-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/racing-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:53.270181+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:42.954114+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/racing-ticket-fort-mcmurray-commercial-driver</loc>
@@ -3835,6 +3877,12 @@
     <lastmod>2025-10-02T16:47:16.739547+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/racing-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:53.270181+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/racing-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3863,12 +3911,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:03.687108+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/racing-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:49.01356+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/racing-ticket-lethbridge-commercial-driver</loc>
@@ -3919,16 +3961,16 @@
     <lastmod>2025-10-02T16:49:41.023137+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/racing-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:49.01356+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/racing-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:08.322232+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/racing-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:51.216232+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/racing-ticket-medicine-hat-commercial-driver</loc>
@@ -3979,16 +4021,16 @@
     <lastmod>2025-10-02T16:49:58.792311+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/racing-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:51.216232+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/racing-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:01.713587+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/racing-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:47.616003+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/racing-ticket-red-deer-commercial-driver</loc>
@@ -4039,6 +4081,12 @@
     <lastmod>2025-10-02T16:49:21.02758+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/racing-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:47.616003+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/racing-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4069,6 +4117,12 @@
     <lastmod>2025-10-02T16:47:56.634252+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/red-light-ticket-alberta</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/red-light-ticket-banff</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4079,12 +4133,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:11.946671+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/red-light-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:41.66934+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/red-light-ticket-calgary-commercial-driver</loc>
@@ -4135,6 +4183,12 @@
     <lastmod>2025-10-02T16:48:36.52152+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/red-light-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:41.66934+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/red-light-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4157,12 +4211,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:14.157049+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/red-light-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:46.439678+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/red-light-ticket-edmonton-commercial-driver</loc>
@@ -4213,10 +4261,10 @@
     <lastmod>2025-10-02T16:48:55.130614+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/red-light-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/red-light-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:52.467186+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:46.439678+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/red-light-ticket-fort-mcmurray-commercial-driver</loc>
@@ -4267,6 +4315,12 @@
     <lastmod>2025-10-02T16:47:16.528961+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/red-light-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:52.467186+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/red-light-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4295,12 +4349,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:02.905084+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/red-light-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:48.176722+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/red-light-ticket-lethbridge-commercial-driver</loc>
@@ -4351,16 +4399,16 @@
     <lastmod>2025-10-02T16:49:32.823207+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/red-light-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:48.176722+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/red-light-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:07.432248+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/red-light-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:50.384524+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/red-light-ticket-medicine-hat-commercial-driver</loc>
@@ -4411,16 +4459,16 @@
     <lastmod>2025-10-02T16:49:51.666205+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/red-light-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:50.384524+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/red-light-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:00.865661+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/red-light-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:39.971686+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/red-light-ticket-red-deer-commercial-driver</loc>
@@ -4471,6 +4519,12 @@
     <lastmod>2025-10-02T16:49:12.873047+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/red-light-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:39.971686+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/red-light-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4501,6 +4555,12 @@
     <lastmod>2025-10-02T16:47:56.479723+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/speeding-ticket-alberta</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-08-01T18:49:16.60841+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/speeding-ticket-banff</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4511,12 +4571,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:11.814472+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/speeding-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:44.314654+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/speeding-ticket-calgary-commercial-driver</loc>
@@ -4567,6 +4621,12 @@
     <lastmod>2025-10-02T16:48:35.384494+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/speeding-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:44.314654+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/speeding-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4589,12 +4649,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:14.011168+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/speeding-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:46.28589+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/speeding-ticket-edmonton-commercial-driver</loc>
@@ -4645,10 +4699,10 @@
     <lastmod>2025-10-02T16:48:53.925575+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/speeding-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/speeding-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:52.340177+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:46.28589+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/speeding-ticket-fort-mcmurray-commercial-driver</loc>
@@ -4699,6 +4753,12 @@
     <lastmod>2025-10-02T16:47:16.528961+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/speeding-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:52.340177+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/speeding-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4727,12 +4787,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:02.778247+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/speeding-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:48.049282+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/speeding-ticket-lethbridge-commercial-driver</loc>
@@ -4783,16 +4837,16 @@
     <lastmod>2025-10-02T16:49:31.486683+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/speeding-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:48.049282+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/speeding-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:07.28098+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/speeding-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:50.208537+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/speeding-ticket-medicine-hat-commercial-driver</loc>
@@ -4843,16 +4897,16 @@
     <lastmod>2025-10-02T16:49:50.940093+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/speeding-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:50.208537+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/speeding-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:00.731384+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/speeding-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:39.81316+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/speeding-ticket-red-deer-commercial-driver</loc>
@@ -4903,6 +4957,12 @@
     <lastmod>2025-10-02T16:49:11.259404+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/speeding-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:39.81316+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/speeding-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -4943,12 +5003,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:12.638594+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/stunting-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:42.410934+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/stunting-ticket-calgary-commercial-driver</loc>
@@ -4999,6 +5053,12 @@
     <lastmod>2025-10-02T16:48:43.302988+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/stunting-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:42.410934+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/stunting-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5021,12 +5081,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:14.928983+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/stunting-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:42.825347+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/stunting-ticket-edmonton-commercial-driver</loc>
@@ -5077,10 +5131,10 @@
     <lastmod>2025-10-02T16:49:00.438482+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/stunting-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/stunting-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:53.145282+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:42.825347+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/stunting-ticket-fort-mcmurray-commercial-driver</loc>
@@ -5131,6 +5185,12 @@
     <lastmod>2025-10-02T16:47:16.739547+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/stunting-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:53.145282+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/stunting-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5159,12 +5219,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:03.558943+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/stunting-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:48.852948+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/stunting-ticket-lethbridge-commercial-driver</loc>
@@ -5215,16 +5269,16 @@
     <lastmod>2025-10-02T16:49:39.802404+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/stunting-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:48.852948+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/stunting-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:08.157364+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/stunting-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:51.087201+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/stunting-ticket-medicine-hat-commercial-driver</loc>
@@ -5275,16 +5329,16 @@
     <lastmod>2025-10-02T16:49:57.775682+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/stunting-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:51.087201+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/stunting-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:01.57311+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/stunting-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:47.484476+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/stunting-ticket-red-deer-commercial-driver</loc>
@@ -5335,6 +5389,12 @@
     <lastmod>2025-10-02T16:49:19.698902+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/stunting-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:47.484476+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/stunting-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5375,12 +5435,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:12.506937+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/suspended-license-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:42.277699+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-calgary-commercial-driver</loc>
@@ -5431,6 +5485,12 @@
     <lastmod>2025-10-02T16:48:42.104678+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/suspended-license-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:42.277699+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5453,12 +5513,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:14.786344+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/suspended-license-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:42.686327+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-edmonton-commercial-driver</loc>
@@ -5509,10 +5563,10 @@
     <lastmod>2025-10-02T16:48:59.266915+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/suspended-license-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/suspended-license-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:53.018133+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:42.686327+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-fort-mcmurray-commercial-driver</loc>
@@ -5563,6 +5617,12 @@
     <lastmod>2025-10-02T16:47:16.739547+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/suspended-license-ticket-fort-mcmurray</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:53.018133+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-grande-prairie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5591,12 +5651,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:03.425064+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/suspended-license-ticket-lethbridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:48.728897+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-lethbridge-commercial-driver</loc>
@@ -5647,16 +5701,16 @@
     <lastmod>2025-10-02T16:49:38.656422+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/suspended-license-ticket-lethbridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:48.728897+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-lloydminster</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:08.008821+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/suspended-license-ticket-medicine-hat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:50.955514+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-medicine-hat-commercial-driver</loc>
@@ -5707,16 +5761,16 @@
     <lastmod>2025-10-02T16:49:56.530457+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/suspended-license-ticket-medicine-hat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:50.955514+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-okotoks</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:01.441989+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/suspended-license-ticket-red-deer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:47.354628+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-red-deer-commercial-driver</loc>
@@ -5767,6 +5821,12 @@
     <lastmod>2025-10-02T16:49:18.593322+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/suspended-license-ticket-red-deer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:47.354628+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/suspended-license-ticket-spruce-grove</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5791,12 +5851,6 @@
     <lastmod>2025-10-02T16:48:17.103302+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/test-seed</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-01T22:56:24.437589+00:00</lastmod>
-  </url>
-  <url>
     <loc>https://fabsy.ca/content/tinted-windows-ticket-airdrie</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5813,12 +5867,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:13.860631+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-calgary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:46.142593+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/tinted-windows-ticket-calgary-commercial-driver</loc>
@@ -5869,6 +5917,12 @@
     <lastmod>2025-10-02T16:48:52.61269+00:00</lastmod>
   </url>
   <url>
+    <loc>https://fabsy.ca/content/tinted-windows-ticket-calgary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:47:46.142593+00:00</lastmod>
+  </url>
+  <url>
     <loc>https://fabsy.ca/content/tinted-windows-ticket-camrose</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -5891,12 +5945,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <lastmod>2025-10-02T16:48:16.257932+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-edmonton</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:39.666691+00:00</lastmod>
   </url>
   <url>
     <loc>https://fabsy.ca/content/tinted-windows-ticket-edmonton-commercial-driver</loc>
@@ -5947,57 +5995,9 @@
     <lastmod>2025-10-02T16:49:10.460255+00:00</lastmod>
   </url>
   <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray</loc>
+    <loc>https://fabsy.ca/content/tinted-windows-ticket-edmonton</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:54.195359+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-commercial-driver</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-first-time-offender</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-multiple-tickets</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-new-driver</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-officer-error</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-out-of-province</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-photo-radar</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-fort-mcmurray-weather-conditions</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:47:16.914731+00:00</lastmod>
+    <lastmod>2025-10-02T16:47:39.666691+00:00</lastmod>
   </url>
 </urlset>

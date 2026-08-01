@@ -8,13 +8,25 @@
   "what": "",
   "how": "",
   "next": "",
+  "content": "<p>Short intro for Lethbridge - Distracted driving ticket guidance.</p>\n\n### Related Traffic Ticket Guides\n\n- [distracted Ticket in Medicine Hat](/content/fight-distracted-ticket-medicine-hat)\n- [distracted Ticket in Red Deer](/content/fight-distracted-ticket-red-deer)\n- [red-light Ticket in Lethbridge](/content/fight-red-light-ticket-lethbridge)\n- [distracted Ticket in Calgary](/content/fight-distracted-ticket-calgary)\n- [distracted Ticket in Edmonton](/content/fight-distracted-ticket-edmonton)\n- [careless Ticket in Lethbridge](/content/fight-careless-ticket-lethbridge)\n\n[View all Alberta traffic ticket guides](/) | [Get free ticket analysis](/submit-ticket)\n",
+  "local_info": "Local court: Lethbridge Provincial Court - example address",
+  "city": "Lethbridge",
+  "violation": "distracted",
+  "stats": {
+    "price_cad": 488,
+    "success_rate": 0.94,
+    "demerit_points": {
+      "default": 2
+    },
+    "average_savings_cad": 1500
+  },
   "faqs": [
     {
-      "a": "It costs a flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488.",
+      "a": "It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.",
       "q": "How much does it cost?"
     },
     {
-      "a": "Usually not, we appear on your behalf for most violations. We will notify you if attendance is required.",
+      "a": "Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.",
       "q": "Do I need to appear in court?"
     },
     {
@@ -23,5 +35,7 @@
     }
   ],
   "video": null,
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs a flat $488 to fight your ticket, plus 30% of any fine reduction we win. No reduction, no fees beyond the $488.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not, we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}",
+  "created_at": "2025-10-02T12:39:34.802+00:00",
+  "updated_at": "2026-08-01T17:40:15.651458+00:00"
 }

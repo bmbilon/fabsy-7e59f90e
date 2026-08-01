@@ -1,230 +1,4494 @@
 {
-  "generated": "2026-06-03T16:55:51.968Z",
-  "count": 32,
+  "generated": "2026-08-01T21:34:54.722Z",
+  "count": 1122,
   "routes": [
     {
+      "path": "/content/careless-driving-ticket-airdrie",
+      "slug": "careless-driving-ticket-airdrie"
+    },
+    {
+      "path": "/content/careless-driving-ticket-alberta",
+      "slug": "careless-driving-ticket-alberta"
+    },
+    {
+      "path": "/content/careless-driving-ticket-banff",
+      "slug": "careless-driving-ticket-banff"
+    },
+    {
+      "path": "/content/careless-driving-ticket-brooks",
+      "slug": "careless-driving-ticket-brooks"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-commercial-driver",
+      "slug": "careless-driving-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-first-time-offender",
+      "slug": "careless-driving-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-multiple-tickets",
+      "slug": "careless-driving-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-new-driver",
+      "slug": "careless-driving-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-officer-error",
+      "slug": "careless-driving-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-out-of-province",
+      "slug": "careless-driving-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-photo-radar",
+      "slug": "careless-driving-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary-weather-conditions",
+      "slug": "careless-driving-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/careless-driving-ticket-calgary",
+      "slug": "careless-driving-ticket-calgary"
+    },
+    {
+      "path": "/content/careless-driving-ticket-camrose",
+      "slug": "careless-driving-ticket-camrose"
+    },
+    {
+      "path": "/content/careless-driving-ticket-canmore",
+      "slug": "careless-driving-ticket-canmore"
+    },
+    {
+      "path": "/content/careless-driving-ticket-cochrane",
+      "slug": "careless-driving-ticket-cochrane"
+    },
+    {
+      "path": "/content/careless-driving-ticket-cold-lake",
+      "slug": "careless-driving-ticket-cold-lake"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-commercial-driver",
+      "slug": "careless-driving-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-first-time-offender",
+      "slug": "careless-driving-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-multiple-tickets",
+      "slug": "careless-driving-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-new-driver",
+      "slug": "careless-driving-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-officer-error",
+      "slug": "careless-driving-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-out-of-province",
+      "slug": "careless-driving-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-photo-radar",
+      "slug": "careless-driving-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton-weather-conditions",
+      "slug": "careless-driving-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/careless-driving-ticket-edmonton",
+      "slug": "careless-driving-ticket-edmonton"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-commercial-driver",
+      "slug": "careless-driving-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-first-time-offender",
+      "slug": "careless-driving-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "careless-driving-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-new-driver",
+      "slug": "careless-driving-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-officer-error",
+      "slug": "careless-driving-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-out-of-province",
+      "slug": "careless-driving-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-photo-radar",
+      "slug": "careless-driving-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray-weather-conditions",
+      "slug": "careless-driving-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/careless-driving-ticket-fort-mcmurray",
+      "slug": "careless-driving-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/careless-driving-ticket-grande-prairie",
+      "slug": "careless-driving-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/careless-driving-ticket-hinton",
+      "slug": "careless-driving-ticket-hinton"
+    },
+    {
+      "path": "/content/careless-driving-ticket-jasper",
+      "slug": "careless-driving-ticket-jasper"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lacombe",
+      "slug": "careless-driving-ticket-lacombe"
+    },
+    {
+      "path": "/content/careless-driving-ticket-leduc",
+      "slug": "careless-driving-ticket-leduc"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-commercial-driver",
+      "slug": "careless-driving-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-first-time-offender",
+      "slug": "careless-driving-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-multiple-tickets",
+      "slug": "careless-driving-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-new-driver",
+      "slug": "careless-driving-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-officer-error",
+      "slug": "careless-driving-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-out-of-province",
+      "slug": "careless-driving-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-photo-radar",
+      "slug": "careless-driving-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge-weather-conditions",
+      "slug": "careless-driving-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lethbridge",
+      "slug": "careless-driving-ticket-lethbridge"
+    },
+    {
+      "path": "/content/careless-driving-ticket-lloydminster",
+      "slug": "careless-driving-ticket-lloydminster"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-commercial-driver",
+      "slug": "careless-driving-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-first-time-offender",
+      "slug": "careless-driving-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-multiple-tickets",
+      "slug": "careless-driving-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-new-driver",
+      "slug": "careless-driving-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-officer-error",
+      "slug": "careless-driving-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-out-of-province",
+      "slug": "careless-driving-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-photo-radar",
+      "slug": "careless-driving-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat-weather-conditions",
+      "slug": "careless-driving-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/careless-driving-ticket-medicine-hat",
+      "slug": "careless-driving-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/careless-driving-ticket-okotoks",
+      "slug": "careless-driving-ticket-okotoks"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-commercial-driver",
+      "slug": "careless-driving-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-first-time-offender",
+      "slug": "careless-driving-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-multiple-tickets",
+      "slug": "careless-driving-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-new-driver",
+      "slug": "careless-driving-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-officer-error",
+      "slug": "careless-driving-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-out-of-province",
+      "slug": "careless-driving-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-photo-radar",
+      "slug": "careless-driving-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer-weather-conditions",
+      "slug": "careless-driving-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/careless-driving-ticket-red-deer",
+      "slug": "careless-driving-ticket-red-deer"
+    },
+    {
+      "path": "/content/careless-driving-ticket-spruce-grove",
+      "slug": "careless-driving-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/careless-driving-ticket-stony-plain",
+      "slug": "careless-driving-ticket-stony-plain"
+    },
+    {
+      "path": "/content/careless-driving-ticket-sylvan-lake",
+      "slug": "careless-driving-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/careless-driving-ticket-wetaskiwin",
+      "slug": "careless-driving-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/demerit-points-alberta",
+      "slug": "demerit-points-alberta"
+    },
+    {
       "path": "/content/dispute-fail-to-carry-proof-of-reg-lic-plate-alberta",
-      "slug": "dispute-fail-to-carry-proof-of-reg-lic-plate-alberta",
-      "meta_title": "Dispute Fail to Carry Proof of Reg/Lic Plate Ticket Alberta",
-      "meta_description": "Learn how to dispute an Alberta ticket for failing to carry proof of registration or license plate. Understand the process and potential outcomes.",
-      "h1": "Disputing a 'Fail to Carry Proof of Registration or License Plate' Ticket in Alberta"
+      "slug": "dispute-fail-to-carry-proof-of-reg-lic-plate-alberta"
     },
     {
       "path": "/content/dispute-fail-to-carry-proof-of-registration-alberta",
-      "slug": "dispute-fail-to-carry-proof-of-registration-alberta",
-      "meta_title": "Dispute Fail to Carry Proof of Registration Ticket Alberta",
-      "meta_description": "Learn how to dispute a Fail to Carry Proof of Registration of License Plate ticket in Alberta. Understand your options and next steps.",
-      "h1": "Disputing a 'Fail to Carry Proof of Registration of License Plate' Ticket in Alberta"
+      "slug": "dispute-fail-to-carry-proof-of-registration-alberta"
     },
     {
       "path": "/content/dispute-fail-to-carry-proof-of-registration-ticket-alberta",
-      "slug": "dispute-fail-to-carry-proof-of-registration-ticket-alberta",
-      "meta_title": "Dispute Fail to Carry Proof of Registration Ticket Alberta",
-      "meta_description": "Learn how to dispute a Fail to Carry Proof of Registration or License Plate ticket in Alberta and understand your options.",
-      "h1": "Dispute a Fail to Carry Proof of Registration or License Plate Ticket"
+      "slug": "dispute-fail-to-carry-proof-of-registration-ticket-alberta"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-airdrie",
+      "slug": "distracted-driving-ticket-airdrie"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-alberta",
+      "slug": "distracted-driving-ticket-alberta"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-banff",
+      "slug": "distracted-driving-ticket-banff"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-brooks",
+      "slug": "distracted-driving-ticket-brooks"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-commercial-driver",
+      "slug": "distracted-driving-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-first-time-offender",
+      "slug": "distracted-driving-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-multiple-tickets",
+      "slug": "distracted-driving-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-new-driver",
+      "slug": "distracted-driving-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-officer-error",
+      "slug": "distracted-driving-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-out-of-province",
+      "slug": "distracted-driving-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-photo-radar",
+      "slug": "distracted-driving-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary-weather-conditions",
+      "slug": "distracted-driving-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-calgary",
+      "slug": "distracted-driving-ticket-calgary"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-camrose",
+      "slug": "distracted-driving-ticket-camrose"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-canmore",
+      "slug": "distracted-driving-ticket-canmore"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-cochrane",
+      "slug": "distracted-driving-ticket-cochrane"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-cold-lake",
+      "slug": "distracted-driving-ticket-cold-lake"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-commercial-driver",
+      "slug": "distracted-driving-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-first-time-offender",
+      "slug": "distracted-driving-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-multiple-tickets",
+      "slug": "distracted-driving-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-new-driver",
+      "slug": "distracted-driving-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-officer-error",
+      "slug": "distracted-driving-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-out-of-province",
+      "slug": "distracted-driving-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-photo-radar",
+      "slug": "distracted-driving-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton-weather-conditions",
+      "slug": "distracted-driving-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-edmonton",
+      "slug": "distracted-driving-ticket-edmonton"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-commercial-driver",
+      "slug": "distracted-driving-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-first-time-offender",
+      "slug": "distracted-driving-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "distracted-driving-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-new-driver",
+      "slug": "distracted-driving-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-officer-error",
+      "slug": "distracted-driving-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-out-of-province",
+      "slug": "distracted-driving-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-photo-radar",
+      "slug": "distracted-driving-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray-weather-conditions",
+      "slug": "distracted-driving-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-fort-mcmurray",
+      "slug": "distracted-driving-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-grande-prairie",
+      "slug": "distracted-driving-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-hinton",
+      "slug": "distracted-driving-ticket-hinton"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-jasper",
+      "slug": "distracted-driving-ticket-jasper"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lacombe",
+      "slug": "distracted-driving-ticket-lacombe"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-leduc",
+      "slug": "distracted-driving-ticket-leduc"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-commercial-driver",
+      "slug": "distracted-driving-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-first-time-offender",
+      "slug": "distracted-driving-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-multiple-tickets",
+      "slug": "distracted-driving-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-new-driver",
+      "slug": "distracted-driving-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-officer-error",
+      "slug": "distracted-driving-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-out-of-province",
+      "slug": "distracted-driving-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-photo-radar",
+      "slug": "distracted-driving-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge-weather-conditions",
+      "slug": "distracted-driving-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lethbridge",
+      "slug": "distracted-driving-ticket-lethbridge"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-lloydminster",
+      "slug": "distracted-driving-ticket-lloydminster"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-commercial-driver",
+      "slug": "distracted-driving-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-first-time-offender",
+      "slug": "distracted-driving-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-multiple-tickets",
+      "slug": "distracted-driving-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-new-driver",
+      "slug": "distracted-driving-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-officer-error",
+      "slug": "distracted-driving-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-out-of-province",
+      "slug": "distracted-driving-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-photo-radar",
+      "slug": "distracted-driving-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat-weather-conditions",
+      "slug": "distracted-driving-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-medicine-hat",
+      "slug": "distracted-driving-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-okotoks",
+      "slug": "distracted-driving-ticket-okotoks"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-commercial-driver",
+      "slug": "distracted-driving-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-first-time-offender",
+      "slug": "distracted-driving-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-multiple-tickets",
+      "slug": "distracted-driving-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-new-driver",
+      "slug": "distracted-driving-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-officer-error",
+      "slug": "distracted-driving-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-out-of-province",
+      "slug": "distracted-driving-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-photo-radar",
+      "slug": "distracted-driving-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer-weather-conditions",
+      "slug": "distracted-driving-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-red-deer",
+      "slug": "distracted-driving-ticket-red-deer"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-spruce-grove",
+      "slug": "distracted-driving-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-stony-plain",
+      "slug": "distracted-driving-ticket-stony-plain"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-sylvan-lake",
+      "slug": "distracted-driving-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/distracted-driving-ticket-wetaskiwin",
+      "slug": "distracted-driving-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-airdrie",
+      "slug": "fail-to-stop-ticket-airdrie"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-banff",
+      "slug": "fail-to-stop-ticket-banff"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-brooks",
+      "slug": "fail-to-stop-ticket-brooks"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-commercial-driver",
+      "slug": "fail-to-stop-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-first-time-offender",
+      "slug": "fail-to-stop-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-multiple-tickets",
+      "slug": "fail-to-stop-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-new-driver",
+      "slug": "fail-to-stop-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-officer-error",
+      "slug": "fail-to-stop-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-out-of-province",
+      "slug": "fail-to-stop-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-photo-radar",
+      "slug": "fail-to-stop-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary-weather-conditions",
+      "slug": "fail-to-stop-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-calgary",
+      "slug": "fail-to-stop-ticket-calgary"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-camrose",
+      "slug": "fail-to-stop-ticket-camrose"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-canmore",
+      "slug": "fail-to-stop-ticket-canmore"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-cochrane",
+      "slug": "fail-to-stop-ticket-cochrane"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-cold-lake",
+      "slug": "fail-to-stop-ticket-cold-lake"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-commercial-driver",
+      "slug": "fail-to-stop-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-first-time-offender",
+      "slug": "fail-to-stop-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-multiple-tickets",
+      "slug": "fail-to-stop-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-new-driver",
+      "slug": "fail-to-stop-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-officer-error",
+      "slug": "fail-to-stop-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-out-of-province",
+      "slug": "fail-to-stop-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-photo-radar",
+      "slug": "fail-to-stop-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton-weather-conditions",
+      "slug": "fail-to-stop-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-edmonton",
+      "slug": "fail-to-stop-ticket-edmonton"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-commercial-driver",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-first-time-offender",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-new-driver",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-officer-error",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-out-of-province",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-photo-radar",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray-weather-conditions",
+      "slug": "fail-to-stop-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-fort-mcmurray",
+      "slug": "fail-to-stop-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-grande-prairie",
+      "slug": "fail-to-stop-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-hinton",
+      "slug": "fail-to-stop-ticket-hinton"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-jasper",
+      "slug": "fail-to-stop-ticket-jasper"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lacombe",
+      "slug": "fail-to-stop-ticket-lacombe"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-leduc",
+      "slug": "fail-to-stop-ticket-leduc"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-commercial-driver",
+      "slug": "fail-to-stop-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-first-time-offender",
+      "slug": "fail-to-stop-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-multiple-tickets",
+      "slug": "fail-to-stop-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-new-driver",
+      "slug": "fail-to-stop-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-officer-error",
+      "slug": "fail-to-stop-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-out-of-province",
+      "slug": "fail-to-stop-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-photo-radar",
+      "slug": "fail-to-stop-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge-weather-conditions",
+      "slug": "fail-to-stop-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lethbridge",
+      "slug": "fail-to-stop-ticket-lethbridge"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-lloydminster",
+      "slug": "fail-to-stop-ticket-lloydminster"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-commercial-driver",
+      "slug": "fail-to-stop-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-first-time-offender",
+      "slug": "fail-to-stop-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-multiple-tickets",
+      "slug": "fail-to-stop-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-new-driver",
+      "slug": "fail-to-stop-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-officer-error",
+      "slug": "fail-to-stop-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-out-of-province",
+      "slug": "fail-to-stop-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-photo-radar",
+      "slug": "fail-to-stop-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat-weather-conditions",
+      "slug": "fail-to-stop-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-medicine-hat",
+      "slug": "fail-to-stop-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-okotoks",
+      "slug": "fail-to-stop-ticket-okotoks"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-commercial-driver",
+      "slug": "fail-to-stop-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-first-time-offender",
+      "slug": "fail-to-stop-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-multiple-tickets",
+      "slug": "fail-to-stop-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-new-driver",
+      "slug": "fail-to-stop-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-officer-error",
+      "slug": "fail-to-stop-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-out-of-province",
+      "slug": "fail-to-stop-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-photo-radar",
+      "slug": "fail-to-stop-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer-weather-conditions",
+      "slug": "fail-to-stop-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-red-deer",
+      "slug": "fail-to-stop-ticket-red-deer"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-spruce-grove",
+      "slug": "fail-to-stop-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-stony-plain",
+      "slug": "fail-to-stop-ticket-stony-plain"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-sylvan-lake",
+      "slug": "fail-to-stop-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/fail-to-stop-ticket-wetaskiwin",
+      "slug": "fail-to-stop-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-airdrie",
+      "slug": "fail-to-yield-ticket-airdrie"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-banff",
+      "slug": "fail-to-yield-ticket-banff"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-brooks",
+      "slug": "fail-to-yield-ticket-brooks"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-commercial-driver",
+      "slug": "fail-to-yield-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-first-time-offender",
+      "slug": "fail-to-yield-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-multiple-tickets",
+      "slug": "fail-to-yield-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-new-driver",
+      "slug": "fail-to-yield-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-officer-error",
+      "slug": "fail-to-yield-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-out-of-province",
+      "slug": "fail-to-yield-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-photo-radar",
+      "slug": "fail-to-yield-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary-weather-conditions",
+      "slug": "fail-to-yield-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-calgary",
+      "slug": "fail-to-yield-ticket-calgary"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-camrose",
+      "slug": "fail-to-yield-ticket-camrose"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-canmore",
+      "slug": "fail-to-yield-ticket-canmore"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-cochrane",
+      "slug": "fail-to-yield-ticket-cochrane"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-cold-lake",
+      "slug": "fail-to-yield-ticket-cold-lake"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-commercial-driver",
+      "slug": "fail-to-yield-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-first-time-offender",
+      "slug": "fail-to-yield-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-multiple-tickets",
+      "slug": "fail-to-yield-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-new-driver",
+      "slug": "fail-to-yield-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-officer-error",
+      "slug": "fail-to-yield-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-out-of-province",
+      "slug": "fail-to-yield-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-photo-radar",
+      "slug": "fail-to-yield-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton-weather-conditions",
+      "slug": "fail-to-yield-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-edmonton",
+      "slug": "fail-to-yield-ticket-edmonton"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-commercial-driver",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-first-time-offender",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-new-driver",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-officer-error",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-out-of-province",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-photo-radar",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray-weather-conditions",
+      "slug": "fail-to-yield-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-fort-mcmurray",
+      "slug": "fail-to-yield-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-grande-prairie",
+      "slug": "fail-to-yield-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-hinton",
+      "slug": "fail-to-yield-ticket-hinton"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-jasper",
+      "slug": "fail-to-yield-ticket-jasper"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lacombe",
+      "slug": "fail-to-yield-ticket-lacombe"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-leduc",
+      "slug": "fail-to-yield-ticket-leduc"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-commercial-driver",
+      "slug": "fail-to-yield-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-first-time-offender",
+      "slug": "fail-to-yield-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-multiple-tickets",
+      "slug": "fail-to-yield-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-new-driver",
+      "slug": "fail-to-yield-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-officer-error",
+      "slug": "fail-to-yield-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-out-of-province",
+      "slug": "fail-to-yield-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-photo-radar",
+      "slug": "fail-to-yield-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge-weather-conditions",
+      "slug": "fail-to-yield-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lethbridge",
+      "slug": "fail-to-yield-ticket-lethbridge"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-lloydminster",
+      "slug": "fail-to-yield-ticket-lloydminster"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-commercial-driver",
+      "slug": "fail-to-yield-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-first-time-offender",
+      "slug": "fail-to-yield-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-multiple-tickets",
+      "slug": "fail-to-yield-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-new-driver",
+      "slug": "fail-to-yield-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-officer-error",
+      "slug": "fail-to-yield-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-out-of-province",
+      "slug": "fail-to-yield-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-photo-radar",
+      "slug": "fail-to-yield-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat-weather-conditions",
+      "slug": "fail-to-yield-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-medicine-hat",
+      "slug": "fail-to-yield-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-okotoks",
+      "slug": "fail-to-yield-ticket-okotoks"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-commercial-driver",
+      "slug": "fail-to-yield-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-first-time-offender",
+      "slug": "fail-to-yield-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-multiple-tickets",
+      "slug": "fail-to-yield-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-new-driver",
+      "slug": "fail-to-yield-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-officer-error",
+      "slug": "fail-to-yield-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-out-of-province",
+      "slug": "fail-to-yield-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-photo-radar",
+      "slug": "fail-to-yield-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer-weather-conditions",
+      "slug": "fail-to-yield-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-red-deer",
+      "slug": "fail-to-yield-ticket-red-deer"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-spruce-grove",
+      "slug": "fail-to-yield-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-stony-plain",
+      "slug": "fail-to-yield-ticket-stony-plain"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-sylvan-lake",
+      "slug": "fail-to-yield-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/fail-to-yield-ticket-wetaskiwin",
+      "slug": "fail-to-yield-ticket-wetaskiwin"
     },
     {
       "path": "/content/fight-careless-ticket-calgary",
-      "slug": "fight-careless-ticket-calgary",
-      "meta_title": "Fight a Careless Driving Ticket in Calgary | Fabsy",
-      "meta_description": "Local guide to fighting careless driving tickets in Calgary. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Careless Driving Ticket in Calgary"
+      "slug": "fight-careless-ticket-calgary"
     },
     {
       "path": "/content/fight-careless-ticket-edmonton",
-      "slug": "fight-careless-ticket-edmonton",
-      "meta_title": "Fight a Careless Driving Ticket in Edmonton | Fabsy",
-      "meta_description": "Local guide to fighting careless driving tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Careless Driving Ticket in Edmonton"
+      "slug": "fight-careless-ticket-edmonton"
     },
     {
       "path": "/content/fight-careless-ticket-fort-mcmurray",
-      "slug": "fight-careless-ticket-fort-mcmurray",
-      "meta_title": "Fight a Careless Driving Ticket in Fort McMurray | Fabsy",
-      "meta_description": "Local guide to fighting careless driving tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Careless Driving Ticket in Fort McMurray"
+      "slug": "fight-careless-ticket-fort-mcmurray"
     },
     {
       "path": "/content/fight-careless-ticket-lethbridge",
-      "slug": "fight-careless-ticket-lethbridge",
-      "meta_title": "Fight a Careless Driving Ticket in Lethbridge | Fabsy",
-      "meta_description": "Local guide to fighting careless driving tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Careless Driving Ticket in Lethbridge"
+      "slug": "fight-careless-ticket-lethbridge"
     },
     {
       "path": "/content/fight-careless-ticket-medicine-hat",
-      "slug": "fight-careless-ticket-medicine-hat",
-      "meta_title": "Fight a Careless Driving Ticket in Medicine Hat | Fabsy",
-      "meta_description": "Local guide to fighting careless driving tickets in Medicine Hat. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Careless Driving Ticket in Medicine Hat"
+      "slug": "fight-careless-ticket-medicine-hat"
     },
     {
       "path": "/content/fight-careless-ticket-red-deer",
-      "slug": "fight-careless-ticket-red-deer",
-      "meta_title": "Fight a Careless Driving Ticket in Red Deer | Fabsy",
-      "meta_description": "Local guide to fighting careless driving tickets in Red Deer. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Careless Driving Ticket in Red Deer"
+      "slug": "fight-careless-ticket-red-deer"
     },
     {
       "path": "/content/fight-distracted-ticket-calgary",
-      "slug": "fight-distracted-ticket-calgary",
-      "meta_title": "Fight a Distracted Driving Ticket in Calgary | Fabsy",
-      "meta_description": "Local guide to fighting distracted driving tickets in Calgary. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Distracted Driving Ticket in Calgary"
+      "slug": "fight-distracted-ticket-calgary"
     },
     {
       "path": "/content/fight-distracted-ticket-edmonton",
-      "slug": "fight-distracted-ticket-edmonton",
-      "meta_title": "Fight a Distracted Driving Ticket in Edmonton | Fabsy",
-      "meta_description": "Local guide to fighting distracted driving tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Distracted Driving Ticket in Edmonton"
+      "slug": "fight-distracted-ticket-edmonton"
     },
     {
       "path": "/content/fight-distracted-ticket-fort-mcmurray",
-      "slug": "fight-distracted-ticket-fort-mcmurray",
-      "meta_title": "Fight a Distracted Driving Ticket in Fort McMurray | Fabsy",
-      "meta_description": "Local guide to fighting distracted driving tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Distracted Driving Ticket in Fort McMurray"
+      "slug": "fight-distracted-ticket-fort-mcmurray"
     },
     {
       "path": "/content/fight-distracted-ticket-lethbridge",
-      "slug": "fight-distracted-ticket-lethbridge",
-      "meta_title": "Fight a Distracted Driving Ticket in Lethbridge | Fabsy",
-      "meta_description": "Local guide to fighting distracted driving tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Distracted Driving Ticket in Lethbridge"
+      "slug": "fight-distracted-ticket-lethbridge"
     },
     {
       "path": "/content/fight-distracted-ticket-medicine-hat",
-      "slug": "fight-distracted-ticket-medicine-hat",
-      "meta_title": "Fight a Distracted Driving Ticket in Medicine Hat | Fabsy",
-      "meta_description": "Local guide to fighting distracted driving tickets in Medicine Hat. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Distracted Driving Ticket in Medicine Hat"
+      "slug": "fight-distracted-ticket-medicine-hat"
     },
     {
       "path": "/content/fight-distracted-ticket-red-deer",
-      "slug": "fight-distracted-ticket-red-deer",
-      "meta_title": "Fight a Distracted Driving Ticket in Red Deer | Fabsy",
-      "meta_description": "Local guide to fighting distracted driving tickets in Red Deer. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Distracted Driving Ticket in Red Deer"
+      "slug": "fight-distracted-ticket-red-deer"
     },
     {
       "path": "/content/fight-photo-radar-ticket-calgary",
-      "slug": "fight-photo-radar-ticket-calgary",
-      "meta_title": "Fight Photo Radar Ticket in Calgary | Fabsy",
-      "meta_description": "Learn how to fight a photo radar ticket in Calgary. Understand common defenses and the process for disputing automated enforcement tickets.",
-      "h1": "Fighting a Photo Radar Ticket in Calgary"
+      "slug": "fight-photo-radar-ticket-calgary"
     },
     {
       "path": "/content/fight-red-light-ticket-calgary",
-      "slug": "fight-red-light-ticket-calgary",
-      "meta_title": "Fight a Red Light Camera Ticket in Calgary | Fabsy",
-      "meta_description": "Local guide to fighting red light tickets in Calgary. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Red Light Camera Ticket in Calgary"
+      "slug": "fight-red-light-ticket-calgary"
     },
     {
       "path": "/content/fight-red-light-ticket-edmonton",
-      "slug": "fight-red-light-ticket-edmonton",
-      "meta_title": "Fight a Red Light Camera Ticket in Edmonton | Fabsy",
-      "meta_description": "Local guide to fighting red light tickets in Edmonton. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Red Light Camera Ticket in Edmonton"
+      "slug": "fight-red-light-ticket-edmonton"
     },
     {
       "path": "/content/fight-red-light-ticket-fort-mcmurray",
-      "slug": "fight-red-light-ticket-fort-mcmurray",
-      "meta_title": "Fight a Red Light Camera Ticket in Fort McMurray | Fabsy",
-      "meta_description": "Local guide to fighting red light tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Red Light Camera Ticket in Fort McMurray"
+      "slug": "fight-red-light-ticket-fort-mcmurray"
     },
     {
       "path": "/content/fight-red-light-ticket-lethbridge",
-      "slug": "fight-red-light-ticket-lethbridge",
-      "meta_title": "Fight a Red Light Camera Ticket in Lethbridge | Fabsy",
-      "meta_description": "Local guide to fighting red light tickets in Lethbridge. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Red Light Camera Ticket in Lethbridge"
+      "slug": "fight-red-light-ticket-lethbridge"
     },
     {
       "path": "/content/fight-red-light-ticket-medicine-hat",
-      "slug": "fight-red-light-ticket-medicine-hat",
-      "meta_title": "Fight a Red Light Camera Ticket in Medicine Hat | Fabsy",
-      "meta_description": "Local guide to fighting red light tickets in Medicine Hat. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Red Light Camera Ticket in Medicine Hat"
+      "slug": "fight-red-light-ticket-medicine-hat"
     },
     {
       "path": "/content/fight-red-light-ticket-red-deer",
-      "slug": "fight-red-light-ticket-red-deer",
-      "meta_title": "Fight a Red Light Camera Ticket in Red Deer | Fabsy",
-      "meta_description": "Local guide to fighting red light tickets in Red Deer. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Red Light Camera Ticket in Red Deer"
+      "slug": "fight-red-light-ticket-red-deer"
     },
     {
       "path": "/content/fight-speeding-ticket-calgary",
-      "slug": "fight-speeding-ticket-calgary",
-      "meta_title": "Fight a Speeding Ticket in Calgary | Fabsy",
-      "meta_description": "You can often dispute a speeding ticket in Calgary. Request disclosure, gather evidence, and get a free eligibility check.",
-      "h1": "How to Fight a Speeding Ticket in Calgary"
+      "slug": "fight-speeding-ticket-calgary"
     },
     {
       "path": "/content/fight-speeding-ticket-edmonton",
-      "slug": "fight-speeding-ticket-edmonton",
-      "meta_title": "Fight a Speeding Ticket in Edmonton | Fabsy",
-      "meta_description": "Local guide: how to dispute a speeding ticket in Edmonton. Request disclosure, gather evidence, and get a free eligibility check.",
-      "h1": "How to Fight a Speeding Ticket in Edmonton"
+      "slug": "fight-speeding-ticket-edmonton"
     },
     {
       "path": "/content/fight-speeding-ticket-fort-mcmurray",
-      "slug": "fight-speeding-ticket-fort-mcmurray",
-      "meta_title": "Fight a Speeding Ticket in Fort McMurray | Fabsy",
-      "meta_description": "Local guide to fighting speeding tickets in Fort McMurray. Free eligibility check, disclosure requests, and trusted representation.",
-      "h1": "Fight a Speeding Ticket in Fort McMurray"
+      "slug": "fight-speeding-ticket-fort-mcmurray"
     },
     {
       "path": "/content/fight-speeding-ticket-lethbridge",
-      "slug": "fight-speeding-ticket-lethbridge",
-      "meta_title": "Fight a Speeding Ticket in Lethbridge | Fabsy",
-      "meta_description": "Local steps to dispute a speeding ticket in Lethbridge. Request disclosure, collect evidence, and get a free eligibility check from Fabsy.",
-      "h1": "How to Fight a Speeding Ticket in Lethbridge"
+      "slug": "fight-speeding-ticket-lethbridge"
     },
     {
       "path": "/content/fight-speeding-ticket-medicine-hat",
-      "slug": "fight-speeding-ticket-medicine-hat",
-      "meta_title": "Fight a Speeding Ticket in Medicine Hat | Fabsy",
-      "meta_description": "Steps to dispute a traffic ticket in Medicine Hat. Request disclosure, collect evidence, and get a free eligibility check.",
-      "h1": "How to Fight a Speeding Ticket in Medicine Hat"
+      "slug": "fight-speeding-ticket-medicine-hat"
     },
     {
       "path": "/content/fight-speeding-ticket-red-deer",
-      "slug": "fight-speeding-ticket-red-deer",
-      "meta_title": "Fight a Speeding Ticket in Red Deer | Fabsy",
-      "meta_description": "How to dispute a speeding or traffic ticket in Red Deer, request disclosure and gather local evidence. Free check from Fabsy.",
-      "h1": "How to Fight a Speeding Ticket in Red Deer"
+      "slug": "fight-speeding-ticket-red-deer"
     },
     {
       "path": "/content/fight-stop-sign-ticket-alberta",
-      "slug": "fight-stop-sign-ticket-alberta",
-      "meta_title": "Fight a Stop Sign Ticket in Alberta | Fabsy Traffic Tickets",
-      "meta_description": "Learn how to fight a stop sign ticket in Alberta. Understand your options, common defenses, and the process for challenging your traffic violation.",
-      "h1": "Can You Fight an Alberta Stop Sign Ticket?"
+      "slug": "fight-stop-sign-ticket-alberta"
+    },
+    {
+      "path": "/content/fight-traffic-ticket-alberta",
+      "slug": "fight-traffic-ticket-alberta"
+    },
+    {
+      "path": "/content/fight-traffic-ticket-calgary",
+      "slug": "fight-traffic-ticket-calgary"
+    },
+    {
+      "path": "/content/fight-traffic-ticket-edmonton",
+      "slug": "fight-traffic-ticket-edmonton"
+    },
+    {
+      "path": "/content/following-too-close-ticket-airdrie",
+      "slug": "following-too-close-ticket-airdrie"
+    },
+    {
+      "path": "/content/following-too-close-ticket-banff",
+      "slug": "following-too-close-ticket-banff"
+    },
+    {
+      "path": "/content/following-too-close-ticket-brooks",
+      "slug": "following-too-close-ticket-brooks"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-commercial-driver",
+      "slug": "following-too-close-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-first-time-offender",
+      "slug": "following-too-close-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-multiple-tickets",
+      "slug": "following-too-close-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-new-driver",
+      "slug": "following-too-close-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-officer-error",
+      "slug": "following-too-close-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-out-of-province",
+      "slug": "following-too-close-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-photo-radar",
+      "slug": "following-too-close-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary-weather-conditions",
+      "slug": "following-too-close-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/following-too-close-ticket-calgary",
+      "slug": "following-too-close-ticket-calgary"
+    },
+    {
+      "path": "/content/following-too-close-ticket-camrose",
+      "slug": "following-too-close-ticket-camrose"
+    },
+    {
+      "path": "/content/following-too-close-ticket-canmore",
+      "slug": "following-too-close-ticket-canmore"
+    },
+    {
+      "path": "/content/following-too-close-ticket-cochrane",
+      "slug": "following-too-close-ticket-cochrane"
+    },
+    {
+      "path": "/content/following-too-close-ticket-cold-lake",
+      "slug": "following-too-close-ticket-cold-lake"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-commercial-driver",
+      "slug": "following-too-close-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-first-time-offender",
+      "slug": "following-too-close-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-multiple-tickets",
+      "slug": "following-too-close-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-new-driver",
+      "slug": "following-too-close-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-officer-error",
+      "slug": "following-too-close-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-out-of-province",
+      "slug": "following-too-close-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-photo-radar",
+      "slug": "following-too-close-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton-weather-conditions",
+      "slug": "following-too-close-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/following-too-close-ticket-edmonton",
+      "slug": "following-too-close-ticket-edmonton"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-commercial-driver",
+      "slug": "following-too-close-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-first-time-offender",
+      "slug": "following-too-close-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "following-too-close-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-new-driver",
+      "slug": "following-too-close-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-officer-error",
+      "slug": "following-too-close-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-out-of-province",
+      "slug": "following-too-close-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-photo-radar",
+      "slug": "following-too-close-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray-weather-conditions",
+      "slug": "following-too-close-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/following-too-close-ticket-fort-mcmurray",
+      "slug": "following-too-close-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/following-too-close-ticket-grande-prairie",
+      "slug": "following-too-close-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/following-too-close-ticket-hinton",
+      "slug": "following-too-close-ticket-hinton"
+    },
+    {
+      "path": "/content/following-too-close-ticket-jasper",
+      "slug": "following-too-close-ticket-jasper"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lacombe",
+      "slug": "following-too-close-ticket-lacombe"
+    },
+    {
+      "path": "/content/following-too-close-ticket-leduc",
+      "slug": "following-too-close-ticket-leduc"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-commercial-driver",
+      "slug": "following-too-close-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-first-time-offender",
+      "slug": "following-too-close-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-multiple-tickets",
+      "slug": "following-too-close-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-new-driver",
+      "slug": "following-too-close-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-officer-error",
+      "slug": "following-too-close-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-out-of-province",
+      "slug": "following-too-close-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-photo-radar",
+      "slug": "following-too-close-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge-weather-conditions",
+      "slug": "following-too-close-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lethbridge",
+      "slug": "following-too-close-ticket-lethbridge"
+    },
+    {
+      "path": "/content/following-too-close-ticket-lloydminster",
+      "slug": "following-too-close-ticket-lloydminster"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-commercial-driver",
+      "slug": "following-too-close-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-first-time-offender",
+      "slug": "following-too-close-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-multiple-tickets",
+      "slug": "following-too-close-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-new-driver",
+      "slug": "following-too-close-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-officer-error",
+      "slug": "following-too-close-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-out-of-province",
+      "slug": "following-too-close-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-photo-radar",
+      "slug": "following-too-close-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat-weather-conditions",
+      "slug": "following-too-close-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/following-too-close-ticket-medicine-hat",
+      "slug": "following-too-close-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/following-too-close-ticket-okotoks",
+      "slug": "following-too-close-ticket-okotoks"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-commercial-driver",
+      "slug": "following-too-close-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-first-time-offender",
+      "slug": "following-too-close-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-multiple-tickets",
+      "slug": "following-too-close-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-new-driver",
+      "slug": "following-too-close-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-officer-error",
+      "slug": "following-too-close-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-out-of-province",
+      "slug": "following-too-close-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-photo-radar",
+      "slug": "following-too-close-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer-weather-conditions",
+      "slug": "following-too-close-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/following-too-close-ticket-red-deer",
+      "slug": "following-too-close-ticket-red-deer"
+    },
+    {
+      "path": "/content/following-too-close-ticket-spruce-grove",
+      "slug": "following-too-close-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/following-too-close-ticket-stony-plain",
+      "slug": "following-too-close-ticket-stony-plain"
+    },
+    {
+      "path": "/content/following-too-close-ticket-sylvan-lake",
+      "slug": "following-too-close-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/following-too-close-ticket-wetaskiwin",
+      "slug": "following-too-close-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/improper-turn-ticket-airdrie",
+      "slug": "improper-turn-ticket-airdrie"
+    },
+    {
+      "path": "/content/improper-turn-ticket-banff",
+      "slug": "improper-turn-ticket-banff"
+    },
+    {
+      "path": "/content/improper-turn-ticket-brooks",
+      "slug": "improper-turn-ticket-brooks"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-commercial-driver",
+      "slug": "improper-turn-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-first-time-offender",
+      "slug": "improper-turn-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-multiple-tickets",
+      "slug": "improper-turn-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-new-driver",
+      "slug": "improper-turn-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-officer-error",
+      "slug": "improper-turn-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-out-of-province",
+      "slug": "improper-turn-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-photo-radar",
+      "slug": "improper-turn-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary-weather-conditions",
+      "slug": "improper-turn-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/improper-turn-ticket-calgary",
+      "slug": "improper-turn-ticket-calgary"
+    },
+    {
+      "path": "/content/improper-turn-ticket-camrose",
+      "slug": "improper-turn-ticket-camrose"
+    },
+    {
+      "path": "/content/improper-turn-ticket-canmore",
+      "slug": "improper-turn-ticket-canmore"
+    },
+    {
+      "path": "/content/improper-turn-ticket-cochrane",
+      "slug": "improper-turn-ticket-cochrane"
+    },
+    {
+      "path": "/content/improper-turn-ticket-cold-lake",
+      "slug": "improper-turn-ticket-cold-lake"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-commercial-driver",
+      "slug": "improper-turn-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-first-time-offender",
+      "slug": "improper-turn-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-multiple-tickets",
+      "slug": "improper-turn-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-new-driver",
+      "slug": "improper-turn-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-officer-error",
+      "slug": "improper-turn-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-out-of-province",
+      "slug": "improper-turn-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-photo-radar",
+      "slug": "improper-turn-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton-weather-conditions",
+      "slug": "improper-turn-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/improper-turn-ticket-edmonton",
+      "slug": "improper-turn-ticket-edmonton"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-commercial-driver",
+      "slug": "improper-turn-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-first-time-offender",
+      "slug": "improper-turn-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "improper-turn-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-new-driver",
+      "slug": "improper-turn-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-officer-error",
+      "slug": "improper-turn-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-out-of-province",
+      "slug": "improper-turn-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-photo-radar",
+      "slug": "improper-turn-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray-weather-conditions",
+      "slug": "improper-turn-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/improper-turn-ticket-fort-mcmurray",
+      "slug": "improper-turn-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/improper-turn-ticket-grande-prairie",
+      "slug": "improper-turn-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/improper-turn-ticket-hinton",
+      "slug": "improper-turn-ticket-hinton"
+    },
+    {
+      "path": "/content/improper-turn-ticket-jasper",
+      "slug": "improper-turn-ticket-jasper"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lacombe",
+      "slug": "improper-turn-ticket-lacombe"
+    },
+    {
+      "path": "/content/improper-turn-ticket-leduc",
+      "slug": "improper-turn-ticket-leduc"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-commercial-driver",
+      "slug": "improper-turn-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-first-time-offender",
+      "slug": "improper-turn-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-multiple-tickets",
+      "slug": "improper-turn-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-new-driver",
+      "slug": "improper-turn-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-officer-error",
+      "slug": "improper-turn-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-out-of-province",
+      "slug": "improper-turn-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-photo-radar",
+      "slug": "improper-turn-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge-weather-conditions",
+      "slug": "improper-turn-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lethbridge",
+      "slug": "improper-turn-ticket-lethbridge"
+    },
+    {
+      "path": "/content/improper-turn-ticket-lloydminster",
+      "slug": "improper-turn-ticket-lloydminster"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-commercial-driver",
+      "slug": "improper-turn-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-first-time-offender",
+      "slug": "improper-turn-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-multiple-tickets",
+      "slug": "improper-turn-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-new-driver",
+      "slug": "improper-turn-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-officer-error",
+      "slug": "improper-turn-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-out-of-province",
+      "slug": "improper-turn-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-photo-radar",
+      "slug": "improper-turn-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat-weather-conditions",
+      "slug": "improper-turn-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/improper-turn-ticket-medicine-hat",
+      "slug": "improper-turn-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/improper-turn-ticket-okotoks",
+      "slug": "improper-turn-ticket-okotoks"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-commercial-driver",
+      "slug": "improper-turn-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-first-time-offender",
+      "slug": "improper-turn-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-multiple-tickets",
+      "slug": "improper-turn-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-new-driver",
+      "slug": "improper-turn-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-officer-error",
+      "slug": "improper-turn-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-out-of-province",
+      "slug": "improper-turn-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-photo-radar",
+      "slug": "improper-turn-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer-weather-conditions",
+      "slug": "improper-turn-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/improper-turn-ticket-red-deer",
+      "slug": "improper-turn-ticket-red-deer"
+    },
+    {
+      "path": "/content/improper-turn-ticket-spruce-grove",
+      "slug": "improper-turn-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/improper-turn-ticket-stony-plain",
+      "slug": "improper-turn-ticket-stony-plain"
+    },
+    {
+      "path": "/content/improper-turn-ticket-sylvan-lake",
+      "slug": "improper-turn-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/improper-turn-ticket-wetaskiwin",
+      "slug": "improper-turn-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/no-insurance-ticket-airdrie",
+      "slug": "no-insurance-ticket-airdrie"
+    },
+    {
+      "path": "/content/no-insurance-ticket-banff",
+      "slug": "no-insurance-ticket-banff"
+    },
+    {
+      "path": "/content/no-insurance-ticket-brooks",
+      "slug": "no-insurance-ticket-brooks"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-commercial-driver",
+      "slug": "no-insurance-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-first-time-offender",
+      "slug": "no-insurance-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-multiple-tickets",
+      "slug": "no-insurance-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-new-driver",
+      "slug": "no-insurance-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-officer-error",
+      "slug": "no-insurance-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-out-of-province",
+      "slug": "no-insurance-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-photo-radar",
+      "slug": "no-insurance-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary-weather-conditions",
+      "slug": "no-insurance-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/no-insurance-ticket-calgary",
+      "slug": "no-insurance-ticket-calgary"
+    },
+    {
+      "path": "/content/no-insurance-ticket-camrose",
+      "slug": "no-insurance-ticket-camrose"
+    },
+    {
+      "path": "/content/no-insurance-ticket-canmore",
+      "slug": "no-insurance-ticket-canmore"
+    },
+    {
+      "path": "/content/no-insurance-ticket-cochrane",
+      "slug": "no-insurance-ticket-cochrane"
+    },
+    {
+      "path": "/content/no-insurance-ticket-cold-lake",
+      "slug": "no-insurance-ticket-cold-lake"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-commercial-driver",
+      "slug": "no-insurance-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-first-time-offender",
+      "slug": "no-insurance-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-multiple-tickets",
+      "slug": "no-insurance-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-new-driver",
+      "slug": "no-insurance-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-officer-error",
+      "slug": "no-insurance-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-out-of-province",
+      "slug": "no-insurance-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-photo-radar",
+      "slug": "no-insurance-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton-weather-conditions",
+      "slug": "no-insurance-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/no-insurance-ticket-edmonton",
+      "slug": "no-insurance-ticket-edmonton"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-commercial-driver",
+      "slug": "no-insurance-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-first-time-offender",
+      "slug": "no-insurance-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "no-insurance-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-new-driver",
+      "slug": "no-insurance-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-officer-error",
+      "slug": "no-insurance-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-out-of-province",
+      "slug": "no-insurance-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-photo-radar",
+      "slug": "no-insurance-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray-weather-conditions",
+      "slug": "no-insurance-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/no-insurance-ticket-fort-mcmurray",
+      "slug": "no-insurance-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/no-insurance-ticket-grande-prairie",
+      "slug": "no-insurance-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/no-insurance-ticket-hinton",
+      "slug": "no-insurance-ticket-hinton"
+    },
+    {
+      "path": "/content/no-insurance-ticket-jasper",
+      "slug": "no-insurance-ticket-jasper"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lacombe",
+      "slug": "no-insurance-ticket-lacombe"
+    },
+    {
+      "path": "/content/no-insurance-ticket-leduc",
+      "slug": "no-insurance-ticket-leduc"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-commercial-driver",
+      "slug": "no-insurance-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-first-time-offender",
+      "slug": "no-insurance-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-multiple-tickets",
+      "slug": "no-insurance-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-new-driver",
+      "slug": "no-insurance-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-officer-error",
+      "slug": "no-insurance-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-out-of-province",
+      "slug": "no-insurance-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-photo-radar",
+      "slug": "no-insurance-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge-weather-conditions",
+      "slug": "no-insurance-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lethbridge",
+      "slug": "no-insurance-ticket-lethbridge"
+    },
+    {
+      "path": "/content/no-insurance-ticket-lloydminster",
+      "slug": "no-insurance-ticket-lloydminster"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-commercial-driver",
+      "slug": "no-insurance-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-first-time-offender",
+      "slug": "no-insurance-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-multiple-tickets",
+      "slug": "no-insurance-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-new-driver",
+      "slug": "no-insurance-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-officer-error",
+      "slug": "no-insurance-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-out-of-province",
+      "slug": "no-insurance-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-photo-radar",
+      "slug": "no-insurance-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat-weather-conditions",
+      "slug": "no-insurance-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/no-insurance-ticket-medicine-hat",
+      "slug": "no-insurance-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/no-insurance-ticket-okotoks",
+      "slug": "no-insurance-ticket-okotoks"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-commercial-driver",
+      "slug": "no-insurance-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-first-time-offender",
+      "slug": "no-insurance-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-multiple-tickets",
+      "slug": "no-insurance-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-new-driver",
+      "slug": "no-insurance-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-officer-error",
+      "slug": "no-insurance-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-out-of-province",
+      "slug": "no-insurance-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-photo-radar",
+      "slug": "no-insurance-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer-weather-conditions",
+      "slug": "no-insurance-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/no-insurance-ticket-red-deer",
+      "slug": "no-insurance-ticket-red-deer"
+    },
+    {
+      "path": "/content/no-insurance-ticket-spruce-grove",
+      "slug": "no-insurance-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/no-insurance-ticket-stony-plain",
+      "slug": "no-insurance-ticket-stony-plain"
+    },
+    {
+      "path": "/content/no-insurance-ticket-sylvan-lake",
+      "slug": "no-insurance-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/no-insurance-ticket-wetaskiwin",
+      "slug": "no-insurance-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-airdrie",
+      "slug": "no-seatbelt-ticket-airdrie"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-banff",
+      "slug": "no-seatbelt-ticket-banff"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-brooks",
+      "slug": "no-seatbelt-ticket-brooks"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-commercial-driver",
+      "slug": "no-seatbelt-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-first-time-offender",
+      "slug": "no-seatbelt-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-multiple-tickets",
+      "slug": "no-seatbelt-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-new-driver",
+      "slug": "no-seatbelt-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-officer-error",
+      "slug": "no-seatbelt-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-out-of-province",
+      "slug": "no-seatbelt-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-photo-radar",
+      "slug": "no-seatbelt-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary-weather-conditions",
+      "slug": "no-seatbelt-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-calgary",
+      "slug": "no-seatbelt-ticket-calgary"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-camrose",
+      "slug": "no-seatbelt-ticket-camrose"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-canmore",
+      "slug": "no-seatbelt-ticket-canmore"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-cochrane",
+      "slug": "no-seatbelt-ticket-cochrane"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-cold-lake",
+      "slug": "no-seatbelt-ticket-cold-lake"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-commercial-driver",
+      "slug": "no-seatbelt-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-first-time-offender",
+      "slug": "no-seatbelt-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-multiple-tickets",
+      "slug": "no-seatbelt-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-new-driver",
+      "slug": "no-seatbelt-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-officer-error",
+      "slug": "no-seatbelt-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-out-of-province",
+      "slug": "no-seatbelt-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-photo-radar",
+      "slug": "no-seatbelt-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton-weather-conditions",
+      "slug": "no-seatbelt-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-edmonton",
+      "slug": "no-seatbelt-ticket-edmonton"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-commercial-driver",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-first-time-offender",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-new-driver",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-officer-error",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-out-of-province",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-photo-radar",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray-weather-conditions",
+      "slug": "no-seatbelt-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-fort-mcmurray",
+      "slug": "no-seatbelt-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-grande-prairie",
+      "slug": "no-seatbelt-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-hinton",
+      "slug": "no-seatbelt-ticket-hinton"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-jasper",
+      "slug": "no-seatbelt-ticket-jasper"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lacombe",
+      "slug": "no-seatbelt-ticket-lacombe"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-leduc",
+      "slug": "no-seatbelt-ticket-leduc"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-commercial-driver",
+      "slug": "no-seatbelt-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-first-time-offender",
+      "slug": "no-seatbelt-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-multiple-tickets",
+      "slug": "no-seatbelt-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-new-driver",
+      "slug": "no-seatbelt-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-officer-error",
+      "slug": "no-seatbelt-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-out-of-province",
+      "slug": "no-seatbelt-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-photo-radar",
+      "slug": "no-seatbelt-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge-weather-conditions",
+      "slug": "no-seatbelt-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lethbridge",
+      "slug": "no-seatbelt-ticket-lethbridge"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-lloydminster",
+      "slug": "no-seatbelt-ticket-lloydminster"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-commercial-driver",
+      "slug": "no-seatbelt-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-first-time-offender",
+      "slug": "no-seatbelt-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-multiple-tickets",
+      "slug": "no-seatbelt-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-new-driver",
+      "slug": "no-seatbelt-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-officer-error",
+      "slug": "no-seatbelt-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-out-of-province",
+      "slug": "no-seatbelt-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-photo-radar",
+      "slug": "no-seatbelt-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat-weather-conditions",
+      "slug": "no-seatbelt-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-medicine-hat",
+      "slug": "no-seatbelt-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-okotoks",
+      "slug": "no-seatbelt-ticket-okotoks"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-commercial-driver",
+      "slug": "no-seatbelt-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-first-time-offender",
+      "slug": "no-seatbelt-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-multiple-tickets",
+      "slug": "no-seatbelt-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-new-driver",
+      "slug": "no-seatbelt-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-officer-error",
+      "slug": "no-seatbelt-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-out-of-province",
+      "slug": "no-seatbelt-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-photo-radar",
+      "slug": "no-seatbelt-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer-weather-conditions",
+      "slug": "no-seatbelt-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-red-deer",
+      "slug": "no-seatbelt-ticket-red-deer"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-spruce-grove",
+      "slug": "no-seatbelt-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-stony-plain",
+      "slug": "no-seatbelt-ticket-stony-plain"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-sylvan-lake",
+      "slug": "no-seatbelt-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/no-seatbelt-ticket-wetaskiwin",
+      "slug": "no-seatbelt-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/photo-radar-ticket-alberta",
+      "slug": "photo-radar-ticket-alberta"
+    },
+    {
+      "path": "/content/photo-radar-ticket-edmonton",
+      "slug": "photo-radar-ticket-edmonton"
+    },
+    {
+      "path": "/content/racing-ticket-airdrie",
+      "slug": "racing-ticket-airdrie"
+    },
+    {
+      "path": "/content/racing-ticket-banff",
+      "slug": "racing-ticket-banff"
+    },
+    {
+      "path": "/content/racing-ticket-brooks",
+      "slug": "racing-ticket-brooks"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-commercial-driver",
+      "slug": "racing-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-first-time-offender",
+      "slug": "racing-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-multiple-tickets",
+      "slug": "racing-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-new-driver",
+      "slug": "racing-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-officer-error",
+      "slug": "racing-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-out-of-province",
+      "slug": "racing-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-photo-radar",
+      "slug": "racing-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/racing-ticket-calgary-weather-conditions",
+      "slug": "racing-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/racing-ticket-calgary",
+      "slug": "racing-ticket-calgary"
+    },
+    {
+      "path": "/content/racing-ticket-camrose",
+      "slug": "racing-ticket-camrose"
+    },
+    {
+      "path": "/content/racing-ticket-canmore",
+      "slug": "racing-ticket-canmore"
+    },
+    {
+      "path": "/content/racing-ticket-cochrane",
+      "slug": "racing-ticket-cochrane"
+    },
+    {
+      "path": "/content/racing-ticket-cold-lake",
+      "slug": "racing-ticket-cold-lake"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-commercial-driver",
+      "slug": "racing-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-first-time-offender",
+      "slug": "racing-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-multiple-tickets",
+      "slug": "racing-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-new-driver",
+      "slug": "racing-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-officer-error",
+      "slug": "racing-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-out-of-province",
+      "slug": "racing-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-photo-radar",
+      "slug": "racing-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton-weather-conditions",
+      "slug": "racing-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/racing-ticket-edmonton",
+      "slug": "racing-ticket-edmonton"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-commercial-driver",
+      "slug": "racing-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-first-time-offender",
+      "slug": "racing-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "racing-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-new-driver",
+      "slug": "racing-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-officer-error",
+      "slug": "racing-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-out-of-province",
+      "slug": "racing-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-photo-radar",
+      "slug": "racing-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray-weather-conditions",
+      "slug": "racing-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/racing-ticket-fort-mcmurray",
+      "slug": "racing-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/racing-ticket-grande-prairie",
+      "slug": "racing-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/racing-ticket-hinton",
+      "slug": "racing-ticket-hinton"
+    },
+    {
+      "path": "/content/racing-ticket-jasper",
+      "slug": "racing-ticket-jasper"
+    },
+    {
+      "path": "/content/racing-ticket-lacombe",
+      "slug": "racing-ticket-lacombe"
+    },
+    {
+      "path": "/content/racing-ticket-leduc",
+      "slug": "racing-ticket-leduc"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-commercial-driver",
+      "slug": "racing-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-first-time-offender",
+      "slug": "racing-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-multiple-tickets",
+      "slug": "racing-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-new-driver",
+      "slug": "racing-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-officer-error",
+      "slug": "racing-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-out-of-province",
+      "slug": "racing-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-photo-radar",
+      "slug": "racing-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge-weather-conditions",
+      "slug": "racing-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/racing-ticket-lethbridge",
+      "slug": "racing-ticket-lethbridge"
+    },
+    {
+      "path": "/content/racing-ticket-lloydminster",
+      "slug": "racing-ticket-lloydminster"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-commercial-driver",
+      "slug": "racing-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-first-time-offender",
+      "slug": "racing-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-multiple-tickets",
+      "slug": "racing-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-new-driver",
+      "slug": "racing-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-officer-error",
+      "slug": "racing-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-out-of-province",
+      "slug": "racing-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-photo-radar",
+      "slug": "racing-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat-weather-conditions",
+      "slug": "racing-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/racing-ticket-medicine-hat",
+      "slug": "racing-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/racing-ticket-okotoks",
+      "slug": "racing-ticket-okotoks"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-commercial-driver",
+      "slug": "racing-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-first-time-offender",
+      "slug": "racing-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-multiple-tickets",
+      "slug": "racing-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-new-driver",
+      "slug": "racing-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-officer-error",
+      "slug": "racing-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-out-of-province",
+      "slug": "racing-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-photo-radar",
+      "slug": "racing-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer-weather-conditions",
+      "slug": "racing-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/racing-ticket-red-deer",
+      "slug": "racing-ticket-red-deer"
+    },
+    {
+      "path": "/content/racing-ticket-spruce-grove",
+      "slug": "racing-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/racing-ticket-stony-plain",
+      "slug": "racing-ticket-stony-plain"
+    },
+    {
+      "path": "/content/racing-ticket-sylvan-lake",
+      "slug": "racing-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/racing-ticket-wetaskiwin",
+      "slug": "racing-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/red-light-ticket-airdrie",
+      "slug": "red-light-ticket-airdrie"
+    },
+    {
+      "path": "/content/red-light-ticket-alberta",
+      "slug": "red-light-ticket-alberta"
+    },
+    {
+      "path": "/content/red-light-ticket-banff",
+      "slug": "red-light-ticket-banff"
+    },
+    {
+      "path": "/content/red-light-ticket-brooks",
+      "slug": "red-light-ticket-brooks"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-commercial-driver",
+      "slug": "red-light-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-first-time-offender",
+      "slug": "red-light-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-multiple-tickets",
+      "slug": "red-light-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-new-driver",
+      "slug": "red-light-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-officer-error",
+      "slug": "red-light-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-out-of-province",
+      "slug": "red-light-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-photo-radar",
+      "slug": "red-light-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary-weather-conditions",
+      "slug": "red-light-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/red-light-ticket-calgary",
+      "slug": "red-light-ticket-calgary"
+    },
+    {
+      "path": "/content/red-light-ticket-camrose",
+      "slug": "red-light-ticket-camrose"
+    },
+    {
+      "path": "/content/red-light-ticket-canmore",
+      "slug": "red-light-ticket-canmore"
+    },
+    {
+      "path": "/content/red-light-ticket-cochrane",
+      "slug": "red-light-ticket-cochrane"
+    },
+    {
+      "path": "/content/red-light-ticket-cold-lake",
+      "slug": "red-light-ticket-cold-lake"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-commercial-driver",
+      "slug": "red-light-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-first-time-offender",
+      "slug": "red-light-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-multiple-tickets",
+      "slug": "red-light-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-new-driver",
+      "slug": "red-light-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-officer-error",
+      "slug": "red-light-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-out-of-province",
+      "slug": "red-light-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-photo-radar",
+      "slug": "red-light-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton-weather-conditions",
+      "slug": "red-light-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/red-light-ticket-edmonton",
+      "slug": "red-light-ticket-edmonton"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-commercial-driver",
+      "slug": "red-light-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-first-time-offender",
+      "slug": "red-light-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "red-light-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-new-driver",
+      "slug": "red-light-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-officer-error",
+      "slug": "red-light-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-out-of-province",
+      "slug": "red-light-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-photo-radar",
+      "slug": "red-light-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray-weather-conditions",
+      "slug": "red-light-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/red-light-ticket-fort-mcmurray",
+      "slug": "red-light-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/red-light-ticket-grande-prairie",
+      "slug": "red-light-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/red-light-ticket-hinton",
+      "slug": "red-light-ticket-hinton"
+    },
+    {
+      "path": "/content/red-light-ticket-jasper",
+      "slug": "red-light-ticket-jasper"
+    },
+    {
+      "path": "/content/red-light-ticket-lacombe",
+      "slug": "red-light-ticket-lacombe"
+    },
+    {
+      "path": "/content/red-light-ticket-leduc",
+      "slug": "red-light-ticket-leduc"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-commercial-driver",
+      "slug": "red-light-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-first-time-offender",
+      "slug": "red-light-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-multiple-tickets",
+      "slug": "red-light-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-new-driver",
+      "slug": "red-light-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-officer-error",
+      "slug": "red-light-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-out-of-province",
+      "slug": "red-light-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-photo-radar",
+      "slug": "red-light-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge-weather-conditions",
+      "slug": "red-light-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/red-light-ticket-lethbridge",
+      "slug": "red-light-ticket-lethbridge"
+    },
+    {
+      "path": "/content/red-light-ticket-lloydminster",
+      "slug": "red-light-ticket-lloydminster"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-commercial-driver",
+      "slug": "red-light-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-first-time-offender",
+      "slug": "red-light-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-multiple-tickets",
+      "slug": "red-light-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-new-driver",
+      "slug": "red-light-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-officer-error",
+      "slug": "red-light-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-out-of-province",
+      "slug": "red-light-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-photo-radar",
+      "slug": "red-light-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat-weather-conditions",
+      "slug": "red-light-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/red-light-ticket-medicine-hat",
+      "slug": "red-light-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/red-light-ticket-okotoks",
+      "slug": "red-light-ticket-okotoks"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-commercial-driver",
+      "slug": "red-light-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-first-time-offender",
+      "slug": "red-light-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-multiple-tickets",
+      "slug": "red-light-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-new-driver",
+      "slug": "red-light-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-officer-error",
+      "slug": "red-light-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-out-of-province",
+      "slug": "red-light-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-photo-radar",
+      "slug": "red-light-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer-weather-conditions",
+      "slug": "red-light-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/red-light-ticket-red-deer",
+      "slug": "red-light-ticket-red-deer"
+    },
+    {
+      "path": "/content/red-light-ticket-spruce-grove",
+      "slug": "red-light-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/red-light-ticket-stony-plain",
+      "slug": "red-light-ticket-stony-plain"
+    },
+    {
+      "path": "/content/red-light-ticket-sylvan-lake",
+      "slug": "red-light-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/red-light-ticket-wetaskiwin",
+      "slug": "red-light-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/speeding-ticket-airdrie",
+      "slug": "speeding-ticket-airdrie"
+    },
+    {
+      "path": "/content/speeding-ticket-alberta",
+      "slug": "speeding-ticket-alberta"
+    },
+    {
+      "path": "/content/speeding-ticket-banff",
+      "slug": "speeding-ticket-banff"
+    },
+    {
+      "path": "/content/speeding-ticket-brooks",
+      "slug": "speeding-ticket-brooks"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-commercial-driver",
+      "slug": "speeding-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-first-time-offender",
+      "slug": "speeding-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-multiple-tickets",
+      "slug": "speeding-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-new-driver",
+      "slug": "speeding-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-officer-error",
+      "slug": "speeding-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-out-of-province",
+      "slug": "speeding-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-photo-radar",
+      "slug": "speeding-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary-weather-conditions",
+      "slug": "speeding-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/speeding-ticket-calgary",
+      "slug": "speeding-ticket-calgary"
+    },
+    {
+      "path": "/content/speeding-ticket-camrose",
+      "slug": "speeding-ticket-camrose"
+    },
+    {
+      "path": "/content/speeding-ticket-canmore",
+      "slug": "speeding-ticket-canmore"
+    },
+    {
+      "path": "/content/speeding-ticket-cochrane",
+      "slug": "speeding-ticket-cochrane"
+    },
+    {
+      "path": "/content/speeding-ticket-cold-lake",
+      "slug": "speeding-ticket-cold-lake"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-commercial-driver",
+      "slug": "speeding-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-first-time-offender",
+      "slug": "speeding-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-multiple-tickets",
+      "slug": "speeding-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-new-driver",
+      "slug": "speeding-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-officer-error",
+      "slug": "speeding-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-out-of-province",
+      "slug": "speeding-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-photo-radar",
+      "slug": "speeding-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton-weather-conditions",
+      "slug": "speeding-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/speeding-ticket-edmonton",
+      "slug": "speeding-ticket-edmonton"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-commercial-driver",
+      "slug": "speeding-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-first-time-offender",
+      "slug": "speeding-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "speeding-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-new-driver",
+      "slug": "speeding-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-officer-error",
+      "slug": "speeding-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-out-of-province",
+      "slug": "speeding-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-photo-radar",
+      "slug": "speeding-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray-weather-conditions",
+      "slug": "speeding-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/speeding-ticket-fort-mcmurray",
+      "slug": "speeding-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/speeding-ticket-grande-prairie",
+      "slug": "speeding-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/speeding-ticket-hinton",
+      "slug": "speeding-ticket-hinton"
+    },
+    {
+      "path": "/content/speeding-ticket-jasper",
+      "slug": "speeding-ticket-jasper"
+    },
+    {
+      "path": "/content/speeding-ticket-lacombe",
+      "slug": "speeding-ticket-lacombe"
+    },
+    {
+      "path": "/content/speeding-ticket-leduc",
+      "slug": "speeding-ticket-leduc"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-commercial-driver",
+      "slug": "speeding-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-first-time-offender",
+      "slug": "speeding-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-multiple-tickets",
+      "slug": "speeding-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-new-driver",
+      "slug": "speeding-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-officer-error",
+      "slug": "speeding-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-out-of-province",
+      "slug": "speeding-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-photo-radar",
+      "slug": "speeding-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge-weather-conditions",
+      "slug": "speeding-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/speeding-ticket-lethbridge",
+      "slug": "speeding-ticket-lethbridge"
+    },
+    {
+      "path": "/content/speeding-ticket-lloydminster",
+      "slug": "speeding-ticket-lloydminster"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-commercial-driver",
+      "slug": "speeding-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-first-time-offender",
+      "slug": "speeding-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-multiple-tickets",
+      "slug": "speeding-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-new-driver",
+      "slug": "speeding-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-officer-error",
+      "slug": "speeding-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-out-of-province",
+      "slug": "speeding-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-photo-radar",
+      "slug": "speeding-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat-weather-conditions",
+      "slug": "speeding-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/speeding-ticket-medicine-hat",
+      "slug": "speeding-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/speeding-ticket-okotoks",
+      "slug": "speeding-ticket-okotoks"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-commercial-driver",
+      "slug": "speeding-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-first-time-offender",
+      "slug": "speeding-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-multiple-tickets",
+      "slug": "speeding-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-new-driver",
+      "slug": "speeding-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-officer-error",
+      "slug": "speeding-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-out-of-province",
+      "slug": "speeding-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-photo-radar",
+      "slug": "speeding-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer-weather-conditions",
+      "slug": "speeding-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/speeding-ticket-red-deer",
+      "slug": "speeding-ticket-red-deer"
+    },
+    {
+      "path": "/content/speeding-ticket-spruce-grove",
+      "slug": "speeding-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/speeding-ticket-stony-plain",
+      "slug": "speeding-ticket-stony-plain"
+    },
+    {
+      "path": "/content/speeding-ticket-sylvan-lake",
+      "slug": "speeding-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/speeding-ticket-wetaskiwin",
+      "slug": "speeding-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/stunting-ticket-airdrie",
+      "slug": "stunting-ticket-airdrie"
+    },
+    {
+      "path": "/content/stunting-ticket-banff",
+      "slug": "stunting-ticket-banff"
+    },
+    {
+      "path": "/content/stunting-ticket-brooks",
+      "slug": "stunting-ticket-brooks"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-commercial-driver",
+      "slug": "stunting-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-first-time-offender",
+      "slug": "stunting-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-multiple-tickets",
+      "slug": "stunting-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-new-driver",
+      "slug": "stunting-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-officer-error",
+      "slug": "stunting-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-out-of-province",
+      "slug": "stunting-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-photo-radar",
+      "slug": "stunting-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary-weather-conditions",
+      "slug": "stunting-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/stunting-ticket-calgary",
+      "slug": "stunting-ticket-calgary"
+    },
+    {
+      "path": "/content/stunting-ticket-camrose",
+      "slug": "stunting-ticket-camrose"
+    },
+    {
+      "path": "/content/stunting-ticket-canmore",
+      "slug": "stunting-ticket-canmore"
+    },
+    {
+      "path": "/content/stunting-ticket-cochrane",
+      "slug": "stunting-ticket-cochrane"
+    },
+    {
+      "path": "/content/stunting-ticket-cold-lake",
+      "slug": "stunting-ticket-cold-lake"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-commercial-driver",
+      "slug": "stunting-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-first-time-offender",
+      "slug": "stunting-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-multiple-tickets",
+      "slug": "stunting-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-new-driver",
+      "slug": "stunting-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-officer-error",
+      "slug": "stunting-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-out-of-province",
+      "slug": "stunting-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-photo-radar",
+      "slug": "stunting-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton-weather-conditions",
+      "slug": "stunting-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/stunting-ticket-edmonton",
+      "slug": "stunting-ticket-edmonton"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-commercial-driver",
+      "slug": "stunting-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-first-time-offender",
+      "slug": "stunting-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "stunting-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-new-driver",
+      "slug": "stunting-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-officer-error",
+      "slug": "stunting-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-out-of-province",
+      "slug": "stunting-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-photo-radar",
+      "slug": "stunting-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray-weather-conditions",
+      "slug": "stunting-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/stunting-ticket-fort-mcmurray",
+      "slug": "stunting-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/stunting-ticket-grande-prairie",
+      "slug": "stunting-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/stunting-ticket-hinton",
+      "slug": "stunting-ticket-hinton"
+    },
+    {
+      "path": "/content/stunting-ticket-jasper",
+      "slug": "stunting-ticket-jasper"
+    },
+    {
+      "path": "/content/stunting-ticket-lacombe",
+      "slug": "stunting-ticket-lacombe"
+    },
+    {
+      "path": "/content/stunting-ticket-leduc",
+      "slug": "stunting-ticket-leduc"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-commercial-driver",
+      "slug": "stunting-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-first-time-offender",
+      "slug": "stunting-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-multiple-tickets",
+      "slug": "stunting-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-new-driver",
+      "slug": "stunting-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-officer-error",
+      "slug": "stunting-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-out-of-province",
+      "slug": "stunting-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-photo-radar",
+      "slug": "stunting-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge-weather-conditions",
+      "slug": "stunting-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/stunting-ticket-lethbridge",
+      "slug": "stunting-ticket-lethbridge"
+    },
+    {
+      "path": "/content/stunting-ticket-lloydminster",
+      "slug": "stunting-ticket-lloydminster"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-commercial-driver",
+      "slug": "stunting-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-first-time-offender",
+      "slug": "stunting-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-multiple-tickets",
+      "slug": "stunting-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-new-driver",
+      "slug": "stunting-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-officer-error",
+      "slug": "stunting-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-out-of-province",
+      "slug": "stunting-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-photo-radar",
+      "slug": "stunting-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat-weather-conditions",
+      "slug": "stunting-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/stunting-ticket-medicine-hat",
+      "slug": "stunting-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/stunting-ticket-okotoks",
+      "slug": "stunting-ticket-okotoks"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-commercial-driver",
+      "slug": "stunting-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-first-time-offender",
+      "slug": "stunting-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-multiple-tickets",
+      "slug": "stunting-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-new-driver",
+      "slug": "stunting-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-officer-error",
+      "slug": "stunting-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-out-of-province",
+      "slug": "stunting-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-photo-radar",
+      "slug": "stunting-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer-weather-conditions",
+      "slug": "stunting-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/stunting-ticket-red-deer",
+      "slug": "stunting-ticket-red-deer"
+    },
+    {
+      "path": "/content/stunting-ticket-spruce-grove",
+      "slug": "stunting-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/stunting-ticket-stony-plain",
+      "slug": "stunting-ticket-stony-plain"
+    },
+    {
+      "path": "/content/stunting-ticket-sylvan-lake",
+      "slug": "stunting-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/stunting-ticket-wetaskiwin",
+      "slug": "stunting-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/suspended-license-ticket-airdrie",
+      "slug": "suspended-license-ticket-airdrie"
+    },
+    {
+      "path": "/content/suspended-license-ticket-banff",
+      "slug": "suspended-license-ticket-banff"
+    },
+    {
+      "path": "/content/suspended-license-ticket-brooks",
+      "slug": "suspended-license-ticket-brooks"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-commercial-driver",
+      "slug": "suspended-license-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-first-time-offender",
+      "slug": "suspended-license-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-multiple-tickets",
+      "slug": "suspended-license-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-new-driver",
+      "slug": "suspended-license-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-officer-error",
+      "slug": "suspended-license-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-out-of-province",
+      "slug": "suspended-license-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-photo-radar",
+      "slug": "suspended-license-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary-weather-conditions",
+      "slug": "suspended-license-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/suspended-license-ticket-calgary",
+      "slug": "suspended-license-ticket-calgary"
+    },
+    {
+      "path": "/content/suspended-license-ticket-camrose",
+      "slug": "suspended-license-ticket-camrose"
+    },
+    {
+      "path": "/content/suspended-license-ticket-canmore",
+      "slug": "suspended-license-ticket-canmore"
+    },
+    {
+      "path": "/content/suspended-license-ticket-cochrane",
+      "slug": "suspended-license-ticket-cochrane"
+    },
+    {
+      "path": "/content/suspended-license-ticket-cold-lake",
+      "slug": "suspended-license-ticket-cold-lake"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-commercial-driver",
+      "slug": "suspended-license-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-first-time-offender",
+      "slug": "suspended-license-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-multiple-tickets",
+      "slug": "suspended-license-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-new-driver",
+      "slug": "suspended-license-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-officer-error",
+      "slug": "suspended-license-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-out-of-province",
+      "slug": "suspended-license-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-photo-radar",
+      "slug": "suspended-license-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton-weather-conditions",
+      "slug": "suspended-license-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/suspended-license-ticket-edmonton",
+      "slug": "suspended-license-ticket-edmonton"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-commercial-driver",
+      "slug": "suspended-license-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-first-time-offender",
+      "slug": "suspended-license-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "suspended-license-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-new-driver",
+      "slug": "suspended-license-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-officer-error",
+      "slug": "suspended-license-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-out-of-province",
+      "slug": "suspended-license-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-photo-radar",
+      "slug": "suspended-license-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray-weather-conditions",
+      "slug": "suspended-license-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/suspended-license-ticket-fort-mcmurray",
+      "slug": "suspended-license-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/suspended-license-ticket-grande-prairie",
+      "slug": "suspended-license-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/suspended-license-ticket-hinton",
+      "slug": "suspended-license-ticket-hinton"
+    },
+    {
+      "path": "/content/suspended-license-ticket-jasper",
+      "slug": "suspended-license-ticket-jasper"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lacombe",
+      "slug": "suspended-license-ticket-lacombe"
+    },
+    {
+      "path": "/content/suspended-license-ticket-leduc",
+      "slug": "suspended-license-ticket-leduc"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-commercial-driver",
+      "slug": "suspended-license-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-first-time-offender",
+      "slug": "suspended-license-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-multiple-tickets",
+      "slug": "suspended-license-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-new-driver",
+      "slug": "suspended-license-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-officer-error",
+      "slug": "suspended-license-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-out-of-province",
+      "slug": "suspended-license-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-photo-radar",
+      "slug": "suspended-license-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge-weather-conditions",
+      "slug": "suspended-license-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lethbridge",
+      "slug": "suspended-license-ticket-lethbridge"
+    },
+    {
+      "path": "/content/suspended-license-ticket-lloydminster",
+      "slug": "suspended-license-ticket-lloydminster"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-commercial-driver",
+      "slug": "suspended-license-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-first-time-offender",
+      "slug": "suspended-license-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-multiple-tickets",
+      "slug": "suspended-license-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-new-driver",
+      "slug": "suspended-license-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-officer-error",
+      "slug": "suspended-license-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-out-of-province",
+      "slug": "suspended-license-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-photo-radar",
+      "slug": "suspended-license-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat-weather-conditions",
+      "slug": "suspended-license-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/suspended-license-ticket-medicine-hat",
+      "slug": "suspended-license-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/suspended-license-ticket-okotoks",
+      "slug": "suspended-license-ticket-okotoks"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-commercial-driver",
+      "slug": "suspended-license-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-first-time-offender",
+      "slug": "suspended-license-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-multiple-tickets",
+      "slug": "suspended-license-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-new-driver",
+      "slug": "suspended-license-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-officer-error",
+      "slug": "suspended-license-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-out-of-province",
+      "slug": "suspended-license-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-photo-radar",
+      "slug": "suspended-license-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer-weather-conditions",
+      "slug": "suspended-license-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/suspended-license-ticket-red-deer",
+      "slug": "suspended-license-ticket-red-deer"
+    },
+    {
+      "path": "/content/suspended-license-ticket-spruce-grove",
+      "slug": "suspended-license-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/suspended-license-ticket-stony-plain",
+      "slug": "suspended-license-ticket-stony-plain"
+    },
+    {
+      "path": "/content/suspended-license-ticket-sylvan-lake",
+      "slug": "suspended-license-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/suspended-license-ticket-wetaskiwin",
+      "slug": "suspended-license-ticket-wetaskiwin"
     },
     {
       "path": "/content/test-seed",
-      "slug": "test-seed",
-      "meta_title": "Test Seed Page",
-      "meta_description": "",
-      "h1": "Test Seed"
+      "slug": "test-seed"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-airdrie",
+      "slug": "tinted-windows-ticket-airdrie"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-banff",
+      "slug": "tinted-windows-ticket-banff"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-brooks",
+      "slug": "tinted-windows-ticket-brooks"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-commercial-driver",
+      "slug": "tinted-windows-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-first-time-offender",
+      "slug": "tinted-windows-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-multiple-tickets",
+      "slug": "tinted-windows-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-new-driver",
+      "slug": "tinted-windows-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-officer-error",
+      "slug": "tinted-windows-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-out-of-province",
+      "slug": "tinted-windows-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-photo-radar",
+      "slug": "tinted-windows-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary-weather-conditions",
+      "slug": "tinted-windows-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-calgary",
+      "slug": "tinted-windows-ticket-calgary"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-camrose",
+      "slug": "tinted-windows-ticket-camrose"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-canmore",
+      "slug": "tinted-windows-ticket-canmore"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-cochrane",
+      "slug": "tinted-windows-ticket-cochrane"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-cold-lake",
+      "slug": "tinted-windows-ticket-cold-lake"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-commercial-driver",
+      "slug": "tinted-windows-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-first-time-offender",
+      "slug": "tinted-windows-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-multiple-tickets",
+      "slug": "tinted-windows-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-new-driver",
+      "slug": "tinted-windows-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-officer-error",
+      "slug": "tinted-windows-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-out-of-province",
+      "slug": "tinted-windows-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-photo-radar",
+      "slug": "tinted-windows-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton-weather-conditions",
+      "slug": "tinted-windows-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-edmonton",
+      "slug": "tinted-windows-ticket-edmonton"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-commercial-driver",
+      "slug": "tinted-windows-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-first-time-offender",
+      "slug": "tinted-windows-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "tinted-windows-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-new-driver",
+      "slug": "tinted-windows-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-officer-error",
+      "slug": "tinted-windows-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-out-of-province",
+      "slug": "tinted-windows-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-photo-radar",
+      "slug": "tinted-windows-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray-weather-conditions",
+      "slug": "tinted-windows-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-fort-mcmurray",
+      "slug": "tinted-windows-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-grande-prairie",
+      "slug": "tinted-windows-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-hinton",
+      "slug": "tinted-windows-ticket-hinton"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-jasper",
+      "slug": "tinted-windows-ticket-jasper"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lacombe",
+      "slug": "tinted-windows-ticket-lacombe"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-leduc",
+      "slug": "tinted-windows-ticket-leduc"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-commercial-driver",
+      "slug": "tinted-windows-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-first-time-offender",
+      "slug": "tinted-windows-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-multiple-tickets",
+      "slug": "tinted-windows-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-new-driver",
+      "slug": "tinted-windows-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-officer-error",
+      "slug": "tinted-windows-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-out-of-province",
+      "slug": "tinted-windows-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-photo-radar",
+      "slug": "tinted-windows-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge-weather-conditions",
+      "slug": "tinted-windows-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lethbridge",
+      "slug": "tinted-windows-ticket-lethbridge"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-lloydminster",
+      "slug": "tinted-windows-ticket-lloydminster"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-commercial-driver",
+      "slug": "tinted-windows-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-first-time-offender",
+      "slug": "tinted-windows-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-multiple-tickets",
+      "slug": "tinted-windows-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-new-driver",
+      "slug": "tinted-windows-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-officer-error",
+      "slug": "tinted-windows-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-out-of-province",
+      "slug": "tinted-windows-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-photo-radar",
+      "slug": "tinted-windows-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat-weather-conditions",
+      "slug": "tinted-windows-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-medicine-hat",
+      "slug": "tinted-windows-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-okotoks",
+      "slug": "tinted-windows-ticket-okotoks"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-commercial-driver",
+      "slug": "tinted-windows-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-first-time-offender",
+      "slug": "tinted-windows-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-multiple-tickets",
+      "slug": "tinted-windows-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-new-driver",
+      "slug": "tinted-windows-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-officer-error",
+      "slug": "tinted-windows-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-out-of-province",
+      "slug": "tinted-windows-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-photo-radar",
+      "slug": "tinted-windows-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer-weather-conditions",
+      "slug": "tinted-windows-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-red-deer",
+      "slug": "tinted-windows-ticket-red-deer"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-spruce-grove",
+      "slug": "tinted-windows-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-stony-plain",
+      "slug": "tinted-windows-ticket-stony-plain"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-sylvan-lake",
+      "slug": "tinted-windows-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/tinted-windows-ticket-wetaskiwin",
+      "slug": "tinted-windows-ticket-wetaskiwin"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-airdrie",
+      "slug": "unsafe-lane-change-ticket-airdrie"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-banff",
+      "slug": "unsafe-lane-change-ticket-banff"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-brooks",
+      "slug": "unsafe-lane-change-ticket-brooks"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-commercial-driver",
+      "slug": "unsafe-lane-change-ticket-calgary-commercial-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-first-time-offender",
+      "slug": "unsafe-lane-change-ticket-calgary-first-time-offender"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-multiple-tickets",
+      "slug": "unsafe-lane-change-ticket-calgary-multiple-tickets"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-new-driver",
+      "slug": "unsafe-lane-change-ticket-calgary-new-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-officer-error",
+      "slug": "unsafe-lane-change-ticket-calgary-officer-error"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-out-of-province",
+      "slug": "unsafe-lane-change-ticket-calgary-out-of-province"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-photo-radar",
+      "slug": "unsafe-lane-change-ticket-calgary-photo-radar"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary-weather-conditions",
+      "slug": "unsafe-lane-change-ticket-calgary-weather-conditions"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-calgary",
+      "slug": "unsafe-lane-change-ticket-calgary"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-camrose",
+      "slug": "unsafe-lane-change-ticket-camrose"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-canmore",
+      "slug": "unsafe-lane-change-ticket-canmore"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-cochrane",
+      "slug": "unsafe-lane-change-ticket-cochrane"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-cold-lake",
+      "slug": "unsafe-lane-change-ticket-cold-lake"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-commercial-driver",
+      "slug": "unsafe-lane-change-ticket-edmonton-commercial-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-first-time-offender",
+      "slug": "unsafe-lane-change-ticket-edmonton-first-time-offender"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-multiple-tickets",
+      "slug": "unsafe-lane-change-ticket-edmonton-multiple-tickets"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-new-driver",
+      "slug": "unsafe-lane-change-ticket-edmonton-new-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-officer-error",
+      "slug": "unsafe-lane-change-ticket-edmonton-officer-error"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-out-of-province",
+      "slug": "unsafe-lane-change-ticket-edmonton-out-of-province"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-photo-radar",
+      "slug": "unsafe-lane-change-ticket-edmonton-photo-radar"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton-weather-conditions",
+      "slug": "unsafe-lane-change-ticket-edmonton-weather-conditions"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-edmonton",
+      "slug": "unsafe-lane-change-ticket-edmonton"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-commercial-driver",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-commercial-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-first-time-offender",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-first-time-offender"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-multiple-tickets",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-multiple-tickets"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-new-driver",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-new-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-officer-error",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-officer-error"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-out-of-province",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-out-of-province"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-photo-radar",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-photo-radar"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray-weather-conditions",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray-weather-conditions"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-fort-mcmurray",
+      "slug": "unsafe-lane-change-ticket-fort-mcmurray"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-grande-prairie",
+      "slug": "unsafe-lane-change-ticket-grande-prairie"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-hinton",
+      "slug": "unsafe-lane-change-ticket-hinton"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-jasper",
+      "slug": "unsafe-lane-change-ticket-jasper"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lacombe",
+      "slug": "unsafe-lane-change-ticket-lacombe"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-leduc",
+      "slug": "unsafe-lane-change-ticket-leduc"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-commercial-driver",
+      "slug": "unsafe-lane-change-ticket-lethbridge-commercial-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-first-time-offender",
+      "slug": "unsafe-lane-change-ticket-lethbridge-first-time-offender"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-multiple-tickets",
+      "slug": "unsafe-lane-change-ticket-lethbridge-multiple-tickets"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-new-driver",
+      "slug": "unsafe-lane-change-ticket-lethbridge-new-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-officer-error",
+      "slug": "unsafe-lane-change-ticket-lethbridge-officer-error"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-out-of-province",
+      "slug": "unsafe-lane-change-ticket-lethbridge-out-of-province"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-photo-radar",
+      "slug": "unsafe-lane-change-ticket-lethbridge-photo-radar"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge-weather-conditions",
+      "slug": "unsafe-lane-change-ticket-lethbridge-weather-conditions"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lethbridge",
+      "slug": "unsafe-lane-change-ticket-lethbridge"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-lloydminster",
+      "slug": "unsafe-lane-change-ticket-lloydminster"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-commercial-driver",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-commercial-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-first-time-offender",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-first-time-offender"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-multiple-tickets",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-multiple-tickets"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-new-driver",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-new-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-officer-error",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-officer-error"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-out-of-province",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-out-of-province"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-photo-radar",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-photo-radar"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat-weather-conditions",
+      "slug": "unsafe-lane-change-ticket-medicine-hat-weather-conditions"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-medicine-hat",
+      "slug": "unsafe-lane-change-ticket-medicine-hat"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-okotoks",
+      "slug": "unsafe-lane-change-ticket-okotoks"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-commercial-driver",
+      "slug": "unsafe-lane-change-ticket-red-deer-commercial-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-first-time-offender",
+      "slug": "unsafe-lane-change-ticket-red-deer-first-time-offender"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-multiple-tickets",
+      "slug": "unsafe-lane-change-ticket-red-deer-multiple-tickets"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-new-driver",
+      "slug": "unsafe-lane-change-ticket-red-deer-new-driver"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-officer-error",
+      "slug": "unsafe-lane-change-ticket-red-deer-officer-error"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-out-of-province",
+      "slug": "unsafe-lane-change-ticket-red-deer-out-of-province"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-photo-radar",
+      "slug": "unsafe-lane-change-ticket-red-deer-photo-radar"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer-weather-conditions",
+      "slug": "unsafe-lane-change-ticket-red-deer-weather-conditions"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-red-deer",
+      "slug": "unsafe-lane-change-ticket-red-deer"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-spruce-grove",
+      "slug": "unsafe-lane-change-ticket-spruce-grove"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-stony-plain",
+      "slug": "unsafe-lane-change-ticket-stony-plain"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-sylvan-lake",
+      "slug": "unsafe-lane-change-ticket-sylvan-lake"
+    },
+    {
+      "path": "/content/unsafe-lane-change-ticket-wetaskiwin",
+      "slug": "unsafe-lane-change-ticket-wetaskiwin"
     },
     {
       "path": "/content/verify-smoke-1759360172",
-      "slug": "verify-smoke-1759360172",
-      "meta_title": "Verify Smoke",
-      "meta_description": "",
-      "h1": "verify-smoke"
+      "slug": "verify-smoke-1759360172"
     },
     {
       "path": "/content/verify-smoke-1759360542",
-      "slug": "verify-smoke-1759360542",
-      "meta_title": "Verify Smoke",
-      "meta_description": "",
-      "h1": "verify-smoke"
+      "slug": "verify-smoke-1759360542"
     }
   ]
 }
