@@ -25,11 +25,12 @@ This runbook covers the production setup and manual controls for the Fabsy Insur
    - `send-idr-case-update`
    - `send-idr-reminders`
 3. Configure the Stripe webhook endpoint at `<SUPABASE_URL>/functions/v1/idr-payment-webhook` for `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded`, and `checkout.session.async_payment_failed`.
-4. In Supabase Auth URL Configuration, set the Site URL to `https://fabsy.ca`. Allow `https://fabsy.ca/portal/**` and `https://fabsy.ca/insurance-damage-report/intake`, plus the matching `fabsy-execom.vercel.app` staging paths. Confirm the passwordless email template uses `{{ .RedirectTo }}` so deep links return to the requested private route.
-5. Set the function secrets listed below.
-6. Import verified insurer rules.
-7. Install and test the reminder schedule in `supabase/idr-reminder-cron.sql`.
-8. Run a live-mode smoke purchase with a low-risk test account before announcing availability.
+4. In Supabase Auth URL Configuration, set the Site URL to `https://fabsy.ca`. Allow `https://fabsy.ca/portal/**` and `https://fabsy.ca/insurance-damage-report/intake`, plus the matching `fabsy-execom.vercel.app` staging paths. Keep the passwordless email link on `{{ .ConfirmationURL }}`: Supabase includes the allow-listed `emailRedirectTo` value in that signed confirmation URL, so the token is verified before the user returns to the requested private route. Do not link directly to a bare `{{ .RedirectTo }}` value.
+5. Configure Supabase Auth custom SMTP with a dedicated, verified sending domain. For Resend, use `smtp.resend.com`, port `587`, username `resend`, and a sending-only API key scoped to the exact domain. Keep click and open tracking disabled for authentication mail, then test a passwordless link end to end.
+6. Set the function secrets listed below.
+7. Import verified insurer rules.
+8. Install and test the reminder schedule in `supabase/idr-reminder-cron.sql`.
+9. Verify live checkout session creation and a valid signed webhook response before announcing availability. If an actual live charge is used for this check, refund it immediately; a charge is not required when the live payment path has already been independently confirmed.
 
 ## Required secrets
 
