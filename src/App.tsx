@@ -40,6 +40,16 @@ import Analytics from "./components/Analytics";
 import AcquisitionTracker from "./components/AcquisitionTracker";
 import ScrollToTop from "./components/ScrollToTop";
 import CallBar from "./components/CallBar";
+import InsuranceDamageReport from "./pages/InsuranceDamageReport";
+import IdrCheckout from "./pages/IdrCheckout";
+import IdrIntake from "./pages/IdrIntake";
+import IdrPortal from "./pages/IdrPortal";
+import IdrReportPage from "./pages/IdrReportPage";
+import IdrOutcomeSurvey from "./pages/IdrOutcomeSurvey";
+import ClientCasesPage from "./pages/ClientCasesPage";
+import ClientCasePage from "./pages/ClientCasePage";
+import AdminIdrDashboard from "./pages/AdminIdrDashboard";
+import AdminIdrReview from "./pages/AdminIdrReview";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +83,15 @@ const App = () => (
           <Route path="/founder" element={<Founder />} />
           <Route path="/ai-info" element={<AIInfo />} />
           <Route path="/ticket-analysis" element={<Navigate to="/submit-ticket" replace />} />
+          <Route path="/insurance-damage-report" element={<InsuranceDamageReport />} />
+          <Route path="/insurance-damage-report/checkout" element={<IdrCheckout />} />
+          <Route path="/insurance-damage-report/intake" element={<IdrIntake />} />
+          <Route path="/portal" element={<Navigate to="/portal/cases" replace />} />
+          <Route path="/portal/cases" element={<ClientCasesPage />} />
+          <Route path="/portal/cases/:caseId" element={<ClientCasePage />} />
+          <Route path="/portal/insurance-reports" element={<IdrPortal />} />
+          <Route path="/portal/insurance-reports/:orderId" element={<IdrReportPage />} />
+          <Route path="/portal/insurance-reports/:orderId/survey" element={<IdrOutcomeSurvey />} />
           {/* Blog Routes */}
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
@@ -84,6 +103,8 @@ const App = () => (
           <Route path="/admin/users" element={<AdminUserManagement />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
           <Route path="/admin/blog" element={<AdminBlog />} />
+          <Route path="/admin/idr" element={<AdminIdrDashboard />} />
+          <Route path="/admin/idr/:orderId" element={<AdminIdrReview />} />
           {/* Blog routes */}
           <Route path="/blog/:slug" element={<BlogPost />} />
           {/* Static test route */}

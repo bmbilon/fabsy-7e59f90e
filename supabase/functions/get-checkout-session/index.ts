@@ -44,6 +44,9 @@ serve(async (req) => {
       amount_subtotal: session.amount_subtotal ?? null,
       currency: session.currency,
       payment_status: session.payment_status,
+      // Fulfillment is intentionally webhook-only. This public endpoint is a
+      // read-only receipt lookup for the thank-you page.
+      submission_status_updated: false,
       total_details: session.total_details || null,
       discounts: session.discounts || null,
       invoice: session.invoice || null,

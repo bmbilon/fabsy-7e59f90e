@@ -1,5 +1,17 @@
 project_id = "gcasbisxfrssonllpqrw"
 
+[auth]
+site_url = "https://fabsy.ca"
+additional_redirect_urls = [
+  "https://fabsy.ca/portal/**",
+  "https://fabsy.ca/insurance-damage-report/intake",
+  "https://fabsy-execom.vercel.app/portal/**",
+  "https://fabsy-execom.vercel.app/insurance-damage-report/intake",
+  "http://localhost:5173/**",
+  "http://localhost:4173/**",
+  "http://localhost:8080/**"
+]
+
 [functions.vapi-call-webhook]
 verify_jwt = false
 
@@ -67,4 +79,19 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.send-lead-capture]
+verify_jwt = false
+
+[functions.create-idr-payment]
+verify_jwt = false
+
+[functions.idr-payment-webhook]
+verify_jwt = false
+
+[functions.generate-idr-report]
+verify_jwt = true
+
+[functions.send-idr-case-update]
+verify_jwt = true
+
+[functions.send-idr-reminders]
 verify_jwt = false

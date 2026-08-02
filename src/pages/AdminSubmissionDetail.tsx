@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { getIdrStaffRole } from "@/hooks/useIdrAuth";
+import { idrDb } from "@/lib/idr/supabase";
 import { ArrowLeft, Calendar, MapPin, Shield, FileText, Phone, Mail, User as UserIcon, Download } from "lucide-react";
 import { format } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
@@ -34,6 +36,9 @@ interface TicketSubmission {
   coupon_code: string;
   insurance_company: string;
   status: string;
+  verdict: "winnable" | "reducible" | "unwinnable" | null;
+  case_outcome: "withdrawn" | "reduced" | "conviction_stands" | "other" | null;
+  idr_offer_sent_at: string | null;
   consent_form_path: string | null;
   created_at: string;
   updated_at: string;
@@ -68,7 +73,7 @@ export default function AdminSubmissionDetail() {
       setUser(session?.user ?? null);
       
       if (session) {
-        checkAuthAndFetchSubmission(session.user);
+        checkAuthAndFetchSubmission();
       } else {
         navigate('/admin');
         setIsLoading(false);
@@ -78,17 +83,12 @@ export default function AdminSubmissionDetail() {
     return () => subscription.unsubscribe();
   }, [id]);
 
-  const checkAuthAndFetchSubmission = async (currentUser: User) => {
+  const checkAuthAndFetchSubmission = async () => {
     try {
       // Check user role
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', currentUser.id)
-        .in('role', ['admin', 'case_manager'])
-        .single();
+      const roleData = await getIdrStaffRole();
 
-      if (roleError || !roleData) {
+      if (!roleData) {
         toast({
           title: "Unauthorized",
           description: "You don't have permission to access this page",
@@ -123,6 +123,10 @@ export default function AdminSubmissionDetail() {
       if (error) throw error;
 
       // Transform data to match existing interface
+      const assessment = data as typeof data & Pick<
+        TicketSubmission,
+        "verdict" | "case_outcome" | "idr_offer_sent_at"
+      >;
       const transformedData = {
         ...data,
         first_name: data.clients?.first_name || '',
@@ -134,11 +138,14 @@ export default function AdminSubmissionDetail() {
         postal_code: data.clients?.postal_code || '',
         date_of_birth: data.clients?.date_of_birth || '',
         drivers_license: data.clients?.drivers_license || '',
-        sms_opt_in: data.clients?.sms_opt_in || false
+        sms_opt_in: data.clients?.sms_opt_in || false,
+        verdict: assessment.verdict ?? null,
+        case_outcome: assessment.case_outcome ?? null,
+        idr_offer_sent_at: assessment.idr_offer_sent_at ?? null,
       };
 
       setSubmission(transformedData);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching submission:', error);
       toast({
         title: "Error",
@@ -168,11 +175,70 @@ export default function AdminSubmissionDetail() {
         title: "Status Updated",
         description: `Case status changed to ${newStatus.replace('_', ' ')}`,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating status:', error);
       toast({
         title: "Update Failed",
         description: "Failed to update case status",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const updateAssessment = async (field: "verdict" | "case_outcome", value: string) => {
+    if (!submission || !user) return;
+    if (submission.status === "awaiting_payment") {
+      toast({
+        title: "Payment not confirmed",
+        description: "A verdict or outcome cannot be sent until Stripe activates the $488 ticket defense service.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      const updates = field === "verdict"
+        ? { verdict: value, verdict_set_at: new Date().toISOString(), verdict_set_by: user.id }
+        : { case_outcome: value };
+
+      const { error } = await idrDb
+        .from("ticket_submissions")
+        .update(updates)
+        .eq("id", submission.id);
+      if (error) throw error;
+
+      setSubmission({ ...submission, [field]: value });
+
+      const shouldNotify = field === "verdict" || value === "conviction_stands";
+      if (shouldNotify) {
+        const { error: notificationError } = await supabase.functions.invoke("send-idr-case-update", {
+          body: {
+            submissionId: submission.id,
+            event: field === "verdict" ? "verdict_set" : "conviction_stands",
+          },
+        });
+        if (notificationError) {
+          toast({
+            title: "Assessment saved",
+            description: "The case was updated, but the client email could not be sent.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      toast({
+        title: "Assessment Updated",
+        description: field === "verdict" ? "The client verdict is now available." : "The case outcome was saved.",
+      });
+    } catch (error) {
+      console.error("Error updating assessment:", error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update the case assessment.",
         variant: "destructive",
       });
     } finally {
@@ -204,7 +270,7 @@ export default function AdminSubmissionDetail() {
         title: "Download Started",
         description: "Consent form is being downloaded",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error downloading consent form:', error);
       toast({
         title: "Download Failed",
@@ -411,6 +477,55 @@ export default function AdminSubmissionDetail() {
                     </p>
                     <p className="font-medium">{format(new Date(submission.court_date), 'PPP')}</p>
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Case Assessment</CardTitle>
+                <CardDescription>
+                  {submission.status === "awaiting_payment"
+                    ? "Stripe has not activated this $488 ticket defense service. Assessment messages are disabled."
+                    : "The verdict is informational in the client portal and does not block the core defense checkout."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Verdict</p>
+                  <Select
+                    value={submission.verdict || undefined}
+                    onValueChange={(value) => updateAssessment("verdict", value)}
+                    disabled={isUpdating || submission.status === "awaiting_payment"}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Set verdict" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="winnable">Winnable</SelectItem>
+                      <SelectItem value="reducible">Reducible</SelectItem>
+                      <SelectItem value="unwinnable">Unwinnable</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Closed-case outcome</p>
+                  <Select
+                    value={submission.case_outcome || undefined}
+                    onValueChange={(value) => updateAssessment("case_outcome", value)}
+                    disabled={isUpdating || submission.status === "awaiting_payment"}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Set outcome" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                      <SelectItem value="reduced">Reduced</SelectItem>
+                      <SelectItem value="conviction_stands">Conviction stands</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {submission.idr_offer_sent_at && (
+                  <p className="text-sm text-muted-foreground sm:col-span-2">
+                    IDR offer email sent {format(new Date(submission.idr_offer_sent_at), "PPP p")}.
+                  </p>
                 )}
               </CardContent>
             </Card>

@@ -143,7 +143,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { data: existingClient, error: clientLookupError } = await supabase
       .from('clients')
-      .select('id')
+      .select('id,email')
       .eq('drivers_license', formData.driversLicense)
       .maybeSingle();
     
@@ -153,30 +153,22 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (existingClient) {
-      // Update existing client
-      console.log('[Submit Ticket] Updating existing client');
-      clientId = existingClient.id;
-      
-      const { error: updateError } = await supabase
-        .from('clients')
-        .update({
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          postal_code: formData.postalCode,
-          date_of_birth: formData.dateOfBirth,
-          sms_opt_in: formData.smsOptIn,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', clientId);
-        
-      if (updateError) {
-        console.error('[Submit Ticket] Client update error:', updateError);
-        throw new Error('Failed to update client');
+      // Public intake must never replace the identity or contact details on an
+      // existing client record. Portal ownership is verified through email.
+      if (existingClient.email?.trim().toLowerCase() !== formData.email.trim().toLowerCase()) {
+        return new Response(
+          JSON.stringify({
+            error: "This licence is already connected to a client record. Use the existing email or contact support.",
+          }),
+          {
+            status: 409,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          },
+        );
       }
+
+      console.log('[Submit Ticket] Reusing verified-email client');
+      clientId = existingClient.id;
     } else {
       // Create new client (using service role key, bypasses RLS)
       console.log('[Submit Ticket] Creating new client');
@@ -206,33 +198,71 @@ const handler = async (req: Request): Promise<Response> => {
       console.log('[Submit Ticket] Client created');
     }
 
-    // Step 2: Create the ticket submission. Payment confirmation remains a
-    // separate Stripe concern until a signature-verified webhook is deployed.
+    const submissionPayload = {
+      client_id: clientId,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      city: formData.city,
+      postal_code: formData.postalCode,
+      date_of_birth: formData.dateOfBirth,
+      drivers_license: formData.driversLicense,
+      ticket_number: formData.ticketNumber,
+      violation: formData.violation,
+      fine_amount: formData.fineAmount,
+      violation_date: formData.violationDate,
+      court_location: formData.courtLocation,
+      court_date: formData.courtDate,
+      defense_strategy: formData.defenseStrategy,
+      additional_notes: formData.additionalNotes,
+      insurance_company: formData.insuranceCompany,
+      status: 'awaiting_payment'
+    };
+
+    // Reuse an unpaid submission so browser retries cannot create duplicate cases.
+    const { data: existingSubmission, error: existingSubmissionError } = await supabase
+      .from('ticket_submissions')
+      .select('id')
+      .eq('client_id', clientId)
+      .eq('ticket_number', formData.ticketNumber)
+      .eq('status', 'awaiting_payment')
+      .limit(1)
+      .maybeSingle();
+
+    if (existingSubmissionError) {
+      console.error('[Submit Ticket] Existing submission lookup error:', existingSubmissionError);
+      throw new Error('Failed to check existing ticket submission');
+    }
+
+    if (existingSubmission) {
+      const { error: refreshError } = await supabase
+        .from('ticket_submissions')
+        .update({ ...submissionPayload, updated_at: new Date().toISOString() })
+        .eq('id', existingSubmission.id);
+
+      if (refreshError) {
+        console.error('[Submit Ticket] Existing submission refresh error:', refreshError);
+        throw new Error('Failed to refresh ticket submission');
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        submissionId: existingSubmission.id,
+        clientId,
+        reused: true,
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Step 2: Create a payment-pending ticket submission.
     console.log('[Submit Ticket] Creating ticket submission');
     const { data: submissionData, error: submissionError } = await supabase
       .from('ticket_submissions')
-      .insert({
-        client_id: clientId,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        city: formData.city,
-        postal_code: formData.postalCode,
-        date_of_birth: formData.dateOfBirth,
-        drivers_license: formData.driversLicense,
-        ticket_number: formData.ticketNumber,
-        violation: formData.violation,
-        fine_amount: formData.fineAmount,
-        violation_date: formData.violationDate,
-        court_location: formData.courtLocation,
-        court_date: formData.courtDate,
-        defense_strategy: formData.defenseStrategy,
-        additional_notes: formData.additionalNotes,
-        insurance_company: formData.insuranceCompany,
-        status: 'pending'
-      })
+      .insert(submissionPayload)
       .select('id')
       .single();
 

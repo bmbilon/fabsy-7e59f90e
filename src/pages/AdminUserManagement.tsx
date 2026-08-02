@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { getIdrStaffRole } from "@/hooks/useIdrAuth";
 import { ArrowLeft, Shield, UserPlus, Mail } from "lucide-react";
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -30,7 +31,7 @@ export default function AdminUserManagement() {
       setSession(session);
       setUser(session?.user ?? null);
       if (event === 'TOKEN_REFRESHED' && session?.user) {
-        setTimeout(() => checkAuthAndFetchData(session.user), 0);
+        setTimeout(() => checkAuthAndFetchData(), 0);
       }
     });
 
@@ -38,14 +39,14 @@ export default function AdminUserManagement() {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAuthAndFetchData(session.user);
+        checkAuthAndFetchData();
         return;
       }
       const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
       if (refreshed.session?.user && !refreshError) {
         setSession(refreshed.session);
         setUser(refreshed.session.user);
-        checkAuthAndFetchData(refreshed.session.user);
+        checkAuthAndFetchData();
       } else {
         setIsLoading(false);
         navigate('/admin');
@@ -55,17 +56,12 @@ export default function AdminUserManagement() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAuthAndFetchData = async (currentUser: User) => {
+  const checkAuthAndFetchData = async () => {
     try {
       // Check if user is admin (only admins can manage roles)
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', currentUser.id)
-        .eq('role', 'admin')
-        .single();
+      const roleData = await getIdrStaffRole();
 
-      if (roleError || !roleData) {
+      if (roleData !== "admin") {
         toast({
           title: "Unauthorized",
           description: "Only administrators can access user management",
@@ -75,7 +71,7 @@ export default function AdminUserManagement() {
         return;
       }
 
-      setCurrentUserRole(roleData.role);
+      setCurrentUserRole(roleData);
 
       // Fetch all user roles
       const { data: rolesData, error: rolesError } = await supabase
@@ -89,7 +85,7 @@ export default function AdminUserManagement() {
       // For now, just display user_id
       setUserRoles(rolesData || []);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching data:', error);
       toast({
         title: "Error",
