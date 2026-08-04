@@ -24,6 +24,7 @@ const Footer = () => {
       { name: "Submit Ticket", path: "/submit-ticket" },
       { name: "Contact Us", path: "/contact" },
       { name: "FAQ", path: "/faq" },
+      { name: "Insurance Damage Report", path: "/insurance-damage-report" },
       { name: "Client Portal", path: "/portal" },
     ]
   };

@@ -21,7 +21,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { articleViolations } from '../../src/lib/published-content-guardrails-core.js';
+import {
+  articleViolations,
+  normalizeFabsyPricingClaims,
+  sanitizeMarketingText,
+} from '../../src/lib/published-content-guardrails-core.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOPICS_FILE = path.join(__dirname, 'topics.json');
@@ -371,6 +375,20 @@ function normalizeMeta(s) {
   return m;
 }
 
+export function normalizeGeneratedArticle(article) {
+  const normalized = { ...article };
+  if (normalized.title) normalized.title = sanitizeMarketingText(normalized.title).trim();
+  if (normalized.meta_description) {
+    normalized.meta_description = normalizeMeta(sanitizeMarketingText(normalized.meta_description));
+  }
+  if (normalized.content) {
+    normalized.content = sanitizeMarketingText(normalizeFabsyPricingClaims(normalized.content)).trim();
+  }
+  if (normalized.slug) normalized.slug = slugify(normalized.slug);
+  normalized.category = normalizeCategory(normalized.category);
+  return normalized;
+}
+
 export function validateArticle(a) {
   const errs = [];
   if (!a.title) errs.push('missing title');
@@ -461,12 +479,8 @@ These slugs exist, do not reuse: ${existingSlugs.slice(0, 100).join(', ') || 'no
 Return EXACTLY this JSON, no other text:
 { "title": "<60-70 chars>", "slug": "<slug>", "meta_description": "<120-150 chars, hard max 150>", "keywords": ["kw1","kw2","kw3"], "category": "<how-to|guide>", "content": "<markdown>" }`;
 
-  const a = parseJsonBlock(await callClaude(prompt, 8000));
-  for (const k of ['title', 'content']) if (a[k]) a[k] = a[k].replaceAll('—', ', ');
-  if (a.meta_description) a.meta_description = normalizeMeta(a.meta_description);
-  if (a.slug) a.slug = slugify(a.slug);
-  a.category = normalizeCategory(a.category);
-  return a;
+  const article = parseJsonBlock(await callClaude(prompt, 8000));
+  return normalizeGeneratedArticle(article);
 }
 
 async function generateValidArticle(picked, existingSlugs) {

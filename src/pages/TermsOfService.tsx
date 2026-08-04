@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { IDR_PRICE_ADDON, IDR_PRICE_STANDALONE } from "@/config/idr";
 
 const TermsOfService = () => {
   return (
@@ -23,6 +24,7 @@ const TermsOfService = () => {
               <li>Court representation for traffic violations</li>
               <li>Administrative assistance with traffic ticket procedures</li>
               <li>Consultation on traffic ticket matters</li>
+              <li>Optional Insurance Damage Reports based on client-supplied records and public research</li>
             </ul>
             <p className="mt-4">
               <strong>Important:</strong> We provide representation services, not legal advice. We are not lawyers and do not practice law.
@@ -62,6 +64,26 @@ const TermsOfService = () => {
               <li>Additional court costs or fines beyond our control remain the client's responsibility</li>
               <li>All fees are quoted in Canadian dollars</li>
             </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">5A. Insurance Damage Report Terms</h2>
+            <p className="mb-4">
+              The standalone Insurance Damage Report costs ${IDR_PRICE_STANDALONE} CAD. The optional report add-on
+              costs ${IDR_PRICE_ADDON} CAD when offered with an eligible Fabsy ticket matter. Applicable tax is
+              calculated at checkout. The cost of ordering a driver abstract is separate.
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>You order and upload your own Alberta driver abstract and provide accurate ticket, policy, renewal, and rating information needed for the report</li>
+              <li>Report estimates are labelled ranges based on public information and the records supplied; they are not insurance quotes</li>
+              <li>Carrier call lists are research starting points. You decide whom to contact and make every call yourself</li>
+              <li>Fabsy does not contact insurers for you, recommend a particular switch, or promise eligibility, savings, or a premium outcome</li>
+              <li>Reminder emails are a convenience. You remain responsible for renewal dates, carrier contact, and decisions about insurance coverage</li>
+            </ul>
+            <p className="mt-4">
+              This report is consumer research based on publicly available information. Fabsy is
+              not an insurance agent or broker and does not sell, quote, or place insurance.
+            </p>
           </section>
 
           <section>

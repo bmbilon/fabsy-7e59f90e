@@ -20,7 +20,10 @@ const PrivacyPolicy = () => {
             <ul className="list-disc pl-6 space-y-2">
               <li>Personal identification information (name, address, phone number, email)</li>
               <li>Driver's license information</li>
+              <li>Driver abstracts and conviction records you upload for an Insurance Damage Report</li>
               <li>Traffic ticket details and violation information</li>
+              <li>Policy renewal dates and rating inputs you provide, such as territory, liability limit, prior claims, and current premium</li>
+              <li>Optional outcome survey responses, including carrier and premium information</li>
               <li>Payment and billing information</li>
               <li>Communication records between you and our representatives</li>
             </ul>
@@ -31,6 +34,9 @@ const PrivacyPolicy = () => {
             <p className="mb-4">We use the information we collect to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide traffic ticket representation services</li>
+              <li>Verify uploaded abstract information and generate private Insurance Damage Reports</li>
+              <li>Prepare estimated premium-exposure ranges and sourced carrier call lists</li>
+              <li>Send requested renewal, conviction-aging, delivery, and outcome survey reminders</li>
               <li>Communicate with you about your case</li>
               <li>Process payments and billing</li>
               <li>Comply with legal obligations and court requirements</li>
@@ -51,6 +57,12 @@ const PrivacyPolicy = () => {
             </ul>
             <p className="mt-4">
               We do not sell, trade, or rent your personal information to third parties for marketing purposes.
+            </p>
+            <p className="mt-4">
+              Fabsy does not send your driver abstract or report to insurance carriers and does not
+              contact carriers on your behalf. Private files are shared only with authorized Fabsy
+              staff and service providers needed to store files, process payments, authenticate
+              access, generate reports, and send requested messages.
             </p>
           </section>
 
@@ -91,6 +103,11 @@ const PrivacyPolicy = () => {
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
             <p>
               Our website may use cookies and similar technologies to enhance your browsing experience and analyze website traffic. You can control cookie preferences through your browser settings.
+            </p>
+            <p className="mt-4">
+              Fabsy suppresses analytics page-view tracking on private client portal and admin
+              routes. Payment session identifiers, private order identifiers, and case identifiers
+              are not intentionally sent as analytics page paths.
             </p>
           </section>
 

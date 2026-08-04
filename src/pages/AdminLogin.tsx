@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { getIdrStaffRole } from "@/hooks/useIdrAuth";
 import { Lock } from "lucide-react";
 
 export default function AdminLogin() {
@@ -42,7 +43,7 @@ export default function AdminLogin() {
         setIsSignUp(false);
       } else {
         // Login flow
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        const { error: authError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -50,14 +51,9 @@ export default function AdminLogin() {
         if (authError) throw authError;
 
         // Check if user has admin or case_manager role
-        const { data: roleData, error: roleError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', authData.user.id)
-          .in('role', ['admin', 'case_manager'])
-          .single();
+        const roleData = await getIdrStaffRole();
 
-        if (roleError || !roleData) {
+        if (!roleData) {
           await supabase.auth.signOut();
           throw new Error('Unauthorized: You do not have admin access');
         }
@@ -69,11 +65,11 @@ export default function AdminLogin() {
 
         navigate('/admin/dashboard');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Auth error:', error);
       toast({
         title: isSignUp ? "Sign Up Failed" : "Login Failed",
-        description: error.message || "Invalid credentials or insufficient permissions",
+        description: error instanceof Error ? error.message : "Invalid credentials or insufficient permissions",
         variant: "destructive",
       });
     } finally {

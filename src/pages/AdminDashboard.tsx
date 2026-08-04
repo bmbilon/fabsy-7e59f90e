@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Users, FileText, Shield, BarChart3 } from "lucide-react";
+import { getIdrStaffRole } from "@/hooks/useIdrAuth";
+import { LogOut, Users, FileText, Shield, BarChart3, FileSearch, type LucideIcon } from "lucide-react";
 import type { User, Session } from '@supabase/supabase-js';
 
 interface DashboardTile {
   title: string;
   description: string;
-  icon: any;
+  icon: LucideIcon;
   path: string;
   color: string;
 }
@@ -36,6 +37,13 @@ export default function AdminDashboard() {
       icon: Users,
       path: "/admin/cases",
       color: "from-blue-500 to-blue-600"
+    },
+    {
+      title: "Insurance Damage Reports",
+      description: "Review abstracts, build reports, and maintain carrier research",
+      icon: FileSearch,
+      path: "/admin/idr",
+      color: "from-cyan-500 to-teal-600"
     },
     {
       title: "Blog Management",
@@ -65,7 +73,7 @@ export default function AdminDashboard() {
       setSession(session);
       setUser(session?.user ?? null);
       if (event === 'TOKEN_REFRESHED' && session?.user) {
-        setTimeout(() => checkAuthAndFetchData(session.user), 0);
+        setTimeout(() => checkAuthAndFetchData(), 0);
       }
     });
 
@@ -73,14 +81,14 @@ export default function AdminDashboard() {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAuthAndFetchData(session.user);
+        checkAuthAndFetchData();
         return;
       }
       const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
       if (refreshed.session?.user && !refreshError) {
         setSession(refreshed.session);
         setUser(refreshed.session.user);
-        checkAuthAndFetchData(refreshed.session.user);
+        checkAuthAndFetchData();
       } else {
         setIsLoading(false);
         navigate('/admin');
@@ -91,16 +99,11 @@ export default function AdminDashboard() {
   }, []);
 
 
-  const checkAuthAndFetchData = async (currentUser: User) => {
+  const checkAuthAndFetchData = async () => {
     try {
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', currentUser.id)
-        .in('role', ['admin', 'case_manager'])
-        .single();
+      const roleData = await getIdrStaffRole();
 
-      if (roleError || !roleData) {
+      if (!roleData) {
         toast({
           title: "Unauthorized",
           description: "You don't have permission to access this page",
@@ -110,7 +113,7 @@ export default function AdminDashboard() {
         return;
       }
 
-      setUserRole(roleData.role);
+      setUserRole(roleData);
 
       // Fetch stats
       const [submissionsResult, blogResult] = await Promise.all([
@@ -125,7 +128,7 @@ export default function AdminDashboard() {
         totalUsers: 0,
       });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching data:', error);
       toast({
         title: "Error",

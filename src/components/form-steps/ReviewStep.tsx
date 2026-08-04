@@ -162,22 +162,20 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
         </div>
       </Card>
 
-      {/* Payment summary */}
+      {/* Service pricing */}
       <Card className="p-6 bg-gradient-card shadow-fab border-primary/10">
         <div className="flex items-center gap-3 mb-4">
           <DollarSign className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-bold">Payment Summary</h3>
+          <h3 className="text-lg font-bold">Service Pricing</h3>
         </div>
         <div className="space-y-3">
           <div className="flex justify-between">
-            <span>Fabsy traffic ticket agent service</span>
-            <span>$488.00</span>
+            <span>Fabsy ticket defense base fee</span>
+            <span>$488.00 CAD</span>
           </div>
-          <div className="border-t pt-3">
-            <div className="flex justify-between text-lg font-bold">
-              <span>Amount Due Today</span>
-              <span className="text-primary">$488.00 CAD</span>
-            </div>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Applicable tax</span>
+            <span>Calculated at checkout</span>
           </div>
           {formData.insuranceCompany && (
             <div className="text-sm text-muted-foreground">
@@ -185,8 +183,9 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
             </div>
           )}
           <p className="border-t pt-3 text-sm text-muted-foreground">
-            Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional
-            charge if the fine is not reduced.
+            A 30% success fee applies to any fine reduction Fabsy achieves and is additional to the
+            $488 base fee. If no fine reduction is achieved, no success fee is charged. Results vary,
+            and a dismissal, lower fine, or fewer demerits are not promised.
           </p>
         </div>
       </Card>
@@ -201,22 +200,22 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
             <div>
-              <div className="font-medium">Secure Payment</div>
-              <div className="text-muted-foreground">Continue to Stripe to pay the flat service fee</div>
+              <div className="font-medium">Secure Checkout</div>
+              <div className="text-muted-foreground">Review the final subtotal, tax, and any optional IDR add-on in the next step</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
             <div>
               <div className="font-medium">Agent Review</div>
-              <div className="text-muted-foreground">Our traffic ticket agent team reviews the information you provided</div>
+              <div className="text-muted-foreground">Our traffic ticket agent team reviews the information you provided after payment</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
             <div>
               <div className="font-medium">Representation Planning</div>
-              <div className="text-muted-foreground">We outline the next steps and applicable court requirements</div>
+              <div className="text-muted-foreground">We outline the next steps and any applicable court requirements</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -236,12 +235,12 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
           size="lg"
           className="bg-gradient-primary hover:opacity-90 transition-smooth shadow-glow px-12 py-4 text-lg"
         >
-          Continue to Payment
+          Continue to Secure Checkout
         </Button>
         
         <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-          By continuing, you confirm the information above and proceed to the payment step. Fabsy is
-          an agent service, not a law firm. Individual outcomes vary.
+          By continuing, you confirm the information above and proceed to the $488 ticket defense
+          checkout. Fabsy is an agent service, not a law firm.
         </p>
       </div>
     </div>

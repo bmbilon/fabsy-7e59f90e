@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle, Mail, Phone, Ticket, DollarSign } from "lucide-react";
+import { getIdrStaffRole } from "@/hooks/useIdrAuth";
+import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle, Mail, Phone, Ticket, DollarSign, type LucideIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -39,7 +40,7 @@ export default function AdminCaseManagement() {
       setSession(session);
       setUser(session?.user ?? null);
       if (event === 'TOKEN_REFRESHED' && session?.user) {
-        setTimeout(() => checkAuthAndFetchData(session.user), 0);
+        setTimeout(() => checkAuthAndFetchData(), 0);
       }
     });
 
@@ -47,14 +48,14 @@ export default function AdminCaseManagement() {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAuthAndFetchData(session.user);
+        checkAuthAndFetchData();
         return;
       }
       const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
       if (refreshed.session?.user && !refreshError) {
         setSession(refreshed.session);
         setUser(refreshed.session.user);
-        checkAuthAndFetchData(refreshed.session.user);
+        checkAuthAndFetchData();
       } else {
         setIsLoading(false);
         navigate('/admin');
@@ -81,16 +82,11 @@ export default function AdminCaseManagement() {
     }
   }, [searchQuery, submissions]);
 
-  const checkAuthAndFetchData = async (currentUser: User) => {
+  const checkAuthAndFetchData = async () => {
     try {
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', currentUser.id)
-        .in('role', ['admin', 'case_manager'])
-        .single();
+      const roleData = await getIdrStaffRole();
 
-      if (roleError || !roleData) {
+      if (!roleData) {
         toast({
           title: "Unauthorized",
           description: "You don't have permission to access this page",
@@ -100,7 +96,7 @@ export default function AdminCaseManagement() {
         return;
       }
 
-      setUserRole(roleData.role);
+      setUserRole(roleData);
 
       const { data, error } = await supabase
         .from('ticket_submissions')
@@ -114,6 +110,7 @@ export default function AdminCaseManagement() {
             drivers_license
           )
         `)
+        .neq('status', 'awaiting_payment')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -133,7 +130,7 @@ export default function AdminCaseManagement() {
 
       setSubmissions(transformedData);
       setFilteredSubmissions(transformedData);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching data:', error);
       toast({
         title: "Error",
@@ -146,7 +143,7 @@ export default function AdminCaseManagement() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", icon: any }> = {
+    const statusConfig: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", icon: LucideIcon }> = {
       pending: { variant: "outline", icon: Clock },
       in_progress: { variant: "secondary", icon: AlertCircle },
       completed: { variant: "default", icon: CheckCircle2 },

@@ -389,7 +389,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
           </h1>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
             Complete this form and our team will review your ticket. Pricing is a flat $488 plus
-            30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
+            30% of any fine reduction achieved. If no fine reduction is achieved, no success fee is charged.
             Fabsy is an agent service, not a law firm.
           </p>
         </div>
