@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { validateArticle } from './generate-post.mjs';
+import { normalizeGeneratedArticle, validateArticle } from './generate-post.mjs';
+import { EXACT_FABSY_PRICING } from '../../src/lib/published-content-guardrails-core.js';
 
 const filler = Array.from({ length: 910 }, () => 'guidance').join(' ');
 
@@ -39,6 +40,48 @@ const bodyPricingErrors = validateArticle(article({
 assert.ok(
   bodyPricingErrors.some((error) => error.includes('pricing claim does not use the exact formula')),
   'rendered-equivalent markdown body checks must reject split inexact pricing'
+);
+
+const normalizedGeneratedDraft = normalizeGeneratedArticle(article({
+  content: `Fabsy reports a success rate of more than 95% across past matters.
+
+Fabsy's pricing is $488 plus a 30% contingency fee on fines saved.
+
+${filler}
+
+Submit a ticket at https://fabsy.ca/submit-ticket.`,
+}));
+assert.deepEqual(
+  validateArticle(normalizedGeneratedDraft),
+  [],
+  'generated drafts should deterministically normalize outcome-rate and pricing wording before validation'
+);
+assert.ok(
+  normalizedGeneratedDraft.content.includes('95%+ historical success rate'),
+  'semantic outcome-rate wording should normalize to the approved historical wording'
+);
+assert.equal(
+  normalizedGeneratedDraft.content.split(EXACT_FABSY_PRICING).length - 1,
+  1,
+  'inexact pricing should normalize to one exact Fabsy pricing statement'
+);
+
+const prohibitedPricingDraft = normalizeGeneratedArticle(article({
+  content: `Fabsy offers no win, no fee pricing.
+
+${filler}
+
+Submit a ticket at https://fabsy.ca/submit-ticket.`,
+}));
+assert.deepEqual(
+  validateArticle(prohibitedPricingDraft),
+  [],
+  'prohibited pricing wording should normalize before marketing-text sanitization'
+);
+assert.equal(
+  prohibitedPricingDraft.content.split(EXACT_FABSY_PRICING).length - 1,
+  1,
+  'prohibited pricing wording should become the exact Fabsy pricing statement'
 );
 
 console.log('Content-engine publication validation tests passed.');
