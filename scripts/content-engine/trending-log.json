@@ -37200,5 +37200,561 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-08-05T16:00:44.788Z",
+    "chosen": "Speed Camera Ticket in Alberta: What Drivers Need to Know",
+    "published_slug": "speed-camera-ticket-alberta-drivers-guide",
+    "fell_back_to": null,
+    "news_hook": "Northern Alberta city brings photo radar program in-house, highlighting growing municipal speed camera use across Alberta.",
+    "topic": "Speed Camera Ticket in Alberta: What Drivers Need to Know",
+    "trend_candidates": [
+      {
+        "title": "Unlicensed Alberta driver caught speeding 230 km/h near Fairmont Hot Springs - Global News",
+        "source": "Global News",
+        "pubDate": "Thu, 23 Jul 2026 07:00:00 GMT",
+        "score": 11.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Speed camera revenue: Northern Alberta city brings photo radar program in-house after sweeping crackdown - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Thu, 23 Jul 2026 07:00:00 GMT",
+        "score": 10.15,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Grande Prairie Construction Zone Blitz: Nearly Two Dozen Tickets in One Hour as Alberta Fines Climb - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Fri, 24 Jul 2026 20:39:45 GMT",
+        "score": 9.88,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 1,
+          "novelty": 0.69,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "New integrated licences leading to longer waits at Alberta registries - CBC",
+        "source": "CBC",
+        "pubDate": "Sat, 01 Aug 2026 12:00:00 GMT",
+        "score": 9.71,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Pair faces 45 charges after RCMP find firearms, drugs during west-central Alberta traffic stop - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 04 Aug 2026 22:01:14 GMT",
+        "score": 9.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP issues over 1,000 traffic-related tickets over long weekend - My Lethbridge Now",
+        "source": "My Lethbridge Now",
+        "pubDate": "Tue, 04 Aug 2026 20:20:57 GMT",
+        "score": 9.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "More than 1,100 tickets issued by RCMP over long weekend - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Tue, 04 Aug 2026 20:15:30 GMT",
+        "score": 9.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue more than 1,100 traffic tickets over Heritage Day long weekend - Lakeland Connect",
+        "source": "Lakeland Connect",
+        "pubDate": "Tue, 04 Aug 2026 19:51:53 GMT",
+        "score": 9.54,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.77,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP hand out 1,107 Heritage Day long weekend tickets - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Tue, 04 Aug 2026 21:18:43 GMT",
+        "score": 9.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP to conduct targeted traffic enforcement over Heritage Day weekend - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 30 Jul 2026 17:24:08 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP dished out 1,100+ tickets on Heritage Day long weekend - CHAT News Today",
+        "source": "CHAT News Today",
+        "pubDate": "Tue, 04 Aug 2026 20:57:05 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP issue over 1,100 tickets across Alberta over Heritage Day long weekend - HeartlandNews.ca",
+        "source": "HeartlandNews.ca",
+        "pubDate": "Tue, 04 Aug 2026 20:34:34 GMT",
+        "score": 9.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP ramping up traffic enforcement Heritage Day weekend - Cochrane Eagle",
+        "source": "Cochrane Eagle",
+        "pubDate": "Fri, 31 Jul 2026 15:17:09 GMT",
+        "score": 9.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue over 1,100 tickets over long weekend - CityNews Calgary",
+        "source": "CityNews Calgary",
+        "pubDate": "Tue, 04 Aug 2026 20:31:40 GMT",
+        "score": 9.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Over, 1,100 traffic tickets issued in Alberta over August long weekend - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Tue, 04 Aug 2026 20:31:00 GMT",
+        "score": 7.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP Issue 1,107 Tickets and Report 5 Fatal Collisions Over Heritage Day Weekend - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Tue, 04 Aug 2026 22:02:34 GMT",
+        "score": 7.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "RCMP urge summer long weekend traffic safety as enforcement ramps up - Today in BC",
+        "source": "Today in BC",
+        "pubDate": "Thu, 30 Jul 2026 17:26:36 GMT",
+        "score": 6.6,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP stepping up traffic enforcement over Heritage Day weekend - play 103.7",
+        "source": "play 103.7",
+        "pubDate": "Fri, 31 Jul 2026 17:59:18 GMT",
+        "score": 6.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Over 1,000 tickets issued by RCMP over long weekend - cfweradio.ca",
+        "source": "cfweradio.ca",
+        "pubDate": "Tue, 04 Aug 2026 20:47:03 GMT",
+        "score": 6.43,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Washington state congressman wants spill response review for Alberta pipeline to B.C. - CityNews Toronto",
+        "source": "CityNews Toronto",
+        "pubDate": "Fri, 31 Jul 2026 23:15:00 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issues warnings for holiday weekend drivers: Be safe! - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Fri, 31 Jul 2026 20:09:07 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue safety tips for Heritage Day Weekend - Meridian Source",
+        "source": "Meridian Source",
+        "pubDate": "Thu, 30 Jul 2026 22:04:58 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP provide road safety tips for Heritage Day long weekend - CHAT News Today",
+        "source": "CHAT News Today",
+        "pubDate": "Fri, 31 Jul 2026 12:02:41 GMT",
+        "score": 5.5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man caught driving 230 km/h while under the influence near Fairmont Hot Springs - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Thu, 23 Jul 2026 07:00:00 GMT",
+        "score": 5.45,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Medicine Hat police, Alberta Sheriffs running check stop initiative - CTV News",
+        "source": "CTV News",
+        "pubDate": "Mon, 27 Jul 2026 07:00:00 GMT",
+        "score": 5.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Provincial government says photo radar a cash grab.. changes coming - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Thu, 30 Jul 2026 07:00:00 GMT",
+        "score": 5.1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Mounties issue 1,100+ tickets over long weekend - CochraneNow",
+        "source": "CochraneNow",
+        "pubDate": "Wed, 05 Aug 2026 12:50:44 GMT",
+        "score": 4.93,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lacombe police seize motorcycle after failed breath test - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Fri, 24 Jul 2026 17:55:28 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Joint Alberta-Saskatchewan crime crackdown leads to 52 arrest warrants - meadowlakenow.com",
+        "source": "meadowlakenow.com",
+        "pubDate": "Wed, 22 Jul 2026 23:35:24 GMT",
+        "score": 4.28,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Edmonton Hit-and-Run on Calgary Trail Leaves Pedestrian With Life-Threatening Injuries, Police Seek Witnesses - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Sat, 25 Jul 2026 20:30:43 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta man caught going 230 km/h in 80 zone on B.C. highway: Police - Surrey Now-Leader",
+        "source": "Surrey Now-Leader",
+        "pubDate": "Thu, 23 Jul 2026 18:43:28 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary Police Clocked a Driver at 154 km/h in a 70 Zone. Alberta Law Let Him Drive Off. - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Wed, 05 Aug 2026 04:17:36 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta driver caught travelling at an alarming 150 km/h over speed limit in B.C. - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 23 Jul 2026 07:00:00 GMT",
+        "score": 3.9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "'Tragedy': Tough task for police to unravel cause of fatal Tsuut'ina Trail crash, says retired officer - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Tue, 04 Aug 2026 21:02:34 GMT",
+        "score": 3.87,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Alberta man caught driving nearly triple the speed limit on B.C. highway: police - CP24",
+        "source": "CP24",
+        "pubDate": "Thu, 23 Jul 2026 07:00:00 GMT",
+        "score": 3.83,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "5 people killed, 28 injured in crashes over the long weekend: Alberta RCMP - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 04 Aug 2026 20:07:11 GMT",
+        "score": 3.4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "75 of these whales remain. A new West Coast pipeline would be 'devastating' for them, experts say - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 28 Jul 2026 08:00:00 GMT",
+        "score": 2.8,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Five fatal collisions recorded on Alberta roads over Heritage Day long weekend - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Tue, 04 Aug 2026 19:49:53 GMT",
+        "score": 1.95,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Man clocked at 230 km/h in 80 km/h zone - Castanet",
+        "source": "Castanet",
+        "pubDate": "Thu, 23 Jul 2026 15:38:00 GMT",
+        "score": 0.83,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
