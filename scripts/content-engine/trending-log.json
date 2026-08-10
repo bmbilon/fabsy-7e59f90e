@@ -39340,5 +39340,533 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-08-10T14:55:13.734Z",
+    "chosen": "What Happens If You Get Multiple Traffic Tickets in One Stop in Alberta?",
+    "published_slug": "multiple-traffic-tickets-one-stop-alberta",
+    "fell_back_to": null,
+    "news_hook": "RCMP issued 1,100+ tickets over Heritage Day weekend, including stops yielding numerous simultaneous charges.",
+    "topic": "What Happens If You Get Multiple Traffic Tickets in One Stop in Alberta?",
+    "trend_candidates": [
+      {
+        "title": "New integrated licences leading to longer waits at Alberta registries - CBC",
+        "source": "CBC",
+        "pubDate": "Sat, 01 Aug 2026 07:00:00 GMT",
+        "score": 9.71,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Pair faces 45 charges after RCMP find firearms, drugs during west-central Alberta traffic stop - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 04 Aug 2026 22:01:14 GMT",
+        "score": 9.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP urge summer long weekend traffic safety as enforcement ramps up - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Thu, 30 Jul 2026 07:00:00 GMT",
+        "score": 9.27,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.64,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP to conduct targeted traffic enforcement over Heritage Day weekend - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Thu, 30 Jul 2026 07:00:00 GMT",
+        "score": 9.2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue over 1,100 traffic tickets over Heritage Day weekend - Meridian Source",
+        "source": "Meridian Source",
+        "pubDate": "Sun, 09 Aug 2026 18:01:32 GMT",
+        "score": 9.2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP ramping up traffic enforcement Heritage Day weekend - Cochrane Eagle",
+        "source": "Cochrane Eagle",
+        "pubDate": "Fri, 31 Jul 2026 15:17:09 GMT",
+        "score": 9.11,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.56,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP dished out 1,100+ tickets on Heritage Day long weekend - CHAT News Today",
+        "source": "CHAT News Today",
+        "pubDate": "Tue, 04 Aug 2026 20:57:05 GMT",
+        "score": 9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP hand out 1,107 Heritage Day long weekend tickets - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Tue, 04 Aug 2026 21:18:43 GMT",
+        "score": 9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP issue over 1,100 tickets across Alberta over Heritage Day long weekend - HeartlandNews.ca",
+        "source": "HeartlandNews.ca",
+        "pubDate": "Tue, 04 Aug 2026 20:34:34 GMT",
+        "score": 9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue over 1,100 tickets over long weekend - calgary.citynews.ca",
+        "source": "calgary.citynews.ca",
+        "pubDate": "Tue, 04 Aug 2026 20:31:40 GMT",
+        "score": 8.89,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.44,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lacombe police charge youth after vehicle flees traffic stop - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Sun, 09 Aug 2026 21:30:15 GMT",
+        "score": 8.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Over, 1,100 traffic tickets issued in Alberta over August long weekend - LakelandToday.ca",
+        "source": "LakelandToday.ca",
+        "pubDate": "Tue, 04 Aug 2026 20:31:00 GMT",
+        "score": 7.39,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.44,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP Issue 1,107 Tickets and Report 5 Fatal Collisions Over Heritage Day Weekend - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Tue, 04 Aug 2026 22:02:34 GMT",
+        "score": 7.27,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.64,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Alberta RCMP issue 1,000 tickets, respond to five fatal collisions over long weekend - OkotoksOnline",
+        "source": "OkotoksOnline",
+        "pubDate": "Wed, 05 Aug 2026 17:34:47 GMT",
+        "score": 7.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.58,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "RCMP stepping up traffic enforcement over Heritage Day weekend - play 103.7",
+        "source": "play 103.7",
+        "pubDate": "Fri, 31 Jul 2026 17:59:18 GMT",
+        "score": 6.25,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.63,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta hosts open house for proposed Mackenzie Crossing Bridge replacement - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Fri, 07 Aug 2026 22:09:47 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Opinion: Renewing your Alberta ID shouldn't mean losing access to services - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 05 Aug 2026 18:07:29 GMT",
+        "score": 5.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government begins work repaving critical highway through Fort McMurray - CBC",
+        "source": "CBC",
+        "pubDate": "Wed, 05 Aug 2026 23:46:59 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP and Town of Cochrane remind residents of road safety - Cochrane Eagle",
+        "source": "Cochrane Eagle",
+        "pubDate": "Wed, 05 Aug 2026 20:44:45 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP provide road safety tips for Heritage Day long weekend - CHAT News Today",
+        "source": "CHAT News Today",
+        "pubDate": "Fri, 31 Jul 2026 07:00:00 GMT",
+        "score": 5.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Buffy Ticket Sales Begin with Electric Midnight Theme Announcement - cfweradio.ca",
+        "source": "cfweradio.ca",
+        "pubDate": "Fri, 07 Aug 2026 19:18:20 GMT",
+        "score": 5.3,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issues warnings for holiday weekend drivers: Be safe! - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Fri, 31 Jul 2026 07:00:00 GMT",
+        "score": 5.2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Washington state congressman wants spill response review for Alberta pipeline to B.C. - constructconnect.com",
+        "source": "constructconnect.com",
+        "pubDate": "Mon, 10 Aug 2026 11:34:10 GMT",
+        "score": 4.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "bet365’s Alberta Casino Debut Gives Canadian Players Another Regulated Option - Dose.ca",
+        "source": "Dose.ca",
+        "pubDate": "Fri, 07 Aug 2026 09:04:49 GMT",
+        "score": 4.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary Police Clocked a Driver at 154 km/h in a 70 Zone. Alberta Law Let Him Drive Off. - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Wed, 05 Aug 2026 04:17:36 GMT",
+        "score": 4,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "8 Stress-Free Alberta Towns For A Weekend Retreat - WorldAtlas",
+        "source": "WorldAtlas",
+        "pubDate": "Wed, 29 Jul 2026 07:00:00 GMT",
+        "score": 3.93,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.71,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "'Tragedy': Tough task for police to unravel cause of fatal Tsuut'ina Trail crash, says retired officer - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Tue, 04 Aug 2026 21:02:34 GMT",
+        "score": 3.87,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.93,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Five people dead, 28 injured in collisions over long weekend: Alberta RCMP - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Wed, 05 Aug 2026 18:49:57 GMT",
+        "score": 3.38,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.69,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "5 people killed, 28 injured in crashes over the long weekend: Alberta RCMP - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 04 Aug 2026 20:07:11 GMT",
+        "score": 3.2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "75 of these whales remain. A new West Coast pipeline would be 'devastating' for them, experts say - CBC",
+        "source": "CBC",
+        "pubDate": "Tue, 28 Jul 2026 07:00:00 GMT",
+        "score": 2.8,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "RCMP busy during August long weekend - River Country | 94.9 FM",
+        "source": "River Country | 94.9 FM",
+        "pubDate": "Wed, 05 Aug 2026 05:17:43 GMT",
+        "score": 2.25,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.63,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Emergency crews responding to crash at Highway 11 - centralalbertaonline.com",
+        "source": "centralalbertaonline.com",
+        "pubDate": "Tue, 28 Jul 2026 13:21:12 GMT",
+        "score": 2.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Three Killed in Alberta Traffic Collision Involving Correctional Officers - India News Network",
+        "source": "India News Network",
+        "pubDate": "Sat, 08 Aug 2026 11:25:59 GMT",
+        "score": 2.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Calgary Driver Arrested After Police Clock 218 km/h on Stoney Trail - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Fri, 07 Aug 2026 17:24:43 GMT",
+        "score": 2.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Five fatal collisions recorded on Alberta roads over Heritage Day long weekend - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Tue, 04 Aug 2026 19:49:53 GMT",
+        "score": 1.95,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "OPINION: When is a distraction really a distraction? - TownAndCountryToday.com",
+        "source": "TownAndCountryToday.com",
+        "pubDate": "Sun, 09 Aug 2026 19:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Rimbey RCMP respond to fatal single-vehicle collision on Highway 53 - rdnewsnow.com",
+        "source": "rdnewsnow.com",
+        "pubDate": "Tue, 04 Aug 2026 22:02:34 GMT",
+        "score": 0.78,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      }
+    ]
   }
 ]
