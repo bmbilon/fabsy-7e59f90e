@@ -44278,5 +44278,771 @@
         }
       }
     ]
+  },
+  {
+    "at": "2026-08-18T14:28:51.405Z",
+    "chosen": "Driving with a Learner's Licence in Alberta: Rules, Violations & What to Do If You Get a Ticket",
+    "published_slug": "learners-licence-rules-tickets-alberta-gdl-guide",
+    "fell_back_to": null,
+    "news_hook": "Alberta driver with learner's licence fined over $700 and charged for repeated violations without valid supervision",
+    "topic": "Driving with a Learner's Licence in Alberta: Rules, Violations & What to Do If You Get a Ticket",
+    "trend_candidates": [
+      {
+        "title": "Calgary Driver Caught at 129 km/h in a 60 Zone Faces $1,200 Fine and 30-Day Suspension - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Thu, 13 Aug 2026 07:15:35 GMT",
+        "score": 10.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Beyond Local: Driver with learner’s licence fined over $700 in southern Alberta - TownAndCountryToday.com",
+        "source": "TownAndCountryToday.com",
+        "pubDate": "Wed, 12 Aug 2026 23:11:26 GMT",
+        "score": 9.95,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 1,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary Stampede says man too late to cash in on $125K 50/50 ticket - CBC",
+        "source": "CBC",
+        "pubDate": "Fri, 14 Aug 2026 11:00:00 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "He won $125K at the Calgary Stampede – but his ticket expired | Hanomansing Tonight - CBC",
+        "source": "CBC",
+        "pubDate": "Sat, 15 Aug 2026 00:23:53 GMT",
+        "score": 9.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue more than 2,000 tickets as part of #OperationImpact2023 safety campaign. - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Fri, 14 Aug 2026 07:00:00 GMT",
+        "score": 9.45,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.73,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue over 1,100 traffic tickets over Heritage Day weekend - Meridian Source",
+        "source": "Meridian Source",
+        "pubDate": "Sun, 09 Aug 2026 18:01:32 GMT",
+        "score": 9.2,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.6,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP dished out 1,100+ tickets on Heritage Day long weekend - Lethbridge News Now",
+        "source": "Lethbridge News Now",
+        "pubDate": "Tue, 04 Aug 2026 20:53:48 GMT",
+        "score": 8.89,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.44,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue over 1,100 tickets over long weekend - CityNews Calgary",
+        "source": "CityNews Calgary",
+        "pubDate": "Tue, 04 Aug 2026 20:31:40 GMT",
+        "score": 8.89,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.44,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Married women share problems renewing Alberta driver’s licences - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Sun, 16 Aug 2026 12:00:21 GMT",
+        "score": 8.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta driver with learner's licence charged for third time without valid supervision - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 13 Aug 2026 21:36:00 GMT",
+        "score": 8.04,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 2,
+          "sourceScore": 1,
+          "novelty": 0.77,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Driver clocked going 69 km/h over speed limit in Calgary may see $1,200 fine - Daily Hive",
+        "source": "Daily Hive",
+        "pubDate": "Thu, 13 Aug 2026 15:56:00 GMT",
+        "score": 7.9,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.7,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP issue 1,000 tickets, respond to five fatal collisions over long weekend - OkotoksOnline",
+        "source": "OkotoksOnline",
+        "pubDate": "Wed, 05 Aug 2026 17:34:47 GMT",
+        "score": 7.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.58,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Lloydminster ticketing jumps after city shifts away from photo radar - meadowlakeNOW",
+        "source": "meadowlakeNOW",
+        "pubDate": "Fri, 14 Aug 2026 23:06:04 GMT",
+        "score": 7.14,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 2,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Calgary Youth Charged With Dangerous Driving After Riding Electric Motorcycle Through Citadel at 70 km/h - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Fri, 14 Aug 2026 17:18:53 GMT",
+        "score": 6.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "RCMP hand out 1,107 Heritage Day long weekend tickets - Ponoka News",
+        "source": "Ponoka News",
+        "pubDate": "Wed, 05 Aug 2026 02:01:11 GMT",
+        "score": 6,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta hosts open house for proposed Mackenzie Crossing Bridge replacement - Red Deer Advocate",
+        "source": "Red Deer Advocate",
+        "pubDate": "Fri, 07 Aug 2026 22:09:47 GMT",
+        "score": 5.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Saturday's letters: Alberta rebate red tape shuts seniors out - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Sat, 15 Aug 2026 10:05:32 GMT",
+        "score": 5.78,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.89,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Massive, slow-moving load may cause central Alberta traffic delays - Edmonton - Global News",
+        "source": "Global News",
+        "pubDate": "Wed, 12 Aug 2026 23:04:25 GMT",
+        "score": 5.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Taber Police, sheriffs, ‘crack down’ on vehicle violations during Thursday blitz - Lethbridge News Now",
+        "source": "Lethbridge News Now",
+        "pubDate": "Wed, 12 Aug 2026 00:28:26 GMT",
+        "score": 5.67,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Traffic moves northbound on Alberta's Highway 2 near Didsbury as a storm sweeps the region - CTV News",
+        "source": "CTV News",
+        "pubDate": "Wed, 12 Aug 2026 02:45:00 GMT",
+        "score": 5.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Opinion: Renewing your Alberta ID shouldn't mean losing access to services - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 05 Aug 2026 07:00:00 GMT",
+        "score": 5.64,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta government begins work repaving critical highway through Fort McMurray - CBC",
+        "source": "CBC",
+        "pubDate": "Wed, 05 Aug 2026 07:00:00 GMT",
+        "score": 5.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP and Town of Cochrane remind residents of road safety - Cochrane Eagle",
+        "source": "Cochrane Eagle",
+        "pubDate": "Wed, 05 Aug 2026 07:00:00 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Severe thunderstorm alert issued for southern Alberta: Environment Canada - CTV News",
+        "source": "CTV News",
+        "pubDate": "Tue, 11 Aug 2026 23:14:11 GMT",
+        "score": 5.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Kellogg is speeding up the MAHA cleanup to eliminate artificial colours - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Wed, 12 Aug 2026 15:06:59 GMT",
+        "score": 5.25,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP provide safety tips for new drivers - rdnewsnow.com",
+        "source": "rdnewsnow.com",
+        "pubDate": "Thu, 13 Aug 2026 17:44:46 GMT",
+        "score": 5.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.57,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Provincial government says photo radar a cash grab.. changes coming - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Thu, 13 Aug 2026 07:00:00 GMT",
+        "score": 5.1,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta RCMP shares tips for new drivers - DiscoverAirdrie",
+        "source": "DiscoverAirdrie",
+        "pubDate": "Mon, 17 Aug 2026 23:02:19 GMT",
+        "score": 5,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.5,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "One card – that’s it! New drivers licence, health number, citizenship ID all in one. - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Fri, 14 Aug 2026 07:00:00 GMT",
+        "score": 5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.75,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Mounties issue 1,100+ tickets over long weekend - cochranenow.com",
+        "source": "cochranenow.com",
+        "pubDate": "Wed, 05 Aug 2026 07:00:00 GMT",
+        "score": 4.64,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 1,
+          "sourceScore": 1,
+          "novelty": 0.57,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Washington congressman urges U.S. Coast Guard to review oil spill plans ahead of new Alberta-to-B.C. pipeline - Energies Media",
+        "source": "Energies Media",
+        "pubDate": "Thu, 06 Aug 2026 07:00:00 GMT",
+        "score": 4.35,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.92,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Washington state congressman wants spill response review for Alberta pipeline to B.C. - constructconnect.com",
+        "source": "constructconnect.com",
+        "pubDate": "Mon, 10 Aug 2026 07:00:00 GMT",
+        "score": 4.3,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.9,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta, Antonijas streets temporarily for pedestrians only in Rīga / Article - LSM",
+        "source": "LSM",
+        "pubDate": "Thu, 13 Aug 2026 12:17:37 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "$50M Lotto Jackpot Winner Is Revealed In Alberta Seven (iH9Tby9stZ) - mshale.com",
+        "source": "mshale.com",
+        "pubDate": "Fri, 14 Aug 2026 14:02:56 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Lottery wins hit Alberta three times in two weeks! - todayville.com",
+        "source": "todayville.com",
+        "pubDate": "Tue, 11 Aug 2026 07:00:00 GMT",
+        "score": 4.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Alberta friends win $12.5M Lotto Max jackpot, joke about ditching wives for Aruba - Yahoo News Canada",
+        "source": "Yahoo News Canada",
+        "pubDate": "Fri, 14 Aug 2026 11:30:00 GMT",
+        "score": 4.17,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.83,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Count on it, UCP red tape will make it easier to lose your health care - Alberta Politics",
+        "source": "Alberta Politics",
+        "pubDate": "Mon, 17 Aug 2026 18:30:04 GMT",
+        "score": 4.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "One Month In: What Alberta’s New Casino Landscape Actually Looks Like - The Solihull Observer",
+        "source": "The Solihull Observer",
+        "pubDate": "Sun, 16 Aug 2026 22:00:51 GMT",
+        "score": 4.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "A Driver Was Clocked at 212 km/h on Edmonton's Anthony Henday Drive. Alberta Law Let Him Drive Away. - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Tue, 11 Aug 2026 23:47:19 GMT",
+        "score": 4.06,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "2 correctional officers, inmate killed in rural Alberta collision during transfer - Global News",
+        "source": "Global News",
+        "pubDate": "Thu, 06 Aug 2026 07:00:00 GMT",
+        "score": 3.82,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.91,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Are bigger vehicles more deadly? Alberta groups call for probe into role of pickups, large SUVs in road deaths - Calgary Herald",
+        "source": "Calgary Herald",
+        "pubDate": "Wed, 12 Aug 2026 21:47:05 GMT",
+        "score": 3.76,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "'Important intersection ahead': RCMP investigations begin into Alberta triple fatal highway crash near Edmonton - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Tue, 11 Aug 2026 11:05:19 GMT",
+        "score": 3.73,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.87,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Suspect dead after Calgary police officer shot twice in traffic stop near Edworthy Park - CBC",
+        "source": "CBC",
+        "pubDate": "Mon, 10 Aug 2026 07:00:00 GMT",
+        "score": 3.69,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.85,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Alberta RCMP say serious collisions on Highway 627 increasing, area residents want changes - CBC",
+        "source": "CBC",
+        "pubDate": "Sat, 15 Aug 2026 02:28:00 GMT",
+        "score": 3.6,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Man, 33, Killed in Calling Lake Hit-and-Run in Northern Alberta, RCMP Seize Side-by-Side - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Sun, 16 Aug 2026 03:06:49 GMT",
+        "score": 3.56,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.78,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Five people dead, 28 injured in collisions over long weekend: Alberta RCMP - Edmonton Journal",
+        "source": "Edmonton Journal",
+        "pubDate": "Wed, 05 Aug 2026 07:00:00 GMT",
+        "score": 3.33,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 2,
+          "novelty": 0.67,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Chaos In Canada Today! Heavy Snow Storm Causes Traffic Crash In Alberta, Saskatoon Deandre Ayton (ZlH1wlb0YL) - mshale.com",
+        "source": "mshale.com",
+        "pubDate": "Wed, 12 Aug 2026 13:13:14 GMT",
+        "score": 2.21,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Three Killed in Alberta Traffic Collision Involving Correctional Officers - India News Network",
+        "source": "India News Network",
+        "pubDate": "Sat, 08 Aug 2026 07:00:00 GMT",
+        "score": 2.14,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.82,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Calgary Driver Arrested After Police Clock 218 km/h on Stoney Trail - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Fri, 07 Aug 2026 07:00:00 GMT",
+        "score": 2.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "Calgary Police Officer Shot During Spruce Cliff Traffic Stop, Suspect Found Dead in Bow River - Culture Alberta",
+        "source": "Culture Alberta",
+        "pubDate": "Mon, 10 Aug 2026 21:57:17 GMT",
+        "score": 2.1,
+        "scores": {
+          "albertaRel": 1,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.8,
+          "nonAlberta": false,
+          "staleRisk": true
+        }
+      },
+      {
+        "title": "OPINION: When is a distraction really a distraction? - TownAndCountryToday.com",
+        "source": "TownAndCountryToday.com",
+        "pubDate": "Sun, 09 Aug 2026 19:00:00 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Loonie to golf ball-sized hail hammers homes, vehicles in Claresholm, Alta. - CP24",
+        "source": "CP24",
+        "pubDate": "Wed, 12 Aug 2026 12:50:04 GMT",
+        "score": 1.5,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 1,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Filming to cause temporary road closure in Nanton Friday - OkotoksOnline",
+        "source": "OkotoksOnline",
+        "pubDate": "Fri, 07 Aug 2026 07:00:00 GMT",
+        "score": 1.25,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.88,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      },
+      {
+        "title": "Tips to keep Cochrane’s newest drivers safe - cochranenow.com",
+        "source": "cochranenow.com",
+        "pubDate": "Thu, 13 Aug 2026 17:23:37 GMT",
+        "score": 1.21,
+        "scores": {
+          "albertaRel": 0,
+          "ticketRel": 0,
+          "sourceScore": 1,
+          "novelty": 0.86,
+          "nonAlberta": false,
+          "staleRisk": false
+        }
+      }
+    ]
   }
 ]
