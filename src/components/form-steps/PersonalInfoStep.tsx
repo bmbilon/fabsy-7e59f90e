@@ -421,7 +421,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
               <Input
                 id="firstName"
                 {...register("firstName")}
-                onBlur={(e) => handleFieldUpdate("firstName", e.target.value)}
+                onChange={(e) => handleFieldUpdate("firstName", e.target.value)}
                 className="h-11"
               />
               {errors.firstName && (
@@ -434,7 +434,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
               <Input
                 id="lastName"
                 {...register("lastName")}
-                onBlur={(e) => handleFieldUpdate("lastName", e.target.value)}
+                onChange={(e) => handleFieldUpdate("lastName", e.target.value)}
                 className="h-11"
               />
               {errors.lastName && (
@@ -496,7 +496,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
               <Input
                 id="driversLicense"
                 {...register("driversLicense")}
-                onBlur={(e) => handleFieldUpdate("driversLicense", e.target.value)}
+                onChange={(e) => handleFieldUpdate("driversLicense", e.target.value)}
                 className="h-11"
               />
               {errors.driversLicense && (
@@ -523,8 +523,9 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
         </Label>
       </div>
 
-      {/* Conditional Address Fields */}
-      {showAddressFields && (
+      {/* Address fields: always shown while the address is incomplete (e.g. no licence
+          uploaded / OCR did not capture it), and shown on demand via the checkbox. */}
+      {(showAddressFields || !(formData.address && formData.city && formData.province && formData.postalCode)) && (
         <Card className="p-6 bg-gradient-card border-2 border-primary/10">
           <h3 className="text-lg font-semibold mb-4 text-primary">Current Address</h3>
           <div className="space-y-4">
@@ -533,7 +534,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
             <Input
               id="currentAddress"
               {...register("address")}
-              onBlur={(e) => handleFieldUpdate("address", e.target.value)}
+              onChange={(e) => handleFieldUpdate("address", e.target.value)}
               className="transition-smooth focus:ring-2 focus:ring-primary/20"
             />
             {errors.address && (
@@ -547,7 +548,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
               <Input
                 id="currentCity"
                 {...register("city")}
-                onBlur={(e) => handleFieldUpdate("city", e.target.value)}
+                onChange={(e) => handleFieldUpdate("city", e.target.value)}
                 className="transition-smooth focus:ring-2 focus:ring-primary/20"
               />
               {errors.city && (
@@ -582,7 +583,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                 id="currentPostalCode"
                 {...register("postalCode")}
                 placeholder="T2P 1J9"
-                onBlur={(e) => handleFieldUpdate("postalCode", e.target.value)}
+                onChange={(e) => handleFieldUpdate("postalCode", e.target.value)}
                 className="transition-smooth focus:ring-2 focus:ring-primary/20"
               />
               {errors.postalCode && (
@@ -605,7 +606,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                 id="email"
                 type="email"
                 {...register("email")}
-                onBlur={(e) => handleFieldUpdate("email", e.target.value)}
+                onChange={(e) => handleFieldUpdate("email", e.target.value)}
                 className="h-11"
               />
               {errors.email && (
@@ -620,7 +621,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                 type="tel"
                 {...register("phone")}
                 placeholder="Enter your phone number"
-                onBlur={(e) => handleFieldUpdate("phone", e.target.value)}
+                onChange={(e) => handleFieldUpdate("phone", e.target.value)}
                 className="h-11"
               />
               {errors.phone && (

@@ -370,6 +370,41 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
     }
   };
 
+  // Human-readable list of what is still blocking the Continue button
+  const missingFields = (): string[] => {
+    const m: string[] = [];
+    switch (currentStep) {
+      case 1:
+        if (!formData.ticketNumber) m.push("Ticket number");
+        if (!formData.issueDate) m.push("Issue date");
+        if (!formData.location) m.push("Location");
+        if (!formData.officer) m.push("Officer name");
+        if (!formData.fineAmount) m.push("Fine amount");
+        break;
+      case 2:
+        if (!formData.firstName) m.push("First name");
+        if (!formData.lastName) m.push("Last name");
+        if (!formData.dateOfBirth) m.push("Date of birth");
+        if (!formData.driversLicense) m.push("Driver's licence number");
+        if (!formData.address) m.push("Street address");
+        if (!formData.city) m.push("City");
+        if (!formData.province) m.push("Province");
+        if (!formData.postalCode) m.push("Postal code");
+        if (!formData.email) m.push("Email");
+        if (!formData.phone) m.push("Phone number");
+        break;
+      case 3:
+        if (!formData.pleaType) m.push("Plea selection");
+        if (!formData.explanation) m.push("Case explanation");
+        break;
+      case 4:
+        if (!formData.consentGiven) m.push("Consent confirmation");
+        if (!formData.digitalSignature) m.push("Digital signature");
+        break;
+    }
+    return m;
+  };
+
   const progress = (currentStep / steps.length) * 100;
   // Ensure page starts at top when this component mounts
   useEffect(() => {
@@ -492,6 +527,13 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
                 </Button>
               )}
           </div>
+
+          {/* Why Continue is disabled */}
+          {currentStep < 5 && !isStepValid() && missingFields().length > 0 && (
+            <p className="text-sm text-muted-foreground text-right mt-3">
+              Still needed: {missingFields().join(", ")}
+            </p>
+          )}
         </Card>
 
         {/* Security Note */}

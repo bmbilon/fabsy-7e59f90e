@@ -496,7 +496,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               <Input
                 id="ticketNumber"
                 {...register("ticketNumber")}
-                onBlur={(e) => handleFieldUpdate("ticketNumber", e.target.value)}
+                onChange={(e) => handleFieldUpdate("ticketNumber", e.target.value)}
                 className="h-11"
                 placeholder="AB123456789"
               />
@@ -542,7 +542,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             <Input
               id="location"
               {...register("location")}
-              onBlur={(e) => handleFieldUpdate("location", e.target.value)}
+              onChange={(e) => handleFieldUpdate("location", e.target.value)}
               className="h-11"
               placeholder="Highway 2 near Calgary, Main St & 1st Ave"
             />
@@ -557,7 +557,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               <Input
                 id="fineAmount"
                 {...register("fineAmount")}
-                onBlur={(e) => handleFieldUpdate("fineAmount", e.target.value)}
+                onChange={(e) => handleFieldUpdate("fineAmount", e.target.value)}
                 className="h-11"
                 placeholder="Enter the amount shown on the ticket"
               />
@@ -606,7 +606,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             <Input
               id="officer"
               {...register("officer")}
-              onBlur={(e) => handleFieldUpdate("officer", e.target.value)}
+              onChange={(e) => handleFieldUpdate("officer", e.target.value)}
               className="h-11"
               placeholder="Last name"
             />
@@ -620,7 +620,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             <Input
               id="officerBadge"
               {...register("officerBadge")}
-              onBlur={(e) => handleFieldUpdate("officerBadge", e.target.value)}
+              onChange={(e) => handleFieldUpdate("officerBadge", e.target.value)}
               className="h-11"
               placeholder="Optional"
             />
