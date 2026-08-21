@@ -57,6 +57,10 @@ jobs:
         run: |
           node scripts/validate-snapshot-guardrails.cjs
           node scripts/validate-blog-snapshot-guardrails.mjs
+      - name: Copy refreshed snapshots into dist
+        env:
+          REQUIRE_SNAPSHOT_MANIFEST: '1'
+        run: node scripts/copy-prerendered.js
       - name: Commit refreshed snapshots
         run: |
           git config user.name  "fabsy-ci"
@@ -75,3 +79,10 @@ jobs:
           git commit -m "ci: refresh generated crawler snapshots"
           git pull --rebase origin main
           git push origin HEAD:main
+      - name: Deploy scheduled or requested refresh to Cloudflare Pages
+        if: github.event_name != 'push'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=fabsy --branch=main
