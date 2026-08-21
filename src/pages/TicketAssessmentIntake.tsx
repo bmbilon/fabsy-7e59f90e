@@ -136,6 +136,26 @@ function moneyValue(value: string) {
   return trimmed ? Number(trimmed) : null;
 }
 
+async function createAssessmentPayment(
+  payload: { submissionId: string; accessToken: string },
+  tries = 2,
+): Promise<{ url: string }> {
+  for (let attempt = 0; attempt < tries; attempt += 1) {
+    try {
+      const { data, error } = await supabase.functions.invoke<CheckoutResponse>(
+        "create-assessment-payment",
+        { body: payload },
+      );
+      if (!error && data?.url) return { url: data.url };
+      if (attempt === tries - 1) break;
+    } catch {
+      if (attempt === tries - 1) break;
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 800));
+  }
+  throw new Error("That didn't go through. Nothing was charged. Please try again.");
+}
+
 export default function TicketAssessmentIntake() {
   const [searchParams] = useSearchParams();
   const checkoutCancelled = searchParams.get("checkout") === "cancelled";
@@ -310,13 +330,10 @@ export default function TicketAssessmentIntake() {
 
       trackAssessmentEvent("ticket_upload_completed", { file_type: ticketFile.type });
 
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke<CheckoutResponse>(
-        "create-assessment-payment",
-        { body: { submissionId: intake.submissionId, accessToken: intake.accessToken } },
-      );
-      if (checkoutError || checkout?.error || !checkout?.url) {
-        throw new Error(checkout?.error || checkoutError?.message || "Secure checkout could not be started.");
-      }
+      const checkout = await createAssessmentPayment({
+        submissionId: intake.submissionId,
+        accessToken: intake.accessToken,
+      });
 
       trackAssessmentEvent("checkout_started", {
         value: TICKET_ASSESSMENT.priceCad,
@@ -467,8 +484,8 @@ export default function TicketAssessmentIntake() {
                       <p className="shrink-0 text-xl font-bold">${TICKET_ASSESSMENT.priceCad} CAD</p>
                     </div>
                     <div className="my-4 border-t" />
-                    <div className="flex justify-between font-semibold"><span>Total charged at checkout</span><span>${TICKET_ASSESSMENT.priceCad} CAD</span></div>
-                    <p className="mt-2 text-xs text-muted-foreground">One-time. Applicable tax included. Government fines and any later representation fee are separate.</p>
+                    <div className="flex justify-between font-semibold"><span>Total charged at checkout</span><span>${TICKET_ASSESSMENT.priceCad} + GST</span></div>
+                    <p className="mt-2 text-xs text-muted-foreground">One-time, plus 5% GST (${TICKET_ASSESSMENT.albertaTotalCad.toFixed(2)} total). Government fines and any later representation fee are separate.</p>
                   </Card>
 
                   <div className="rounded-xl border bg-slate-50 p-4">
@@ -496,7 +513,7 @@ export default function TicketAssessmentIntake() {
                 ) : (
                   <Button type="submit" size="lg" disabled={!contactStepValid || isSubmitting} className="min-h-12">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    {isSubmitting ? "Saving and opening checkout..." : `Secure checkout: $${TICKET_ASSESSMENT.priceCad}`}
+                    {isSubmitting ? "Saving and opening checkout..." : `Secure checkout: $${TICKET_ASSESSMENT.priceCad} + GST`}
                   </Button>
                 )}
               </div>
@@ -507,7 +524,7 @@ export default function TicketAssessmentIntake() {
             <Card className="p-6 shadow-fab">
               <p className="text-sm font-semibold text-primary">Complete assessment</p>
               <p className="mt-1 text-4xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
-              <p className="text-sm text-muted-foreground">CAD, one-time · tax included</p>
+              <p className="text-sm text-muted-foreground">CAD, one-time · plus GST</p>
               <ul className="mt-5 space-y-3 text-sm">
                 {["Charge and deadline", "Demerit implications", "Likely insurance significance", "Representation break-even", "Recommended next step"].map((item) => <li key={item} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}
               </ul>

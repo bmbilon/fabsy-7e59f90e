@@ -376,7 +376,7 @@ ${JSON.stringify(schema.faq, null, 2)}
         <div class="answer-box" data-city="${city}" data-offence="${offenceSlug}">
           <p>${content.content_snippet}</p>
           <button class="cta-primary" data-cta="primary">
-            ${options.custom_cta_text || 'Get a free analysis →'}
+            ${options.custom_cta_text || 'Get a free ticket check →'}
           </button>
         </div>
       </div>

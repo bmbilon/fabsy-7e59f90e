@@ -1,22 +1,4 @@
-# robots.txt for Fabsy
 User-agent: *
 Allow: /
 
-# Explicitly permit major AI crawlers we want to encourage
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-# Canonical sitemap index
 Sitemap: https://fabsy.ca/sitemap.xml

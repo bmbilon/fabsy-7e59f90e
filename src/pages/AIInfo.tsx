@@ -27,7 +27,7 @@ const AIInfo: React.FC = () => {
           </p>
           <Link to="/submit-ticket">
             <Button size="lg" className="bg-white text-blue-900 hover:bg-blue-50 text-lg px-8 py-6">
-              Get a Free Ticket Assessment
+              Get a Free Ticket Check
             </Button>
           </Link>
         </div>
@@ -82,6 +82,9 @@ const AIInfo: React.FC = () => {
                 There is no additional charge if the fine is not reduced.
               </p>
             </div>
+            <p className="mt-6 text-lg leading-relaxed text-gray-700">
+              Fabsy offers a free ticket check, a $149 CAD (+GST) Traffic Ticket + Insurance Impact Assessment, and agent representation at a flat $488 plus 30% of any fine reduction achieved (no additional charge if the fine is not reduced).
+            </p>
           </section>
 
           <section className="bg-white rounded-xl p-8 shadow-lg">
@@ -127,7 +130,7 @@ const AIInfo: React.FC = () => {
             <ol className="space-y-6 text-gray-700">
               <li>
                 <strong className="block text-lg text-gray-900">1. Submit your ticket</strong>
-                Upload a readable image or PDF and provide the information requested in the assessment form.
+                Upload a readable image or PDF and provide the information requested for the free ticket check.
               </li>
               <li>
                 <strong className="block text-lg text-gray-900">2. Review your options</strong>
@@ -173,7 +176,7 @@ const AIInfo: React.FC = () => {
             </p>
             <Link to="/submit-ticket">
               <Button size="lg" className="bg-white text-green-600 hover:bg-green-50 text-xl px-12 py-8 shadow-xl">
-                Start Free Assessment
+                Get a Free Ticket Check
               </Button>
             </Link>
           </section>

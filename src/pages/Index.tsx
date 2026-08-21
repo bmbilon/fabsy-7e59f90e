@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import useSafeHead from "@/hooks/useSafeHead";
 import AssessmentOfferCard from "@/components/AssessmentOfferCard";
+import ProductLadder from "@/components/ProductLadder";
 
 const Index = () => {
   // Set homepage canonical
@@ -17,6 +18,7 @@ const Index = () => {
       <Header />
       <Hero />
       <AssessmentOfferCard />
+      <ProductLadder />
       <TrustBar />
       <ROISection />
       <Footer />

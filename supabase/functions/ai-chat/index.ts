@@ -31,7 +31,7 @@ PRICING:
 
 STYLE:
 - Be concise, calm, and plain-language.
-- Offer a Fabsy agent assessment when useful, while making clear that it is not legal advice.
+- Offer a free Fabsy ticket check when useful, while making clear that it is not legal advice.
 - Do not claim that a consultation or outcome is free.`;
 
 type UnknownRecord = Record<string, unknown>;
@@ -306,7 +306,7 @@ serve(async (req) => {
     console.error("Error in ai-chat:", error);
     return new Response(
       JSON.stringify({
-        error: "The assistant could not process that request. Please try again or request a Fabsy agent assessment.",
+        error: "The assistant could not process that request. Please try again or request a free Fabsy ticket check.",
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );

@@ -151,7 +151,7 @@ export const renderingRules: RenderingRules = {
   ],
   answer_box_position: "Immediately below H1",
   cta_rules: {
-    primary_cta_text: "Get a free analysis →",
+    primary_cta_text: "Get a free ticket check →",
     soft_cta_text: "Check your options (no obligation)",
     cta_repeat: "Once above the fold, once pre-footer"
   }

@@ -152,7 +152,7 @@ const safeLegacyPage = (page: PageRecord): PageRecord => {
   return {
     ...page,
     meta_title: metaTitle,
-    meta_description: `Review options for a ${ticketLabel}${place}, check the deadline printed on the ticket, and request a Fabsy assessment.`,
+    meta_description: `Review options for a ${ticketLabel}${place}, check the deadline printed on the ticket, and request a free Fabsy ticket check.`,
     h1,
     hook: `Check the dispute deadline printed on your ${ticketLabel} and review your options before deciding how to respond.`,
     bullets: [
@@ -562,14 +562,14 @@ const WorkingContentPage = () => {
                   Fight Your {pageData.violation || 'Traffic'} Ticket
                 </h3>
                 <p className="text-sm mb-5 opacity-95">
-                  Start with a free ticket analysis. Representation is available where paid agent representation is permitted.
+                  Start with a free ticket check. Representation is available where paid agent representation is permitted.
                 </p>
                 <Link to="/submit-ticket">
                   <Button 
                     size="lg"
                     className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
                   >
-                    Get Free Analysis →
+                    Get a Free Ticket Check →
                   </Button>
                 </Link>
                 <p className="text-xs mt-3 opacity-80 text-center">Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</p>

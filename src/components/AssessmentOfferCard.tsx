@@ -5,6 +5,7 @@ import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
+import { PRODUCT_LADDER_BRIDGE } from "@/components/ProductLadder";
 
 export default function AssessmentOfferCard() {
   const offer = useRef<HTMLElement | null>(null);
@@ -53,7 +54,7 @@ export default function AssessmentOfferCard() {
           <div className="bg-slate-950 p-7 text-white sm:p-10 lg:p-12">
             <p className="text-sm font-semibold text-violet-200">Complete assessment</p>
             <p className="mt-2 text-5xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
-            <p className="mt-1 text-sm text-slate-300">CAD, one-time · applicable tax included</p>
+            <p className="mt-1 text-sm text-slate-300">CAD, one-time · plus GST</p>
             <ul className="mt-7 space-y-3 text-sm text-slate-200">
               {[
                 "What the charge and deadline mean",
@@ -68,6 +69,7 @@ export default function AssessmentOfferCard() {
                 </li>
               ))}
             </ul>
+            <p className="mt-6 text-xs leading-relaxed text-slate-300">{PRODUCT_LADDER_BRIDGE}</p>
           </div>
         </div>
       </Card>

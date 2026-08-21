@@ -22,7 +22,7 @@ const Footer = () => {
     ],
     support: [
       { name: "Ticket + Insurance Assessment", path: "/traffic-ticket-assessment" },
-      { name: "Submit Ticket", path: "/submit-ticket" },
+      { name: "Free Ticket Check", path: "/submit-ticket" },
       { name: "Contact Us", path: "/contact" },
       { name: "FAQ", path: "/faq" },
       { name: "Insurance Damage Report", path: "/insurance-damage-report" },
@@ -174,8 +174,7 @@ const Footer = () => {
           </div>
 
           <p className="text-center">
-            *By using our free ticket assessment tool, you agree to share your contact information and any content contained in your uploaded ticket. 
-            This information may be used to contact you about our services. Your privacy is important to us - see our Privacy Policy for details.
+            *By submitting a ticket for a free ticket check or a paid assessment, you agree to share your contact information and the contents of your uploaded ticket so we can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
           </p>
         </div>
 

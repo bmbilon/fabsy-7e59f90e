@@ -19,7 +19,7 @@ interface CheckoutSessionData {
   customer_email?: string | null;
   customer_details?: { email?: string | null } | null;
   payment_intent?: string | { id?: string } | null;
-  total_details?: { amount_discount?: number | null } | null;
+  total_details?: { amount_discount?: number | null; amount_tax?: number | null } | null;
   metadata: Record<string, string> | null;
 }
 
@@ -220,7 +220,9 @@ async function persistPaidTicketAssessment(
     session.payment_status !== "paid" ||
     session.currency?.toLowerCase() !== "cad" ||
     session.amount_subtotal !== TICKET_ASSESSMENT_CENTS ||
-    session.amount_total !== TICKET_ASSESSMENT_CENTS ||
+    session.amount_total === null ||
+    session.amount_total <= TICKET_ASSESSMENT_CENTS ||
+    Number(session.total_details?.amount_tax || 0) !== session.amount_total - TICKET_ASSESSMENT_CENTS ||
     metadata.assessment_price_cents !== String(TICKET_ASSESSMENT_CENTS) ||
     Number(session.total_details?.amount_discount || 0) !== 0
   ) {
@@ -321,7 +323,7 @@ async function sendTicketAssessmentConfirmation(
       reply_to: "hello@fabsy.ca",
       to: [client.email],
       subject: "Fabsy received your ticket assessment",
-      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1f2937"><h1>Payment received—your ticket is in the review queue</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Fabsy received your private ticket upload and the information for your <strong>Traffic Ticket + Insurance Impact Assessment</strong>.</p><div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px;margin:24px 0"><p style="margin:0 0 8px"><strong>Payment:</strong> $149 CAD, one-time</p><p style="margin:0 0 8px"><strong>Ticket:</strong> received</p><p style="margin:0"><strong>Next:</strong> a Fabsy team member will complete a human review and email the assessment.</p></div><p>Fabsy will review the charge and deadline, fine and demerit implications, available options, likely insurance-risk significance, representation economics and the recommended next step.</p><p>If a response deadline is close, reply to this email or call (825) 793-2279 after submitting. The assessment does not pause any deadline printed on the ticket.</p><p style="font-size:13px;color:#6b7280;line-height:1.5">Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Fabsy's assessment is not a binding insurance quote or guarantee of premium changes. Fabsy is an Alberta traffic ticket agent service, not a law firm, and no outcome is promised.</p>${getFabsyEmailSignature()}</div>`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1f2937"><h1>Payment received—your ticket is in the review queue</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Fabsy received your private ticket upload and the information for your <strong>Traffic Ticket + Insurance Impact Assessment</strong>.</p><div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px;margin:24px 0"><p style="margin:0 0 8px"><strong>Payment:</strong> $149 CAD, one-time, plus GST</p><p style="margin:0 0 8px"><strong>Ticket:</strong> received</p><p style="margin:0"><strong>Next:</strong> a Fabsy team member will complete a human review and email the assessment.</p></div><p>Fabsy will review the charge and deadline, fine and demerit implications, available options, likely insurance-risk significance, representation economics and the recommended next step.</p><p>If a response deadline is close, reply to this email or call (825) 793-2279 after submitting. The assessment does not pause any deadline printed on the ticket.</p><p style="font-size:13px;color:#6b7280;line-height:1.5">Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Fabsy's assessment is not a binding insurance quote or guarantee of premium changes. Fabsy is an Alberta traffic ticket agent service, not a law firm, and no outcome is promised.</p>${getFabsyEmailSignature()}</div>`,
     }, `ticket-assessment-confirmation/${submissionId}`);
     emailAccepted = true;
     const { error: sentError } = await supabase.from("ticket_submissions").update({

@@ -77,7 +77,7 @@ const CompetitorComparison = () => {
             </ul>
             <div className="mt-8 text-center">
               <Button size="lg" onClick={() => navigate("/submit-ticket")} className="text-lg px-8 py-6">
-                Submit a Ticket for Assessment
+                Get a Free Ticket Check
               </Button>
             </div>
           </div>

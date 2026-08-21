@@ -359,7 +359,7 @@ const ContentPage = () => {
                 size="lg"
                 className="bg-white text-green-600 hover:bg-green-50 text-lg px-8 py-6"
               >
-                Get Free Analysis Now
+                Get a Free Ticket Check
               </Button>
             </Link>
           </div>

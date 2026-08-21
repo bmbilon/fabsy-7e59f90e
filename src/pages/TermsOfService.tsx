@@ -92,7 +92,7 @@ const TermsOfService = () => {
             <h2 className="text-2xl font-semibold mb-4">5B. Traffic Ticket + Insurance Impact Assessment Terms</h2>
             <p className="mb-4">
               The Traffic Ticket + Insurance Impact Assessment costs ${TICKET_ASSESSMENT.priceCad} CAD as a
-              one-time payment. Applicable tax is included in that price. Government fines, court costs,
+              one-time payment, plus GST, charged at checkout. Government fines, court costs,
               driver records, and any later representation service are separate.
             </p>
             <ul className="list-disc pl-6 space-y-2">

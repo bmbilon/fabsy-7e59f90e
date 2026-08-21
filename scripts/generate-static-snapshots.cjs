@@ -180,7 +180,7 @@ function legacyTitle(h1) {
 function legacyDescription(page) {
   const city = safeLegacyCity(page);
   const place = city === 'Alberta' ? '' : ` in ${city}`;
-  return `Review options for an Alberta traffic ticket${place}, check the deadline printed on the ticket, and request a Fabsy assessment.`;
+  return `Review options for an Alberta traffic ticket${place}, check the deadline printed on the ticket, and request a free Fabsy ticket check.`;
 }
 
 function normalizedPage(basePage, curated) {
@@ -340,7 +340,7 @@ function render(page) {
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}
       </ul>
 ${sections}
-      <p><a class="cta" href="/submit-ticket">Get a free ticket assessment</a></p>
+      <p><a class="cta" href="/submit-ticket">Get a free ticket check</a></p>
       <section>
         <h2>Frequently Asked Questions</h2>
 ${faqsHtml}

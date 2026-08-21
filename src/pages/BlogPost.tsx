@@ -361,11 +361,11 @@ const BlogPost = () => {
                 <div className="bg-primary/10 border border-primary/20 rounded-lg p-8 text-center shadow-lg">
                   <h3 className="text-2xl font-bold mb-4 text-white">Need Help with Your Traffic Ticket?</h3>
                   <p className="text-xl mb-6 text-white/80">
-                    Ask Fabsy to assess the ticket and explain whether agent services are permitted and available for the matter.
+                    Ask Fabsy to check the charge and court location, confirm whether representation is available, and quote the representation fee.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg" className="bg-primary text-white hover:bg-primary-dark border-0">
-                      <Link to="/submit-ticket">Request a Free Ticket Assessment</Link>
+                      <Link to="/submit-ticket">Get a Free Ticket Check</Link>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-primary/20">
                       <Link to="/">Learn More</Link>

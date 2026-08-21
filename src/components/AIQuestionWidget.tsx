@@ -21,7 +21,7 @@ type UnknownRecord = Record<string, unknown>;
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
 const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
-const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent assessment. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
+const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent review. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
 
 const forbiddenOutputPatterns = [
   new RegExp(["no", "win", "no", "fee"].join("\\s+"), "i"),
@@ -171,7 +171,7 @@ const AIQuestionWidget = () => {
       console.error('Analysis error:', err);
       setError('The automated review could not be completed safely.');
       toast.error('Review unavailable', {
-        description: 'Please try again or request a Fabsy agent assessment.'
+        description: 'Please try again or request a free Fabsy ticket check.'
       });
     } finally {
       setIsAnalyzing(false);

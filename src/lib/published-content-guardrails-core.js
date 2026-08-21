@@ -21,9 +21,9 @@ Depending on the matter, you may be able to respond yourself, use an authorized 
 
 Fabsy provides agent services for Alberta traffic matters and is not a law firm. ${EXACT_FABSY_PRICING}
 
-## Request an assessment
+## Get a free ticket check
 
-To ask Fabsy to assess whether it can assist, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
+To ask Fabsy to confirm the charge, check representation availability and quote the representation fee, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
 
 This article provides general information and is not legal advice.`;
 
@@ -94,9 +94,9 @@ No. Historical results describe past matters only. The charge, evidence, procedu
 
 ${EXACT_FABSY_PRICING}
 
-## Get a ticket assessment
+## Get a free ticket check
 
-To ask Fabsy to assess whether it can assist with your Alberta traffic matter, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
+To ask Fabsy to confirm the charge, check representation availability and quote the representation fee, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
 
 This article provides general information and is not legal advice.`;
 

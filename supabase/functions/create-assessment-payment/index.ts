@@ -182,7 +182,7 @@ serve(async (req) => {
         price_data: {
           currency: "cad",
           unit_amount: ASSESSMENT_CENTS,
-          tax_behavior: "inclusive",
+          tax_behavior: "exclusive",
           product_data: {
             name: "Traffic Ticket + Insurance Impact Assessment",
             description: "Human-reviewed Alberta ticket, insurance-risk and representation break-even assessment. Government fines and later representation are separate.",

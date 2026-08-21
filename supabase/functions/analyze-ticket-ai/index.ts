@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
 const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
-const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent assessment. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
+const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent review. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
 
 const SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket information.
 
@@ -131,13 +131,13 @@ const fallbackResponse = (): AnalysisResponse => {
     page_json: {
       slug: "alberta-traffic-ticket-information",
       meta_title: "Alberta Traffic Ticket Information | Fabsy",
-      meta_description: "Review general Alberta traffic ticket process information and request a Fabsy agent assessment for an eligible matter.",
+      meta_description: "Review general Alberta traffic ticket process information and request a free Fabsy ticket check for an eligible matter.",
       h1: "Alberta Traffic Ticket Information",
       hook,
       bullets: [
         "Verify extracted details against the ticket.",
         "Follow the response instructions printed on the ticket.",
-        "Request a Fabsy agent assessment for an eligible matter.",
+        "Request a free Fabsy ticket check for an eligible matter.",
       ],
       what: "<p>This page provides general automated extraction and Alberta traffic ticket process information.</p>",
       how: "<p>Check the ticket details and use the official instructions and court source that apply to the matter.</p>",
@@ -368,7 +368,7 @@ const validateAndNormalizeResponse = (
       bullets,
       what,
       how,
-      next: `<p>Check the instructions printed on the ticket and request a Fabsy agent assessment if the matter may be eligible. ${EXACT_PRICING} Outcomes vary.</p>`,
+      next: `<p>Check the instructions printed on the ticket and request a free Fabsy ticket check if the matter may be eligible. ${EXACT_PRICING} Outcomes vary.</p>`,
       faqs,
       video: { youtubeUrl: "", transcript: "" },
       status: "draft",
@@ -488,7 +488,7 @@ serve(async (req) => {
     console.error("Error in analyze-ticket-ai:", error);
     return new Response(
       JSON.stringify({
-        error: "The automated analysis could not be completed. Please try again or request a Fabsy agent assessment.",
+        error: "The automated analysis could not be completed. Please try again or request a free Fabsy ticket check.",
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );

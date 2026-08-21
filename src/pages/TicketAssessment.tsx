@@ -18,6 +18,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StaticJsonLd from "@/components/StaticJsonLd";
+import ProductLadder, { PRODUCT_LADDER_BRIDGE } from "@/components/ProductLadder";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -108,7 +109,7 @@ export default function TicketAssessment() {
   useSafeHead({
     title: "$149 Alberta Traffic Ticket & Insurance Assessment | Fabsy",
     description:
-      "For $149 CAD, get an Alberta ticket review, likely insurance-impact assessment and a clear recommendation on what to do next.",
+      "For $149 CAD plus GST, get an Alberta ticket review, likely insurance-impact assessment and a clear recommendation on what to do next.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
   });
 
@@ -189,7 +190,7 @@ export default function TicketAssessment() {
             <Card className="border-white/10 bg-white p-7 text-slate-950 shadow-2xl sm:p-8">
               <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-700">Complete assessment</p>
               <p className="mt-2 text-5xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
-              <p className="mt-1 text-sm text-slate-600">CAD · one-time · applicable tax included</p>
+              <p className="mt-1 text-sm text-slate-600">CAD · one-time · plus GST</p>
               <div className="my-6 border-t" />
               <ul className="space-y-3 text-sm text-slate-700">
                 {["Ticket and deadline review", "Demerit and conviction explanation", "Insurance-risk assessment", "Representation break-even analysis", "Recommended next step"].map((item) => (
@@ -202,9 +203,12 @@ export default function TicketAssessment() {
               <p className="mt-6 rounded-lg bg-slate-100 p-4 text-xs leading-relaxed text-slate-600">
                 Government fines and any later representation fee are separate. No percentage or success fee applies to this assessment.
               </p>
+              <p className="mt-4 text-xs leading-relaxed text-slate-600">{PRODUCT_LADDER_BRIDGE}</p>
             </Card>
           </div>
         </section>
+
+        <ProductLadder />
 
         {checkoutCancelled ? (
           <div className="container mx-auto px-4 pt-8">
@@ -361,7 +365,7 @@ export default function TicketAssessment() {
 
         <section className="bg-slate-950 px-4 py-16 text-white">
           <div className="container mx-auto max-w-4xl text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-200">Complete assessment · ${TICKET_ASSESSMENT.priceCad} CAD</p>
+            <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-200">Complete assessment · ${TICKET_ASSESSMENT.priceCad} CAD + GST</p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Know the smart move before you spend more.</h2>
             <Button asChild size="lg" className="mt-7 min-h-12 bg-violet-600 px-8 text-base hover:bg-violet-500">
               <Link

@@ -59,7 +59,9 @@ export default function TicketAssessmentConfirmation() {
       }
 
       const isAssessment = data.line_items?.some((item) => item.description === TICKET_ASSESSMENT.name);
-      const validAmount = data.amount_total === TICKET_ASSESSMENT.priceCents &&
+      const validAmount = data.amount_subtotal === TICKET_ASSESSMENT.priceCents &&
+        typeof data.amount_total === "number" &&
+        data.amount_total > TICKET_ASSESSMENT.priceCents &&
         data.currency?.toLowerCase() === "cad";
       if (data.payment_status !== "paid" || !isAssessment || !validAmount) {
         setStatus("pending");

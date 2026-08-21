@@ -128,7 +128,7 @@ function generatePageObject(city, violation, scenario = null) {
     : `${violation.name}-ticket-${city.toLowerCase().replace(/\s+/g, '-')}`;
   const faqs = [
     { q: `How do I respond to a ${violation.display} ticket in ${city}?`, a: `Follow the instructions and deadline printed on the ticket. Those instructions explain how to pay the ticket or start a dispute.` },
-    { q: `Can Fabsy review a ${violation.display} ticket from ${city}?`, a: `Yes. Submit a copy for an assessment. Fabsy will confirm the available options and whether agent representation is permitted for the matter and court location.` },
+    { q: `Can Fabsy review a ${violation.display} ticket from ${city}?`, a: `Yes. Submit a copy for a free ticket check. Fabsy will confirm the available options and whether agent representation is permitted for the matter and court location.` },
     { q: `How much does Fabsy charge for representation?`, a: EXACT_PRICING },
   ];
 

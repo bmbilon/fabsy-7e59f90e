@@ -12,6 +12,7 @@ import PaymentStep from "./form-steps/PaymentStep";
 import ReviewStep from "./form-steps/ReviewStep";
 import { useToast } from "@/hooks/use-toast";
 import { useTicketCache } from "@/hooks/useTicketCache";
+import { Link } from "react-router-dom";
 
 export interface FormData {
   // Personal Information
@@ -420,12 +421,13 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
             Fight Your Ticket
           </Badge>
           <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
-            Get Your <span className="text-gradient-primary">Ticket Assessed</span>
+            Free Ticket Check <span className="text-gradient-primary">&amp; Representation</span>
           </h1>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Complete this form and our team will review your ticket. Pricing is a flat $488 plus
-            30% of any fine reduction achieved. If no fine reduction is achieved, no success fee is charged.
-            Fabsy is an agent service, not a law firm.
+            Upload your ticket. We confirm the charge, check availability, and quote the flat $488 representation fee. Want the full insurance math first?{" "}
+            <Link to="/traffic-ticket-assessment" className="font-semibold text-white underline underline-offset-4">
+              Get the $149 assessment.
+            </Link>
           </p>
         </div>
 

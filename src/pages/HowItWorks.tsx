@@ -32,8 +32,8 @@ const HowItWorks: React.FC = () => {
       icon: Upload,
     },
     {
-      name: "Get a free analysis",
-      text: "Fabsy reviews the submitted ticket and explains whether the service is available and what next steps may be considered. Keep following the instructions and deadlines printed on the ticket unless Fabsy confirms otherwise.",
+      name: "Get a free ticket check",
+      text: "Fabsy confirms the charge, whether representation is available for your court location, and what it would cost. Keep following the instructions and deadlines printed on the ticket unless Fabsy confirms otherwise.",
       url: "https://fabsy.ca/submit-ticket",
       icon: FileCheck,
     },
