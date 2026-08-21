@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 export const PRODUCT_LADDER_BRIDGE =
-  "Start with a free ticket check. Upgrade to the $149 assessment when you want the insurance math done on your actual policy. Hire representation only if the assessment says it's worth it.";
+  "Start with a free ticket check. Choose $149 Ticket Triage for the insurance math, a priority place in our representation queue, and a full $149 credit if you upgrade. If representation is worth it, only $339 of the $488 flat fee remains, plus GST.";
 
 const tiers = [
   {
@@ -19,14 +19,16 @@ const tiers = [
     ],
   },
   {
-    name: "Ticket + Insurance Impact Assessment",
+    name: "Ticket Triage",
     price: "$149",
     priceNote: "+ GST, one-time",
     sub: "Know the smart move before spending more",
     highlight: true,
-    cta: { label: "Start My $149 Assessment", href: "/traffic-ticket-assessment/start" },
+    cta: { label: "Start My Ticket Triage", href: "/traffic-ticket-assessment/start" },
     features: [
       "Everything in the Free Ticket Check",
+      "Priority placement in our representation queue",
+      "$149 credited toward the $488 flat representation fee",
       "Fine, demerit and conviction breakdown",
       "Insurance-risk assessment using your policy, insurer and renewal details",
       "Representation break-even analysis",
@@ -45,6 +47,7 @@ const tiers = [
       "Disclosure request and review",
       "Court process handled for you",
       "No reduction, no success fee",
+      "$339 flat-fee balance after a Ticket Triage credit",
     ],
   },
 ] as const;
@@ -115,9 +118,9 @@ export default function ProductLadder({ compact = false, className }: ProductLad
           ))}
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-xs leading-relaxed text-muted-foreground">
-          The $149 assessment is a commercial decision aid, not legal advice, and never obligates
-          you to hire Fabsy. Representation is a separate service, available where paid agent
-          representation is permitted.
+          Ticket Triage is a commercial decision aid, not legal advice, and never obligates you to
+          hire Fabsy. The $149 credit applies to the same eligible matter; the $339 balance is plus
+          GST, and the 30% success fee still applies to any fine reduction.
         </p>
       </div>
     </section>

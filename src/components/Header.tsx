@@ -17,7 +17,7 @@ const Header = () => {
     { name: "How It Works", path: "/how-it-works" },
     { name: "About", path: "/about" },
     { name: "What We Help With", path: "/services" },
-    { name: "Ticket Assessment", path: "/traffic-ticket-assessment" },
+    { name: "Ticket Triage", path: "/traffic-ticket-assessment" },
     { name: "Success Stories", path: "/testimonials" },
     { name: "Blog", path: "/blog" },
   ];
@@ -64,7 +64,7 @@ const Header = () => {
             </a>
             <Link to="/traffic-ticket-assessment" onClick={() => trackAssessmentEvent("assessment_start", { location: "desktop_header" })}>
               <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                $149 Assessment
+                $149 Ticket Triage
               </Button>
             </Link>
           </div>
@@ -124,7 +124,7 @@ const Header = () => {
                         setIsOpen(false);
                       }}
                     >
-                      $149 Assessment
+                      $149 Ticket Triage
                     </Button>
                   </Link>
                 </div>

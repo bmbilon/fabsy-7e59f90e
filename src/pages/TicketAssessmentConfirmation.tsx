@@ -36,8 +36,8 @@ export default function TicketAssessmentConfirmation() {
   const [message, setMessage] = useState("");
 
   useSafeHead({
-    title: "Assessment Received | Fabsy",
-    description: "Fabsy received your Traffic Ticket + Insurance Impact Assessment order.",
+    title: "Ticket Triage Received | Fabsy",
+    description: "Fabsy received your Ticket Triage order.",
     robots: "noindex, nofollow",
   });
 
@@ -58,7 +58,10 @@ export default function TicketAssessmentConfirmation() {
         return;
       }
 
-      const isAssessment = data.line_items?.some((item) => item.description === TICKET_ASSESSMENT.name);
+      const isAssessment = data.line_items?.some((item) =>
+        item.description === TICKET_ASSESSMENT.name ||
+        item.description === "Traffic Ticket + Insurance Impact Assessment"
+      );
       const validAmount = data.amount_subtotal === TICKET_ASSESSMENT.priceCents &&
         typeof data.amount_total === "number" &&
         data.amount_total > TICKET_ASSESSMENT.priceCents &&
@@ -105,7 +108,7 @@ export default function TicketAssessmentConfirmation() {
             <div className="text-center">
               <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-600" aria-hidden="true" />
               <p className="mt-5 text-sm font-bold uppercase tracking-[0.15em] text-emerald-700">Payment received</p>
-              <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Your ticket is in Fabsy's review queue</h1>
+              <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Your Ticket Triage is in Fabsy's review queue</h1>
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
                 We received the ticket and assessment details submitted before checkout. A human reviewer will assess the full picture and email the result to the purchase address.
               </p>
@@ -133,6 +136,14 @@ export default function TicketAssessmentConfirmation() {
               <Clock3 className="h-4 w-4" />
               <AlertTitle>What happens next</AlertTitle>
               <AlertDescription>{TICKET_ASSESSMENT.deliveryExpectation} The assessment does not pause any deadline printed on your ticket.</AlertDescription>
+            </Alert>
+
+            <Alert className="mt-4 border-violet-200 bg-violet-50">
+              <ShieldCheck className="h-4 w-4" />
+              <AlertTitle>Your representation upgrade benefits are active</AlertTitle>
+              <AlertDescription>
+                If you upgrade this eligible matter, you receive priority placement in Fabsy's representation queue and your $149 Ticket Triage payment is applied to the $488 flat fee, leaving a $339 base-fee balance plus GST. The 30% success fee still applies to any fine reduction.
+              </AlertDescription>
             </Alert>
 
             <Card className="mt-8 p-6 sm:p-8">

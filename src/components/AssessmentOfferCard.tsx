@@ -30,7 +30,7 @@ export default function AssessmentOfferCard() {
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Scale className="h-6 w-6" aria-hidden="true" />
             </div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">A clear decision before a bigger spend</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">Ticket Triage</p>
             <h2 id="assessment-offer-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
               Before you pay or spend hundreds fighting it, find out what the smart move is.
             </h2>
@@ -52,7 +52,7 @@ export default function AssessmentOfferCard() {
             </div>
           </div>
           <div className="bg-slate-950 p-7 text-white sm:p-10 lg:p-12">
-            <p className="text-sm font-semibold text-violet-200">Complete assessment</p>
+            <p className="text-sm font-semibold text-violet-200">Complete Ticket Triage</p>
             <p className="mt-2 text-5xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
             <p className="mt-1 text-sm text-slate-300">CAD, one-time · plus GST</p>
             <ul className="mt-7 space-y-3 text-sm text-slate-200">
@@ -62,6 +62,8 @@ export default function AssessmentOfferCard() {
                 "Likely insurance-risk significance",
                 "Representation break-even assessment",
                 "A clear recommended next step",
+                "Priority placement if you upgrade",
+                "$149 credited toward representation ($339 flat-fee balance)",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />

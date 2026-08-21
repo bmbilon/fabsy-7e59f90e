@@ -83,7 +83,7 @@ const AIInfo: React.FC = () => {
               </p>
             </div>
             <p className="mt-6 text-lg leading-relaxed text-gray-700">
-              Fabsy offers a free ticket check, a $149 CAD (+GST) Traffic Ticket + Insurance Impact Assessment, and agent representation at a flat $488 plus 30% of any fine reduction achieved (no additional charge if the fine is not reduced).
+              Fabsy offers a free ticket check, $149 CAD (+GST) Ticket Triage, and agent representation at a flat $488 plus 30% of any fine reduction achieved (no additional charge if the fine is not reduced). Ticket Triage includes priority placement in the representation queue and a $149 credit toward the flat representation fee, leaving a $339 base-fee balance plus GST if the same eligible matter is upgraded.
             </p>
           </section>
 

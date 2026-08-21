@@ -21,7 +21,7 @@ const Footer = () => {
       { name: "Legal Disclaimer", path: "/disclaimer" },
     ],
     support: [
-      { name: "Ticket + Insurance Assessment", path: "/traffic-ticket-assessment" },
+      { name: "Ticket Triage", path: "/traffic-ticket-assessment" },
       { name: "Free Ticket Check", path: "/submit-ticket" },
       { name: "Contact Us", path: "/contact" },
       { name: "FAQ", path: "/faq" },

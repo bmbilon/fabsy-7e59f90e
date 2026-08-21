@@ -7,6 +7,7 @@ const corsHeaders = {
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
 const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
+const EXACT_TICKET_TRIAGE = "Ticket Triage costs $149 plus GST and includes priority placement in Fabsy's representation queue for the same eligible matter. If the matter is upgraded to the $488 representation service, the $149 is credited toward the flat fee, leaving a $339 base-fee balance plus GST; the 30% success fee still applies to any fine reduction.";
 const SAFE_REPLY = `I can provide general process information, but I cannot provide case-specific legal advice or calculate a fine, demerit count, or response deadline. Check the values and instructions printed on your ticket. ${SERVICE_STATUS} ${EXACT_PRICING} Outcomes vary.`;
 
 const CHAT_SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket questions.
@@ -27,7 +28,8 @@ FACT SAFETY:
 - Use a standard hyphen or comma instead of a long dash.
 
 PRICING:
-- If pricing is relevant, use this exact sentence and no other fee description: "${EXACT_PRICING}"
+- For representation pricing, use this exact sentence: "${EXACT_PRICING}"
+- For Ticket Triage pricing or upgrade benefits, use this exact wording: "${EXACT_TICKET_TRIAGE}"
 
 STYLE:
 - Be concise, calm, and plain-language.
@@ -136,7 +138,7 @@ const hasOverCapPercentage = (text: string): boolean => {
 
 const hasUnsupportedTicketNumbers = (text: string, ticketData: unknown): boolean => {
   const evidence = collectTicketEvidence(ticketData);
-  const withoutApprovedPricing = text.split(EXACT_PRICING).join("");
+  const withoutApprovedPricing = text.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
 
   const amountPattern = /(?:CA\$|CAD\s*\$?)\s*\d[\d,.]*|\$\s*\d[\d,.]*|\b\d[\d,.]*\s*(?:CAD|dollars?)\b|\bfine(?:\s+\w+){0,3}\s+\d[\d,.]*/gi;
   const demeritPattern = /\b\d+(?:\.\d+)?\s+demerit(?:\s+points?)?\b/gi;
@@ -161,7 +163,7 @@ const sanitizeAiReply = (reply: unknown, ticketData: unknown): string => {
 
   const hasForbiddenLanguage = forbiddenOutputPatterns.some((pattern) => pattern.test(normalized));
   const hasGenderedAudience = /\b(?:for women|women-only|female drivers?)\b/i.test(normalized);
-  const withoutApprovedPricing = normalized.split(EXACT_PRICING).join("");
+  const withoutApprovedPricing = normalized.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
   const hasInexactPricing = /\b(?:price|pricing|fee|cost)\b|\bFabsy\b[^.!?\n]{0,80}(?:\bcharges?\b|\$)/i.test(withoutApprovedPricing);
 
   if (

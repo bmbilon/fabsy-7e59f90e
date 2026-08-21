@@ -7,6 +7,7 @@ const corsHeaders = {
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
 const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
+const EXACT_TICKET_TRIAGE = "Ticket Triage costs $149 plus GST and includes priority placement in Fabsy's representation queue for the same eligible matter. If the matter is upgraded to the $488 representation service, the $149 is credited toward the flat fee, leaving a $339 base-fee balance plus GST; the 30% success fee still applies to any fine reduction.";
 const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent review. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
 
 const SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket information.
@@ -28,7 +29,8 @@ FACT SAFETY:
 - Do not state unsourced statistics or a success rate above 95%.
 
 PRICING:
-- If pricing is relevant, use this exact sentence and no other fee description: "${EXACT_PRICING}"
+- For representation pricing, use this exact sentence: "${EXACT_PRICING}"
+- For Ticket Triage pricing or upgrade benefits, use this exact wording: "${EXACT_TICKET_TRIAGE}"
 
 OUTPUT SHAPE:
 {
@@ -267,7 +269,7 @@ const hasOverCapPercentage = (text: string): boolean => {
 
 const hasUnsupportedTicketNumbers = (text: string, ticketData: unknown): boolean => {
   const evidence = collectTicketEvidence(ticketData);
-  const withoutApprovedPricing = text.split(EXACT_PRICING).join("");
+  const withoutApprovedPricing = text.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
   const numberWord = "(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand)";
   const wordNumericClaim = new RegExp(
     `\\b${numberWord}(?:[-\\s]+${numberWord}){0,4}[-\\s]+(?:dollars?|demerit(?:s|\\s+points?)?|days?|weeks?|months?|years?|percent)\\b`,
@@ -389,7 +391,7 @@ const validateAndNormalizeResponse = (
     normalized.page_json.how,
     normalized.page_json.next,
   ].join("\n");
-  const withoutApprovedPricing = visibleText.split(EXACT_PRICING).join("");
+  const withoutApprovedPricing = visibleText.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
   const hasInexactPricing = /\b(?:price|pricing|fee|cost)\b|\bFabsy\b[^.!?\n]{0,80}(?:\bcharges?\b|\$)/i.test(withoutApprovedPricing);
 
   if (

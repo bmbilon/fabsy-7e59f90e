@@ -61,8 +61,8 @@ const DemeritsInsurance: React.FC = () => {
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Need a ticket-specific answer?</h2>
-          <p className="mt-2 text-muted-foreground">Fabsy's $149 Ticket + Insurance Impact Assessment reviews an Alberta ticket, likely insurance significance and whether representation appears worth the cost.</p>
-          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See the complete assessment</Link>
+          <p className="mt-2 text-muted-foreground">Fabsy's $149 Ticket Triage reviews an Alberta ticket, likely insurance significance and whether representation appears worth the cost. It includes priority placement and a $149 credit if the same eligible matter is upgraded to representation.</p>
+          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Ticket Triage</Link>
         </section>
 
         <section className="mb-10">

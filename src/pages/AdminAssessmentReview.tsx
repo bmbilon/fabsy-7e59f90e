@@ -120,7 +120,7 @@ export default function AdminAssessmentReview() {
         .select("id,ticket_number,violation,status,service_type,assessment_intake,assessment_result,assessment_ticket_path,assessment_paid_at,assessment_delivered_at,representation_credit_eligible,created_at,clients(first_name,last_name,email,phone)")
         .eq("id", id).single();
       if (error || !data || data.service_type !== "ticket_insurance_assessment") {
-        toast({ title: "Assessment not found", description: "This case is not a ticket and insurance assessment.", variant: "destructive" });
+        toast({ title: "Ticket Triage not found", description: "This case is not a Ticket Triage order.", variant: "destructive" });
         navigate("/admin/cases");
         return;
       }
@@ -221,7 +221,7 @@ export default function AdminAssessmentReview() {
           <Button variant="ghost" onClick={() => navigate("/admin/cases")}><ArrowLeft className="mr-2 h-4 w-4" />Back to cases</Button>
           <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <div className="flex flex-wrap items-center gap-2"><Badge>Ticket + Insurance Assessment</Badge><Badge variant={locked ? "default" : "outline"}>{assessment.status.replaceAll("_", " ")}</Badge></div>
+              <div className="flex flex-wrap items-center gap-2"><Badge>Ticket Triage</Badge><Badge variant={locked ? "default" : "outline"}>{assessment.status.replaceAll("_", " ")}</Badge></div>
               <h1 className="mt-3 text-3xl font-bold">{client.first_name} {client.last_name}</h1>
               <p className="mt-1 text-sm text-muted-foreground">{client.email} · {client.phone || "No phone supplied"} · {assessment.ticket_number}</p>
             </div>
@@ -243,8 +243,15 @@ export default function AdminAssessmentReview() {
           <Alert>
             <ShieldAlert className="h-4 w-4" />
             <AlertTitle>Review guardrails</AlertTitle>
-            <AlertDescription>Use ranges or scenarios only when supportable. State uncertainty. Do not promise a court result, insurer decision or premium change. The $149 representation-credit policy is disabled.</AlertDescription>
+            <AlertDescription>Use ranges or scenarios only when supportable. State uncertainty. Do not promise a court result, insurer decision or premium change.</AlertDescription>
           </Alert>
+          {assessment.representation_credit_eligible ? (
+            <Alert className="border-violet-200 bg-violet-50">
+              <ShieldAlert className="h-4 w-4" />
+              <AlertTitle>Priority Ticket Triage upgrade</AlertTitle>
+              <AlertDescription>This customer receives priority placement in the representation queue and a $149 credit toward the $488 flat fee for the same eligible matter. Quote a $339 base-fee balance plus GST; the 30% success fee still applies to any fine reduction.</AlertDescription>
+            </Alert>
+          ) : null}
         </div>
 
         <Card>

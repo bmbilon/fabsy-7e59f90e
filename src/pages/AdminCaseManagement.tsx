@@ -191,7 +191,7 @@ export default function AdminCaseManagement() {
           </Button>
           <h1 className="text-2xl font-bold">Client Case Management</h1>
           <p className="text-sm text-muted-foreground">
-            Manage paid representation matters and ticket assessments
+            Manage paid representation matters and Ticket Triage orders
           </p>
         </div>
       </header>
@@ -280,7 +280,7 @@ export default function AdminCaseManagement() {
                             </h3>
                             {getStatusBadge(submission.status)}
                             {submission.service_type === 'ticket_insurance_assessment' && (
-                              <Badge variant="secondary">Ticket + Insurance Assessment</Badge>
+                              <Badge variant="secondary">Ticket Triage</Badge>
                             )}
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">

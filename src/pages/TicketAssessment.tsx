@@ -46,6 +46,7 @@ const included = [
   { icon: Gauge, title: "Insurance impact assessment", text: "A cautious estimate of whether the risk appears trivial, moderate or potentially material using the context you provide." },
   { icon: BadgeDollarSign, title: "Representation break-even", text: "A practical comparison between plausible financial exposure and the cost and realistic value of professional representation." },
   { icon: CheckCircle2, title: "Recommended next step", text: "A direct human-reviewed recommendation, including when paying the ticket appears more sensible than hiring Fabsy." },
+  { icon: ShieldCheck, title: "Priority upgrade path", text: "If you upgrade the same eligible matter, you receive priority placement in our representation queue and your $149 Ticket Triage fee is credited toward the $488 flat fee, leaving $339 plus GST." },
 ] as const;
 
 const process = [
@@ -57,7 +58,7 @@ const process = [
 const faqItems = [
   {
     q: "What exactly do I get for $149?",
-    a: "A human-reviewed assessment of your Alberta ticket: the charge and deadline, fine and demerit implications, options, likely insurance-risk significance, representation economics and a recommended next step.",
+    a: "Ticket Triage includes a human-reviewed assessment of your Alberta ticket: the charge and deadline, fine and demerit implications, options, likely insurance-risk significance, representation economics and a recommended next step. It also includes priority placement and a $149 representation credit if the same eligible matter is upgraded.",
   },
   {
     q: "Does paying a ticket affect my insurance?",
@@ -85,7 +86,7 @@ const faqItems = [
   },
   {
     q: "What happens if Fabsy recommends representation?",
-    a: "The assessment explains why representation may be worthwhile and the next step. Eligibility and pricing are confirmed separately; no later service is automatic or required.",
+    a: "Ticket Triage explains why representation may be worthwhile and the next step. If the same matter is eligible and you choose to upgrade, you receive priority placement in Fabsy's representation queue and your $149 payment is applied to the $488 flat fee, leaving a $339 base-fee balance plus GST. The 30% success fee still applies to any fine reduction. No later service is automatic or required.",
   },
   {
     q: "Is the $149 applied toward representation?",
@@ -107,9 +108,9 @@ export default function TicketAssessment() {
   const representationSection = useRef<HTMLDivElement | null>(null);
 
   useSafeHead({
-    title: "$149 Alberta Traffic Ticket & Insurance Assessment | Fabsy",
+    title: "$149 Ticket Triage for Alberta Traffic Tickets | Fabsy",
     description:
-      "For $149 CAD plus GST, get an Alberta ticket review, likely insurance-impact assessment and a clear recommendation on what to do next.",
+      "For $149 CAD plus GST, Ticket Triage includes an Alberta ticket and insurance assessment, priority placement and a $149 representation credit.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
   });
 
@@ -164,7 +165,7 @@ export default function TicketAssessment() {
           <div className="container mx-auto grid gap-10 px-4 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:py-24">
             <div>
               <Badge className="border-violet-300/30 bg-violet-300/10 text-violet-100">
-                Alberta tickets · Human reviewed
+                Ticket Triage · Alberta tickets · Human reviewed
               </Badge>
               <h1 className="mt-5 max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 {TICKET_ASSESSMENT.heroHeadline}
@@ -188,12 +189,12 @@ export default function TicketAssessment() {
             </div>
 
             <Card className="border-white/10 bg-white p-7 text-slate-950 shadow-2xl sm:p-8">
-              <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-700">Complete assessment</p>
+              <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-700">Ticket Triage</p>
               <p className="mt-2 text-5xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
               <p className="mt-1 text-sm text-slate-600">CAD · one-time · plus GST</p>
               <div className="my-6 border-t" />
               <ul className="space-y-3 text-sm text-slate-700">
-                {["Ticket and deadline review", "Demerit and conviction explanation", "Insurance-risk assessment", "Representation break-even analysis", "Recommended next step"].map((item) => (
+                {["Ticket and deadline review", "Demerit and conviction explanation", "Insurance-risk assessment", "Representation break-even analysis", "Priority placement if you upgrade", "$149 credited toward representation ($339 base-fee balance)", "Recommended next step"].map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-700" aria-hidden="true" />
                     <span>{item}</span>
@@ -201,7 +202,7 @@ export default function TicketAssessment() {
                 ))}
               </ul>
               <p className="mt-6 rounded-lg bg-slate-100 p-4 text-xs leading-relaxed text-slate-600">
-                Government fines and any later representation fee are separate. No percentage or success fee applies to this assessment.
+                Government fines are separate. No success fee applies to Ticket Triage. If you upgrade, your $149 payment is credited toward the $488 flat representation fee; the remaining $339 is plus GST, and the 30% success fee applies only to any fine reduction.
               </p>
               <p className="mt-4 text-xs leading-relaxed text-slate-600">{PRODUCT_LADDER_BRIDGE}</p>
             </Card>
@@ -267,7 +268,7 @@ export default function TicketAssessment() {
           <div className="container mx-auto max-w-6xl">
             <div className="mx-auto max-w-3xl text-center">
               <Badge variant="outline">A substantial bundle</Badge>
-              <h2 id="included-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">What the $149 assessment includes</h2>
+              <h2 id="included-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">What $149 Ticket Triage includes</h2>
             </div>
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {included.map(({ icon: Icon, title, text }) => (
@@ -326,7 +327,7 @@ export default function TicketAssessment() {
             <LockKeyhole className="mx-auto h-9 w-9 text-primary" aria-hidden="true" />
             <h2 id="trust-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">We'll tell you when fighting it isn't worth it</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-              If the likely downside does not justify spending hundreds more on representation, the assessment should save you from that expense. If the exposure appears material, Fabsy will explain the practical path forward without making representation automatic.
+              If the likely downside does not justify spending more on representation, Ticket Triage should save you from that expense. If the exposure appears material, you receive priority placement in our representation queue and your $149 payment is credited toward the $488 flat fee, leaving a $339 base-fee balance plus GST.
             </p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg">
@@ -351,7 +352,7 @@ export default function TicketAssessment() {
 
         <section className="px-4 py-16 sm:py-20" aria-labelledby="faq-heading">
           <div className="container mx-auto max-w-3xl">
-            <h2 id="faq-heading" className="text-center text-3xl font-bold tracking-tight sm:text-4xl">Ticket assessment FAQs</h2>
+            <h2 id="faq-heading" className="text-center text-3xl font-bold tracking-tight sm:text-4xl">Ticket Triage FAQs</h2>
             <Accordion type="single" collapsible className="mt-8">
               {faqItems.map((item, index) => (
                 <AccordionItem key={item.q} value={`assessment-faq-${index}`}>
@@ -365,7 +366,7 @@ export default function TicketAssessment() {
 
         <section className="bg-slate-950 px-4 py-16 text-white">
           <div className="container mx-auto max-w-4xl text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-200">Complete assessment · ${TICKET_ASSESSMENT.priceCad} CAD + GST</p>
+            <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-200">Ticket Triage · ${TICKET_ASSESSMENT.priceCad} CAD + GST</p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Know the smart move before you spend more.</h2>
             <Button asChild size="lg" className="mt-7 min-h-12 bg-violet-600 px-8 text-base hover:bg-violet-500">
               <Link

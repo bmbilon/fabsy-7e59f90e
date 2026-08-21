@@ -2,8 +2,8 @@ export const TICKET_ASSESSMENT = {
   slug: "/traffic-ticket-assessment",
   intakePath: "/traffic-ticket-assessment/start",
   confirmationPath: "/traffic-ticket-assessment/confirmation",
-  name: "Traffic Ticket + Insurance Impact Assessment",
-  shortName: "Ticket + Insurance Assessment",
+  name: "Ticket Triage",
+  shortName: "Ticket Triage",
   priceCad: 149,
   priceCents: 14_900,
   albertaGstCad: 7.45,
@@ -12,17 +12,23 @@ export const TICKET_ASSESSMENT = {
   priceIncludesApplicableTax: false,
   heroHeadline: "Got a traffic ticket and don't know what to do?",
   heroSubheadline:
-    "For $149 CAD plus GST, Fabsy will review your Alberta ticket, explain your options, assess the likely insurance impact and tell you whether fighting it is actually worth the money.",
-  cta: "Start My $149 Assessment",
-  offerVariant: "baseline_149_v1",
+    "For $149 CAD plus GST, Ticket Triage gives you a human-reviewed Alberta ticket and insurance assessment, priority placement in our representation queue, and a $149 credit if you upgrade.",
+  cta: "Start My Ticket Triage",
+  offerVariant: "ticket_triage_149_v1",
   supportedJurisdictions: ["Alberta"] as const,
   deliveryExpectation:
     "A Fabsy team member will complete a human review and email your assessment. If a response deadline is close, contact us after submitting.",
   representationCredit: {
-    enabled: false,
+    enabled: true,
     amountCad: 149,
+    upgradeBalanceCad: 339,
     publicCopy:
-      "The assessment fee is not currently promised as a credit toward representation. If further help is worthwhile and your matter qualifies, Fabsy will explain the separate representation fee before you decide.",
+      "If you upgrade the same eligible matter to Fabsy's $488 representation service, your $149 Ticket Triage fee is applied to the flat fee, leaving a $339 base-fee balance plus GST. The 30% success fee on any fine reduction still applies.",
+  },
+  representationPriority: {
+    enabled: true,
+    publicCopy:
+      "Ticket Triage clients receive priority placement in Fabsy's representation queue if they upgrade and the matter is eligible for Fabsy representation. Priority placement does not extend a ticket deadline or guarantee a specific start date or outcome.",
   },
   insuranceDisclaimer:
     "Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Fabsy's assessment estimates likely risk and financial significance; it is not a binding insurance quote and does not predict a specific premium change.",

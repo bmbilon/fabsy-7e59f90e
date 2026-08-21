@@ -167,8 +167,8 @@ export default function TicketAssessmentIntake() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useSafeHead({
-    title: "Start Your $149 Ticket Assessment | Fabsy",
-    description: "Securely submit an Alberta traffic ticket for Fabsy's $149 Ticket + Insurance Impact Assessment.",
+    title: "Start Your $149 Ticket Triage | Fabsy",
+    description: "Securely submit an Alberta traffic ticket for Fabsy's $149 Ticket Triage.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.intakePath}`,
     robots: "noindex, nofollow",
   });
@@ -351,13 +351,13 @@ export default function TicketAssessmentIntake() {
       <Header />
       <main className="container mx-auto max-w-6xl px-4 py-8 sm:py-12">
         <Button asChild variant="ghost" className="mb-4">
-          <Link to={TICKET_ASSESSMENT.slug}><ArrowLeft className="mr-2 h-4 w-4" />Back to assessment details</Link>
+          <Link to={TICKET_ASSESSMENT.slug}><ArrowLeft className="mr-2 h-4 w-4" />Back to Ticket Triage details</Link>
         </Button>
 
         <div className="grid gap-7 lg:grid-cols-[1fr_340px] lg:items-start">
           <Card className="overflow-hidden shadow-elevated">
             <div className="border-b bg-white p-6 sm:p-8">
-              <Badge className="mb-4">Secure assessment intake</Badge>
+              <Badge className="mb-4">Secure Ticket Triage intake</Badge>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Tell us enough to assess the full picture</h1>
               <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
                 This is for Alberta tickets. Choose “I don't know” where needed; the service exists because the answer is not always obvious.
@@ -485,14 +485,14 @@ export default function TicketAssessmentIntake() {
                     </div>
                     <div className="my-4 border-t" />
                     <div className="flex justify-between font-semibold"><span>Total charged at checkout</span><span>${TICKET_ASSESSMENT.priceCad} + GST</span></div>
-                    <p className="mt-2 text-xs text-muted-foreground">One-time, plus 5% GST (${TICKET_ASSESSMENT.albertaTotalCad.toFixed(2)} total). Government fines and any later representation fee are separate.</p>
+                      <p className="mt-2 text-xs text-muted-foreground">One-time, plus 5% GST (${TICKET_ASSESSMENT.albertaTotalCad.toFixed(2)} total). If you upgrade the same eligible matter, the $149 is credited toward the $488 flat representation fee, leaving $339 plus GST.</p>
                   </Card>
 
                   <div className="rounded-xl border bg-slate-50 p-4">
                     <div className="flex items-start gap-3">
                       <Checkbox id="assessment-terms" checked={draft.termsAccepted} onCheckedChange={(value) => update("termsAccepted", value === true)} className="mt-0.5" />
                       <Label htmlFor="assessment-terms" className="cursor-pointer text-sm leading-relaxed">
-                        I confirm the information is accurate to the best of my knowledge and agree to Fabsy's <Link to="/terms-of-service" className="font-semibold text-primary underline">Terms of Service</Link> and <Link to="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>. I understand this is an assessment, not a promise of a court or insurance result.
+                        I confirm the information is accurate to the best of my knowledge and agree to Fabsy's <Link to="/terms-of-service" className="font-semibold text-primary underline">Terms of Service</Link> and <Link to="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>. I understand Ticket Triage is an assessment, not a promise of a court or insurance result.
                       </Label>
                     </div>
                   </div>
@@ -522,11 +522,11 @@ export default function TicketAssessmentIntake() {
 
           <aside className="space-y-5 lg:sticky lg:top-24">
             <Card className="p-6 shadow-fab">
-              <p className="text-sm font-semibold text-primary">Complete assessment</p>
+              <p className="text-sm font-semibold text-primary">Ticket Triage</p>
               <p className="mt-1 text-4xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
               <p className="text-sm text-muted-foreground">CAD, one-time · plus GST</p>
               <ul className="mt-5 space-y-3 text-sm">
-                {["Charge and deadline", "Demerit implications", "Likely insurance significance", "Representation break-even", "Recommended next step"].map((item) => <li key={item} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}
+                {["Charge and deadline", "Demerit implications", "Likely insurance significance", "Representation break-even", "Priority placement if you upgrade", "$149 representation credit ($339 base-fee balance)", "Recommended next step"].map((item) => <li key={item} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}
               </ul>
             </Card>
             <Card className="p-5">

@@ -271,7 +271,7 @@ serve(async (req) => {
       violation_date: ticketDate,
       court_date: responseDeadline,
       court_location: "Alberta",
-      defense_strategy: "Ticket + Insurance Impact Assessment",
+      defense_strategy: "Ticket Triage",
       additional_notes: whatHappened,
       insurance_company: insurer,
       status: "assessment_awaiting_payment",
@@ -280,7 +280,7 @@ serve(async (req) => {
       assessment_ticket_path: storagePath,
       assessment_access_token_hash: accessTokenHash,
       assessment_price_cad: 149,
-      representation_credit_eligible: false,
+      representation_credit_eligible: true,
       updated_at: new Date().toISOString(),
     };
 
