@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { IDR_PRICE_ADDON, IDR_PRICE_STANDALONE } from "@/config/idr";
+import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 
 const TermsOfService = () => {
   return (
@@ -24,6 +25,7 @@ const TermsOfService = () => {
               <li>Court representation for traffic violations</li>
               <li>Administrative assistance with traffic ticket procedures</li>
               <li>Consultation on traffic ticket matters</li>
+              <li>Traffic Ticket + Insurance Impact Assessments based on customer-supplied information and ticket documents</li>
               <li>Optional Insurance Damage Reports based on client-supplied records and public research</li>
             </ul>
             <p className="mt-4">
@@ -84,6 +86,24 @@ const TermsOfService = () => {
               This report is consumer research based on publicly available information. Fabsy is
               not an insurance agent or broker and does not sell, quote, or place insurance.
             </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">5B. Traffic Ticket + Insurance Impact Assessment Terms</h2>
+            <p className="mb-4">
+              The Traffic Ticket + Insurance Impact Assessment costs ${TICKET_ASSESSMENT.priceCad} CAD as a
+              one-time payment. Applicable tax is included in that price. Government fines, court costs,
+              driver records, and any later representation service are separate.
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>You must provide accurate contact, ticket, driving-record, and insurance context and securely upload a legible Alberta ticket</li>
+              <li>You remain responsible for every response, payment, appearance, limitation, and court deadline; submitting or purchasing an assessment does not extend or pause one</li>
+              <li>The assessment is a human-reviewed decision aid, not legal advice, an insurance quote, or a promise of a court, conviction, demerit, insurer, or premium result</li>
+              <li>Insurance impact is described cautiously using the supplied context; an insurer determines underwriting, eligibility, rating, and renewal</li>
+              <li>Fabsy may recommend paying or handling a matter directly when representation does not appear economically worthwhile</li>
+              <li>Representation availability, eligibility, scope, and pricing are confirmed separately and are not included in this assessment</li>
+              <li>{TICKET_ASSESSMENT.representationCredit.publicCopy}</li>
+            </ul>
           </section>
 
           <section>

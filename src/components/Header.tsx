@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, X, Scale, Phone } from "lucide-react";
+import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_HREF = "tel:+18257932279";
@@ -16,7 +17,7 @@ const Header = () => {
     { name: "How It Works", path: "/how-it-works" },
     { name: "About", path: "/about" },
     { name: "What We Help With", path: "/services" },
-    { name: "Insurance Report", path: "/insurance-damage-report" },
+    { name: "Ticket Assessment", path: "/traffic-ticket-assessment" },
     { name: "Success Stories", path: "/testimonials" },
     { name: "Blog", path: "/blog" },
   ];
@@ -61,9 +62,9 @@ const Header = () => {
                 {PHONE_DISPLAY}
               </Button>
             </a>
-            <Link to="/submit-ticket">
+            <Link to="/traffic-ticket-assessment/start" onClick={() => trackAssessmentEvent("assessment_start", { location: "desktop_header" })}>
               <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                Submit Your Ticket
+                Assessment — $149
               </Button>
             </Link>
           </div>
@@ -115,12 +116,15 @@ const Header = () => {
                       Call {PHONE_DISPLAY}
                     </Button>
                   </a>
-                  <Link to="/submit-ticket">
+                  <Link to="/traffic-ticket-assessment/start">
                     <Button
                       className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        trackAssessmentEvent("assessment_start", { location: "mobile_header" });
+                        setIsOpen(false);
+                      }}
                     >
-                      Submit Your Ticket
+                      Start Assessment — $149
                     </Button>
                   </Link>
                 </div>

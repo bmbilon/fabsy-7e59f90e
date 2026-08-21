@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useSafeHead from "@/hooks/useSafeHead";
+import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 
 const Services = () => {
   useSafeHead({
@@ -119,6 +120,29 @@ const Services = () => {
               </Badge>
             </Card>
           ))}
+        </div>
+
+        {/* Entry-level assessment */}
+        <div className="mb-16">
+          <Card className="overflow-hidden border-violet-300/30 bg-white shadow-elevated">
+            <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="p-8 sm:p-10">
+                <Badge className="mb-4">Entry-level decision service</Badge>
+                <h2 className="text-3xl font-bold text-card-foreground">Not ready to spend $488+ on representation?</h2>
+                <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+                  For $149 CAD, Fabsy reviews the Alberta ticket, explains the options, assesses likely insurance significance and tells you whether further paid representation appears economically worthwhile.
+                </p>
+                <p className="mt-3 font-semibold text-foreground">If fighting it isn't worth the cost, we'll tell you.</p>
+                <Button asChild size="lg" className="mt-6"><Link to={TICKET_ASSESSMENT.slug}>{TICKET_ASSESSMENT.cta}</Link></Button>
+              </div>
+              <div className="bg-slate-950 p-8 text-white sm:p-10">
+                <p className="text-sm font-semibold text-violet-200">Complete assessment</p>
+                <p className="mt-2 text-5xl font-bold">$149</p>
+                <p className="mt-1 text-sm text-slate-300">CAD · one-time · applicable tax included</p>
+                <p className="mt-6 text-sm leading-relaxed text-slate-300">Government fines and any later representation fee are separate. No percentage or success fee applies to the assessment.</p>
+              </div>
+            </div>
+          </Card>
         </div>
 
         {/* Benefits Section */}
@@ -227,9 +251,9 @@ const Services = () => {
                 A Note on Insurance Increases
               </h3>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
-                Insurance consequences vary by driver, conviction, and insurer. Fabsy does not
-                estimate or promise premium savings. Contact your insurer for information about
-                how a particular outcome may affect your policy.
+                Insurance consequences vary by driver, conviction, insurer, and renewal timing.
+                Fabsy's $149 Ticket + Insurance Impact Assessment can estimate likely risk and
+                financial significance, but it is not an insurer-issued quote and does not promise savings.
               </p>
             </div>
           </Card>

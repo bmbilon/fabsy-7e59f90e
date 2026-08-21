@@ -5,7 +5,7 @@ import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { sendResendEmail } from "../_shared/resend-email.ts";
 
 type IdrOrderType = "standalone" | "addon";
-type CheckoutIntentType = IdrOrderType | "ticket";
+type CheckoutIntentType = IdrOrderType | "ticket" | "assessment";
 
 interface CheckoutSessionData {
   id: string;
@@ -34,6 +34,7 @@ const PRICE_CENTS: Record<IdrOrderType, number> = {
   addon: 9900,
 };
 const TICKET_BASE_CENTS = 48800;
+const TICKET_ASSESSMENT_CENTS = 14900;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -193,6 +194,150 @@ async function persistPaidTicketCheckout(
     .eq("attempts", intent.attempts);
   if (intentPaidError) throw intentPaidError;
   return result;
+}
+
+async function persistPaidTicketAssessment(
+  supabase: ReturnType<typeof createClient>,
+  session: CheckoutSessionData,
+): Promise<"assessment_activated" | "assessment_already_active"> {
+  const metadata = session.metadata || {};
+  const intentId = metadata.checkout_intent_id;
+  const submissionId = metadata.assessment_submission_id;
+  const clientId = metadata.client_id;
+  const checkoutKind = metadata.fabsy_checkout_kind;
+
+  if (
+    !isUuid(intentId) ||
+    !isUuid(submissionId) ||
+    !isUuid(clientId) ||
+    checkoutKind !== "ticket_assessment"
+  ) {
+    throw new Error("Checkout session has invalid ticket assessment metadata.");
+  }
+  if (
+    session.client_reference_id !== submissionId ||
+    session.mode !== "payment" ||
+    session.payment_status !== "paid" ||
+    session.currency?.toLowerCase() !== "cad" ||
+    session.amount_subtotal !== TICKET_ASSESSMENT_CENTS ||
+    session.amount_total !== TICKET_ASSESSMENT_CENTS ||
+    metadata.assessment_price_cents !== String(TICKET_ASSESSMENT_CENTS) ||
+    Number(session.total_details?.amount_discount || 0) !== 0
+  ) {
+    throw new Error("Ticket assessment checkout does not match the configured product price.");
+  }
+
+  const intent = await validateCheckoutIntent(
+    supabase,
+    session,
+    intentId,
+    "assessment",
+    checkoutKind,
+    submissionId,
+    TICKET_ASSESSMENT_CENTS,
+  );
+  if (intent.client_id !== clientId) {
+    throw new Error("Paid ticket assessment client does not match its reservation.");
+  }
+
+  const { data: submission, error: submissionError } = await supabase
+    .from("ticket_submissions")
+    .select("id,client_id,status,service_type,assessment_price_cad,assessment_paid_at,assessment_checkout_session_id")
+    .eq("id", submissionId)
+    .maybeSingle();
+  if (submissionError) throw submissionError;
+  if (
+    !submission ||
+    submission.client_id !== clientId ||
+    submission.service_type !== "ticket_insurance_assessment" ||
+    Number(submission.assessment_price_cad) !== 149 ||
+    (submission.assessment_checkout_session_id && submission.assessment_checkout_session_id !== session.id)
+  ) {
+    throw new Error("Paid ticket assessment does not match its saved intake.");
+  }
+
+  const paymentIntentId = typeof session.payment_intent === "string"
+    ? session.payment_intent
+    : session.payment_intent?.id || null;
+  let result: "assessment_activated" | "assessment_already_active" = "assessment_already_active";
+  if (!submission.assessment_paid_at) {
+    const { data: activated, error: activationError } = await supabase
+      .from("ticket_submissions")
+      .update({
+        status: "assessment_pending",
+        assessment_paid_at: new Date().toISOString(),
+        assessment_checkout_session_id: session.id,
+        assessment_payment_intent_id: paymentIntentId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", submissionId)
+      .is("assessment_paid_at", null)
+      .select("id")
+      .maybeSingle();
+    if (activationError) throw activationError;
+    if (activated) result = "assessment_activated";
+  }
+
+  const { error: intentPaidError } = await supabase
+    .from("idr_checkout_intents")
+    .update({ status: "paid", stripe_checkout_session_id: session.id })
+    .eq("id", intentId)
+    .eq("attempts", intent.attempts);
+  if (intentPaidError) throw intentPaidError;
+  return result;
+}
+
+async function sendTicketAssessmentConfirmation(
+  supabase: ReturnType<typeof createClient>,
+  submissionId: string,
+) {
+  const { data: submission, error: submissionError } = await supabase
+    .from("ticket_submissions")
+    .select("id,assessment_confirmation_claimed_at,assessment_confirmation_sent_at,clients(first_name,email)")
+    .eq("id", submissionId)
+    .single();
+  if (submissionError || !submission) throw submissionError || new Error("Paid ticket assessment was not found.");
+  if (submission.assessment_confirmation_sent_at || submission.assessment_confirmation_claimed_at) return;
+
+  const client = Array.isArray(submission.clients) ? submission.clients[0] : submission.clients;
+  if (!client?.email) throw new Error("Paid ticket assessment has no delivery email.");
+  const claimedAt = new Date().toISOString();
+  const { data: claimed, error: claimError } = await supabase.from("ticket_submissions").update({
+    assessment_confirmation_claimed_at: claimedAt,
+  }).eq("id", submissionId)
+    .is("assessment_confirmation_claimed_at", null)
+    .is("assessment_confirmation_sent_at", null)
+    .select("id")
+    .maybeSingle();
+  if (claimError) throw claimError;
+  if (!claimed) return;
+
+  let emailAccepted = false;
+  try {
+    const apiKey = Deno.env.get("RESEND_API_KEY");
+    if (!apiKey) throw new Error("RESEND_API_KEY is unavailable.");
+    await sendResendEmail(apiKey, {
+      from: "Fabsy <hello@fabsy.ca>",
+      reply_to: "hello@fabsy.ca",
+      to: [client.email],
+      subject: "Fabsy received your ticket assessment",
+      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1f2937"><h1>Payment received—your ticket is in the review queue</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Fabsy received your private ticket upload and the information for your <strong>Traffic Ticket + Insurance Impact Assessment</strong>.</p><div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px;margin:24px 0"><p style="margin:0 0 8px"><strong>Payment:</strong> $149 CAD, one-time</p><p style="margin:0 0 8px"><strong>Ticket:</strong> received</p><p style="margin:0"><strong>Next:</strong> a Fabsy team member will complete a human review and email the assessment.</p></div><p>Fabsy will review the charge and deadline, fine and demerit implications, available options, likely insurance-risk significance, representation economics and the recommended next step.</p><p>If a response deadline is close, reply to this email or call (825) 793-2279 after submitting. The assessment does not pause any deadline printed on the ticket.</p><p style="font-size:13px;color:#6b7280;line-height:1.5">Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Fabsy's assessment is not a binding insurance quote or guarantee of premium changes. Fabsy is an Alberta traffic ticket agent service, not a law firm, and no outcome is promised.</p>${getFabsyEmailSignature()}</div>`,
+    }, `ticket-assessment-confirmation/${submissionId}`);
+    emailAccepted = true;
+    const { error: sentError } = await supabase.from("ticket_submissions").update({
+      assessment_confirmation_sent_at: new Date().toISOString(),
+      assessment_confirmation_claimed_at: null,
+    }).eq("id", submissionId);
+    if (sentError) throw sentError;
+  } catch (error) {
+    if (!emailAccepted) {
+      await supabase.from("ticket_submissions").update({ assessment_confirmation_claimed_at: null })
+        .eq("id", submissionId).eq("assessment_confirmation_claimed_at", claimedAt);
+    } else {
+      console.error(`Ticket assessment confirmation accepted for ${submissionId} but needs reconciliation`);
+    }
+    throw error;
+  }
 }
 
 async function releaseFailedCheckoutIntent(
@@ -610,6 +755,12 @@ serve(async (req: Request): Promise<Response> => {
     }
     if (session.payment_status !== "paid") {
       return json({ received: true, handled: false });
+    }
+
+    if (session.metadata?.fabsy_checkout_kind === "ticket_assessment") {
+      const result = await persistPaidTicketAssessment(supabase, session);
+      await sendTicketAssessmentConfirmation(supabase, session.metadata.assessment_submission_id);
+      return json({ received: true, handled: true, result });
     }
 
     if (session.metadata?.fabsy_checkout_kind === "ticket_only") {

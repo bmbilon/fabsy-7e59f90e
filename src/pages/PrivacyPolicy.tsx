@@ -21,7 +21,8 @@ const PrivacyPolicy = () => {
               <li>Personal identification information (name, address, phone number, email)</li>
               <li>Driver's license information</li>
               <li>Driver abstracts and conviction records you upload for an Insurance Damage Report</li>
-              <li>Traffic ticket details and violation information</li>
+              <li>Traffic ticket documents, details, violation information, deadlines, and your description of what happened</li>
+              <li>Driving-history context you provide, including years licensed, recent tickets, demerit context, licence class, and commercial-driving status</li>
               <li>Policy renewal dates and rating inputs you provide, such as territory, liability limit, prior claims, and current premium</li>
               <li>Optional outcome survey responses, including carrier and premium information</li>
               <li>Payment and billing information</li>
@@ -34,6 +35,8 @@ const PrivacyPolicy = () => {
             <p className="mb-4">We use the information we collect to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide traffic ticket representation services</li>
+              <li>Review a submitted ticket and deliver a private Traffic Ticket + Insurance Impact Assessment</li>
+              <li>Assess the practical relationship among the fine, demerits, driving-record implications, possible insurance exposure, and representation economics</li>
               <li>Verify uploaded abstract information and generate private Insurance Damage Reports</li>
               <li>Prepare estimated premium-exposure ranges and sourced carrier call lists</li>
               <li>Send requested renewal, conviction-aging, delivery, and outcome survey reminders</li>
@@ -60,9 +63,9 @@ const PrivacyPolicy = () => {
             </p>
             <p className="mt-4">
               Fabsy does not send your driver abstract or report to insurance carriers and does not
-              contact carriers on your behalf. Private files are shared only with authorized Fabsy
+              contact carriers on your behalf. Ticket documents and other private files are shared only with authorized Fabsy
               staff and service providers needed to store files, process payments, authenticate
-              access, generate reports, and send requested messages.
+              access, review and deliver assessments or reports, and send requested messages.
             </p>
           </section>
 
@@ -108,6 +111,12 @@ const PrivacyPolicy = () => {
               Fabsy suppresses analytics page-view tracking on private client portal and admin
               routes. Payment session identifiers, private order identifiers, and case identifiers
               are not intentionally sent as analytics page paths.
+            </p>
+            <p className="mt-4">
+              Assessment funnel events use offer, page, checkout-stage, and campaign-attribution
+              fields. Fabsy does not intentionally send names, email addresses, phone numbers,
+              ticket numbers, uploaded documents, free-text answers, or assessment results to its
+              website analytics service.
             </p>
           </section>
 

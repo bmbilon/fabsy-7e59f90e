@@ -60,6 +60,12 @@ const AlbertaTickets101: React.FC = () => {
           </ul>
         </section>
 
+        <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
+          <h2 className="text-2xl font-bold text-foreground">Unsure whether to pay or fight?</h2>
+          <p className="mt-2 text-muted-foreground">The $149 Fabsy Ticket + Insurance Impact Assessment explains the charge, likely consequences, options and whether paying for representation appears financially sensible.</p>
+          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">Start with the assessment</Link>
+        </section>
+
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Official information</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">

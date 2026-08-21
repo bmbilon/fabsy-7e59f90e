@@ -264,6 +264,19 @@ export type Database = {
         Row: {
           additional_notes: string | null
           address: string | null
+          assessment_access_token_hash: string | null
+          assessment_checkout_session_id: string | null
+          assessment_confirmation_claimed_at: string | null
+          assessment_confirmation_sent_at: string | null
+          assessment_delivered_at: string | null
+          assessment_delivery_claimed_at: string | null
+          assessment_delivery_sent_at: string | null
+          assessment_intake: Json | null
+          assessment_paid_at: string | null
+          assessment_payment_intent_id: string | null
+          assessment_price_cad: number | null
+          assessment_result: Json | null
+          assessment_ticket_path: string | null
           assigned_to: string | null
           city: string | null
           client_id: string
@@ -283,7 +296,9 @@ export type Database = {
           last_name: string
           phone: string
           postal_code: string | null
+          representation_credit_eligible: boolean
           search_vector: unknown | null
+          service_type: string
           sms_opt_in: boolean | null
           status: string | null
           ticket_number: string
@@ -295,6 +310,19 @@ export type Database = {
         Insert: {
           additional_notes?: string | null
           address?: string | null
+          assessment_access_token_hash?: string | null
+          assessment_checkout_session_id?: string | null
+          assessment_confirmation_claimed_at?: string | null
+          assessment_confirmation_sent_at?: string | null
+          assessment_delivered_at?: string | null
+          assessment_delivery_claimed_at?: string | null
+          assessment_delivery_sent_at?: string | null
+          assessment_intake?: Json | null
+          assessment_paid_at?: string | null
+          assessment_payment_intent_id?: string | null
+          assessment_price_cad?: number | null
+          assessment_result?: Json | null
+          assessment_ticket_path?: string | null
           assigned_to?: string | null
           city?: string | null
           client_id: string
@@ -314,7 +342,9 @@ export type Database = {
           last_name: string
           phone: string
           postal_code?: string | null
+          representation_credit_eligible?: boolean
           search_vector?: unknown | null
+          service_type?: string
           sms_opt_in?: boolean | null
           status?: string | null
           ticket_number: string
@@ -326,6 +356,19 @@ export type Database = {
         Update: {
           additional_notes?: string | null
           address?: string | null
+          assessment_access_token_hash?: string | null
+          assessment_checkout_session_id?: string | null
+          assessment_confirmation_claimed_at?: string | null
+          assessment_confirmation_sent_at?: string | null
+          assessment_delivered_at?: string | null
+          assessment_delivery_claimed_at?: string | null
+          assessment_delivery_sent_at?: string | null
+          assessment_intake?: Json | null
+          assessment_paid_at?: string | null
+          assessment_payment_intent_id?: string | null
+          assessment_price_cad?: number | null
+          assessment_result?: Json | null
+          assessment_ticket_path?: string | null
           assigned_to?: string | null
           city?: string | null
           client_id?: string
@@ -345,7 +388,9 @@ export type Database = {
           last_name?: string
           phone?: string
           postal_code?: string | null
+          representation_credit_eligible?: boolean
           search_vector?: unknown | null
+          service_type?: string
           sms_opt_in?: boolean | null
           status?: string | null
           ticket_number?: string

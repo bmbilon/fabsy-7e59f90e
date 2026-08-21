@@ -21,6 +21,7 @@ interface TicketSubmission {
   violation: string;
   fine_amount: string;
   status: string;
+  service_type: "representation" | "ticket_insurance_assessment";
   created_at: string;
 }
 
@@ -111,6 +112,8 @@ export default function AdminCaseManagement() {
           )
         `)
         .neq('status', 'awaiting_payment')
+        .neq('status', 'assessment_awaiting_payment')
+        .neq('status', 'assessment_checkout_open')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -125,6 +128,7 @@ export default function AdminCaseManagement() {
         violation: sub.violation,
         fine_amount: sub.fine_amount,
         status: sub.status,
+        service_type: sub.service_type || 'representation',
         created_at: sub.created_at
       })) || [];
 
@@ -147,6 +151,7 @@ export default function AdminCaseManagement() {
       pending: { variant: "outline", icon: Clock },
       in_progress: { variant: "secondary", icon: AlertCircle },
       completed: { variant: "default", icon: CheckCircle2 },
+      assessment_pending: { variant: "outline", icon: Clock },
     };
 
     const config = statusConfig[status] || statusConfig.pending;
@@ -186,7 +191,7 @@ export default function AdminCaseManagement() {
           </Button>
           <h1 className="text-2xl font-bold">Client Case Management</h1>
           <p className="text-sm text-muted-foreground">
-            Manage ticket submissions and client cases
+            Manage paid representation matters and ticket assessments
           </p>
         </div>
       </header>
@@ -204,7 +209,7 @@ export default function AdminCaseManagement() {
             <CardHeader className="pb-3">
               <CardDescription>Pending</CardDescription>
               <CardTitle className="text-3xl">
-                {submissions.filter(s => s.status === 'pending').length}
+                {submissions.filter(s => s.status === 'pending' || s.status === 'assessment_pending').length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -264,7 +269,7 @@ export default function AdminCaseManagement() {
                   <Card
                     key={submission.id}
                     className="cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => navigate(`/admin/submissions/${submission.id}`)}
+                    onClick={() => navigate(submission.service_type === 'ticket_insurance_assessment' ? `/admin/assessments/${submission.id}` : `/admin/submissions/${submission.id}`)}
                   >
                     <CardContent className="pt-6">
                       <div className="flex items-start justify-between">
@@ -274,6 +279,9 @@ export default function AdminCaseManagement() {
                               {submission.first_name} {submission.last_name}
                             </h3>
                             {getStatusBadge(submission.status)}
+                            {submission.service_type === 'ticket_insurance_assessment' && (
+                              <Badge variant="secondary">Ticket + Insurance Assessment</Badge>
+                            )}
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
                             <p className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /> {submission.email}</p>

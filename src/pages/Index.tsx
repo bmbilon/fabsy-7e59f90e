@@ -4,6 +4,7 @@ import ROISection from "@/components/ROISection";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import useSafeHead from "@/hooks/useSafeHead";
+import AssessmentOfferCard from "@/components/AssessmentOfferCard";
 
 const Index = () => {
   // Set homepage canonical
@@ -15,6 +16,7 @@ const Index = () => {
     <main className="min-h-screen">
       <Header />
       <Hero />
+      <AssessmentOfferCard />
       <TrustBar />
       <ROISection />
       <Footer />

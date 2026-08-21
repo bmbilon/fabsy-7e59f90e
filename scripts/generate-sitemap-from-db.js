@@ -120,6 +120,7 @@ async function generateSitemap() {
     { loc: '/how-it-works', priority: '0.9', changefreq: 'weekly' },
     { loc: '/about', priority: '0.8', changefreq: 'monthly' },
     { loc: '/services', priority: '0.9', changefreq: 'weekly' },
+    { loc: '/traffic-ticket-assessment', priority: '0.9', changefreq: 'weekly' },
     { loc: '/testimonials', priority: '0.7', changefreq: 'weekly' },
     { loc: '/contact', priority: '0.8', changefreq: 'monthly' },
     { loc: '/blog', priority: '0.8', changefreq: 'daily' },

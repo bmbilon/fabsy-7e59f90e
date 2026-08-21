@@ -59,6 +59,12 @@ const DemeritsInsurance: React.FC = () => {
           </ul>
         </section>
 
+        <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
+          <h2 className="text-2xl font-bold text-foreground">Need a ticket-specific answer?</h2>
+          <p className="mt-2 text-muted-foreground">Fabsy's $149 Ticket + Insurance Impact Assessment reviews an Alberta ticket, likely insurance significance and whether representation appears worth the cost.</p>
+          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See the complete assessment</Link>
+        </section>
+
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Official information</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
