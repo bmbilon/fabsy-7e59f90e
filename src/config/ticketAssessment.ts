@@ -11,7 +11,7 @@ export const TICKET_ASSESSMENT = {
   heroHeadline: "Got a traffic ticket and don't know what to do?",
   heroSubheadline:
     "For $149, Fabsy will review your Alberta ticket, explain your options, assess the likely insurance impact and tell you whether fighting it is actually worth the money.",
-  cta: "Start My Assessment — $149",
+  cta: "Start My $149 Assessment",
   offerVariant: "baseline_149_v1",
   supportedJurisdictions: ["Alberta"] as const,
   deliveryExpectation:
@@ -23,7 +23,7 @@ export const TICKET_ASSESSMENT = {
       "The assessment fee is not currently promised as a credit toward representation. If further help is worthwhile and your matter qualifies, Fabsy will explain the separate representation fee before you decide.",
   },
   insuranceDisclaimer:
-    "Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Fabsy's assessment estimates likely risk and financial significance; it is not a binding insurance quote or guarantee of premium changes.",
+    "Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Fabsy's assessment estimates likely risk and financial significance; it is not a binding insurance quote and does not predict a specific premium change.",
   serviceDisclaimer:
     "Fabsy is an Alberta traffic ticket agent service, not a law firm. The assessment provides practical information and an agent-service recommendation; it does not promise a reduction, withdrawal, insurance saving or any other result.",
 } as const;

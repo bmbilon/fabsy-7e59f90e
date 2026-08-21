@@ -108,7 +108,7 @@ export default function TicketAssessment() {
   useSafeHead({
     title: "$149 Alberta Traffic Ticket & Insurance Assessment | Fabsy",
     description:
-      "Not sure what to do after an Alberta traffic ticket? For $149 CAD, Fabsy reviews the ticket, likely insurance impact and whether fighting it is worth the cost.",
+      "For $149 CAD, get an Alberta ticket review, likely insurance-impact assessment and a clear recommendation on what to do next.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
   });
 
@@ -151,12 +151,6 @@ export default function TicketAssessment() {
     url: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
     areaServed: { "@type": "AdministrativeArea", name: "Alberta, Canada" },
     provider: { "@type": "ProfessionalService", name: "Fabsy Traffic Ticket Services", url: "https://fabsy.ca" },
-    offers: {
-      "@type": "Offer",
-      price: String(TICKET_ASSESSMENT.priceCad),
-      priceCurrency: TICKET_ASSESSMENT.currency,
-      availability: "https://schema.org/InStock",
-    },
   } as const;
 
   return (
@@ -245,9 +239,9 @@ export default function TicketAssessment() {
             <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
               <div>
                 <Badge variant="outline">A distinction worth understanding</Badge>
-                <h2 id="not-the-same-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">The fine is only one part of the decision</h2>
+                <h2 id="not-the-same-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">The ticket amount is only part of the decision</h2>
                 <p className="mt-4 leading-relaxed text-muted-foreground">
-                  A $200 ticket can matter because of downstream record or insurance consequences—or the risk may be small enough that expensive representation makes little sense.
+                  A modest ticket can matter because of downstream record or insurance consequences, or the risk may be small enough that expensive representation makes little sense.
                 </p>
               </div>
               <Card className="p-6 shadow-elevated sm:p-8">
@@ -268,7 +262,7 @@ export default function TicketAssessment() {
         <section className="px-4 py-16 sm:py-20" aria-labelledby="included-heading">
           <div className="container mx-auto max-w-6xl">
             <div className="mx-auto max-w-3xl text-center">
-              <Badge variant="outline">One substantial bundle</Badge>
+              <Badge variant="outline">A substantial bundle</Badge>
               <h2 id="included-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">What the $149 assessment includes</h2>
             </div>
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -328,7 +322,7 @@ export default function TicketAssessment() {
             <LockKeyhole className="mx-auto h-9 w-9 text-primary" aria-hidden="true" />
             <h2 id="trust-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">We'll tell you when fighting it isn't worth it</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-              If the likely downside does not justify another $500–$1,000 or more, the assessment should save you from that spend. If the exposure appears material, Fabsy will explain the practical path forward without making representation automatic.
+              If the likely downside does not justify spending hundreds more on representation, the assessment should save you from that expense. If the exposure appears material, Fabsy will explain the practical path forward without making representation automatic.
             </p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg">

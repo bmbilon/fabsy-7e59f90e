@@ -31,7 +31,7 @@ export default function AssessmentOfferCard() {
             </div>
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">A clear decision before a bigger spend</p>
             <h2 id="assessment-offer-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              Before you pay—or spend hundreds fighting it—find out what the smart move is.
+              Before you pay or spend hundreds fighting it, find out what the smart move is.
             </h2>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               A human-reviewed Alberta ticket assessment covering the charge, deadlines, demerits,

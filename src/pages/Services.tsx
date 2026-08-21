@@ -130,7 +130,7 @@ const Services = () => {
                 <Badge className="mb-4">Entry-level decision service</Badge>
                 <h2 className="text-3xl font-bold text-card-foreground">Not ready to spend $488+ on representation?</h2>
                 <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                  For $149 CAD, Fabsy reviews the Alberta ticket, explains the options, assesses likely insurance significance and tells you whether further paid representation appears economically worthwhile.
+                  For the $149 assessment, Fabsy reviews the Alberta ticket, explains the options, assesses likely insurance significance and tells you whether further paid representation appears economically worthwhile.
                 </p>
                 <p className="mt-3 font-semibold text-foreground">If fighting it isn't worth the cost, we'll tell you.</p>
                 <Button asChild size="lg" className="mt-6"><Link to={TICKET_ASSESSMENT.slug}>{TICKET_ASSESSMENT.cta}</Link></Button>

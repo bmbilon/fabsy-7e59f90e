@@ -147,6 +147,21 @@ function redactSlugVerifiedFacts(value, slug) {
 function redactVerifiedNumericClaims(value, slug) {
   let text = visibleText(value);
 
+  text = replaceWhenNearby(
+    text,
+    /\$\s*149\b/gi,
+    /\bassessment\b/i,
+    '[verified assessment price]'
+  );
+
+  if (slug === 'traffic-ticket-assessment') {
+    // Verified Fabsy product pricing. Keep this exemption narrowly scoped to
+    // the dedicated assessment route so unrelated legal claims remain guarded.
+    text = text
+      .replace(/\$\s*149\b/gi, '[verified assessment price]')
+      .replace(/\b149\s*CAD\b/gi, '[verified assessment price]');
+  }
+
   if (hasCompleteFabsyPricing(text)) {
     text = text
       .replace(/\$\s*488\b/gi, '[verified price]')

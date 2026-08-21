@@ -343,7 +343,7 @@ export default function TicketAssessmentIntake() {
               <Badge className="mb-4">Secure assessment intake</Badge>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Tell us enough to assess the full picture</h1>
               <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
-                This is for Alberta tickets. Choose “I don't know” where needed—the service exists because the answer is not always obvious.
+                This is for Alberta tickets. Choose “I don't know” where needed; the service exists because the answer is not always obvious.
               </p>
               <div className="mt-6">
                 <div className="mb-2 flex items-center justify-between text-sm font-medium">
@@ -496,7 +496,7 @@ export default function TicketAssessmentIntake() {
                 ) : (
                   <Button type="submit" size="lg" disabled={!contactStepValid || isSubmitting} className="min-h-12">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    {isSubmitting ? "Saving and opening checkout..." : `Secure checkout — $${TICKET_ASSESSMENT.priceCad}`}
+                    {isSubmitting ? "Saving and opening checkout..." : `Secure checkout: $${TICKET_ASSESSMENT.priceCad}`}
                   </Button>
                 )}
               </div>

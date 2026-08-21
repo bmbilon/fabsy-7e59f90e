@@ -64,7 +64,7 @@ const Header = () => {
             </a>
             <Link to="/traffic-ticket-assessment/start" onClick={() => trackAssessmentEvent("assessment_start", { location: "desktop_header" })}>
               <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                Assessment — $149
+                Ticket Assessment
               </Button>
             </Link>
           </div>
@@ -124,7 +124,7 @@ const Header = () => {
                         setIsOpen(false);
                       }}
                     >
-                      Start Assessment — $149
+                      Start Ticket Assessment
                     </Button>
                   </Link>
                 </div>
