@@ -149,6 +149,13 @@ function redactVerifiedNumericClaims(value, slug) {
 
   text = replaceWhenNearby(
     text,
+    /\$\s*0\b/gi,
+    /\bFree Ticket Check\b/i,
+    '[verified free ticket check price]'
+  );
+
+  text = replaceWhenNearby(
+    text,
     /\$\s*149\b/gi,
     /\bassessment\b/i,
     '[verified assessment price]'
