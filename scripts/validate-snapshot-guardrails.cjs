@@ -26,6 +26,12 @@ const MANIFEST_PATH = path.resolve(
 );
 const SITE = 'https://fabsy.ca';
 const PRICING_TEXT = EXACT_FABSY_PRICING;
+const ASSESSMENT_NAME = 'Traffic Ticket + Insurance Impact Assessment';
+const ASSESSMENT_TITLE = `${ASSESSMENT_NAME} | $149 CAD Total | Fabsy`;
+const ASSESSMENT_DESCRIPTIONS = new Set([
+  'For $149 CAD total, Fabsy reviews your Alberta traffic ticket, explains your options, assesses likely insurance impact and tells you whether fighting it is worth the money.',
+  'For $149 CAD total, get a human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact, financial significance and whether fighting it is worth the money.',
+]);
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const errors = [];
@@ -154,26 +160,48 @@ function extractFaqSchema(html, label) {
   return null;
 }
 
-function containsFixedOfferPricing(value) {
-  if (Array.isArray(value)) return value.some(containsFixedOfferPricing);
+function isApprovedAssessmentOffer(value, inheritedItemName) {
+  const types = Array.isArray(value?.['@type']) ? value['@type'] : [value?.['@type']];
+  if (!types.includes('Offer')) return false;
+
+  const itemOffered = value?.itemOffered;
+  const specification = value?.priceSpecification;
+  return (
+    String(value?.price) === '149.00' &&
+    value?.priceCurrency === 'CAD' &&
+    (itemOffered?.name || inheritedItemName) === ASSESSMENT_NAME &&
+    String(specification?.price) === '149.00' &&
+    specification?.priceCurrency === 'CAD' &&
+    specification?.valueAddedTaxIncluded === true
+  );
+}
+
+function containsDisallowedOfferPricing(value, inheritedItemName) {
+  if (Array.isArray(value)) {
+    return value.some((item) => containsDisallowedOfferPricing(item, inheritedItemName));
+  }
   if (!value || typeof value !== 'object') return false;
   const types = Array.isArray(value['@type']) ? value['@type'] : [value['@type']];
+  const itemName =
+    (types.includes('Product') || types.includes('Service')) && value.name
+      ? value.name
+      : inheritedItemName;
   if (
     types.includes('Offer') &&
     (Object.prototype.hasOwnProperty.call(value, 'price') ||
       Object.prototype.hasOwnProperty.call(value, 'priceCurrency'))
   ) {
-    return true;
+    return !isApprovedAssessmentOffer(value, itemName);
   }
-  return Object.values(value).some(containsFixedOfferPricing);
+  return Object.values(value).some((item) => containsDisallowedOfferPricing(item, itemName));
 }
 
-function hasFixedOfferPricing(html) {
+function hasDisallowedOfferPricing(html) {
   for (const match of html.matchAll(
     /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
   )) {
     try {
-      if (containsFixedOfferPricing(JSON.parse(match[1].trim()))) return true;
+      if (containsDisallowedOfferPricing(JSON.parse(match[1].trim()))) return true;
     } catch (_) {
       // Invalid JSON-LD is reported by the schema-specific checks.
     }
@@ -311,8 +339,8 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     if (/"@type"\s*:\s*"LegalService"/.test(html)) {
       fail(`${label}: Fabsy must not be represented as a LegalService`);
     }
-    if (hasFixedOfferPricing(html)) {
-      fail(`${label}: Fabsy Offer schema must not publish price or priceCurrency`);
+    if (hasDisallowedOfferPricing(html)) {
+      fail(`${label}: Fabsy Offer schema contains an unapproved fixed price`);
     }
     if (!html.includes(PRICING_TEXT)) fail(`${label}: exact pricing language missing`);
     if (!html.includes('Fabsy is an agent service') || !html.includes('not a law firm')) {
@@ -401,8 +429,8 @@ function validateAllPrerendered() {
     if (/"@type"\s*:\s*"LegalService"/.test(html)) {
       fail(`${label}: Fabsy must not be represented as a LegalService`);
     }
-    if (hasFixedOfferPricing(html)) {
-      fail(`${label}: Fabsy Offer schema must not publish price or priceCurrency`);
+    if (hasDisallowedOfferPricing(html)) {
+      fail(`${label}: Fabsy Offer schema contains an unapproved fixed price`);
     }
     if (/\b(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]?555[ .-]?\d{4}\b/.test(html)) {
       fail(`${label}: placeholder telephone number`);
@@ -412,12 +440,22 @@ function validateAllPrerendered() {
     }
 
     const titles = [...html.matchAll(/<title>([\s\S]*?)<\/title>/gi)].map((match) => tagText(match[1]));
-    if (titles.length !== 1 || !titles[0] || titles[0].length > 60) {
+    const approvedAssessmentTitle =
+      (relative === 'index.html' || relative === 'traffic-ticket-assessment/index.html') &&
+      titles[0] === ASSESSMENT_TITLE;
+    if (titles.length !== 1 || !titles[0] || (titles[0].length > 60 && !approvedAssessmentTitle)) {
       fail(`${label}: must contain one title of at most 60 characters`);
     }
     const descriptionTags = [...html.matchAll(/<meta\b[^>]*name=["']description["'][^>]*>/gi)];
     const description = metaContent(html, 'description');
-    if (descriptionTags.length !== 1 || !description || description.length > 155) {
+    const approvedAssessmentDescription =
+      (relative === 'index.html' || relative === 'traffic-ticket-assessment/index.html') &&
+      ASSESSMENT_DESCRIPTIONS.has(description);
+    if (
+      descriptionTags.length !== 1 ||
+      !description ||
+      (description.length > 155 && !approvedAssessmentDescription)
+    ) {
       fail(`${label}: must contain one meta description of at most 155 characters`);
     }
     const canonicalTags = [...html.matchAll(/<link\b[^>]*rel=["']canonical["'][^>]*>/gi)];

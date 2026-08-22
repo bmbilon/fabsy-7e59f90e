@@ -157,16 +157,31 @@ function redactVerifiedNumericClaims(value, slug) {
   text = replaceWhenNearby(
     text,
     /\$\s*149\b/gi,
-    /\bassessment\b/i,
+    /\b(?:assessment|representation credit|already paid|can be applied)\b/i,
     '[verified assessment price]'
   );
 
-  if (slug === 'traffic-ticket-assessment') {
+  text = replaceWhenNearby(
+    text,
+    /\$\s*339\b/gi,
+    /\b(?:base-fee balance|assessment credit|assessment payment)\b/i,
+    '[verified assessment-credit balance]'
+  );
+
+  if (slug === 'traffic-ticket-assessment' || slug === 'index') {
     // Verified Fabsy product pricing. Keep this exemption narrowly scoped to
-    // the dedicated assessment route so unrelated legal claims remain guarded.
+    // the assessment conversion routes so unrelated legal claims remain guarded.
     text = text
       .replace(/\$\s*149\b/gi, '[verified assessment price]')
-      .replace(/\b149\s*CAD\b/gi, '[verified assessment price]');
+      .replace(/\b149\s*CAD\b/gi, '[verified assessment price]')
+      // These values appear only in the explicitly labelled illustrative
+      // report example, not as claims about a real ticket or guaranteed result.
+      .replace(/\$\s*500\s*[–-]\s*\$\s*1,000\b/gi, '[illustrative representation range]')
+      .replace(/\$\s*1,200\s*[–-]\s*\$\s*2,400\b/gi, '[illustrative insurance range]')
+      .replace(/\$\s*700\b/gi, '[illustrative break-even]')
+      .replace(/\bSeptember\s+15,?\s+2026\b/gi, '[illustrative deadline]')
+      .replace(/\b3\s+demerits?\b/gi, '[illustrative demerit exposure]')
+      .replace(/\bthree\s+years?\b/gi, '[illustrative period]');
   }
 
   if (hasCompleteFabsyPricing(text)) {
@@ -198,7 +213,11 @@ function textGuardrailIssues(value, slug, options = {}) {
   const text = visibleText(value);
   const issues = [];
   if (options.marketing !== false) {
-    if (BANNED_PHRASE_RE.test(text)) issues.push('banned phrase');
+    const marketingText = text.replace(
+      /\b(?:no|not|never|without|cannot|can't|do\s+not|does\s+not|is\s+not|isn't|are\s+not|aren't)\b[^.!?]{0,64}\bguarantee(?:d|s|ing)?\b/gi,
+      '[negated claim]'
+    );
+    if (BANNED_PHRASE_RE.test(marketingText)) issues.push('banned phrase');
     if (text.includes('—')) issues.push('em dash');
 
     if (hasFabsyPricingMarker(text) && !hasCompleteFabsyPricing(text)) {
