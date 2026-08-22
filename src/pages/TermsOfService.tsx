@@ -25,7 +25,7 @@ const TermsOfService = () => {
               <li>Court representation for traffic violations</li>
               <li>Administrative assistance with traffic ticket procedures</li>
               <li>Consultation on traffic ticket matters</li>
-              <li>Ticket Triage assessments based on customer-supplied information and ticket documents</li>
+              <li>Traffic Ticket + Insurance Impact Assessments based on customer-supplied information and ticket documents</li>
               <li>Optional Insurance Damage Reports based on client-supplied records and public research</li>
             </ul>
             <p className="mt-4">
@@ -54,8 +54,8 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">4. How Our Pricing Works</h2>
             <p className="mb-4">
-              Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
-              reduced, there is no additional charge.
+              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
+              If the fine is not reduced, there is no success fee.
             </p>
           </section>
 
@@ -89,19 +89,19 @@ const TermsOfService = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5B. Ticket Triage Terms</h2>
+            <h2 className="text-2xl font-semibold mb-4">5B. Traffic Ticket + Insurance Impact Assessment Terms</h2>
             <p className="mb-4">
-              Ticket Triage costs ${TICKET_ASSESSMENT.priceCad} CAD as a
-              one-time payment, plus GST, charged at checkout. Government fines, court costs,
+              The Traffic Ticket + Insurance Impact Assessment costs ${TICKET_ASSESSMENT.priceCad} CAD total as a
+              one-time payment, including applicable GST, charged at checkout. Government fines, court costs,
               driver records, and any later representation service are separate.
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>You must provide accurate contact, ticket, driving-record, and insurance context and securely upload a legible Alberta ticket</li>
               <li>You remain responsible for every response, payment, appearance, limitation, and court deadline; submitting or purchasing an assessment does not extend or pause one</li>
-              <li>Ticket Triage is a human-reviewed decision aid, not legal advice, an insurance quote, or a promise of a court, conviction, demerit, insurer, or premium result</li>
+              <li>The assessment is a human-reviewed decision aid, not legal advice, an insurance quote, or a promise of a court, conviction, demerit, insurer, or premium result</li>
               <li>Insurance impact is described cautiously using the supplied context; an insurer determines underwriting, eligibility, rating, and renewal</li>
               <li>Fabsy may recommend paying or handling a matter directly when representation does not appear economically worthwhile</li>
-              <li>Representation availability, eligibility, scope, and pricing are confirmed separately and are not included in Ticket Triage</li>
+              <li>Representation availability, eligibility, scope, and pricing are confirmed separately and are not included in the assessment</li>
               <li>{TICKET_ASSESSMENT.representationPriority.publicCopy}</li>
               <li>{TICKET_ASSESSMENT.representationCredit.publicCopy}</li>
             </ul>

@@ -231,7 +231,7 @@ const Services = () => {
               </h3>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
                 Insurance consequences vary by driver, conviction, insurer, and renewal timing.
-                Fabsy's $149 Ticket Triage can estimate likely risk and financial significance,
+                Fabsy's $149 Traffic Ticket + Insurance Impact Assessment can estimate likely risk and financial significance,
                 but it is not an insurer-issued quote and does not promise savings. It also includes
                 priority placement and a $149 representation credit if the same eligible matter is upgraded.
               </p>
@@ -246,8 +246,8 @@ const Services = () => {
               Get Your Ticket Reviewed
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
-              reduced, there is no additional charge.
+              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
+              If the fine is not reduced, there is no success fee.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

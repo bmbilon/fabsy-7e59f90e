@@ -31,7 +31,7 @@ const DRY_RUN = String(process.env.DRY_RUN || process.env.DRY || 'true').toLower
 const APPLY = String(process.env.APPLY || 'false').toLowerCase() === 'true';
 const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || '50', 10) || 50;
 const MAX_PAGES = parseInt(process.env.MAX_PAGES || '0', 10) || 0; // 0 = unlimited
-const EXACT_PRICING = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.';
+const EXACT_PRICING = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
 
 if (!SUPABASE_URL) {
   console.error('ERROR: SUPABASE_URL is required via env (SUPABASE_URL or VITE_SUPABASE_URL).');
@@ -128,7 +128,7 @@ function generatePageObject(city, violation, scenario = null) {
     : `${violation.name}-ticket-${city.toLowerCase().replace(/\s+/g, '-')}`;
   const faqs = [
     { q: `How do I respond to a ${violation.display} ticket in ${city}?`, a: `Follow the instructions and deadline printed on the ticket. Those instructions explain how to pay the ticket or start a dispute.` },
-    { q: `Can Fabsy review a ${violation.display} ticket from ${city}?`, a: `Yes. Submit a copy for a free ticket check. Fabsy will confirm the available options and whether agent representation is permitted for the matter and court location.` },
+    { q: `Can Fabsy review a ${violation.display} ticket from ${city}?`, a: `Yes. Submit a copy for the Free Representation Eligibility Check. Fabsy will confirm whether agent representation may be available for the matter and court location.` },
     { q: `How much does Fabsy charge for representation?`, a: EXACT_PRICING },
   ];
 

@@ -421,12 +421,12 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
             Fight Your Ticket
           </Badge>
           <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
-            Free Ticket Check <span className="text-gradient-primary">&amp; Representation</span>
+            Free Representation Eligibility Check <span className="text-gradient-primary">&amp; Representation</span>
           </h1>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Upload your ticket. We confirm the charge, check availability, and quote the flat $488 representation fee. Want the full insurance math first?{" "}
+            Upload your ticket. We confirm the charge, check availability, and quote the $488 base representation fee. Want the full insurance math first?{" "}
             <Link to="/traffic-ticket-assessment" className="font-semibold text-white underline underline-offset-4">
-              See $149 Ticket Triage.
+              See the $149 Traffic Ticket + Insurance Impact Assessment.
             </Link>
           </p>
         </div>

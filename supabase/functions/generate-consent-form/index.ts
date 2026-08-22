@@ -118,8 +118,8 @@ const handler = async (req: Request): Promise<Response> => {
       "• Fabsy will not choose or change a plea or strategy without my instructions",
       "• Fabsy may access only information actually needed and lawfully available for this matter",
       "• Outcomes vary and Fabsy does not promise a particular result",
-      "• Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no",
-      "  additional charge if the fine is not reduced"
+      "• Representation uses a $488 base representation fee plus 30% of any fine",
+      "  reduction achieved; there is no success fee if the fine is not reduced"
     ];
 
     authLines.forEach(line => {

@@ -22,7 +22,7 @@
   },
   "faqs": [
     {
-      "a": "It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.",
+      "a": "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.",
       "q": "How much does it cost?"
     },
     {
@@ -35,7 +35,7 @@
     }
   ],
   "video": null,
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}",
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How much does it cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.\"}},{\"@type\":\"Question\",\"name\":\"Do I need to appear in court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Usually not. we appear on your behalf for most violations. We will notify you if attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"How long does this take?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The process typically takes 3-6 months from submission to resolution.\"}}]}",
   "created_at": "2025-10-02T12:39:34.802+00:00",
   "updated_at": "2026-08-01T17:40:14.817862+00:00"
 }

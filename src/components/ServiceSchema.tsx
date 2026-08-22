@@ -21,7 +21,7 @@ const ServiceSchema: React.FC<Props> = ({
   providerName = 'Fabsy Traffic Ticket Services',
   providerUrl = 'https://fabsy.ca',
   cityName,
-  offerDescription = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.',
+  offerDescription = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.',
 }) => {
   if (!name || !serviceType || !url) return null;
 

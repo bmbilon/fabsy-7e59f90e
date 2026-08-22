@@ -40,7 +40,7 @@ Got a {Offence} Ticket in {City}?
 
 ### **Meta Description Pattern**
 ```
-{Offence} ticket in {City}? Fabsy is a traffic ticket agent service, not a law firm. Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
+{Offence} ticket in {City}? Fabsy is a traffic ticket agent service, not a law firm. Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.
 ```
 
 ## 📚 **FAQ/PAA Question Bank**

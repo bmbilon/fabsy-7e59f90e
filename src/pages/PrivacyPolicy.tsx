@@ -35,7 +35,7 @@ const PrivacyPolicy = () => {
             <p className="mb-4">We use the information we collect to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide traffic ticket representation services</li>
-              <li>Review a submitted ticket and deliver a private Ticket Triage assessment</li>
+              <li>Review a submitted ticket and deliver a private Traffic Ticket + Insurance Impact Assessment</li>
               <li>Assess the practical relationship among the fine, demerits, driving-record implications, possible insurance exposure, and representation economics</li>
               <li>Verify uploaded abstract information and generate private Insurance Damage Reports</li>
               <li>Prepare estimated premium-exposure ranges and sourced carrier call lists</li>

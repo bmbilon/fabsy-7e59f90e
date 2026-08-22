@@ -12,7 +12,7 @@
   ],
   "what": "<h2>What a Calgary photo radar ticket means</h2><p>A photo radar notice identifies the registered owner rather than a driver. It carries no demerits and does not appear on the driving abstract.</p><p>Since April 1, 2025, Alberta restricts photo radar to school, playground, and construction zones and prohibits it on provincial highways. Red-light cameras remain, while speed-on-green enforcement has ended.</p>",
   "how": "<h2>How to review the notice</h2><p>Read both sides of the notice and use the response deadline and instructions printed on it. Keep a copy and preserve any photographs, video, or documents that may be relevant.</p><p>If you choose to dispute the notice, request the available evidence and compare it with the allegation and location. The available response depends on the notice, the evidence, and the current court process.</p>",
-  "next": "<h2>What to do next</h2><p>Fabsy can review the notice and explain whether the matter is eligible for agent representation. Fabsy is an agent service, not a law firm.</p><p>Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</p>",
+  "next": "<h2>What to do next</h2><p>Fabsy can review the notice and explain whether the matter is eligible for agent representation. Fabsy is an agent service, not a law firm.</p><p>Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>",
   "faqs": [
     {
       "a": "No. A photo radar notice goes to the registered owner, carries no demerits, and does not appear on the driving abstract.",
@@ -27,7 +27,7 @@
       "q": "How do I respond to a Calgary photo radar ticket?"
     },
     {
-      "a": "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.",
+      "a": "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.",
       "q": "What does Fabsy charge?"
     }
   ],
@@ -35,5 +35,5 @@
     "transcript": "",
     "youtubeUrl": ""
   },
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Does a Calgary photo radar ticket add demerits?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No. A photo radar notice goes to the registered owner, carries no demerits, and does not appear on the driving abstract.\"}},{\"@type\":\"Question\",\"name\":\"Where can photo radar be used in Alberta?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Since April 1, 2025, Alberta restricts photo radar to school, playground, and construction zones and prohibits it on provincial highways.\"}},{\"@type\":\"Question\",\"name\":\"How do I respond to a Calgary photo radar ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Use the response deadline and instructions printed on the notice. Keep a copy and act before that date.\"}},{\"@type\":\"Question\",\"name\":\"What does Fabsy charge?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.\"}}]}"
+  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"Does a Calgary photo radar ticket add demerits?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No. A photo radar notice goes to the registered owner, carries no demerits, and does not appear on the driving abstract.\"}},{\"@type\":\"Question\",\"name\":\"Where can photo radar be used in Alberta?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Since April 1, 2025, Alberta restricts photo radar to school, playground, and construction zones and prohibits it on provincial highways.\"}},{\"@type\":\"Question\",\"name\":\"How do I respond to a Calgary photo radar ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Use the response deadline and instructions printed on the notice. Keep a copy and act before that date.\"}},{\"@type\":\"Question\",\"name\":\"What does Fabsy charge?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.\"}}]}"
 }

@@ -1,158 +1,105 @@
-import { useState } from "react";
+import { ArrowRight, CheckCircle2, FileCheck2, Gauge, ShieldCheck, UserRoundCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Calculator, Zap, DollarSign, Phone, CheckCircle } from "lucide-react";
-import { EligibilityChecker } from "./EligibilityChecker";
+import { Card } from "@/components/ui/card";
+import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 
-const features = [
-  { icon: Zap, title: "Online submission", sub: "Upload your ticket" },
-  { icon: Shield, title: "Agent service", sub: "Alberta traffic matters" },
-  { icon: DollarSign, title: "Clear pricing", sub: "Explained before checkout" },
-];
+const trustPoints = [
+  { icon: UserRoundCheck, label: "Human reviewed" },
+  { icon: Gauge, label: "Insurance impact included" },
+  { icon: ShieldCheck, label: "Clear recommended next step" },
+  { icon: FileCheck2, label: "$149 CAD total" },
+] as const;
 
-const stats = [
-  { value: "Alberta", label: "Service area" },
-  { value: "Agent service", label: "Not a law firm" },
-  { value: "Online", label: "Ticket submission" },
-  { value: "95%+", label: "Historical success rate", note: "Past results do not predict future outcomes" },
-];
+const included = [
+  "The charge, deadline, fine and demerit implications",
+  "Your practical options and likely insurance significance",
+  "The financial break-even for representation",
+  "A direct, human-reviewed recommendation",
+] as const;
 
 const Hero = () => {
-  const [eligibilityOpen, setEligibilityOpen] = useState(false);
-
-  const scrollToPricing = () =>
-    document.getElementById("pricing-overview")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToDetails = () =>
+    document.getElementById("assessment-details")?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <section className="relative bg-gradient-hero overflow-hidden">
-      <div className="container mx-auto px-4 py-20 lg:py-28 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* LEFT column */}
-          <div className="space-y-8">
-            {/* Pill badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5">
-              <span className="text-xs font-semibold tracking-wide text-primary-light">
-                Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is
-                not reduced, there is no additional charge.
+    <section className="relative overflow-hidden bg-gradient-hero text-white">
+      <div className="container relative z-10 mx-auto px-4 py-16 sm:py-20 lg:py-24">
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-14">
+          <div>
+            <div className="inline-flex items-center rounded-full border border-primary/35 bg-primary/10 px-4 py-1.5">
+              <span className="text-xs font-bold tracking-wide text-primary-light">
+                {TICKET_ASSESSMENT.name} · Alberta
               </span>
             </div>
 
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
-              <span className="block text-white">Take the next step{" "}</span>
-              <span className="block text-primary">on your traffic ticket.</span>
+            <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              {TICKET_ASSESSMENT.heroHeadline}
             </h1>
-
-            {/* Subcopy */}
-            <p className="text-lg lg:text-xl text-slate-300 leading-relaxed max-w-xl">
-              Submit your ticket online for review by Fabsy's traffic ticket agent team. We assess
-              the information available and explain the next steps without promising an outcome.
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-200 sm:text-xl">
+              {TICKET_ASSESSMENT.heroSubheadline}
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary-dark text-white transition-smooth text-base font-semibold px-6 py-6"
-                onClick={() => setEligibilityOpen(true)}
-              >
-                Review your ticket
-                <ArrowRight className="ml-2 h-5 w-5" />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="min-h-12 bg-primary px-7 text-base font-bold text-white hover:bg-primary-dark">
+                <Link
+                  to={TICKET_ASSESSMENT.intakePath}
+                  onClick={() => trackAssessmentEvent(
+                    "assessment_cta_click",
+                    { location: "homepage_hero", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                    "homepage_hero",
+                  )}
+                >
+                  {TICKET_ASSESSMENT.cta}
+                  <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                </Link>
               </Button>
               <Button
                 size="lg"
-                variant="ghost"
-                className="text-white hover:bg-primary/15 hover:text-white transition-smooth text-base font-semibold px-6 py-6"
-                onClick={scrollToPricing}
+                variant="outline"
+                className="min-h-12 border-white/30 bg-transparent px-7 text-base font-bold text-white hover:bg-primary/20 hover:text-white"
+                onClick={scrollToDetails}
               >
-                <Calculator className="mr-2 h-5 w-5" />
-                Review pricing
+                See What's Included
               </Button>
             </div>
 
-            {/* Call option */}
-            <p className="text-base text-slate-300">
-              Prefer to talk?{" "}
-              <a
-                href="tel:+18257932279"
-                className="inline-flex items-center gap-2 font-semibold text-primary hover:text-primary-light transition-smooth"
-              >
-                <Phone className="h-4 w-4" />
-                Call (825) 793-2279
-              </a>
+            <p className="mt-5 text-sm font-semibold text-slate-300">
+              If representation isn't worth the cost, we'll tell you.
             </p>
+          </div>
 
-            {/* Feature chips */}
-            <div className="grid sm:grid-cols-3 gap-4 pt-2">
-              {features.map(({ icon: Icon, title, sub }) => (
-                <div key={title} className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <div className="text-sm font-bold text-white">{title}</div>
-                    <div className="text-xs text-slate-400">{sub}</div>
-                  </div>
-                </div>
+          <Card className="border-white/15 bg-white p-7 text-slate-950 shadow-2xl sm:p-8">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary">Complete assessment</p>
+            <div className="mt-3 flex flex-wrap items-end gap-x-3 gap-y-1">
+              <p className="text-5xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
+              <p className="pb-1 text-sm font-semibold text-slate-600">CAD total · GST included</p>
+            </div>
+            <div className="my-6 border-t" />
+            <ul className="space-y-4 text-sm text-slate-700">
+              {included.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
               ))}
-            </div>
-
-            {/* Approach card */}
-            <div className="rounded-xl border border-white/15 bg-white/5 p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <h2 className="text-base font-semibold text-white">Our approach</h2>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                We review each ticket on its own facts, communicate clearly, and work toward the
-                best available outcome. Fabsy is an agent service, not a law firm.
-              </p>
-            </div>
-          </div>
-
-          {/* RIGHT column: service overview */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-xl rounded-2xl border border-white/15 bg-slate-950/50 p-8 shadow-elevated backdrop-blur-sm">
-              <h2 className="text-2xl font-bold text-white">What the service includes</h2>
-              <div className="mt-6 space-y-5">
-                {[
-                  "Review of the ticket details you submit",
-                  "Assessment of agent-service availability",
-                  "A representation plan based on available information",
-                  "Updates as the matter progresses",
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                    <span className="text-slate-200">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-8 border-t border-white/10 pt-5 text-sm leading-relaxed text-slate-400">
-                Service availability and outcomes depend on the ticket, court location, and case
-                circumstances. No specific result is promised.
-              </p>
-            </div>
-          </div>
+            </ul>
+            <p className="mt-6 rounded-xl bg-slate-100 p-4 text-xs leading-relaxed text-slate-600">
+              Government fines and any later representation are separate. No success fee applies to this assessment.
+            </p>
+          </Card>
         </div>
 
-        {/* Stats bar */}
-        <div className="mt-16 lg:mt-20 grid grid-cols-2 lg:grid-cols-4 rounded-2xl border border-white/10 divide-x divide-y lg:divide-y-0 divide-white/10">
-          {stats.map(({ value, label, note }) => (
-            <div key={value} className="px-6 py-6 text-center sm:text-left">
-              <div className="text-3xl font-bold text-white">{value}</div>
-              <div className="mt-1 text-sm text-slate-400">{label}</div>
-              {note && <div className="mt-1 text-xs text-slate-500">{note}</div>}
+        <div className="mt-10 grid grid-cols-2 gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-4 sm:p-5">
+          {trustPoints.map(({ icon: Icon, label }) => (
+            <div key={label} className="flex items-center gap-2.5 text-sm font-semibold text-slate-100">
+              <Icon className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+              <span>{label}</span>
             </div>
           ))}
         </div>
-
-        {/* Pricing details */}
-        <p className="mt-8 text-xs text-muted-foreground max-w-3xl leading-relaxed">
-          Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
-          reduced, there is no additional charge.
-        </p>
       </div>
-
-      <EligibilityChecker open={eligibilityOpen} onOpenChange={setEligibilityOpen} />
     </section>
   );
 };

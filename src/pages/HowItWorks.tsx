@@ -32,14 +32,14 @@ const HowItWorks: React.FC = () => {
       icon: Upload,
     },
     {
-      name: "Get a free ticket check",
+      name: "Start the Free Representation Eligibility Check",
       text: "Fabsy confirms the charge, whether representation is available for your court location, and what it would cost. Keep following the instructions and deadlines printed on the ticket unless Fabsy confirms otherwise.",
       url: "https://fabsy.ca/submit-ticket",
       icon: FileCheck,
     },
     {
       name: "Review the service scope",
-      text: "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Fabsy confirms the available service scope before the matter proceeds.",
+      text: "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Fabsy confirms the available service scope before the matter proceeds.",
       url: "https://fabsy.ca/services",
       icon: Shield,
     },

@@ -20,7 +20,7 @@ interface AIAnswer {
 type UnknownRecord = Record<string, unknown>;
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
-const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
+const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
 const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent review. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
 
 const forbiddenOutputPatterns = [

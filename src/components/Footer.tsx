@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Scale, Mail, MapPin, Phone, Facebook, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -17,12 +15,10 @@ const Footer = () => {
     legal: [
       { name: "Privacy Policy", path: "/privacy-policy" },
       { name: "Terms of Service", path: "/terms-of-service" },
-      { name: "Cookie Policy", path: "/cookie-policy" },
-      { name: "Legal Disclaimer", path: "/disclaimer" },
     ],
     support: [
-      { name: "Ticket Triage", path: "/traffic-ticket-assessment" },
-      { name: "Free Ticket Check", path: "/submit-ticket" },
+      { name: "Traffic Ticket + Insurance Impact Assessment", path: "/traffic-ticket-assessment" },
+      { name: "Free Representation Eligibility Check", path: "/submit-ticket" },
       { name: "Contact Us", path: "/contact" },
       { name: "FAQ", path: "/faq" },
       { name: "Insurance Damage Report", path: "/insurance-damage-report" },
@@ -160,7 +156,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Fabsy reports a 95%+ historical success rate across past matters. Results vary, and past performance does not predict future results.
+                Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Fabsy reports a 95%+ historical success rate across past matters. Results vary, and past performance does not predict future results.
               </p>
             </div>
             
@@ -174,7 +170,7 @@ const Footer = () => {
           </div>
 
           <p className="text-center">
-            *By submitting a ticket for a free ticket check or a paid assessment, you agree to share your contact information and the contents of your uploaded ticket so we can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
+            *By submitting a ticket for a Free Representation Eligibility Check or a paid assessment, you agree to share your contact information and the contents of your uploaded ticket so we can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
           </p>
         </div>
 

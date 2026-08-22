@@ -430,9 +430,9 @@ function validateAllPrerendered() {
     const text = renderedPageText(html);
     if (/\$488|30%/.test(text)) {
       const required = [
-        'flat $488',
+        '$488 base representation fee',
         '30% of any fine reduction achieved',
-        'no additional charge if the fine is not reduced',
+        'no success fee if the fine is not reduced',
       ];
       for (const phrase of required) {
         if (!text.toLowerCase().includes(phrase.toLowerCase())) {

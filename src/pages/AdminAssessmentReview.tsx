@@ -249,7 +249,7 @@ export default function AdminAssessmentReview() {
             <Alert className="border-violet-200 bg-violet-50">
               <ShieldAlert className="h-4 w-4" />
               <AlertTitle>Priority Ticket Triage upgrade</AlertTitle>
-              <AlertDescription>This customer receives priority placement in the representation queue and a $149 credit toward the $488 flat fee for the same eligible matter. Quote a $339 base-fee balance plus GST; the 30% success fee still applies to any fine reduction.</AlertDescription>
+              <AlertDescription>If representation is worthwhile and this matter is eligible, apply the $149 assessment payment to the $488 base representation fee. Quote a $339 base-fee balance plus applicable tax; priority placement and the 30% success fee on any fine reduction still apply.</AlertDescription>
             </Alert>
           ) : null}
         </div>

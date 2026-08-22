@@ -340,7 +340,7 @@ function render(page) {
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}
       </ul>
 ${sections}
-      <p><a class="cta" href="/submit-ticket">Get a free ticket check</a></p>
+      <p><a class="cta" href="/submit-ticket">Start the Free Representation Eligibility Check</a></p>
       <section>
         <h2>Frequently Asked Questions</h2>
 ${faqsHtml}

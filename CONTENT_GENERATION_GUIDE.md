@@ -32,7 +32,7 @@ Rules:
 4) Keep meta lengths under the limits.
 5) Output valid JSON only, minified or pretty is OK.
 6) Fabsy is an agent service, not a law firm.
-7) If pricing is mentioned, use exactly: "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
+7) If pricing is mentioned, use exactly: "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
 8) Do not use "no win no fee", "risk-free", "money back", "guarantee", "zero-risk", or em dashes. Do not invent fines, demerits, deadlines, insurance figures, turnaround times, or outcomes.
 
 Example topic: "How to fight a traffic ticket in Alberta"

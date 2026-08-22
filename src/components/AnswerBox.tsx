@@ -78,10 +78,10 @@ const AnswerBox: React.FC<Props> = ({
           className="inline-flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
         >
           <Shield className="w-4 h-4" />
-          Get a free ticket check →
+          Start the Free Representation Eligibility Check →
         </Link>
         <div className="text-xs text-slate-600">
-          <span className="font-semibold text-green-600">Pricing is a flat $488 plus 30% of any fine reduction achieved;</span> there is no additional charge if the fine is not reduced.
+          <span className="font-semibold text-green-600">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved;</span> there is no success fee if the fine is not reduced.
         </div>
       </div>
 

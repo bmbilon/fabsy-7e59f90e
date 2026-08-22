@@ -13,7 +13,7 @@ Use this information without variations on every listing:
 
 ## Description
 
-> Traffic ticket agent services for Alberta drivers. Fabsy reviews speeding, distracted driving, red-light, careless driving, and other provincial traffic matters. Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Serving Calgary, Edmonton, Red Deer, Lethbridge, Medicine Hat, Fort McMurray, Grande Prairie, and other Alberta locations where agent representation is permitted. Fabsy is not a law firm.
+> Traffic ticket agent services for Alberta drivers. Fabsy reviews speeding, distracted driving, red-light, careless driving, and other provincial traffic matters. Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Serving Calgary, Edmonton, Red Deer, Lethbridge, Medicine Hat, Fort McMurray, Grande Prairie, and other Alberta locations where agent representation is permitted. Fabsy is not a law firm.
 
 ## Hours
 

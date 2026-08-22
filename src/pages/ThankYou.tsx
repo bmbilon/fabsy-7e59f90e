@@ -151,8 +151,8 @@ const ThankYou: React.FC = () => {
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">How our pricing works</h2>
             <p className="text-sm text-muted-foreground">
-              Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no
-              additional charge if the fine is not reduced.
+              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved;
+              there is no success fee if the fine is not reduced.
             </p>
           </div>
           <div className="rounded-lg border p-4 bg-card">

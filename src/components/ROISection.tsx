@@ -16,8 +16,8 @@ const ROISection = () => {
             Know How <span className="text-gradient-hero">Fabsy Charges</span>
           </h2>
           <p className="text-xl text-foreground/90 max-w-3xl mx-auto drop-shadow-sm mb-6">
-            Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
-            reduced, there is no additional charge.
+            Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
+            If the fine is not reduced, there is no success fee.
           </p>
 
         </div>
@@ -33,7 +33,7 @@ const ROISection = () => {
 
                 <div className="space-y-4">
                   <div className="flex justify-between gap-4 p-4 bg-accent/50 rounded-lg">
-                    <span className="text-secondary">Flat service fee</span>
+                    <span className="text-secondary">Base representation fee</span>
                     <span className="font-bold text-primary">$488 CAD</span>
                   </div>
                   <div className="flex justify-between gap-4 p-4 bg-primary/10 rounded-lg border border-primary/20">

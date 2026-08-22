@@ -31,6 +31,8 @@ const SUPABASE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   'sb_publishable_KEo-G1wij9RC_IDDzblisw_VISRvwrX';
 const REQUIRE_SYNC = process.env.REQUIRE_PAGE_SYNC === '1';
+const REPRESENTATION_PRICING =
+  'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
 
 if (!SUPABASE_KEY) {
   const message = 'Supabase anonymous/publishable key not set; page_content sync skipped.';
@@ -64,8 +66,45 @@ function validateRows(rows, expectedCount) {
   }
 }
 
+function normalizePublicPositioning(value) {
+  if (Array.isArray(value)) return value.map(normalizePublicPositioning);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, nested]) => [key, normalizePublicPositioning(nested)]));
+  }
+  if (typeof value !== 'string') return value;
+
+  return value
+    .replaceAll(
+      'It costs a flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.',
+      REPRESENTATION_PRICING,
+    )
+    .replaceAll(
+      'A flat $488 for representation, plus 30 percent of any fine reduction we achieve. No additional charge if the fine is not reduced.',
+      REPRESENTATION_PRICING,
+    )
+    .replaceAll(
+      'A flat $488. Fabsy also charges 30 percent of any fine reduction achieved, with no additional charge if the fine is not reduced.',
+      REPRESENTATION_PRICING,
+    )
+    .replaceAll(
+      'For eligible matters, pricing is a flat $488 plus 30 percent of any fine reduction achieved. There is no additional charge if the fine is not reduced.',
+      REPRESENTATION_PRICING,
+    )
+    .replaceAll(
+      'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.',
+      REPRESENTATION_PRICING,
+    )
+    .replaceAll('A flat $488 plus 30% of any fine reduction achieved', 'A $488 base representation fee plus 30% of any fine reduction achieved')
+    .replaceAll('Flat $488, plus 30 percent of any fine reduction we win for you.', '$488 base representation fee plus 30% of any fine reduction achieved.')
+    .replaceAll('Flat $488.', '$488 base representation fee.')
+    .replaceAll('the $488 flat fee', 'the $488 base representation fee')
+    .replaceAll('flat $488 representation fee', '$488 base representation fee')
+    .replaceAll('Free Ticket Check', 'Free Representation Eligibility Check')
+    .replaceAll('free ticket check', 'Free Representation Eligibility Check');
+}
+
 function pageObject(row) {
-  return {
+  return normalizePublicPositioning({
     slug: row.slug,
     meta_title: row.meta_title || row.h1 || '',
     meta_description: row.meta_description || '',
@@ -85,7 +124,7 @@ function pageObject(row) {
     jsonld: row.jsonld || null,
     created_at: row.created_at || null,
     updated_at: row.updated_at || null,
-  };
+  });
 }
 
 function replaceCache(rows) {

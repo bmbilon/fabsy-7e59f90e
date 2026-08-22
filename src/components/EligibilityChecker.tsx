@@ -360,8 +360,8 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
               <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-lg p-4">
                 <h4 className="font-semibold mb-2">How our pricing works</h4>
                 <p className="text-sm text-muted-foreground">
-                  Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is
-                  not reduced, there is no additional charge.
+                  Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
+                  If the fine is not reduced, there is no success fee.
                 </p>
               </div>
 

@@ -15,7 +15,7 @@ export default function AssessmentOfferCard() {
     if (!node || typeof IntersectionObserver === "undefined") return;
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
-      trackAssessmentEvent("assessment_offer_view", { location: "homepage" });
+      trackAssessmentEvent("assessment_offer_view", { location: "homepage" }, "homepage_offer_card");
       observer.disconnect();
     }, { threshold: 0.35 });
     observer.observe(node);
@@ -30,7 +30,7 @@ export default function AssessmentOfferCard() {
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Scale className="h-6 w-6" aria-hidden="true" />
             </div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">Ticket Triage</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">{TICKET_ASSESSMENT.name}</p>
             <h2 id="assessment-offer-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
               Before you pay or spend hundreds fighting it, find out what the smart move is.
             </h2>
@@ -42,7 +42,11 @@ export default function AssessmentOfferCard() {
               <Button asChild size="lg" className="min-h-12 px-7 text-base">
                 <Link
                   to={TICKET_ASSESSMENT.intakePath}
-                  onClick={() => trackAssessmentEvent("assessment_start", { location: "homepage" })}
+                  onClick={() => trackAssessmentEvent(
+                    "assessment_cta_click",
+                    { location: "homepage_offer_card", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                    "homepage_offer_card",
+                  )}
                 >
                   {TICKET_ASSESSMENT.cta}
                   <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
@@ -52,9 +56,9 @@ export default function AssessmentOfferCard() {
             </div>
           </div>
           <div className="bg-slate-950 p-7 text-white sm:p-10 lg:p-12">
-            <p className="text-sm font-semibold text-violet-200">Complete Ticket Triage</p>
+            <p className="text-sm font-semibold text-violet-200">Complete assessment</p>
             <p className="mt-2 text-5xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
-            <p className="mt-1 text-sm text-slate-300">CAD, one-time · plus GST</p>
+            <p className="mt-1 text-sm text-slate-300">CAD total · GST included</p>
             <ul className="mt-7 space-y-3 text-sm text-slate-200">
               {[
                 "What the charge and deadline mean",
@@ -62,8 +66,8 @@ export default function AssessmentOfferCard() {
                 "Likely insurance-risk significance",
                 "Representation break-even assessment",
                 "A clear recommended next step",
+                "$149 can be applied to eligible representation when worthwhile",
                 "Priority placement if you upgrade",
-                "$149 credited toward representation ($339 flat-fee balance)",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />

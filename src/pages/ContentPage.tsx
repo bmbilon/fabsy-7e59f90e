@@ -352,14 +352,14 @@ const ContentPage = () => {
               Ready to Fight Your {pageData.violation || 'Traffic'} Ticket?
             </h2>
               <p className="text-xl mb-6 text-green-50">
-              Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
+              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.
             </p>
             <Link to="/submit-ticket">
               <Button 
                 size="lg"
                 className="bg-white text-green-600 hover:bg-green-50 text-lg px-8 py-6"
               >
-                Get a Free Ticket Check
+                Start the Free Representation Eligibility Check
               </Button>
             </Link>
           </div>

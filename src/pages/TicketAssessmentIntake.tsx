@@ -167,11 +167,19 @@ export default function TicketAssessmentIntake() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useSafeHead({
-    title: "Start Your $149 Ticket Triage | Fabsy",
-    description: "Securely submit an Alberta traffic ticket for Fabsy's $149 Ticket Triage.",
+    title: "Start Your $149 Traffic Ticket + Insurance Impact Assessment | Fabsy",
+    description: "Securely submit an Alberta traffic ticket for Fabsy's $149 CAD total traffic ticket and insurance impact assessment.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.intakePath}`,
     robots: "noindex, nofollow",
   });
+
+  useEffect(() => {
+    trackAssessmentEvent(
+      "assessment_start",
+      { location: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+      orderId,
+    );
+  }, [orderId]);
 
   useEffect(() => {
     if (checkoutCancelled) {
@@ -317,8 +325,11 @@ export default function TicketAssessmentIntake() {
         throw new Error(intake?.error || intakeError?.message || "The intake could not be saved.");
       }
 
-      trackAssessmentEvent("intake_completed", { value: TICKET_ASSESSMENT.priceCad });
-      trackAssessmentEvent("ticket_upload_started", { file_type: ticketFile.type, file_size_band: ticketFile.size < 2_000_000 ? "under_2mb" : "2mb_to_10mb" });
+      trackAssessmentEvent(
+        "ticket_upload_started",
+        { file_type: ticketFile.type, file_size_band: ticketFile.size < 2_000_000 ? "under_2mb" : "2mb_to_10mb" },
+        orderId,
+      );
 
       const { error: uploadError } = await supabase.storage
         .from("assessment-tickets")
@@ -328,7 +339,8 @@ export default function TicketAssessmentIntake() {
         });
       if (uploadError) throw new Error("The ticket upload did not finish. Please try again.");
 
-      trackAssessmentEvent("ticket_upload_completed", { file_type: ticketFile.type });
+      trackAssessmentEvent("ticket_upload_completed", { file_type: ticketFile.type }, orderId);
+      trackAssessmentEvent("intake_completed", { value: TICKET_ASSESSMENT.priceCad }, orderId);
 
       const checkout = await createAssessmentPayment({
         submissionId: intake.submissionId,
@@ -338,7 +350,7 @@ export default function TicketAssessmentIntake() {
       trackAssessmentEvent("checkout_started", {
         value: TICKET_ASSESSMENT.priceCad,
         item_id: "traffic_ticket_insurance_assessment",
-      });
+      }, orderId);
       window.location.assign(checkout.url);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "We could not start checkout. Please try again.");
@@ -351,13 +363,13 @@ export default function TicketAssessmentIntake() {
       <Header />
       <main className="container mx-auto max-w-6xl px-4 py-8 sm:py-12">
         <Button asChild variant="ghost" className="mb-4">
-          <Link to={TICKET_ASSESSMENT.slug}><ArrowLeft className="mr-2 h-4 w-4" />Back to Ticket Triage details</Link>
+          <Link to={TICKET_ASSESSMENT.slug}><ArrowLeft className="mr-2 h-4 w-4" />Back to assessment details</Link>
         </Button>
 
         <div className="grid gap-7 lg:grid-cols-[1fr_340px] lg:items-start">
           <Card className="overflow-hidden shadow-elevated">
             <div className="border-b bg-white p-6 sm:p-8">
-              <Badge className="mb-4">Secure Ticket Triage intake</Badge>
+              <Badge className="mb-4">Secure $149 assessment intake</Badge>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Tell us enough to assess the full picture</h1>
               <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
                 This is for Alberta tickets. Choose “I don't know” where needed; the service exists because the answer is not always obvious.
@@ -484,15 +496,15 @@ export default function TicketAssessmentIntake() {
                       <p className="shrink-0 text-xl font-bold">${TICKET_ASSESSMENT.priceCad} CAD</p>
                     </div>
                     <div className="my-4 border-t" />
-                    <div className="flex justify-between font-semibold"><span>Total charged at checkout</span><span>${TICKET_ASSESSMENT.priceCad} + GST</span></div>
-                      <p className="mt-2 text-xs text-muted-foreground">One-time, plus 5% GST (${TICKET_ASSESSMENT.albertaTotalCad.toFixed(2)} total). If you upgrade the same eligible matter, the $149 is credited toward the $488 flat representation fee, leaving $339 plus GST.</p>
+                    <div className="flex justify-between font-semibold"><span>Total charged at checkout</span><span>${TICKET_ASSESSMENT.priceCad} CAD</span></div>
+                    <p className="mt-2 text-xs text-muted-foreground">One-time total; applicable GST is included. If representation is worthwhile and the same matter is eligible, the $149 can be applied to Fabsy's $488 base representation fee, leaving a $339 base-fee balance plus applicable tax.</p>
                   </Card>
 
                   <div className="rounded-xl border bg-slate-50 p-4">
                     <div className="flex items-start gap-3">
                       <Checkbox id="assessment-terms" checked={draft.termsAccepted} onCheckedChange={(value) => update("termsAccepted", value === true)} className="mt-0.5" />
                       <Label htmlFor="assessment-terms" className="cursor-pointer text-sm leading-relaxed">
-                        I confirm the information is accurate to the best of my knowledge and agree to Fabsy's <Link to="/terms-of-service" className="font-semibold text-primary underline">Terms of Service</Link> and <Link to="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>. I understand Ticket Triage is an assessment, not a promise of a court or insurance result.
+                        I confirm the information is accurate to the best of my knowledge and agree to Fabsy's <Link to="/terms-of-service" className="font-semibold text-primary underline">Terms of Service</Link> and <Link to="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>. I understand this is an assessment, not a promise of a court or insurance result.
                       </Label>
                     </div>
                   </div>
@@ -513,7 +525,7 @@ export default function TicketAssessmentIntake() {
                 ) : (
                   <Button type="submit" size="lg" disabled={!contactStepValid || isSubmitting} className="min-h-12">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    {isSubmitting ? "Saving and opening checkout..." : `Secure checkout: $${TICKET_ASSESSMENT.priceCad} + GST`}
+                    {isSubmitting ? "Saving and opening checkout..." : `Secure checkout: $${TICKET_ASSESSMENT.priceCad} CAD total`}
                   </Button>
                 )}
               </div>
@@ -522,11 +534,11 @@ export default function TicketAssessmentIntake() {
 
           <aside className="space-y-5 lg:sticky lg:top-24">
             <Card className="p-6 shadow-fab">
-              <p className="text-sm font-semibold text-primary">Ticket Triage</p>
+              <p className="text-sm font-semibold text-primary">{TICKET_ASSESSMENT.name}</p>
               <p className="mt-1 text-4xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
-              <p className="text-sm text-muted-foreground">CAD, one-time · plus GST</p>
+              <p className="text-sm text-muted-foreground">CAD total · GST included</p>
               <ul className="mt-5 space-y-3 text-sm">
-                {["Charge and deadline", "Demerit implications", "Likely insurance significance", "Representation break-even", "Priority placement if you upgrade", "$149 representation credit ($339 base-fee balance)", "Recommended next step"].map((item) => <li key={item} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}
+                {["Charge and deadline", "Demerit implications", "Likely insurance significance", "Representation break-even", "Recommended next step", "$149 can be applied to eligible representation when worthwhile", "Priority placement if you upgrade"].map((item) => <li key={item} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}
               </ul>
             </Card>
             <Card className="p-5">

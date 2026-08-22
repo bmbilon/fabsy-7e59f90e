@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X, Scale, Phone } from "lucide-react";
+import { Menu, Scale, Phone } from "lucide-react";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
+import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_HREF = "tel:+18257932279";
 import { Link, useLocation } from "react-router-dom";
 
+const NAV_ITEMS = [
+  { name: "Home", path: "/" },
+  { name: "How It Works", path: "/how-it-works" },
+  { name: "About", path: "/about" },
+  { name: "What We Help With", path: "/services" },
+  { name: "$149 Assessment", path: "/traffic-ticket-assessment" },
+  { name: "Success Stories", path: "/testimonials" },
+  { name: "Blog", path: "/blog" },
+] as const;
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-
-  const navItems = [
-    { name: "Home", path: "/" },
-    { name: "How It Works", path: "/how-it-works" },
-    { name: "About", path: "/about" },
-    { name: "What We Help With", path: "/services" },
-    { name: "Ticket Triage", path: "/traffic-ticket-assessment" },
-    { name: "Success Stories", path: "/testimonials" },
-    { name: "Blog", path: "/blog" },
-  ];
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -38,11 +39,20 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => (
+          <nav className="hidden lg:flex items-center space-x-4 xl:space-x-5">
+            {NAV_ITEMS.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
+                onClick={() => {
+                  if (item.path === TICKET_ASSESSMENT.slug) {
+                    trackAssessmentEvent(
+                      "assessment_cta_click",
+                      { location: "desktop_nav", destination: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
+                      `desktop_nav:${location.pathname}`,
+                    );
+                  }
+                }}
                 className={`text-sm font-medium transition-colors hover:text-primary ${
                   isActive(item.path) 
                     ? "text-primary border-b-2 border-primary pb-1" 
@@ -55,25 +65,32 @@ const Header = () => {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
-            <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
+          <div className="hidden lg:flex items-center gap-3">
+            <a className="hidden 2xl:block" href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
               <Button variant="outline" className="gap-2 border-primary text-primary hover:bg-primary/10 transition-smooth">
                 <Phone className="h-4 w-4" />
                 {PHONE_DISPLAY}
               </Button>
             </a>
-            <Link to="/traffic-ticket-assessment" onClick={() => trackAssessmentEvent("assessment_start", { location: "desktop_header" })}>
+            <Link
+              to={TICKET_ASSESSMENT.intakePath}
+              onClick={() => trackAssessmentEvent(
+                "assessment_cta_click",
+                { location: "desktop_header", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                "desktop_header",
+              )}
+            >
               <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                $149 Ticket Triage
+                {TICKET_ASSESSMENT.cta}
               </Button>
             </Link>
           </div>
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
+            <SheetTrigger asChild className="lg:hidden">
+              <Button variant="ghost" size="icon" aria-label="Open navigation">
+                <Menu className="h-6 w-6" aria-hidden="true" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80 bg-gradient-soft">
@@ -90,11 +107,20 @@ const Header = () => {
                 </div>
 
                 <nav className="flex flex-col space-y-4 flex-1">
-                  {navItems.map((item) => (
+                  {NAV_ITEMS.map((item) => (
                     <Link
                       key={item.name}
                       to={item.path}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        if (item.path === TICKET_ASSESSMENT.slug) {
+                          trackAssessmentEvent(
+                            "assessment_cta_click",
+                            { location: "mobile_nav", destination: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
+                            `mobile_nav:${location.pathname}`,
+                          );
+                        }
+                        setIsOpen(false);
+                      }}
                       className={`text-lg font-medium py-3 px-4 rounded-lg transition-colors ${
                         isActive(item.path)
                           ? "bg-primary/10 text-primary border border-primary/20"
@@ -116,15 +142,19 @@ const Header = () => {
                       Call {PHONE_DISPLAY}
                     </Button>
                   </a>
-                  <Link to="/traffic-ticket-assessment">
+                  <Link to={TICKET_ASSESSMENT.intakePath}>
                     <Button
                       className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
                       onClick={() => {
-                        trackAssessmentEvent("assessment_start", { location: "mobile_header" });
+                        trackAssessmentEvent(
+                          "assessment_cta_click",
+                          { location: "mobile_header", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                          "mobile_header",
+                        );
                         setIsOpen(false);
                       }}
                     >
-                      $149 Ticket Triage
+                      {TICKET_ASSESSMENT.cta}
                     </Button>
                   </Link>
                 </div>

@@ -19,13 +19,13 @@ const LocalBusinessSchema: React.FC<Props> = ({
   url,
   cityName,
   serviceArea = 'Alberta, Canada',
-  priceRange = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.',
+  priceRange = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.',
   telephone = '(825) 793-2279',
   email = 'hello@fabsy.ca'
 }) => {
   if (!url || !cityName) return null;
 
-  const pricing = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.';
+  const pricing = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
   const services = [
     'Speeding ticket agent representation',
     'Red light ticket agent representation',

@@ -27,7 +27,7 @@ const AIInfo: React.FC = () => {
           </p>
           <Link to="/submit-ticket">
             <Button size="lg" className="bg-white text-blue-900 hover:bg-blue-50 text-lg px-8 py-6">
-              Get a Free Ticket Check
+              Start the Free Representation Eligibility Check
             </Button>
           </Link>
         </div>
@@ -76,14 +76,14 @@ const AIInfo: React.FC = () => {
             </div>
             <div className="bg-green-50 border-l-4 border-green-500 p-6">
               <p className="text-xl font-semibold text-green-900 mb-2">
-                A flat $488 plus 30% of any fine reduction achieved
+                A $488 base representation fee plus 30% of any fine reduction achieved
               </p>
               <p className="text-green-800">
-                There is no additional charge if the fine is not reduced.
+                There is no success fee if the fine is not reduced.
               </p>
             </div>
             <p className="mt-6 text-lg leading-relaxed text-gray-700">
-              Fabsy offers a free ticket check, $149 CAD (+GST) Ticket Triage, and agent representation at a flat $488 plus 30% of any fine reduction achieved (no additional charge if the fine is not reduced). Ticket Triage includes priority placement in the representation queue and a $149 credit toward the flat representation fee, leaving a $339 base-fee balance plus GST if the same eligible matter is upgraded.
+              Fabsy offers a Free Representation Eligibility Check, a Traffic Ticket + Insurance Impact Assessment for $149 CAD total including applicable GST, and agent representation with a $488 base representation fee plus 30% of any fine reduction achieved. If representation is worthwhile and the same matter is eligible, the $149 assessment payment can be applied, leaving a $339 base-fee balance plus applicable tax.
             </p>
           </section>
 
@@ -130,7 +130,7 @@ const AIInfo: React.FC = () => {
             <ol className="space-y-6 text-gray-700">
               <li>
                 <strong className="block text-lg text-gray-900">1. Submit your ticket</strong>
-                Upload a readable image or PDF and provide the information requested for the free ticket check.
+                Upload a readable image or PDF and provide the information requested for the Free Representation Eligibility Check.
               </li>
               <li>
                 <strong className="block text-lg text-gray-900">2. Review your options</strong>
@@ -163,7 +163,7 @@ const AIInfo: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">What happens if my fine is not reduced?</h3>
-                <p>Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</p>
+                <p>Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>
               </div>
             </div>
           </section>
@@ -176,7 +176,7 @@ const AIInfo: React.FC = () => {
             </p>
             <Link to="/submit-ticket">
               <Button size="lg" className="bg-white text-green-600 hover:bg-green-50 text-xl px-12 py-8 shadow-xl">
-                Get a Free Ticket Check
+                Start the Free Representation Eligibility Check
               </Button>
             </Link>
           </section>

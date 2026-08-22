@@ -97,7 +97,7 @@ const JurisdictionChecker = ({ onResult, initialLocation = "" }: JurisdictionChe
                   )}
                   <p className="text-sm">
                     This tool does not make a legal eligibility determination. Fabsy is an agent service,
-                    not a law firm. You can continue with your free ticket check submission.
+                    not a law firm. You can continue with your Free Representation Eligibility Check submission.
                   </p>
                 </div>
               </AlertDescription>

@@ -91,8 +91,8 @@ const TestimonialsPage = () => {
               Ready to Have Your Ticket Reviewed?
             </h2>
             <p className="text-lg text-muted-foreground mb-3 max-w-3xl mx-auto">
-              Pricing is a flat $488 plus 30% of any fine reduction achieved. If the fine is not
-              reduced, there is no additional charge.
+              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
+              If the fine is not reduced, there is no success fee.
             </p>
             <p className="text-sm text-muted-foreground mb-8">
               Outcomes depend on the facts and are not promised.

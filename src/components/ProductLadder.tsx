@@ -1,17 +1,20 @@
 import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 import { cn } from "@/lib/utils";
 
 export const PRODUCT_LADDER_BRIDGE =
-  "Start with a free ticket check. Choose $149 Ticket Triage for the insurance math, a priority place in our representation queue, and a full $149 credit if you upgrade. If representation is worth it, only $339 of the $488 flat fee remains, plus GST.";
+  "Use the free check to confirm whether representation may be available. Choose the $149 assessment when you need the insurance-impact analysis, financial break-even and a written recommendation. Representation is a separate service only when it appears worthwhile.";
 
 const tiers = [
   {
-    name: "Free Ticket Check",
+    name: "Free Representation Eligibility Check",
     price: "$0",
-    sub: "Find out if it's worth a conversation",
+    sub: "Confirm whether Fabsy may be able to represent you",
     highlight: false,
-    cta: { label: "Get a free ticket check", href: "/submit-ticket" },
+    type: "free",
+    cta: { label: "Check representation eligibility", href: "/submit-ticket" },
     features: [
       "Charge and court location confirmed",
       "Representation availability check",
@@ -19,35 +22,37 @@ const tiers = [
     ],
   },
   {
-    name: "Ticket Triage",
+    name: "Traffic Ticket + Insurance Impact Assessment",
     price: "$149",
-    priceNote: "+ GST, one-time",
+    priceNote: "CAD total · GST included",
     sub: "Know the smart move before spending more",
     highlight: true,
-    cta: { label: "Start My Ticket Triage", href: "/traffic-ticket-assessment/start" },
+    type: "assessment",
+    cta: { label: "Get My $149 Assessment", href: "/traffic-ticket-assessment/start" },
     features: [
-      "Everything in the Free Ticket Check",
-      "Priority placement in our representation queue",
-      "$149 credited toward the $488 flat representation fee",
+      "Everything in the Free Representation Eligibility Check",
       "Fine, demerit and conviction breakdown",
       "Insurance-risk assessment using your policy, insurer and renewal details",
       "Representation break-even analysis",
       "Written, human-reviewed recommendation by email",
+      "$149 can be applied to eligible representation when worthwhile",
+      "Priority placement if you later upgrade",
     ],
   },
   {
     name: "Representation",
     price: "$488",
-    priceNote: "flat + 30% of any fine reduction",
+    priceNote: "base fee + 30% of any fine reduction",
     sub: "We handle it as your agent",
     highlight: false,
+    type: "representation",
     cta: { label: "Hire Fabsy to fight it", href: "/submit-ticket" },
     features: [
       "Agent representation where permitted",
       "Disclosure request and review",
       "Court process handled for you",
       "No reduction, no success fee",
-      "$339 flat-fee balance after a Ticket Triage credit",
+      "$339 base-fee balance after an eligible assessment credit",
     ],
   },
 ] as const;
@@ -105,6 +110,22 @@ export default function ProductLadder({ compact = false, className }: ProductLad
               </ul>
               <Link
                 to={tier.cta.href}
+                onClick={() => {
+                  if (tier.type === "assessment") {
+                    trackAssessmentEvent(
+                      "assessment_cta_click",
+                      { location: "product_ladder", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                      `product_ladder:${window.location.pathname}`,
+                    );
+                  }
+                  if (tier.type === "representation") {
+                    trackAssessmentEvent(
+                      "representation_cta_click",
+                      { location: "product_ladder", destination: "representation_intake" },
+                      `product_ladder:${window.location.pathname}`,
+                    );
+                  }
+                }}
                 className={cn(
                   "mt-6 inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2.5 text-center font-medium transition-colors",
                   tier.highlight
@@ -118,9 +139,10 @@ export default function ProductLadder({ compact = false, className }: ProductLad
           ))}
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-xs leading-relaxed text-muted-foreground">
-          Ticket Triage is a commercial decision aid, not legal advice, and never obligates you to
-          hire Fabsy. The $149 credit applies to the same eligible matter; the $339 balance is plus
-          GST, and the 30% success fee still applies to any fine reduction.
+          The assessment is a commercial decision aid, not legal advice, and never obligates you to
+          hire Fabsy. If representation is worthwhile and the same matter is eligible, the $149 can
+          be applied to the $488 base representation fee, leaving a $339 base-fee balance plus
+          applicable tax. The 30% success fee still applies to any fine reduction.
         </p>
       </div>
     </section>

@@ -365,7 +365,7 @@ const BlogPost = () => {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg" className="bg-primary text-white hover:bg-primary-dark border-0">
-                      <Link to="/submit-ticket">Get a Free Ticket Check</Link>
+                      <Link to="/submit-ticket">Start the Free Representation Eligibility Check</Link>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-primary/20">
                       <Link to="/">Learn More</Link>

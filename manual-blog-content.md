@@ -18,7 +18,7 @@ Self-representation may suit someone who is comfortable following the ticket ins
 
 An authorized agent may review the ticket and disclosure, handle paperwork, explain available options, and provide representation where Alberta rules permit. Ask any provider to explain its status, scope, pricing, communication process, and any attendance requirement.
 
-Fabsy provides agent services for Alberta traffic matters and is not a law firm. Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced. Outcomes vary, and past results do not predict a future result.
+Fabsy provides agent services for Alberta traffic matters and is not a law firm. Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Outcomes vary, and past results do not predict a future result.
 
 ### Consult a lawyer
 

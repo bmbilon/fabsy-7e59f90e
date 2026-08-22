@@ -29,13 +29,13 @@ import useSafeHead from "@/hooks/useSafeHead";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 
 const outcomes = [
-  "What exactly did I get charged with?",
+  "What exactly was I charged with?",
   "What happens if I pay it?",
-  "Will I get demerits?",
-  "Could my insurance go up?",
-  "How much could that matter financially?",
+  "Will I receive demerits?",
+  "Could the conviction affect my insurance?",
+  "How financially significant could that be?",
   "Can the outcome realistically be improved?",
-  "Is paying for representation actually worth it?",
+  "Is spending $500–$1,000 or more on representation worth it?",
   "What should I do next?",
 ] as const;
 
@@ -46,7 +46,7 @@ const included = [
   { icon: Gauge, title: "Insurance impact assessment", text: "A cautious estimate of whether the risk appears trivial, moderate or potentially material using the context you provide." },
   { icon: BadgeDollarSign, title: "Representation break-even", text: "A practical comparison between plausible financial exposure and the cost and realistic value of professional representation." },
   { icon: CheckCircle2, title: "Recommended next step", text: "A direct human-reviewed recommendation, including when paying the ticket appears more sensible than hiring Fabsy." },
-  { icon: ShieldCheck, title: "Priority upgrade path", text: "If you upgrade the same eligible matter, you receive priority placement in our representation queue and your $149 Ticket Triage fee is credited toward the $488 flat fee, leaving $339 plus GST." },
+  { icon: ShieldCheck, title: "Eligible upgrade credit", text: "If representation is worthwhile and the same matter is eligible, the $149 can be applied to Fabsy's $488 base representation fee, leaving a $339 base-fee balance plus applicable tax." },
 ] as const;
 
 const process = [
@@ -55,10 +55,21 @@ const process = [
   { icon: Scale, title: "Get a clear recommendation", text: "Understand the options and whether further representation is actually worth paying for." },
 ] as const;
 
+const sampleRows = [
+  ["Charge", "Speeding"],
+  ["Key deadline", "September 15, 2026"],
+  ["Demerit exposure", "3 demerits"],
+  ["Insurance-risk level", "Potentially material"],
+  ["Estimated financial significance", "$1,200–$2,400 over three years"],
+  ["Representation break-even", "Approximately $700"],
+  ["Recommended action", "Seek a reduction before conviction"],
+  ["Reason", "Potential insurance exposure may materially exceed the cost of a better outcome"],
+] as const;
+
 const faqItems = [
   {
     q: "What exactly do I get for $149?",
-    a: "Ticket Triage includes a human-reviewed assessment of your Alberta ticket: the charge and deadline, fine and demerit implications, options, likely insurance-risk significance, representation economics and a recommended next step. It also includes priority placement and a $149 representation credit if the same eligible matter is upgraded.",
+    a: "The Traffic Ticket + Insurance Impact Assessment includes a human-reviewed assessment of your Alberta ticket: the charge and deadline, fine and demerit implications, options, likely insurance-risk significance, representation economics and a recommended next step.",
   },
   {
     q: "Does paying a ticket affect my insurance?",
@@ -86,7 +97,7 @@ const faqItems = [
   },
   {
     q: "What happens if Fabsy recommends representation?",
-    a: "Ticket Triage explains why representation may be worthwhile and the next step. If the same matter is eligible and you choose to upgrade, you receive priority placement in Fabsy's representation queue and your $149 payment is applied to the $488 flat fee, leaving a $339 base-fee balance plus GST. The 30% success fee still applies to any fine reduction. No later service is automatic or required.",
+    a: "The assessment explains why representation may be worthwhile and the next step. If the same matter is eligible and you choose to upgrade, the $149 can be applied to Fabsy's $488 base representation fee, leaving a $339 base-fee balance plus applicable tax. The 30% success fee still applies to any fine reduction. Eligible assessment clients also receive priority placement. No later service is automatic or required.",
   },
   {
     q: "Is the $149 applied toward representation?",
@@ -108,14 +119,18 @@ export default function TicketAssessment() {
   const representationSection = useRef<HTMLDivElement | null>(null);
 
   useSafeHead({
-    title: "$149 Ticket Triage for Alberta Traffic Tickets | Fabsy",
+    title: "Traffic Ticket + Insurance Impact Assessment | $149 CAD Total | Fabsy",
     description:
-      "For $149 CAD plus GST, Ticket Triage includes an Alberta ticket and insurance assessment, priority placement and a $149 representation credit.",
+      "For $149 CAD total, get a human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact, financial significance and whether fighting it is worth the money.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
   });
 
   useEffect(() => {
-    trackAssessmentEvent("assessment_offer_view", { value: TICKET_ASSESSMENT.priceCad });
+    trackAssessmentEvent(
+      "assessment_offer_view",
+      { location: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
+      "assessment_landing",
+    );
     if (checkoutCancelled) {
       trackAssessmentEvent("checkout_abandoned", { checkout_stage: "stripe" });
     }
@@ -128,7 +143,7 @@ export default function TicketAssessment() {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !tracked) {
         tracked = true;
-        trackAssessmentEvent("representation_cta_view", { location: "assessment_landing" });
+        trackAssessmentEvent("representation_cta_view", { location: "assessment_landing" }, "assessment_landing");
         observer.disconnect();
       }
     }, { threshold: 0.4 });
@@ -153,6 +168,18 @@ export default function TicketAssessment() {
     url: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
     areaServed: { "@type": "AdministrativeArea", name: "Alberta, Canada" },
     provider: { "@type": "ProfessionalService", name: "Fabsy Traffic Ticket Services", url: "https://fabsy.ca" },
+    offers: {
+      "@type": "Offer",
+      price: TICKET_ASSESSMENT.priceCad.toFixed(2),
+      priceCurrency: TICKET_ASSESSMENT.currency,
+      url: `https://fabsy.ca${TICKET_ASSESSMENT.intakePath}`,
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: TICKET_ASSESSMENT.priceCad.toFixed(2),
+        priceCurrency: TICKET_ASSESSMENT.currency,
+        valueAddedTaxIncluded: true,
+      },
+    },
   } as const;
 
   return (
@@ -165,7 +192,7 @@ export default function TicketAssessment() {
           <div className="container mx-auto grid gap-10 px-4 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:py-24">
             <div>
               <Badge className="border-violet-300/30 bg-violet-300/10 text-violet-100">
-                Ticket Triage · Alberta tickets · Human reviewed
+                {TICKET_ASSESSMENT.name} · Alberta · Human reviewed
               </Badge>
               <h1 className="mt-5 max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 {TICKET_ASSESSMENT.heroHeadline}
@@ -177,7 +204,11 @@ export default function TicketAssessment() {
                 <Button asChild size="lg" className="min-h-13 bg-violet-600 px-7 text-base hover:bg-violet-500">
                   <Link
                     to={TICKET_ASSESSMENT.intakePath}
-                    onClick={() => trackAssessmentEvent("assessment_start", { location: "hero" })}
+                    onClick={() => trackAssessmentEvent(
+                      "assessment_cta_click",
+                      { location: "assessment_landing_hero", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                      "assessment_landing_hero",
+                    )}
                   >
                     {TICKET_ASSESSMENT.cta}
                     <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
@@ -189,12 +220,12 @@ export default function TicketAssessment() {
             </div>
 
             <Card className="border-white/10 bg-white p-7 text-slate-950 shadow-2xl sm:p-8">
-              <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-700">Ticket Triage</p>
+              <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-700">Complete assessment</p>
               <p className="mt-2 text-5xl font-bold">${TICKET_ASSESSMENT.priceCad}</p>
-              <p className="mt-1 text-sm text-slate-600">CAD · one-time · plus GST</p>
+              <p className="mt-1 text-sm text-slate-600">CAD total · GST included</p>
               <div className="my-6 border-t" />
               <ul className="space-y-3 text-sm text-slate-700">
-                {["Ticket and deadline review", "Demerit and conviction explanation", "Insurance-risk assessment", "Representation break-even analysis", "Priority placement if you upgrade", "$149 credited toward representation ($339 base-fee balance)", "Recommended next step"].map((item) => (
+                {["Ticket and deadline review", "Demerit and conviction explanation", "Insurance-risk assessment", "Representation break-even analysis", "Recommended next step", "$149 can be applied to eligible representation when worthwhile", "Priority placement if you upgrade"].map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-700" aria-hidden="true" />
                     <span>{item}</span>
@@ -202,14 +233,12 @@ export default function TicketAssessment() {
                 ))}
               </ul>
               <p className="mt-6 rounded-lg bg-slate-100 p-4 text-xs leading-relaxed text-slate-600">
-                Government fines are separate. No success fee applies to Ticket Triage. If you upgrade, your $149 payment is credited toward the $488 flat representation fee; the remaining $339 is plus GST, and the 30% success fee applies only to any fine reduction.
+                Government fines are separate. No success fee applies to this assessment. If representation is worthwhile and the same matter is eligible, your $149 payment can be applied to Fabsy's $488 base representation fee; the remaining $339 base-fee balance is plus applicable tax, and the 30% success fee applies only to any fine reduction.
               </p>
               <p className="mt-4 text-xs leading-relaxed text-slate-600">{PRODUCT_LADDER_BRIDGE}</p>
             </Card>
           </div>
         </section>
-
-        <ProductLadder />
 
         {checkoutCancelled ? (
           <div className="container mx-auto px-4 pt-8">
@@ -268,7 +297,7 @@ export default function TicketAssessment() {
           <div className="container mx-auto max-w-6xl">
             <div className="mx-auto max-w-3xl text-center">
               <Badge variant="outline">A substantial bundle</Badge>
-              <h2 id="included-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">What $149 Ticket Triage includes</h2>
+              <h2 id="included-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">What the $149 assessment includes</h2>
             </div>
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {included.map(({ icon: Icon, title, text }) => (
@@ -307,6 +336,34 @@ export default function TicketAssessment() {
           </div>
         </section>
 
+        <section className="px-4 py-16 sm:py-20" aria-labelledby="assessment-sample-heading">
+          <div className="container mx-auto max-w-5xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <Badge variant="outline">Illustrative sample</Badge>
+              <h2 id="assessment-sample-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">See the kind of answer you receive</h2>
+            </div>
+            <Card className="mt-10 overflow-hidden border-primary/20 shadow-elevated">
+              <div className="bg-gradient-hero p-6 text-white sm:p-8">
+                <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary-light">Sample assessment result</p>
+                <p className="mt-2 text-lg text-slate-200">A concise decision summary built from the ticket and context supplied.</p>
+              </div>
+              <dl className="grid sm:grid-cols-2">
+                {sampleRows.map(([label, value]) => (
+                  <div key={label} className="border-b p-5 last:border-b-0 sm:[&:nth-last-child(-n+2)]:border-b-0 sm:[&:nth-child(odd)]:border-r">
+                    <dt className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{label}</dt>
+                    <dd className="mt-2 font-semibold leading-relaxed text-foreground">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="bg-amber-50 p-5 text-sm leading-relaxed text-amber-950">
+                Illustrative example only. Figures and recommendations vary by ticket, driving history, insurer context and the information supplied; this is not a promise of a particular result or premium change.
+              </p>
+            </Card>
+          </div>
+        </section>
+
+        <ProductLadder />
+
         <section className="px-4 py-16 sm:py-20">
           <div className="container mx-auto max-w-5xl">
             <Card className="border-amber-200 bg-amber-50 p-6 sm:p-8">
@@ -327,13 +384,17 @@ export default function TicketAssessment() {
             <LockKeyhole className="mx-auto h-9 w-9 text-primary" aria-hidden="true" />
             <h2 id="trust-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">We'll tell you when fighting it isn't worth it</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-              If the likely downside does not justify spending more on representation, Ticket Triage should save you from that expense. If the exposure appears material, you receive priority placement in our representation queue and your $149 payment is credited toward the $488 flat fee, leaving a $339 base-fee balance plus GST.
+              If the likely downside does not justify spending more on representation, the assessment should save you from that expense. If representation is worthwhile and the same matter is eligible, your $149 payment can be applied to Fabsy's $488 base representation fee, leaving a $339 base-fee balance plus applicable tax. Eligible assessment clients also receive priority placement in the representation queue.
             </p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg">
                 <Link
                   to={TICKET_ASSESSMENT.intakePath}
-                  onClick={() => trackAssessmentEvent("representation_cta_click", { location: "trust_section", destination: "assessment_intake" })}
+                  onClick={() => trackAssessmentEvent(
+                    "assessment_cta_click",
+                    { location: "assessment_trust_section", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                    "assessment_trust_section",
+                  )}
                 >
                   {TICKET_ASSESSMENT.cta}
                 </Link>
@@ -341,7 +402,11 @@ export default function TicketAssessment() {
               <Button asChild size="lg" variant="outline">
                 <Link
                   to="/submit-ticket"
-                  onClick={() => trackAssessmentEvent("representation_cta_click", { location: "trust_section", destination: "representation_intake" })}
+                  onClick={() => trackAssessmentEvent(
+                    "representation_cta_click",
+                    { location: "assessment_trust_section", destination: "representation_intake" },
+                    "assessment_trust_section",
+                  )}
                 >
                   I already want representation
                 </Link>
@@ -352,7 +417,7 @@ export default function TicketAssessment() {
 
         <section className="px-4 py-16 sm:py-20" aria-labelledby="faq-heading">
           <div className="container mx-auto max-w-3xl">
-            <h2 id="faq-heading" className="text-center text-3xl font-bold tracking-tight sm:text-4xl">Ticket Triage FAQs</h2>
+            <h2 id="faq-heading" className="text-center text-3xl font-bold tracking-tight sm:text-4xl">Assessment FAQs</h2>
             <Accordion type="single" collapsible className="mt-8">
               {faqItems.map((item, index) => (
                 <AccordionItem key={item.q} value={`assessment-faq-${index}`}>
@@ -366,12 +431,16 @@ export default function TicketAssessment() {
 
         <section className="bg-slate-950 px-4 py-16 text-white">
           <div className="container mx-auto max-w-4xl text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-200">Ticket Triage · ${TICKET_ASSESSMENT.priceCad} CAD + GST</p>
+            <p className="text-sm font-bold uppercase tracking-[0.15em] text-violet-200">${TICKET_ASSESSMENT.priceCad} CAD total · GST included</p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Know the smart move before you spend more.</h2>
             <Button asChild size="lg" className="mt-7 min-h-12 bg-violet-600 px-8 text-base hover:bg-violet-500">
               <Link
                 to={TICKET_ASSESSMENT.intakePath}
-                onClick={() => trackAssessmentEvent("assessment_start", { location: "final_cta" })}
+                onClick={() => trackAssessmentEvent(
+                  "assessment_cta_click",
+                  { location: "assessment_final_cta", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
+                  "assessment_final_cta",
+                )}
               >
                 {TICKET_ASSESSMENT.cta}
                 <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />

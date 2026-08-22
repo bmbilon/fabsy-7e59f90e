@@ -2,6 +2,7 @@ import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 
 type AssessmentEvent =
   | "assessment_offer_view"
+  | "assessment_cta_click"
   | "assessment_start"
   | "ticket_upload_started"
   | "ticket_upload_completed"
@@ -41,8 +42,19 @@ export function assessmentAttribution() {
 export function trackAssessmentEvent(
   event: AssessmentEvent,
   parameters: Record<string, string | number | boolean | undefined> = {},
+  onceKey?: string,
 ) {
   if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+
+  const storageKey = onceKey ? `fabsy-assessment-event:${event}:${onceKey}` : null;
+  if (storageKey) {
+    try {
+      if (window.sessionStorage.getItem(storageKey)) return;
+    } catch {
+      // Analytics should continue when browser storage is unavailable.
+    }
+  }
+
   window.gtag("event", event, {
     page_path: window.location.pathname,
     offer_variant: TICKET_ASSESSMENT.offerVariant,
@@ -50,4 +62,12 @@ export function trackAssessmentEvent(
     ...storedAttribution(),
     ...parameters,
   });
+
+  if (storageKey) {
+    try {
+      window.sessionStorage.setItem(storageKey, "1");
+    } catch {
+      // The event has already been sent; storage failure must not affect the flow.
+    }
+  }
 }

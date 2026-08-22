@@ -55,7 +55,7 @@ async function addInternalLinks() {
 
 ${related.map(r => `- [${r.violation} Ticket in ${r.city}](/content/${r.slug})`).join('\n')}
 
-[View all Alberta traffic ticket guides](/) | [Get a free ticket check](/submit-ticket)
+[View all Alberta traffic ticket guides](/) | [Start the Free Representation Eligibility Check](/submit-ticket)
 `;
 
     const updatedContent = page.content + linksSection;

@@ -1,5 +1,5 @@
 export const EXACT_FABSY_PRICING =
-  "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
+  "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
 
 const bannedPatterns: Array<[RegExp, string]> = [
   [/\bno[\s-]*win[\s,;-]+no[\s-]*fee\b/i, "no-win-no-fee wording"],

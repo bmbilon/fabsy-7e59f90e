@@ -147,7 +147,7 @@ const safeLegacyPage = (page: PageRecord): PageRecord => {
   const metaTitle = `${titleBase.slice(0, 52).trim()} | Fabsy`;
   const ticketLabel = violation ? `${violation.toLowerCase()} ticket` : 'traffic ticket';
   const place = city ? ` in ${city}` : ' in Alberta';
-  const pricing = 'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.';
+  const pricing = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
 
   return {
     ...page,
@@ -345,7 +345,7 @@ const WorkingContentPage = () => {
         serviceType={serviceType}
         url={currentUrl}
         cityName={cityName}
-        offerDescription="Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
+        offerDescription="Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
       />
       {/* Enhanced LocalBusiness schema for Alberta city pages */}
       {cityName && (
@@ -419,7 +419,7 @@ const WorkingContentPage = () => {
                 <h3 className="text-sm font-semibold text-foreground">What happens next</h3>
                 <p className="text-foreground">We review the ticket and disclosure, explain the available options, and provide agent representation where permitted.</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Pricing</h3>
-                <p className="text-foreground">Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</p>
+                <p className="text-foreground">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>
                 <p className="text-foreground">{cityName || 'Alberta'} • {offence.charAt(0).toUpperCase() + offence.slice(1)}</p>
               </div>
@@ -562,17 +562,17 @@ const WorkingContentPage = () => {
                   Fight Your {pageData.violation || 'Traffic'} Ticket
                 </h3>
                 <p className="text-sm mb-5 opacity-95">
-                  Start with a free ticket check. Representation is available where paid agent representation is permitted.
+                  Start with the Free Representation Eligibility Check. Representation is available where paid agent representation is permitted.
                 </p>
                 <Link to="/submit-ticket">
                   <Button 
                     size="lg"
                     className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
                   >
-                    Get a Free Ticket Check →
+                    Start the Free Representation Eligibility Check →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.</p>
+                <p className="text-xs mt-3 opacity-80 text-center">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>
               </div>
 
               {/* Related Resources */}

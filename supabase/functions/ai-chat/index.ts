@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
-const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
-const EXACT_TICKET_TRIAGE = "Ticket Triage costs $149 plus GST and includes priority placement in Fabsy's representation queue for the same eligible matter. If the matter is upgraded to the $488 representation service, the $149 is credited toward the flat fee, leaving a $339 base-fee balance plus GST; the 30% success fee still applies to any fine reduction.";
+const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
+const EXACT_TICKET_TRIAGE = "The Traffic Ticket + Insurance Impact Assessment costs $149 CAD total, including applicable GST. If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax; the 30% success fee still applies to any fine reduction.";
 const SAFE_REPLY = `I can provide general process information, but I cannot provide case-specific legal advice or calculate a fine, demerit count, or response deadline. Check the values and instructions printed on your ticket. ${SERVICE_STATUS} ${EXACT_PRICING} Outcomes vary.`;
 
 const CHAT_SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket questions.
@@ -29,11 +29,11 @@ FACT SAFETY:
 
 PRICING:
 - For representation pricing, use this exact sentence: "${EXACT_PRICING}"
-- For Ticket Triage pricing or upgrade benefits, use this exact wording: "${EXACT_TICKET_TRIAGE}"
+- For assessment pricing or upgrade benefits, use this exact wording: "${EXACT_TICKET_TRIAGE}"
 
 STYLE:
 - Be concise, calm, and plain-language.
-- Offer a free Fabsy ticket check when useful, while making clear that it is not legal advice.
+- Offer the Free Representation Eligibility Check when useful, while making clear that it is not legal advice or the paid assessment.
 - Do not claim that a consultation or outcome is free.`;
 
 type UnknownRecord = Record<string, unknown>;

@@ -468,7 +468,7 @@ const page = pdfDoc.addPage([612, 792]); // Letter size (8.5" x 11")
 │  • Outcomes vary by case                                   │
 │  • I am responsible for the service fee regardless of      │
 │    outcome                                                  │
-│  • Pricing is a flat $488 plus 30% of any fine reduction   │
+│  • $488 base representation fee + 30% of fine reduction    │
 │    achieved; there is no additional charge if the fine is  │
 │    not reduced                                               │
 │                                                              │

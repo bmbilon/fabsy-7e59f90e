@@ -1,5 +1,5 @@
 export const EXACT_FABSY_PRICING =
-  'Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.';
+  'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
 
 export const SAFE_BLOG_FALLBACK_TITLE = 'How to Respond to an Alberta Traffic Ticket';
 export const SAFE_BLOG_FALLBACK_DESCRIPTION =
@@ -21,7 +21,7 @@ Depending on the matter, you may be able to respond yourself, use an authorized 
 
 Fabsy provides agent services for Alberta traffic matters and is not a law firm. ${EXACT_FABSY_PRICING}
 
-## Get a free ticket check
+## Free Representation Eligibility Check
 
 To ask Fabsy to confirm the charge, check representation availability and quote the representation fee, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
 
@@ -94,7 +94,7 @@ No. Historical results describe past matters only. The charge, evidence, procedu
 
 ${EXACT_FABSY_PRICING}
 
-## Get a free ticket check
+## Free Representation Eligibility Check
 
 To ask Fabsy to confirm the charge, check representation availability and quote the representation fee, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
 

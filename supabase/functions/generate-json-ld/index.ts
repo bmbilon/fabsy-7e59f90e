@@ -66,7 +66,7 @@ const FABSY = {
   areaServed: "Alberta, Canada",
 } as const;
 
-const EXACT_PRICING = "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.";
+const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
 const SERVICE_DESCRIPTION = `Traffic ticket agent services for Alberta drivers. Fabsy is not a law firm. ${EXACT_PRICING}`;
 
 const unsafeClaimReplacements: Array<[RegExp, string]> = [

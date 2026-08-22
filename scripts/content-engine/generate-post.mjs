@@ -421,9 +421,9 @@ export function validateArticle(a) {
   }
   if (/\$488/.test(blob)) {
     for (const phrase of [
-      'flat $488',
+      '$488 base representation fee',
       '30% of any fine reduction achieved',
-      'no additional charge if the fine is not reduced',
+      'no success fee if the fine is not reduced',
     ]) {
       if (!blob.toLowerCase().includes(phrase)) errs.push(`incomplete pricing: missing "${phrase}"`);
     }
@@ -448,7 +448,7 @@ async function generateArticleOnce(picked, existingSlugs, corrective) {
 
 Business facts (must respect exactly):
 - Service: Fabsy fights traffic tickets for Alberta drivers.
-- Pricing (use exactly): "Pricing is a flat $488 plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced."
+- Pricing (use exactly): "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
 - Never use "no win, no fee", "no-fee", "zero risk", "risk-free", "money back", "refund", or the word "guarantee" in any form.
 - Success rate: 95%+ of tickets resolved favourably. Do not inflate.
 - Audience: Alberta drivers generally. Do not gender the audience.

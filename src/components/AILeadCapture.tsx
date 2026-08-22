@@ -64,8 +64,8 @@ export default function AILeadCapture({
           </Button>
 
           <p className="text-xs text-muted-foreground">
-            There is no charge to use this upload tool. If Fabsy can assist, pricing is a flat $488
-            plus 30% of any fine reduction achieved; there is no additional charge if the fine is not reduced.
+            There is no charge to use this upload tool. If Fabsy can assist, representation uses a $488 base representation fee
+            plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.
           </p>
         </CardContent>
       </Card>

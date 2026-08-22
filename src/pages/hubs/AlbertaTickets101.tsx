@@ -62,8 +62,8 @@ const AlbertaTickets101: React.FC = () => {
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Unsure whether to pay or fight?</h2>
-          <p className="mt-2 text-muted-foreground">Fabsy's $149 Ticket Triage explains the charge, likely consequences, options and whether paying for representation appears financially sensible. It includes priority placement and a $149 credit if the same eligible matter is upgraded to representation.</p>
-          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">Start with Ticket Triage</Link>
+          <p className="mt-2 text-muted-foreground">Fabsy's $149 CAD total Traffic Ticket + Insurance Impact Assessment explains the charge, likely consequences, options and whether paying for representation appears financially sensible. The $149 can be applied if representation is worthwhile and the same matter is eligible.</p>
+          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See the $149 assessment</Link>
         </section>
 
         <section className="mb-10">
