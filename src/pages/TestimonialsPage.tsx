@@ -82,7 +82,7 @@ const TestimonialsPage = () => {
               <blockquote className="mt-5 text-xl font-medium leading-relaxed text-card-foreground sm:text-2xl">
                 “{testimonial.quote}”
               </blockquote>
-              <p className="mt-6 font-bold text-card-foreground">— {testimonial.name}, {testimonial.location}</p>
+              <p className="mt-6 font-bold text-card-foreground">{testimonial.name}, {testimonial.location}</p>
               <p className="mt-1 text-sm text-muted-foreground">{testimonial.matter} · Shared with permission</p>
               <p className="mt-5 border-t pt-4 text-xs leading-relaxed text-muted-foreground">
                 This is one client's experience. Outcomes depend on the facts, evidence, procedure, and available options.
@@ -140,12 +140,12 @@ const TestimonialsPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/traffic-ticket-assessment">
                 <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0 text-lg px-8">
-                  Get Ticket Triage — $149
+                  Get Ticket Triage - $149
                 </Button>
               </Link>
               <Link to="/submit-ticket">
                 <Button variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 transition-smooth text-lg px-8">
-                  Check Representation Eligibility — Free
+                  Check Representation Eligibility - Free
                 </Button>
               </Link>
             </div>

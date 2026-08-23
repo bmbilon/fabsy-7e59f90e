@@ -35,6 +35,9 @@ const ASSESSMENT_DESCRIPTIONS = new Set([
   "Ticket Triage is Fabsy's $149 CAD total, human-reviewed Alberta traffic ticket and insurance-impact assessment with a practical next-step recommendation.",
   'Ticket Triage is a $149 CAD total, human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact and whether fighting it is worth the money.',
 ]);
+const VERIFIED_CLIENT_TESTIMONIALS = require('../src/content/client-testimonials.json').filter(
+  (testimonial) => testimonial.publicationPermissionConfirmed === true
+);
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const errors = [];
@@ -205,6 +208,51 @@ function hasDisallowedOfferPricing(html) {
   )) {
     try {
       if (containsDisallowedOfferPricing(JSON.parse(match[1].trim()))) return true;
+    } catch (_) {
+      // Invalid JSON-LD is reported by the schema-specific checks.
+    }
+  }
+  return false;
+}
+
+function isApprovedVerifiedReview(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const allowedKeys = new Set(['@type', 'author', 'reviewBody', 'itemReviewed']);
+  if (Object.keys(value).some((key) => !allowedKeys.has(key))) return false;
+  if (value['@type'] !== 'Review' || typeof value.reviewBody !== 'string') return false;
+  if (value.author?.['@type'] !== 'Person' || typeof value.author?.name !== 'string') return false;
+  if (
+    value.itemReviewed?.['@type'] !== 'ProfessionalService' ||
+    value.itemReviewed?.name !== 'Fabsy Traffic Ticket Services' ||
+    value.itemReviewed?.url !== SITE
+  ) {
+    return false;
+  }
+  return VERIFIED_CLIENT_TESTIMONIALS.some(
+    (testimonial) =>
+      testimonial.quote === value.reviewBody &&
+      testimonial.name === value.author.name
+  );
+}
+
+function containsDisallowedRatingOrReview(value) {
+  if (Array.isArray(value)) return value.some(containsDisallowedRatingOrReview);
+  if (!value || typeof value !== 'object') return false;
+  if (Object.prototype.hasOwnProperty.call(value, 'aggregateRating')) return true;
+  if (value['@type'] === 'Review' && !isApprovedVerifiedReview(value)) return true;
+  if (Object.prototype.hasOwnProperty.call(value, 'review')) {
+    const reviews = Array.isArray(value.review) ? value.review : [value.review];
+    if (!reviews.length || reviews.some((review) => !isApprovedVerifiedReview(review))) return true;
+  }
+  return Object.values(value).some(containsDisallowedRatingOrReview);
+}
+
+function hasDisallowedRatingOrReviewSchema(html) {
+  for (const match of html.matchAll(
+    /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
+  )) {
+    try {
+      if (containsDisallowedRatingOrReview(JSON.parse(match[1].trim()))) return true;
     } catch (_) {
       // Invalid JSON-LD is reported by the schema-specific checks.
     }
@@ -457,7 +505,7 @@ function validateAllPrerendered() {
     if (/\b(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]?555[ .-]?\d{4}\b/.test(html)) {
       fail(`${label}: placeholder telephone number`);
     }
-    if (/"(?:aggregateRating|review)"\s*:/.test(html)) {
+    if (hasDisallowedRatingOrReviewSchema(html)) {
       fail(`${label}: fabricated rating or review schema`);
     }
 

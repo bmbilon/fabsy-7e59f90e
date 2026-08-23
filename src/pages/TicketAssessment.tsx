@@ -399,7 +399,7 @@ export default function TicketAssessment() {
               <blockquote className="mt-4 text-xl font-medium leading-relaxed text-foreground sm:text-2xl">
                 “{featuredTestimonial.quote}”
               </blockquote>
-              <p className="mt-5 font-bold text-foreground">— {featuredTestimonial.name}, {featuredTestimonial.location}</p>
+              <p className="mt-5 font-bold text-foreground">{featuredTestimonial.name}, {featuredTestimonial.location}</p>
               <p className="mt-1 text-sm text-muted-foreground">{featuredTestimonial.matter} · Shared with permission</p>
               <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
                 This feedback describes Fabsy's broader traffic-ticket service and does not represent a guaranteed result or claim that every client needs representation.
