@@ -12,6 +12,8 @@ import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnswerBox from '@/components/AnswerBox';
+import { TICKET_ASSESSMENT } from '@/config/ticketAssessment';
+import { trackAssessmentEvent } from '@/lib/assessment/analytics';
 
 type PageRecord = Record<string, unknown>;
 
@@ -123,36 +125,70 @@ const hasReviewedCuratedBody = (page: PageRecord): boolean => {
     && pricingClaimsAreComplete(page);
 };
 
-const safeLegacyH1 = (page: PageRecord): string => {
-  const candidate = text(page.h1)
-    .replace(/\s*\|\s*\d{1,3}%\+?\s+success(?:\s+rate)?\s*$/i, '')
-    .trim();
-  if (
-    !candidate ||
-    BANNED_CONTENT_RE.test(candidate) ||
-    candidate.includes('\u2014') ||
-    /\$\s*\d|\b\d+\s*(?:demerit|days?|months?|years?)\b/i.test(candidate)
-  ) {
-    const city = text(page.city);
-    return city ? `Traffic Ticket Options in ${city}` : 'Alberta Traffic Ticket Options';
+const titleCase = (value: string): string => value
+  .toLowerCase()
+  .replace(/\b[a-z]/g, (letter) => letter.toUpperCase())
+  .replace(/\bRcmp\b/g, 'RCMP');
+
+const safeLegacyCity = (page: PageRecord): string => {
+  const city = text(page.city);
+  return /^[A-Za-z][A-Za-z .'-]{1,58}$/.test(city) && !BANNED_CONTENT_RE.test(city)
+    ? city
+    : 'Alberta';
+};
+
+const safeLegacyViolation = (page: PageRecord): string => {
+  const supplied = text(page.violation).replace(/\s+ticket$/i, '');
+  if (supplied && /^[A-Za-z][A-Za-z0-9 /&'-]{1,58}$/.test(supplied) && !BANNED_CONTENT_RE.test(supplied)) {
+    return titleCase(supplied);
   }
-  return candidate;
+  const slug = text(page.slug).toLowerCase();
+  const derived = slug.match(/^(?:fight-)?(.+?)-ticket(?:-|$)/)?.[1]?.replace(/-/g, ' ');
+  return derived ? titleCase(derived) : 'Traffic';
+};
+
+const safeLegacyH1 = (page: PageRecord): string => {
+  const city = safeLegacyCity(page);
+  const violation = safeLegacyViolation(page);
+  const slug = text(page.slug).toLowerCase();
+
+  if (slug.startsWith('fight-')) return `Fight a ${violation} Ticket in ${city}`;
+  if (slug.includes('-photo-radar')) {
+    return violation.toLowerCase() === 'red light'
+      ? `Red Light Camera Ticket in ${city}`
+      : `${violation} Photo Radar Ticket in ${city}`;
+  }
+  if (slug.includes('-multiple-tickets')) return `Multiple ${violation} Tickets in ${city}`;
+  if (slug.includes('-commercial-driver')) return `${violation} Ticket for Commercial Drivers in ${city}`;
+  if (slug.includes('-new-driver')) return `${violation} Ticket for New Drivers in ${city}`;
+  if (slug.includes('-first-time-offender')) return `${violation} Ticket: First Offence in ${city}`;
+  if (slug.includes('-out-of-province')) return `${violation} Ticket for Out-of-Province Drivers in ${city}`;
+  if (slug.includes('-officer-error')) return `${violation} Ticket and Possible Officer Error in ${city}`;
+  if (slug.includes('-weather-conditions')) return `${violation} Ticket in Poor Weather in ${city}`;
+  return `${violation} Ticket in ${city}`;
+};
+
+const safeLegacyTitle = (h1: string): string => {
+  const suffix = ' | Fabsy';
+  const intentTitle = `${h1}: Options & Next Steps`;
+  if (intentTitle.length + suffix.length <= 60) return `${intentTitle}${suffix}`;
+  if (h1.length + suffix.length <= 60) return `${h1}${suffix}`;
+  return `${h1.slice(0, 60 - suffix.length).trim()}${suffix}`;
 };
 
 const safeLegacyPage = (page: PageRecord): PageRecord => {
-  const city = text(page.city);
-  const violation = text(page.violation);
   const h1 = safeLegacyH1(page);
-  const titleBase = h1.replace(/\s*\|\s*Fabsy\s*$/i, '');
-  const metaTitle = `${titleBase.slice(0, 52).trim()} | Fabsy`;
-  const ticketLabel = violation ? `${violation.toLowerCase()} ticket` : 'traffic ticket';
-  const place = city ? ` in ${city}` : ' in Alberta';
+  const safeCity = safeLegacyCity(page);
+  const safeViolation = safeLegacyViolation(page);
+  const metaTitle = safeLegacyTitle(h1);
+  const ticketLabel = `${safeViolation.toLowerCase()} ticket`;
+  const place = safeCity === 'Alberta' ? ' in Alberta' : ` in ${safeCity}`;
   const pricing = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
 
   return {
     ...page,
     meta_title: metaTitle,
-    meta_description: `Review options for a ${ticketLabel}${place}, check the deadline printed on the ticket, and request a free Fabsy ticket check.`,
+    meta_description: `Got a ${ticketLabel}${place}? Review your options or get human-reviewed Ticket Triage for $149 CAD total.`,
     h1,
     hook: `Check the dispute deadline printed on your ${ticketLabel} and review your options before deciding how to respond.`,
     bullets: [
@@ -178,6 +214,10 @@ const safeLegacyPage = (page: PageRecord): PageRecord => {
       {
         q: 'Is Fabsy a law firm?',
         a: 'No. Fabsy is an agent service for Alberta traffic matters, not a law firm.',
+      },
+      {
+        q: 'What is Ticket Triage?',
+        a: 'Ticket Triage is a $149 CAD total, GST-included, human-reviewed assessment of an Alberta traffic ticket, its likely insurance significance, the economics of representation, and the recommended next step.',
       },
     ],
   };
@@ -562,7 +602,14 @@ const WorkingContentPage = () => {
                 <p className="text-sm mb-5 opacity-95">
                   Ticket Triage reviews the ticket, demerit implications, likely insurance significance, and whether representation appears worth the cost.
                 </p>
-                <Link to="/traffic-ticket-assessment">
+                <Link
+                  to="/traffic-ticket-assessment"
+                  onClick={() => trackAssessmentEvent(
+                    "assessment_cta_click",
+                    { location: "content_sidebar", destination: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
+                    `content_sidebar:${window.location.pathname}`,
+                  )}
+                >
                   <Button 
                     size="lg"
                     className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
@@ -570,7 +617,7 @@ const WorkingContentPage = () => {
                     See Ticket Triage - $149 →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">Human reviewed · GST included · $149 can be applied to eligible representation when worthwhile</p>
+                <p className="text-xs mt-3 opacity-80 text-center">Human reviewed · GST included · $149 can be applied to eligible representation when worthwhile · Priority placement on eligible upgrades</p>
                 <p className="mt-3 text-center text-xs opacity-80">
                   <Link to="/submit-ticket" className="underline underline-offset-2">Only need the free representation eligibility check?</Link>
                 </p>

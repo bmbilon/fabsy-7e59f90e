@@ -156,6 +156,10 @@ function fallbackFaqs() {
       q: 'Is Fabsy a law firm?',
       a: 'No. Fabsy is an agent service for Alberta traffic matters, not a law firm.',
     },
+    {
+      q: 'What is Ticket Triage?',
+      a: 'Ticket Triage is a $149 CAD total, GST-included, human-reviewed assessment of an Alberta traffic ticket, its likely insurance significance, the economics of representation, and the recommended next step.',
+    },
   ];
 }
 
@@ -166,21 +170,63 @@ function safeLegacyCity(page) {
     : 'Alberta';
 }
 
+function titleCase(value) {
+  return value
+    .toLowerCase()
+    .replace(/\b[a-z]/g, (letter) => letter.toUpperCase())
+    .replace(/\bRcmp\b/g, 'RCMP');
+}
+
+function safeLegacyViolation(page) {
+  const supplied = present(page.violation) ? page.violation.trim().replace(/\s+ticket$/i, '') : '';
+  if (
+    supplied
+    && /^[A-Za-z][A-Za-z0-9 /&'-]{1,58}$/.test(supplied)
+    && !textGuardrailIssue(supplied, page.slug)
+  ) {
+    return titleCase(supplied);
+  }
+
+  const slug = present(page.slug) ? page.slug.toLowerCase() : '';
+  const derived = slug.match(/^(?:fight-)?(.+?)-ticket(?:-|$)/)?.[1]?.replace(/-/g, ' ');
+  return derived ? titleCase(derived) : 'Traffic';
+}
+
 function safeLegacyH1(page) {
-  return `Traffic Ticket Options in ${safeLegacyCity(page)}`;
+  const city = safeLegacyCity(page);
+  const violation = safeLegacyViolation(page);
+  const slug = present(page.slug) ? page.slug.toLowerCase() : '';
+
+  if (slug.startsWith('fight-')) return `Fight a ${violation} Ticket in ${city}`;
+  if (slug.includes('-photo-radar')) {
+    return violation.toLowerCase() === 'red light'
+      ? `Red Light Camera Ticket in ${city}`
+      : `${violation} Photo Radar Ticket in ${city}`;
+  }
+  if (slug.includes('-multiple-tickets')) return `Multiple ${violation} Tickets in ${city}`;
+  if (slug.includes('-commercial-driver')) return `${violation} Ticket for Commercial Drivers in ${city}`;
+  if (slug.includes('-new-driver')) return `${violation} Ticket for New Drivers in ${city}`;
+  if (slug.includes('-first-time-offender')) return `${violation} Ticket: First Offence in ${city}`;
+  if (slug.includes('-out-of-province')) return `${violation} Ticket for Out-of-Province Drivers in ${city}`;
+  if (slug.includes('-officer-error')) return `${violation} Ticket and Possible Officer Error in ${city}`;
+  if (slug.includes('-weather-conditions')) return `${violation} Ticket in Poor Weather in ${city}`;
+  return `${violation} Ticket in ${city}`;
 }
 
 function legacyTitle(h1) {
   const withoutBrand = h1.replace(/\s*\|\s*Fabsy\s*$/i, '').trim();
   const suffix = ' | Fabsy';
+  const intentTitle = `${withoutBrand}: Options & Next Steps`;
+  if (intentTitle.length + suffix.length <= 60) return `${intentTitle}${suffix}`;
   if (withoutBrand.length + suffix.length <= 60) return `${withoutBrand}${suffix}`;
   return `${withoutBrand.slice(0, 60 - suffix.length).trim()}${suffix}`;
 }
 
 function legacyDescription(page) {
   const city = safeLegacyCity(page);
-  const place = city === 'Alberta' ? '' : ` in ${city}`;
-  return `Review options for an Alberta traffic ticket${place}, check the deadline printed on the ticket, and request a free Fabsy ticket check.`;
+  const violation = safeLegacyViolation(page).toLowerCase();
+  const place = city === 'Alberta' ? ' in Alberta' : ` in ${city}`;
+  return `Got a ${violation} ticket${place}? Review your options or get human-reviewed Ticket Triage for $149 CAD total.`;
 }
 
 function normalizedPage(basePage, curated) {
@@ -265,8 +311,12 @@ function curatedSections(page) {
   return [page.what, page.how, page.next].filter(present).join('\n');
 }
 
-function fallbackSections() {
-  return `      <h2>What to do next</h2>
+function fallbackSections(page) {
+  const ticket = `${safeLegacyViolation(page).toLowerCase()} ticket`;
+  const city = safeLegacyCity(page);
+  return `      <h2>What should I do after receiving a ${esc(ticket)} in ${esc(city)}?</h2>
+      <p>Check the instructions and response deadline printed on the ticket before choosing how to respond. Keep a copy and gather any relevant photos, video, or documents.</p>
+      <h2>What to do next</h2>
       <ol>
         <li>Check the dispute deadline printed on the ticket.</li>
         <li>Keep the ticket and gather any relevant photos, video, or documents.</li>
@@ -290,7 +340,7 @@ function render(page) {
       </details>`
     )
     .join('\n');
-  const sections = page.curated ? curatedSections(page) : fallbackSections();
+  const sections = page.curated ? curatedSections(page) : fallbackSections(page);
 
   const html = `<!DOCTYPE html>
 <html lang="en-CA">
@@ -315,6 +365,7 @@ function render(page) {
     body{font-family:Inter,system-ui,sans-serif;max-width:760px;margin:0 auto;padding:24px;line-height:1.6;color:#1a1a2e}
     header nav a{margin-right:16px;color:#7c3aed;text-decoration:none}
     .hook{font-size:1.1rem;font-weight:500;background:#f5f3ff;border-left:4px solid #7c3aed;padding:12px 16px;margin:16px 0}
+    .triage{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;padding:20px;margin:28px 0}
     ul.key-facts li{margin:6px 0}
     details{border-bottom:1px solid #e5e7eb;padding:8px 0}
     summary h3{display:inline;font-size:1rem}
@@ -328,6 +379,7 @@ function render(page) {
       <a href="/">Fabsy</a>
       <a href="/how-it-works">How It Works</a>
       <a href="/faq">FAQ</a>
+      <a href="/traffic-ticket-assessment">Ticket Triage - $149</a>
       <a href="/submit-ticket">Submit Your Ticket</a>
     </nav>
   </header>
@@ -340,7 +392,19 @@ function render(page) {
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}
       </ul>
 ${sections}
-      <p><a class="cta" href="/submit-ticket">Start the Free Representation Eligibility Check</a></p>
+      <section class="triage" aria-labelledby="ticket-triage-heading">
+        <h2 id="ticket-triage-heading">Need a ticket-specific answer?</h2>
+        <p><strong>Ticket Triage</strong> is Fabsy's $149 CAD total, GST-included, human-reviewed assessment for Alberta traffic tickets.</p>
+        <ul>
+          <li>The charge, ticket instructions, and important deadline</li>
+          <li>Fine, demerit, conviction, and likely insurance significance</li>
+          <li>Available response options and representation economics</li>
+          <li>A direct recommended next step</li>
+        </ul>
+        <p>If representation appears worthwhile and the same matter is eligible, the $149 can be applied to Fabsy's $488 base representation fee, leaving a $339 base-fee balance plus applicable tax. Eligible clients receive priority placement in Fabsy's representation queue. The 30% success fee applies only to any fine reduction; there is no success fee if the fine is not reduced.</p>
+        <p><a class="cta" href="/traffic-ticket-assessment">See Ticket Triage - $149</a></p>
+        <p><a href="/submit-ticket">Only need the free Representation Eligibility Check?</a></p>
+      </section>
       <section>
         <h2>Frequently Asked Questions</h2>
 ${faqsHtml}

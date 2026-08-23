@@ -349,6 +349,17 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     if (!html.includes('Fabsy is an agent service') || !html.includes('not a law firm')) {
       fail(`${label}: agent-service disclaimer missing`);
     }
+    const chatGptDiscoverySignals = [
+      'Ticket Triage',
+      '$149 CAD total',
+      'human-reviewed',
+      'priority placement',
+      '$339 base-fee balance',
+      'href="/traffic-ticket-assessment"',
+    ];
+    for (const signal of chatGptDiscoverySignals) {
+      if (!html.includes(signal)) fail(`${label}: ChatGPT discovery signal missing: ${signal}`);
+    }
     if (!html.includes(`<link rel="canonical" href="${SITE}/content/${slug}">`)) {
       fail(`${label}: self-referential canonical missing`);
     }
@@ -364,6 +375,14 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     if (!title || title.length > 60) fail(`${label}: title missing or exceeds 60 characters`);
     if (!description || description.length > 155) {
       fail(`${label}: description missing or exceeds 155 characters`);
+    }
+    if (!reviewedCurated.slugs.includes(slug)) {
+      if (/^Traffic Ticket Options in\b/i.test(title)) {
+        fail(`${label}: fallback title is generic instead of offence-specific`);
+      }
+      if (!description.includes('Ticket Triage') || !description.includes('$149 CAD total')) {
+        fail(`${label}: fallback description does not connect the answer to Ticket Triage`);
+      }
     }
 
     const visible = visibleFaqs(html);
