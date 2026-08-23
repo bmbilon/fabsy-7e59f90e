@@ -91,7 +91,9 @@ for (const file of files) {
   const canonicalStr = JSON.stringify(canonical);
 
   // 1) Check jsonld field in page JSON (semantic compare - formatting/whitespace doesn't matter)
-  const storedJsonld = obj.jsonld ? safeJSONParse(obj.jsonld) : null;
+  const storedJsonld = typeof obj.jsonld === 'string'
+    ? safeJSONParse(obj.jsonld)
+    : (obj.jsonld && typeof obj.jsonld === 'object' ? obj.jsonld : null);
   if (storedJsonld && JSON.stringify(storedJsonld) === canonicalStr) {
     // OK
   } else {
