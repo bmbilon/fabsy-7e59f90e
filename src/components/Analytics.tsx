@@ -41,9 +41,10 @@ export default function Analytics() {
     if (!gaId && !adsId) return; // nothing to load
 
     window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || ((...args: unknown[]) => {
-      window.dataLayer?.push(args);
-    });
+    window.gtag = window.gtag || function gtag(..._args: unknown[]) {
+      // Google expects each command to be queued as the function's arguments object.
+      window.dataLayer?.push(arguments);
+    };
 
     // One gtag.js loader can configure both GA4 and Google Ads destinations.
     const loaderId = gaId || adsId;
