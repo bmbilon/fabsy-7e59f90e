@@ -1,5 +1,5 @@
 // Google Analytics 4 utility functions
-// Make sure GA4 is loaded in index.html before using these functions
+// GA4 is loaded by src/components/Analytics.tsx before these helpers are used.
 
 declare global {
   interface Window {
@@ -16,9 +16,10 @@ export const isGA4Available = (): boolean => {
 // Track page views (usually handled automatically, but useful for SPA routing)
 export const trackPageView = (page_title: string, page_location?: string): void => {
   if (isGA4Available()) {
-    window.gtag('config', 'G-YRP61S5TPF', {
+    window.gtag('event', 'page_view', {
       page_title,
-      page_location: page_location || window.location.href,
+      page_location: page_location || `${window.location.origin}${window.location.pathname}`,
+      page_path: window.location.pathname,
     });
   }
 };

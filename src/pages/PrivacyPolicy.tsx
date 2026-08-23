@@ -105,7 +105,19 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
             <p>
-              Our website may use cookies and similar technologies to enhance your browsing experience and analyze website traffic. You can control cookie preferences through your browser settings.
+              Fabsy uses Google Analytics 4 on public website pages to understand traffic,
+              navigation, and assessment-funnel performance. Google Analytics may use cookies
+              and similar technologies and may process device, browser, approximate-location,
+              page-view, referral, and interaction information on our behalf. You can control or
+              delete cookies through your browser settings. Learn more in the{' '}
+              <a
+                href="https://policies.google.com/privacy"
+                className="underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Google Privacy Policy
+              </a>.
             </p>
             <p className="mt-4">
               Fabsy suppresses analytics page-view tracking on private client portal and admin

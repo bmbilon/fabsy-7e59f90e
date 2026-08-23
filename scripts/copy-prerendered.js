@@ -13,6 +13,8 @@ const manifestPath = path.resolve(
   process.env.SNAPSHOT_MANIFEST || path.join(src, 'content-manifest.json')
 );
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const LEGACY_GA4_MEASUREMENT_ID = 'G-YRP61S5TPF';
+const LEGACY_GA4_BLOCK_RE = /\s*<!-- Google tag \(gtag\.js\) -->\s*<script async(?:="")? src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-YRP61S5TPF"><\/script>\s*<script>\s*window\.dataLayer = window\.dataLayer \|\| \[\];\s*function gtag\(\)\{dataLayer\.push\(arguments\);\}\s*gtag\('js', new Date\(\)\);\s*gtag\('config', 'G-YRP61S5TPF'\);\s*<\/script>\s*/g;
 
 function slugArray(value, label) {
   if (!Array.isArray(value)) throw new Error(`content snapshot manifest ${label} must be an array`);
@@ -137,6 +139,32 @@ function verifyCoverage(root, manifest, label) {
   }
 }
 
+function removeLegacyAnalyticsTags(root) {
+  const pending = [root];
+  let cleaned = 0;
+
+  while (pending.length > 0) {
+    const directory = pending.pop();
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const filePath = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        pending.push(filePath);
+      } else if (entry.isFile() && entry.name.endsWith('.html')) {
+        const original = fs.readFileSync(filePath, 'utf8');
+        if (!original.includes(LEGACY_GA4_MEASUREMENT_ID)) continue;
+        const sanitized = original.replace(LEGACY_GA4_BLOCK_RE, '\n');
+        if (sanitized.includes(LEGACY_GA4_MEASUREMENT_ID)) {
+          throw new Error(`legacy GA4 tag remains in staged snapshot: ${filePath}`);
+        }
+        fs.writeFileSync(filePath, sanitized, 'utf8');
+        cleaned += 1;
+      }
+    }
+  }
+
+  return cleaned;
+}
+
 function copyAtomically(manifest) {
   if (src === distDir) throw new Error('prerendered source and destination must differ');
   const parent = path.dirname(distDir);
@@ -146,6 +174,7 @@ function copyAtomically(manifest) {
   fs.rmSync(tempDir, { recursive: true, force: true });
   fs.rmSync(backupDir, { recursive: true, force: true });
   fs.cpSync(src, tempDir, { recursive: true, force: true });
+  const cleanedLegacyTags = removeLegacyAnalyticsTags(tempDir);
 
   const copiedManifestPath = path.join(tempDir, 'content-manifest.json');
   if (path.resolve(manifestPath) !== path.resolve(path.join(src, 'content-manifest.json'))) {
@@ -162,6 +191,9 @@ function copyAtomically(manifest) {
     }
     fs.renameSync(tempDir, distDir);
     if (movedExisting) fs.rmSync(backupDir, { recursive: true, force: true });
+    if (cleanedLegacyTags > 0) {
+      console.log(`Removed legacy GA4 tag from ${cleanedLegacyTags} staged snapshot(s).`);
+    }
   } catch (error) {
     if (!fs.existsSync(distDir) && movedExisting && fs.existsSync(backupDir)) {
       fs.renameSync(backupDir, distDir);
