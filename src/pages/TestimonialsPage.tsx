@@ -1,18 +1,38 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileCheck, Scale, Shield } from "lucide-react";
+import { FileCheck, Quote, Scale, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import StaticJsonLd from "@/components/StaticJsonLd";
+import { VERIFIED_CLIENT_TESTIMONIALS } from "@/content/clientTestimonials";
 import useSafeHead from "@/hooks/useSafeHead";
 
 const TestimonialsPage = () => {
   useSafeHead({
-    title: "Service Standards & Client Outcomes | Fabsy Alberta",
-    description: "Review Fabsy's evidence standard, service limitations, and pricing for Alberta traffic ticket agent services.",
+    title: "Client Testimonials & Service Standards | Fabsy Alberta",
+    description: "Read verified client feedback and review Fabsy's evidence standard, service limitations, and pricing for Alberta traffic ticket agent services.",
     canonical: "https://fabsy.ca/testimonials",
   });
+
+  const testimonialSchema = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "Fabsy Traffic Ticket Services",
+    url: "https://fabsy.ca",
+    areaServed: { "@type": "AdministrativeArea", name: "Alberta, Canada" },
+    review: VERIFIED_CLIENT_TESTIMONIALS.map((testimonial) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: testimonial.name },
+      reviewBody: testimonial.quote,
+      itemReviewed: {
+        "@type": "ProfessionalService",
+        name: "Fabsy Traffic Ticket Services",
+        url: "https://fabsy.ca",
+      },
+    })),
+  } as const;
 
   const serviceFacts = [
     {
@@ -37,21 +57,39 @@ const TestimonialsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
+      <StaticJsonLd schema={testimonialSchema} dataAttr="client-testimonials" />
       <Header />
 
       <main className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Transparent Outcome Information
+            Verified Client Feedback
           </Badge>
           <h1 className="text-4xl lg:text-6xl font-bold text-white drop-shadow-lg mb-6">
-            Evidence Before <span className="text-gradient-hero">Anecdotes</span>
+            Real Feedback. <span className="text-gradient-hero">Clear Limits.</span>
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            Fabsy publishes outcome claims only with clear definitions and methodology. Individual
-            results vary, and no ticket outcome is promised.
+            Fabsy publishes client feedback only with permission and keeps every outcome claim in
+            context. Individual results vary, and no ticket outcome is promised.
           </p>
         </div>
+
+        <section className="mx-auto mb-16 max-w-4xl" aria-labelledby="client-feedback-heading">
+          <h2 id="client-feedback-heading" className="sr-only">Client feedback</h2>
+          {VERIFIED_CLIENT_TESTIMONIALS.map((testimonial) => (
+            <Card key={`${testimonial.name}-${testimonial.location}`} className="relative overflow-hidden border-white/20 bg-white p-8 shadow-elevated sm:p-10">
+              <Quote className="h-10 w-10 text-primary" aria-hidden="true" />
+              <blockquote className="mt-5 text-xl font-medium leading-relaxed text-card-foreground sm:text-2xl">
+                “{testimonial.quote}”
+              </blockquote>
+              <p className="mt-6 font-bold text-card-foreground">— {testimonial.name}, {testimonial.location}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{testimonial.matter} · Shared with permission</p>
+              <p className="mt-5 border-t pt-4 text-xs leading-relaxed text-muted-foreground">
+                This is one client's experience. Outcomes depend on the facts, evidence, procedure, and available options.
+              </p>
+            </Card>
+          ))}
+        </section>
 
         <div className="flex flex-wrap justify-center gap-6 mb-20 max-w-5xl mx-auto">
           {serviceFacts.map(({ icon: Icon, value, label, description }) => (
@@ -80,8 +118,8 @@ const TestimonialsPage = () => {
             <h2 className="text-2xl font-bold text-card-foreground mb-4">Verified Feedback Only</h2>
             <p className="text-muted-foreground leading-relaxed">
               Fabsy does not present sample, anonymous, or unverified stories as client testimonials.
-              Feedback will be published only when its source and publication permission can be
-              confirmed.
+              Feedback is published only when its source and publication permission have been
+              confirmed, and it is never presented as a promise of the same outcome.
             </p>
           </Card>
         </div>
@@ -100,14 +138,14 @@ const TestimonialsPage = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/submit-ticket">
+              <Link to="/traffic-ticket-assessment">
                 <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0 text-lg px-8">
-                  Submit Your Ticket
+                  Get Ticket Triage — $149
                 </Button>
               </Link>
-              <Link to="/how-it-works">
+              <Link to="/submit-ticket">
                 <Button variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 transition-smooth text-lg px-8">
-                  See How It Works
+                  Check Representation Eligibility — Free
                 </Button>
               </Link>
             </div>

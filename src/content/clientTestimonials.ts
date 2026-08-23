@@ -1,0 +1,10 @@
+export const VERIFIED_CLIENT_TESTIMONIALS = [
+  {
+    quote:
+      "Fabsy helped me understand how the process works to dispute my speeding ticket, then walked me through the options and made sure I understood everything before I chose how I wanted to move forward. They got me an outcome I was happy with and everything was very easy and comfortable. Excellent communication and responsiveness the whole time.",
+    name: "Sam",
+    location: "Edmonton",
+    matter: "Speeding ticket",
+  },
+] as const;
+

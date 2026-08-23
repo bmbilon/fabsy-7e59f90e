@@ -11,6 +11,7 @@ import {
   HelpCircle,
   LockKeyhole,
   MessageSquareText,
+  Quote,
   Route,
   Scale,
   ShieldCheck,
@@ -26,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { VERIFIED_CLIENT_TESTIMONIALS } from "@/content/clientTestimonials";
 import useSafeHead from "@/hooks/useSafeHead";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 import { readMarketingAttribution } from "@/lib/marketingAttribution";
@@ -56,6 +58,8 @@ const process = [
   { icon: FileSearch, title: "We assess the full picture", text: "A Fabsy team member reviews the ticket, driving-record context and potential insurance consequences." },
   { icon: Scale, title: "Get a clear recommendation", text: "Understand the options and whether further representation is actually worth paying for." },
 ] as const;
+
+const featuredTestimonial = VERIFIED_CLIENT_TESTIMONIALS[0];
 
 const sampleRows = [
   ["Charge", "Speeding"],
@@ -384,6 +388,28 @@ export default function TicketAssessment() {
         </section>
 
         <ProductLadder />
+
+        <section className="px-4 py-16 sm:py-20" aria-labelledby="assessment-testimonial-heading">
+          <div className="container mx-auto max-w-4xl">
+            <Card className="border-primary/20 p-7 shadow-elevated sm:p-10">
+              <Quote className="h-9 w-9 text-primary" aria-hidden="true" />
+              <p id="assessment-testimonial-heading" className="mt-4 text-sm font-bold uppercase tracking-[0.14em] text-primary">
+                Client feedback about Fabsy's traffic-ticket service
+              </p>
+              <blockquote className="mt-4 text-xl font-medium leading-relaxed text-foreground sm:text-2xl">
+                “{featuredTestimonial.quote}”
+              </blockquote>
+              <p className="mt-5 font-bold text-foreground">— {featuredTestimonial.name}, {featuredTestimonial.location}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{featuredTestimonial.matter} · Shared with permission</p>
+              <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+                This feedback describes Fabsy's broader traffic-ticket service and does not represent a guaranteed result or claim that every client needs representation.
+              </p>
+              <Link to="/testimonials" className="mt-5 inline-flex font-semibold text-primary underline underline-offset-4">
+                See Fabsy's client-feedback standards
+              </Link>
+            </Card>
+          </div>
+        </section>
 
         <section className="px-4 py-16 sm:py-20">
           <div className="container mx-auto max-w-5xl">
