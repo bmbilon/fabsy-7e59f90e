@@ -22,13 +22,13 @@ const tiers = [
     ],
   },
   {
-    name: "Traffic Ticket + Insurance Impact Assessment",
+    name: TICKET_ASSESSMENT.name,
     price: "$149",
     priceNote: "CAD total · GST included",
     sub: "Know the smart move before spending more",
     highlight: true,
     type: "assessment",
-    cta: { label: "Get My $149 Assessment", href: "/traffic-ticket-assessment/start" },
+    cta: { label: TICKET_ASSESSMENT.cta, href: "/traffic-ticket-assessment/start" },
     features: [
       "Everything in the Free Representation Eligibility Check",
       "Fine, demerit and conviction breakdown",

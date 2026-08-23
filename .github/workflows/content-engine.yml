@@ -9,14 +9,11 @@ on:
       status:
         description: 'published or draft'
         required: false
-        default: 'published'
+        default: 'draft'
       trend_mode:
         description: 'on (trending+fallback) or off (queue only)'
         required: false
         default: 'on'
-  schedule:
-    # Daily at 14:00 UTC (7-8am Alberta)
-    - cron: '0 14 * * *'
 
 concurrency:
   group: content-engine
@@ -46,7 +43,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TOPIC_OVERRIDE: ${{ github.event.inputs.topic }}
-          PUBLISH_STATUS: ${{ github.event.inputs.status || 'published' }}
+          PUBLISH_STATUS: ${{ github.event.inputs.status || 'draft' }}
           TREND_MODE: ${{ github.event.inputs.trend_mode || 'on' }}
         run: node scripts/content-engine/generate-post.mjs
 
@@ -59,7 +56,8 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
 
-      - name: Refresh sitemap and crawler snapshots
+      - name: Refresh sitemap and crawler snapshots after an explicit publish
+        if: github.event.inputs.status == 'published'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run prerender-refresh.yml --ref main

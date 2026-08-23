@@ -10,8 +10,8 @@ import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 
 const Index = () => {
   useSafeHead({
-    title: "Traffic Ticket + Insurance Impact Assessment | $149 CAD Total | Fabsy",
-    description: "For $149 CAD total, Fabsy reviews your Alberta traffic ticket, explains your options, assesses likely insurance impact and tells you whether fighting it is worth the money.",
+    title: "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+    description: "Ticket Triage is Fabsy's $149 CAD total, human-reviewed Alberta traffic ticket and insurance-impact assessment with a practical next-step recommendation.",
     canonical: "https://fabsy.ca/",
   });
 
@@ -27,6 +27,7 @@ const Index = () => {
     "@context": "https://schema.org",
     "@type": "Product",
     name: TICKET_ASSESSMENT.name,
+    alternateName: TICKET_ASSESSMENT.descriptor,
     description: TICKET_ASSESSMENT.heroSubheadline,
     url: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
     brand: { "@type": "Brand", name: "Fabsy" },

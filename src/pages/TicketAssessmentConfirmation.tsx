@@ -36,8 +36,8 @@ export default function TicketAssessmentConfirmation() {
   const [message, setMessage] = useState("");
 
   useSafeHead({
-    title: "Traffic Ticket + Insurance Impact Assessment Received | Fabsy",
-    description: "Fabsy received your traffic ticket and insurance impact assessment order.",
+    title: "Ticket Triage Received | Fabsy",
+    description: "Fabsy received your Ticket Triage order and private Alberta traffic-ticket submission.",
     robots: "noindex, nofollow",
   });
 
@@ -78,8 +78,18 @@ export default function TicketAssessmentConfirmation() {
           trackAssessmentEvent("assessment_purchase", {
             transaction_id: data.id || sessionId,
             value: TICKET_ASSESSMENT.priceCad,
-            item_id: "traffic_ticket_insurance_assessment",
+            item_id: "ticket_triage",
             item_name: TICKET_ASSESSMENT.name,
+          });
+          trackAssessmentEvent("purchase", {
+            transaction_id: data.id || sessionId,
+            value: TICKET_ASSESSMENT.priceCad,
+            items: [{
+              item_id: "ticket_triage",
+              item_name: TICKET_ASSESSMENT.name,
+              price: TICKET_ASSESSMENT.priceCad,
+              quantity: 1,
+            }],
           });
           window.sessionStorage.setItem(purchaseKey, "1");
         }

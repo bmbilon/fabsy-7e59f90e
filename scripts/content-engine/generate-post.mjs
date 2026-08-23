@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Fabsy Content Engine (daily, search-demand driven)
- * Publishes one evergreen Alberta traffic-ticket post per run.
+ * Fabsy Content Engine (manual, search-demand driven)
+ * Creates one evergreen Alberta traffic-ticket draft per run unless an operator
+ * explicitly requests publication after review.
  *
  * Topic source priority:
  *   1. TOPIC_OVERRIDE env (manual run)
@@ -9,7 +10,7 @@
  *      -> Claude reframes the strongest signal into an EVERGREEN search topic
  *   3. Evergreen queue fallback (topics.json), with auto-refill when low
  *
- * A post always ships. Trending candidates are logged to trending-log.json
+ * A draft is the default. Trending candidates are logged to trending-log.json
  * for audit. No paid APIs, no new secrets.
  *
  * Required env: ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
@@ -34,10 +35,16 @@ const TREND_LOG = path.join(__dirname, 'trending-log.json');
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const PUBLISH_STATUS = process.env.PUBLISH_STATUS || 'published';
+const PUBLISH_STATUS = process.env.PUBLISH_STATUS || 'draft';
 const TREND_MODE = (process.env.TREND_MODE || 'on').toLowerCase();
 const MODEL = 'claude-sonnet-4-6';
-const CTA_URL = 'https://fabsy.ca/submit-ticket';
+const CTA_URL = 'https://fabsy.ca/traffic-ticket-assessment';
+const APPROVED_OFFICIAL_SOURCES = [
+  'https://traffictickets.alberta.ca/',
+  'https://www.alberta.ca/demerit-points',
+  'https://www.alberta.ca/demerit-driving-suspension',
+  'https://www.alberta.ca/photo-radar-alberta',
+];
 const QUEUE_MIN = 7;
 const REFILL_COUNT = 20;
 const ALLOWED_CATEGORIES = new Set(['guide', 'how-to']);
@@ -401,10 +408,10 @@ export function validateArticle(a) {
   if (blob.includes('—')) errs.push('contains em-dash');
   for (const f of FORBIDDEN) if (f.re.test(blob)) errs.push(`forbidden: ${f.label}`);
   for (const match of blob.matchAll(/(\d{1,3})%\+?\s+(?:success|win|favourable|favorable)/gi)) {
-    if (Number(match[1]) > 95) errs.push('outcome rate exceeds 95%');
+    if (Number(match[1]) >= 0) errs.push('numeric outcome rate is not permitted');
   }
   for (const match of blob.matchAll(/(?:success|win|favourable|favorable)(?:\s+rate)?[^\d]{0,12}(\d{1,3})%\+?/gi)) {
-    if (Number(match[1]) > 95) errs.push('outcome rate exceeds 95%');
+    if (Number(match[1]) >= 0) errs.push('numeric outcome rate is not permitted');
   }
   if (/\b(?:women?|men|mothers?|moms?|fathers?|dads?|female|male)\b/i.test(blob)) {
     errs.push('gendered audience wording');
@@ -435,7 +442,11 @@ export function validateArticle(a) {
   })) {
     errs.push(`publication guard: ${violation}`);
   }
-  if (!(a.content || '').includes('fabsy.ca/submit-ticket')) errs.push('missing CTA URL');
+  if (!(a.content || '').includes(CTA_URL)) errs.push('missing Ticket Triage CTA URL');
+  const officialSourceCount = APPROVED_OFFICIAL_SOURCES.filter((source) =>
+    (a.content || '').includes(source)
+  ).length;
+  if (officialSourceCount < 2) errs.push('fewer than two approved official Alberta source links');
   if (!['published', 'draft'].includes(PUBLISH_STATUS)) errs.push(`bad status: ${PUBLISH_STATUS}`);
   return [...new Set(errs)];
 }
@@ -448,11 +459,13 @@ async function generateArticleOnce(picked, existingSlugs, corrective) {
 
 Business facts (must respect exactly):
 - Service: Fabsy fights traffic tickets for Alberta drivers.
+- Product: Ticket Triage is a $149 CAD total, human-reviewed traffic ticket and insurance-impact assessment. Applicable GST is included.
+- Upgrade: If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax. Eligible clients receive priority placement. The 30% success fee still applies to any fine reduction.
 - Pricing (use exactly): "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
 - Never use "no win, no fee", "no-fee", "zero risk", "risk-free", "money back", "refund", or the word "guarantee" in any form.
-- Success rate: 95%+ of tickets resolved favourably. Do not inflate.
+- Do not state or imply a success-rate percentage. Say that results vary and no outcome is promised.
 - Audience: Alberta drivers generally. Do not gender the audience.
-- CTA: direct readers to submit their ticket at ${CTA_URL}
+- Primary CTA: direct readers to Ticket Triage at ${CTA_URL}
 
 Topic: "${picked.topic}"
 Target keywords: ${(picked.target_keywords || []).length ? picked.target_keywords.join(', ') : 'choose 3-5 sensible Alberta traffic keywords'}${newsLine}
@@ -460,6 +473,8 @@ Target keywords: ${(picked.target_keywords || []).length ? picked.target_keyword
 Accuracy rules (critical):
 - Do NOT fabricate fine amounts, demerit point counts, limitation periods, court deadlines, or procedural steps.
 - If exact Alberta-law details are uncertain, use cautious general language ("often", "typically", "in many cases", "check the current Alberta rules") instead of inventing specifics.
+- Include an "Official Alberta sources" section with at least two contextually relevant links selected only from this approved list. Do not invent or alter URLs:
+${APPROVED_OFFICIAL_SOURCES.map((source) => `  - ${source}`).join('\n')}
 - This is general information, not legal advice. Include one short disclaimer line near the end.
 
 Style rules:
@@ -526,11 +541,19 @@ async function main() {
     meta_description: article.meta_description,
     keywords: article.keywords || [],
     category: article.category || 'guide',
-    author: 'Fabsy Team',
+    author: 'Fabsy Editorial Team',
     status: PUBLISH_STATUS,
     published_at: PUBLISH_STATUS === 'published' ? now : null,
     ai_generated_at: now,
-    source_data: { engine: 'github-actions', model: MODEL, topic: picked.topic, source: picked.source, news_hook: picked.news_hook || null },
+    source_data: {
+      engine: 'github-actions',
+      model: MODEL,
+      topic: picked.topic,
+      source: picked.source,
+      news_hook: picked.news_hook || null,
+      review_status: PUBLISH_STATUS === 'published' ? 'operator_published' : 'human_review_required',
+      approved_official_sources: APPROVED_OFFICIAL_SOURCES,
+    },
   };
 
   const inserted = await supabaseRest('blog_posts', {
@@ -540,7 +563,9 @@ async function main() {
   });
 
   console.log(`Inserted: ${inserted[0].slug} (${wordCount} words, ${PUBLISH_STATUS})`);
-  console.log(`Live at: https://fabsy.ca/blog/${inserted[0].slug}`);
+  console.log(PUBLISH_STATUS === 'published'
+    ? `Live at: https://fabsy.ca/blog/${inserted[0].slug}`
+    : `Draft created for human review: ${inserted[0].slug}`);
 
   if (picked.source === 'queue') markTopicUsed(picked.topic);
 

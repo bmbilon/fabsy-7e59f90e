@@ -23,9 +23,10 @@ const PhotoRadarVsOfficer: React.FC = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Photo-Radar vs Officer-Issued, Fabsy',
+    name: 'How photo radar and officer-issued tickets differ in Alberta',
     url,
     description: 'A cautious overview of how Alberta photo radar notices and officer-issued traffic tickets differ.',
+    dateModified: '2026-08-23',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -44,10 +45,17 @@ const PhotoRadarVsOfficer: React.FC = () => {
       <StaticJsonLd schema={schema} dataAttr="webpage" />
       <Header />
       <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Photo-Radar vs Officer-Issued</h1>
-        <p className="text-muted-foreground mb-8">
-          Understand the basic differences between Alberta photo radar notices and officer-issued tickets.
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">How Are Photo Radar and Officer-Issued Tickets Different in Alberta?</h1>
+        <p className="text-lg leading-relaxed text-foreground mb-3">
+          A photo-radar notice is generally issued to the registered owner rather than identifying a driver, while an officer-issued ticket identifies the driver who was stopped. That distinction affects demerits, driving-record treatment, available evidence, and the questions worth asking before responding.
         </p>
+        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 23, 2026 · Check the notice and current official Alberta rules</p>
+
+        <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
+          <h2 className="text-2xl font-bold text-foreground">Need the distinction applied to your ticket?</h2>
+          <p className="mt-2 text-muted-foreground">Ticket Triage is a $149 CAD total, human-reviewed assessment of the ticket, likely consequences, and whether representation appears worth the cost.</p>
+          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Ticket Triage - $149</Link>
+        </section>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Core differences</h2>

@@ -167,8 +167,8 @@ export default function TicketAssessmentIntake() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useSafeHead({
-    title: "Start Your $149 Traffic Ticket + Insurance Impact Assessment | Fabsy",
-    description: "Securely submit an Alberta traffic ticket for Fabsy's $149 CAD total traffic ticket and insurance impact assessment.",
+    title: "Start Ticket Triage | $149 Alberta Ticket Assessment | Fabsy",
+    description: "Securely submit an Alberta traffic ticket for Fabsy's $149 CAD total, human-reviewed Ticket Triage assessment.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.intakePath}`,
     robots: "noindex, nofollow",
   });
@@ -349,7 +349,16 @@ export default function TicketAssessmentIntake() {
 
       trackAssessmentEvent("checkout_started", {
         value: TICKET_ASSESSMENT.priceCad,
-        item_id: "traffic_ticket_insurance_assessment",
+        item_id: "ticket_triage",
+      }, orderId);
+      trackAssessmentEvent("begin_checkout", {
+        value: TICKET_ASSESSMENT.priceCad,
+        items: [{
+          item_id: "ticket_triage",
+          item_name: TICKET_ASSESSMENT.name,
+          price: TICKET_ASSESSMENT.priceCad,
+          quantity: 1,
+        }],
       }, orderId);
       window.location.assign(checkout.url);
     } catch (caught) {
@@ -369,7 +378,7 @@ export default function TicketAssessmentIntake() {
         <div className="grid gap-7 lg:grid-cols-[1fr_340px] lg:items-start">
           <Card className="overflow-hidden shadow-elevated">
             <div className="border-b bg-white p-6 sm:p-8">
-              <Badge className="mb-4">Secure $149 assessment intake</Badge>
+              <Badge className="mb-4">Secure Ticket Triage intake · $149 CAD total</Badge>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Tell us enough to assess the full picture</h1>
               <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
                 This is for Alberta tickets. Choose “I don't know” where needed; the service exists because the answer is not always obvious.

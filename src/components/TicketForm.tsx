@@ -426,7 +426,7 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
             Upload your ticket. We confirm the charge, check availability, and quote the $488 base representation fee. Want the full insurance math first?{" "}
             <Link to="/traffic-ticket-assessment" className="font-semibold text-white underline underline-offset-4">
-              See the $149 Traffic Ticket + Insurance Impact Assessment.
+              See Ticket Triage, the $149 human-reviewed ticket and insurance-impact assessment.
             </Link>
           </p>
         </div>

@@ -23,9 +23,10 @@ const DemeritsInsurance: React.FC = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Demerits & Insurance, Fabsy',
+    name: 'Do Alberta traffic tickets affect demerits and insurance?',
     url,
     description: 'A cautious overview of Alberta demerit points, driving abstracts, and questions to ask an insurer about a traffic conviction.',
+    dateModified: '2026-08-23',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -44,11 +45,11 @@ const DemeritsInsurance: React.FC = () => {
       <StaticJsonLd schema={schema} dataAttr="webpage" />
       <Header />
       <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Demerits & Insurance</h1>
-        <p className="text-muted-foreground mb-8">
-          Learn how Alberta demerit points are recorded and where to verify current rules. Insurance
-          effects depend on the insurer and the individual record.
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Do Alberta Traffic Tickets Affect Demerits and Insurance?</h1>
+        <p className="text-lg leading-relaxed text-foreground mb-3">
+          Some convictions carry Alberta demerit points, while insurance treatment is a separate underwriting decision made by an insurer. The ticket type, final outcome, driving record, insurer, and renewal timing can all matter, so a demerit count alone does not answer the insurance question.
         </p>
+        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 23, 2026 · General information, not an insurance quote or legal advice</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Key points</h2>
@@ -61,13 +62,14 @@ const DemeritsInsurance: React.FC = () => {
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Need a ticket-specific answer?</h2>
-          <p className="mt-2 text-muted-foreground">Fabsy's $149 CAD total Traffic Ticket + Insurance Impact Assessment reviews an Alberta ticket, likely insurance significance and whether representation appears worth the cost. The $149 can be applied if representation is worthwhile and the same matter is eligible.</p>
-          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See the $149 assessment</Link>
+          <p className="mt-2 text-muted-foreground">Fabsy's $149 CAD total Ticket Triage reviews an Alberta ticket, likely insurance significance and whether representation appears worth the cost. The $149 can be applied if representation is worthwhile and the same matter is eligible.</p>
+          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Ticket Triage - $149</Link>
         </section>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Official information</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
+            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/demerit-points">Alberta demerit point schedule</a></li>
             <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/demerit-driving-suspension">Alberta demerit point suspensions</a></li>
             <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/photo-radar-alberta">Alberta photo radar rules</a></li>
           </ul>

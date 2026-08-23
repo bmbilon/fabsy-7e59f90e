@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
 const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
-const EXACT_TICKET_TRIAGE = "The Traffic Ticket + Insurance Impact Assessment costs $149 CAD total, including applicable GST. If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax; the 30% success fee still applies to any fine reduction.";
+const EXACT_TICKET_TRIAGE = "Ticket Triage is Fabsy's human-reviewed traffic ticket and insurance-impact assessment. It costs $149 CAD total, including applicable GST. If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax; eligible clients receive priority placement and the 30% success fee still applies to any fine reduction.";
 const SAFE_REPLY = `I can provide general process information, but I cannot provide case-specific legal advice or calculate a fine, demerit count, or response deadline. Check the values and instructions printed on your ticket. ${SERVICE_STATUS} ${EXACT_PRICING} Outcomes vary.`;
 
 const CHAT_SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket questions.
@@ -23,7 +23,7 @@ FACT SAFETY:
 - Do not state a fine amount, demerit count, response period, court date, or deadline unless the exact value appears in the structured TICKET DATA supplied with the user message.
 - Never infer a number from a charge name, location, or general knowledge.
 - When structured ticket data is absent, tell the user to check the ticket and the applicable official Alberta or court source.
-- Do not state a success rate above 95%.
+- Do not state or imply a success-rate percentage.
 - Avoid refund-based, outcome-promise, and no-fee marketing claims.
 - Use a standard hyphen or comma instead of a long dash.
 
@@ -33,7 +33,7 @@ PRICING:
 
 STYLE:
 - Be concise, calm, and plain-language.
-- Offer the Free Representation Eligibility Check when useful, while making clear that it is not legal advice or the paid assessment.
+- Offer Ticket Triage when a user needs a human-reviewed ticket-specific recommendation. Mention the Free Representation Eligibility Check only when the user solely wants to know whether Fabsy may provide representation.
 - Do not claim that a consultation or outcome is free.`;
 
 type UnknownRecord = Record<string, unknown>;

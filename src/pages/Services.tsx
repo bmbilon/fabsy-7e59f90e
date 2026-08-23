@@ -231,7 +231,7 @@ const Services = () => {
               </h3>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
                 Insurance consequences vary by driver, conviction, insurer, and renewal timing.
-                Fabsy's $149 Traffic Ticket + Insurance Impact Assessment can estimate likely risk and financial significance,
+                Fabsy's $149 Ticket Triage can estimate likely risk and financial significance,
                 but it is not an insurer-issued quote and does not promise savings. It also includes
                 priority placement and a $149 representation credit if the same eligible matter is upgraded.
               </p>

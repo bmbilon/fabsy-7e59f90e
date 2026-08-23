@@ -150,14 +150,14 @@ function redactVerifiedNumericClaims(value, slug) {
   text = replaceWhenNearby(
     text,
     /\$\s*0\b/gi,
-    /\bFree Representation Eligibility Check\b/i,
+    /\b(?:Free\s+)?Representation Eligibility Check\b/i,
     '[verified representation eligibility price]'
   );
 
   text = replaceWhenNearby(
     text,
     /\$\s*149\b/gi,
-    /\b(?:assessment|representation credit|already paid|can be applied)\b/i,
+    /\b(?:Ticket Triage|assessment|representation credit|already paid|can be applied)\b/i,
     '[verified assessment price]'
   );
 
@@ -192,7 +192,7 @@ function redactVerifiedNumericClaims(value, slug) {
 
   text = text
     .replace(/\b\d{1,3}\s*%\s+complete\b/gi, '[form progress]')
-    .replace(/\b95\s*%\+\s*(?:historical\s+)?(?:(?:success|win|favourable|favorable)(?:\s+rate)?|outcomes?)?/gi, '[permitted outcome cap]')
+    .replace(/\b(?:last\s+)?reviewed:?\s*\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}\b/gi, '[verified editorial review date]')
     .replace(/\bApril\s+1,?\s+2025\b/gi, '[verified photo radar date]')
     .replace(/\b(?:2|two)\s+to\s+(?:6|six)\s+demerit(?:s|\s+points?)\b/gi, '[verified speeding demerit range]')
     .replace(/\b(?:2|two)\s*(?:demerit(?:s|\s+points?))?\s*\(?\s*(?:for\s+)?(?:up\s+to\s+)?15\s*(?:km\/h\s*)?over\s*\)?/gi, '[verified speeding band]')

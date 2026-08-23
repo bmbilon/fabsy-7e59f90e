@@ -25,7 +25,7 @@ const TermsOfService = () => {
               <li>Court representation for traffic violations</li>
               <li>Administrative assistance with traffic ticket procedures</li>
               <li>Consultation on traffic ticket matters</li>
-              <li>Traffic Ticket + Insurance Impact Assessments based on customer-supplied information and ticket documents</li>
+              <li>Ticket Triage assessments based on customer-supplied information and ticket documents</li>
               <li>Optional Insurance Damage Reports based on client-supplied records and public research</li>
             </ul>
             <p className="mt-4">
@@ -89,9 +89,9 @@ const TermsOfService = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5B. Traffic Ticket + Insurance Impact Assessment Terms</h2>
+            <h2 className="text-2xl font-semibold mb-4">5B. Ticket Triage Terms</h2>
             <p className="mb-4">
-              The Traffic Ticket + Insurance Impact Assessment costs ${TICKET_ASSESSMENT.priceCad} CAD total as a
+              Ticket Triage, Fabsy's human-reviewed traffic ticket and insurance-impact assessment, costs ${TICKET_ASSESSMENT.priceCad} CAD total as a
               one-time payment, including applicable GST, charged at checkout. Government fines, court costs,
               driver records, and any later representation service are separate.
             </p>

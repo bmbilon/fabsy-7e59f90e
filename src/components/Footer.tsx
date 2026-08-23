@@ -17,7 +17,7 @@ const Footer = () => {
       { name: "Terms of Service", path: "/terms-of-service" },
     ],
     support: [
-      { name: "Traffic Ticket + Insurance Impact Assessment", path: "/traffic-ticket-assessment" },
+      { name: "Ticket Triage ($149)", path: "/traffic-ticket-assessment" },
       { name: "Free Representation Eligibility Check", path: "/submit-ticket" },
       { name: "Contact Us", path: "/contact" },
       { name: "FAQ", path: "/faq" },
@@ -156,7 +156,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Fabsy reports a 95%+ historical success rate across past matters. Results vary, and past performance does not predict future results.
+                Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised.
               </p>
             </div>
             
@@ -170,7 +170,7 @@ const Footer = () => {
           </div>
 
           <p className="text-center">
-            *By submitting a ticket for a Free Representation Eligibility Check or a paid assessment, you agree to share your contact information and the contents of your uploaded ticket so we can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
+            *By submitting a ticket for a Free Representation Eligibility Check or Ticket Triage, you agree to share your contact information and the contents of your uploaded ticket so we can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
           </p>
         </div>
 

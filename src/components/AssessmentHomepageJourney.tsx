@@ -93,8 +93,8 @@ const trustEvidence = [
   },
   {
     icon: BadgeDollarSign,
-    title: "95%+ historical rate",
-    text: "Fabsy's aggregate past representation figure. Individual outcomes vary and are not predicted.",
+    title: "Clear service economics",
+    text: "The recommendation compares the potential downside with the cost and realistic value of representation.",
   },
   {
     icon: Gauge,

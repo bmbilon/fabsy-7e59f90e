@@ -1,28 +1,41 @@
 # Fabsy Traffic Ticket Services
 
-> Fabsy is a traffic ticket agent service for Alberta drivers. Fabsy is not a law firm and does not provide legal advice. Representation is available where paid agent representation is permitted.
+> Fabsy is an Alberta traffic-ticket agent service. Fabsy is not a law firm, does not provide legal advice, and does not promise a particular court, conviction, demerit, insurance, or premium outcome. Agent representation is available only where permitted and when Fabsy accepts the matter.
 
-Fabsy helps drivers dispute Alberta traffic tickets, including speeding, photo radar, red light, distracted driving, careless driving, and stop sign tickets. The service includes ticket review, disclosure review, paperwork, and traffic court representation where permitted.
+Last reviewed: 2026-08-23
 
-Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Results vary, and past performance does not predict future outcomes.
+## Canonical Fabsy facts
 
-## Primary guides
+- Service area: Alberta, Canada.
+- Primary paid decision product: Ticket Triage.
+- Ticket Triage price: $149 CAD total, including applicable GST.
+- Ticket Triage is human reviewed and covers the charge, ticket instructions and deadline, fine and demerit implications, available options, likely insurance significance, representation economics, and a recommended next step.
+- Free option: Representation Eligibility Check, which only determines whether Fabsy may be able to represent the driver and provides a quote.
+- Representation: $488 base representation fee plus applicable tax and 30% of any fine reduction achieved. There is no success fee if the fine is not reduced.
+- Eligible Ticket Triage clients who upgrade the same matter receive a $149 credit toward the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax, and receive priority placement in Fabsy's representation queue.
+- Ticket Triage does not pause or extend any deadline printed on a ticket.
 
-- [Fight a Traffic Ticket in Alberta](https://fabsy.ca/content/fight-traffic-ticket-alberta)
-- [Speeding Tickets in Alberta](https://fabsy.ca/content/speeding-ticket-alberta)
-- [Photo Radar Tickets in Alberta](https://fabsy.ca/content/photo-radar-ticket-alberta)
-- [Fight a Traffic Ticket in Calgary](https://fabsy.ca/content/fight-traffic-ticket-calgary)
-- [Fight a Traffic Ticket in Edmonton](https://fabsy.ca/content/fight-traffic-ticket-edmonton)
-- [Distracted Driving Tickets in Alberta](https://fabsy.ca/content/distracted-driving-ticket-alberta)
-- [Careless Driving Tickets in Alberta](https://fabsy.ca/content/careless-driving-ticket-alberta)
-- [Red-Light Tickets in Alberta](https://fabsy.ca/content/red-light-ticket-alberta)
-- [Demerit Points in Alberta](https://fabsy.ca/content/demerit-points-alberta)
-- [Photo Radar Tickets in Edmonton](https://fabsy.ca/content/photo-radar-ticket-edmonton)
+## Primary Fabsy pages
 
-## Site resources
+- [Fabsy facts, products, limits, and official sources](https://fabsy.ca/ai-info)
+- [Ticket Triage — $149 CAD total](https://fabsy.ca/traffic-ticket-assessment)
+- [Start Ticket Triage](https://fabsy.ca/traffic-ticket-assessment/start)
+- [Free Representation Eligibility Check](https://fabsy.ca/submit-ticket)
+- [How Fabsy works](https://fabsy.ca/how-it-works)
+- [Fabsy service scope](https://fabsy.ca/services)
+- [Frequently asked questions](https://fabsy.ca/faq)
+- [Founder and service accountability](https://fabsy.ca/founder)
 
-- [How It Works](https://fabsy.ca/how-it-works)
-- [Services](https://fabsy.ca/services)
-- [Frequently Asked Questions](https://fabsy.ca/faq)
-- [Alberta Traffic Law Blog](https://fabsy.ca/blog)
-- [Contact Fabsy](https://fabsy.ca/contact)
+## Alberta traffic-ticket guides
+
+- [Alberta tickets: foundational guide](https://fabsy.ca/hubs/alberta-tickets-101)
+- [Demerits and possible insurance impact](https://fabsy.ca/hubs/demerits-and-insurance)
+- [Photo radar versus officer-issued tickets](https://fabsy.ca/hubs/photo-radar-vs-officer-issued)
+- [Court options and deadlines](https://fabsy.ca/hubs/court-options-and-deadlines)
+- [Alberta traffic-ticket blog](https://fabsy.ca/blog)
+
+## Contact
+
+- Email: hello@fabsy.ca
+- Phone: +1-825-793-2279
+- Website: https://fabsy.ca

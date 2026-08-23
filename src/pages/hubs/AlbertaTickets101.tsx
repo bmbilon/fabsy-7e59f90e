@@ -24,10 +24,11 @@ const AlbertaTickets101: React.FC = () => {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Alberta Tickets 101, Fabsy',
+    name: 'What to do after getting a traffic ticket in Alberta',
     url,
     description:
       'Overview of Alberta traffic tickets, common issuing methods, response instructions, and links to current official information.',
+    dateModified: '2026-08-23',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -46,10 +47,11 @@ const AlbertaTickets101: React.FC = () => {
       <StaticJsonLd schema={schema} dataAttr="webpage" />
       <Header />
       <div className="container mx-auto px-4 py-12 md:py-16 max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Alberta Tickets 101</h1>
-        <p className="text-muted-foreground mb-8">
-          A practical overview of Alberta traffic tickets: types, process, and outcomes. Use this hub to find the right path for your situation and follow expert trails into the most relevant city pages.
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">What Should You Do After Getting a Traffic Ticket in Alberta?</h1>
+        <p className="text-lg leading-relaxed text-foreground mb-3">
+          Read the ticket, confirm the alleged offence and response deadline, preserve relevant records, and compare the available response choices before acting. The ticket and current Alberta sources control; general web information cannot replace its instructions.
         </p>
+        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 23, 2026 · General information, not legal advice</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">What to know</h2>
@@ -62,14 +64,15 @@ const AlbertaTickets101: React.FC = () => {
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Unsure whether to pay or fight?</h2>
-          <p className="mt-2 text-muted-foreground">Fabsy's $149 CAD total Traffic Ticket + Insurance Impact Assessment explains the charge, likely consequences, options and whether paying for representation appears financially sensible. The $149 can be applied if representation is worthwhile and the same matter is eligible.</p>
-          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See the $149 assessment</Link>
+          <p className="mt-2 text-muted-foreground">Fabsy's $149 CAD total Ticket Triage explains the charge, likely consequences, options and whether paying for representation appears financially sensible. The $149 can be applied if representation is worthwhile and the same matter is eligible.</p>
+          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Ticket Triage - $149</Link>
         </section>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Official information</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
-            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/fine-payment">Alberta fine payment and traffic ticket information</a></li>
+            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://traffictickets.alberta.ca/">Alberta Traffic Tickets Service</a></li>
+            <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/fine-payment">Alberta fine payment information</a></li>
             <li><a className="underline decoration-dashed underline-offset-4 hover:text-primary" href="https://www.alberta.ca/photo-radar-alberta">Alberta photo radar rules</a></li>
           </ul>
         </section>

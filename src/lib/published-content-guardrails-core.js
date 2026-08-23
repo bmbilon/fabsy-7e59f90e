@@ -21,9 +21,9 @@ Depending on the matter, you may be able to respond yourself, use an authorized 
 
 Fabsy provides agent services for Alberta traffic matters and is not a law firm. ${EXACT_FABSY_PRICING}
 
-## Free Representation Eligibility Check
+## Ticket Triage
 
-To ask Fabsy to confirm the charge, check representation availability and quote the representation fee, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
+For a human-reviewed assessment of the ticket, likely insurance significance, and whether representation appears worth the cost, [review Ticket Triage](https://fabsy.ca/traffic-ticket-assessment) before the response deadline printed on the ticket.
 
 This article provides general information and is not legal advice.`;
 
@@ -94,9 +94,9 @@ No. Historical results describe past matters only. The charge, evidence, procedu
 
 ${EXACT_FABSY_PRICING}
 
-## Free Representation Eligibility Check
+## Ticket Triage
 
-To ask Fabsy to confirm the charge, check representation availability and quote the representation fee, [submit your ticket](https://fabsy.ca/submit-ticket) before the response deadline printed on it.
+For a human-reviewed assessment of the ticket, likely insurance significance, and whether representation appears worth the cost, [review Ticket Triage](https://fabsy.ca/traffic-ticket-assessment) before the response deadline printed on the ticket.
 
 This article provides general information and is not legal advice.`;
 
@@ -113,7 +113,7 @@ const LAWYER_STATUS_RE =
   /\b(?:our|fabsy(?:'s)?)\s+(?:traffic\s+)?lawyers?\b|\blawyers?\s+(?:at|from)\s+fabsy\b|\bfabsy\s+is\s+(?:a\s+)?law\s+firm\b/i;
 const SEMANTIC_OVER_CAP_RE =
   /\b(?:more\s+than|over|above|greater\s+than|in\s+excess\s+of)\s*(?:9[5-9]|100)%\+?(?!\d)/i;
-const OUTCOME_WORD = '(?:success(?:ful)?|win(?:s|ning)?|favourable|favorable)';
+const OUTCOME_WORD = '(?:success(?:ful)?(?!\\s+fee)|win(?:s|ning)?|favourable|favorable)';
 const OUTCOME_RATE = `(?:${OUTCOME_WORD}(?:\\s+rate)?|cases?\\s+(?:were\\s+)?${OUTCOME_WORD})`;
 const NUMBER_WORD_TOKEN =
   '(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand)';
@@ -201,26 +201,36 @@ function normalizeOutcomeRates(value) {
   let result = String(value || '');
   const semantic = '(?:more\\s+than|over|above|greater\\s+than|in\\s+excess\\s+of)';
   const percent = '(?:9[5-9]|100)%\\+?';
+  const noPromise = 'Results vary and no outcome is promised.';
+
+  result = result.replace(
+    new RegExp(`[^.!?\\n]*\\b${OUTCOME_RATE}[^.!?\\n]*\\d{1,3}%\\+?[^.!?\\n]*[.!?]?`, 'gi'),
+    noPromise
+  );
+  result = result.replace(
+    new RegExp(`[^.!?\\n]*\\b\\d{1,3}%\\+?[^.!?\\n]*${OUTCOME_RATE}[^.!?\\n]*[.!?]?`, 'gi'),
+    noPromise
+  );
 
   result = result.replace(
     new RegExp(`\\b${OUTCOME_RATE}\\s*(?:is|was|of|at|:)?\\s*${semantic}\\s*${percent}(?!\\d)`, 'gi'),
-    '95%+ historical success rate'
+    noPromise
   );
   result = result.replace(
     new RegExp(`\\b${OUTCOME_WORD}\\s+${semantic}\\s*${percent}(?:\\s+of\\s+(?:cases?|tickets?|matters?))?`, 'gi'),
-    '95%+ historical success rate'
+    noPromise
   );
   result = result.replace(
     new RegExp(`\\b${semantic}\\s*${percent}(?:\\s+(?:historical\\s+)?${OUTCOME_RATE})?`, 'gi'),
-    '95%+ historical success rate'
+    noPromise
   );
   result = result.replace(
     new RegExp(`\\b(\\d{1,3})%\\+?\\s+(?:historical\\s+)?${OUTCOME_RATE}\\b`, 'gi'),
-    (match, rawRate) => Number(rawRate) > 95 ? '95%+ historical success rate' : match
+    (match, rawRate) => Number(rawRate) > 95 ? noPromise : match
   );
   result = result.replace(
     new RegExp(`\\b${OUTCOME_RATE}\\s*(?:is|was|of|at|:)?\\s*(\\d{1,3})%\\+?(?!\\d)`, 'gi'),
-    (match, rawRate) => Number(rawRate) > 95 ? '95%+ historical success rate' : match
+    (match, rawRate) => Number(rawRate) > 95 ? noPromise : match
   );
   return result;
 }
@@ -232,8 +242,8 @@ export function sanitizeMarketingText(value) {
     .replace(/\brisk[\s-]*free\b/gi, 'transparent')
     .replace(/\bmoney[\s-]*back\b/gi, 'pricing')
     .replace(/\bzero[\s-]*risk\b/gi, 'transparent pricing')
-    .replace(/\b100%\s+guarantee(?:s|d|ing)?\b/gi, '95%+ historical success rate')
-    .replace(/\bguarantee(?:s|d|ing)?\s+100%\s+success\b/gi, '95%+ historical success rate')
+    .replace(/\b100%\s+guarantee(?:s|d|ing)?\b/gi, 'results vary and no outcome is promised')
+    .replace(/\bguarantee(?:s|d|ing)?\s+100%\s+success\b/gi, 'results vary and no outcome is promised')
     .replace(/\bcannot be guaranteed\b/gi, 'cannot be predicted')
     .replace(/\bcan(?:not|'t) guarantee\b/gi, 'cannot predict')
     .replace(/\bdoes(?: not|n't) guarantee\b/gi, 'does not predict')
@@ -291,13 +301,13 @@ function fallbackPost(post) {
 function outcomeRateViolations(value, field) {
   const violations = [];
   if (SEMANTIC_OVER_CAP_RE.test(value)) {
-    violations.push(`${field}: semantic outcome rate exceeds 95%`);
+    violations.push(`${field}: numeric outcome rate is not permitted`);
   }
   for (const match of value.matchAll(/(\d{1,3})%\+?\s+(?:historical\s+)?(?:success|win|favourable|favorable)(?:\s+rate)?/gi)) {
-    if (Number(match[1]) > 95) violations.push(`${field}: outcome rate exceeds 95%`);
+    if (Number(match[1]) >= 0) violations.push(`${field}: numeric outcome rate is not permitted`);
   }
   for (const match of value.matchAll(/(?:success|win|favourable|favorable)(?:\s+rate)?[^\d]{0,16}(\d{1,3})%\+?/gi)) {
-    if (Number(match[1]) > 95) violations.push(`${field}: outcome rate exceeds 95%`);
+    if (Number(match[1]) >= 0) violations.push(`${field}: numeric outcome rate is not permitted`);
   }
   return violations;
 }

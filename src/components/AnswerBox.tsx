@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, CheckCircle, Shield } from 'lucide-react';
+import { TICKET_ASSESSMENT } from '@/config/ticketAssessment';
+import { trackAssessmentEvent } from '@/lib/assessment/analytics';
 
 type Props = {
   offence: string;
@@ -16,7 +18,7 @@ type Props = {
 const AnswerBox: React.FC<Props> = ({ 
   offence, 
   city, 
-  ctaHref = "/submit-ticket", 
+  ctaHref = TICKET_ASSESSMENT.slug,
   className = "" 
 }) => {
   // Format offence for display (handle various cases)
@@ -33,7 +35,7 @@ const AnswerBox: React.FC<Props> = ({
         </div>
         <div className="flex items-center gap-1 text-green-600 text-xs">
           <CheckCircle className="w-3 h-3" />
-          <span>Ticket-specific guidance</span>
+          <span>Alberta-focused information</span>
         </div>
       </div>
 
@@ -58,15 +60,11 @@ const AnswerBox: React.FC<Props> = ({
           </li>
           <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold mt-0.5 flex-shrink-0">2</span>
-            <div>
-              <span className="font-semibold">Steps:</span> Upload ticket → We pull the court file → Confirm your plan.
-            </div>
+            <div><span className="font-semibold">Context:</span> The practical choice depends on the charge, record, evidence, and what a conviction could mean for you.</div>
           </li>
           <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold mt-0.5 flex-shrink-0">3</span>
-            <div>
-              <span className="font-semibold">Review:</span> We review disclosure, explain the available options, and provide agent representation where permitted.
-            </div>
+            <div><span className="font-semibold">Ticket Triage:</span> Get a human-reviewed recommendation about the ticket, likely insurance significance, and whether representation appears worth the cost.</div>
           </li>
         </ol>
       </div>
@@ -75,19 +73,24 @@ const AnswerBox: React.FC<Props> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <Link 
           to={ctaHref}
+          onClick={() => trackAssessmentEvent(
+            "assessment_cta_click",
+            { location: "content_answer_box", destination: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
+            `content_answer_box:${window.location.pathname}`,
+          )}
           className="inline-flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
         >
           <Shield className="w-4 h-4" />
-          Start the Free Representation Eligibility Check →
+          See Ticket Triage - $149 →
         </Link>
         <div className="text-xs text-slate-600">
-          <span className="font-semibold text-green-600">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved;</span> there is no success fee if the fine is not reduced.
+          Human reviewed · GST included · $149 can be applied to eligible representation when worthwhile
         </div>
       </div>
 
       {/* Local indicator */}
       <div className="mt-4 pt-3 border-t border-sky-200 text-xs text-slate-500">
-        Serving {city}, Alberta • {capitalizedOffence} ticket agent service • Representation where permitted
+        Serving {city}, Alberta • {capitalizedOffence} ticket information • Agent representation where permitted
       </div>
     </section>
   );

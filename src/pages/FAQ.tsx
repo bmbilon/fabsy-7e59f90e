@@ -8,15 +8,15 @@ const FAQPage: React.FC = () => {
   const faqs = [
     {
       q: "How much does Fabsy charge?",
-      a: "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
+      a: "The free Representation Eligibility Check costs $0. Ticket Triage costs $149 CAD total including applicable GST. Representation is separate and uses a $488 base representation fee plus applicable tax and 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
     },
     {
       q: "Is Fabsy a law firm?",
       a: "No. Fabsy is an Alberta traffic ticket agent service, not a law firm, and does not provide legal advice. Service availability and scope depend on the matter and court location."
     },
     {
-      q: "What does Fabsy's 95%+ figure mean?",
-      a: "Fabsy reports a 95%+ historical success rate across past matters. It is an aggregate past figure, not a prediction for a particular ticket. Outcomes depend on the facts, evidence, and available options."
+      q: "Does Fabsy promise a particular result?",
+      a: "No. Ticket outcomes depend on the charge, evidence, procedure, available options, and court. Fabsy does not promise a withdrawal, reduction, demerit result, insurance result, or any other outcome."
     },
     {
       q: "Will disputing a ticket affect my insurance?",

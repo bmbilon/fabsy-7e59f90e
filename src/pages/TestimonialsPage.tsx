@@ -9,17 +9,17 @@ import useSafeHead from "@/hooks/useSafeHead";
 
 const TestimonialsPage = () => {
   useSafeHead({
-    title: "Client Outcomes | Fabsy Alberta",
-    description: "Review Fabsy's historical success-rate context, service limitations, and pricing for Alberta traffic ticket agent services.",
+    title: "Service Standards & Client Outcomes | Fabsy Alberta",
+    description: "Review Fabsy's evidence standard, service limitations, and pricing for Alberta traffic ticket agent services.",
     canonical: "https://fabsy.ca/testimonials",
   });
 
   const serviceFacts = [
     {
       icon: FileCheck,
-      value: "95%+",
-      label: "Historical Success Rate",
-      description: "Fabsy's aggregate past figure. Individual outcomes vary.",
+      value: "Human",
+      label: "Ticket Review",
+      description: "Paid Ticket Triage recommendations are reviewed by a Fabsy team member.",
     },
     {
       icon: Scale,
@@ -67,10 +67,11 @@ const TestimonialsPage = () => {
         <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20">
           <Card className="p-8 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
             <FileCheck className="h-10 w-10 text-primary mb-5" />
-            <h2 className="text-2xl font-bold text-card-foreground mb-4">Historical Outcome Information</h2>
+            <h2 className="text-2xl font-bold text-card-foreground mb-4">Outcome Claim Standard</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
-              Fabsy reports a 95%+ historical success rate across past matters. It is an aggregate
-              past figure, not a prediction for a particular ticket. Individual outcomes vary.
+              Fabsy does not use an unsupported percentage as a prediction for a new ticket. Any
+              future aggregate outcome reporting will identify the period, sample, inclusion rules,
+              and definition of a favourable result. Individual outcomes vary.
             </p>
           </Card>
 

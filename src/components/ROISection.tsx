@@ -51,8 +51,8 @@ const ROISection = () => {
             <div className="grid grid-cols-2 gap-4">
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">
                 <CheckCircle className="h-8 w-8 text-primary mx-auto mb-3" />
-                <div className="text-2xl font-bold text-gradient-hero">95%+</div>
-                <div className="text-sm text-secondary">Historical rate; outcomes vary</div>
+                <div className="text-2xl font-bold text-gradient-hero">Human Reviewed</div>
+                <div className="text-sm text-secondary">Ticket-specific recommendations</div>
               </Card>
 
               <Card className="p-6 text-center bg-gradient-card backdrop-blur-sm shadow-fab border-white/20">

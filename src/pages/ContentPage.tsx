@@ -230,7 +230,7 @@ const ContentPage = () => {
             <AnswerBox 
               offence={pageData.violation as string}
               city={detectedCity}
-              ctaHref="/submit-ticket"
+              ctaHref="/traffic-ticket-assessment"
               className="mb-8"
             />
           )}
@@ -348,18 +348,16 @@ const ContentPage = () => {
           {/* CTA */}
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-2xl p-8 text-white text-center">
             <Shield className="w-16 h-16 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold mb-3">
-              Ready to Fight Your {pageData.violation || 'Traffic'} Ticket?
-            </h2>
+            <h2 className="text-3xl font-bold mb-3">Get a Ticket-Specific Recommendation</h2>
               <p className="text-xl mb-6 text-green-50">
-              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.
+              Ticket Triage is a $149 CAD total, human-reviewed assessment of the ticket, likely insurance significance, and whether representation appears worth the cost.
             </p>
-            <Link to="/submit-ticket">
+            <Link to="/traffic-ticket-assessment">
               <Button 
                 size="lg"
                 className="bg-white text-green-600 hover:bg-green-50 text-lg px-8 py-6"
               >
-                Start the Free Representation Eligibility Check
+                See Ticket Triage - $149
               </Button>
             </Link>
           </div>

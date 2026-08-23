@@ -398,7 +398,7 @@ const WorkingContentPage = () => {
             <AnswerBox 
               offence={offence}
               city={cityName}
-              ctaHref="/submit-ticket"
+              ctaHref="/traffic-ticket-assessment"
             />
           )}
 
@@ -558,21 +558,22 @@ const WorkingContentPage = () => {
                 <div className="w-12 h-12 rounded-lg bg-primary-foreground/20 flex items-center justify-center mb-4">
                   <Shield className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Fight Your {pageData.violation || 'Traffic'} Ticket
-                </h3>
+                <h3 className="text-xl font-bold mb-2">Get a ticket-specific recommendation</h3>
                 <p className="text-sm mb-5 opacity-95">
-                  Start with the Free Representation Eligibility Check. Representation is available where paid agent representation is permitted.
+                  Ticket Triage reviews the ticket, demerit implications, likely insurance significance, and whether representation appears worth the cost.
                 </p>
-                <Link to="/submit-ticket">
+                <Link to="/traffic-ticket-assessment">
                   <Button 
                     size="lg"
                     className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
                   >
-                    Start the Free Representation Eligibility Check →
+                    See Ticket Triage - $149 →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>
+                <p className="text-xs mt-3 opacity-80 text-center">Human reviewed · GST included · $149 can be applied to eligible representation when worthwhile</p>
+                <p className="mt-3 text-center text-xs opacity-80">
+                  <Link to="/submit-ticket" className="underline underline-offset-2">Only need the free representation eligibility check?</Link>
+                </p>
               </div>
 
               {/* Related Resources */}

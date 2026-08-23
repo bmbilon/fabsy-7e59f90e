@@ -11,8 +11,8 @@ const TrustBar = () => {
     },
     {
       icon: CheckCircle,
-      stat: "95%+ Historical Rate",
-      detail: "Fabsy's published historical success rate. Individual outcomes vary.",
+      stat: "Human Reviewed",
+      detail: "Paid Ticket Triage recommendations are reviewed by a Fabsy team member.",
       color: "text-green-600"
     },
     {

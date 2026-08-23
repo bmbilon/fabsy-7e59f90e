@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
@@ -10,6 +10,7 @@ import {
   Gauge,
   HelpCircle,
   LockKeyhole,
+  MessageSquareText,
   Route,
   Scale,
   ShieldCheck,
@@ -27,6 +28,7 @@ import { Card } from "@/components/ui/card";
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 import useSafeHead from "@/hooks/useSafeHead";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
+import { readMarketingAttribution } from "@/lib/marketingAttribution";
 
 const outcomes = [
   "What exactly was I charged with?",
@@ -69,7 +71,7 @@ const sampleRows = [
 const faqItems = [
   {
     q: "What exactly do I get for $149?",
-    a: "The Traffic Ticket + Insurance Impact Assessment includes a human-reviewed assessment of your Alberta ticket: the charge and deadline, fine and demerit implications, options, likely insurance-risk significance, representation economics and a recommended next step.",
+    a: "Ticket Triage includes a human-reviewed assessment of your Alberta ticket: the charge and deadline, fine and demerit implications, options, likely insurance-risk significance, representation economics and a recommended next step.",
   },
   {
     q: "Does paying a ticket affect my insurance?",
@@ -115,15 +117,20 @@ const faqItems = [
 
 export default function TicketAssessment() {
   const [searchParams] = useSearchParams();
+  const [llmSource, setLlmSource] = useState<string>();
   const checkoutCancelled = searchParams.get("checkout") === "cancelled";
   const representationSection = useRef<HTMLDivElement | null>(null);
 
   useSafeHead({
-    title: "Traffic Ticket + Insurance Impact Assessment | $149 CAD Total | Fabsy",
+    title: "Ticket Triage | Human-Reviewed Alberta Ticket Assessment | $149",
     description:
-      "For $149 CAD total, get a human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact, financial significance and whether fighting it is worth the money.",
+      "Ticket Triage is a $149 CAD total, human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact and whether fighting it is worth the money.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
   });
+
+  useEffect(() => {
+    setLlmSource(readMarketingAttribution().llm_source);
+  }, []);
 
   useEffect(() => {
     trackAssessmentEvent(
@@ -165,6 +172,7 @@ export default function TicketAssessment() {
     "@context": "https://schema.org",
     "@type": "Service",
     name: TICKET_ASSESSMENT.name,
+    alternateName: TICKET_ASSESSMENT.descriptor,
     url: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
     areaServed: { "@type": "AdministrativeArea", name: "Alberta, Canada" },
     provider: { "@type": "ProfessionalService", name: "Fabsy Traffic Ticket Services", url: "https://fabsy.ca" },
@@ -200,6 +208,14 @@ export default function TicketAssessment() {
               <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-200 sm:text-xl">
                 {TICKET_ASSESSMENT.heroSubheadline}
               </p>
+              {llmSource ? (
+                <div className="mt-6 flex max-w-3xl items-start gap-3 rounded-xl border border-violet-300/20 bg-violet-300/10 p-4 text-sm leading-relaxed text-violet-50">
+                  <MessageSquareText className="mt-0.5 h-5 w-5 shrink-0 text-violet-200" aria-hidden="true" />
+                  <p>
+                    {llmSource === "chatgpt" ? "ChatGPT" : "AI search"} can explain the general Alberta rules. Ticket Triage applies the available information to your actual ticket and gives you a human-reviewed next-step recommendation.
+                  </p>
+                </div>
+              ) : null}
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Button asChild size="lg" className="min-h-13 bg-violet-600 px-7 text-base hover:bg-violet-500">
                   <Link

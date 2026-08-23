@@ -66,8 +66,8 @@ const App = () => (
         <GlobalSchema />
         <BrowserRouter>
         {/* Analytics must be inside the router to track SPA route changes */}
-        <Analytics />
         <AcquisitionTracker />
+        <Analytics />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />

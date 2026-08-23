@@ -110,7 +110,18 @@ function requestIp(req: Request) {
 
 function cleanAttribution(value: unknown) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  const allowed = ["gclid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+  const allowed = [
+    "gclid",
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "llm_source",
+    "referrer_host",
+    "landing_page",
+    "first_touch_at",
+  ];
   return allowed.reduce<Record<string, string>>((result, key) => {
     const field = (value as Record<string, unknown>)[key];
     if (typeof field === "string" && field.trim() && field.length <= 250) result[key] = field.trim();

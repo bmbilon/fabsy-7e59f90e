@@ -35,7 +35,7 @@ const PrivacyPolicy = () => {
             <p className="mb-4">We use the information we collect to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide traffic ticket representation services</li>
-              <li>Review a submitted ticket and deliver a private Traffic Ticket + Insurance Impact Assessment</li>
+              <li>Review a submitted ticket and deliver a private Ticket Triage assessment</li>
               <li>Assess the practical relationship among the fine, demerits, driving-record implications, possible insurance exposure, and representation economics</li>
               <li>Verify uploaded abstract information and generate private Insurance Damage Reports</li>
               <li>Prepare estimated premium-exposure ranges and sourced carrier call lists</li>
@@ -108,7 +108,9 @@ const PrivacyPolicy = () => {
               Fabsy uses Google Analytics 4 on public website pages to understand traffic,
               navigation, and assessment-funnel performance. Google Analytics may use cookies
               and similar technologies and may process device, browser, approximate-location,
-              page-view, referral, and interaction information on our behalf. You can control or
+              page-view, referring-site, campaign, AI-referral source, and interaction information
+              on our behalf. Fabsy does not send uploaded ticket contents, names, email addresses,
+              or phone numbers to Google Analytics. You can control or
               delete cookies through your browser settings. Learn more in the{' '}
               <a
                 href="https://policies.google.com/privacy"

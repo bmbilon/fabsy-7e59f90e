@@ -5,13 +5,19 @@ import { normalizeGeneratedArticle, validateArticle } from './generate-post.mjs'
 import { EXACT_FABSY_PRICING } from '../../src/lib/published-content-guardrails-core.js';
 
 const filler = Array.from({ length: 910 }, () => 'guidance').join(' ');
+const approvedSources = `
+
+## Official Alberta sources
+
+- https://traffictickets.alberta.ca/
+- https://www.alberta.ca/demerit-points`;
 
 function article(overrides = {}) {
   return {
     title: 'Responding to an Alberta Traffic Ticket',
     slug: 'responding-to-an-alberta-traffic-ticket',
     meta_description: 'General information about reviewing an Alberta traffic ticket and considering available response options.',
-    content: `Review the notice and use current official information. ${filler}\n\nSubmit a ticket at https://fabsy.ca/submit-ticket.`,
+    content: `Review the notice and use current official information. ${filler}${approvedSources}\n\nGet Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
     ...overrides,
   };
 }
@@ -22,8 +28,8 @@ const hiddenOutcomeErrors = validateArticle(article({
   title: 'Fabsy Resolves More Than **95%** of Tickets Favourably',
 }));
 assert.ok(
-  hiddenOutcomeErrors.some((error) => error.includes('semantic outcome rate exceeds 95%')),
-  'markdown must not hide an over-cap outcome claim in generated metadata'
+  hiddenOutcomeErrors.some((error) => error.includes('numeric outcome rate is not permitted')),
+  'markdown must not hide a numeric outcome claim in generated metadata'
 );
 
 const splitPricingErrors = validateArticle(article({
@@ -35,7 +41,7 @@ assert.ok(
 );
 
 const bodyPricingErrors = validateArticle(article({
-  content: `Our **fee**\n\nis outcome-**based**. ${filler}\n\nSubmit a ticket at https://fabsy.ca/submit-ticket.`,
+  content: `Our **fee**\n\nis outcome-**based**. ${filler}${approvedSources}\n\nGet Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
 }));
 assert.ok(
   bodyPricingErrors.some((error) => error.includes('pricing claim does not use the exact formula')),
@@ -47,9 +53,9 @@ const normalizedGeneratedDraft = normalizeGeneratedArticle(article({
 
 Fabsy's pricing is $488 plus a 30% contingency fee on fines saved.
 
-${filler}
+${filler}${approvedSources}
 
-Submit a ticket at https://fabsy.ca/submit-ticket.`,
+Get Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
 }));
 assert.deepEqual(
   validateArticle(normalizedGeneratedDraft),
@@ -57,8 +63,8 @@ assert.deepEqual(
   'generated drafts should deterministically normalize outcome-rate and pricing wording before validation'
 );
 assert.ok(
-  normalizedGeneratedDraft.content.includes('95%+ historical success rate'),
-  'semantic outcome-rate wording should normalize to the approved historical wording'
+  normalizedGeneratedDraft.content.includes('Results vary and no outcome is promised'),
+  'semantic outcome-rate wording should normalize to a no-promise statement'
 );
 assert.equal(
   normalizedGeneratedDraft.content.split(EXACT_FABSY_PRICING).length - 1,
@@ -69,9 +75,9 @@ assert.equal(
 const prohibitedPricingDraft = normalizeGeneratedArticle(article({
   content: `Fabsy offers no win, no fee pricing.
 
-${filler}
+${filler}${approvedSources}
 
-Submit a ticket at https://fabsy.ca/submit-ticket.`,
+Get Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
 }));
 assert.deepEqual(
   validateArticle(prohibitedPricingDraft),

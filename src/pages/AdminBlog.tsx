@@ -123,7 +123,7 @@ const AdminBlog = () => {
               {drafts.length === 0 ? (
                 <Card className="p-8 text-center">
                   <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-600 mb-4">No drafts yet. n8n will generate them daily.</p>
+                  <p className="text-gray-600 mb-4">No drafts yet. Run the Content Engine workflow when you want a new source-backed draft to review.</p>
                   <p className="text-sm text-gray-500">Check back tomorrow or trigger the n8n workflow manually.</p>
                 </Card>
               ) : (

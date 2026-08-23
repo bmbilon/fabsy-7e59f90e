@@ -73,7 +73,7 @@ const CompetitorComparison = () => {
               <li><strong className="text-foreground">Service status:</strong> Fabsy is an agent service for Alberta traffic matters, not a law firm.</li>
               <li><strong className="text-foreground">Scope:</strong> Fabsy reviews tickets and disclosure, handles paperwork, and provides agent representation where permitted.</li>
               <li><strong className="text-foreground">Pricing:</strong> A $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</li>
-              <li><strong className="text-foreground">Past results:</strong> Fabsy reports a 95%+ historical success rate. Outcomes vary, and past results do not predict a future outcome.</li>
+              <li><strong className="text-foreground">Outcome standard:</strong> Fabsy does not promise a withdrawal, reduction, demerit result, insurance result, or other outcome.</li>
             </ul>
             <div className="mt-8 text-center">
               <Button size="lg" onClick={() => navigate("/submit-ticket")} className="text-lg px-8 py-6">

@@ -5,6 +5,7 @@ import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import useSafeHead from '@/hooks/useSafeHead';
+import { readMarketingAttribution } from '@/lib/marketingAttribution';
 
 type Gtag = (...args: unknown[]) => void;
 
@@ -29,15 +30,6 @@ interface CheckoutSession {
   };
   line_items?: CheckoutLineItem[];
 }
-
-const acquisitionKeys = [
-  'gclid',
-  'utm_source',
-  'utm_medium',
-  'utm_campaign',
-  'utm_term',
-  'utm_content',
-] as const;
 
 const ThankYou: React.FC = () => {
   const url = 'https://fabsy.ca/thank-you';
@@ -87,12 +79,7 @@ const ThankYou: React.FC = () => {
           const transaction_id = data?.id || sessionId;
 
           // Attach stored acquisition parameters if present
-          let acq: Record<string, string> = {};
-          try {
-            acq = JSON.parse(localStorage.getItem('fabsy_marketing') || '{}') as Record<string, string>;
-          } catch {
-            // Missing or malformed attribution data is non-blocking.
-          }
+          const acq = readMarketingAttribution();
 
           // GA4 purchase event
           gtag('event', 'purchase', {
@@ -106,10 +93,7 @@ const ThankYou: React.FC = () => {
               price: (li.amount_total ?? 0) / 100,
               currency: (li.currency || currency).toUpperCase(),
             })),
-            ...(acquisitionKeys.reduce<Record<string, string>>((acc, key) => {
-              if (acq[key]) acc[key] = acq[key];
-              return acc;
-            }, {})),
+            ...acq,
           });
 
           // Google Ads conversion (purchase) if configured
@@ -156,9 +140,9 @@ const ThankYou: React.FC = () => {
             </p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
-            <h2 className="font-semibold text-foreground mb-1">Historical outcomes</h2>
+            <h2 className="font-semibold text-foreground mb-1">Outcome standard</h2>
             <p className="text-sm text-muted-foreground">
-              Fabsy reports a 95%+ historical success rate across past matters. Individual outcomes vary.
+              Results depend on the facts, evidence, procedure, and available options. No outcome is promised.
             </p>
           </div>
         </div>

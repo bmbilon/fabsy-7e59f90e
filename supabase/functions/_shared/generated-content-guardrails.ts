@@ -72,13 +72,13 @@ const addTextViolations = (value: string, violations: Set<string>) => {
   if (lawyerStatusPattern.test(value)) violations.add("lawyer-status claim");
 
   if (/\b(?:more\s+than|over|above|greater\s+than|in\s+excess\s+of)\s*(?:9[5-9]|100)%\+?(?!\d)/i.test(value)) {
-    violations.add("outcome rate exceeds 95%");
+    violations.add("numeric outcome rate is not permitted");
   }
   for (const match of value.matchAll(/(\d{1,3})%\+?\s+(?:historical\s+)?(?:success|win|favourable|favorable)(?:\s+rate)?/gi)) {
-    if (Number(match[1]) > 95) violations.add("outcome rate exceeds 95%");
+    if (Number(match[1]) >= 0) violations.add("numeric outcome rate is not permitted");
   }
   for (const match of value.matchAll(/(?:success|win|favourable|favorable)(?:\s+rate)?[^\d]{0,16}(\d{1,3})%\+?/gi)) {
-    if (Number(match[1]) > 95) violations.add("outcome rate exceeds 95%");
+    if (Number(match[1]) >= 0) violations.add("numeric outcome rate is not permitted");
   }
 
   if (/\b(?:testimonials?|social\s+proof)\b/i.test(value)) {

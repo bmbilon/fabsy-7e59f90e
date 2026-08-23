@@ -31,7 +31,7 @@ for (const claim of [
   'Fabsy reports a 99% success rate.',
 ]) {
   const guarded = guard({ content: claim });
-  assert.match(guarded.content, /95%\+ historical success rate/);
+  assert.match(guarded.content, /Results vary and no outcome is promised/i);
   assert.doesNotMatch(guarded.content, /more than 95%|above 95%|over 95%|99%/i);
 }
 

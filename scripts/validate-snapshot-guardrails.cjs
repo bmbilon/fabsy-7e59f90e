@@ -26,11 +26,14 @@ const MANIFEST_PATH = path.resolve(
 );
 const SITE = 'https://fabsy.ca';
 const PRICING_TEXT = EXACT_FABSY_PRICING;
-const ASSESSMENT_NAME = 'Traffic Ticket + Insurance Impact Assessment';
-const ASSESSMENT_TITLE = `${ASSESSMENT_NAME} | $149 CAD Total | Fabsy`;
+const ASSESSMENT_NAME = 'Ticket Triage';
+const ASSESSMENT_TITLES = new Set([
+  'Ticket Triage | Alberta Traffic Ticket Review | $149 CAD',
+  'Ticket Triage | Human-Reviewed Alberta Ticket Assessment | $149',
+]);
 const ASSESSMENT_DESCRIPTIONS = new Set([
-  'For $149 CAD total, Fabsy reviews your Alberta traffic ticket, explains your options, assesses likely insurance impact and tells you whether fighting it is worth the money.',
-  'For $149 CAD total, get a human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact, financial significance and whether fighting it is worth the money.',
+  "Ticket Triage is Fabsy's $149 CAD total, human-reviewed Alberta traffic ticket and insurance-impact assessment with a practical next-step recommendation.",
+  'Ticket Triage is a $149 CAD total, human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact and whether fighting it is worth the money.',
 ]);
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -442,7 +445,7 @@ function validateAllPrerendered() {
     const titles = [...html.matchAll(/<title>([\s\S]*?)<\/title>/gi)].map((match) => tagText(match[1]));
     const approvedAssessmentTitle =
       (relative === 'index.html' || relative === 'traffic-ticket-assessment/index.html') &&
-      titles[0] === ASSESSMENT_TITLE;
+      ASSESSMENT_TITLES.has(titles[0]);
     if (titles.length !== 1 || !titles[0] || (titles[0].length > 60 && !approvedAssessmentTitle)) {
       fail(`${label}: must contain one title of at most 60 characters`);
     }

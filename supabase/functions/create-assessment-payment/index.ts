@@ -185,11 +185,11 @@ serve(async (req) => {
           unit_amount: ASSESSMENT_CENTS,
           tax_behavior: "inclusive",
           product_data: {
-            name: "Traffic Ticket + Insurance Impact Assessment",
+            name: "Ticket Triage",
             description: "Human-reviewed Alberta ticket assessment covering options, likely insurance impact, financial significance, representation break-even, and a recommended next step.",
             metadata: {
               fabsy_product: "traffic_ticket_insurance_assessment",
-              fabsy_display_name: "Traffic Ticket + Insurance Impact Assessment",
+              fabsy_display_name: "Ticket Triage",
               fabsy_internal_name: "Ticket Triage",
               price_includes_applicable_tax: "true",
               representation_priority: "true",

@@ -2,8 +2,10 @@ export const TICKET_ASSESSMENT = {
   slug: "/traffic-ticket-assessment",
   intakePath: "/traffic-ticket-assessment/start",
   confirmationPath: "/traffic-ticket-assessment/confirmation",
-  name: "Traffic Ticket + Insurance Impact Assessment",
-  shortName: "$149 Assessment",
+  name: "Ticket Triage",
+  descriptor: "Human-Reviewed Traffic Ticket + Insurance Impact Assessment",
+  displayName: "Ticket Triage: Human-Reviewed Traffic Ticket + Insurance Impact Assessment",
+  shortName: "Ticket Triage",
   internalName: "Ticket Triage",
   priceCad: 149,
   priceCents: 14_900,
@@ -15,8 +17,8 @@ export const TICKET_ASSESSMENT = {
   heroHeadline: "Got a traffic ticket and don't know what to do?",
   heroSubheadline:
     "For $149, Fabsy will review your ticket, explain your options, assess the likely insurance impact and tell you whether fighting it is actually worth the money.",
-  cta: "Get My $149 Assessment",
-  offerVariant: "traffic_ticket_insurance_assessment_149_v2",
+  cta: "Get Ticket Triage - $149",
+  offerVariant: "ticket_triage_149_v3",
   supportedJurisdictions: ["Alberta"] as const,
   deliveryExpectation:
     "A Fabsy team member will complete a human review and email your assessment. If a response deadline is close, contact us after submitting.",
@@ -30,7 +32,7 @@ export const TICKET_ASSESSMENT = {
   representationPriority: {
     enabled: true,
     publicCopy:
-      "Assessment clients receive priority placement in Fabsy's representation queue if they upgrade and the matter is eligible. Priority placement does not extend a ticket deadline or guarantee a specific start date or outcome.",
+      "Assessment clients receive priority placement in Fabsy's representation queue if they upgrade and the matter is eligible. Priority placement does not extend a ticket deadline or promise a specific start date or outcome.",
   },
   insuranceDisclaimer:
     "Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Fabsy's assessment estimates likely risk and financial significance; it is not a binding insurance quote and does not predict a specific premium change.",

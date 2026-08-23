@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { name: "How It Works", path: "/how-it-works" },
   { name: "About", path: "/about" },
   { name: "What We Help With", path: "/services" },
-  { name: "$149 Assessment", path: "/traffic-ticket-assessment" },
+  { name: "Ticket Triage", path: "/traffic-ticket-assessment" },
   { name: "Success Stories", path: "/testimonials" },
   { name: "Blog", path: "/blog" },
 ] as const;

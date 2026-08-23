@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { captureMarketingAttribution } from '@/lib/marketingAttribution';
 
 declare global {
   interface Window {
@@ -43,6 +44,7 @@ export default function Analytics() {
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function gtag(..._args: unknown[]) {
       // Google expects each command to be queued as the function's arguments object.
+      // eslint-disable-next-line prefer-rest-params
       window.dataLayer?.push(arguments);
     };
 
@@ -62,6 +64,32 @@ export default function Analytics() {
         send_page_view: false,
         debug_mode: isDebugAnalyticsSession(),
       });
+
+      const attribution = captureMarketingAttribution(
+        window.location.search,
+        location.pathname,
+        document.referrer,
+      );
+      if (attribution.llm_source || attribution.utm_source) {
+        window.gtag('set', 'user_properties', {
+          acquisition_source: attribution.llm_source || attribution.utm_source,
+        });
+      }
+      if (attribution.llm_source) {
+        try {
+          const sessionKey = `fabsy-llm-referral:${attribution.llm_source}:${attribution.landing_page || location.pathname}`;
+          if (!window.sessionStorage.getItem(sessionKey)) {
+            window.gtag('event', 'llm_referral', {
+              llm_source: attribution.llm_source,
+              landing_page: attribution.landing_page || location.pathname,
+              referrer_host: attribution.referrer_host,
+            });
+            window.sessionStorage.setItem(sessionKey, '1');
+          }
+        } catch {
+          // Analytics continues when session storage is unavailable.
+        }
+      }
     }
 
     if (adsId) {
@@ -76,10 +104,17 @@ export default function Analytics() {
     const gtag = window.gtag;
     if (gaId && typeof gtag === 'function' && !isPrivateAnalyticsRoute(location.pathname)) {
       const pageLocation = `${window.location.origin}${location.pathname}`;
+      const attribution = captureMarketingAttribution(
+        window.location.search,
+        location.pathname,
+        document.referrer,
+      );
       gtag('event', 'page_view', {
         page_location: pageLocation,
         page_path: location.pathname,
         page_title: document.title,
+        llm_source: attribution.llm_source,
+        first_landing_page: attribution.landing_page,
         debug_mode: isDebugAnalyticsSession(),
       });
     }

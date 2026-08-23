@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
 const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
-const EXACT_TICKET_TRIAGE = "The Traffic Ticket + Insurance Impact Assessment costs $149 CAD total, including applicable GST. If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax; the 30% success fee still applies to any fine reduction.";
+const EXACT_TICKET_TRIAGE = "Ticket Triage is Fabsy's human-reviewed traffic ticket and insurance-impact assessment. It costs $149 CAD total, including applicable GST. If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax; eligible clients receive priority placement and the 30% success fee still applies to any fine reduction.";
 const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent review. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
 
 const SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket information.
@@ -26,7 +26,7 @@ FACT SAFETY:
 - Only repeat a fine amount, demerit count, response period, court date, or deadline if that exact value appears in the structured TICKET DATA.
 - Never infer a numeric value from a violation name, location, or general knowledge.
 - If a value is not in TICKET DATA, tell the user to check the ticket and the applicable official Alberta or court source.
-- Do not state unsourced statistics or a success rate above 95%.
+- Do not state unsourced statistics or any success-rate percentage.
 
 PRICING:
 - For representation pricing, use this exact sentence: "${EXACT_PRICING}"

@@ -1,4 +1,5 @@
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { readMarketingAttribution } from "@/lib/marketingAttribution";
 
 type AssessmentEvent =
   | "assessment_offer_view"
@@ -8,40 +9,20 @@ type AssessmentEvent =
   | "ticket_upload_completed"
   | "intake_completed"
   | "checkout_started"
+  | "begin_checkout"
   | "assessment_purchase"
+  | "purchase"
   | "checkout_abandoned"
   | "representation_cta_view"
   | "representation_cta_click";
 
-const ATTRIBUTION_KEYS = [
-  "gclid",
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_term",
-  "utm_content",
-] as const;
-
-function storedAttribution(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  try {
-    const stored = JSON.parse(window.localStorage.getItem("fabsy_marketing") || "{}") as Record<string, unknown>;
-    return ATTRIBUTION_KEYS.reduce<Record<string, string>>((safe, key) => {
-      if (typeof stored[key] === "string" && stored[key]) safe[key] = stored[key] as string;
-      return safe;
-    }, {});
-  } catch {
-    return {};
-  }
-}
-
 export function assessmentAttribution() {
-  return storedAttribution();
+  return readMarketingAttribution();
 }
 
 export function trackAssessmentEvent(
   event: AssessmentEvent,
-  parameters: Record<string, string | number | boolean | undefined> = {},
+  parameters: Record<string, unknown> = {},
   onceKey?: string,
 ) {
   if (typeof window === "undefined" || typeof window.gtag !== "function") return;
@@ -59,7 +40,7 @@ export function trackAssessmentEvent(
     page_path: window.location.pathname,
     offer_variant: TICKET_ASSESSMENT.offerVariant,
     currency: TICKET_ASSESSMENT.currency,
-    ...storedAttribution(),
+    ...readMarketingAttribution(),
     ...parameters,
   });
 
