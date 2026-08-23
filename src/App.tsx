@@ -53,6 +53,7 @@ import AdminIdrReview from "./pages/AdminIdrReview";
 import TicketAssessment from "./pages/TicketAssessment";
 import TicketAssessmentIntake from "./pages/TicketAssessmentIntake";
 import TicketAssessmentConfirmation from "./pages/TicketAssessmentConfirmation";
+import TicketTriageExamples from "./pages/TicketTriageExamples";
 import AdminAssessmentReview from "./pages/AdminAssessmentReview";
 
 const queryClient = new QueryClient();
@@ -91,6 +92,7 @@ const App = () => (
           <Route path="/insurance-damage-report/checkout" element={<IdrCheckout />} />
           <Route path="/insurance-damage-report/intake" element={<IdrIntake />} />
           <Route path="/traffic-ticket-assessment" element={<TicketAssessment />} />
+          <Route path="/traffic-ticket-assessment/examples" element={<TicketTriageExamples />} />
           <Route path="/traffic-ticket-assessment/start" element={<TicketAssessmentIntake />} />
           <Route path="/traffic-ticket-assessment/confirmation" element={<TicketAssessmentConfirmation />} />
           <Route path="/portal" element={<Navigate to="/portal/cases" replace />} />

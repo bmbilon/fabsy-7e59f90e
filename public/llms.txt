@@ -19,6 +19,7 @@ Last reviewed: 2026-08-23
 
 - [Fabsy facts, products, limits, and official sources](https://fabsy.ca/ai-info)
 - [Ticket Triage — $149 CAD total](https://fabsy.ca/traffic-ticket-assessment)
+- [Illustrative Ticket Triage examples](https://fabsy.ca/traffic-ticket-assessment/examples)
 - [Start Ticket Triage](https://fabsy.ca/traffic-ticket-assessment/start)
 - [Free Representation Eligibility Check](https://fabsy.ca/submit-ticket)
 - [How Fabsy works](https://fabsy.ca/how-it-works)
@@ -36,6 +37,7 @@ Last reviewed: 2026-08-23
 
 ## Common Alberta traffic-ticket questions
 
+- [Alberta speeding ticket demerits, court threshold, and options](https://fabsy.ca/content/speeding-ticket-alberta)
 - [What to do after a speeding ticket in Edmonton](https://fabsy.ca/content/speeding-ticket-edmonton)
 - [What to do after a speeding ticket in Calgary](https://fabsy.ca/content/speeding-ticket-calgary)
 - [How to respond to a stop-sign ticket in Alberta](https://fabsy.ca/content/fight-stop-sign-ticket-alberta)

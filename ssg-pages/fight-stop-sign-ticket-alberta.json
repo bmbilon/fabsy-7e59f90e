@@ -1,39 +1,75 @@
 {
   "slug": "fight-stop-sign-ticket-alberta",
-  "meta_title": "Fight a Stop Sign Ticket in Alberta | Fabsy Traffic Tickets",
-  "meta_description": "Review options for responding to an Alberta stop sign ticket, requesting available evidence, and getting an agent-service assessment.",
+  "meta_title": "Fight a Stop Sign Ticket in Alberta | Fabsy",
+  "meta_description": "An Alberta stop-sign conviction carries three demerit points. Review the official rule, evidence to preserve, response options, and next steps.",
   "h1": "Can You Fight an Alberta Stop Sign Ticket?",
-  "hook": "You can dispute an Alberta stop sign ticket by following the response instructions before the deadline printed on the ticket and reviewing the available evidence.",
+  "hook": "An officer-issued conviction for failing to stop at a stop sign carries three demerit points in Alberta, and you can dispute the allegation by following the response instructions before the deadline printed on the ticket.",
   "bullets": [
+    "A stop-sign conviction carries three demerit points under Alberta's current schedule.",
     "Use the response deadline and instructions printed on the ticket.",
     "Keep the ticket and any relevant photographs, video, or documents.",
-    "Request the available evidence before deciding how to proceed.",
-    "The available response depends on the allegation, the evidence, and the court process."
+    "Request the available disclosure before deciding how to proceed."
   ],
-  "what": "<h2>What disputing a stop sign ticket means</h2><p>Disputing a ticket starts with the notice itself. Confirm the alleged offence, location, court office, and response deadline printed on the ticket. Keep the original and any records related to the event.</p><p>The available response depends on the allegation, the evidence, and the current court process. No service can predict the result of an individual matter.</p>",
-  "how": "<h2>How to review your options</h2><p>Follow the response instructions before the deadline printed on the ticket. Request the available disclosure and review it alongside any relevant photographs, video, documents, or witness information.</p><p>A matter may resolve or may proceed to trial. Attendance requirements depend on the charge, the court, and what happens in the matter.</p>",
-  "next": "<h2>What to do next</h2><p>Fabsy can review the ticket and explain whether the matter is eligible for agent representation. Fabsy is an agent service, not a law firm.</p><p>Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>",
-  "faqs": [
+  "what": "<h2>What the allegation means</h2><p>The current Alberta Driver's Guide assigns three demerit points for failing to stop at an intersection controlled by a stop sign. Demerit points are applied on the conviction date and remain on the driving record for two years from that date.</p><p>The legal and factual issue is not simply whether the vehicle slowed. Review the exact allegation, intersection layout, stop line, officer position, notes, and any available video or photographs.</p>",
+  "how": "<h2>How to review and dispute the ticket</h2><p>Confirm the alleged offence, location, court office, response instructions, and deadline printed on the ticket. Preserve your ticket, written recollection, photographs, dashcam video, and any witness information.</p><p>Request the available disclosure and compare it with the intersection layout and your records. Alberta's Traffic Ticket Digital Service supports ticket actions including pleading not guilty, requesting a trial date, and asking for a prosecutor review where available.</p>",
+  "next": "<h2>What to do next</h2><p>The right response depends on the allegation, available evidence, driving record, and the practical value of a different outcome. No service can predict the result of an individual matter.</p><p>Fabsy can review the ticket and explain whether the matter is eligible for agent representation. Fabsy is an agent service, not a law firm.</p><p>Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>",
+  "reviewed_at": "2026-08-23",
+  "sources": [
     {
-      "a": "Use the response deadline and instructions printed on the ticket. Keep a copy and request the available evidence before choosing how to proceed.",
-      "q": "How do I dispute an Alberta stop sign ticket?"
+      "title": "Government of Alberta Driver's Guide: demerit point schedule",
+      "url": "https://open.alberta.ca/dataset/387f4e8a-6c0a-456a-ab31-995aadaf1f2b/resource/1edf5165-9c51-4da8-8206-7bf08bb9a76d/download/tran-drivers-guide-2023-04.pdf"
     },
     {
-      "a": "It depends on the allegation, the evidence, and the circumstances. Review the disclosure and any relevant records before deciding how to respond.",
-      "q": "What evidence matters in a stop sign dispute?"
+      "title": "Government of Alberta: demerit driving suspension",
+      "url": "https://www.alberta.ca/demerit-driving-suspension"
     },
     {
-      "a": "Attendance requirements depend on the charge, the court, and what happens in the matter. An agent can tell you if personal attendance is required.",
-      "q": "Will I need to attend court?"
-    },
-    {
-      "a": "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.",
-      "q": "What does Fabsy charge?"
+      "title": "Government of Alberta: Traffic Ticket Digital Service options",
+      "url": "https://www.alberta.ca/alberta-crown-prosecution-service"
     }
   ],
-  "video": {
-    "transcript": "",
-    "youtubeUrl": ""
-  },
-  "jsonld": "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How do I dispute an Alberta stop sign ticket?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Use the response deadline and instructions printed on the ticket. Keep a copy and request the available evidence before choosing how to proceed.\"}},{\"@type\":\"Question\",\"name\":\"What evidence matters in a stop sign dispute?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It depends on the allegation, the evidence, and the circumstances. Review the disclosure and any relevant records before deciding how to respond.\"}},{\"@type\":\"Question\",\"name\":\"Will I need to attend court?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Attendance requirements depend on the charge, the court, and what happens in the matter. An agent can tell you if personal attendance is required.\"}},{\"@type\":\"Question\",\"name\":\"What does Fabsy charge?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.\"}}]}"
+  "faqs": [
+    {
+      "q": "How many demerits does an Alberta stop-sign ticket carry?",
+      "a": "The current Alberta Driver's Guide assigns three demerit points for failing to stop at an intersection controlled by a stop sign."
+    },
+    {
+      "q": "How do I dispute an Alberta stop-sign ticket?",
+      "a": "Use the response deadline and instructions printed on the ticket. Keep a copy, request the available disclosure, and preserve relevant photographs, video, documents, and witness information."
+    },
+    {
+      "q": "What evidence matters in a stop-sign dispute?",
+      "a": "Relevant material can include the officer's notes and position, the stop line and intersection layout, dashcam video, photographs, witness information, and your written recollection."
+    },
+    {
+      "q": "What does Fabsy charge for representation?",
+      "a": "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
+    }
+  ],
+  "jsonld": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How many demerits does an Alberta stop-sign ticket carry?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The current Alberta Driver's Guide assigns three demerit points for failing to stop at an intersection controlled by a stop sign." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I dispute an Alberta stop-sign ticket?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Use the response deadline and instructions printed on the ticket. Keep a copy, request the available disclosure, and preserve relevant photographs, video, documents, and witness information." }
+      },
+      {
+        "@type": "Question",
+        "name": "What evidence matters in a stop-sign dispute?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Relevant material can include the officer's notes and position, the stop line and intersection layout, dashcam video, photographs, witness information, and your written recollection." }
+      },
+      {
+        "@type": "Question",
+        "name": "What does Fabsy charge for representation?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced." }
+      }
+    ]
+  }
 }

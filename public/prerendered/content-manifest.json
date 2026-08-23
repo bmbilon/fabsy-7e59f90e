@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-08-23T22:49:51.000Z",
+  "generatedAt": "2026-08-23T23:25:33.245Z",
   "dbSourceCount": 1122,
   "dbSlugs": [
     "careless-driving-ticket-airdrie",
@@ -1126,7 +1126,7 @@
     "verify-smoke-1759360172",
     "verify-smoke-1759360542"
   ],
-  "curatedSourceCount": 36,
+  "curatedSourceCount": 38,
   "curatedSourceSlugs": [
     "careless-driving-ticket-alberta",
     "demerit-points-alberta",
@@ -1163,13 +1163,15 @@
     "photo-radar-ticket-alberta",
     "photo-radar-ticket-edmonton",
     "red-light-ticket-alberta",
-    "speeding-ticket-alberta"
+    "speeding-ticket-alberta",
+    "speeding-ticket-calgary",
+    "speeding-ticket-edmonton"
   ],
   "curatedOnlyCount": 0,
   "curatedOnlySlugs": [],
   "sourceUnionCount": 1122,
   "generatedCount": 1122,
-  "curatedCount": 17,
+  "curatedCount": 19,
   "curatedSlugs": [
     "careless-driving-ticket-alberta",
     "demerit-points-alberta",
@@ -1187,10 +1189,12 @@
     "photo-radar-ticket-alberta",
     "photo-radar-ticket-edmonton",
     "red-light-ticket-alberta",
-    "speeding-ticket-alberta"
+    "speeding-ticket-alberta",
+    "speeding-ticket-calgary",
+    "speeding-ticket-edmonton"
   ],
   "quarantinedCuratedSlugs": [],
-  "fallbackCount": 1105,
+  "fallbackCount": 1103,
   "slugs": [
     "careless-driving-ticket-airdrie",
     "careless-driving-ticket-alberta",

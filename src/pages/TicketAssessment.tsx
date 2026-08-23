@@ -375,6 +375,11 @@ export default function TicketAssessment() {
                 Illustrative example only. Figures and recommendations vary by ticket, driving history, insurer context and the information supplied; this is not a promise of a particular result or premium change.
               </p>
             </Card>
+            <div className="mt-6 text-center">
+              <Button asChild variant="outline">
+                <Link to="/traffic-ticket-assessment/examples">See three complete Ticket Triage examples</Link>
+              </Button>
+            </div>
           </div>
         </section>
 

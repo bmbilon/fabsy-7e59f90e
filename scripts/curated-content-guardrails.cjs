@@ -129,6 +129,13 @@ function redactSlugVerifiedFacts(value, slug) {
         '[verified speed-on-green removal date]'
       );
       break;
+    case 'fight-stop-sign-ticket-alberta':
+      // Official source: current Alberta Driver's Guide demerit schedule.
+      text = text.replace(
+        /\b(?:3|three)\s+demerit(?:s|\s+points?)\b/gi,
+        '[verified stop-sign demerits]'
+      );
+      break;
     case 'photo-radar-ticket-edmonton':
       // Official sources: Alberta.ca "Photo radar in Alberta" and Edmonton automated enforcement.
       text = replaceWhenNearby(
@@ -146,6 +153,48 @@ function redactSlugVerifiedFacts(value, slug) {
 
 function redactVerifiedNumericClaims(value, slug) {
   let text = visibleText(value);
+
+  // Official source: current Alberta Driver's Guide speeding bands. Redact
+  // both the point value and its matching speed threshold only when they
+  // appear near one another, so unrelated numeric claims remain guarded.
+  const speedingBands = [
+    { points: '(?:2|two)', speed: '(?:up\\s+to\\s+)?15' },
+    { points: '(?:3|three)', speed: '16\\s*(?:to|-)\\s*30' },
+    { points: '(?:4|four)', speed: '31\\s*(?:to|-)\\s*50' },
+    { points: '(?:6|six)', speed: '(?:51\\s*(?:km\\/h\\s*)?(?:or\\s+more)?|(?:more\\s+than|over)\\s*50)' },
+  ];
+  for (const band of speedingBands) {
+    const completeBandPattern = new RegExp(
+      `\\b${band.points}\\s+(?:demerits?|demerit\\s+points?|points?)\\b[^.!?]{0,70}\\b${band.speed}\\s*(?:km\\/h|kilometres?\\s+per\\s+hour)(?:\\s+over)?\\b`,
+      'gi'
+    );
+    text = text.replace(completeBandPattern, '[verified complete speeding band]');
+    const pointPattern = new RegExp(`\\b${band.points}\\s+(?:demerits?|demerit\\s+points?|points?)\\b`, 'gi');
+    const speedPattern = new RegExp(`\\b${band.speed}\\s*(?:km\\/h|kilometres?\\s+per\\s+hour)(?:\\s+over)?\\b`, 'gi');
+    const pointContext = new RegExp(`\\b${band.points}\\s+(?:demerits?|demerit\\s+points?|points?)\\b`, 'i');
+    const speedContext = new RegExp(`\\b${band.speed}\\s*(?:km\\/h|kilometres?\\s+per\\s+hour)(?:\\s+over)?\\b`, 'i');
+    text = replaceWhenNearby(text, pointPattern, speedContext, '[verified speeding demerit band]');
+    text = replaceWhenNearby(text, speedPattern, pointContext, '[verified speeding threshold band]');
+  }
+
+  text = replaceWhenNearby(
+    text,
+    /\b(?:2|two)(?:\s+|-)years?\b/gi,
+    /\b(?:demerit|points?|record|abstract|conviction)\b/i,
+    '[verified demerit record period]'
+  );
+
+  text = replaceWhenNearby(
+    text,
+    /\b51\s*km\/h\s+or\s+more\s+over(?:\s+the\s+limit)?\b/gi,
+    /\b(?:court\s+appearance|six\s+(?:demerit\s+)?points?)\b/i,
+    '[verified mandatory court threshold]'
+  );
+
+  text = text.replace(
+    /\b(?:2|two)\s+to\s+(?:6|six)\s+(?:demerits?|demerit\s+points?|points?)\b/gi,
+    '[verified speeding demerit range]'
+  );
 
   text = replaceWhenNearby(
     text,
@@ -193,6 +242,7 @@ function redactVerifiedNumericClaims(value, slug) {
   text = text
     .replace(/\b\d{1,3}\s*%\s+complete\b/gi, '[form progress]')
     .replace(/\b(?:last\s+)?reviewed:?\s*\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}\b/gi, '[verified editorial review date]')
+    .replace(/"dateModified"\s*:\s*"\d{4}-\d{2}-\d{2}"/gi, '"dateModified":"[verified editorial review date]"')
     .replace(/\bApril\s+1,?\s+2025\b/gi, '[verified photo radar date]')
     .replace(/\b(?:2|two)\s+to\s+(?:6|six)\s+demerit(?:s|\s+points?)\b/gi, '[verified speeding demerit range]')
     .replace(/\b(?:2|two)\s*(?:demerit(?:s|\s+points?))?\s*\(?\s*(?:for\s+)?(?:up\s+to\s+)?15\s*(?:km\/h\s*)?over\s*\)?/gi, '[verified speeding band]')
@@ -281,6 +331,21 @@ function curatedPageIssues(page) {
     page.faqs.some((faq) => !present(faq?.q) || !present(faq?.a))
   ) {
     issues.push('FAQs must contain complete questions and answers');
+  }
+  if (page?.reviewed_at !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(page.reviewed_at)) {
+    issues.push('reviewed_at must use YYYY-MM-DD');
+  }
+  if (page?.sources !== undefined) {
+    if (!Array.isArray(page.sources) || page.sources.length === 0) {
+      issues.push('sources must contain at least one source');
+    } else {
+      page.sources.forEach((source, index) => {
+        if (!present(source?.title)) issues.push(`source ${index + 1}: missing title`);
+        if (!/^https:\/\/(?:www\.)?(?:alberta\.ca|open\.alberta\.ca|traffictickets\.alberta\.ca)\//i.test(source?.url || '')) {
+          issues.push(`source ${index + 1}: URL must be an official Alberta source`);
+        }
+      });
+    }
   }
 
   const textFields = [

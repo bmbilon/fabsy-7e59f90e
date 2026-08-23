@@ -142,6 +142,27 @@ function normalizeFaqs(faqs) {
     .filter((faq) => faq.q && faq.a);
 }
 
+function normalizeSources(sources) {
+  if (!Array.isArray(sources)) return [];
+  return sources
+    .map((source) => ({
+      title: typeof source?.title === 'string' ? source.title.trim() : '',
+      url: typeof source?.url === 'string' ? source.url.trim() : '',
+    }))
+    .filter((source) => source.title && source.url);
+}
+
+function reviewedLabel(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return '';
+  const [year, month, day] = value.split('-').map(Number);
+  return new Intl.DateTimeFormat('en-CA', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
 function fallbackFaqs() {
   return [
     {
@@ -240,6 +261,8 @@ function normalizedPage(basePage, curated) {
       hook: basePage.hook.trim(),
       bullets: Array.isArray(basePage.bullets) ? basePage.bullets.map(String) : [],
       faqs: normalizeFaqs(basePage.faqs),
+      sources: normalizeSources(basePage.sources),
+      reviewed_at: typeof basePage.reviewed_at === 'string' ? basePage.reviewed_at.trim() : '',
       curated: true,
     };
   }
@@ -307,6 +330,21 @@ function professionalServiceJsonLd() {
   };
 }
 
+function articleJsonLd(page, url) {
+  if (!page.curated || !page.reviewed_at || page.sources.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: page.h1,
+    description: page.meta_description,
+    url,
+    dateModified: page.reviewed_at,
+    author: { '@type': 'Organization', name: BUSINESS_NAME, url: SITE },
+    publisher: { '@type': 'Organization', name: BUSINESS_NAME, url: SITE },
+    citation: page.sources.map((source) => source.url),
+  };
+}
+
 function curatedSections(page) {
   return [page.what, page.how, page.next].filter(present).join('\n');
 }
@@ -341,6 +379,17 @@ function render(page) {
     )
     .join('\n');
   const sections = page.curated ? curatedSections(page) : fallbackSections(page);
+  const articleSchema = articleJsonLd(page, url);
+  const sourcesHtml = page.curated && page.sources.length
+    ? `      <aside class="triage sources" aria-labelledby="sources-heading">
+        <h2 id="sources-heading">Sources checked</h2>
+        ${page.reviewed_at ? `<p><strong>Reviewed:</strong> ${esc(reviewedLabel(page.reviewed_at))}</p>` : ''}
+        <ul>
+${page.sources.map((source) => `          <li><a href="${esc(source.url)}" rel="noopener noreferrer">${esc(source.title)}</a></li>`).join('\n')}
+        </ul>
+        <p>Rules and procedures can change. Use the current official source and the instructions printed on the individual ticket.</p>
+      </aside>`
+    : '';
 
   const html = `<!DOCTYPE html>
 <html lang="en-CA">
@@ -361,7 +410,7 @@ function render(page) {
   <script type="application/ld+json">${safeJsonLd(faqJsonLd(page.faqs))}</script>
   <script type="application/ld+json">${safeJsonLd(breadcrumbJsonLd(page))}</script>
   <script type="application/ld+json">${safeJsonLd(professionalServiceJsonLd())}</script>
-  <style>
+${articleSchema ? `  <script type="application/ld+json">${safeJsonLd(articleSchema)}</script>\n` : ''}  <style>
     body{font-family:Inter,system-ui,sans-serif;max-width:760px;margin:0 auto;padding:24px;line-height:1.6;color:#1a1a2e}
     header nav a{margin-right:16px;color:#7c3aed;text-decoration:none}
     .hook{font-size:1.1rem;font-weight:500;background:#f5f3ff;border-left:4px solid #7c3aed;padding:12px 16px;margin:16px 0}
@@ -392,7 +441,7 @@ function render(page) {
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}
       </ul>
 ${sections}
-      <section class="triage" aria-labelledby="ticket-triage-heading">
+${sourcesHtml ? `${sourcesHtml}\n` : ''}      <section class="triage" aria-labelledby="ticket-triage-heading">
         <h2 id="ticket-triage-heading">Need a ticket-specific answer?</h2>
         <p><strong>Ticket Triage</strong> is Fabsy's $149 CAD total, GST-included, human-reviewed assessment for Alberta traffic tickets.</p>
         <ul>

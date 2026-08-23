@@ -1,0 +1,75 @@
+{
+  "slug": "speeding-ticket-edmonton",
+  "meta_title": "Edmonton Speeding Ticket: Demerits & Options | Fabsy",
+  "meta_description": "Got an Edmonton speeding ticket? Check Alberta demerit bands, the court threshold, official response options, and what to review before acting.",
+  "h1": "Edmonton Speeding Tickets: Demerits and What to Do Next",
+  "hook": "Edmonton officer-issued speeding tickets use Alberta's provincial demerit schedule, ranging from two to six points depending on the alleged speed.",
+  "bullets": [
+    "The Alberta speeding schedule applies to officer-issued Edmonton tickets.",
+    "The schedule rises from two points up to 15 km/h over to six points at 51 km/h or more over.",
+    "Speeding at 51 km/h or more over the limit requires a court appearance.",
+    "Use the instructions and response deadline printed on the ticket."
+  ],
+  "what": "<h2>What an Edmonton speeding ticket can mean</h2><p>For an officer-issued ticket, Alberta's current schedule assigns two demerit points up to 15 km/h over, three for 16 to 30 km/h over, four for 31 to 50 km/h over, and six for 51 km/h or more over. The highest band also requires a court appearance.</p><p>Demerit points are applied on the conviction date and remain on the driving record for two years. The existing record matters because Alberta's suspension thresholds differ for fully licensed and GDL drivers.</p>",
+  "how": "<h2>How to review the ticket</h2><p>Check whether the ticket was issued by an officer or generated through automated enforcement, because the record consequences and evidence can differ. Confirm the alleged offence, location, response deadline, and instructions printed on the ticket.</p><p>Preserve any relevant photographs, dashcam video, or documents. Request the available disclosure and review the officer notes, measurement-device records, location, signs, and conditions before choosing a response through Alberta's current ticket process.</p>",
+  "next": "<h2>What to do next</h2><p>A ticket-specific decision should consider the alleged speed, evidence, existing record, licence class, and whether the economic value of a different outcome justifies paid help.</p><p>Fabsy can review the ticket and explain whether the matter is eligible for agent representation. Fabsy is an agent service, not a law firm.</p><p>Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>",
+  "reviewed_at": "2026-08-23",
+  "sources": [
+    {
+      "title": "Government of Alberta Driver's Guide: demerit point schedule",
+      "url": "https://open.alberta.ca/dataset/387f4e8a-6c0a-456a-ab31-995aadaf1f2b/resource/1edf5165-9c51-4da8-8206-7bf08bb9a76d/download/tran-drivers-guide-2023-04.pdf"
+    },
+    {
+      "title": "Government of Alberta: demerit driving suspension",
+      "url": "https://www.alberta.ca/demerit-driving-suspension"
+    },
+    {
+      "title": "Government of Alberta: Traffic Ticket Digital Service options",
+      "url": "https://www.alberta.ca/alberta-crown-prosecution-service"
+    }
+  ],
+  "faqs": [
+    {
+      "q": "How many demerits can an Edmonton speeding ticket carry?",
+      "a": "An officer-issued Edmonton speeding conviction uses Alberta's schedule, which ranges from two demerit points up to 15 km/h over the limit to six points at 51 km/h or more over."
+    },
+    {
+      "q": "Does an Edmonton speeding ticket always require court?",
+      "a": "No. The current Alberta Driver's Guide requires a court appearance at 51 km/h or more over the limit. For every ticket, use the response instructions printed on the notice."
+    },
+    {
+      "q": "What evidence should I review?",
+      "a": "Review the available disclosure, including the allegation, officer notes, any measurement-device records provided, location, signs, and relevant photographs or video."
+    },
+    {
+      "q": "Can Ticket Triage tell me if representation is worth it?",
+      "a": "Yes. Ticket Triage is a human-reviewed assessment of the ticket, likely record and insurance significance, response options, representation economics, and the recommended next step."
+    }
+  ],
+  "jsonld": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How many demerits can an Edmonton speeding ticket carry?",
+        "acceptedAnswer": { "@type": "Answer", "text": "An officer-issued Edmonton speeding conviction uses Alberta's schedule, which ranges from two demerit points up to 15 km/h over the limit to six points at 51 km/h or more over." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does an Edmonton speeding ticket always require court?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. The current Alberta Driver's Guide requires a court appearance at 51 km/h or more over the limit. For every ticket, use the response instructions printed on the notice." }
+      },
+      {
+        "@type": "Question",
+        "name": "What evidence should I review?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Review the available disclosure, including the allegation, officer notes, any measurement-device records provided, location, signs, and relevant photographs or video." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can Ticket Triage tell me if representation is worth it?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Ticket Triage is a human-reviewed assessment of the ticket, likely record and insurance significance, response options, representation economics, and the recommended next step." }
+      }
+    ]
+  }
+}
