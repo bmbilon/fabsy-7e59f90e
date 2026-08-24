@@ -43,8 +43,16 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const errors = [];
 const fail = (message) => errors.push(message);
 
+function redactVerifiedClientTestimonials(value) {
+  return VERIFIED_CLIENT_TESTIMONIALS.reduce(
+    (text, testimonial) => text.split(testimonial.quote).join('[verified client testimonial]'),
+    String(value ?? '')
+  );
+}
+
 function guardedText(value, label, slug, options) {
-  for (const issue of textGuardrailIssues(value, slug, options)) fail(`${label}: ${issue}`);
+  const candidate = redactVerifiedClientTestimonials(value);
+  for (const issue of textGuardrailIssues(candidate, slug, options)) fail(`${label}: ${issue}`);
 }
 
 function normalizedFaqs(value, label) {

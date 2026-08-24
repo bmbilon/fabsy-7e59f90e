@@ -74,7 +74,7 @@ const TestimonialsPage = () => {
           </p>
         </div>
 
-        <section className="mx-auto mb-16 max-w-4xl" aria-labelledby="client-feedback-heading">
+        <section className="mx-auto mb-16 max-w-4xl space-y-6" aria-labelledby="client-feedback-heading">
           <h2 id="client-feedback-heading" className="sr-only">Client feedback</h2>
           {VERIFIED_CLIENT_TESTIMONIALS.map((testimonial) => (
             <Card key={`${testimonial.name}-${testimonial.location}`} className="relative overflow-hidden border-white/20 bg-white p-8 shadow-elevated sm:p-10">

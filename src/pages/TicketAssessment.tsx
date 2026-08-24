@@ -59,7 +59,9 @@ const process = [
   { icon: Scale, title: "Get a clear recommendation", text: "Understand the options and whether further representation is actually worth paying for." },
 ] as const;
 
-const featuredTestimonial = VERIFIED_CLIENT_TESTIMONIALS[0];
+const featuredTestimonial =
+  VERIFIED_CLIENT_TESTIMONIALS.find((testimonial) => testimonial.name === "James") ??
+  VERIFIED_CLIENT_TESTIMONIALS[0];
 
 const sampleRows = [
   ["Charge", "Speeding"],
