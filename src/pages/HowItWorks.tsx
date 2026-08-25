@@ -18,23 +18,23 @@ const HowItWorks: React.FC = () => {
     canonical: "https://fabsy.ca/how-it-works",
   });
   
-  // Handle file upload and navigate to submit-ticket page
+  // Carry the source file into the connected review intake.
   const handleTicketUpload = (file?: File | null) => {
     if (!file) return;
-    navigate("/submit-ticket", { state: { ticketImage: file } });
+    navigate("/traffic-ticket-assessment/start", { state: { ticketImage: file, source: "how_it_works" } });
   };
   
   const steps = [
     {
       name: "Upload your ticket",
       text: "Upload a clear image or PDF of the ticket so Fabsy can review the information you provide.",
-      url: "https://fabsy.ca/submit-ticket",
+      url: "https://fabsy.ca/traffic-ticket-assessment/start",
       icon: Upload,
     },
     {
-      name: "Start the Free Representation Eligibility Check",
-      text: "Fabsy confirms the charge, whether representation is available for your court location, and what it would cost. Keep following the instructions and deadlines printed on the ticket unless Fabsy confirms otherwise.",
-      url: "https://fabsy.ca/submit-ticket",
+      name: "Check the Free Ticket Review",
+      text: "Review and correct the ticket details captured from the file. Keep following the instructions and deadlines printed on the ticket unless Fabsy confirms otherwise.",
+      url: "https://fabsy.ca/traffic-ticket-assessment/start",
       icon: FileCheck,
     },
     {

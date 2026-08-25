@@ -148,7 +148,7 @@ const ThankYou: React.FC = () => {
         </div>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link to="/submit-ticket" className="inline-block">
+          <Link to="/traffic-ticket-assessment/start" className="inline-block">
             <span className="inline-flex items-center rounded-md bg-primary px-6 py-3 font-semibold text-white hover:opacity-90 transition">Submit another ticket</span>
           </Link>
           <Link to="/how-it-works" className="inline-block">

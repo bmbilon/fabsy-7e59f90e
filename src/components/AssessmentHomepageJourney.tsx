@@ -68,8 +68,8 @@ const faqItems = [
     a: "$149 CAD is the total one-time checkout price and includes applicable GST. Government fines and any later representation are separate.",
   },
   {
-    q: "What is the Free Representation Eligibility Check?",
-    a: "The free check only confirms whether Fabsy may be able to represent you and provides a representation quote. It does not include the paid assessment's insurance-impact analysis, financial significance, break-even calculation or written recommendation.",
+    q: "What is the Free Ticket Review?",
+    a: "Upload or photograph the ticket and check the OCR-assisted details before choosing paid help. The free stage does not retain Fabsy, pause a deadline or include the human report and policy-based insurance scenarios.",
   },
   {
     q: "Can Fabsy tell me exactly how much my premium will change?",
@@ -245,14 +245,14 @@ export default function AssessmentHomepageJourney() {
               </div>
               <Button asChild size="lg" variant="outline" className="min-h-12 lg:min-w-56">
                 <Link
-                  to="/submit-ticket"
+                  to={TICKET_ASSESSMENT.intakePath}
                   onClick={() => trackAssessmentEvent(
                     "representation_cta_click",
                     { location: "homepage_representation_step", destination: "representation_intake" },
                     "homepage_representation_step",
                   )}
                 >
-                  Check representation eligibility
+                  Start the connected intake
                 </Link>
               </Button>
             </div>
@@ -294,7 +294,7 @@ export default function AssessmentHomepageJourney() {
             ))}
           </Accordion>
           <p className="mt-5 text-center text-sm text-muted-foreground">
-            Only need to know whether Fabsy can represent you? <Link to="/submit-ticket" className="font-semibold text-primary underline underline-offset-4">Start the Free Representation Eligibility Check</Link>.
+            Start with the ticket itself: <Link to={TICKET_ASSESSMENT.intakePath} className="font-semibold text-primary underline underline-offset-4">upload or take a photo for the Free Ticket Review</Link>.
           </p>
         </div>
       </section>

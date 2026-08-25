@@ -17,8 +17,8 @@ const Footer = () => {
       { name: "Terms of Service", path: "/terms-of-service" },
     ],
     support: [
-      { name: "Ticket Triage ($149)", path: "/traffic-ticket-assessment" },
-      { name: "Free Representation Eligibility Check", path: "/submit-ticket" },
+      { name: "Priority Ticket Review ($149)", path: "/traffic-ticket-assessment" },
+      { name: "Free Ticket Review", path: "/traffic-ticket-assessment/start" },
       { name: "Contact Us", path: "/contact" },
       { name: "FAQ", path: "/faq" },
       { name: "Insurance Damage Report", path: "/insurance-damage-report" },
@@ -170,7 +170,7 @@ const Footer = () => {
           </div>
 
           <p className="text-center">
-            *By submitting a ticket for a Free Representation Eligibility Check or Ticket Triage, you agree to share your contact information and the contents of your uploaded ticket so we can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
+            *By continuing past the Free Ticket Review into a paid service, you agree to share your contact information and supplied ticket or policy documents so Fabsy can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
           </p>
         </div>
 

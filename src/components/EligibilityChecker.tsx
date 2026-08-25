@@ -1,13 +1,20 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Camera, CheckCircle2, Circle, FileSearch, Loader2, ShieldCheck, Upload } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Loader2, CheckCircle, Camera, Circle } from "lucide-react";
+import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useTicketCache } from "@/hooks/useTicketCache";
+import { toast } from "sonner";
 
 interface EligibilityCheckerProps {
   open: boolean;
@@ -28,389 +35,405 @@ interface TicketData {
   offenceDescription?: string;
   courtDate?: string;
   courtJurisdiction?: string;
+  [key: string]: unknown;
 }
 
-interface EligibilityResult {
-  reason: string;
-  violationType: string;
+interface OcrResponse {
+  success?: boolean;
+  data?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+const ticketFields = [
+  { key: "ticketNumber", label: "Ticket #", placeholder: "e.g. AB1234567" },
+  { key: "issueDate", label: "Issue date", placeholder: "YYYY-MM-DD" },
+  { key: "location", label: "Location", placeholder: "Intersection or address" },
+  { key: "officer", label: "Officer name", placeholder: "e.g. J. Smith" },
+  { key: "officerBadge", label: "Badge #", placeholder: "e.g. 12345" },
+  { key: "offenceSection", label: "Offence section", placeholder: "e.g. 115(2)(p)" },
+  { key: "offenceSubSection", label: "Offence subsection", placeholder: "e.g. (ii)" },
+  { key: "offenceDescription", label: "Offence description", placeholder: "Description shown on the ticket" },
+  { key: "violation", label: "Violation text", placeholder: "Short violation text" },
+  { key: "fineAmount", label: "Fine amount", placeholder: "Amount shown on ticket" },
+  { key: "courtDate", label: "Response or court date", placeholder: "YYYY-MM-DD, if shown" },
+  { key: "courtJurisdiction", label: "Court jurisdiction", placeholder: "e.g. Red Deer Court of Justice" },
+] as const satisfies ReadonlyArray<{ key: keyof TicketData; label: string; placeholder: string }>;
+
+function textValue(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
+function normalizedTicketData(response: OcrResponse | null): TicketData {
+  const extracted = response?.data && typeof response.data === "object" ? response.data : response;
+  const source = extracted && typeof extracted === "object" ? extracted : {};
+
+  return {
+    ticketNumber: textValue(source.ticketNumber),
+    issueDate: textValue(source.issueDate),
+    location: textValue(source.location),
+    officer: textValue(source.officer),
+    officerBadge: textValue(source.officerBadge),
+    offenceSection: textValue(source.offenceSection || source.section),
+    offenceSubSection: textValue(source.offenceSubSection || source.subsection),
+    offenceDescription: textValue(source.offenceDescription || source.offenseDescription),
+    violation: textValue(source.violation),
+    fine: textValue(source.fine),
+    fineAmount: textValue(source.fineAmount || source.fine),
+    courtDate: textValue(source.courtDate),
+    courtJurisdiction: textValue(source.courtJurisdiction),
+  };
+}
+
+function numericFine(value: string) {
+  return value.replace(/[^0-9.]/g, "");
+}
+
+function priorityReviewPrefill(ticketData: TicketData) {
+  const fineAmount = ticketData.fineAmount || ticketData.fine || "";
+  const offence = ticketData.offenceDescription || ticketData.violation || "";
+
+  return {
+    ticketNumber: ticketData.ticketNumber || "",
+    issueDate: ticketData.issueDate || "",
+    ticketDate: ticketData.issueDate || "",
+    location: ticketData.location || "",
+    officer: ticketData.officer || "",
+    officerBadge: ticketData.officerBadge || "",
+    offenceSection: ticketData.offenceSection || "",
+    offenceSubSection: ticketData.offenceSubSection || "",
+    offenceDescription: ticketData.offenceDescription || "",
+    violation: ticketData.violation || "",
+    offence,
+    fineAmount: numericFine(fineAmount),
+    courtDate: ticketData.courtDate || "",
+    responseDeadline: ticketData.courtDate || "",
+    courtJurisdiction: ticketData.courtJurisdiction || "",
+  };
+}
+
+function isSupportedImage(file: File) {
+  return file.type.startsWith("image/") || /\.(heic|heif)$/i.test(file.name);
 }
 
 export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerProps) {
   const navigate = useNavigate();
+  const inputId = useId();
+  const cameraInputId = useId();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const dialogScrollRef = useRef<HTMLDivElement | null>(null);
+  const reviewRequestRef = useRef(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
-  const [eligibilityResult, setEligibilityResult] = useState<EligibilityResult | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
   const [cacheKey, setCacheKey] = useState<string | null>(null);
-  const dialogScrollRef = useRef<HTMLDivElement | null>(null);
-  
-  // Use ticket cache hook
   const { cacheTicketData } = useTicketCache();
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (showSummary && dialogScrollRef.current) {
+      dialogScrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [showSummary]);
+
+  const resetReview = () => {
+    reviewRequestRef.current += 1;
+    setTicketData(null);
+    setSelectedFile(null);
+    setImagePreview(null);
+    setShowSummary(false);
+    setCacheKey(null);
+    setIsProcessing(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
+  };
+
+  const handleDialogChange = (nextOpen: boolean) => {
+    if (!nextOpen) resetReview();
+    onOpenChange(nextOpen);
+  };
+
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (!isSupportedImage(file)) {
+      event.target.value = "";
+      toast.error("Choose a JPG, PNG, WebP, HEIC or HEIF ticket image.");
+      return;
+    }
+    if (file.size <= 0 || file.size > MAX_IMAGE_BYTES) {
+      event.target.value = "";
+      toast.error("The ticket image must be between 1 byte and 10 MB.");
+      return;
+    }
+
+    const requestId = reviewRequestRef.current + 1;
+    reviewRequestRef.current = requestId;
     setIsProcessing(true);
     setTicketData(null);
-    setEligibilityResult(null);
+    setShowSummary(false);
+    setCacheKey(null);
+    setSelectedFile(file);
 
     try {
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => setImagePreview(e.target?.result as string);
-      reader.readAsDataURL(file);
-
-      // Convert to base64 for OCR
-      const base64 = await new Promise<string>((resolve) => {
+      const imageBase64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          resolve(base64String.split(',')[1]);
-        };
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("The ticket image could not be read."));
         reader.readAsDataURL(file);
       });
+      if (reviewRequestRef.current !== requestId) return;
+      setImagePreview(imageBase64);
 
-      // Step 1: Run OCR
       toast.info("Scanning your ticket...");
-      const { data: ocrData, error: ocrError } = await supabase.functions.invoke('ocr-ticket', {
-        body: { imageBase64: base64 }
+      const { data, error } = await supabase.functions.invoke<OcrResponse>("ocr-ticket", {
+        body: { imageBase64 },
       });
+      if (reviewRequestRef.current !== requestId) return;
+      if (error) throw error;
 
-      if (ocrError) throw ocrError;
+      const captured = normalizedTicketData(data);
+      setTicketData(captured);
+      toast.success("Ticket details captured. Please check them for accuracy.");
 
-      toast.success("Ticket scanned successfully!");
-      
-      // Extract and structure the data
-      const extractedData = ocrData?.data || ocrData;
-      const structuredTicketData = {
-        ticketNumber: extractedData.ticketNumber,
-        issueDate: extractedData.issueDate,
-        location: extractedData.location,
-        officer: extractedData.officer,
-        officerBadge: extractedData.officerBadge,
-        offenceSection: extractedData.offenceSection,
-        offenceSubSection: extractedData.offenceSubSection,
-        offenceDescription: extractedData.offenceDescription,
-        violation: extractedData.violation,
-        fine: extractedData.fine, // Use the formatted fine for display
-        fineAmount: extractedData.fineAmount, // Store raw amount for calculations and form
-        courtDate: extractedData.courtDate,
-        courtJurisdiction: '', // Default empty for form compatibility
-      };
-      
-      console.log('[EligibilityChecker] Structured ticket data created:', JSON.stringify(structuredTicketData, null, 2));
-      
-      // Persist immediately to localStorage so downstream pages can prefill reliably
       try {
-        localStorage.setItem('eligibility-ocr-data', JSON.stringify(structuredTicketData));
-        console.log('[EligibilityChecker] Saved structured ticket data to localStorage (eligibility-ocr-data)');
-      } catch (e) {
-        console.warn('[EligibilityChecker] Failed to save OCR data to localStorage', e);
+        window.localStorage.setItem("eligibility-ocr-data", JSON.stringify(captured));
+      } catch {
+        // Browser storage is optional; the current review remains available in memory.
       }
 
-      // IMMEDIATELY CACHE THE DATA TO SUPABASE (best effort, silent on failure)
-      console.log('[EligibilityChecker] Attempting to cache ticket data to Supabase...');
-      
-      if (cacheTicketData) {
-        try {
-          const newCacheKey = await cacheTicketData(structuredTicketData);
-          
-          if (newCacheKey) {
-            setCacheKey(newCacheKey);
-            console.log(`[EligibilityChecker] Successfully cached ticket data with key: ${newCacheKey}`);
-          } else {
-            console.warn('[EligibilityChecker] Cache function returned null - no key generated');
-          }
-        } catch (cacheError) {
-          console.error('[EligibilityChecker] Error during caching (non-blocking):', cacheError);
-        }
-      } else {
-        console.warn('[EligibilityChecker] cacheTicketData function not available (non-blocking)');
+      try {
+        const newCacheKey = await cacheTicketData(captured);
+        if (reviewRequestRef.current === requestId && newCacheKey) setCacheKey(newCacheKey);
+      } catch {
+        // Remote field caching is best effort and must never block the free review.
       }
-      
-      // Set the local state for eligibility calculation
-      setTicketData(structuredTicketData);
-      setIsProcessing(false);
     } catch (error) {
-      console.error('Error processing ticket:', error);
-      toast.error("Failed to process ticket. Please try again.");
-      setIsProcessing(false);
-    }
-  };
-
-  const reviewEligibility = () => {
-    if (!ticketData) return;
-    
-    setIsProcessing(true);
-    try {
-      toast.info("Preparing your ticket for review...");
-
-      setEligibilityResult({
-        reason: "Your captured ticket details are ready for an agent review. Service availability and possible options depend on the ticket, court location, and case circumstances.",
-        violationType: ticketData.offenceDescription || ticketData.violation || "Traffic ticket",
-      });
-
-      toast.success("Ticket details ready for review!");
-    } catch (error) {
-      console.error('Error preparing ticket review:', error);
-      toast.error("Failed to prepare the review. Please try again.");
+      if (reviewRequestRef.current !== requestId) return;
+      console.error("Free ticket review OCR failed", error);
+      setSelectedFile(null);
+      setImagePreview(null);
+      toast.error("We could not read that ticket image. Try another image or continue from the Priority Review page.");
     } finally {
-    setIsProcessing(false);
+      if (reviewRequestRef.current === requestId) setIsProcessing(false);
     }
   };
 
-  // When eligibility result is ready, scroll the dialog content to top so the result header is visible
-  useEffect(() => {
-    if (eligibilityResult && dialogScrollRef.current) {
-      // scroll to very top of the dialog content
-      dialogScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+  const continueToPriorityReview = () => {
+    if (!ticketData || !selectedFile) {
+      toast.error("Choose and review a ticket image first.");
+      return;
     }
-  }, [eligibilityResult]);
 
-  const resetChecker = () => {
-    setTicketData(null);
-    setEligibilityResult(null);
-    setImagePreview(null);
+    const prefillTicketData = priorityReviewPrefill(ticketData);
+    try {
+      window.localStorage.setItem("eligibility-ocr-data", JSON.stringify(prefillTicketData));
+      if (cacheKey) window.localStorage.setItem("ticket-cache-key", cacheKey);
+    } catch {
+      // React Router state still carries the file and captured fields.
+    }
+
+    const navigationState = {
+      ticketImage: selectedFile,
+      prefillTicketData,
+      source: "free_ticket_review",
+      ticketCacheKey: cacheKey,
+    };
+
+    resetReview();
+    onOpenChange(false);
+    navigate(TICKET_ASSESSMENT.intakePath, { state: navigationState });
   };
 
   return (
-    <Dialog open={open} onOpenChange={(open) => {
-      onOpenChange(open);
-      if (!open) resetChecker();
-    }}>
-      <DialogContent ref={dialogScrollRef} className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={handleDialogChange}>
+      <DialogContent ref={dialogScrollRef} className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Ticket Eligibility Review</DialogTitle>
+          <DialogTitle className="text-2xl">Free Ticket Review</DialogTitle>
+          <DialogDescription>
+            Upload a clear image or take a photo. The tool captures ticket details for you to verify; no payment is required.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {!eligibilityResult ? (
-            <div className="space-y-4">
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="ticket-upload"
-                  disabled={isProcessing}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="ticket-camera"
-                  disabled={isProcessing}
-                />
-                <div className="flex flex-col items-center space-y-4">
-                  <div className="flex flex-col items-center space-y-3">
-                    {isProcessing ? (
-                      <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                    ) : (
-                      <Upload className="h-12 w-12 text-muted-foreground" />
-                    )}
-                    <div>
-                      <p className="text-lg font-semibold">
-                        {isProcessing ? "Processing your ticket..." : "Upload Your Traffic Ticket"}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Click to select or drag and drop
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {!isProcessing && (
-                    <div className="flex gap-3 w-full max-w-sm">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => document.getElementById('ticket-upload')?.click()}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Choose File
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => document.getElementById('ticket-camera')?.click()}
-                      >
-                        <Camera className="h-4 w-4 mr-2" />
-                        Take Photo
-                      </Button>
-                    </div>
-                  )}
+        {!showSummary ? (
+          <div className="space-y-5">
+            <div className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center sm:p-8">
+              <input
+                ref={fileInputRef}
+                id={inputId}
+                type="file"
+                accept="image/*,.heic,.heif"
+                className="sr-only"
+                disabled={isProcessing}
+                onChange={handleFileUpload}
+              />
+              <input
+                ref={cameraInputRef}
+                id={cameraInputId}
+                type="file"
+                accept="image/*,.heic,.heif"
+                capture="environment"
+                className="sr-only"
+                disabled={isProcessing}
+                onChange={handleFileUpload}
+              />
+
+              <div className="flex flex-col items-center gap-4">
+                {isProcessing ? (
+                  <Loader2 className="h-12 w-12 animate-spin text-primary" aria-hidden="true" />
+                ) : (
+                  <Upload className="h-12 w-12 text-primary" aria-hidden="true" />
+                )}
+                <div>
+                  <p className="text-lg font-semibold">
+                    {isProcessing ? "Reading your ticket..." : "Add your ticket image"}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">JPG, PNG, WebP, HEIC or HEIF · maximum 10 MB</p>
                 </div>
-              </div>
 
-              {imagePreview && !ticketData && (
-                <div className="rounded-lg overflow-hidden border">
-                  <img src={imagePreview} alt="Ticket preview" className="w-full" />
-                </div>
-              )}
-
-              {ticketData && !eligibilityResult && (
-                <div className="space-y-6">
-                  <div className="bg-muted/50 rounded-lg p-4 space-y-4">
-                    <p className="font-semibold">Captured Ticket Details</p>
-
-                    {/* Captured fields grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Helper rendering for each field */}
-                      {([
-                        { key: 'ticketNumber', label: 'Ticket #', placeholder: 'e.g., AB1234567' },
-                        { key: 'issueDate', label: 'Issue Date', placeholder: 'YYYY-MM-DD' },
-                        { key: 'location', label: 'Location', placeholder: 'Intersection or address' },
-                        { key: 'officer', label: 'Officer Name', placeholder: 'e.g., J. Smith' },
-                        { key: 'officerBadge', label: 'Badge #', placeholder: 'e.g., 12345' },
-                        { key: 'offenceSection', label: 'Offence Section', placeholder: 'e.g., 115(2)(p)' },
-                        { key: 'offenceSubSection', label: 'Offence Subsection', placeholder: 'e.g., (ii)' },
-                        { key: 'offenceDescription', label: 'Offence Description', placeholder: 'e.g., Exceeded speed limit by 20 km/h' },
-                        { key: 'violation', label: 'Violation Text', placeholder: 'Short violation text' },
-                        { key: 'fineAmount', label: 'Fine Amount', placeholder: 'Amount shown on ticket' },
-                        { key: 'courtDate', label: 'Court Date', placeholder: 'YYYY-MM-DD (if set)' },
-                        { key: 'courtJurisdiction', label: 'Court Jurisdiction', placeholder: 'e.g., Calgary Provincial Court' },
-                      ] as { key: keyof TicketData; label: string; placeholder: string }[]).map(({ key, label, placeholder }) => {
-                        const k = key as keyof TicketData;
-                        const value = ticketData?.[k] as string | undefined;
-                        const present = Boolean(value && String(value).trim().length > 0);
-                        return (
-                          <div key={String(key)} className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              {present ? (
-                                <CheckCircle className="h-4 w-4 text-green-600" />
-                              ) : (
-                                <Circle className="h-4 w-4 text-red-500" />
-                              )}
-                              <Label className="text-xs font-medium">{label}</Label>
-                            </div>
-                            <Input
-                              value={value || ''}
-                              onChange={(e) => {
-                                const v = e.target.value;
-                                setTicketData((prev) => ({ ...(prev || {}), [k]: v } as TicketData));
-                              }}
-                              placeholder={present ? undefined : placeholder}
-                              className={`bg-white dark:bg-gray-900 placeholder:italic placeholder:text-muted-foreground`}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Continue to review the captured information. This tool does not estimate
-                      insurance changes, savings, demerits, or a likely case outcome.
-                    </p>
-                    <Button
-                      onClick={reviewEligibility}
-                      className="w-full"
-                      size="lg"
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? "Reviewing..." : "Review Ticket Details"}
+                {!isProcessing ? (
+                  <div className="grid w-full max-w-sm gap-3 sm:grid-cols-2">
+                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                      <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Choose File
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => cameraInputRef.current?.click()}>
+                      <Camera className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Take Photo
                     </Button>
                   </div>
-                </div>
-              )}
+                ) : null}
+              </div>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Eligibility Status */}
-              <div className="p-6 rounded-lg border-2 border-green-500 bg-green-50 dark:bg-green-950">
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Ready for Agent Review</h3>
-                    <p className="text-lg">{eligibilityResult.reason}</p>
+
+            {imagePreview ? (
+              <div className="overflow-hidden rounded-xl border bg-muted/30 p-3">
+                <img src={imagePreview} alt="Uploaded traffic ticket preview" className="mx-auto max-h-64 rounded-lg object-contain" />
+              </div>
+            ) : null}
+
+            {ticketData ? (
+              <div className="space-y-5">
+                <div className="rounded-xl border bg-muted/30 p-4 sm:p-5">
+                  <div className="flex items-start gap-3">
+                    <FileSearch className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                    <div>
+                      <p className="font-semibold">Check the captured ticket details</p>
+                      <p className="mt-1 text-sm text-muted-foreground">OCR can make mistakes. Correct anything that does not match the ticket.</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    {ticketFields.map(({ key, label, placeholder }) => {
+                      const value = ticketData[key] || "";
+                      const present = value.trim().length > 0;
+                      return (
+                        <div key={key} className="space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            {present ? (
+                              <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                            ) : (
+                              <Circle className="h-4 w-4 text-amber-500" aria-hidden="true" />
+                            )}
+                            <Label htmlFor={`${inputId}-${key}`} className="text-xs font-medium">{label}</Label>
+                          </div>
+                          <Input
+                            id={`${inputId}-${key}`}
+                            value={value}
+                            placeholder={placeholder}
+                            onChange={(event) => setTicketData((current) => ({
+                              ...(current || {}),
+                              [key]: event.target.value,
+                            }))}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
 
-              {/* Ticket Details */}
-              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                <h4 className="font-semibold mb-3">Ticket Information</h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Violation Type:</span>
-                    <p className="font-medium">{eligibilityResult.violationType}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Ticket #:</span>
-                    <p className="font-medium">{ticketData?.ticketNumber || 'Not captured'}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Fine Amount:</span>
-                    <p className="font-medium">{ticketData?.fineAmount || ticketData?.fine || 'Not captured'}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Court Jurisdiction:</span>
-                    <p className="font-medium">{ticketData?.courtJurisdiction || 'Not captured'}</p>
-                  </div>
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    This free tool captures the information you provide. It does not determine legal eligibility,
+                    estimate insurance changes or savings, provide legal advice, or predict an outcome.
+                  </p>
+                  <Button type="button" size="lg" className="mt-4 w-full" onClick={() => setShowSummary(true)}>
+                    Review Captured Details
+                  </Button>
                 </div>
               </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-600" aria-hidden="true" />
+                <div>
+                  <h3 className="text-lg font-bold text-slate-950">Your ticket details are ready</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-700">
+                    You completed the free capture and review. No payment has been requested and no service has been retained.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-              {/* Pricing explanation */}
-              <div className="bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-lg p-4">
-                <h4 className="font-semibold mb-2">How our pricing works</h4>
-                <p className="text-sm text-muted-foreground">
-                  Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
-                  If the fine is not reduced, there is no success fee.
+            <div className="rounded-xl border bg-muted/30 p-4">
+              <h4 className="font-semibold">Captured ticket</h4>
+              <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+                <div><dt className="text-muted-foreground">Ticket #</dt><dd className="font-medium">{ticketData?.ticketNumber || "Not captured"}</dd></div>
+                <div><dt className="text-muted-foreground">Offence</dt><dd className="font-medium">{ticketData?.offenceDescription || ticketData?.violation || "Not captured"}</dd></div>
+                <div><dt className="text-muted-foreground">Fine</dt><dd className="font-medium">{ticketData?.fineAmount || ticketData?.fine || "Not captured"}</dd></div>
+                <div><dt className="text-muted-foreground">Date</dt><dd className="font-medium">{ticketData?.issueDate || "Not captured"}</dd></div>
+              </dl>
+            </div>
+
+            <div className="rounded-xl border border-primary/25 bg-primary/5 p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Optional next step</p>
+              <div className="mt-2 flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <h4 className="text-lg font-bold">$149 Priority Review</h4>
+                  <p className="text-sm text-muted-foreground">Human-reviewed ticket and insurance-impact assessment.</p>
+                </div>
+                <p className="text-sm font-semibold">CAD total · GST included</p>
+              </div>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Charge, deadline, fine and demerit implications</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Likely insurance significance and practical options</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Representation economics and a recommended next step</li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border bg-slate-50 p-4">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                <p className="text-xs leading-relaxed text-slate-600">
+                  Full Representation is a separate later choice for eligible matters. It uses a $488 base
+                  representation fee plus applicable tax and 30% of any fine reduction achieved; there is no
+                  success fee if the fine is not reduced. Priority Review has no success fee. Government fines
+                  are separate. Fabsy is an Alberta traffic ticket agent service, not a law firm, and no result is promised.
                 </p>
               </div>
-
-              <div className="flex gap-3">
-                <Button onClick={resetChecker} variant="outline" className="flex-1">
-                  Check Another Ticket
-                </Button>
-                <Button onClick={() => {
-                  console.log(`[EligibilityChecker] Button clicked. Cache key: ${cacheKey}`);
-                  console.log(`[EligibilityChecker] Ticket data:`, ticketData);
-                  
-                  // Ensure we have ticket data
-                  if (!ticketData) {
-                    toast.error("No ticket data available. Please scan your ticket again.");
-                    return;
-                  }
-                  
-                  // Create data for form - prioritize fineAmount field for TicketForm compatibility
-                  const formData = {
-                    ticketNumber: ticketData?.ticketNumber || '',
-                    issueDate: ticketData?.issueDate || '',
-                    location: ticketData?.location || '',
-                    officer: ticketData?.officer || '',
-                    officerBadge: ticketData?.officerBadge || '',
-                    offenceSection: ticketData?.offenceSection || '',
-                    offenceSubSection: ticketData?.offenceSubSection || '',
-                    offenceDescription: ticketData?.offenceDescription || '',
-                    violation: ticketData?.violation || '',
-                    fineAmount: ticketData?.fineAmount || ticketData?.fine || '', // Prefer fineAmount, fallback to fine
-                    courtDate: ticketData?.courtDate || '',
-                    courtJurisdiction: ticketData?.courtJurisdiction || '',
-                  };
-                  
-                  console.log(`[EligibilityChecker] Form data being stored for direct navigation:`, formData);
-                  
-                  // Store data in localStorage for resilience
-                  localStorage.setItem('eligibility-ocr-data', JSON.stringify(formData));
-                  if (cacheKey) localStorage.setItem('ticket-cache-key', cacheKey);
-                  
-                  // Close dialog and navigate directly to Ticket Form step 2 with prefill
-                  onOpenChange(false);
-                  navigate('/ticket-form', { state: { prefillTicketData: formData, startAtStep: 2 } });
-                }} className="flex-1">
-                  Continue to Ticket Form
-                </Button>
-              </div>
             </div>
-          )}
-        </div>
+
+            <div className="grid gap-3 sm:grid-cols-[0.8fr_1.2fr]">
+              <Button type="button" variant="outline" onClick={resetReview}>Review Another Ticket</Button>
+              <Button type="button" size="lg" onClick={continueToPriorityReview}>
+                Continue to $149 Priority Review
+              </Button>
+            </div>
+
+            <p className="text-center text-xs leading-relaxed text-muted-foreground">
+              Continuing opens the secure Priority Review intake with your ticket image and captured details attached in this browser session.
+            </p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

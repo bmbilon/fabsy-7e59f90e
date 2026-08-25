@@ -59,7 +59,7 @@ const Founder = () => {
               </p>
               
               <div className="mt-6 flex flex-wrap justify-center gap-4">
-                <Link to="/submit-ticket" className="btn is-primary">Submit Your Ticket</Link>
+                <Link to="/traffic-ticket-assessment/start" className="btn is-primary">Start Free Ticket Review</Link>
                 <Link to="/how-it-works" className="btn is-secondary">Learn the Process</Link>
               </div>
             </div>

@@ -13,10 +13,26 @@ import {
   IDR_DISCLAIMER,
   IDR_PRICE_ADDON,
 } from "@/config/idr";
+import { validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
 
 interface PaymentStepProps {
   formData: FormData;
   updateFormData: (updates: Partial<FormData>) => void;
+}
+
+async function functionErrorMessage(error: unknown, fallback: string) {
+  if (error && typeof error === "object" && "context" in error) {
+    const context = (error as { context?: Response }).context;
+    if (context instanceof Response) {
+      try {
+        const body = await context.clone().json() as { error?: unknown };
+        if (typeof body.error === "string" && body.error.trim()) return body.error;
+      } catch {
+        // Use the provider error below when the response body is unavailable.
+      }
+    }
+  }
+  return error instanceof Error && error.message ? error.message : fallback;
 }
 
 export default function PaymentStep({ formData, updateFormData }: PaymentStepProps) {
@@ -25,6 +41,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
   const [isProcessing, setIsProcessing] = useState(false);
   const [idrOrderId] = useState(() => crypto.randomUUID());
   const { toast } = useToast();
+  const includesPriorityReview = Boolean(formData.sourceAssessmentId && formData.sourceAssessmentAccessToken);
 
   const checkoutSubtotal = 488 + (includeIdrAddon ? IDR_PRICE_ADDON : 0);
 
@@ -40,6 +57,19 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
 
     setIsProcessing(true);
     try {
+      const sourceAssessment = formData.sourceAssessmentId && formData.sourceAssessmentAccessToken
+        ? {
+          submissionId: formData.sourceAssessmentId,
+          accessToken: formData.sourceAssessmentAccessToken,
+        }
+        : null;
+      const ticketFile = formData.ticketImage;
+      if (!sourceAssessment && !ticketFile) {
+        throw new Error("Return to Ticket Details and attach the ticket PDF or photo before checkout.");
+      }
+      const ticketDescriptor = ticketFile ? validateTicketCaptureFile(ticketFile) : null;
+      if (ticketDescriptor && "error" in ticketDescriptor) throw new Error(ticketDescriptor.error);
+
       const { data: submission, error: submissionError } = await supabase.functions.invoke("submit-ticket", {
         body: {
           driversLicense: formData.driversLicense,
@@ -54,57 +84,58 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           dateOfBirth: formData.dateOfBirth?.toISOString().split("T")[0],
           smsOptIn: formData.smsOptIn,
           ticketNumber: formData.ticketNumber,
-          violation: formData.violation,
+          violation: formData.violation || formData.offenceDescription,
           fineAmount: formData.fineAmount,
           violationDate: formData.issueDate?.toISOString().split("T")[0],
-          courtLocation: formData.courtJurisdiction,
+          courtLocation: formData.courtJurisdiction || formData.location,
           courtDate: formData.courtDate?.toISOString().split("T")[0],
           defenseStrategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
-          additionalNotes: formData.additionalNotes,
+          additionalNotes: [
+            formData.additionalNotes,
+            formData.offenceSection ? `Section: ${formData.offenceSection}${formData.offenceSubSection ? `(${formData.offenceSubSection})` : ""}` : "",
+            formData.officer ? `Officer: ${formData.officer}${formData.officerBadge ? ` (${formData.officerBadge})` : ""}` : "",
+            formData.location ? `Offence location: ${formData.location}` : "",
+          ].filter(Boolean).join("\n"),
           insuranceCompany: formData.insuranceCompany,
+          ...(sourceAssessment ? { sourceAssessment } : {
+            file: { contentType: ticketDescriptor!.mimeType, size: ticketFile!.size },
+          }),
         },
       });
 
-      if (submissionError || !submission?.success || !submission.submissionId || !submission.clientId) {
-        throw submissionError || new Error("Ticket submission could not be created.");
+      if (submissionError || !submission?.success || !submission.submissionId || !submission.clientId || !submission.accessToken) {
+        throw new Error(
+          typeof submission?.error === "string"
+            ? submission.error
+            : await functionErrorMessage(submissionError, "Ticket submission could not be created."),
+        );
       }
 
       const submissionId = submission.submissionId as string;
       const clientId = submission.clientId as string;
-      const { error: consentError } = await supabase.functions.invoke("generate-consent-form", {
+      const representationAccessToken = submission.accessToken as string;
+      if (submission.upload?.path && submission.upload?.token && ticketFile) {
+        const { error: uploadError } = await supabase.storage
+          .from("assessment-tickets")
+          .uploadToSignedUrl(submission.upload.path, submission.upload.token, ticketFile, {
+            contentType: ticketDescriptor!.mimeType,
+            upsert: true,
+          });
+        if (uploadError) throw new Error("Your ticket was saved, but the private file upload did not finish. Please try again.");
+      }
+      const { data: consent, error: consentError } = await supabase.functions.invoke("generate-consent-form", {
         body: {
           submissionId,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          province: formData.province,
-          postalCode: formData.postalCode,
-          dateOfBirth: formData.dateOfBirth?.toLocaleDateString() || "",
-          driversLicense: formData.driversLicense,
-          ticketNumber: formData.ticketNumber,
-          violation: formData.violation,
-          issueDate: formData.issueDate?.toLocaleDateString() || "",
+          accessToken: representationAccessToken,
           digitalSignature: formData.digitalSignature,
         },
       });
-      if (consentError) console.error("Consent form generation failed", consentError);
+      if (consentError || !consent?.success || !consent?.consentFormPath) {
+        throw new Error(await functionErrorMessage(consentError, "Your signed consent form could not be stored. Please try again."));
+      }
 
       const { error: notificationError } = await supabase.functions.invoke("send-notification", {
-        body: {
-          submissionId,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          ticketNumber: formData.ticketNumber,
-          violation: formData.violation,
-          fineAmount: formData.fineAmount,
-          submittedAt: new Date().toLocaleString(),
-          smsOptIn: formData.smsOptIn,
-        },
+        body: { submissionId, accessToken: representationAccessToken },
       });
       if (notificationError) console.error("Submission notification failed", notificationError);
 
@@ -113,6 +144,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           formData,
           submissionId,
           clientId,
+          accessToken: representationAccessToken,
           includeIdrAddon,
           ...(includeIdrAddon ? { idrOrderId } : {}),
         },
@@ -125,7 +157,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
       console.error("Ticket checkout failed", error);
       toast({
         title: "Checkout unavailable",
-        description: "We could not start secure checkout. Please try again.",
+        description: error instanceof Error ? error.message : "We could not start secure checkout. Please try again.",
         variant: "destructive",
       });
       setIsProcessing(false);
@@ -152,6 +184,11 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-4 text-sm">
             A 30% success fee applies to any fine reduction Fabsy achieves. That success fee is additional to the $488 base fee. If no fine reduction is achieved, no success fee is charged.
           </div>
+          {includesPriorityReview && (
+            <div className="rounded-lg border border-primary/25 bg-primary/5 p-4 text-sm">
+              Included at no extra charge: the $149 Priority Ticket Review deliverables, including policy-based insurance-impact scenarios, a fast report and an initial dispute plan.
+            </div>
+          )}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between text-lg font-bold">
               <span>Checkout subtotal</span>
@@ -186,7 +223,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
             />
           </div>
 
-          <div className="rounded-lg border border-primary/25 bg-primary/5 p-4">
+          {!includesPriorityReview && <div className="rounded-lg border border-primary/25 bg-primary/5 p-4">
             <div className="flex items-start gap-3">
               <Checkbox
                 id="idr-addon"
@@ -214,7 +251,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
                 <p className="text-xs leading-relaxed text-muted-foreground">{IDR_DISCLAIMER}</p>
               </div>
             )}
-          </div>
+          </div>}
 
           <div className="rounded-lg border bg-muted/30 p-4">
             <div className="flex items-start gap-3">

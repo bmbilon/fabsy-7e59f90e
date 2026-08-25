@@ -273,7 +273,9 @@ export type Database = {
           assessment_delivery_sent_at: string | null
           assessment_intake: Json | null
           assessment_paid_at: string | null
+          assessment_payment_source: string | null
           assessment_payment_intent_id: string | null
+          assessment_policy_paths: string[]
           assessment_price_cad: number | null
           assessment_result: Json | null
           assessment_ticket_path: string | null
@@ -296,11 +298,16 @@ export type Database = {
           last_name: string
           phone: string
           postal_code: string | null
+          representation_access_token_hash: string | null
           representation_credit_eligible: boolean
+          representation_includes_assessment: boolean
+          review_consent: Json | null
           search_vector: unknown | null
           service_type: string
           sms_opt_in: boolean | null
           status: string | null
+          source_assessment_id: string | null
+          ticket_document_path: string | null
           ticket_number: string
           updated_at: string | null
           violation: string
@@ -319,7 +326,9 @@ export type Database = {
           assessment_delivery_sent_at?: string | null
           assessment_intake?: Json | null
           assessment_paid_at?: string | null
+          assessment_payment_source?: string | null
           assessment_payment_intent_id?: string | null
+          assessment_policy_paths?: string[]
           assessment_price_cad?: number | null
           assessment_result?: Json | null
           assessment_ticket_path?: string | null
@@ -342,11 +351,16 @@ export type Database = {
           last_name: string
           phone: string
           postal_code?: string | null
+          representation_access_token_hash?: string | null
           representation_credit_eligible?: boolean
+          representation_includes_assessment?: boolean
+          review_consent?: Json | null
           search_vector?: unknown | null
           service_type?: string
           sms_opt_in?: boolean | null
           status?: string | null
+          source_assessment_id?: string | null
+          ticket_document_path?: string | null
           ticket_number: string
           updated_at?: string | null
           violation: string
@@ -365,7 +379,9 @@ export type Database = {
           assessment_delivery_sent_at?: string | null
           assessment_intake?: Json | null
           assessment_paid_at?: string | null
+          assessment_payment_source?: string | null
           assessment_payment_intent_id?: string | null
+          assessment_policy_paths?: string[]
           assessment_price_cad?: number | null
           assessment_result?: Json | null
           assessment_ticket_path?: string | null
@@ -388,11 +404,16 @@ export type Database = {
           last_name?: string
           phone?: string
           postal_code?: string | null
+          representation_access_token_hash?: string | null
           representation_credit_eligible?: boolean
+          representation_includes_assessment?: boolean
+          review_consent?: Json | null
           search_vector?: unknown | null
           service_type?: string
           sms_opt_in?: boolean | null
           status?: string | null
+          source_assessment_id?: string | null
+          ticket_document_path?: string | null
           ticket_number?: string
           updated_at?: string | null
           violation?: string
@@ -405,6 +426,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_submissions_source_assessment_id_fkey"
+            columns: ["source_assessment_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_submissions"
             referencedColumns: ["id"]
           },
         ]

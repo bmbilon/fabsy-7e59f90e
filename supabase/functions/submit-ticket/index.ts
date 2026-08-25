@@ -9,6 +9,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const submissionTracker = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const MAX_SUBMISSIONS_PER_HOUR = 5;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const MIME_EXTENSIONS: Record<string, string> = {
+  "application/pdf": "pdf",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/heic": "heic",
+  "image/heif": "heif",
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,6 +49,37 @@ interface SubmissionData {
   defenseStrategy: string;
   additionalNotes?: string;
   insuranceCompany?: string;
+  file?: { contentType?: string; size?: number };
+  sourceAssessment?: { submissionId?: string; accessToken?: string };
+}
+
+class RequestError extends Error {
+  constructor(message: string, public status = 400) {
+    super(message);
+  }
+}
+
+async function sha256(value: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest)).map((part) => part.toString(16).padStart(2, "0")).join("");
+}
+
+function normalizePhone(value: string) {
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/g, "");
+  if (digits.length < 7 || digits.length > 15) throw new RequestError("Enter a valid phone number.");
+  return trimmed.startsWith("+") ? `+${digits}` : digits;
+}
+
+function uploadMetadata(value: SubmissionData["file"]) {
+  if (!value || typeof value !== "object") throw new RequestError("A ticket PDF or photo is required.");
+  const contentType = typeof value.contentType === "string" ? value.contentType.trim().toLowerCase() : "";
+  const extension = MIME_EXTENSIONS[contentType];
+  if (!extension) throw new RequestError("Upload a PDF, JPG, PNG, WebP, HEIC or HEIF ticket file.");
+  if (typeof value.size !== "number" || !Number.isInteger(value.size) || value.size <= 0 || value.size > MAX_FILE_BYTES) {
+    throw new RequestError("The ticket file must be 10 MB or smaller.");
+  }
+  return { contentType, extension };
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -95,7 +136,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Length validation to prevent DoS
     if (formData.firstName.length > 100 || formData.lastName.length > 100 ||
-        formData.email.length > 255 || formData.phone.length > 20 ||
+        formData.email.length > 255 || formData.phone.length > 30 ||
         formData.driversLicense.length > 50 || formData.ticketNumber.length > 50 ||
         formData.violation.length > 500 || formData.fineAmount.length > 20 ||
         (formData.address && formData.address.length > 500) ||
@@ -126,17 +167,67 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Phone validation (basic format check)
-    const phoneRegex = /^[\d\s+()-]+$/;
-    if (!phoneRegex.test(formData.phone)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid phone number format" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    const normalizedPhone = normalizePhone(formData.phone);
+
+    let sourceAssessment: {
+      id: string;
+      assessment_ticket_path: string;
+    } | null = null;
+    if (formData.sourceAssessment) {
+      const sourceId = typeof formData.sourceAssessment.submissionId === "string"
+        ? formData.sourceAssessment.submissionId.trim().toLowerCase()
+        : "";
+      const accessToken = typeof formData.sourceAssessment.accessToken === "string"
+        ? formData.sourceAssessment.accessToken.trim()
+        : "";
+      if (!UUID_PATTERN.test(sourceId) || accessToken.length < 32 || accessToken.length > 200) {
+        throw new RequestError("The saved review handoff is invalid. Start again from the ticket review.");
+      }
+      const accessTokenHash = await sha256(accessToken);
+      const { data: source, error: sourceError } = await supabase
+        .from("ticket_submissions")
+        .select("id,email,service_type,assessment_access_token_hash,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at")
+        .eq("id", sourceId)
+        .maybeSingle();
+      if (sourceError) throw sourceError;
+      if (
+        !source ||
+        source.service_type !== "ticket_insurance_assessment" ||
+        source.email?.trim().toLowerCase() !== normalizedEmail ||
+        source.assessment_access_token_hash !== accessTokenHash ||
+        !source.assessment_ticket_path ||
+        !Array.isArray(source.assessment_policy_paths) ||
+        source.assessment_policy_paths.length < 1 ||
+        !source.review_consent ||
+        source.assessment_paid_at
+      ) {
+        throw new RequestError(
+          source?.assessment_paid_at
+            ? "This priority review has already been paid. Contact Fabsy to apply its credit to representation."
+            : "The saved review documents could not be verified. Start again from the ticket review.",
+          source?.assessment_paid_at ? 409 : 403,
+        );
+      }
+      const { data: linkedRepresentation, error: linkedError } = await supabase
+        .from("ticket_submissions")
+        .select("id,status")
+        .eq("source_assessment_id", sourceId)
+        .eq("service_type", "representation")
+        .limit(1)
+        .maybeSingle();
+      if (linkedError) throw linkedError;
+      if (linkedRepresentation && linkedRepresentation.status !== "awaiting_payment") {
+        throw new RequestError("This review is already connected to a representation case.", 409);
+      }
+      sourceAssessment = {
+        id: source.id,
+        assessment_ticket_path: source.assessment_ticket_path,
+      };
     }
+    const directUpload = sourceAssessment ? null : uploadMetadata(formData.file);
+    const representationAccessToken = `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll("-", "");
+    const representationAccessTokenHash = await sha256(representationAccessToken);
 
     // Step 1: Check if client exists
     let clientId: string;
@@ -144,7 +235,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { data: existingClient, error: clientLookupError } = await supabase
       .from('clients')
       .select('id,email')
-      .eq('drivers_license', formData.driversLicense)
+      .eq('drivers_license', formData.driversLicense.trim())
       .maybeSingle();
     
     if (clientLookupError) {
@@ -155,7 +246,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (existingClient) {
       // Public intake must never replace the identity or contact details on an
       // existing client record. Portal ownership is verified through email.
-      if (existingClient.email?.trim().toLowerCase() !== formData.email.trim().toLowerCase()) {
+      if (existingClient.email?.trim().toLowerCase() !== normalizedEmail) {
         return new Response(
           JSON.stringify({
             error: "This licence is already connected to a client record. Use the existing email or contact support.",
@@ -175,11 +266,11 @@ const handler = async (req: Request): Promise<Response> => {
       const { data: newClient, error: createClientError } = await supabase
         .from('clients')
         .insert({
-          drivers_license: formData.driversLicense,
+          drivers_license: formData.driversLicense.trim(),
           first_name: formData.firstName,
           last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
+          email: normalizedEmail,
+          phone: normalizedPhone,
           address: formData.address,
           city: formData.city,
           postal_code: formData.postalCode,
@@ -202,8 +293,8 @@ const handler = async (req: Request): Promise<Response> => {
       client_id: clientId,
       first_name: formData.firstName,
       last_name: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
+      email: normalizedEmail,
+      phone: normalizedPhone,
       address: formData.address,
       city: formData.city,
       postal_code: formData.postalCode,
@@ -218,13 +309,19 @@ const handler = async (req: Request): Promise<Response> => {
       defense_strategy: formData.defenseStrategy,
       additional_notes: formData.additionalNotes,
       insurance_company: formData.insuranceCompany,
-      status: 'awaiting_payment'
+      sms_opt_in: Boolean(formData.smsOptIn),
+      status: 'awaiting_payment',
+      service_type: 'representation',
+      source_assessment_id: sourceAssessment?.id || null,
+      representation_includes_assessment: Boolean(sourceAssessment),
+      ticket_document_path: sourceAssessment?.assessment_ticket_path || null,
+      representation_access_token_hash: representationAccessTokenHash,
     };
 
     // Reuse an unpaid submission so browser retries cannot create duplicate cases.
     const { data: existingSubmission, error: existingSubmissionError } = await supabase
       .from('ticket_submissions')
-      .select('id')
+      .select('id,consent_form_path')
       .eq('client_id', clientId)
       .eq('ticket_number', formData.ticketNumber)
       .eq('status', 'awaiting_payment')
@@ -237,14 +334,59 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (existingSubmission) {
-      const { error: refreshError } = await supabase
+      const { data: activeCheckoutIntent, error: activeCheckoutError } = await supabase
+        .from("idr_checkout_intents")
+        .select("id,status")
+        .eq("ticket_submission_id", existingSubmission.id)
+        .in("checkout_kind", ["ticket_only", "ticket_with_addon"])
+        .in("status", ["creating", "open", "paid"])
+        .limit(1)
+        .maybeSingle();
+      if (activeCheckoutError) throw activeCheckoutError;
+      if (activeCheckoutIntent) {
+        throw new RequestError(
+          activeCheckoutIntent.status === "paid"
+            ? "This representation checkout has already been paid."
+            : "A representation checkout is already open for this ticket. Use that checkout or let it expire before changing the intake.",
+          409,
+        );
+      }
+      const ticketDocumentPath = sourceAssessment?.assessment_ticket_path ||
+        `${existingSubmission.id}/representation-ticket.${directUpload!.extension}`;
+      const { data: refreshedSubmission, error: refreshError } = await supabase
         .from('ticket_submissions')
-        .update({ ...submissionPayload, updated_at: new Date().toISOString() })
-        .eq('id', existingSubmission.id);
+        .update({
+          ...submissionPayload,
+          ticket_document_path: ticketDocumentPath,
+          consent_form_path: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingSubmission.id)
+        .eq('status', 'awaiting_payment')
+        .select('id')
+        .maybeSingle();
 
-      if (refreshError) {
+      if (refreshError || !refreshedSubmission) {
         console.error('[Submit Ticket] Existing submission refresh error:', refreshError);
-        throw new Error('Failed to refresh ticket submission');
+        if (refreshError?.message?.includes("REPRESENTATION_CHECKOUT_IMMUTABLE")) {
+          throw new RequestError("This representation checkout is already open and its signed intake can no longer be changed.", 409);
+        }
+        throw refreshError || new RequestError('The ticket intake changed elsewhere. Please try again.', 409);
+      }
+      if (existingSubmission.consent_form_path) {
+        const { error: staleConsentError } = await supabase.storage
+          .from("consent-forms")
+          .remove([existingSubmission.consent_form_path]);
+        if (staleConsentError) console.error("[Submit Ticket] Stale consent cleanup failed");
+      }
+
+      let upload = null;
+      if (directUpload) {
+        const { data: signedUpload, error: signedUploadError } = await supabase.storage
+          .from("assessment-tickets")
+          .createSignedUploadUrl(ticketDocumentPath, { upsert: true });
+        if (signedUploadError || !signedUpload?.token) throw signedUploadError || new Error("Private ticket upload could not be prepared.");
+        upload = { path: ticketDocumentPath, token: signedUpload.token, contentType: directUpload.contentType };
       }
 
       return new Response(JSON.stringify({
@@ -252,6 +394,8 @@ const handler = async (req: Request): Promise<Response> => {
         submissionId: existingSubmission.id,
         clientId,
         reused: true,
+        accessToken: representationAccessToken,
+        upload,
       }), {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -273,10 +417,29 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('[Submit Ticket] Submission created successfully');
 
+    const ticketDocumentPath = sourceAssessment?.assessment_ticket_path ||
+      `${submissionData.id}/representation-ticket.${directUpload!.extension}`;
+    const { error: pathUpdateError } = await supabase
+      .from("ticket_submissions")
+      .update({ ticket_document_path: ticketDocumentPath })
+      .eq("id", submissionData.id);
+    if (pathUpdateError) throw pathUpdateError;
+
+    let upload = null;
+    if (directUpload) {
+      const { data: signedUpload, error: signedUploadError } = await supabase.storage
+        .from("assessment-tickets")
+        .createSignedUploadUrl(ticketDocumentPath, { upsert: true });
+      if (signedUploadError || !signedUpload?.token) throw signedUploadError || new Error("Private ticket upload could not be prepared.");
+      upload = { path: ticketDocumentPath, token: signedUpload.token, contentType: directUpload.contentType };
+    }
+
     return new Response(JSON.stringify({ 
       success: true,
       submissionId: submissionData.id,
-      clientId: clientId
+      clientId: clientId,
+      accessToken: representationAccessToken,
+      upload,
     }), {
       status: 200,
       headers: {
@@ -286,12 +449,13 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: unknown) {
     console.error("[Submit Ticket] Error:", error);
+    const status = error instanceof RequestError ? error.status : 500;
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Submission failed",
       }),
       {
-        status: 500,
+        status,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );

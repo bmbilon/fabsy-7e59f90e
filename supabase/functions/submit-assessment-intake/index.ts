@@ -11,11 +11,18 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^[\d\s+().-]*$/;
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const MAX_POLICY_FILES = 5;
+const REVIEW_CONSENT_VERSION = "ticket-triage-review-v1";
 const MIME_EXTENSIONS: Record<string, string> = {
   "application/pdf": "pdf",
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
+  "image/heic": "heic",
+  "image/heif": "heif",
+};
+const POLICY_MIME_EXTENSIONS: Record<string, string> = {
+  ...MIME_EXTENSIONS,
 };
 const BASE_ORIGINS = new Set([
   "https://fabsy.ca",
@@ -96,6 +103,58 @@ function optionalIsoDate(value: unknown, label: string) {
   return value;
 }
 
+function policyFileMetadata(value: unknown) {
+  if (!Array.isArray(value) || value.length < 1) {
+    throw new RequestError("At least one policy document is required for Ticket Triage.");
+  }
+  if (value.length > MAX_POLICY_FILES) {
+    throw new RequestError(`Upload no more than ${MAX_POLICY_FILES} policy documents.`);
+  }
+  return value.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      throw new RequestError(`Policy document ${index + 1} is invalid.`);
+    }
+    const metadata = item as Record<string, unknown>;
+    const contentType = requiredText(metadata.contentType, `Policy document ${index + 1} type`, 100);
+    const extension = POLICY_MIME_EXTENSIONS[contentType];
+    if (!extension) throw new RequestError(`Policy document ${index + 1} type is not supported.`);
+    if (
+      typeof metadata.size !== "number" ||
+      !Number.isInteger(metadata.size) ||
+      metadata.size <= 0 ||
+      metadata.size > MAX_FILE_BYTES
+    ) {
+      throw new RequestError(`Policy document ${index + 1} size is invalid.`);
+    }
+    return { contentType, extension, size: metadata.size };
+  });
+}
+
+function signedReviewConsent(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new RequestError("Signed review consent is required.");
+  }
+  const consent = value as Record<string, unknown>;
+  if (consent.schemaVersion !== 1 || consent.consentVersion !== REVIEW_CONSENT_VERSION || consent.accepted !== true) {
+    throw new RequestError("Review consent is invalid or out of date.");
+  }
+  const digitalSignature = requiredText(consent.digitalSignature, "Review consent signature", 200);
+  const signedAtValue = requiredText(consent.signedAt, "Review consent timestamp", 60);
+  const signedAt = new Date(signedAtValue);
+  if (Number.isNaN(signedAt.getTime())) throw new RequestError("Review consent timestamp is invalid.");
+  if (signedAt.getTime() > Date.now() + 5 * 60 * 1000) {
+    throw new RequestError("Review consent timestamp cannot be in the future.");
+  }
+  return {
+    schema_version: 1,
+    consent_version: REVIEW_CONSENT_VERSION,
+    accepted: true,
+    digital_signature: digitalSignature,
+    signed_at: signedAt.toISOString(),
+    captured_at: new Date().toISOString(),
+  };
+}
+
 async function sha256(value: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest)).map((part) => part.toString(16).padStart(2, "0")).join("");
@@ -164,9 +223,11 @@ serve(async (req) => {
     if (!EMAIL_PATTERN.test(email)) throw new RequestError("Email is invalid.");
     const phone = optionalText(contact.phone, "Phone", 30) || "";
     if (!PHONE_PATTERN.test(phone) || phone.replace(/\D/g, "").length > 15) throw new RequestError("Phone is invalid.");
+    const reviewConsent = signedReviewConsent(body.reviewConsent);
 
     const province = requiredText(ticket.province, "Province", 80);
     if (province !== "Alberta") throw new RequestError("This assessment currently accepts Alberta traffic tickets only.", 422);
+    const ticketNumber = optionalText(ticket.ticketNumber, "Ticket number", 50);
     const offence = optionalText(ticket.offence, "Offence", 200);
     const ticketDate = optionalIsoDate(ticket.ticketDate, "Ticket date");
     const responseDeadline = optionalIsoDate(ticket.responseDeadline, "Response deadline");
@@ -191,6 +252,7 @@ serve(async (req) => {
     if (typeof file.size !== "number" || !Number.isInteger(file.size) || file.size <= 0 || file.size > MAX_FILE_BYTES) {
       throw new RequestError("Ticket file size is invalid.");
     }
+    const policyFiles = policyFileMetadata(body.policyFiles);
 
     const fingerprint = await sha256(`${serviceRoleKey}:${requestIp(req)}`);
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -204,12 +266,16 @@ serve(async (req) => {
     if ((count || 0) >= 5) throw new RequestError("Too many assessment attempts. Please try again later.", 429);
 
     const storagePath = `${orderId}/ticket.${extension}`;
+    const policyPaths = policyFiles.map((policyFile, index) =>
+      `${orderId}/policy-${String(index + 1).padStart(2, "0")}.${policyFile.extension}`
+    );
     const accessToken = `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll("-", "");
     const accessTokenHash = await sha256(accessToken);
     const intake = {
       schema_version: 1,
       ticket: {
         province,
+        ticket_number: ticketNumber,
         offence,
         ticket_date: ticketDate,
         response_deadline: responseDeadline,
@@ -276,7 +342,7 @@ serve(async (req) => {
       email,
       phone,
       drivers_license: placeholderLicense,
-      ticket_number: `ASSESS-${orderId.slice(0, 8).toUpperCase()}`,
+      ticket_number: ticketNumber || `ASSESS-${orderId.slice(0, 8).toUpperCase()}`,
       violation: offence || "Ticket pending human review",
       fine_amount: fineAmountCad === null ? "Unknown" : fineAmountCad.toFixed(2),
       violation_date: ticketDate,
@@ -289,6 +355,8 @@ serve(async (req) => {
       service_type: "ticket_insurance_assessment",
       assessment_intake: intake,
       assessment_ticket_path: storagePath,
+      assessment_policy_paths: policyPaths,
+      review_consent: reviewConsent,
       assessment_access_token_hash: accessTokenHash,
       assessment_price_cad: 149,
       representation_credit_eligible: true,
@@ -297,7 +365,7 @@ serve(async (req) => {
 
     const { data: existingSubmission, error: existingSubmissionError } = await admin
       .from("ticket_submissions")
-      .select("id,client_id,service_type,assessment_ticket_path")
+      .select("id,client_id,service_type,assessment_ticket_path,assessment_policy_paths")
       .eq("id", orderId)
       .maybeSingle();
     if (existingSubmissionError) throw existingSubmissionError;
@@ -307,6 +375,15 @@ serve(async (req) => {
       }
       if (existingSubmission.assessment_ticket_path && existingSubmission.assessment_ticket_path !== storagePath) {
         await admin.storage.from("assessment-tickets").remove([existingSubmission.assessment_ticket_path]);
+      }
+      const expectedPolicyPaths = new Set(policyPaths);
+      const stalePolicyPaths = Array.isArray(existingSubmission.assessment_policy_paths)
+        ? existingSubmission.assessment_policy_paths.filter((path: unknown): path is string =>
+          typeof path === "string" && !expectedPolicyPaths.has(path)
+        )
+        : [];
+      if (stalePolicyPaths.length) {
+        await admin.storage.from("assessment-policy-documents").remove(stalePolicyPaths);
       }
       const { error: updateError } = await admin.from("ticket_submissions").update(submissionPayload).eq("id", orderId);
       if (updateError) throw updateError;
@@ -320,10 +397,27 @@ serve(async (req) => {
       .createSignedUploadUrl(storagePath, { upsert: true });
     if (signedUploadError || !signedUpload?.token) throw signedUploadError || new Error("Private upload could not be prepared.");
 
+    const policyUploads = await Promise.all(policyPaths.map(async (path, index) => {
+      const { data: signedPolicyUpload, error: signedPolicyUploadError } = await admin.storage
+        .from("assessment-policy-documents")
+        .createSignedUploadUrl(path, { upsert: true });
+      if (signedPolicyUploadError || !signedPolicyUpload?.token) {
+        throw signedPolicyUploadError || new Error("Private policy upload could not be prepared.");
+      }
+      return {
+        index,
+        path,
+        token: signedPolicyUpload.token,
+        contentType: policyFiles[index].contentType,
+        size: policyFiles[index].size,
+      };
+    }));
+
     return json(origin, {
       submissionId: orderId,
       accessToken,
       upload: { path: storagePath, token: signedUpload.token },
+      policyUploads,
     });
   } catch (error) {
     const status = error instanceof RequestError ? error.status : 500;

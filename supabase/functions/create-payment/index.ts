@@ -63,6 +63,65 @@ function requiredUuid(value: unknown, field: string) {
   return result.toLowerCase();
 }
 
+async function sha256(value: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest)).map((part) => part.toString(16).padStart(2, "0")).join("");
+}
+
+async function requireStoredObject(bucket: string, path: string, ownerId: string, label: string) {
+  if (!path.startsWith(`${ownerId}/`) || path.includes("..")) {
+    throw new RequestError(`${label} path could not be verified.`, 409);
+  }
+  const objectName = path.slice(ownerId.length + 1);
+  const { data: objects, error } = await admin.storage
+    .from(bucket)
+    .list(ownerId, { limit: 10, search: objectName });
+  if (error) throw error;
+  if (!objects?.some((item) => item.name === objectName && item.id)) {
+    throw new RequestError(`Finish uploading ${label.toLowerCase()} before checkout.`, 409);
+  }
+}
+
+async function claimIncludedAssessmentCheckout(
+  sourceAssessmentId: string,
+  checkoutIntentId: string,
+  checkoutAttempt: number,
+  stripeSessionId: string | null,
+) {
+  const { error } = await admin.rpc("claim_source_assessment_checkout", {
+    p_source_assessment_id: sourceAssessmentId,
+    p_checkout_intent_id: checkoutIntentId,
+    p_checkout_attempt: checkoutAttempt,
+    p_claim_kind: "included_representation",
+    p_stripe_checkout_session_id: stripeSessionId,
+  });
+  if (!error) return;
+  if (error.message?.includes("ASSESSMENT_CHECKOUT_ALREADY_RESERVED")) {
+    throw new RequestError(
+      "A $149 review checkout is already open for this intake. Complete or let that checkout expire before starting representation checkout.",
+      409,
+    );
+  }
+  if (error.message?.includes("ASSESSMENT_CHECKOUT_SOURCE_UNAVAILABLE")) {
+    throw new RequestError("This priority review has already been purchased or activated.", 409);
+  }
+  throw error;
+}
+
+async function releaseIncludedAssessmentCheckout(
+  checkoutIntentId: string,
+  checkoutAttempt: number,
+  stripeSessionId: string | null,
+) {
+  const { error } = await admin.rpc("release_source_assessment_checkout", {
+    p_checkout_intent_id: checkoutIntentId,
+    p_checkout_attempt: checkoutAttempt,
+    p_stripe_checkout_session_id: stripeSessionId,
+    p_intent_status: "failed",
+  });
+  if (error) console.error("create-payment checkout claim cleanup failed");
+}
+
 type TicketCheckoutKind = "ticket_only" | "ticket_with_addon";
 type TicketIntentType = "ticket" | "addon";
 
@@ -85,6 +144,7 @@ async function reserveTicketCheckout(
   clientId: string,
   customerEmail: string,
   includeIdrAddon: boolean,
+  sourceAssessmentId: string | null,
 ) {
   const expectedType: TicketIntentType = includeIdrAddon ? "addon" : "ticket";
   const expectedCheckoutKind: TicketCheckoutKind = includeIdrAddon
@@ -214,10 +274,14 @@ async function reserveTicketCheckout(
   if (intent.stripe_checkout_session_id) {
     const existingSession = await stripe.checkout.sessions.retrieve(intent.stripe_checkout_session_id);
     if (existingSession.status === "open" && existingSession.url) {
-      return { orderId: intent.id as string, attempt, url: existingSession.url };
+      return { orderId: intent.id as string, attempt, url: existingSession.url, sessionId: existingSession.id };
     }
     if (existingSession.status === "complete") {
       throw new RequestError("Payment is being confirmed for this ticket checkout.", 409);
+    }
+
+    if (sourceAssessmentId) {
+      await releaseIncludedAssessmentCheckout(intent.id as string, attempt, existingSession.id);
     }
 
     const nextAttempt = attempt + 1;
@@ -240,7 +304,7 @@ async function reserveTicketCheckout(
     attempt = nextAttempt;
   }
 
-  return { orderId: intent.id as string, attempt, url: null as string | null };
+  return { orderId: intent.id as string, attempt, url: null as string | null, sessionId: null as string | null };
 }
 
 serve(async (req) => {
@@ -250,6 +314,9 @@ serve(async (req) => {
   const origin = req.headers.get("origin") || "";
   if (!allowedOrigins.has(origin)) return json(req, { error: "Origin is not allowed." }, 403);
 
+  let cleanupClaim: { intentId: string; attempt: number; sessionId: string | null } | null = null;
+  let checkoutStripe: Stripe | null = null;
+  let createdStripeSessionId: string | null = null;
   try {
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
@@ -264,6 +331,9 @@ serve(async (req) => {
 
     const submissionId = requiredUuid(raw.submissionId, "submissionId");
     const clientId = requiredUuid(raw.clientId, "clientId");
+    const accessToken = requiredString(raw.accessToken, "accessToken", 200);
+    if (accessToken.length < 32) throw new RequestError("Submission authorization is invalid.", 403);
+    const accessTokenHash = await sha256(accessToken);
     const customerEmail = requiredString(formData.email, "email", 255).toLowerCase();
     const customerName = `${requiredString(formData.firstName, "firstName", 100)} ${requiredString(formData.lastName, "lastName", 100)}`;
     const ticketNumber = requiredString(formData.ticketNumber, "ticketNumber", 50);
@@ -273,7 +343,7 @@ serve(async (req) => {
 
     const { data: submission, error: submissionError } = await admin
       .from("ticket_submissions")
-      .select("id,client_id,ticket_number,status,clients(email)")
+      .select("id,client_id,ticket_number,status,ticket_document_path,consent_form_path,representation_access_token_hash,source_assessment_id,representation_includes_assessment,clients(email)")
       .eq("id", submissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
@@ -283,9 +353,49 @@ serve(async (req) => {
       submission.client_id !== clientId ||
       submission.ticket_number !== ticketNumber ||
       client?.email?.toLowerCase() !== customerEmail ||
+      submission.representation_access_token_hash !== accessTokenHash ||
       submission.status !== "awaiting_payment"
     ) {
       throw new RequestError("Ticket checkout details could not be verified.", 403);
+    }
+
+    const ticketDocumentPath = String(submission.ticket_document_path || "");
+    const ticketOwnerId = submission.source_assessment_id || submissionId;
+    await requireStoredObject("assessment-tickets", ticketDocumentPath, ticketOwnerId, "Ticket document");
+    const consentFormPath = String(submission.consent_form_path || "");
+    const expectedConsentFormPath = `${submissionId}/consent-form-${accessTokenHash.slice(0, 16)}.pdf`;
+    if (consentFormPath !== expectedConsentFormPath) {
+      throw new RequestError("Sign and store the current representation consent before checkout.", 409);
+    }
+    await requireStoredObject("consent-forms", consentFormPath, submissionId, "Signed consent form");
+
+    if (submission.representation_includes_assessment) {
+      if (!submission.source_assessment_id) {
+        throw new RequestError("The included priority review could not be verified.", 409);
+      }
+      const { data: sourceAssessment, error: sourceAssessmentError } = await admin
+        .from("ticket_submissions")
+        .select("id,email,service_type,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at")
+        .eq("id", submission.source_assessment_id)
+        .maybeSingle();
+      if (sourceAssessmentError) throw sourceAssessmentError;
+      const policyPaths = Array.isArray(sourceAssessment?.assessment_policy_paths)
+        ? sourceAssessment.assessment_policy_paths.filter((path: unknown): path is string => typeof path === "string")
+        : [];
+      if (
+        !sourceAssessment ||
+        sourceAssessment.service_type !== "ticket_insurance_assessment" ||
+        sourceAssessment.email?.trim().toLowerCase() !== customerEmail ||
+        sourceAssessment.assessment_ticket_path !== ticketDocumentPath ||
+        sourceAssessment.assessment_paid_at ||
+        policyPaths.length < 1 ||
+        !sourceAssessment.review_consent
+      ) {
+        throw new RequestError("The included priority review documents could not be verified.", 409);
+      }
+      await Promise.all(policyPaths.map((path: string) =>
+        requireStoredObject("assessment-policy-documents", path, sourceAssessment.id, "Policy document")
+      ));
     }
 
     if (includeIdrAddon) {
@@ -299,6 +409,7 @@ serve(async (req) => {
     }
 
     const stripe = new Stripe(stripeSecretKey, { apiVersion: "2025-08-27.basil" });
+    checkoutStripe = stripe;
     await verifyTicketPrice(stripe);
     const reservation = await reserveTicketCheckout(
       stripe,
@@ -307,7 +418,21 @@ serve(async (req) => {
       clientId,
       customerEmail,
       includeIdrAddon,
+      submission.representation_includes_assessment ? submission.source_assessment_id : null,
     );
+    if (submission.representation_includes_assessment && submission.source_assessment_id) {
+      await claimIncludedAssessmentCheckout(
+        submission.source_assessment_id,
+        reservation.orderId,
+        reservation.attempt,
+        reservation.sessionId,
+      );
+      cleanupClaim = {
+        intentId: reservation.orderId,
+        attempt: reservation.attempt,
+        sessionId: reservation.sessionId,
+      };
+    }
     if (reservation?.url) {
       return json(req, {
         url: reservation.url,
@@ -346,7 +471,11 @@ serve(async (req) => {
       checkout_intent_id: checkoutIntentId,
       checkout_attempt: String(reservation.attempt),
       fabsy_checkout_kind: includeIdrAddon ? "ticket_with_addon" : "ticket_only",
+      representation_includes_assessment: submission.representation_includes_assessment ? "true" : "false",
     };
+    if (submission.source_assessment_id) {
+      metadata.source_assessment_id = submission.source_assessment_id;
+    }
     if (includeIdrAddon && idrOrderId) {
       Object.assign(metadata, {
         idr_order_id: idrOrderId,
@@ -376,6 +505,7 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create(params, {
       idempotencyKey: `ticket-checkout:${checkoutIntentId}:${reservation.attempt}`,
     });
+    createdStripeSessionId = session.id;
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL.");
     const { data: linkedIntent, error: intentUpdateError } = await admin
@@ -402,8 +532,32 @@ serve(async (req) => {
         throw currentIntentError || new Error("The checkout reservation could not be linked.");
       }
     }
+    if (submission.representation_includes_assessment && submission.source_assessment_id) {
+      await claimIncludedAssessmentCheckout(
+        submission.source_assessment_id,
+        checkoutIntentId,
+        reservation.attempt,
+        session.id,
+      );
+      cleanupClaim = { intentId: checkoutIntentId, attempt: reservation.attempt, sessionId: session.id };
+    }
     return json(req, { url: session.url, checkoutIntentId, idrOrderId });
   } catch (error) {
+    if (createdStripeSessionId && checkoutStripe) {
+      try {
+        const currentSession = await checkoutStripe.checkout.sessions.retrieve(createdStripeSessionId);
+        if (currentSession.status === "open") await checkoutStripe.checkout.sessions.expire(createdStripeSessionId);
+      } catch {
+        console.error("create-payment Stripe session cleanup failed");
+      }
+    }
+    if (cleanupClaim) {
+      await releaseIncludedAssessmentCheckout(
+        cleanupClaim.intentId,
+        cleanupClaim.attempt,
+        createdStripeSessionId || cleanupClaim.sessionId,
+      );
+    }
     const status = error instanceof RequestError ? error.status : 500;
     if (status >= 500) console.error("create-payment failed");
     return json(req, {

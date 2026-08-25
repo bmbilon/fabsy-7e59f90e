@@ -87,7 +87,7 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/founder" element={<Founder />} />
           <Route path="/ai-info" element={<AIInfo />} />
-          <Route path="/ticket-analysis" element={<Navigate to="/submit-ticket" replace />} />
+          <Route path="/ticket-analysis" element={<Navigate to="/traffic-ticket-assessment/start" replace />} />
           <Route path="/insurance-damage-report" element={<InsuranceDamageReport />} />
           <Route path="/insurance-damage-report/checkout" element={<IdrCheckout />} />
           <Route path="/insurance-damage-report/intake" element={<IdrIntake />} />

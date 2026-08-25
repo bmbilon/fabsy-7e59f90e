@@ -5,7 +5,14 @@ import { useLocation } from "react-router-dom";
 import type { FormData } from "@/components/TicketForm";
 import useSafeHead from "@/hooks/useSafeHead";
 
-type LocationState = { state?: { ticketImage?: File | null; prefillTicketData?: Partial<FormData> | null; startAtStep?: number } };
+type LocationState = {
+  state?: {
+    ticketImage?: File | null;
+    prefillTicketData?: Partial<FormData> | null;
+    startAtStep?: number;
+    sourceAssessment?: { submissionId: string; accessToken: string } | null;
+  };
+};
 
 const TicketFormPage = () => {
   useSafeHead({
@@ -17,11 +24,17 @@ const TicketFormPage = () => {
   const initialTicketImage = location?.state?.ticketImage ?? null;
   const prefillTicketData = location?.state?.prefillTicketData ?? null;
   const startAtStep = location?.state?.startAtStep ?? null;
+  const sourceAssessment = location?.state?.sourceAssessment ?? null;
   return (
     <div className="min-h-screen bg-gradient-hero">
       <Header />
       <div className="container mx-auto px-4 py-8">
-        <TicketForm initialTicketImage={initialTicketImage} initialPrefill={prefillTicketData} initialStep={startAtStep ?? undefined} />
+        <TicketForm
+          initialTicketImage={initialTicketImage}
+          initialPrefill={prefillTicketData}
+          initialStep={startAtStep ?? undefined}
+          sourceAssessment={sourceAssessment}
+        />
       </div>
       <Footer />
     </div>

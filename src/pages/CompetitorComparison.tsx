@@ -76,8 +76,8 @@ const CompetitorComparison = () => {
               <li><strong className="text-foreground">Outcome standard:</strong> Fabsy does not promise a withdrawal, reduction, demerit result, insurance result, or other outcome.</li>
             </ul>
             <div className="mt-8 text-center">
-              <Button size="lg" onClick={() => navigate("/submit-ticket")} className="text-lg px-8 py-6">
-                Start the Free Representation Eligibility Check
+              <Button size="lg" onClick={() => navigate("/traffic-ticket-assessment/start")} className="text-lg px-8 py-6">
+                Start the Free Ticket Review
               </Button>
             </div>
           </div>

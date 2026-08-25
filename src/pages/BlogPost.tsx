@@ -365,10 +365,10 @@ const BlogPost = () => {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg" className="bg-primary text-white hover:bg-primary-dark border-0">
-                      <Link to="/traffic-ticket-assessment">See Ticket Triage - $149</Link>
+                      <Link to="/traffic-ticket-assessment/start">Start Free Ticket Review</Link>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-primary/20">
-                      <Link to="/submit-ticket">Free Representation Eligibility Check</Link>
+                      <Link to="/how-it-works">See How It Works</Link>
                     </Button>
                   </div>
                 </div>

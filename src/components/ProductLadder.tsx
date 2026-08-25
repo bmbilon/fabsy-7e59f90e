@@ -5,34 +5,35 @@ import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 import { cn } from "@/lib/utils";
 
 export const PRODUCT_LADDER_BRIDGE =
-  "Use the free check to confirm whether representation may be available. Choose the $149 assessment when you need the insurance-impact analysis, financial break-even and a written recommendation. Representation is a separate service only when it appears worthwhile.";
+  "Start by uploading or photographing the ticket once. The same private intake carries into a $149 priority report or $488 full representation, so documents and details do not get lost between services.";
 
 const tiers = [
   {
-    name: "Free Representation Eligibility Check",
+    name: "Free Ticket Review",
     price: "$0",
-    sub: "Confirm whether Fabsy may be able to represent you",
+    sub: "Capture the ticket and check the extracted details",
     highlight: false,
     type: "free",
-    cta: { label: "Check representation eligibility", href: "/submit-ticket" },
+    cta: { label: "Upload or take a photo", href: TICKET_ASSESSMENT.intakePath },
     features: [
-      "Charge and court location confirmed",
-      "Representation availability check",
-      "Quote for representation",
+      "Ticket photo or PDF capture",
+      "OCR-assisted ticket details",
+      "Clear next-step service choice",
     ],
   },
   {
     name: TICKET_ASSESSMENT.name,
     price: "$149",
     priceNote: "CAD total · GST included",
-    sub: "Know the smart move before spending more",
+    sub: "Fast report, insurance scenarios and dispute plan",
     highlight: true,
     type: "assessment",
     cta: { label: TICKET_ASSESSMENT.cta, href: "/traffic-ticket-assessment/start" },
     features: [
-      "Everything in the Free Representation Eligibility Check",
+      "Everything in the Free Ticket Review",
       "Fine, demerit and conviction breakdown",
       "Insurance-risk assessment using your policy, insurer and renewal details",
+      "Required private policy-document review",
       "Representation break-even analysis",
       "Written, human-reviewed recommendation by email",
       "$149 can be applied to eligible representation when worthwhile",
@@ -40,19 +41,20 @@ const tiers = [
     ],
   },
   {
-    name: "Representation",
+    name: "Full Representation",
     price: "$488",
     priceNote: "base fee + 30% of any fine reduction",
-    sub: "We handle it as your agent",
+    sub: "Everything in the $149 review, handled end-to-end",
     highlight: false,
     type: "representation",
-    cta: { label: "Hire Fabsy to fight it", href: "/submit-ticket" },
+    cta: { label: "Start connected intake", href: TICKET_ASSESSMENT.intakePath },
     features: [
+      "Everything in the $149 Priority Review included",
       "Agent representation where permitted",
       "Disclosure request and review",
       "Court process handled for you",
       "No reduction, no success fee",
-      "$339 base-fee balance after an eligible assessment credit",
+      "One connected ticket, policy and consent record",
     ],
   },
 ] as const;
@@ -73,7 +75,7 @@ export default function ProductLadder({ compact = false, className }: ProductLad
           Three ways to deal with your ticket
         </h2>
         <p className="mt-2 text-center text-muted-foreground">
-          Start free. Pay for depth only if you need it. Hire us only if it's worth it.
+          Upload once. Choose a priority report or full representation when you are ready.
         </p>
         <p className="mx-auto mt-4 max-w-4xl text-center text-sm font-medium leading-relaxed text-foreground/80">
           {PRODUCT_LADDER_BRIDGE}

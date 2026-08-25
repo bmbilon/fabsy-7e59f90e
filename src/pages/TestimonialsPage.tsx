@@ -138,14 +138,14 @@ const TestimonialsPage = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/traffic-ticket-assessment">
+              <Link to="/traffic-ticket-assessment/start">
                 <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0 text-lg px-8">
-                  Get Ticket Triage - $149
+                  Start Free Ticket Review
                 </Button>
               </Link>
-              <Link to="/submit-ticket">
+              <Link to="/how-it-works">
                 <Button variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 transition-smooth text-lg px-8">
-                  Check Representation Eligibility - Free
+                  See How It Works
                 </Button>
               </Link>
             </div>

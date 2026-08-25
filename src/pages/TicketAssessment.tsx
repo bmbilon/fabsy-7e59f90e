@@ -450,14 +450,14 @@ export default function TicketAssessment() {
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link
-                  to="/submit-ticket"
+                  to={TICKET_ASSESSMENT.intakePath}
                   onClick={() => trackAssessmentEvent(
                     "representation_cta_click",
                     { location: "assessment_trust_section", destination: "representation_intake" },
                     "assessment_trust_section",
                   )}
                 >
-                  I already want representation
+                  Start connected representation intake
                 </Link>
               </Button>
             </div>

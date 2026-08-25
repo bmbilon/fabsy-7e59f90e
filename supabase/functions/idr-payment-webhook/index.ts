@@ -119,6 +119,57 @@ async function validateCheckoutIntent(
   return intent;
 }
 
+async function activateIncludedAssessment(
+  supabase: ReturnType<typeof createClient>,
+  representationId: string,
+  sourceAssessmentId: string | undefined,
+) {
+  if (!isUuid(sourceAssessmentId)) {
+    throw new Error("Paid representation is missing its included assessment link.");
+  }
+  const { data: source, error: sourceError } = await supabase
+    .from("ticket_submissions")
+    .select("id,status,service_type,assessment_paid_at,assessment_payment_source")
+    .eq("id", sourceAssessmentId)
+    .maybeSingle();
+  if (sourceError) throw sourceError;
+  if (!source || source.service_type !== "ticket_insurance_assessment") {
+    throw new Error("Paid representation has an invalid included assessment link.");
+  }
+  if (source.assessment_paid_at) {
+    if (source.assessment_payment_source !== "included_with_representation") {
+      throw new Error("The linked assessment was paid separately and cannot be activated twice.");
+    }
+    return;
+  }
+
+  const { data: activated, error: activationError } = await supabase
+    .from("ticket_submissions")
+    .update({
+      status: "assessment_pending",
+      assessment_paid_at: new Date().toISOString(),
+      assessment_payment_source: "included_with_representation",
+      representation_credit_eligible: false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", source.id)
+    .is("assessment_paid_at", null)
+    .select("id")
+    .maybeSingle();
+  if (activationError) throw activationError;
+  if (!activated) {
+    const { data: raced, error: racedError } = await supabase
+      .from("ticket_submissions")
+      .select("assessment_payment_source")
+      .eq("id", source.id)
+      .single();
+    if (racedError || raced?.assessment_payment_source !== "included_with_representation") {
+      throw racedError || new Error("The included assessment could not be activated.");
+    }
+  }
+  console.log(`Activated included assessment for paid representation ${representationId}`);
+}
+
 async function persistPaidTicketCheckout(
   supabase: ReturnType<typeof createClient>,
   session: CheckoutSessionData,
@@ -166,12 +217,21 @@ async function persistPaidTicketCheckout(
 
   const { data: submission, error: submissionError } = await supabase
     .from("ticket_submissions")
-    .select("id,client_id,status")
+    .select("id,client_id,status,source_assessment_id,representation_includes_assessment")
     .eq("id", submissionId)
     .maybeSingle();
   if (submissionError) throw submissionError;
   if (!submission || submission.client_id !== clientId) {
     throw new Error("Paid ticket checkout does not belong to its reserved client.");
+  }
+  if (submission.representation_includes_assessment) {
+    if (
+      !isUuid(submission.source_assessment_id) ||
+      metadata.source_assessment_id !== submission.source_assessment_id
+    ) {
+      throw new Error("Paid representation does not match its exclusive assessment claim.");
+    }
+    await markSourceAssessmentCheckoutPaid(supabase, session);
   }
 
   let result: "ticket_activated" | "ticket_already_active" = "ticket_already_active";
@@ -193,6 +253,9 @@ async function persistPaidTicketCheckout(
     .eq("id", intentId)
     .eq("attempts", intent.attempts);
   if (intentPaidError) throw intentPaidError;
+  if (submission.representation_includes_assessment) {
+    await activateIncludedAssessment(supabase, submission.id, submission.source_assessment_id);
+  }
   return result;
 }
 
@@ -260,6 +323,8 @@ async function persistPaidTicketAssessment(
     throw new Error("Paid ticket assessment does not match its saved intake.");
   }
 
+  await markSourceAssessmentCheckoutPaid(supabase, session);
+
   const paymentIntentId = typeof session.payment_intent === "string"
     ? session.payment_intent
     : session.payment_intent?.id || null;
@@ -272,6 +337,7 @@ async function persistPaidTicketAssessment(
         assessment_paid_at: new Date().toISOString(),
         assessment_checkout_session_id: session.id,
         assessment_payment_intent_id: paymentIntentId,
+        assessment_payment_source: "standalone",
         representation_credit_eligible: true,
         updated_at: new Date().toISOString(),
       })
@@ -298,7 +364,7 @@ async function sendTicketAssessmentConfirmation(
 ) {
   const { data: submission, error: submissionError } = await supabase
     .from("ticket_submissions")
-    .select("id,assessment_confirmation_claimed_at,assessment_confirmation_sent_at,clients(first_name,email)")
+    .select("id,assessment_payment_source,assessment_confirmation_claimed_at,assessment_confirmation_sent_at,clients(first_name,email)")
     .eq("id", submissionId)
     .single();
   if (submissionError || !submission) throw submissionError || new Error("Paid ticket assessment was not found.");
@@ -321,12 +387,22 @@ async function sendTicketAssessmentConfirmation(
   try {
     const apiKey = Deno.env.get("RESEND_API_KEY");
     if (!apiKey) throw new Error("RESEND_API_KEY is unavailable.");
+    const included = submission.assessment_payment_source === "included_with_representation";
+    const subject = included
+      ? "Fabsy received your representation order and priority review"
+      : "Fabsy received your Ticket Triage order";
+    const paymentSummary = included
+      ? "Your priority ticket and insurance-impact review is included with the $488 base representation service. Applicable tax and any separately disclosed contingent fee are governed by your representation terms."
+      : "$149 CAD total, one-time; applicable GST included";
+    const upgradeNote = included
+      ? "<p>Your representation intake is connected to this review, so you do not need to buy the $149 review separately.</p>"
+      : "<div style=\"background:#f5f3ff;border:1px solid #c4b5fd;border-radius:10px;padding:18px;margin:24px 0\"><p style=\"margin:0 0 8px\"><strong>If representation is worthwhile:</strong> the $149 Ticket Triage payment can be applied to Fabsy's $488 base representation fee for the same eligible matter, leaving a $339 base-fee balance plus applicable tax.</p><p style=\"margin:0\">Eligible Ticket Triage clients also receive priority placement. The 30% success fee still applies to any fine reduction.</p></div>";
     await sendResendEmail(apiKey, {
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "hello@fabsy.ca",
       to: [client.email],
-      subject: "Fabsy received your Ticket Triage order",
-      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1f2937"><h1>Payment received—your Ticket Triage is in the review queue</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Fabsy received your private ticket upload and Ticket Triage information.</p><div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px;margin:24px 0"><p style="margin:0 0 8px"><strong>Payment:</strong> $149 CAD total, one-time; applicable GST included</p><p style="margin:0 0 8px"><strong>Ticket:</strong> received</p><p style="margin:0"><strong>Next:</strong> a Fabsy team member will complete a human review and email your Ticket Triage.</p></div><div style="background:#f5f3ff;border:1px solid #c4b5fd;border-radius:10px;padding:18px;margin:24px 0"><p style="margin:0 0 8px"><strong>If representation is worthwhile:</strong> the $149 Ticket Triage payment can be applied to Fabsy's $488 base representation fee for the same eligible matter, leaving a $339 base-fee balance plus applicable tax.</p><p style="margin:0">Eligible Ticket Triage clients also receive priority placement. The 30% success fee still applies to any fine reduction.</p></div><p>Fabsy will review the charge and deadline, fine and demerit implications, available options, likely insurance-risk significance, representation economics and the recommended next step.</p><p>If a response deadline is close, reply to this email or call (825) 793-2279 after submitting. Ticket Triage does not pause any deadline printed on the ticket.</p><p style="font-size:13px;color:#6b7280;line-height:1.5">Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. Ticket Triage is not a binding insurance quote or guarantee of premium changes. Fabsy is an Alberta traffic ticket agent service, not a law firm, and no outcome is promised.</p>${getFabsyEmailSignature()}</div>`,
+      subject,
+      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1f2937"><h1>Payment received—your priority review is in the queue</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Fabsy received your private ticket upload, policy documents and review information.</p><div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px;margin:24px 0"><p style="margin:0 0 8px"><strong>Payment:</strong> ${paymentSummary}</p><p style="margin:0 0 8px"><strong>Documents:</strong> received privately</p><p style="margin:0"><strong>Next:</strong> a Fabsy team member will complete the review and email your report and initial dispute plan.</p></div>${upgradeNote}<p>Fabsy will review the charge and deadline, fine and demerit implications, available options, likely insurance-risk significance, cost scenarios, representation economics and the recommended next step.</p><p>If a response deadline is close, reply to this email or call (825) 793-2279 after submitting. The review does not pause any deadline printed on the ticket.</p><p style="font-size:13px;color:#6b7280;line-height:1.5">Insurance treatment varies by insurer, driving history, jurisdiction, renewal timing and other underwriting factors. This is not a binding insurance quote or guarantee of premium changes. Fabsy is an Alberta traffic ticket agent service, not a law firm, and no outcome is promised.</p>${getFabsyEmailSignature()}</div>`,
     }, `ticket-assessment-confirmation/${submissionId}`);
     emailAccepted = true;
     const { error: sentError } = await supabase.from("ticket_submissions").update({
@@ -354,22 +430,70 @@ async function releaseFailedCheckoutIntent(
   const intentId = metadata.checkout_intent_id || metadata.idr_order_id;
   if (!isUuid(intentId)) return false;
 
+  let attempt: number | null = null;
+  if (metadata.checkout_attempt) {
+    attempt = Number(metadata.checkout_attempt);
+    if (!Number.isInteger(attempt) || attempt < 1) {
+      throw new Error("Failed checkout has invalid attempt metadata.");
+    }
+  }
+
+  // The claim release also transitions the matching intent in one database
+  // transaction. If this session does not consume an assessment, fall back to
+  // the generic intent-only release below.
+  if (attempt !== null) {
+    const { data: claimReleased, error: claimReleaseError } = await supabase.rpc(
+      "release_source_assessment_checkout",
+      {
+        p_checkout_intent_id: intentId,
+        p_checkout_attempt: attempt,
+        p_stripe_checkout_session_id: session.id,
+        p_intent_status: status,
+      },
+    );
+    if (claimReleaseError) throw claimReleaseError;
+    if (claimReleased === true) return true;
+  }
+
   let query = supabase
     .from("idr_checkout_intents")
     .update({ status, stripe_checkout_session_id: null })
     .eq("id", intentId)
     .eq("stripe_checkout_session_id", session.id)
     .neq("status", "paid");
-  if (metadata.checkout_attempt) {
-    const attempt = Number(metadata.checkout_attempt);
-    if (!Number.isInteger(attempt) || attempt < 1) {
-      throw new Error("Failed checkout has invalid attempt metadata.");
-    }
+  if (attempt !== null) {
     query = query.eq("attempts", attempt);
   }
   const { data: released, error: releaseError } = await query.select("id").maybeSingle();
   if (releaseError) throw releaseError;
   return Boolean(released);
+}
+
+async function markSourceAssessmentCheckoutPaid(
+  supabase: ReturnType<typeof createClient>,
+  session: CheckoutSessionData,
+) {
+  const metadata = session.metadata || {};
+  const sourceAssessmentId = metadata.assessment_submission_id || metadata.source_assessment_id;
+  if (!isUuid(sourceAssessmentId)) return false;
+
+  const intentId = metadata.checkout_intent_id || metadata.idr_order_id;
+  const attempt = Number(metadata.checkout_attempt);
+  if (!isUuid(intentId) || !Number.isInteger(attempt) || attempt < 1) {
+    throw new Error("Paid assessment checkout is missing its exact claim metadata.");
+  }
+
+  const { data: marked, error: markError } = await supabase.rpc(
+    "mark_source_assessment_checkout_paid",
+    {
+      p_checkout_intent_id: intentId,
+      p_checkout_attempt: attempt,
+      p_stripe_checkout_session_id: session.id,
+    },
+  );
+  if (markError) throw markError;
+  if (marked !== true) throw new Error("Paid assessment checkout claim could not be sealed.");
+  return true;
 }
 
 async function resolveClientId(
@@ -521,15 +645,30 @@ async function persistPaidOrder(
     throw new Error("Paid checkout client does not match its IDR reservation.");
   }
 
+  let combinedRepresentation: {
+    id: string;
+    source_assessment_id?: string | null;
+    representation_includes_assessment?: boolean;
+  } | null = null;
   if (ticketSubmissionId) {
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
-      .select("id,client_id")
+      .select("id,client_id,source_assessment_id,representation_includes_assessment")
       .eq("id", ticketSubmissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
     if (!submission || submission.client_id !== clientId) {
       throw new Error("Ticket submission does not belong to the IDR client.");
+    }
+    combinedRepresentation = submission;
+    if (combinedRepresentation.representation_includes_assessment) {
+      if (
+        !isUuid(combinedRepresentation.source_assessment_id || undefined) ||
+        metadata.source_assessment_id !== combinedRepresentation.source_assessment_id
+      ) {
+        throw new Error("Paid representation add-on does not match its exclusive assessment claim.");
+      }
+      await markSourceAssessmentCheckoutPaid(supabase, session);
     }
   }
 
@@ -552,6 +691,13 @@ async function persistPaidOrder(
       .eq("id", ticketSubmissionId)
       .eq("status", "awaiting_payment");
     if (activationError) throw activationError;
+    if (combinedRepresentation?.representation_includes_assessment) {
+      await activateIncludedAssessment(
+        supabase,
+        combinedRepresentation.id,
+        combinedRepresentation.source_assessment_id || undefined,
+      );
+    }
   };
   const selectFields =
     "id,client_id,ticket_submission_id,type,price_paid,status,stripe_checkout_session_id,stripe_payment_intent_id";
@@ -770,6 +916,9 @@ serve(async (req: Request): Promise<Response> => {
 
     if (session.metadata?.fabsy_checkout_kind === "ticket_only") {
       const result = await persistPaidTicketCheckout(supabase, session);
+      if (isUuid(session.metadata.source_assessment_id)) {
+        await sendTicketAssessmentConfirmation(supabase, session.metadata.source_assessment_id);
+      }
       return json({ received: true, handled: true, result });
     }
     if (!session.metadata?.idr_order_id) {
@@ -777,6 +926,9 @@ serve(async (req: Request): Promise<Response> => {
     }
     const result = await persistPaidOrder(supabase, session);
     await sendAccessEmail(supabase, session.metadata!.idr_order_id);
+    if (isUuid(session.metadata?.source_assessment_id)) {
+      await sendTicketAssessmentConfirmation(supabase, session.metadata.source_assessment_id);
+    }
     return json({ received: true, handled: true, result });
   } catch {
     console.error(`idr-payment-webhook failed for event ${event.id}`);

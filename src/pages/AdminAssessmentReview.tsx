@@ -41,6 +41,15 @@ interface AssessmentIntake {
   attribution?: Record<string, string>;
 }
 
+interface ReviewConsent {
+  schema_version: number;
+  consent_version: string;
+  accepted: boolean;
+  digital_signature: string;
+  signed_at: string;
+  captured_at?: string;
+}
+
 interface AssessmentRow {
   id: string;
   ticket_number: string;
@@ -50,6 +59,8 @@ interface AssessmentRow {
   assessment_intake: AssessmentIntake;
   assessment_result: Record<string, unknown> | null;
   assessment_ticket_path: string;
+  assessment_policy_paths: string[] | null;
+  review_consent: ReviewConsent | null;
   assessment_paid_at: string | null;
   assessment_delivered_at: string | null;
   representation_credit_eligible: boolean;
@@ -96,7 +107,13 @@ function relationOne<T>(value: T | T[]) {
 
 function display(value: string | number | null | undefined) {
   if (value === null || value === undefined || value === "" || value === "unknown") return "I don't know / not supplied";
-  return String(value).replaceAll("_", " ");
+  return String(value).replace(/_/g, " ");
+}
+
+function displayDateTime(value: string | null | undefined) {
+  if (!value) return "Not supplied";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
 export default function AdminAssessmentReview() {
@@ -117,7 +134,7 @@ export default function AdminAssessmentReview() {
         return;
       }
       const { data, error } = await idrDb.from("ticket_submissions")
-        .select("id,ticket_number,violation,status,service_type,assessment_intake,assessment_result,assessment_ticket_path,assessment_paid_at,assessment_delivered_at,representation_credit_eligible,created_at,clients(first_name,last_name,email,phone)")
+        .select("id,ticket_number,violation,status,service_type,assessment_intake,assessment_result,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at,assessment_delivered_at,representation_credit_eligible,created_at,clients(first_name,last_name,email,phone)")
         .eq("id", id).single();
       if (error || !data || data.service_type !== "ticket_insurance_assessment") {
         toast({ title: "Ticket Triage not found", description: "This case is not a Ticket Triage order.", variant: "destructive" });
@@ -194,25 +211,47 @@ export default function AdminAssessmentReview() {
     setDelivering(false);
   };
 
-  const downloadTicket = async () => {
-    if (!assessment?.assessment_ticket_path) return;
-    const { data, error } = await supabase.storage.from("assessment-tickets").download(assessment.assessment_ticket_path);
+  const downloadPrivateDocument = async (bucket: string, path: string, fileName: string, label: string) => {
+    const { data, error } = await supabase.storage.from(bucket).download(path);
     if (error || !data) {
-      toast({ title: "Download failed", description: error?.message || "The private ticket could not be downloaded.", variant: "destructive" });
+      toast({ title: "Download failed", description: error?.message || `The private ${label} could not be downloaded.`, variant: "destructive" });
       return;
     }
     const objectUrl = URL.createObjectURL(data);
     const anchor = document.createElement("a");
     anchor.href = objectUrl;
-    anchor.download = `assessment-ticket-${assessment.id}.${assessment.assessment_ticket_path.split(".").pop() || "pdf"}`;
+    anchor.download = fileName;
     anchor.click();
     URL.revokeObjectURL(objectUrl);
+  };
+
+  const downloadTicket = async () => {
+    if (!assessment?.assessment_ticket_path) return;
+    const extension = assessment.assessment_ticket_path.split(".").pop() || "pdf";
+    await downloadPrivateDocument(
+      "assessment-tickets",
+      assessment.assessment_ticket_path,
+      `assessment-ticket-${assessment.id}.${extension}`,
+      "ticket",
+    );
+  };
+
+  const downloadPolicyDocument = async (path: string, index: number) => {
+    if (!assessment) return;
+    const extension = path.split(".").pop() || "pdf";
+    await downloadPrivateDocument(
+      "assessment-policy-documents",
+      path,
+      `assessment-policy-${assessment.id}-${index + 1}.${extension}`,
+      `policy document ${index + 1}`,
+    );
   };
 
   if (loading) return <div className="flex min-h-screen items-center justify-center"><div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" /></div>;
   if (!assessment) return null;
   const client = relationOne(assessment.clients);
   const locked = Boolean(assessment.assessment_delivered_at);
+  const policyPaths = assessment.assessment_policy_paths || [];
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -221,7 +260,7 @@ export default function AdminAssessmentReview() {
           <Button variant="ghost" onClick={() => navigate("/admin/cases")}><ArrowLeft className="mr-2 h-4 w-4" />Back to cases</Button>
           <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <div className="flex flex-wrap items-center gap-2"><Badge>Ticket Triage</Badge><Badge variant={locked ? "default" : "outline"}>{assessment.status.replaceAll("_", " ")}</Badge></div>
+              <div className="flex flex-wrap items-center gap-2"><Badge>Priority Ticket Review</Badge><Badge variant={locked ? "default" : "outline"}>{assessment.status.replace(/_/g, " ")}</Badge></div>
               <h1 className="mt-3 text-3xl font-bold">{client.first_name} {client.last_name}</h1>
               <p className="mt-1 text-sm text-muted-foreground">{client.email} · {client.phone || "No phone supplied"} · {assessment.ticket_number}</p>
             </div>
@@ -238,6 +277,36 @@ export default function AdminAssessmentReview() {
               <IntakeGroup title="Ticket" values={assessment.assessment_intake.ticket} />
               <IntakeGroup title="Driving" values={assessment.assessment_intake.driving} />
               <IntakeGroup title="Insurance" values={assessment.assessment_intake.insurance} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle>Private source documents</CardTitle><CardDescription>Files supplied for this human review.</CardDescription></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
+                <div><p className="font-semibold">Traffic ticket</p><p className="text-xs text-muted-foreground">{assessment.assessment_ticket_path}</p></div>
+                <Button variant="outline" size="sm" onClick={() => void downloadTicket()}><Download className="mr-2 h-4 w-4" />Download</Button>
+              </div>
+              {policyPaths.length ? policyPaths.map((path, index) => (
+                <div key={path} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
+                  <div><p className="font-semibold">Policy document {index + 1}</p><p className="text-xs text-muted-foreground">{path}</p></div>
+                  <Button variant="outline" size="sm" onClick={() => void downloadPolicyDocument(path, index)}><Download className="mr-2 h-4 w-4" />Download</Button>
+                </div>
+              )) : <p className="text-sm text-muted-foreground">No policy documents are attached to this legacy assessment.</p>}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle>Signed review consent</CardTitle><CardDescription>Consent to review the supplied ticket and policy documents.</CardDescription></CardHeader>
+            <CardContent>
+              {assessment.review_consent ? (
+                <dl className="grid gap-3 sm:grid-cols-2">
+                  <div><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</dt><dd className="mt-1"><Badge variant={assessment.review_consent.accepted ? "default" : "destructive"}>{assessment.review_consent.accepted ? "Accepted" : "Not accepted"}</Badge></dd></div>
+                  <div><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Consent version</dt><dd className="mt-1 text-sm">{assessment.review_consent.consent_version}</dd></div>
+                  <div><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Schema version</dt><dd className="mt-1 text-sm">{assessment.review_consent.schema_version}</dd></div>
+                  <div><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Digital signature</dt><dd className="mt-1 text-sm font-medium">{assessment.review_consent.digital_signature}</dd></div>
+                  <div><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Signed</dt><dd className="mt-1 text-sm">{displayDateTime(assessment.review_consent.signed_at)}</dd></div>
+                  <div className="sm:col-span-2"><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Captured by Fabsy</dt><dd className="mt-1 text-sm">{displayDateTime(assessment.review_consent.captured_at)}</dd></div>
+                </dl>
+              ) : <p className="text-sm text-muted-foreground">No signed review consent is stored for this legacy assessment.</p>}
             </CardContent>
           </Card>
           <Alert>
@@ -291,7 +360,7 @@ export default function AdminAssessmentReview() {
 }
 
 function IntakeGroup({ title, values }: { title: string; values: Record<string, string | number | null> }) {
-  return <div><h3 className="font-bold">{title}</h3><dl className="mt-3 grid gap-3 sm:grid-cols-2">{Object.entries(values).map(([key, value]) => <div key={key} className={key === "what_happened" ? "sm:col-span-2" : ""}><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{key.replaceAll("_", " ")}</dt><dd className="mt-1 whitespace-pre-wrap text-sm">{display(value)}</dd></div>)}</dl></div>;
+  return <div><h3 className="font-bold">{title}</h3><dl className="mt-3 grid gap-3 sm:grid-cols-2">{Object.entries(values).map(([key, value]) => <div key={key} className={key === "what_happened" ? "sm:col-span-2" : ""}><dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{key.replace(/_/g, " ")}</dt><dd className="mt-1 whitespace-pre-wrap text-sm">{display(value)}</dd></div>)}</dl></div>;
 }
 
 function TextField({ id, label, value, onChange, disabled }: { id: string; label: string; value: string; onChange: (value: string) => void; disabled: boolean }) {

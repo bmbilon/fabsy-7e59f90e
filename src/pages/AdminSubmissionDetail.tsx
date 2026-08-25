@@ -40,6 +40,9 @@ interface TicketSubmission {
   case_outcome: "withdrawn" | "reduced" | "conviction_stands" | "other" | null;
   idr_offer_sent_at: string | null;
   consent_form_path: string | null;
+  ticket_document_path: string | null;
+  source_assessment_id: string | null;
+  representation_includes_assessment: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -277,6 +280,28 @@ export default function AdminSubmissionDetail() {
         description: "Failed to download consent form",
         variant: "destructive",
       });
+    }
+  };
+
+  const downloadTicketDocument = async () => {
+    if (!submission?.ticket_document_path) return;
+    try {
+      const { data, error } = await supabase.storage
+        .from("assessment-tickets")
+        .download(submission.ticket_document_path);
+      if (error) throw error;
+      const extension = submission.ticket_document_path.split(".").pop() || "pdf";
+      const url = window.URL.createObjectURL(data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `ticket-${submission.ticket_number}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading ticket document:", error);
+      toast({ title: "Download Failed", description: "Failed to download the ticket document", variant: "destructive" });
     }
   };
 
@@ -557,7 +582,7 @@ export default function AdminSubmissionDetail() {
             )}
 
             {/* Documents */}
-            {submission.consent_form_path && (
+            {(submission.consent_form_path || submission.ticket_document_path || submission.source_assessment_id) && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -565,15 +590,22 @@ export default function AdminSubmissionDetail() {
                     Documents
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Button
+                <CardContent className="space-y-3">
+                  {submission.ticket_document_path && <Button
                     variant="outline"
                     className="w-full"
-                    onClick={downloadConsentForm}
+                    onClick={downloadTicketDocument}
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Download Consent Form
-                  </Button>
+                    Download Source Ticket
+                  </Button>}
+                  {submission.consent_form_path && <Button variant="outline" className="w-full" onClick={downloadConsentForm}>
+                    <Download className="mr-2 h-4 w-4" />Download Representation Consent
+                  </Button>}
+                  {submission.source_assessment_id && <Button variant="outline" className="w-full" onClick={() => navigate(`/admin/assessments/${submission.source_assessment_id}`)}>
+                    <FileText className="mr-2 h-4 w-4" />Open Included Priority Review
+                  </Button>}
+                  {submission.representation_includes_assessment && <p className="text-sm text-muted-foreground">The $149 report deliverables are included with this representation order.</p>}
                 </CardContent>
               </Card>
             )}

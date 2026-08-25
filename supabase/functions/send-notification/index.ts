@@ -32,8 +32,15 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+interface NotificationRequest {
+  submissionId: string;
+  accessToken: string;
+}
+
 interface TicketNotification {
-  submissionId?: string;
+  submissionId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -45,6 +52,24 @@ interface TicketNotification {
   smsOptIn?: boolean;
 }
 
+class RequestError extends Error {
+  constructor(message: string, public status = 400) {
+    super(message);
+  }
+}
+
+async function sha256(value: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest)).map((part) => part.toString(16).padStart(2, "0")).join("");
+}
+
+function requiredText(value: unknown, label: string, maxLength: number) {
+  if (typeof value !== "string") throw new RequestError(`${label} is required.`);
+  const normalized = value.trim();
+  if (!normalized || normalized.length > maxLength) throw new RequestError(`${label} is invalid.`);
+  return normalized;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -52,8 +77,44 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const ticketData: TicketNotification = await req.json();
-    const siteOrigin = req.headers.get("origin") || "https://fabsy.ca";
+    const request = await req.json() as Partial<NotificationRequest>;
+    const submissionId = requiredText(request.submissionId, "Submission", 36).toLowerCase();
+    const accessToken = requiredText(request.accessToken, "Submission access token", 200);
+    if (!UUID_PATTERN.test(submissionId) || accessToken.length < 32) {
+      throw new RequestError("Submission authorization is invalid.", 403);
+    }
+    const accessTokenHash = await sha256(accessToken);
+    const { data: submission, error: submissionError } = await supabase
+      .from("ticket_submissions")
+      .select("id,first_name,last_name,email,phone,ticket_number,violation,fine_amount,created_at,sms_opt_in,status,service_type,consent_form_path,representation_access_token_hash")
+      .eq("id", submissionId)
+      .maybeSingle();
+    if (submissionError) throw submissionError;
+    if (
+      !submission ||
+      submission.service_type !== "representation" ||
+      submission.status !== "awaiting_payment" ||
+      submission.representation_access_token_hash !== accessTokenHash ||
+      typeof submission.consent_form_path !== "string" ||
+      !submission.consent_form_path.startsWith(`${submissionId}/`) ||
+      submission.consent_form_path.includes("..")
+    ) {
+      throw new RequestError("Submission authorization or stored consent is invalid.", 403);
+    }
+    const ticketData: TicketNotification = {
+      submissionId: submission.id,
+      firstName: String(submission.first_name || ""),
+      lastName: String(submission.last_name || ""),
+      email: String(submission.email || ""),
+      phone: String(submission.phone || ""),
+      ticketNumber: String(submission.ticket_number || ""),
+      violation: String(submission.violation || ""),
+      fineAmount: String(submission.fine_amount || ""),
+      submittedAt: submission.created_at ? String(submission.created_at) : new Date().toISOString(),
+      smsOptIn: submission.sms_opt_in === true,
+    };
+    const configuredSiteUrl = Deno.env.get("SITE_URL") || "https://fabsy.ca";
+    const siteOrigin = new URL(configuredSiteUrl).origin;
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
@@ -139,7 +200,7 @@ const handler = async (req: Request): Promise<Response> => {
     let pdfBuffer: ArrayBuffer | null = null;
     
     if (ticketData.submissionId) {
-      const fileName = `${ticketData.submissionId}/consent-form.pdf`;
+      const fileName = submission.consent_form_path;
       let retries = 3;
       let retryDelay = 1000; // Start with 1 second delay
       
@@ -338,10 +399,11 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: unknown) {
     console.error("Error in send-notification function:", error);
+    const status = error instanceof RequestError ? error.status : 500;
     return new Response(
       JSON.stringify({ error: getErrorMessage(error) }),
       {
-        status: 500,
+        status,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );

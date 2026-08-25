@@ -207,7 +207,7 @@ const About = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/submit-ticket">
+              <Link to="/traffic-ticket-assessment/start">
                 <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
                   Get Started Today
                 </Button>

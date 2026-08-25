@@ -8,7 +8,7 @@ const FAQPage: React.FC = () => {
   const faqs = [
     {
       q: "How much does Fabsy charge?",
-      a: "The free Representation Eligibility Check costs $0. Ticket Triage costs $149 CAD total including applicable GST. Representation is separate and uses a $488 base representation fee plus applicable tax and 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
+      a: "The Free Ticket Review costs $0. The Priority Ticket Review costs $149 CAD total including applicable GST and requires relevant policy documents. Full Representation uses a $488 base fee plus applicable tax and includes the $149 review deliverables; a 30% fee applies only to a fine reduction achieved."
     },
     {
       q: "Is Fabsy a law firm?",

@@ -2,10 +2,10 @@ export const TICKET_ASSESSMENT = {
   slug: "/traffic-ticket-assessment",
   intakePath: "/traffic-ticket-assessment/start",
   confirmationPath: "/traffic-ticket-assessment/confirmation",
-  name: "Ticket Triage",
-  descriptor: "Human-Reviewed Traffic Ticket + Insurance Impact Assessment",
-  displayName: "Ticket Triage: Human-Reviewed Traffic Ticket + Insurance Impact Assessment",
-  shortName: "Ticket Triage",
+  name: "Priority Ticket Review",
+  descriptor: "Fast Human-Reviewed Ticket, Insurance Impact + Dispute Plan",
+  displayName: "Priority Ticket Review: Ticket, Insurance Impact + Initial Dispute Plan",
+  shortName: "Priority Review",
   internalName: "Ticket Triage",
   priceCad: 149,
   priceCents: 14_900,
@@ -14,11 +14,11 @@ export const TICKET_ASSESSMENT = {
   albertaTotalCad: 149,
   currency: "CAD",
   priceIncludesApplicableTax: true,
-  heroHeadline: "Got a traffic ticket and don't know what to do?",
+  heroHeadline: "Get a fast report on your ticket before you decide what to do",
   heroSubheadline:
-    "For $149, Fabsy will review your ticket, explain your options, assess the likely insurance impact and tell you whether fighting it is actually worth the money.",
-  cta: "Get Ticket Triage - $149",
-  offerVariant: "ticket_triage_149_v3",
+    "For $149 CAD total, Fabsy reviews your ticket and policy documents, models likely insurance-cost scenarios, and delivers an initial dispute plan and recommended next step.",
+  cta: "Get Priority Review - $149",
+  offerVariant: "priority_ticket_review_149_v4",
   supportedJurisdictions: ["Alberta"] as const,
   deliveryExpectation:
     "A Fabsy team member will complete a human review and email your assessment. If a response deadline is close, contact us after submitting.",
@@ -45,6 +45,8 @@ export const ASSESSMENT_ALLOWED_UPLOAD_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
+  "image/heic",
+  "image/heif",
 ] as const;
 
 export const ASSESSMENT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;

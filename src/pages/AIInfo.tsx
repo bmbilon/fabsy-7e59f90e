@@ -272,7 +272,7 @@ export default function AIInfo() {
               </Link>
             </Button>
             <p className="mt-5 text-sm text-muted-foreground">
-              Only need to know whether representation may be available? <Link to="/submit-ticket" className="font-semibold text-primary underline underline-offset-4">Use the free eligibility check</Link>.
+              Start with one secure upload, then choose the level of service you need. <Link to="/traffic-ticket-assessment/start" className="font-semibold text-primary underline underline-offset-4">Start the free ticket review</Link>.
             </p>
           </div>
         </section>

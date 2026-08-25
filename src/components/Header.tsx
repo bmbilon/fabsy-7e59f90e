@@ -1,34 +1,37 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Scale, Phone } from "lucide-react";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { EligibilityChecker } from "@/components/EligibilityChecker";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_HREF = "tel:+18257932279";
-import { Link, useLocation } from "react-router-dom";
 
 const NAV_ITEMS = [
   { name: "Home", path: "/" },
   { name: "How It Works", path: "/how-it-works" },
   { name: "About", path: "/about" },
   { name: "What We Help With", path: "/services" },
-  { name: "Ticket Triage", path: "/traffic-ticket-assessment" },
+  { name: "Priority Review", path: "/traffic-ticket-assessment" },
   { name: "Success Stories", path: "/testimonials" },
   { name: "Blog", path: "/blog" },
 ] as const;
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-muted shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <>
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-muted shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link 
             to="/" 
@@ -72,18 +75,13 @@ const Header = () => {
                 {PHONE_DISPLAY}
               </Button>
             </a>
-            <Link
-              to={TICKET_ASSESSMENT.intakePath}
-              onClick={() => trackAssessmentEvent(
-                "assessment_cta_click",
-                { location: "desktop_header", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
-                "desktop_header",
-              )}
+            <Button
+              type="button"
+              className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
+              onClick={() => setReviewOpen(true)}
             >
-              <Button className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                {TICKET_ASSESSMENT.cta}
-              </Button>
-            </Link>
+              Free Ticket Review
+            </Button>
           </div>
 
           {/* Mobile Menu */}
@@ -142,28 +140,25 @@ const Header = () => {
                       Call {PHONE_DISPLAY}
                     </Button>
                   </a>
-                  <Link to={TICKET_ASSESSMENT.intakePath}>
-                    <Button
-                      className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
-                      onClick={() => {
-                        trackAssessmentEvent(
-                          "assessment_cta_click",
-                          { location: "mobile_header", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
-                          "mobile_header",
-                        );
-                        setIsOpen(false);
-                      }}
-                    >
-                      {TICKET_ASSESSMENT.cta}
-                    </Button>
-                  </Link>
+                  <Button
+                    type="button"
+                    className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
+                    onClick={() => {
+                      setIsOpen(false);
+                      setReviewOpen(true);
+                    }}
+                  >
+                    Free Ticket Review
+                  </Button>
                 </div>
               </div>
             </SheetContent>
           </Sheet>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      <EligibilityChecker open={reviewOpen} onOpenChange={setReviewOpen} />
+    </>
   );
 };
 

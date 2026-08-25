@@ -15,6 +15,10 @@ import { useTicketCache } from "@/hooks/useTicketCache";
 import { Link } from "react-router-dom";
 
 export interface FormData {
+  // Unified intake handoff
+  sourceAssessmentId: string;
+  sourceAssessmentAccessToken: string;
+
   // Personal Information
   firstName: string;
   lastName: string;
@@ -68,6 +72,10 @@ export interface FormData {
 }
 
 const initialFormData: FormData = {
+  // Unified intake handoff
+  sourceAssessmentId: "",
+  sourceAssessmentAccessToken: "",
+
   // Personal Information
   firstName: "",
   lastName: "",
@@ -129,7 +137,17 @@ const steps = [
   { id: 6, title: "Payment", description: "Secure payment processing" }
 ];
 
-const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialStep }: { initialTicketImage?: File | null, initialPrefill?: Partial<FormData> | null, initialStep?: number }) => {
+const TicketForm = ({
+  initialTicketImage = null,
+  initialPrefill = null,
+  initialStep,
+  sourceAssessment = null,
+}: {
+  initialTicketImage?: File | null;
+  initialPrefill?: Partial<FormData> | null;
+  initialStep?: number;
+  sourceAssessment?: { submissionId: string; accessToken: string } | null;
+}) => {
   const [currentStep, setCurrentStep] = useState<number>(() => {
     const s = typeof initialStep === 'number' ? initialStep : 1;
     const clamped = Math.max(1, Math.min(s, steps.length));
@@ -153,6 +171,8 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
     return {
       ...initialFormData,
       ticketImage: initialTicketImage ?? null,
+      sourceAssessmentId: sourceAssessment?.submissionId ?? "",
+      sourceAssessmentAccessToken: sourceAssessment?.accessToken ?? "",
       ...(pre ? {
         ...pre,
         issueDate: coerceDate(preIssue),
@@ -421,12 +441,12 @@ const TicketForm = ({ initialTicketImage = null, initialPrefill = null, initialS
             Fight Your Ticket
           </Badge>
           <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
-            Free Representation Eligibility Check <span className="text-gradient-primary">&amp; Representation</span>
+            Full Ticket <span className="text-gradient-primary">Representation</span>
           </h1>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Upload your ticket. We confirm the charge, check availability, and quote the $488 base representation fee. Want the full insurance math first?{" "}
+            Complete the representation-only details and separate authorization. Your source ticket stays attached. Want the report without representation?{" "}
             <Link to="/traffic-ticket-assessment" className="font-semibold text-white underline underline-offset-4">
-              See Ticket Triage, the $149 human-reviewed ticket and insurance-impact assessment.
+              See the $149 Priority Ticket Review with policy-based insurance scenarios and an initial dispute plan.
             </Link>
           </p>
         </div>

@@ -438,7 +438,7 @@ const WorkingContentPage = () => {
             <AnswerBox 
               offence={offence}
               city={cityName}
-              ctaHref="/traffic-ticket-assessment"
+              ctaHref="/traffic-ticket-assessment/start"
             />
           )}
 
@@ -603,10 +603,10 @@ const WorkingContentPage = () => {
                   Ticket Triage reviews the ticket, demerit implications, likely insurance significance, and whether representation appears worth the cost.
                 </p>
                 <Link
-                  to="/traffic-ticket-assessment"
+                  to="/traffic-ticket-assessment/start"
                   onClick={() => trackAssessmentEvent(
                     "assessment_cta_click",
-                    { location: "content_sidebar", destination: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
+                    { location: "content_sidebar", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
                     `content_sidebar:${window.location.pathname}`,
                   )}
                 >
@@ -614,12 +614,12 @@ const WorkingContentPage = () => {
                     size="lg"
                     className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
                   >
-                    See Ticket Triage - $149 →
+                    Start Free Ticket Review →
                   </Button>
                 </Link>
                 <p className="text-xs mt-3 opacity-80 text-center">Human reviewed · GST included · $149 can be applied to eligible representation when worthwhile · Priority placement on eligible upgrades</p>
                 <p className="mt-3 text-center text-xs opacity-80">
-                  <Link to="/submit-ticket" className="underline underline-offset-2">Only need the free representation eligibility check?</Link>
+                  Upload once, then choose a $149 priority review or $488 representation.
                 </p>
               </div>
 

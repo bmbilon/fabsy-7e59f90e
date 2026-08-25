@@ -14,7 +14,9 @@ type AssessmentEvent =
   | "purchase"
   | "checkout_abandoned"
   | "representation_cta_view"
-  | "representation_cta_click";
+  | "representation_cta_click"
+  | "free_ticket_review_completed"
+  | "representation_selected";
 
 export function assessmentAttribution() {
   return readMarketingAttribution();

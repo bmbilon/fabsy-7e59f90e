@@ -99,9 +99,9 @@ const ROISection = () => {
               ))}
             </div>
 
-            <Link to="/submit-ticket">
+            <Link to="/traffic-ticket-assessment/start">
               <Button size="lg" className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                Submit Your Ticket
+                Start Free Ticket Review
               </Button>
             </Link>
           </div>

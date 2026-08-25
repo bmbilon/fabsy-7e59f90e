@@ -230,7 +230,7 @@ const ContentPage = () => {
             <AnswerBox 
               offence={pageData.violation as string}
               city={detectedCity}
-              ctaHref="/traffic-ticket-assessment"
+              ctaHref="/traffic-ticket-assessment/start"
               className="mb-8"
             />
           )}
@@ -352,12 +352,12 @@ const ContentPage = () => {
               <p className="text-xl mb-6 text-green-50">
               Ticket Triage is a $149 CAD total, human-reviewed assessment of the ticket, likely insurance significance, and whether representation appears worth the cost.
             </p>
-            <Link to="/traffic-ticket-assessment">
+            <Link to="/traffic-ticket-assessment/start">
               <Button 
                 size="lg"
                 className="bg-white text-green-600 hover:bg-green-50 text-lg px-8 py-6"
               >
-                See Ticket Triage - $149
+                Start Free Ticket Review
               </Button>
             </Link>
           </div>

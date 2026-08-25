@@ -12,21 +12,30 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-interface ConsentFormData {
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+interface ConsentRequest {
   submissionId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  province: string;
-  postalCode: string;
-  driversLicense: string;
-  ticketNumber: string;
-  violation: string;
-  issueDate: string;
+  accessToken: string;
   digitalSignature: string;
+}
+
+class RequestError extends Error {
+  constructor(message: string, public status = 400) {
+    super(message);
+  }
+}
+
+async function sha256(value: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest)).map((part) => part.toString(16).padStart(2, "0")).join("");
+}
+
+function requiredText(value: unknown, label: string, maxLength: number) {
+  if (typeof value !== "string") throw new RequestError(`${label} is required.`);
+  const normalized = value.trim();
+  if (!normalized || normalized.length > maxLength) throw new RequestError(`${label} is invalid.`);
+  return normalized;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -35,11 +44,51 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const formData: ConsentFormData = await req.json();
-    
-    console.log("Generating consent form for submission:", formData.submissionId);
-    console.log("Client name:", formData.firstName, formData.lastName);
-    console.log("Ticket number:", formData.ticketNumber);
+    const request = await req.json() as Partial<ConsentRequest>;
+    const submissionId = requiredText(request.submissionId, "Submission", 36).toLowerCase();
+    const accessToken = requiredText(request.accessToken, "Submission access token", 200);
+    const digitalSignature = requiredText(request.digitalSignature, "Digital signature", 200);
+    if (!UUID_PATTERN.test(submissionId) || accessToken.length < 32) {
+      throw new RequestError("Submission authorization is invalid.", 403);
+    }
+    const accessTokenHash = await sha256(accessToken);
+    const { data: submission, error: submissionError } = await supabase
+      .from("ticket_submissions")
+      .select("id,first_name,last_name,email,phone,address,city,postal_code,drivers_license,ticket_number,violation,violation_date,status,service_type,representation_access_token_hash")
+      .eq("id", submissionId)
+      .maybeSingle();
+    if (submissionError) throw submissionError;
+    if (
+      !submission ||
+      submission.service_type !== "representation" ||
+      submission.status !== "awaiting_payment" ||
+      submission.representation_access_token_hash !== accessTokenHash
+    ) {
+      throw new RequestError("Submission authorization is invalid or expired.", 403);
+    }
+
+    const formData = {
+      submissionId: submission.id,
+      firstName: String(submission.first_name || ""),
+      lastName: String(submission.last_name || ""),
+      email: String(submission.email || ""),
+      phone: String(submission.phone || ""),
+      address: String(submission.address || ""),
+      city: String(submission.city || ""),
+      province: "Alberta",
+      postalCode: String(submission.postal_code || ""),
+      driversLicense: String(submission.drivers_license || ""),
+      ticketNumber: String(submission.ticket_number || ""),
+      violation: String(submission.violation || ""),
+      issueDate: submission.violation_date ? String(submission.violation_date) : "Not supplied",
+      digitalSignature,
+    };
+    const expectedSignature = `${formData.firstName} ${formData.lastName}`.trim().replace(/\s+/g, " ").toLocaleLowerCase("en-CA");
+    if (digitalSignature.replace(/\s+/g, " ").toLocaleLowerCase("en-CA") !== expectedSignature) {
+      throw new RequestError("Type the same full legal name shown on the consent form.");
+    }
+
+    console.log("Generating authorized consent form for submission:", submissionId);
 
     // Create PDF document using pdf-lib
     const pdfDoc = await PDFDocument.create();
@@ -161,7 +210,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("PDF generated, size:", pdfBytes.length, "bytes");
 
     // Upload to storage
-    const fileName = `${formData.submissionId}/consent-form.pdf`;
+    const fileName = `${formData.submissionId}/consent-form-${accessTokenHash.slice(0, 16)}.pdf`;
     console.log("Uploading to storage:", fileName);
     
     const { error: uploadError } = await supabase.storage
@@ -179,14 +228,18 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Consent form uploaded successfully to storage:", fileName);
 
     // Update ticket submission with consent form path
-    const { error: updateError } = await supabase
+    const { data: updatedSubmission, error: updateError } = await supabase
       .from('ticket_submissions')
       .update({ consent_form_path: fileName })
-      .eq('id', formData.submissionId);
+      .eq('id', formData.submissionId)
+      .eq('status', 'awaiting_payment')
+      .eq('representation_access_token_hash', accessTokenHash)
+      .select('id')
+      .maybeSingle();
 
-    if (updateError) {
+    if (updateError || !updatedSubmission) {
       console.error("Error updating submission with consent form path:", updateError);
-      throw updateError;
+      throw updateError || new RequestError("Submission authorization expired before consent was stored.", 409);
     }
 
     console.log("Submission updated with consent form path");
@@ -204,10 +257,11 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: unknown) {
     console.error("Error in generate-consent-form function:", error);
     const errorMessage = error instanceof Error ? error.message : "Consent form generation failed";
+    const status = error instanceof RequestError ? error.status : 500;
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
-        status: 500,
+        status,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );

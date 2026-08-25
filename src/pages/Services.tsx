@@ -231,7 +231,7 @@ const Services = () => {
               </h3>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
                 Insurance consequences vary by driver, conviction, insurer, and renewal timing.
-                Fabsy's $149 Ticket Triage can estimate likely risk and financial significance,
+                Fabsy's $149 Priority Ticket Review can estimate likely risk and financial significance,
                 but it is not an insurer-issued quote and does not promise savings. It also includes
                 priority placement and a $149 representation credit if the same eligible matter is upgraded.
               </p>
@@ -251,9 +251,9 @@ const Services = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/submit-ticket">
+              <Link to="/traffic-ticket-assessment/start">
                 <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                  Submit Your Ticket
+                  Start Free Ticket Review
                 </Button>
               </Link>
               <Link to="/how-it-works">
