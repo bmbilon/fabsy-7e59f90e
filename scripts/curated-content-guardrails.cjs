@@ -199,14 +199,14 @@ function redactVerifiedNumericClaims(value, slug) {
   text = replaceWhenNearby(
     text,
     /\$\s*0\b/gi,
-    /\b(?:Free\s+)?Representation Eligibility Check\b/i,
+    /\b(?:(?:Free\s+)?Representation Eligibility Check|Free Ticket Review)\b/i,
     '[verified representation eligibility price]'
   );
 
   text = replaceWhenNearby(
     text,
     /\$\s*149\b/gi,
-    /\b(?:Ticket Triage|assessment|representation credit|already paid|can be applied)\b/i,
+    /\b(?:Ticket Triage|Priority(?: Ticket)? Review|priority report|review deliverables|assessment|representation credit|already paid|can be applied)\b/i,
     '[verified assessment price]'
   );
 

@@ -26,7 +26,7 @@ const MANIFEST_PATH = path.resolve(
 );
 const SITE = 'https://fabsy.ca';
 const PRICING_TEXT = EXACT_FABSY_PRICING;
-const ASSESSMENT_NAME = 'Ticket Triage';
+const ASSESSMENT_NAMES = new Set(['Ticket Triage', 'Priority Ticket Review']);
 const ASSESSMENT_TITLES = new Set([
   'Ticket Triage | Alberta Traffic Ticket Review | $149 CAD',
   'Ticket Triage | Human-Reviewed Alberta Ticket Assessment | $149',
@@ -183,7 +183,7 @@ function isApprovedAssessmentOffer(value, inheritedItemName) {
   return (
     String(value?.price) === '149.00' &&
     value?.priceCurrency === 'CAD' &&
-    (itemOffered?.name || inheritedItemName) === ASSESSMENT_NAME &&
+    ASSESSMENT_NAMES.has(itemOffered?.name || inheritedItemName) &&
     String(specification?.price) === '149.00' &&
     specification?.priceCurrency === 'CAD' &&
     specification?.valueAddedTaxIncluded === true
