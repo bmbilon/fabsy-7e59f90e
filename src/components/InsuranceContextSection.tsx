@@ -30,7 +30,7 @@ export default function InsuranceContextSection() {
               id="insurance-context-heading"
               className="mt-3 max-w-xl text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl"
             >
-              Built around your actual insurer and policy
+              Built for your actual insurer and individual policy
             </h2>
           </div>
           <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
