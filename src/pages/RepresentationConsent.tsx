@@ -319,12 +319,10 @@ function unavailableReason(details: RequestFailure): UnavailableReason {
   return "error";
 }
 
-function Definition({ label, value, optional = false }: { label: string; value: string | null | undefined; optional?: boolean }) {
+function Definition({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div className="min-w-0">
-      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        {label}{optional ? <span className="normal-case tracking-normal"> (optional)</span> : null}
-      </dt>
+      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</dt>
       <dd className="mt-1 break-words text-sm font-medium text-foreground">{value || "Not provided"}</dd>
     </div>
   );
@@ -782,9 +780,7 @@ export default function RepresentationConsent() {
             <p className="mt-2 text-sm text-muted-foreground">These details are supplied by Fabsy and cannot be changed from this invitation.</p>
             <dl className="mt-6 grid gap-5 rounded-lg border bg-muted/30 p-4 sm:grid-cols-2">
               <Definition label="First name" value={representative?.firstName} /><Definition label="Last name" value={representative?.lastName} />
-              <Definition label="Firm" value={representative?.firm} optional /><Definition label="Phone number" value={representative?.phone} />
-              <Definition label="Mailing address" value={representative?.mailingAddress} optional /><Definition label="City or town" value={representative?.city} optional />
-              <Definition label="Province" value={representative?.province} optional /><Definition label="Postal code" value={representative?.postalCode} optional />
+              <Definition label="Phone number" value={representative?.phone} />
             </dl>
             <InlineError id="representative-error" message={fieldErrors.representative} />
           </section>
