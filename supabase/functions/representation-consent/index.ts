@@ -7,6 +7,12 @@ import {
   rgb,
   StandardFonts,
 } from "https://esm.sh/pdf-lib@1.17.1";
+import {
+  consentAccessDenial,
+  signedUrlLifetimeSeconds,
+  type ConsentAccessDenial,
+  type ConsentAccessRecord,
+} from "./access.ts";
 
 // Bump this whenever buildConsentText changes. Completed invitations retain the
 // exact text/version/hash they signed, independent of later deployments.
@@ -26,10 +32,12 @@ const DEFAULT_ALLOWED_ORIGINS = new Set([
 type JsonRecord = Record<string, unknown>;
 type SupabaseAdmin = ReturnType<typeof createClient>;
 
-interface InviteRow extends JsonRecord {
+interface InviteRow extends JsonRecord, ConsentAccessRecord {
   id: string;
   status: "pending" | "signing" | "completed" | "revoked" | "expired";
   expires_at: string;
+  access_revoked_at: string | null;
+  access_revocation_reason: string | null;
   client_legal_name: string;
   client_email: string;
   client_phone: string | null;
@@ -453,16 +461,51 @@ function validPdfPath(invite: InviteRow) {
   return path.startsWith(`standalone/${invite.id}/`) && path.endsWith(".pdf") && !path.includes("..");
 }
 
+function unavailableRequestError(status: ConsentAccessDenial) {
+  const expired = status === "expired";
+  return new RequestError(
+    expired
+      ? "This consent invitation has expired. Contact Fabsy for a new link."
+      : "This consent invitation is no longer available. Contact Fabsy if you need assistance.",
+    410,
+    expired ? "invite_expired" : "invite_revoked",
+  );
+}
+
+function assertInviteAccess(invite: ConsentAccessRecord) {
+  const denial = consentAccessDenial(invite);
+  if (denial) throw unavailableRequestError(denial);
+}
+
+async function currentInviteAccess(admin: SupabaseAdmin, inviteId: string) {
+  const { data, error } = await admin
+    .from("representation_consent_invites")
+    .select("status, expires_at, access_revoked_at")
+    .eq("id", inviteId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new RequestError("Consent invitation not found.", 404, "invite_not_found");
+  const access = data as ConsentAccessRecord;
+  assertInviteAccess(access);
+  return access;
+}
+
 async function signedPdfUrl(admin: SupabaseAdmin, invite: InviteRow) {
+  // Refresh only access-control fields immediately before minting. This keeps
+  // revocation checks independent of any earlier PII-bearing invite snapshot.
+  const access = await currentInviteAccess(admin, invite.id);
+  const expiresIn = signedUrlLifetimeSeconds(access.expires_at, Date.now(), SIGNED_PDF_URL_SECONDS);
+  if (expiresIn < 1) throw unavailableRequestError("expired");
   if (!validPdfPath(invite)) throw new Error("Stored consent PDF path is invalid.");
   const { data, error } = await admin.storage
     .from("consent-forms")
-    .createSignedUrl(String(invite.pdf_path), SIGNED_PDF_URL_SECONDS);
+    .createSignedUrl(String(invite.pdf_path), expiresIn);
   if (error || !data?.signedUrl) throw error || new Error("Consent PDF link could not be created.");
-  return data.signedUrl;
+  return { url: data.signedUrl, expiresIn };
 }
 
 async function pendingResponse(invite: InviteRow) {
+  assertInviteAccess(invite);
   const consentText = buildConsentText(invite);
   const consentTextHash = await sha256Hex(consentText);
   return {
@@ -479,6 +522,7 @@ async function pendingResponse(invite: InviteRow) {
 }
 
 async function completedResponse(admin: SupabaseAdmin, invite: InviteRow) {
+  assertInviteAccess(invite);
   const consentText = String(invite.signed_consent_text || "");
   const consentVersion = String(invite.signed_consent_text_version || "");
   const consentHash = String(invite.signed_consent_text_hash || "");
@@ -492,6 +536,8 @@ async function completedResponse(admin: SupabaseAdmin, invite: InviteRow) {
   ) {
     throw new Error("Completed consent audit record is invalid.");
   }
+  // Mint and re-check access before constructing any PII-bearing response.
+  const pdf = await signedPdfUrl(admin, invite);
   return {
     status: "completed",
     readOnly: true,
@@ -507,14 +553,14 @@ async function completedResponse(admin: SupabaseAdmin, invite: InviteRow) {
       signedAt: invite.signed_at,
       clientReportedSignedAt: invite.client_reported_signed_at,
       digitalSignature: invite.digital_signature,
-      pdfUrl: await signedPdfUrl(admin, invite),
-      pdfUrlExpiresIn: SIGNED_PDF_URL_SECONDS,
+      pdfUrl: pdf.url,
+      pdfUrlExpiresIn: pdf.expiresIn,
       pdfSha256: invite.pdf_sha256,
     },
   };
 }
 
-function unavailableResponse(origin: string | null, status: InviteRow["status"]) {
+function unavailableResponse(origin: string | null, status: ConsentAccessDenial) {
   const expired = status === "expired";
   return json(origin, {
     status,
@@ -726,9 +772,8 @@ async function handleGet(
 ) {
   const invite = await resolveInvite(admin, tokenHash);
   if (!invite) throw new RequestError("Consent invitation not found.", 404, "invite_not_found");
-  if (invite.status === "expired" || invite.status === "revoked") {
-    return unavailableResponse(origin, invite.status);
-  }
+  const accessDenial = consentAccessDenial(invite);
+  if (accessDenial) return unavailableResponse(origin, accessDenial);
   if (invite.status === "signing") {
     return json(origin, {
       status: "processing",
@@ -750,11 +795,10 @@ async function handleSubmit(
 ) {
   const currentInvite = await resolveInvite(admin, tokenHash);
   if (!currentInvite) throw new RequestError("Consent invitation not found.", 404, "invite_not_found");
+  const accessDenial = consentAccessDenial(currentInvite);
+  if (accessDenial) return unavailableResponse(origin, accessDenial);
   if (currentInvite.status === "completed") {
     return json(origin, await completedResponse(admin, currentInvite));
-  }
-  if (currentInvite.status === "expired" || currentInvite.status === "revoked") {
-    return unavailableResponse(origin, currentInvite.status);
   }
   if (currentInvite.status === "signing") {
     return json(origin, {
@@ -825,7 +869,7 @@ async function handleSubmit(
     return json(origin, await completedResponse(admin, claimedInvite));
   }
   if (claimResult === "expired" || claimResult === "revoked") {
-    return unavailableResponse(origin, claimResult as InviteRow["status"]);
+    return unavailableResponse(origin, claimResult as ConsentAccessDenial);
   }
   if (claimResult === "processing") {
     return json(origin, {
