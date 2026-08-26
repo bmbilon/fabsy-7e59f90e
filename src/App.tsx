@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import GlobalSchema from "@/components/GlobalSchema";
 import Index from "./pages/Index";
@@ -55,8 +55,20 @@ import TicketAssessmentIntake from "./pages/TicketAssessmentIntake";
 import TicketAssessmentConfirmation from "./pages/TicketAssessmentConfirmation";
 import TicketTriageExamples from "./pages/TicketTriageExamples";
 import AdminAssessmentReview from "./pages/AdminAssessmentReview";
+import RepresentationConsent from "./pages/RepresentationConsent";
 
 const queryClient = new QueryClient();
+
+const RouteAnalytics = () => {
+  const location = useLocation();
+  if (location.pathname === "/representation-consent") return null;
+  return (
+    <>
+      <AcquisitionTracker />
+      <Analytics />
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -66,14 +78,14 @@ const App = () => (
         <Sonner />
         <GlobalSchema />
         <BrowserRouter>
-        {/* Analytics must be inside the router to track SPA route changes */}
-        <AcquisitionTracker />
-        <Analytics />
+        {/* Analytics must be inside the router; secure bearer-token routes are excluded. */}
+        <RouteAnalytics />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />
           <Route path="/ticket-form" element={<TicketFormPage />} />
+          <Route path="/representation-consent" element={<RepresentationConsent />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/about" element={<About />} />
           <Route path="/about/comparison" element={<CompetitorComparison />} />

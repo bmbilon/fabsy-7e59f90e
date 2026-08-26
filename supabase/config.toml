@@ -45,6 +45,9 @@ verify_jwt = false
 [functions.generate-consent-form]
 verify_jwt = false
 
+[functions.representation-consent]
+verify_jwt = false
+
 [functions.submit-ticket]
 verify_jwt = false
 
