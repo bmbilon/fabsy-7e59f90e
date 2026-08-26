@@ -11,7 +11,7 @@
 
 **Findings**
 
-- No actionable P0, P1 or P2 differences remain.
+- No actionable P0, P1 or P2 differences remain after the second comparison pass.
 - Fonts and typography: the section uses the existing Inter-based site typography, established heading weights, blue uppercase eyebrow treatment and readable body/disclaimer line heights. Desktop and mobile wrapping is balanced and untruncated.
 - Spacing and layout rhythm: the new slate band preserves the existing hero width and page gutters, uses the established rounded-card treatment, and changes cleanly from six desktop columns to two mobile columns without horizontal overflow.
 - Colors and visual tokens: slate surfaces, primary blue accents, white cards, borders and `shadow-fab` match the homepage design system and maintain readable contrast.
@@ -48,7 +48,9 @@ The focused desktop capture makes logo sharpness, optical scaling, card spacing,
 
 **Comparison History**
 
-- Pass 1: no P0/P1/P2 visual issue was identified in the combined desktop comparison or focused desktop/mobile captures. No design-QA fix iteration was required.
+- Pass 1: the visual comparison showed no layout or asset mismatch. An independent release review then identified two P2 content/accessibility refinements: the 12 px eyebrow used a blue with insufficient normal-text contrast on slate-50, and the disclaimer's "commonly identified" phrase made an unnecessary empirical claim.
+- Fixes: changed the eyebrow to the established `text-primary-dark` token and rewrote the disclaimer opening as "Examples of insurer brands, shown for identification only."
+- Pass 2: the revised 1280 x 720 implementation retained the same layout, typography, logo rendering and responsive behavior while improving the small-text contrast and removing the unsupported claim. Post-fix visual evidence: `/Users/brettbilon/.codex/visualizations/2026/08/25/01a0395c-182c-7893-be46-f8f86d7dc4e4/fabsy-insurer-section/06-local-desktop-post-fix.png` and `/Users/brettbilon/.codex/visualizations/2026/08/25/01a0395c-182c-7893-be46-f8f86d7dc4e4/fabsy-insurer-section/07-reference-vs-post-fix.png`.
 
 **Follow-up Polish**
 

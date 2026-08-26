@@ -23,7 +23,7 @@ export default function InsuranceContextSection() {
       <div className="container mx-auto max-w-6xl">
         <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-12">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary-dark">
               Insurance context
             </p>
             <h2
@@ -67,11 +67,10 @@ export default function InsuranceContextSection() {
         </ul>
 
         <p className="mt-5 text-xs leading-5 text-slate-600">
-          Examples of insurers commonly identified in Alberta ticket assessments. Logos are
-          trademarks of their respective owners and appear for identification only. Fabsy is
-          independent and is not affiliated with or endorsed by the insurers shown. Insurance
-          treatment varies by provider, policy, driving record and underwriting rules; no premium,
-          coverage or underwriting outcome is promised.
+          Examples of insurer brands, shown for identification only. Logos are trademarks of their
+          respective owners. Fabsy is independent and is not affiliated with or endorsed by the
+          insurers shown. Insurance treatment varies by provider, policy, driving record and
+          underwriting rules; no premium, coverage or underwriting outcome is promised.
         </p>
       </div>
     </section>
