@@ -1,50 +1,65 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  consentAccessDenial,
-  signedUrlLifetimeSeconds,
-} from "./access.ts";
+import { consentAccessDenial, signedUrlLifetimeSeconds } from "./access.ts";
 
 const NOW = Date.parse("2026-08-25T20:00:00.000Z");
 
 test("completed consent remains accessible only before its invitation expiry", () => {
-  assert.equal(consentAccessDenial({
-    status: "completed",
-    expires_at: "2026-08-25T20:00:01.000Z",
-    access_revoked_at: null,
-  }, NOW), null);
-  assert.equal(consentAccessDenial({
-    status: "completed",
-    expires_at: "2026-08-25T20:00:00.000Z",
-    access_revoked_at: null,
-  }, NOW), "expired");
+  assert.equal(
+    consentAccessDenial({
+      status: "completed",
+      expires_at: "2026-08-25T20:00:01.000Z",
+      access_revoked_at: null,
+    }, NOW),
+    null,
+  );
+  assert.equal(
+    consentAccessDenial({
+      status: "completed",
+      expires_at: "2026-08-25T20:00:00.000Z",
+      access_revoked_at: null,
+    }, NOW),
+    "expired",
+  );
 });
 
 test("post-completion access revocation is denied without changing completed status", () => {
-  assert.equal(consentAccessDenial({
-    status: "completed",
-    expires_at: "2026-08-26T20:00:00.000Z",
-    access_revoked_at: "2026-08-25T20:00:00.000Z",
-  }, NOW), "revoked");
+  assert.equal(
+    consentAccessDenial({
+      status: "completed",
+      expires_at: "2026-08-26T20:00:00.000Z",
+      access_revoked_at: "2026-08-25T20:00:00.000Z",
+    }, NOW),
+    "revoked",
+  );
 });
 
 test("legacy revoked and expired statuses remain denied", () => {
-  assert.equal(consentAccessDenial({
-    status: "revoked",
-    expires_at: "2026-08-26T20:00:00.000Z",
-  }, NOW), "revoked");
-  assert.equal(consentAccessDenial({
-    status: "expired",
-    expires_at: "2026-08-26T20:00:00.000Z",
-  }, NOW), "expired");
+  assert.equal(
+    consentAccessDenial({
+      status: "revoked",
+      expires_at: "2026-08-26T20:00:00.000Z",
+    }, NOW),
+    "revoked",
+  );
+  assert.equal(
+    consentAccessDenial({
+      status: "expired",
+      expires_at: "2026-08-26T20:00:00.000Z",
+    }, NOW),
+    "expired",
+  );
 });
 
 test("malformed expiry fails closed", () => {
-  assert.equal(consentAccessDenial({
-    status: "completed",
-    expires_at: "not-a-date",
-    access_revoked_at: null,
-  }, NOW), "expired");
+  assert.equal(
+    consentAccessDenial({
+      status: "completed",
+      expires_at: "not-a-date",
+      access_revoked_at: null,
+    }, NOW),
+    "expired",
+  );
 });
 
 test("signed URL lifetime is capped at ten minutes and invite lifetime", () => {

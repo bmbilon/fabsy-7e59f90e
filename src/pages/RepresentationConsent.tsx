@@ -1,41 +1,65 @@
-import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   AlertCircle,
+  Camera,
   CheckCircle2,
   Download,
+  ExternalLink,
+  FileCheck2,
   FileSignature,
+  FileUp,
+  Loader2,
   LockKeyhole,
+  Mail,
+  Phone,
+  Scale,
   ShieldCheck,
+  Trash2,
 } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import useSafeHead from "@/hooks/useSafeHead";
+import { supabase } from "@/integrations/supabase/client";
 
-type ConsentStatus = "pending" | "completed";
+type SignatureMethod = "typed" | "manual_scan";
+type ConsentStatus = "pending" | "completed" | "document_received";
 type UnavailableReason = "missing" | "invalid" | "expired" | "revoked" | "error";
 type PageState = "loading" | "processing" | "ready" | "submitting" | "completed" | UnavailableReason;
+type ManualUploadState = "idle" | "uploading" | "uploaded" | "error";
+
+interface ConsentClient {
+  legalName: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  email: string;
+  phone: string | null;
+  dateOfBirth?: string | null;
+  address: string | null;
+  city?: string | null;
+  province?: string | null;
+  postalCode?: string | null;
+  driversLicense?: string | null;
+}
 
 interface ConsentInvite {
-  client: {
-    legalName: string;
-    email: string;
-    phone: string | null;
-    dateOfBirth?: string | null;
-    address: string | null;
-    city?: string | null;
-    province?: string | null;
-    postalCode?: string | null;
-    driversLicense?: string | null;
-  };
+  client: ConsentClient;
   matter: {
     ticketNumber: string;
+    ticketNumbers?: string[];
     charge: string;
     offenceDate: string | null;
     courtLocation: string | null;
@@ -53,22 +77,50 @@ interface ConsentInvite {
   expiresAt: string;
 }
 
+interface RepresentativeDetails {
+  firstName: string;
+  lastName: string;
+  firm: string | null;
+  phone: string;
+  mailingAddress: string | null;
+  city: string | null;
+  province: string | null;
+  postalCode: string | null;
+}
+
+interface GovernmentFormDetails {
+  code: string;
+  revision: string;
+  sourceUrl: string;
+  securityClassification: string;
+  sha256: string;
+}
+
+interface SignedConsentDetails {
+  signedAt: string;
+  digitalSignature?: string;
+  signatureMethod?: SignatureMethod;
+  pdfUrl?: string;
+  pdfUrlExpiresIn?: number;
+  pdfSha256?: string;
+  manualScanPdfUrl?: string;
+  manualScanPdfUrlExpiresIn?: number;
+  manualScanPdfSha256?: string;
+  manualScanReviewStatus?: string;
+}
+
 interface ConsentResponse {
   invite?: ConsentInvite;
+  representative?: RepresentativeDetails;
+  governmentForm?: GovernmentFormDetails;
   consent?: {
     version: string;
     text: string;
     hash: string;
     requiredSignature: string;
   };
-  status?: ConsentStatus;
-  signed?: {
-    signedAt: string;
-    digitalSignature?: string;
-    pdfUrl?: string;
-    pdfUrlExpiresIn?: number;
-    pdfSha256?: string;
-  };
+  status?: ConsentStatus | string;
+  signed?: SignedConsentDetails;
   formData?: {
     phone: string | null;
     dateOfBirth: string | null;
@@ -78,6 +130,14 @@ interface ConsentResponse {
     postalCode: string | null;
     driversLicense: string | null;
     signedAt?: string | null;
+  };
+  upload?: {
+    bucket: string;
+    path: string;
+    token: string;
+    maxBytes: number;
+    allowedTypes: string[];
+    expiresAt?: string;
   };
   error?: string;
   code?: string;
@@ -110,24 +170,39 @@ interface ConsentFormData {
   postalCode: string;
   driversLicense: string;
   digitalSignature: string;
+  manualSignedName: string;
+  manualSignedDate: string;
   accepted: boolean;
 }
+
+interface UploadedManualScan {
+  path: string;
+  contentType: string;
+  size: number;
+}
+
+type FieldErrors = Record<string, string>;
 
 const INITIAL_FORM: ConsentFormData = {
   phone: "",
   dateOfBirth: "",
   address: "",
   city: "",
-  province: "Alberta",
+  province: "",
   postalCode: "",
   driversLicense: "",
   digitalSignature: "",
+  manualSignedName: "",
+  manualSignedDate: "",
   accepted: false,
 };
 
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, "") ||
   "https://gcasbisxfrssonllpqrw.supabase.co";
 const CONSENT_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/representation-consent`;
+const OFFICIAL_APTO_URL = "https://cfr.forms.gov.ab.ca/Form/APTO13348.pdf";
+const MAX_MANUAL_SCAN_BYTES = 10 * 1024 * 1024;
+const ACCEPTED_MANUAL_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
 function containsControlCharacter(value: string) {
   for (let index = 0; index < value.length; index += 1) {
@@ -159,10 +234,7 @@ function localDateValue(date = new Date()) {
 
 function formatMoney(cents: number, currency: string) {
   try {
-    return new Intl.NumberFormat("en-CA", {
-      style: "currency",
-      currency: currency || "CAD",
-    }).format(cents / 100);
+    return new Intl.NumberFormat("en-CA", { style: "currency", currency: currency || "CAD" }).format(cents / 100);
   } catch {
     return `${(cents / 100).toFixed(2)} ${currency || "CAD"}`;
   }
@@ -171,10 +243,20 @@ function formatMoney(cents: number, currency: string) {
 function formatExpiry(value: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return null;
-  return new Intl.DateTimeFormat("en-CA", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(parsed);
+  return new Intl.DateTimeFormat("en-CA", { dateStyle: "medium", timeStyle: "short" }).format(parsed);
+}
+
+function formatSignedAt(value: string | undefined) {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return new Intl.DateTimeFormat("en-CA", { dateStyle: "long", timeStyle: "short" }).format(parsed);
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} bytes`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function trustedPdfUrl(value: string | undefined) {
@@ -188,15 +270,43 @@ function trustedPdfUrl(value: string | undefined) {
   }
 }
 
+function trustedGovernmentFormUrl(value: string | undefined) {
+  try {
+    const candidate = new URL(value || OFFICIAL_APTO_URL);
+    if (candidate.protocol !== "https:" || candidate.hostname !== "cfr.forms.gov.ab.ca") return OFFICIAL_APTO_URL;
+    return candidate.toString();
+  } catch {
+    return OFFICIAL_APTO_URL;
+  }
+}
+
+function contentTypeForFile(file: File) {
+  if (ACCEPTED_MANUAL_TYPES.includes(file.type)) return file.type;
+  const extension = file.name.toLowerCase().split(".").pop();
+  if (extension === "pdf") return "application/pdf";
+  if (extension === "jpg" || extension === "jpeg") return "image/jpeg";
+  if (extension === "png") return "image/png";
+  return "";
+}
+
+function hasSafeUploadTarget(upload: ConsentResponse["upload"]): upload is NonNullable<ConsentResponse["upload"]> {
+  if (!upload) return false;
+  if (!/^[a-z0-9][a-z0-9._-]{0,62}$/i.test(upload.bucket)) return false;
+  if (!upload.path || upload.path.length > 1024 || containsControlCharacter(upload.path)) return false;
+  if (!upload.token || upload.token.length > 4096 || containsControlCharacter(upload.token)) return false;
+  return true;
+}
+
+function isFinishedStatus(status: ConsentResponse["status"]) {
+  return status === "completed" || status === "document_received";
+}
+
 async function requestConsent(token: string, body: Record<string, unknown>): Promise<ConsentResponse> {
   let response: Response;
   try {
     response = await fetch(CONSENT_FUNCTION_URL, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
       cache: "no-store",
       credentials: "omit",
@@ -210,7 +320,7 @@ async function requestConsent(token: string, body: Record<string, unknown>): Pro
   try {
     data = await response.json() as ConsentResponse;
   } catch {
-    // The generic response below avoids displaying provider or infrastructure details.
+    // Keep infrastructure details out of the client-facing error.
   }
   if (!response.ok) {
     throw new ConsentRequestError({
@@ -226,59 +336,91 @@ function unavailableReason(details: RequestFailure): UnavailableReason {
   const hint = `${details.code} ${details.message}`.toLowerCase();
   if (hint.includes("expired")) return "expired";
   if (hint.includes("revoked") || hint.includes("disabled")) return "revoked";
-  if (
-    details.code === "invite_not_found" ||
-    hint.includes("invitation not found") ||
-    details.status === 401 ||
-    details.status === 404
-  ) return "invalid";
+  if (details.code === "invite_not_found" || hint.includes("invitation not found") || details.status === 401 || details.status === 404) return "invalid";
   return "error";
 }
 
-function Definition({ label, value }: { label: string; value: string }) {
+function Definition({ label, value, optional = false }: { label: string; value: string | null | undefined; optional?: boolean }) {
   return (
     <div className="min-w-0">
-      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}{optional ? <span className="normal-case tracking-normal"> (optional)</span> : null}
+      </dt>
       <dd className="mt-1 break-words text-sm font-medium text-foreground">{value || "Not provided"}</dd>
     </div>
   );
 }
 
+function InlineError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+  return <p id={id} className="text-xs font-medium text-destructive">{message}</p>;
+}
+
+function ConsentText({ text }: { text: string }) {
+  const blocks = text.trim().split(/\n\s*\n/).filter(Boolean);
+  return (
+    <div className="space-y-3 rounded-lg border bg-muted/30 p-4 text-sm leading-6 text-foreground sm:p-5">
+      {blocks.map((block, index) => {
+        const cleanBlock = block.trim();
+        if (/^[A-Z][A-Z\s&/–—-]+$/.test(cleanBlock) && cleanBlock.length < 80) {
+          return <h3 key={`${cleanBlock}-${index}`} className="text-sm font-bold tracking-wide">{cleanBlock}</h3>;
+        }
+        return <p key={`${cleanBlock.slice(0, 24)}-${index}`} className="whitespace-pre-line">{cleanBlock}</p>;
+      })}
+    </div>
+  );
+}
+
+function PrivateHeader() {
+  return (
+    <header className="border-b bg-background" aria-label="Fabsy secure document header">
+      <div className="container mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
+        <a href="/" className="flex min-h-11 items-center gap-2 font-bold text-primary" aria-label="Fabsy home">
+          <Scale className="h-6 w-6" aria-hidden="true" /><span className="text-2xl">Fabsy</span>
+        </a>
+        <div className="text-right">
+          <p className="flex items-center justify-end gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <LockKeyhole className="h-3.5 w-3.5" aria-hidden="true" />Private document
+          </p>
+          <a className="mt-1 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline" href="mailto:hello@fabsy.ca">Need help?</a>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function PrivateFooter() {
+  return (
+    <footer className="border-t bg-background">
+      <div className="container mx-auto max-w-5xl px-4 py-8 text-center text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 font-semibold text-primary"><Scale className="h-4 w-4" aria-hidden="true" />Fabsy Traffic Ticket Services</div>
+        <p className="mt-2">Alberta traffic ticket agent services where permitted.</p>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="tel:+18257932279"><Phone className="h-4 w-4" aria-hidden="true" />(825) 793-2279</a>
+          <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="mailto:hello@fabsy.ca"><Mail className="h-4 w-4" aria-hidden="true" />hello@fabsy.ca</a>
+          <a className="inline-flex min-h-11 items-center underline-offset-4 hover:text-primary hover:underline" href="/privacy-policy">Privacy policy</a>
+        </div>
+        <p className="mt-4 text-xs">This page does not request payment.</p>
+      </div>
+    </footer>
+  );
+}
+
 function UnavailableConsent({ reason }: { reason: UnavailableReason }) {
   const copy: Record<UnavailableReason, { title: string; body: string }> = {
-    missing: {
-      title: "Secure invitation required",
-      body: "Open the complete consent link Fabsy sent you. If you copied the address manually, make sure the full link was included.",
-    },
-    invalid: {
-      title: "This consent link is not available",
-      body: "The secure link may be incomplete or no longer active. Ask Fabsy for a new consent invitation.",
-    },
-    expired: {
-      title: "This consent link has expired",
-      body: "For your privacy, consent links are available only for a limited time. Ask Fabsy for a new invitation.",
-    },
-    revoked: {
-      title: "This consent link is no longer active",
-      body: "Ask Fabsy if you still need to complete a representation consent form.",
-    },
-    error: {
-      title: "We could not open the consent form",
-      body: "Please try again in a moment. If the problem continues, contact Fabsy for help.",
-    },
+    missing: { title: "Secure invitation required", body: "Open the complete consent link Fabsy sent you. If you copied the address manually, make sure the full link was included." },
+    invalid: { title: "This consent link is not available", body: "The secure link may be incomplete or no longer active. Ask Fabsy for a new consent invitation." },
+    expired: { title: "This consent link has expired", body: "For your privacy, consent links are available only for a limited time. Ask Fabsy for a new invitation." },
+    revoked: { title: "This consent link is no longer active", body: "Ask Fabsy if you still need to complete a representation consent form." },
+    error: { title: "We could not open the consent form", body: "Please try again in a moment. If the problem continues, contact Fabsy for help." },
   };
-
   return (
     <Card className="mx-auto max-w-2xl p-6 shadow-fab sm:p-8">
       <Alert variant={reason === "error" ? "destructive" : "default"}>
-        <AlertCircle aria-hidden="true" />
-        <AlertTitle>{copy[reason].title}</AlertTitle>
+        <AlertCircle aria-hidden="true" /><AlertTitle>{copy[reason].title}</AlertTitle>
         <AlertDescription>
           <p>{copy[reason].body}</p>
-          <p className="mt-3">
-            Email <a className="font-medium underline" href="mailto:hello@fabsy.ca">hello@fabsy.ca</a> or call{" "}
-            <a className="font-medium underline" href="tel:+18257932279">(825) 793-2279</a>.
-          </p>
+          <p className="mt-3">Email <a className="font-medium underline" href="mailto:hello@fabsy.ca">hello@fabsy.ca</a> or call <a className="font-medium underline" href="tel:+18257932279">(825) 793-2279</a>.</p>
         </AlertDescription>
       </Alert>
     </Card>
@@ -289,14 +431,26 @@ export default function RepresentationConsent() {
   const [token] = useState(readBearerToken);
   const [pageState, setPageState] = useState<PageState>(() => token ? "loading" : "missing");
   const [invite, setInvite] = useState<ConsentInvite | null>(null);
+  const [representative, setRepresentative] = useState<RepresentativeDetails | null>(null);
+  const [governmentForm, setGovernmentForm] = useState<GovernmentFormDetails | null>(null);
   const [consent, setConsent] = useState<ConsentResponse["consent"]>(undefined);
+  const [signedDetails, setSignedDetails] = useState<SignedConsentDetails | null>(null);
   const [downloadUrl, setDownloadUrl] = useState("");
   const [downloadExpiresIn, setDownloadExpiresIn] = useState(0);
+  const [manualScanDownloadUrl, setManualScanDownloadUrl] = useState("");
+  const [manualScanDownloadExpiresIn, setManualScanDownloadExpiresIn] = useState(0);
+  const [signatureMethod, setSignatureMethod] = useState<SignatureMethod>("typed");
   const [form, setForm] = useState<ConsentFormData>(INITIAL_FORM);
+  const [manualFile, setManualFile] = useState<File | null>(null);
+  const [uploadedManualScan, setUploadedManualScan] = useState<UploadedManualScan | null>(null);
+  const [manualUploadState, setManualUploadState] = useState<ManualUploadState>("idle");
   const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const alertRef = useRef<HTMLDivElement>(null);
   const completionRef = useRef<HTMLHeadingElement>(null);
   const submitStartedRef = useRef(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
 
   useSafeHead({
     title: "Representation Consent | Fabsy",
@@ -305,49 +459,54 @@ export default function RepresentationConsent() {
     robots: "noindex, nofollow, noarchive",
   });
 
-  // Read the bearer once, then remove it from the address and browser history
-  // before analytics, API calls, or outbound navigation can observe it.
   useLayoutEffect(() => {
     if (typeof window === "undefined" || !token || (!window.location.search && !window.location.hash)) return;
     window.history.replaceState(window.history.state, "", window.location.pathname);
   }, [token]);
 
+  useLayoutEffect(() => {
+    document.body.classList.add("fabsy-private-consent");
+    return () => document.body.classList.remove("fabsy-private-consent");
+  }, []);
+
+  const applyResponse = (data: ConsentResponse) => {
+    if (!data.invite || !data.consent || !data.status) return false;
+    setInvite(data.invite);
+    setRepresentative(data.representative || null);
+    setGovernmentForm(data.governmentForm || null);
+    setConsent(data.consent);
+    setSignedDetails(data.signed || null);
+    setForm((current) => ({
+      ...current,
+      phone: current.phone || data.formData?.phone || data.invite?.client.phone || "",
+      dateOfBirth: current.dateOfBirth || data.formData?.dateOfBirth || data.invite?.client.dateOfBirth || "",
+      address: current.address || data.formData?.address || data.invite?.client.address || "",
+      city: current.city || data.formData?.city || data.invite?.client.city || "",
+      province: current.province || data.formData?.province || data.invite?.client.province || "",
+      postalCode: current.postalCode || data.formData?.postalCode || data.invite?.client.postalCode || "",
+      driversLicense: current.driversLicense || data.formData?.driversLicense || data.invite?.client.driversLicense || "",
+    }));
+    setDownloadUrl(trustedPdfUrl(data.signed?.pdfUrl));
+    setDownloadExpiresIn(data.signed?.pdfUrlExpiresIn || 0);
+    setManualScanDownloadUrl(trustedPdfUrl(data.signed?.manualScanPdfUrl));
+    setManualScanDownloadExpiresIn(data.signed?.manualScanPdfUrlExpiresIn || 0);
+    setPageState(isFinishedStatus(data.status) ? "completed" : "ready");
+    return true;
+  };
+
   useEffect(() => {
     if (!token) return;
     let active = true;
-
     const loadInvite = async () => {
       try {
         const data = await requestConsent(token, { action: "get" });
-        if (!active) return;
-        if (!data.invite || !data.consent || !data.status) {
-          setPageState("error");
-          return;
-        }
-        setInvite(data.invite);
-        setConsent(data.consent);
-        setForm((current) => ({
-          ...current,
-          phone: current.phone || data.formData?.phone || data.invite?.client.phone || "",
-          dateOfBirth: current.dateOfBirth || data.formData?.dateOfBirth || data.invite?.client.dateOfBirth || "",
-          address: current.address || data.formData?.address || data.invite?.client.address || "",
-          city: current.city || data.formData?.city || data.invite?.client.city || "",
-          province: data.formData?.province || data.invite?.client.province || current.province || "Alberta",
-          postalCode: current.postalCode || data.formData?.postalCode || data.invite?.client.postalCode || "",
-          driversLicense: current.driversLicense || data.formData?.driversLicense || data.invite?.client.driversLicense || "",
-        }));
-        setDownloadUrl(trustedPdfUrl(data.signed?.pdfUrl));
-        setDownloadExpiresIn(data.signed?.pdfUrlExpiresIn || 0);
-        setPageState(data.status === "completed" ? "completed" : "ready");
+        if (active && !applyResponse(data)) setPageState("error");
       } catch (error) {
         if (!active) return;
-        const details = error instanceof ConsentRequestError
-          ? { code: error.code, message: error.message, status: error.status }
-          : { code: "request_failed", message: "The secure request was not accepted." };
+        const details = error instanceof ConsentRequestError ? { code: error.code, message: error.message, status: error.status } : { code: "request_failed", message: "The secure request was not accepted." };
         setPageState(details.code === "consent_processing" ? "processing" : unavailableReason(details));
       }
     };
-
     void loadInvite();
     return () => { active = false; };
   }, [token]);
@@ -356,390 +515,441 @@ export default function RepresentationConsent() {
     if (!token || pageState !== "processing") return;
     let active = true;
     let retryTimer: number | undefined;
-
     const checkStatus = async () => {
       try {
         const data = await requestConsent(token, { action: "get" });
-        if (!active) return;
-        if (!data.invite || !data.consent || !data.status) {
-          setPageState("error");
-          return;
-        }
-        setInvite(data.invite);
-        setConsent(data.consent);
-        setDownloadUrl(trustedPdfUrl(data.signed?.pdfUrl));
-        setDownloadExpiresIn(data.signed?.pdfUrlExpiresIn || 0);
-        setPageState(data.status === "completed" ? "completed" : "ready");
+        if (active && !applyResponse(data)) setPageState("error");
       } catch (error) {
         if (!active) return;
-        const details = error instanceof ConsentRequestError
-          ? { code: error.code, message: error.message, status: error.status }
-          : { code: "request_failed", message: "The secure request was not accepted." };
-        if (details.code === "consent_processing") {
-          retryTimer = window.setTimeout(() => { void checkStatus(); }, 3_000);
-        } else {
-          setPageState(unavailableReason(details));
-        }
+        const details = error instanceof ConsentRequestError ? { code: error.code, message: error.message, status: error.status } : { code: "request_failed", message: "The secure request was not accepted." };
+        if (details.code === "consent_processing") retryTimer = window.setTimeout(() => { void checkStatus(); }, 3_000);
+        else setPageState(unavailableReason(details));
       }
     };
-
     retryTimer = window.setTimeout(() => { void checkStatus(); }, 3_000);
-    return () => {
-      active = false;
-      if (retryTimer !== undefined) window.clearTimeout(retryTimer);
-    };
+    return () => { active = false; if (retryTimer !== undefined) window.clearTimeout(retryTimer); };
   }, [pageState, token]);
 
-  useEffect(() => {
-    if (formError) alertRef.current?.focus();
-  }, [formError]);
+  useEffect(() => { if (formError) alertRef.current?.focus(); }, [formError]);
+  useEffect(() => { if (pageState === "completed") completionRef.current?.focus(); }, [pageState]);
 
-  useEffect(() => {
-    if (pageState === "completed") completionRef.current?.focus();
-  }, [pageState]);
-
-  const fullName = consent?.requiredSignature || invite?.client.legalName || "";
-  const signatureMatches = Boolean(
-    fullName && form.digitalSignature && normalizeName(form.digitalSignature) === normalizeName(fullName),
-  );
+  const clientFirstName = invite?.client.firstName?.trim() || "";
+  const clientLastName = invite?.client.lastName?.trim() || "";
+  const fullName = consent?.requiredSignature || invite?.client.legalName || [clientFirstName, clientLastName].filter(Boolean).join(" ");
+  const ticketNumbers = Array.from(new Set((invite?.matter.ticketNumbers?.length ? invite.matter.ticketNumbers : [invite?.matter.ticketNumber || ""]).map((ticketNumber) => ticketNumber.trim()).filter(Boolean)));
+  const typedSignatureMatches = Boolean(fullName && form.digitalSignature && normalizeName(form.digitalSignature) === normalizeName(fullName));
+  const manualSignatureMatches = Boolean(fullName && form.manualSignedName && normalizeName(form.manualSignedName) === normalizeName(fullName));
   const expiry = invite ? formatExpiry(invite.expiresAt) : null;
-  const feeIsWaived = Boolean(
-    invite && (invite.fees.successFeeWaived || invite.fees.successFeePercent === 0),
-  );
+  const feeIsWaived = Boolean(invite && (invite.fees.successFeeWaived || invite.fees.successFeePercent === 0));
+  const officialFormUrl = trustedGovernmentFormUrl(governmentForm?.sourceUrl);
 
   const updateField = <Key extends keyof ConsentFormData>(key: Key, value: ConsentFormData[Key]) => {
     setForm((current) => ({ ...current, [key]: value }));
+    setFieldErrors((current) => { if (!current[key]) return current; const next = { ...current }; delete next[key]; return next; });
     if (formError) setFormError("");
+  };
+
+  const selectSignatureMethod = (value: string) => {
+    if (value !== "typed" && value !== "manual_scan") return;
+    setSignatureMethod(value);
+    setForm((current) => ({ ...current, accepted: false }));
+    setFieldErrors({});
+    setFormError("");
+  };
+
+  const selectManualFile = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    event.target.value = "";
+    if (!file) return;
+    const contentType = contentTypeForFile(file);
+    if (!contentType) {
+      setFieldErrors((current) => ({ ...current, manualFile: "Choose a PDF, JPEG, or PNG file." }));
+      setFormError("The hand-signed form could not be selected. Review the file requirement below.");
+      return;
+    }
+    if (file.size <= 0 || file.size > MAX_MANUAL_SCAN_BYTES) {
+      setFieldErrors((current) => ({ ...current, manualFile: "The file must be no larger than 10 MB." }));
+      setFormError("The hand-signed form could not be selected. Review the file requirement below.");
+      return;
+    }
+    setManualFile(file);
+    setUploadedManualScan(null);
+    setManualUploadState("idle");
+    setFieldErrors((current) => { const next = { ...current }; delete next.manualFile; return next; });
+    setFormError("");
+  };
+
+  const removeManualFile = () => {
+    if (manualUploadState === "uploading") return;
+    setManualFile(null);
+    setUploadedManualScan(null);
+    setManualUploadState("idle");
+    setFieldErrors((current) => { const next = { ...current }; delete next.manualFile; return next; });
+  };
+
+  const validateForm = () => {
+    const errors: FieldErrors = {};
+    if (!clientFirstName || !clientLastName) errors.clientIdentity = "Your first and last name must be present on the secure invitation.";
+    if (!ticketNumbers.length) errors.ticketNumbers = "At least one violation ticket number is required.";
+    if (!representative?.firstName || !representative.lastName || !representative.phone) errors.representative = "Fabsy must complete the representative name and phone number before this form can be signed.";
+    if (!form.dateOfBirth.trim()) errors.dateOfBirth = "Enter your date of birth.";
+    else if (!/^\d{4}-\d{2}-\d{2}$/.test(form.dateOfBirth) || form.dateOfBirth < "1900-01-01" || form.dateOfBirth > localDateValue()) errors.dateOfBirth = "Enter a valid date of birth that is not in the future.";
+    if (!form.address.trim()) errors.address = "Enter your mailing address.";
+    if (!form.city.trim()) errors.city = "Enter your city or town.";
+    if (form.phone.trim()) {
+      const phoneDigitCount = form.phone.replace(/\D/g, "").length;
+      if (!/^[0-9+(). -]+$/.test(form.phone) || phoneDigitCount < 10 || phoneDigitCount > 15) errors.phone = "Enter a valid phone number, including the area code, or leave this optional field blank.";
+    }
+    if (form.postalCode.trim()) {
+      const postalCode = form.postalCode.trim().toUpperCase();
+      if (postalCode.length < 3 || !/^[A-Z0-9][A-Z0-9 -]*[A-Z0-9]$/.test(postalCode)) errors.postalCode = "Enter a valid postal code or leave this optional field blank.";
+    }
+    const driversLicense = form.driversLicense.trim();
+    if (!driversLicense) errors.driversLicense = "Enter the driver's licence number Fabsy uses to match your matter.";
+    else if (driversLicense.length < 3 || !/^[A-Za-z0-9][A-Za-z0-9 .'-]*[A-Za-z0-9]$/.test(driversLicense)) errors.driversLicense = "Enter a valid driver's licence number.";
+    if (!form.accepted) errors.accepted = "Confirm the authorization before submitting.";
+
+    if (signatureMethod === "typed") {
+      if (!form.digitalSignature.trim()) errors.digitalSignature = "Type your full legal name to sign.";
+      else if (!typedSignatureMatches) errors.digitalSignature = `Your typed signature must match ${fullName}.`;
+    } else {
+      if (!form.manualSignedName.trim()) errors.manualSignedName = "Enter the printed name shown on the hand-signed form.";
+      else if (!manualSignatureMatches) errors.manualSignedName = `The printed name must match ${fullName}.`;
+      if (!form.manualSignedDate) errors.manualSignedDate = "Enter the date written on the hand-signed form.";
+      else if (form.manualSignedDate < "1900-01-01" || form.manualSignedDate > localDateValue()) errors.manualSignedDate = "Enter a valid signed date that is not in the future.";
+      if (!manualFile) errors.manualFile = "Take a clear photo or choose the complete signed PDF or image.";
+    }
+
+    setFieldErrors(errors);
+    if (Object.keys(errors).length) { setFormError("Review the highlighted information before submitting your consent."); return false; }
+    setFormError("");
+    return true;
+  };
+
+  const ensureManualScanUploaded = async () => {
+    if (uploadedManualScan) return uploadedManualScan;
+    if (!manualFile || !consent) throw new ConsentRequestError({ code: "manual_scan_required", message: "A hand-signed form is required." });
+    const contentType = contentTypeForFile(manualFile);
+    setManualUploadState("uploading");
+    const uploadResponse = await requestConsent(token, {
+      action: "create_manual_upload",
+      consentTextHash: consent.hash,
+      file: { name: manualFile.name, contentType, size: manualFile.size },
+    });
+    if (!hasSafeUploadTarget(uploadResponse.upload)) throw new ConsentRequestError({ code: "invalid_upload_target", message: "The secure upload could not be prepared." });
+    const upload = uploadResponse.upload;
+    const effectiveMaxBytes = Math.min(MAX_MANUAL_SCAN_BYTES, Number.isFinite(upload.maxBytes) && upload.maxBytes > 0 ? upload.maxBytes : MAX_MANUAL_SCAN_BYTES);
+    if (manualFile.size > effectiveMaxBytes) throw new ConsentRequestError({ code: "manual_scan_too_large", message: "The selected file exceeds the secure upload limit." });
+    if (upload.allowedTypes?.length && !upload.allowedTypes.includes(contentType)) throw new ConsentRequestError({ code: "manual_scan_type_not_allowed", message: "The selected file type is not accepted." });
+    const { error: uploadError } = await supabase.storage.from(upload.bucket).uploadToSignedUrl(upload.path, upload.token, manualFile, { contentType, upsert: false });
+    if (uploadError) throw new ConsentRequestError({ code: "manual_scan_upload_failed", message: "The secure file upload did not finish." });
+    const uploaded = { path: upload.path, contentType, size: manualFile.size };
+    setUploadedManualScan(uploaded);
+    setManualUploadState("uploaded");
+    return uploaded;
   };
 
   const submitConsent = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!invite || !consent || pageState !== "ready" || submitStartedRef.current) return;
-
-    const requiredValues = [
-      form.phone,
-      form.dateOfBirth,
-      form.address,
-      form.city,
-      form.province,
-      form.postalCode,
-      form.driversLicense,
-      form.digitalSignature,
-    ];
-    if (requiredValues.some((value) => !value.trim()) || !form.accepted) {
-      setFormError("Complete every required field, confirm the authorization, and type your full legal name to sign.");
-      return;
-    }
-    const phone = form.phone.trim();
-    const phoneDigitCount = phone.replace(/\D/g, "").length;
-    if (!/^[0-9+(). -]+$/.test(phone) || phoneDigitCount < 10 || phoneDigitCount > 15) {
-      setFormError("Enter a valid phone number, including the area code.");
-      return;
-    }
-    const today = localDateValue();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(form.dateOfBirth) || form.dateOfBirth < "1900-01-01" || form.dateOfBirth > today) {
-      setFormError("Enter a valid date of birth that is not in the future.");
-      return;
-    }
-    const postalCode = form.postalCode.trim().toUpperCase();
-    if (postalCode.length < 3 || !/^[A-Z0-9][A-Z0-9 -]*[A-Z0-9]$/.test(postalCode)) {
-      setFormError("Enter a valid postal code.");
-      return;
-    }
-    const driversLicense = form.driversLicense.trim();
-    if (driversLicense.length < 3 || !/^[A-Za-z0-9][A-Za-z0-9 .'-]*[A-Za-z0-9]$/.test(driversLicense)) {
-      setFormError("Enter a valid driver's licence number.");
-      return;
-    }
-    if (!signatureMatches) {
-      setFormError(`Your typed signature must match the full legal name shown above: ${fullName}.`);
-      return;
-    }
-
+    if (!invite || !consent || pageState !== "ready" || submitStartedRef.current || !validateForm()) return;
     submitStartedRef.current = true;
     setPageState("submitting");
     setFormError("");
+    let manualScanPrepared = uploadedManualScan;
     try {
-      const data = await requestConsent(token, {
-        action: "submit",
-        accepted: true,
-        digitalSignature: form.digitalSignature.trim(),
-        consentTextHash: consent.hash,
-        formData: {
-          phone,
-          dateOfBirth: form.dateOfBirth,
-          address: form.address.trim(),
-          city: form.city.trim(),
-          province: form.province.trim(),
-          postalCode,
-          driversLicense,
-          signedAt: new Date().toISOString(),
-        },
-      });
-      if (data.status !== "completed" || !data.invite || !data.consent) {
-        throw new ConsentRequestError({ code: "invalid_response", message: "Consent was not saved." });
+      const signedAt = new Date().toISOString();
+      const normalizedFormData = {
+        phone: form.phone.trim(), dateOfBirth: form.dateOfBirth, address: form.address.trim(), city: form.city.trim(),
+        province: form.province.trim(), postalCode: form.postalCode.trim().toUpperCase(), driversLicense: form.driversLicense.trim(), signedAt,
+      };
+      const body: Record<string, unknown> = { action: "submit", signatureMethod, accepted: true, consentTextHash: consent.hash, formData: normalizedFormData };
+      if (signatureMethod === "typed") body.digitalSignature = form.digitalSignature.trim();
+      else {
+        const manualScan = await ensureManualScanUploaded();
+        manualScanPrepared = manualScan;
+        body.manualSignedName = form.manualSignedName.trim();
+        body.manualSignedDate = form.manualSignedDate;
+        body.manualScan = manualScan;
       }
-      setInvite(data.invite);
-      setConsent(data.consent);
-      setDownloadUrl(trustedPdfUrl(data.signed?.pdfUrl));
-      setDownloadExpiresIn(data.signed?.pdfUrlExpiresIn || 0);
+      const data = await requestConsent(token, body);
+      if (!isFinishedStatus(data.status) || !data.invite || !data.consent) throw new ConsentRequestError({ code: "invalid_response", message: "Consent was not saved." });
+      applyResponse(data);
+      setSignedDetails(data.signed || { signedAt, signatureMethod });
       setPageState("completed");
     } catch (error) {
-      const details = error instanceof ConsentRequestError
-        ? { code: error.code, message: error.message, status: error.status }
-        : { code: "request_failed", message: "The secure request was not accepted." };
+      const details = error instanceof ConsentRequestError ? { code: error.code, message: error.message, status: error.status } : { code: "request_failed", message: "The secure request was not accepted." };
       const reason = unavailableReason(details);
       submitStartedRef.current = false;
-      if (reason === "expired" || reason === "revoked" || reason === "invalid") {
-        setPageState(reason);
-      } else {
+      if (signatureMethod === "manual_scan" && !manualScanPrepared) setManualUploadState("error");
+      if (reason === "expired" || reason === "revoked" || reason === "invalid") setPageState(reason);
+      else {
         setPageState("ready");
         if (details.code === "signature_mismatch" || details.code === "signature_required") {
-          setFormError(`Your typed signature must match the full legal name shown above: ${fullName}.`);
+          const fieldName = signatureMethod === "typed" ? "digitalSignature" : "manualSignedName";
+          setFieldErrors((current) => ({ ...current, [fieldName]: `The signature must match ${fullName}.` }));
+          setFormError(`The signature must match the full legal name shown on this form: ${fullName}.`);
         } else if (details.code === "consent_version_changed") {
           setForm((current) => ({ ...current, accepted: false }));
           setFormError("The consent terms changed before signing. Reopen the secure invitation and review the current terms.");
-        } else if (details.code === "consent_processing") {
-          setPageState("processing");
-        } else if (details.code === "invalid_client_details") {
-          setFormError("Review your phone number, date of birth, address, postal code, and driver's licence number, then try again.");
-        } else {
-          setFormError("Your consent was not saved. Nothing was submitted. Please review the fields and try again.");
-        }
+        } else if (details.code === "consent_processing") setPageState("processing");
+        else if (details.code === "invalid_client_details") setFormError("Review your identification and mailing information, then try again.");
+        else if (details.code.startsWith("manual_scan") || details.code === "invalid_upload_target") {
+          setFieldErrors((current) => ({ ...current, manualFile: "The signed form could not be uploaded. Remove it, choose the file again, and retry." }));
+          setFormError("The hand-signed form was not submitted. Choose the file again and retry.");
+        } else setFormError("Your consent was not saved. Nothing was submitted. Review the fields and try again.");
       }
     }
   };
 
+  const renderCompletion = () => {
+    const completedMethod = signedDetails?.signatureMethod || "typed";
+    const isManual = completedMethod === "manual_scan";
+    const reviewStatus = (signedDetails?.manualScanReviewStatus || "").toLowerCase();
+    const requiresReupload = reviewStatus === "requires_reupload" || reviewStatus === "rejected";
+    const pendingReview = isManual && !reviewStatus.match(/^(approved|accepted|completed)$/) && !requiresReupload;
+    return (
+      <Card className="mx-auto max-w-2xl p-6 text-center shadow-elevated sm:p-10" aria-live="polite">
+        <CheckCircle2 className="mx-auto h-12 w-12 text-primary" aria-hidden="true" />
+        <h2 ref={completionRef} tabIndex={-1} className="mt-4 text-2xl font-bold outline-none">{isManual ? "Hand-signed form received" : "Online Fabsy authorization completed"}</h2>
+        <p className="mx-auto mt-3 max-w-lg text-muted-foreground">{isManual ? "Fabsy securely received your hand-signed APTO form and recorded it with this matter." : "Your typed Fabsy client authorization has been securely recorded. This confirmation does not mean APTO13348 was digitally signed."}</p>
+        {formatSignedAt(signedDetails?.signedAt) ? <p className="mt-3 text-sm text-muted-foreground">Recorded {formatSignedAt(signedDetails?.signedAt)}</p> : null}
+        {pendingReview ? <Alert className="mt-6 text-left"><FileCheck2 aria-hidden="true" /><AlertTitle>Document check in progress</AlertTitle><AlertDescription>Fabsy will check that the complete form, signature, and date are readable before relying on the scan.</AlertDescription></Alert> : null}
+        {requiresReupload ? <Alert variant="destructive" className="mt-6 text-left"><AlertCircle aria-hidden="true" /><AlertTitle>A new scan is required</AlertTitle><AlertDescription>Contact Fabsy for a new secure upload link so the complete signed page can be provided.</AlertDescription></Alert> : null}
+        <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
+          {downloadUrl ? <Button asChild size="lg"><a href={downloadUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><Download aria-hidden="true" />Download consent record</a></Button> : null}
+          {isManual && manualScanDownloadUrl ? <Button asChild size="lg" variant="outline"><a href={manualScanDownloadUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><FileSignature aria-hidden="true" />Download hand-signed scan</a></Button> : null}
+        </div>
+        {downloadUrl && downloadExpiresIn > 0 ? <p className="mt-4 text-xs text-muted-foreground">The consent-record download expires in about {Math.max(1, Math.round(downloadExpiresIn / 60))} minutes.</p> : null}
+        {manualScanDownloadUrl && manualScanDownloadExpiresIn > 0 ? <p className="mt-2 text-xs text-muted-foreground">The private scan download expires in about {Math.max(1, Math.round(manualScanDownloadExpiresIn / 60))} minutes.</p> : null}
+        {!downloadUrl && !manualScanDownloadUrl ? <p className="mt-5 text-sm text-muted-foreground">Contact <a className="underline" href="mailto:hello@fabsy.ca">hello@fabsy.ca</a> if you need a copy.</p> : null}
+      </Card>
+    );
+  };
+
   const renderContent = () => {
-    if (pageState === "loading" || pageState === "processing") {
-      return (
-        <Card className="mx-auto max-w-2xl p-8 text-center shadow-fab" role="status" aria-live="polite">
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" aria-hidden="true" />
-          <h2 className="text-xl font-semibold">
-            {pageState === "processing" ? "Finalizing your signed consent" : "Opening your secure consent form"}
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {pageState === "processing" ? "Keep this page open. Your secure PDF will appear when it is ready." : "This normally takes only a moment."}
-          </p>
-        </Card>
-      );
-    }
-
-    if (["missing", "invalid", "expired", "revoked", "error"].includes(pageState)) {
-      return <UnavailableConsent reason={pageState as UnavailableReason} />;
-    }
-
-    if (pageState === "completed") {
-      return (
-        <Card className="mx-auto max-w-2xl p-6 text-center shadow-elevated sm:p-10" aria-live="polite">
-          <CheckCircle2 className="mx-auto h-12 w-12 text-primary" aria-hidden="true" />
-          <h2 ref={completionRef} tabIndex={-1} className="mt-4 text-2xl font-bold outline-none">
-            Consent completed
-          </h2>
-          <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-            Your signed representation consent has been securely recorded. You do not need to sign it again.
-          </p>
-          {downloadUrl ? (
-            <>
-              <Button asChild size="lg" className="mt-6">
-                <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-                  <Download aria-hidden="true" />
-                  Download your signed consent PDF
-                </a>
-              </Button>
-              {downloadExpiresIn > 0 ? (
-                <p className="mt-3 text-xs text-muted-foreground">
-                  This private download link expires in about {Math.max(1, Math.round(downloadExpiresIn / 60))} minutes. Reopen your original secure invitation if you later need a new link.
-                </p>
-              ) : null}
-            </>
-          ) : (
-            <p className="mt-5 text-sm text-muted-foreground">
-              Contact <a className="underline" href="mailto:hello@fabsy.ca">hello@fabsy.ca</a> if you need another copy.
-            </p>
-          )}
-        </Card>
-      );
-    }
-
+    if (pageState === "loading" || pageState === "processing") return (
+      <Card className="mx-auto max-w-2xl p-8 text-center shadow-fab" role="status" aria-live="polite">
+        <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-primary motion-reduce:animate-none" aria-hidden="true" />
+        <h2 className="text-xl font-semibold">{pageState === "processing" ? "Finalizing your consent" : "Opening your secure consent form"}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{pageState === "processing" ? "Keep this page open. Your secure documents will appear when they are ready." : "This normally takes only a moment."}</p>
+      </Card>
+    );
+    if (["missing", "invalid", "expired", "revoked", "error"].includes(pageState)) return <UnavailableConsent reason={pageState as UnavailableReason} />;
+    if (pageState === "completed") return renderCompletion();
     if (!invite || !consent) return <UnavailableConsent reason="error" />;
 
     return (
-      <form className="space-y-6" onSubmit={submitConsent} noValidate>
+      <form className="space-y-6" onSubmit={submitConsent} noValidate aria-busy={pageState === "submitting"}>
         <Card className="overflow-hidden border-primary/20 shadow-fab">
-          <div className="border-b bg-muted/50 px-5 py-4 sm:px-7">
-            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-              <ShieldCheck aria-hidden="true" />
-              Invitation details
-            </div>
-          </div>
+          <div className="border-b bg-muted/50 px-5 py-4 sm:px-7"><div className="flex items-center gap-2 text-sm font-semibold text-primary"><ShieldCheck aria-hidden="true" />Matter and fee details</div></div>
           <div className="space-y-6 p-5 sm:p-7">
             <dl className="grid gap-5 sm:grid-cols-2">
-              <Definition label="Full legal name" value={fullName} />
-              <Definition label="Email" value={invite.client.email} />
-              <Definition label="Ticket or file number" value={invite.matter.ticketNumber} />
+              <Definition label="Full legal name" value={fullName} /><Definition label="Email kept by Fabsy" value={invite.client.email} />
+              <div className="min-w-0 sm:col-span-2" id="consent-ticket-numbers">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Violation ticket number(s)</dt>
+                <dd className="mt-2">{ticketNumbers.length ? <ul className="flex flex-wrap gap-2" aria-label="Violation ticket numbers">{ticketNumbers.map((ticketNumber) => <li key={ticketNumber} className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-semibold text-foreground">{ticketNumber}</li>)}</ul> : <span className="text-sm font-medium text-destructive">Not provided</span>}<InlineError id="ticket-numbers-error" message={fieldErrors.ticketNumbers} /></dd>
+              </div>
               <Definition label="Charge" value={invite.matter.charge} />
               {invite.matter.offenceDate ? <Definition label="Offence date" value={invite.matter.offenceDate} /> : null}
               {invite.matter.courtLocation ? <Definition label="Court location" value={invite.matter.courtLocation} /> : null}
               {invite.matter.courtDate ? <Definition label="Court date" value={invite.matter.courtDate} /> : null}
               {invite.matter.details ? <Definition label="Matter details" value={invite.matter.details} /> : null}
             </dl>
-
             <Separator />
-
             <section aria-labelledby="fee-heading">
-              <h2 id="fee-heading" className="text-lg font-semibold">Your agreed fee terms</h2>
+              <h2 id="fee-heading" className="text-lg font-semibold">Your agreed Fabsy fee terms</h2>
               <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
                 <dl className="grid gap-3 text-sm sm:grid-cols-2">
-                  {typeof invite.fees.baseFeeCents === "number" ? (
-                    <Definition
-                      label="Base representation fee"
-                      value={`${formatMoney(invite.fees.baseFeeCents, invite.fees.currency)} ${invite.fees.taxTerms}`}
-                    />
-                  ) : null}
-                  {typeof invite.fees.successFeePercent === "number" ? (
-                    <Definition
-                      label="Fine-reduction fee"
-                      value={feeIsWaived
-                        ? `Waived in full for this matter${invite.fees.successFeePercent > 0 ? ` (usual rate: ${invite.fees.successFeePercent}% of any fine reduction)` : ""}`
-                        : `${invite.fees.successFeePercent}% of any fine reduction achieved`}
-                    />
-                  ) : null}
+                  {typeof invite.fees.baseFeeCents === "number" ? <Definition label="Base representation fee" value={`${formatMoney(invite.fees.baseFeeCents, invite.fees.currency)} ${invite.fees.taxTerms}`} /> : null}
+                  {typeof invite.fees.successFeePercent === "number" ? <Definition label="Fine-reduction fee" value={feeIsWaived ? `Waived in full for this matter${invite.fees.successFeePercent > 0 ? ` (usual rate: ${invite.fees.successFeePercent}% of any fine reduction)` : ""}` : `${invite.fees.successFeePercent}% of any fine reduction achieved`} /> : null}
                 </dl>
-                {invite.fees.additionalTerms ? (
-                  <p className="mt-3 text-sm font-medium text-foreground">{invite.fees.additionalTerms}</p>
-                ) : null}
-                <p className="mt-3 text-xs text-muted-foreground">These are the client-specific fee terms for the matter identified above.</p>
+                {invite.fees.additionalTerms ? <p className="mt-3 text-sm font-medium text-foreground">{invite.fees.additionalTerms}</p> : null}
+                <p className="mt-3 text-xs text-muted-foreground">Fee terms are part of Fabsy's client authorization, not a field on the government APTO form.</p>
               </div>
             </section>
-
-            {expiry ? (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <LockKeyhole className="h-4 w-4" aria-hidden="true" />
-                This secure invitation expires {expiry}.
-              </p>
-            ) : null}
+            {expiry ? <p className="flex items-start gap-2 text-xs text-muted-foreground"><LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />This secure invitation expires {expiry}.</p> : null}
           </div>
         </Card>
 
-        <Card className="p-5 shadow-fab sm:p-7">
+        <Card id="government-details" className="p-5 shadow-fab sm:p-7">
           <fieldset>
-            <legend className="text-xl font-bold">Information required for representation</legend>
-            <p className="mt-2 text-sm text-muted-foreground">All fields are required and are used to identify you and act on this matter.</p>
+            <legend className="text-xl font-bold">Person giving consent — government form details</legend>
+            <p className="mt-2 text-sm text-muted-foreground">These fields map to Alberta form {governmentForm?.code || "APTO13348"}. Fields labelled optional are not marked mandatory on the government form.</p>
+            <dl className="mt-6 grid gap-5 rounded-lg border bg-muted/30 p-4 sm:grid-cols-2"><Definition label="First name" value={clientFirstName} /><Definition label="Last name" value={clientLastName} /></dl>
+            <InlineError id="client-identity-error" message={fieldErrors.clientIdentity} />
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="consent-phone">Phone number</Label>
-                <Input id="consent-phone" type="tel" autoComplete="tel" inputMode="tel" maxLength={30} placeholder="(780) 555-0123" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} />
+                <Label htmlFor="consent-dob">Date of birth <span aria-hidden="true">*</span></Label>
+                <Input id="consent-dob" type="date" autoComplete="bday" min="1900-01-01" max={localDateValue()} required aria-required="true" aria-invalid={Boolean(fieldErrors.dateOfBirth)} aria-describedby={fieldErrors.dateOfBirth ? "consent-dob-error" : "consent-dob-help"} value={form.dateOfBirth} onChange={(event) => updateField("dateOfBirth", event.target.value)} />
+                <p id="consent-dob-help" className="text-xs text-muted-foreground">Use yyyy-mm-dd.</p><InlineError id="consent-dob-error" message={fieldErrors.dateOfBirth} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="consent-dob">Date of birth</Label>
-                <Input id="consent-dob" type="date" autoComplete="bday" min="1900-01-01" max={localDateValue()} required value={form.dateOfBirth} onChange={(event) => updateField("dateOfBirth", event.target.value)} />
+                <Label htmlFor="consent-phone">Phone number <span className="font-normal text-muted-foreground">(optional on APTO form)</span></Label>
+                <Input id="consent-phone" type="tel" autoComplete="tel" inputMode="tel" maxLength={30} placeholder="(780) 555-0123" aria-invalid={Boolean(fieldErrors.phone)} aria-describedby={fieldErrors.phone ? "consent-phone-error" : undefined} value={form.phone} onChange={(event) => updateField("phone", event.target.value)} />
+                <InlineError id="consent-phone-error" message={fieldErrors.phone} />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="consent-address">Street address</Label>
-                <Input id="consent-address" autoComplete="street-address" maxLength={160} required value={form.address} onChange={(event) => updateField("address", event.target.value)} />
+                <Label htmlFor="consent-address">Mailing address <span aria-hidden="true">*</span></Label>
+                <Input id="consent-address" autoComplete="street-address" maxLength={160} required aria-required="true" aria-invalid={Boolean(fieldErrors.address)} aria-describedby={fieldErrors.address ? "consent-address-error" : undefined} value={form.address} onChange={(event) => updateField("address", event.target.value)} />
+                <InlineError id="consent-address-error" message={fieldErrors.address} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="consent-city">City</Label>
-                <Input id="consent-city" autoComplete="address-level2" maxLength={80} required value={form.city} onChange={(event) => updateField("city", event.target.value)} />
+                <Label htmlFor="consent-city">City or town <span aria-hidden="true">*</span></Label>
+                <Input id="consent-city" autoComplete="address-level2" maxLength={80} required aria-required="true" aria-invalid={Boolean(fieldErrors.city)} aria-describedby={fieldErrors.city ? "consent-city-error" : undefined} value={form.city} onChange={(event) => updateField("city", event.target.value)} />
+                <InlineError id="consent-city-error" message={fieldErrors.city} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="consent-province">Province</Label>
-                <Input id="consent-province" autoComplete="address-level1" maxLength={80} required value={form.province} onChange={(event) => updateField("province", event.target.value)} />
+                <Label htmlFor="consent-province">Province <span className="font-normal text-muted-foreground">(optional on APTO form)</span></Label>
+                <Input id="consent-province" autoComplete="address-level1" autoCapitalize="characters" maxLength={80} placeholder="AB" value={form.province} onChange={(event) => updateField("province", event.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="consent-postal">Postal code</Label>
-                <Input id="consent-postal" autoComplete="postal-code" autoCapitalize="characters" maxLength={12} placeholder="T4N 1A1" required value={form.postalCode} onChange={(event) => updateField("postalCode", event.target.value.toUpperCase())} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="consent-licence">Driver's licence number</Label>
-                <Input id="consent-licence" autoComplete="off" autoCapitalize="characters" maxLength={40} required value={form.driversLicense} onChange={(event) => updateField("driversLicense", event.target.value)} />
+                <Label htmlFor="consent-postal">Postal code <span className="font-normal text-muted-foreground">(optional on APTO form)</span></Label>
+                <Input id="consent-postal" autoComplete="postal-code" autoCapitalize="characters" maxLength={12} placeholder="T4N 1A1" aria-invalid={Boolean(fieldErrors.postalCode)} aria-describedby={fieldErrors.postalCode ? "consent-postal-error" : undefined} value={form.postalCode} onChange={(event) => updateField("postalCode", event.target.value.toUpperCase())} />
+                <InlineError id="consent-postal-error" message={fieldErrors.postalCode} />
               </div>
             </div>
+            <p className="mt-5 text-xs text-muted-foreground"><span aria-hidden="true">*</span> Mandatory on the government form.</p>
           </fieldset>
         </Card>
 
         <Card className="p-5 shadow-fab sm:p-7">
+          <section aria-labelledby="fabsy-only-heading">
+            <h2 id="fabsy-only-heading" className="text-xl font-bold">Additional information Fabsy needs</h2>
+            <p className="mt-2 text-sm text-muted-foreground">These details are kept with your Fabsy matter and are not fields on APTO13348.</p>
+            <dl className="mt-6 grid gap-5 rounded-lg border bg-muted/30 p-4 sm:grid-cols-2">
+              <Definition label="Email" value={invite.client.email} />
+              <div className="space-y-2">
+                <Label htmlFor="consent-licence">Driver's licence number <span className="font-normal text-muted-foreground">(required by Fabsy)</span></Label>
+                <Input id="consent-licence" autoComplete="off" autoCapitalize="characters" maxLength={40} required aria-required="true" aria-invalid={Boolean(fieldErrors.driversLicense)} aria-describedby={fieldErrors.driversLicense ? "consent-licence-error" : "consent-licence-help"} value={form.driversLicense} onChange={(event) => updateField("driversLicense", event.target.value)} />
+                <p id="consent-licence-help" className="text-xs text-muted-foreground">Used to confirm identity and match disclosure to the correct matter.</p><InlineError id="consent-licence-error" message={fieldErrors.driversLicense} />
+              </div>
+            </dl>
+          </section>
+        </Card>
+
+        <Card id="representative-details" className="p-5 shadow-fab sm:p-7">
+          <section aria-labelledby="representative-heading">
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Fixed by Fabsy</p><h2 id="representative-heading" className="mt-1 text-xl font-bold">Your named representative</h2>
+            <p className="mt-2 text-sm text-muted-foreground">These details are supplied by Fabsy and cannot be changed from this invitation.</p>
+            <dl className="mt-6 grid gap-5 rounded-lg border bg-muted/30 p-4 sm:grid-cols-2">
+              <Definition label="First name" value={representative?.firstName} /><Definition label="Last name" value={representative?.lastName} />
+              <Definition label="Firm" value={representative?.firm} optional /><Definition label="Phone number" value={representative?.phone} />
+              <Definition label="Mailing address" value={representative?.mailingAddress} optional /><Definition label="City or town" value={representative?.city} optional />
+              <Definition label="Province" value={representative?.province} optional /><Definition label="Postal code" value={representative?.postalCode} optional />
+            </dl>
+            <InlineError id="representative-error" message={fieldErrors.representative} />
+          </section>
+        </Card>
+
+        <Card className="p-5 shadow-fab sm:p-7">
           <section aria-labelledby="authorization-heading" className="space-y-5">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-primary">Please read before signing</p>
-              <h2 id="authorization-heading" className="mt-1 text-xl font-bold">Consent to traffic ticket representation</h2>
+            <div><p className="text-sm font-semibold uppercase tracking-wide text-primary">Please read before signing</p><h2 id="authorization-heading" className="mt-1 text-xl font-bold">Government and Fabsy authorization</h2></div>
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div><p className="font-semibold text-foreground">Alberta Consent for Representation</p><p className="mt-1 text-sm text-muted-foreground">{governmentForm?.code || "APTO13348"}{governmentForm?.revision ? ` · Revision ${governmentForm.revision}` : " · Revision 2023-08"}</p></div>
+                <a className="inline-flex min-h-11 items-center gap-2 self-start font-semibold text-primary underline underline-offset-4" href={officialFormUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">View official form<ExternalLink className="h-4 w-4" aria-hidden="true" /></a>
+              </div>
+              <p className="mt-4 text-sm">By signing, you authorize the representative named above to act for all matters related to the listed violation ticket number(s).</p>
+              <p className="mt-4 text-sm font-semibold">You understand that your representative:</p>
+              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6">
+                <li>may access all information related to the listed violation ticket number(s) in the Traffic Ticket Digital Service (TTDS) portal;</li>
+                <li>may request and obtain full disclosure for the listed violation ticket number(s); and</li>
+                <li>remains authorized from the date signed until you withdraw consent, including by contacting TTDS at JSG.TrafficTicketsSupport@gov.ab.ca.</li>
+              </ul>
             </div>
-
-            <div className="whitespace-pre-wrap rounded-lg border bg-muted/30 p-4 text-sm leading-6 text-foreground">
-              {consent.text}
-            </div>
-
-            <Alert>
-              <FileSignature aria-hidden="true" />
-              <AlertTitle>Separate government form may still be required</AlertTitle>
-              <AlertDescription>
-                This is Fabsy's client authorization. Alberta's Traffic Ticket Digital Service (TTDS), a court, or another government body may still require its separate prescribed Consent for Representation form. Fabsy will tell you if that form is needed.
-              </AlertDescription>
-            </Alert>
-            <Alert>
-              <AlertCircle aria-hidden="true" />
-              <AlertTitle>No guaranteed outcome</AlertTitle>
-              <AlertDescription>
-                Fabsy does not promise a withdrawal, reduction, acquittal, demerit result, insurance result, premium result, or any other specific outcome. A guilty plea or final negotiated disposition will not be accepted without my instructions.
-              </AlertDescription>
-            </Alert>
-            <Alert>
-              <LockKeyhole aria-hidden="true" />
-              <AlertTitle>Deadlines still apply</AlertTitle>
-              <AlertDescription>
-                Signing this form does not extend a response date, payment date, court date, appeal period, or statutory deadline. I will continue following existing notices until Fabsy confirms in writing that it has assumed conduct of the matter.
-              </AlertDescription>
-            </Alert>
-
+            <Alert><ShieldCheck aria-hidden="true" /><AlertTitle>{governmentForm?.securityClassification || "Protected B when completed"}</AlertTitle><AlertDescription>Your completed government form contains sensitive personal information. Fabsy stores and provides it only through this secure invitation.</AlertDescription></Alert>
+            <div><h3 className="mb-3 text-lg font-semibold">Fabsy client authorization and scope</h3><ConsentText text={consent.text} /></div>
+            <Alert><AlertCircle aria-hidden="true" /><AlertTitle>No guaranteed outcome</AlertTitle><AlertDescription>Fabsy does not promise a withdrawal, reduction, acquittal, demerit result, insurance result, premium result, or any other specific outcome. A guilty plea or final negotiated disposition will not be accepted without your instructions.</AlertDescription></Alert>
+            <Alert><LockKeyhole aria-hidden="true" /><AlertTitle>Deadlines still apply</AlertTitle><AlertDescription>Signing does not extend a response date, payment date, court date, appeal period, or statutory deadline. Continue following existing notices until Fabsy confirms in writing that it has assumed conduct of the matter.</AlertDescription></Alert>
             <p className="text-xs text-muted-foreground">Consent text version: {consent.version}</p>
           </section>
         </Card>
 
         <Card className="p-5 shadow-fab sm:p-7">
-          <fieldset className="space-y-5">
-            <legend className="text-xl font-bold">Digital signature</legend>
-            <div className="space-y-2">
-              <Label htmlFor="consent-signature">Type your full legal name exactly as shown above</Label>
-              <Input
-                id="consent-signature"
-                autoComplete="name"
-                maxLength={200}
-                required
-                className="font-serif text-lg"
-                aria-describedby="signature-help"
-                value={form.digitalSignature}
-                onChange={(event) => updateField("digitalSignature", event.target.value)}
-              />
-              <p id="signature-help" className={`text-xs ${form.digitalSignature && !signatureMatches ? "text-destructive" : "text-muted-foreground"}`}>
-                {form.digitalSignature && !signatureMatches ? `Signature must match: ${fullName}` : `Required signature: ${fullName}`}
-              </p>
-            </div>
+          <fieldset className="space-y-6">
+            <legend className="text-xl font-bold">Choose how to sign</legend>
+            <RadioGroup value={signatureMethod} onValueChange={selectSignatureMethod} className="grid gap-3 sm:grid-cols-2" aria-label="Signature method">
+              <Label htmlFor="signature-typed" className={`flex min-h-28 cursor-pointer items-start gap-3 rounded-lg border p-4 font-normal transition-colors ${signatureMethod === "typed" ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:bg-muted/40"}`}>
+                <RadioGroupItem id="signature-typed" value="typed" className="mt-1 h-5 w-5 shrink-0" /><span><span className="block font-semibold text-foreground">Type my name for Fabsy</span><span className="mt-1 block text-sm leading-5 text-muted-foreground">Recommended. Sign Fabsy's secure companion authorization online.</span></span>
+              </Label>
+              <Label htmlFor="signature-manual" className={`flex min-h-28 cursor-pointer items-start gap-3 rounded-lg border p-4 font-normal transition-colors ${signatureMethod === "manual_scan" ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:bg-muted/40"}`}>
+                <RadioGroupItem id="signature-manual" value="manual_scan" className="mt-1 h-5 w-5 shrink-0" /><span><span className="block font-semibold text-foreground">Sign by hand and upload</span><span className="mt-1 block text-sm leading-5 text-muted-foreground">Print the official form, sign it, then upload one complete scan or photo.</span></span>
+              </Label>
+            </RadioGroup>
+
+            {signatureMethod === "typed" ? (
+              <div className="space-y-2">
+                <Alert className="mb-4"><FileSignature aria-hidden="true" /><AlertTitle>This does not digitally sign APTO13348</AlertTitle><AlertDescription>Your typed name signs Fabsy's secure companion authorization. Alberta or TTDS may still require the separate prescribed Consent for Representation form.</AlertDescription></Alert>
+                <Label htmlFor="consent-signature">Type your full legal name exactly as shown above</Label>
+                <Input id="consent-signature" autoComplete="name" maxLength={200} required className="font-serif text-lg" aria-invalid={Boolean(fieldErrors.digitalSignature)} aria-describedby={fieldErrors.digitalSignature ? "signature-error" : "signature-help"} value={form.digitalSignature} onChange={(event) => updateField("digitalSignature", event.target.value)} />
+                <p id="signature-help" className={`text-xs ${form.digitalSignature && !typedSignatureMatches ? "text-destructive" : "text-muted-foreground"}`}>{form.digitalSignature && !typedSignatureMatches ? `Signature must match: ${fullName}` : `Required signature: ${fullName}`}</p>
+                <InlineError id="signature-error" message={fieldErrors.digitalSignature} />
+              </div>
+            ) : (
+              <div className="space-y-5 rounded-lg border bg-muted/20 p-4 sm:p-5">
+                <div>
+                  <h3 className="text-lg font-semibold">Upload a hand-signed APTO form</h3>
+                  <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+                    <li><a className="font-semibold text-primary underline" href={officialFormUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">Download the official APTO form</a> and open it in Adobe Reader on a computer. The government PDF does not work inside a mobile browser.</li>
+                    <li>Complete the client, representative, and violation-ticket fields using the details shown on this page.</li>
+                    <li>Print the page, write the signed date, and sign it by hand.</li>
+                    <li>Upload the entire page as one PDF or one clear, well-lit photo with all four corners visible.</li>
+                  </ol>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="manual-signed-name">Printed name on signed form</Label>
+                    <Input id="manual-signed-name" autoComplete="name" maxLength={200} required aria-invalid={Boolean(fieldErrors.manualSignedName)} aria-describedby={fieldErrors.manualSignedName ? "manual-name-error" : "manual-name-help"} value={form.manualSignedName} onChange={(event) => updateField("manualSignedName", event.target.value)} />
+                    <p id="manual-name-help" className="text-xs text-muted-foreground">Must match {fullName} exactly.</p><InlineError id="manual-name-error" message={fieldErrors.manualSignedName} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="manual-signed-date">Date written on signed form</Label>
+                    <Input id="manual-signed-date" type="date" min="1900-01-01" max={localDateValue()} required aria-invalid={Boolean(fieldErrors.manualSignedDate)} aria-describedby={fieldErrors.manualSignedDate ? "manual-date-error" : "manual-date-help"} value={form.manualSignedDate} onChange={(event) => updateField("manualSignedDate", event.target.value)} />
+                    <p id="manual-date-help" className="text-xs text-muted-foreground">Use yyyy-mm-dd.</p><InlineError id="manual-date-error" message={fieldErrors.manualSignedDate} />
+                  </div>
+                </div>
+                <div id="manual-file-section" className="space-y-3">
+                  <div><p className="text-sm font-semibold text-foreground">Complete signed page</p><p className="mt-1 text-xs text-muted-foreground">PDF, JPEG, or PNG · maximum 10 MB · one complete page</p></div>
+                  <input ref={photoInputRef} hidden type="file" accept="image/jpeg,image/png" capture="environment" onChange={selectManualFile} />
+                  <input ref={documentInputRef} hidden type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" onChange={selectManualFile} />
+                  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <Button type="button" variant="outline" className="min-h-11" onClick={() => photoInputRef.current?.click()} disabled={manualUploadState === "uploading"}><Camera aria-hidden="true" />Take photo</Button>
+                    <Button type="button" variant="outline" className="min-h-11" onClick={() => documentInputRef.current?.click()} disabled={manualUploadState === "uploading"}><FileUp aria-hidden="true" />{manualFile ? "Replace PDF or image" : "Choose PDF or image"}</Button>
+                  </div>
+                  {manualFile ? <div className="flex flex-col gap-3 rounded-lg border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="break-words text-sm font-semibold text-foreground">{manualFile.name}</p><p className="mt-1 text-xs text-muted-foreground">{contentTypeForFile(manualFile)} · {formatFileSize(manualFile.size)}</p></div><Button type="button" variant="ghost" className="min-h-11 self-start text-destructive hover:text-destructive sm:self-auto" onClick={removeManualFile} disabled={manualUploadState === "uploading"}><Trash2 aria-hidden="true" />Remove</Button></div> : null}
+                  <InlineError id="manual-file-error" message={fieldErrors.manualFile} />
+                  <div aria-live="polite" role="status">
+                    {manualUploadState === "uploading" ? <div className="space-y-2"><p className="flex items-center gap-2 text-sm font-medium text-primary"><Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />Securely uploading the signed form…</p><Progress value={65} aria-label="Signed form upload in progress" /></div> : null}
+                    {manualUploadState === "uploaded" ? <p className="flex items-center gap-2 text-sm font-medium text-primary"><CheckCircle2 className="h-4 w-4" aria-hidden="true" />Signed form uploaded. Finalizing your consent…</p> : null}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-start gap-3 rounded-lg border bg-muted/40 p-4">
-              <Checkbox id="consent-accepted" checked={form.accepted} onCheckedChange={(checked) => updateField("accepted", checked === true)} aria-describedby="consent-confirmation" />
-              <Label id="consent-confirmation" htmlFor="consent-accepted" className="cursor-pointer text-sm font-normal leading-6">
-                I am the person named above. I have read and understood this form, agree to the quoted fee terms, authorize representation as described, and intend my typed name to be my electronic signature.
-              </Label>
+              <Checkbox id="consent-accepted" checked={form.accepted} onCheckedChange={(checked) => updateField("accepted", checked === true)} aria-invalid={Boolean(fieldErrors.accepted)} aria-describedby={fieldErrors.accepted ? "consent-accepted-error" : "consent-confirmation"} />
+              <div><Label id="consent-confirmation" htmlFor="consent-accepted" className="cursor-pointer text-sm font-normal leading-6">{signatureMethod === "typed" ? "I am the person named above. I have read and understood Fabsy's client authorization, agree to the quoted fee terms, and intend my typed name to be my electronic signature on Fabsy's secure companion authorization. I understand this does not digitally sign APTO13348 and the prescribed form may still be required separately." : "I am the person named above. I have read and understood the government and Fabsy authorization, agree to the quoted fee terms, and confirm that the uploaded file is a complete and unaltered copy of the official APTO form I signed by hand."}</Label><InlineError id="consent-accepted-error" message={fieldErrors.accepted} /></div>
             </div>
           </fieldset>
 
           {formError ? (
             <Alert ref={alertRef} tabIndex={-1} variant="destructive" className="mt-5 outline-none">
-              <AlertCircle aria-hidden="true" />
-              <AlertTitle>Consent not submitted</AlertTitle>
-              <AlertDescription>{formError}</AlertDescription>
+              <AlertCircle aria-hidden="true" /><AlertTitle>Consent not submitted</AlertTitle>
+              <AlertDescription>
+                <p>{formError}</p>
+                {Object.entries(fieldErrors).length ? <ul className="mt-2 list-disc space-y-1 pl-5">{Object.entries(fieldErrors).map(([field, message]) => {
+                  const targets: Record<string, string> = { clientIdentity: "government-details", ticketNumbers: "consent-ticket-numbers", representative: "representative-details", dateOfBirth: "consent-dob", phone: "consent-phone", address: "consent-address", city: "consent-city", postalCode: "consent-postal", driversLicense: "consent-licence", digitalSignature: "consent-signature", manualSignedName: "manual-signed-name", manualSignedDate: "manual-signed-date", manualFile: "manual-file-section", accepted: "consent-accepted" };
+                  return <li key={field}><a className="underline" href={`#${targets[field] || "government-details"}`}>{message}</a></li>;
+                })}</ul> : null}
+              </AlertDescription>
             </Alert>
           ) : null}
 
-          <Button type="submit" size="lg" className="mt-6 w-full sm:w-auto" disabled={pageState === "submitting"}>
-            <FileSignature aria-hidden="true" />
-            {pageState === "submitting" ? "Securely saving…" : "Sign and submit consent"}
+          <Button type="submit" size="lg" className="mt-6 min-h-12 w-full sm:w-auto" disabled={pageState === "submitting"}>
+            {pageState === "submitting" ? <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <FileSignature aria-hidden="true" />}
+            {pageState === "submitting" ? (signatureMethod === "manual_scan" ? "Uploading and submitting…" : "Securely saving…") : (signatureMethod === "manual_scan" ? "Upload and submit signed form" : "Sign and submit consent")}
           </Button>
-          <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-            <LockKeyhole className="h-4 w-4" aria-hidden="true" />
-            Your secure invitation is required to view or submit this form. This page does not request payment.
-          </p>
+          <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground"><LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />Your secure invitation is required to view or submit this form. This page does not request payment.</p>
         </Card>
       </form>
     );
@@ -747,26 +957,20 @@ export default function RepresentationConsent() {
 
   return (
     <div className="min-h-screen bg-gradient-soft">
-      <Header />
+      <style>{`.fabsy-private-consent .md\\:hidden.fixed.inset-x-0.bottom-0.z-40{display:none!important}`}</style>
+      <PrivateHeader />
       <main id="main-content">
-        <section className="bg-gradient-hero px-4 py-10 text-white sm:py-14">
+        <section className="bg-gradient-hero px-4 py-8 text-white sm:py-10">
           <div className="container mx-auto max-w-4xl px-0 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
-              <FileSignature className="h-6 w-6" aria-hidden="true" />
-            </div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary-light">Secure client document</p>
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10"><FileSignature className="h-5 w-5" aria-hidden="true" /></div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light">Secure client document</p>
             <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">Traffic ticket representation consent</h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-              Review the matter and exact fee terms, complete your information, and sign securely online. No payment is requested on this page.
-            </p>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/80 sm:text-base">Confirm the government-form details, review Fabsy's terms, and sign online or upload a hand-signed copy. No payment is requested.</p>
           </div>
         </section>
-
-        <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12">
-          {renderContent()}
-        </div>
+        <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12">{renderContent()}</div>
       </main>
-      <Footer />
+      <PrivateFooter />
     </div>
   );
 }

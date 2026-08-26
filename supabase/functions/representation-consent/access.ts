@@ -15,7 +15,9 @@ export function consentAccessDenial(
   nowMs = Date.now(),
 ): ConsentAccessDenial | null {
   if (invite.status === "expired") return "expired";
-  if (invite.status === "revoked" || Boolean(invite.access_revoked_at)) return "revoked";
+  if (invite.status === "revoked" || Boolean(invite.access_revoked_at)) {
+    return "revoked";
+  }
   const expiryMs = Date.parse(invite.expires_at);
   if (!Number.isFinite(expiryMs) || expiryMs <= nowMs) {
     return "expired";
