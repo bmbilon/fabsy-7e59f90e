@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Hero from "@/components/Hero";
+import InsuranceContextSection from "@/components/InsuranceContextSection";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import useSafeHead from "@/hooks/useSafeHead";
@@ -51,6 +52,7 @@ const Index = () => {
       <StaticJsonLd schema={productSchema} dataAttr="homepage-assessment-product" />
       <Header />
       <Hero />
+      <InsuranceContextSection />
       <AssessmentHomepageJourney />
       <Footer />
     </main>
