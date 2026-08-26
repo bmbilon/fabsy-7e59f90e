@@ -438,6 +438,20 @@ export default function RepresentationConsent() {
     robots: "noindex, nofollow, noarchive",
   });
 
+  useEffect(() => {
+    const reloadForNewBearerToken = () => {
+      const nextToken = readBearerToken();
+      if (nextToken && nextToken !== token) window.location.reload();
+    };
+
+    window.addEventListener("hashchange", reloadForNewBearerToken);
+    window.addEventListener("popstate", reloadForNewBearerToken);
+    return () => {
+      window.removeEventListener("hashchange", reloadForNewBearerToken);
+      window.removeEventListener("popstate", reloadForNewBearerToken);
+    };
+  }, [token]);
+
   useLayoutEffect(() => {
     if (typeof window === "undefined" || !token || (!window.location.search && !window.location.hash)) return;
     window.history.replaceState(window.history.state, "", window.location.pathname);
