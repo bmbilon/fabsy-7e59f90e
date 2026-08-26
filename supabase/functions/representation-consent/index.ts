@@ -1,12 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import {
-  PDFDocument,
-  PDFFont,
-  PDFPage,
-  rgb,
-  StandardFonts,
-} from "https://esm.sh/pdf-lib@1.17.1";
+import { PDFDocument } from "https://esm.sh/pdf-lib@1.17.1";
 import {
   type ConsentAccessDenial,
   consentAccessDenial,
@@ -27,11 +21,9 @@ import {
   validOptionalAptoPostalCode,
   validOptionalAptoProvince,
 } from "./client-fields.ts";
+import { buildConsentText, CONSENT_TEXT_VERSION } from "./consent-text.ts";
+import { createSignedConsentPdf } from "./signed-pdf.ts";
 
-// Bump this whenever buildConsentText changes. Completed invitations retain the
-// exact text/version/hash they signed, independent of later deployments.
-const CONSENT_TEXT_VERSION =
-  "standalone-representation-consent-v2-apto-2026-08-26";
 const SIGNED_PDF_URL_SECONDS = 600;
 const MANUAL_UPLOAD_GRANT_SECONDS = 15 * 60;
 const CONSENT_PDF_BUCKET = "consent-forms";
@@ -310,6 +302,8 @@ interface ValidatedClientFormData {
   city: string;
   province: string;
   postalCode: string;
+  // Preserved as an empty audit field for backward-compatible database RPCs.
+  // Driver's licence is not an APTO13348 consent field and is not collected.
   driversLicense: string;
   signedAt: string;
 }
@@ -410,20 +404,6 @@ function validateClientFormData(value: unknown): ValidatedClientFormData {
       "invalid_client_details",
     );
   }
-  const driversLicense = requiredClientText(
-    form.driversLicense,
-    "Driver's licence number",
-    3,
-    40,
-  );
-  if (!/^[A-Za-z0-9][A-Za-z0-9 .'-]*[A-Za-z0-9]$/.test(driversLicense)) {
-    throw new RequestError(
-      "Driver's licence number is invalid.",
-      400,
-      "invalid_client_details",
-    );
-  }
-
   const signedAtValue = typeof form.signedAt === "string" ? form.signedAt : "";
   const signedAtDate = new Date(signedAtValue);
   const now = Date.now();
@@ -447,166 +427,9 @@ function validateClientFormData(value: unknown): ValidatedClientFormData {
     city,
     province,
     postalCode,
-    driversLicense,
+    driversLicense: "",
     signedAt: signedAtDate.toISOString(),
   };
-}
-
-function formatCad(centsValue: unknown, currencyValue: unknown) {
-  const cents = Number(centsValue);
-  const currency = cleanLine(currencyValue).toUpperCase() || "CAD";
-  if (!Number.isSafeInteger(cents) || cents < 0) {
-    throw new Error("Stored base fee is invalid.");
-  }
-  const formatted = new Intl.NumberFormat("en-CA", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(cents / 100);
-  return `${formatted} ${currency}`;
-}
-
-function formatPercent(value: unknown) {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric) || numeric < 0 || numeric > 100) {
-    throw new Error("Stored success-fee percentage is invalid.");
-  }
-  return Number.isInteger(numeric)
-    ? String(numeric)
-    : numeric.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
-}
-
-function buildConsentText(invite: InviteRow) {
-  const legalName = cleanLine(invite.client_legal_name);
-  const firstName = cleanLine(invite.client_first_name);
-  const lastName = cleanLine(invite.client_last_name);
-  const email = cleanLine(invite.client_email);
-  const ticketNumbers = Array.isArray(invite.ticket_numbers)
-    ? invite.ticket_numbers.map(cleanLine).filter(Boolean)
-    : [cleanLine(invite.ticket_number)].filter(Boolean);
-  const charge = cleanLine(invite.charge_description);
-  const offenceDate = optionalLine(invite.offence_date_text);
-  const courtLocation = optionalLine(invite.court_location);
-  const courtDate = optionalLine(invite.court_date_text);
-  const matterDetails = optionalLine(invite.matter_details);
-  const taxTerms = cleanLine(invite.tax_terms);
-  const baseFee = formatCad(invite.base_fee_cents, invite.fee_currency);
-  const successFeePercent = formatPercent(invite.success_fee_percent);
-  const additionalFeeTerms = optionalLine(invite.additional_fee_terms);
-  const additionalAuthorizationTerms = optionalLine(
-    invite.additional_authorization_terms,
-  );
-
-  const representativeName = `${cleanLine(invite.representative_first_name)} ${
-    cleanLine(invite.representative_last_name)
-  }`.trim();
-  if (
-    !legalName || !firstName || !lastName || !email || !ticketNumbers.length ||
-    !charge || !taxTerms ||
-    !representativeName || !cleanLine(invite.representative_phone)
-  ) {
-    throw new Error("Stored invitation terms are incomplete.");
-  }
-
-  const clientLines = [
-    `First name: ${firstName}`,
-    `Last name: ${lastName}`,
-    `Full legal name: ${legalName}`,
-    `Email: ${email}`,
-  ].filter(Boolean);
-  const matterLines = [
-    `Violation ticket number(s): ${ticketNumbers.join(", ")}`,
-    `Charge: ${charge}`,
-    offenceDate ? `Offence date: ${offenceDate}` : null,
-    courtLocation ? `Court location: ${courtLocation}` : null,
-    courtDate ? `Court date: ${courtDate}` : null,
-    matterDetails ? `Matter details: ${matterDetails}` : null,
-  ].filter(Boolean);
-
-  let successFeeLine: string;
-  if (invite.success_fee_waived) {
-    successFeeLine =
-      `The usual success fee of ${successFeePercent}% of any fine reduction is waived in full for this matter. No percentage-based success fee will be charged.`;
-  } else if (Number(invite.success_fee_percent) > 0) {
-    successFeeLine =
-      `A success fee equal to ${successFeePercent}% of any fine reduction achieved will apply. No success fee is payable if the fine is not reduced.`;
-  } else {
-    successFeeLine =
-      "No percentage-based success fee will be charged for this matter.";
-  }
-
-  return [
-    "CLIENT CONSENT FOR TRAFFIC TICKET REPRESENTATION",
-    "",
-    "CLIENT",
-    ...clientLines,
-    "",
-    "MATTER",
-    ...matterLines,
-    "",
-    "REPRESENTATIVE",
-    `First name: ${cleanLine(invite.representative_first_name)}`,
-    `Last name: ${cleanLine(invite.representative_last_name)}`,
-    `Firm: ${cleanLine(invite.representative_firm)}`,
-    `Phone: ${cleanLine(invite.representative_phone)}`,
-    optionalLine(invite.representative_mailing_address)
-      ? `Mailing address: ${cleanLine(invite.representative_mailing_address)}`
-      : "Mailing address: not provided",
-    optionalLine(invite.representative_city)
-      ? `City or town: ${cleanLine(invite.representative_city)}`
-      : "City or town: not provided",
-    `Province: ${cleanLine(invite.representative_province)}`,
-    optionalLine(invite.representative_postal_code)
-      ? `Postal code: ${cleanLine(invite.representative_postal_code)}`
-      : "Postal code: not provided",
-    "",
-    "FEES",
-    `Base representation fee: ${baseFee} ${taxTerms}.`,
-    successFeeLine,
-    additionalFeeTerms ? `Additional fee terms: ${additionalFeeTerms}` : null,
-    "This consent does not authorize Fabsy to create a checkout, charge a payment method, or collect any amount not stated above.",
-    "",
-    "AUTHORIZATION",
-    `I, ${legalName}, authorize ${representativeName} of ${
-      cleanLine(invite.representative_firm)
-    } ("Fabsy") to act for me on the matter identified above, within the scope permitted by applicable law and court rules.`,
-    "I authorize Fabsy to:",
-    "- request, receive, and review disclosure and other records for this matter;",
-    "- communicate with the Crown, prosecutors, court staff, enforcement agencies, and other authorized participants about this matter;",
-    "- discuss and negotiate possible resolutions with the Crown or prosecutor;",
-    "- prepare and submit permitted forms, correspondence, and information for this matter;",
-    "- attend court or arrange an authorized appearance for this matter; and",
-    "- take other procedural steps I specifically instruct Fabsy to take within the permitted agent-services scope.",
-    additionalAuthorizationTerms
-      ? `Additional authorization terms: ${additionalAuthorizationTerms}`
-      : null,
-    "",
-    "CLIENT INSTRUCTIONS AND ACKNOWLEDGEMENTS",
-    "I understand that Fabsy provides traffic-ticket agent services and is not a law firm. Fabsy does not promise or guarantee a particular result.",
-    "Fabsy will not enter or change a plea, accept a resolution, make an admission, or abandon a defence without my instructions.",
-    "I will provide complete and accurate information, keep Fabsy informed of relevant changes, and respond promptly when my instructions are required.",
-    "This consent is limited to the matter identified above. I may revoke it by written notice, subject to any steps reasonably required to notify the court, Crown, prosecutor, or other participant and to comply with applicable rules.",
-    "Signing this consent does not extend a response date, payment date, court date, appeal period, or statutory deadline. I will continue to follow existing notices until Fabsy confirms in writing that it has assumed conduct of this matter.",
-    "",
-    "PRESCRIBED GOVERNMENT FORMS",
-    `This document maps the client, representative, ticket, and authorization information used by Alberta form ${
-      cleanLine(invite.government_form_code)
-    } (revision ${
-      cleanLine(invite.government_form_revision)
-    }). It is Fabsy's client authorization and does not replace that prescribed government form or its signature requirements. I understand that I may be asked to sign the official form separately.`,
-    `Official form: ${cleanLine(invite.government_form_url)}`,
-    "For the listed ticket number(s), I authorize the representative to access the matter information available through the Traffic Ticket Digital Service and to request and receive full disclosure.",
-    "This authorization remains in effect from the signed date until I withdraw it. I may also be required to notify Alberta Traffic Tickets Support using the withdrawal process stated on the current government form.",
-    "",
-    "PERSONAL INFORMATION CONSENT",
-    "I consent to Fabsy collecting, using, and disclosing the personal information reasonably required to provide the authorized service, including exchanging that information with courts, prosecutors, enforcement agencies, service providers, and other authorized participants as needed for this matter or as required by law.",
-    "",
-    "SIGNATURE OPTIONS",
-    "If I sign by typing my exact full legal name, I confirm that I have read and agree to this entire consent and intend my typed name to be my electronic signature for Fabsy's authorization.",
-    "If I choose the manual-scan option, I confirm that the uploaded PDF or image contains my hand signature, printed legal name, and signed date and is an accurate scan or photo of the document I signed.",
-    "A Fabsy typed signature is not a certificate-backed digital signature on the official Alberta form and does not replace the official APTO13348 form.",
-  ].filter((line): line is string => line !== null).join("\n");
 }
 
 async function sha256Hex(value: string | Uint8Array) {
@@ -795,11 +618,6 @@ function publicInvite(invite: InviteRow) {
           ? invite.signed_client_postal_code
           : invite.client_postal_code,
       ),
-      driversLicense: optionalLine(
-        completed
-          ? invite.signed_client_drivers_license
-          : invite.client_drivers_license,
-      ),
     },
     matter: {
       ticketNumber: cleanLine(invite.ticket_number),
@@ -811,14 +629,6 @@ function publicInvite(invite: InviteRow) {
       courtLocation: optionalLine(invite.court_location),
       courtDate: optionalLine(invite.court_date_text),
       details: optionalLine(invite.matter_details),
-    },
-    fees: {
-      baseFeeCents: Number(invite.base_fee_cents),
-      currency: cleanLine(invite.fee_currency),
-      taxTerms: cleanLine(invite.tax_terms),
-      successFeePercent: Number(invite.success_fee_percent),
-      successFeeWaived: Boolean(invite.success_fee_waived),
-      additionalTerms: optionalLine(invite.additional_fee_terms),
     },
     expiresAt: invite.expires_at,
   };
@@ -871,11 +681,6 @@ function publicFormData(invite: InviteRow) {
     ),
     postalCode: optionalLine(
       completed ? invite.signed_client_postal_code : invite.client_postal_code,
-    ),
-    driversLicense: optionalLine(
-      completed
-        ? invite.signed_client_drivers_license
-        : invite.client_drivers_license,
     ),
     signedAt: completed ? invite.client_reported_signed_at : null,
   };
@@ -1080,305 +885,6 @@ function unavailableResponse(
       : "This consent invitation is no longer available. Contact Fabsy if you need assistance.",
     code: expired ? "invite_expired" : "invite_revoked",
   }, 410);
-}
-
-function pdfSafe(value: unknown) {
-  return String(value ?? "");
-}
-
-function wrapPdfText(
-  text: string,
-  font: PDFFont,
-  size: number,
-  maxWidth: number,
-) {
-  const words = pdfSafe(text).split(/\s+/).filter(Boolean);
-  if (!words.length) return [""];
-  const lines: string[] = [];
-  let line = "";
-  for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (!line || font.widthOfTextAtSize(candidate, size) <= maxWidth) {
-      line = candidate;
-    } else {
-      lines.push(line);
-      line = word;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
-async function createSignedPdf(invite: InviteRow) {
-  const consentText = String(invite.pending_consent_text || "");
-  const consentVersion = String(invite.pending_consent_text_version || "");
-  const consentHash = String(invite.pending_consent_text_hash || "");
-  const signatureMethod = String(invite.pending_signature_method || "");
-  const signature = signatureMethod === "manual_scan"
-    ? String(invite.pending_manual_signed_name || "")
-    : String(invite.pending_digital_signature || "");
-  const signedAt = String(invite.pending_signed_at || "");
-  const clientReportedSignedAt = String(
-    invite.pending_client_reported_signed_at || "",
-  );
-  const signedClientDetails = {
-    phone: String(invite.pending_client_phone || ""),
-    dateOfBirth: String(invite.pending_client_date_of_birth || ""),
-    address: String(invite.pending_client_address || ""),
-    city: String(invite.pending_client_city || ""),
-    province: String(invite.pending_client_province || ""),
-    postalCode: String(invite.pending_client_postal_code || ""),
-    driversLicense: String(invite.pending_client_drivers_license || ""),
-  };
-  if (
-    !consentText || !consentVersion || !SHA256_PATTERN.test(consentHash) ||
-    !["typed", "manual_scan"].includes(signatureMethod) || !signature ||
-    !signedAt
-  ) {
-    throw new Error("Claimed consent audit data is incomplete.");
-  }
-  if (
-    !clientReportedSignedAt || !signedClientDetails.dateOfBirth ||
-    !signedClientDetails.address ||
-    !signedClientDetails.city || !signedClientDetails.driversLicense
-  ) {
-    throw new Error("Claimed client-identification data is incomplete.");
-  }
-  if (await sha256Hex(consentText) !== consentHash) {
-    throw new Error("Claimed consent text hash does not match.");
-  }
-
-  const document = await PDFDocument.create();
-  const regular = await document.embedFont(StandardFonts.Helvetica);
-  const bold = await document.embedFont(StandardFonts.HelveticaBold);
-  const pageWidth = 612;
-  const pageHeight = 792;
-  const margin = 52;
-  const contentWidth = pageWidth - margin * 2;
-  const bottom = 58;
-  let page!: PDFPage;
-  let y = 0;
-
-  const addPage = () => {
-    page = document.addPage([pageWidth, pageHeight]);
-    page.drawText("FABSY", {
-      x: margin,
-      y: pageHeight - 43,
-      size: 15,
-      font: bold,
-      color: rgb(0.31, 0.12, 0.58),
-    });
-    page.drawText("Traffic Ticket Defense", {
-      x: margin + 57,
-      y: pageHeight - 41,
-      size: 9,
-      font: regular,
-      color: rgb(0.34, 0.36, 0.42),
-    });
-    page.drawLine({
-      start: { x: margin, y: pageHeight - 51 },
-      end: { x: pageWidth - margin, y: pageHeight - 51 },
-      thickness: 1,
-      color: rgb(0.84, 0.81, 0.9),
-    });
-    y = pageHeight - 76;
-  };
-
-  const ensureSpace = (height: number) => {
-    if (y - height < bottom) addPage();
-  };
-
-  const drawParagraph = (
-    text: string,
-    options: {
-      font?: PDFFont;
-      size?: number;
-      color?: ReturnType<typeof rgb>;
-      indent?: number;
-      gapAfter?: number;
-    } = {},
-  ) => {
-    const selectedFont = options.font || regular;
-    const size = options.size || 9.5;
-    const indent = options.indent || 0;
-    const lineHeight = size * 1.38;
-    const lines = wrapPdfText(text, selectedFont, size, contentWidth - indent);
-    for (const line of lines) {
-      ensureSpace(lineHeight);
-      page.drawText(line, {
-        x: margin + indent,
-        y,
-        size,
-        font: selectedFont,
-        color: options.color || rgb(0.12, 0.14, 0.18),
-      });
-      y -= lineHeight;
-    }
-    y -= options.gapAfter ?? 4;
-  };
-
-  addPage();
-  drawParagraph("SIGNED REPRESENTATION CONSENT", {
-    font: bold,
-    size: 17,
-    color: rgb(0.31, 0.12, 0.58),
-    gapAfter: 9,
-  });
-  drawParagraph(`Consent version: ${consentVersion}`, {
-    size: 8.5,
-    gapAfter: 1,
-  });
-  drawParagraph(`Consent text SHA-256: ${consentHash}`, {
-    size: 8.5,
-    gapAfter: 13,
-  });
-
-  drawParagraph("CLIENT IDENTIFICATION SUPPLIED AT SIGNING", {
-    font: bold,
-    size: 11.5,
-    color: rgb(0.31, 0.12, 0.58),
-    gapAfter: 6,
-  });
-  drawParagraph(`First name: ${cleanLine(invite.client_first_name)}`, {
-    gapAfter: 2,
-  });
-  drawParagraph(`Last name: ${cleanLine(invite.client_last_name)}`, {
-    gapAfter: 2,
-  });
-  drawParagraph(`Full legal name: ${cleanLine(invite.client_legal_name)}`, {
-    gapAfter: 2,
-  });
-  drawParagraph(`Email: ${cleanLine(invite.client_email)}`, { gapAfter: 2 });
-  drawParagraph(`Phone: ${signedClientDetails.phone}`, { gapAfter: 2 });
-  drawParagraph(`Date of birth: ${signedClientDetails.dateOfBirth}`, {
-    gapAfter: 2,
-  });
-  drawParagraph(
-    `Address: ${signedClientDetails.address}, ${signedClientDetails.city}, ${signedClientDetails.province} ${signedClientDetails.postalCode}`,
-    { gapAfter: 2 },
-  );
-  drawParagraph(
-    `Driver's licence number: ${signedClientDetails.driversLicense}`,
-    { gapAfter: 12 },
-  );
-
-  for (const rawLine of consentText.split("\n")) {
-    const line = rawLine.trim();
-    if (!line) {
-      y -= 6;
-      continue;
-    }
-    const isHeading = /^[A-Z][A-Z ]+$/.test(line) && line.length <= 64;
-    const isBullet = line.startsWith("- ");
-    drawParagraph(line, {
-      font: isHeading ? bold : regular,
-      size: isHeading ? 11.5 : 9.5,
-      color: isHeading ? rgb(0.31, 0.12, 0.58) : rgb(0.12, 0.14, 0.18),
-      indent: isBullet ? 12 : 0,
-      gapAfter: isHeading ? 6 : 3,
-    });
-  }
-
-  ensureSpace(115);
-  y -= 8;
-  page.drawLine({
-    start: { x: margin, y },
-    end: { x: pageWidth - margin, y },
-    thickness: 1,
-    color: rgb(0.84, 0.81, 0.9),
-  });
-  y -= 22;
-  drawParagraph(
-    signatureMethod === "manual_scan"
-      ? "MANUAL SIGNATURE SCAN AUDIT"
-      : "ELECTRONIC SIGNATURE AUDIT",
-    {
-      font: bold,
-      size: 11.5,
-      color: rgb(0.31, 0.12, 0.58),
-      gapAfter: 7,
-    },
-  );
-  drawParagraph(
-    `${
-      signatureMethod === "manual_scan"
-        ? "Printed legal name"
-        : "Typed signature"
-    }: ${signature}`,
-    {
-      font: bold,
-      size: 10.5,
-      gapAfter: 3,
-    },
-  );
-  drawParagraph(`Signature method: ${signatureMethod}`, {
-    size: 9,
-    gapAfter: 3,
-  });
-  if (signatureMethod === "manual_scan") {
-    drawParagraph(
-      `Client-entered signed date: ${invite.pending_manual_signed_date || ""}`,
-      { size: 9, gapAfter: 3 },
-    );
-    drawParagraph(
-      `Uploaded source SHA-256: ${
-        invite.pending_manual_scan_source_sha256 || ""
-      }`,
-      { size: 8.5, gapAfter: 3 },
-    );
-    drawParagraph(
-      `TTDS-ready scan PDF SHA-256: ${
-        invite.pending_manual_scan_pdf_sha256 || ""
-      }`,
-      { size: 8.5, gapAfter: 3 },
-    );
-    drawParagraph(
-      "The uploaded signature scan is stored privately and its review status is pending.",
-      {
-        size: 8.5,
-        color: rgb(0.34, 0.36, 0.42),
-      },
-    );
-  }
-  drawParagraph(`Server-recorded signature time: ${signedAt}`, {
-    size: 9,
-    gapAfter: 3,
-  });
-  drawParagraph(`Client-reported signature time: ${clientReportedSignedAt}`, {
-    size: 9,
-    gapAfter: 3,
-  });
-  drawParagraph(
-    "The client affirmatively accepted the versioned consent above before submitting this signature.",
-    {
-      size: 8.5,
-      color: rgb(0.34, 0.36, 0.42),
-    },
-  );
-
-  const pages = document.getPages();
-  pages.forEach((currentPage, index) => {
-    currentPage.drawText(
-      `Fabsy representation consent | Page ${index + 1} of ${pages.length}`,
-      {
-        x: margin,
-        y: 29,
-        size: 7.5,
-        font: regular,
-        color: rgb(0.45, 0.47, 0.52),
-      },
-    );
-  });
-  document.setTitle(
-    `Representation consent - ${pdfSafe(invite.ticket_number)}`,
-  );
-  document.setAuthor("Fabsy Traffic Ticket Defense");
-  document.setSubject("Signed traffic ticket representation consent");
-  document.setCreator("Fabsy secure consent service");
-  document.setProducer("Fabsy secure consent service");
-  document.setCreationDate(new Date(signedAt));
-  document.setModificationDate(new Date(signedAt));
-  return document.save({ useObjectStreams: false });
 }
 
 async function handleGet(
@@ -1910,7 +1416,7 @@ async function handleSubmit(
       uploadedScanPaths.push(manualPdfPath);
     }
 
-    const pdfBytes = await createSignedPdf(claimedInvite);
+    const pdfBytes = await createSignedConsentPdf(claimedInvite);
     const pdfHash = await sha256Hex(pdfBytes);
     const pdfPath =
       `standalone/${claimedInvite.id}/${claimId}/signed-consent.pdf`;

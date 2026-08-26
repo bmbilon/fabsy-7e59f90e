@@ -14,6 +14,7 @@ const Footer = () => {
     ],
     legal: [
       { name: "Privacy Policy", path: "/privacy-policy" },
+      { name: "Terms of Purchase", path: "/terms-of-purchase" },
       { name: "Terms of Service", path: "/terms-of-service" },
     ],
     support: [
@@ -156,7 +157,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised.
+                Representation pricing and any success fee are stated in the written quote or order. A 30% fee on a fine reduction applies only when expressly included; a written waiver controls. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised.
               </p>
             </div>
             

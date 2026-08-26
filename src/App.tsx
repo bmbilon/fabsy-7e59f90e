@@ -14,6 +14,7 @@ import TestimonialsPage from "./pages/TestimonialsPage";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import TermsOfPurchase from "./pages/TermsOfPurchase";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import AIInfo from "./pages/AIInfo";
@@ -95,6 +96,7 @@ const App = () => (
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/terms-of-purchase" element={<TermsOfPurchase />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/founder" element={<Founder />} />

@@ -38,6 +38,7 @@ const STATIC_ROUTES = [
   '/founder',
   '/about/comparison',
   '/submit-ticket',
+  '/terms-of-purchase',
   '/traffic-ticket-assessment',
   '/traffic-ticket-assessment/examples',
   '/hubs/alberta-tickets-101',

@@ -263,7 +263,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
               />
               <div>
                 <Label htmlFor="payment-terms" className="cursor-pointer leading-relaxed">
-                  I agree to the <a href="/terms-of-service" className="text-primary underline">Terms of Service</a> and <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a>.
+                  I agree to the <a href="/terms-of-purchase" className="text-primary underline">Terms of Purchase</a>, <a href="/terms-of-service" className="text-primary underline">Terms of Service</a>, and <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a>.
                 </Label>
                 <p className="mt-2 text-xs text-muted-foreground">
                   Payment activates the ticket defense service under the signed consent. Fabsy is a traffic ticket agent service, not a law firm.

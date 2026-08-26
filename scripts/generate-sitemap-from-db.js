@@ -129,6 +129,7 @@ async function generateSitemap() {
     { loc: '/founder', priority: '0.5', changefreq: 'monthly' },
     { loc: '/about/comparison', priority: '0.7', changefreq: 'monthly' },
     { loc: '/submit-ticket', priority: '0.9', changefreq: 'monthly' },
+    { loc: '/terms-of-purchase', priority: '0.4', changefreq: 'monthly' },
     { loc: '/hubs/alberta-tickets-101', priority: '0.8', changefreq: 'monthly' },
     { loc: '/hubs/photo-radar-vs-officer-issued', priority: '0.8', changefreq: 'monthly' },
     { loc: '/hubs/demerits-and-insurance', priority: '0.8', changefreq: 'monthly' },

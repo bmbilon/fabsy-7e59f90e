@@ -31,7 +31,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
 import useSafeHead from "@/hooks/useSafeHead";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -52,7 +51,6 @@ interface ConsentClient {
   city?: string | null;
   province?: string | null;
   postalCode?: string | null;
-  driversLicense?: string | null;
 }
 
 interface ConsentInvite {
@@ -65,14 +63,6 @@ interface ConsentInvite {
     courtLocation: string | null;
     courtDate: string | null;
     details: string | null;
-  };
-  fees: {
-    baseFeeCents: number | null;
-    currency: string;
-    taxTerms: string;
-    successFeePercent: number | null;
-    successFeeWaived: boolean;
-    additionalTerms: string | null;
   };
   expiresAt: string;
 }
@@ -128,7 +118,6 @@ interface ConsentResponse {
     city: string | null;
     province: string | null;
     postalCode: string | null;
-    driversLicense: string | null;
     signedAt?: string | null;
   };
   upload?: {
@@ -168,7 +157,6 @@ interface ConsentFormData {
   city: string;
   province: string;
   postalCode: string;
-  driversLicense: string;
   digitalSignature: string;
   manualSignedName: string;
   manualSignedDate: string;
@@ -190,7 +178,6 @@ const INITIAL_FORM: ConsentFormData = {
   city: "",
   province: "",
   postalCode: "",
-  driversLicense: "",
   digitalSignature: "",
   manualSignedName: "",
   manualSignedDate: "",
@@ -230,14 +217,6 @@ function localDateValue(date = new Date()) {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-}
-
-function formatMoney(cents: number, currency: string) {
-  try {
-    return new Intl.NumberFormat("en-CA", { style: "currency", currency: currency || "CAD" }).format(cents / 100);
-  } catch {
-    return `${(cents / 100).toFixed(2)} ${currency || "CAD"}`;
-  }
 }
 
 function formatExpiry(value: string) {
@@ -359,7 +338,7 @@ function InlineError({ id, message }: { id: string; message?: string }) {
 function ConsentText({ text }: { text: string }) {
   const blocks = text.trim().split(/\n\s*\n/).filter(Boolean);
   return (
-    <div className="space-y-3 rounded-lg border bg-muted/30 p-4 text-sm leading-6 text-foreground sm:p-5">
+    <div className="mt-4 space-y-3 border-t pt-4 text-sm leading-6 text-foreground">
       {blocks.map((block, index) => {
         const cleanBlock = block.trim();
         if (/^[A-Z][A-Z\s&/–—-]+$/.test(cleanBlock) && cleanBlock.length < 80) {
@@ -399,8 +378,10 @@ function PrivateFooter() {
           <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="tel:+18257932279"><Phone className="h-4 w-4" aria-hidden="true" />(825) 793-2279</a>
           <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="mailto:hello@fabsy.ca"><Mail className="h-4 w-4" aria-hidden="true" />hello@fabsy.ca</a>
           <a className="inline-flex min-h-11 items-center underline-offset-4 hover:text-primary hover:underline" href="/privacy-policy">Privacy policy</a>
+          <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="/terms-of-purchase" target="_blank" rel="noopener noreferrer">
+            Terms of purchase<span className="sr-only"> (opens in a new tab)</span><ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          </a>
         </div>
-        <p className="mt-4 text-xs">This page does not request payment.</p>
       </div>
     </footer>
   );
@@ -484,7 +465,6 @@ export default function RepresentationConsent() {
       city: current.city || data.formData?.city || data.invite?.client.city || "",
       province: current.province || data.formData?.province || data.invite?.client.province || "",
       postalCode: current.postalCode || data.formData?.postalCode || data.invite?.client.postalCode || "",
-      driversLicense: current.driversLicense || data.formData?.driversLicense || data.invite?.client.driversLicense || "",
     }));
     setDownloadUrl(trustedPdfUrl(data.signed?.pdfUrl));
     setDownloadExpiresIn(data.signed?.pdfUrlExpiresIn || 0);
@@ -540,7 +520,6 @@ export default function RepresentationConsent() {
   const typedSignatureMatches = Boolean(fullName && form.digitalSignature && normalizeName(form.digitalSignature) === normalizeName(fullName));
   const manualSignatureMatches = Boolean(fullName && form.manualSignedName && normalizeName(form.manualSignedName) === normalizeName(fullName));
   const expiry = invite ? formatExpiry(invite.expiresAt) : null;
-  const feeIsWaived = Boolean(invite && (invite.fees.successFeeWaived || invite.fees.successFeePercent === 0));
   const officialFormUrl = trustedGovernmentFormUrl(governmentForm?.sourceUrl);
 
   const updateField = <Key extends keyof ConsentFormData>(key: Key, value: ConsentFormData[Key]) => {
@@ -604,9 +583,6 @@ export default function RepresentationConsent() {
       const postalCode = form.postalCode.trim().toUpperCase();
       if (postalCode.length < 3 || !/^[A-Z0-9][A-Z0-9 -]*[A-Z0-9]$/.test(postalCode)) errors.postalCode = "Enter a valid postal code or leave this optional field blank.";
     }
-    const driversLicense = form.driversLicense.trim();
-    if (!driversLicense) errors.driversLicense = "Enter the driver's licence number Fabsy uses to match your matter.";
-    else if (driversLicense.length < 3 || !/^[A-Za-z0-9][A-Za-z0-9 .'-]*[A-Za-z0-9]$/.test(driversLicense)) errors.driversLicense = "Enter a valid driver's licence number.";
     if (!form.accepted) errors.accepted = "Confirm the authorization before submitting.";
 
     if (signatureMethod === "typed") {
@@ -660,7 +636,7 @@ export default function RepresentationConsent() {
       const signedAt = new Date().toISOString();
       const normalizedFormData = {
         phone: form.phone.trim(), dateOfBirth: form.dateOfBirth, address: form.address.trim(), city: form.city.trim(),
-        province: form.province.trim(), postalCode: form.postalCode.trim().toUpperCase(), driversLicense: form.driversLicense.trim(), signedAt,
+        province: form.province.trim(), postalCode: form.postalCode.trim().toUpperCase(), signedAt,
       };
       const body: Record<string, unknown> = { action: "submit", signatureMethod, accepted: true, consentTextHash: consent.hash, formData: normalizedFormData };
       if (signatureMethod === "typed") body.digitalSignature = form.digitalSignature.trim();
@@ -690,7 +666,7 @@ export default function RepresentationConsent() {
           setFormError(`The signature must match the full legal name shown on this form: ${fullName}.`);
         } else if (details.code === "consent_version_changed") {
           setForm((current) => ({ ...current, accepted: false }));
-          setFormError("The consent terms changed before signing. Reopen the secure invitation and review the current terms.");
+          setFormError("The consent wording changed before signing. Reopen the secure invitation and review the current authorization.");
         } else if (details.code === "consent_processing") setPageState("processing");
         else if (details.code === "invalid_client_details") setFormError("Review your identification and mailing information, then try again.");
         else if (details.code.startsWith("manual_scan") || details.code === "invalid_upload_target") {
@@ -711,7 +687,7 @@ export default function RepresentationConsent() {
       <Card className="mx-auto max-w-2xl p-6 text-center shadow-elevated sm:p-10" aria-live="polite">
         <CheckCircle2 className="mx-auto h-12 w-12 text-primary" aria-hidden="true" />
         <h2 ref={completionRef} tabIndex={-1} className="mt-4 text-2xl font-bold outline-none">{isManual ? "Hand-signed form received" : "Online Fabsy authorization completed"}</h2>
-        <p className="mx-auto mt-3 max-w-lg text-muted-foreground">{isManual ? "Fabsy securely received your hand-signed APTO form and recorded it with this matter." : "Your typed Fabsy client authorization has been securely recorded. This confirmation does not mean APTO13348 was digitally signed."}</p>
+        <p className="mx-auto mt-3 max-w-lg text-muted-foreground">{isManual ? "Fabsy securely received your hand-signed APTO form and recorded it with this matter." : "Your consent and electronic signature have been securely recorded."}</p>
         {formatSignedAt(signedDetails?.signedAt) ? <p className="mt-3 text-sm text-muted-foreground">Recorded {formatSignedAt(signedDetails?.signedAt)}</p> : null}
         {pendingReview ? <Alert className="mt-6 text-left"><FileCheck2 aria-hidden="true" /><AlertTitle>Document check in progress</AlertTitle><AlertDescription>Fabsy will check that the complete form, signature, and date are readable before relying on the scan.</AlertDescription></Alert> : null}
         {requiresReupload ? <Alert variant="destructive" className="mt-6 text-left"><AlertCircle aria-hidden="true" /><AlertTitle>A new scan is required</AlertTitle><AlertDescription>Contact Fabsy for a new secure upload link so the complete signed page can be provided.</AlertDescription></Alert> : null}
@@ -741,7 +717,7 @@ export default function RepresentationConsent() {
     return (
       <form className="space-y-6" onSubmit={submitConsent} noValidate aria-busy={pageState === "submitting"}>
         <Card className="overflow-hidden border-primary/20 shadow-fab">
-          <div className="border-b bg-muted/50 px-5 py-4 sm:px-7"><div className="flex items-center gap-2 text-sm font-semibold text-primary"><ShieldCheck aria-hidden="true" />Matter and fee details</div></div>
+          <div className="border-b bg-muted/50 px-5 py-4 sm:px-7"><div className="flex items-center gap-2 text-sm font-semibold text-primary"><ShieldCheck aria-hidden="true" />Your matter</div></div>
           <div className="space-y-6 p-5 sm:p-7">
             <dl className="grid gap-5 sm:grid-cols-2">
               <Definition label="Full legal name" value={fullName} /><Definition label="Email kept by Fabsy" value={invite.client.email} />
@@ -755,18 +731,6 @@ export default function RepresentationConsent() {
               {invite.matter.courtDate ? <Definition label="Court date" value={invite.matter.courtDate} /> : null}
               {invite.matter.details ? <Definition label="Matter details" value={invite.matter.details} /> : null}
             </dl>
-            <Separator />
-            <section aria-labelledby="fee-heading">
-              <h2 id="fee-heading" className="text-lg font-semibold">Your agreed Fabsy fee terms</h2>
-              <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
-                <dl className="grid gap-3 text-sm sm:grid-cols-2">
-                  {typeof invite.fees.baseFeeCents === "number" ? <Definition label="Base representation fee" value={`${formatMoney(invite.fees.baseFeeCents, invite.fees.currency)} ${invite.fees.taxTerms}`} /> : null}
-                  {typeof invite.fees.successFeePercent === "number" ? <Definition label="Fine-reduction fee" value={feeIsWaived ? `Waived in full for this matter${invite.fees.successFeePercent > 0 ? ` (usual rate: ${invite.fees.successFeePercent}% of any fine reduction)` : ""}` : `${invite.fees.successFeePercent}% of any fine reduction achieved`} /> : null}
-                </dl>
-                {invite.fees.additionalTerms ? <p className="mt-3 text-sm font-medium text-foreground">{invite.fees.additionalTerms}</p> : null}
-                <p className="mt-3 text-xs text-muted-foreground">Fee terms are part of Fabsy's client authorization, not a field on the government APTO form.</p>
-              </div>
-            </section>
             {expiry ? <p className="flex items-start gap-2 text-xs text-muted-foreground"><LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />This secure invitation expires {expiry}.</p> : null}
           </div>
         </Card>
@@ -812,21 +776,6 @@ export default function RepresentationConsent() {
           </fieldset>
         </Card>
 
-        <Card className="p-5 shadow-fab sm:p-7">
-          <section aria-labelledby="fabsy-only-heading">
-            <h2 id="fabsy-only-heading" className="text-xl font-bold">Additional information Fabsy needs</h2>
-            <p className="mt-2 text-sm text-muted-foreground">These details are kept with your Fabsy matter and are not fields on APTO13348.</p>
-            <dl className="mt-6 grid gap-5 rounded-lg border bg-muted/30 p-4 sm:grid-cols-2">
-              <Definition label="Email" value={invite.client.email} />
-              <div className="space-y-2">
-                <Label htmlFor="consent-licence">Driver's licence number <span className="font-normal text-muted-foreground">(required by Fabsy)</span></Label>
-                <Input id="consent-licence" autoComplete="off" autoCapitalize="characters" maxLength={40} required aria-required="true" aria-invalid={Boolean(fieldErrors.driversLicense)} aria-describedby={fieldErrors.driversLicense ? "consent-licence-error" : "consent-licence-help"} value={form.driversLicense} onChange={(event) => updateField("driversLicense", event.target.value)} />
-                <p id="consent-licence-help" className="text-xs text-muted-foreground">Used to confirm identity and match disclosure to the correct matter.</p><InlineError id="consent-licence-error" message={fieldErrors.driversLicense} />
-              </div>
-            </dl>
-          </section>
-        </Card>
-
         <Card id="representative-details" className="p-5 shadow-fab sm:p-7">
           <section aria-labelledby="representative-heading">
             <p className="text-sm font-semibold uppercase tracking-wide text-primary">Fixed by Fabsy</p><h2 id="representative-heading" className="mt-1 text-xl font-bold">Your named representative</h2>
@@ -843,25 +792,27 @@ export default function RepresentationConsent() {
 
         <Card className="p-5 shadow-fab sm:p-7">
           <section aria-labelledby="authorization-heading" className="space-y-5">
-            <div><p className="text-sm font-semibold uppercase tracking-wide text-primary">Please read before signing</p><h2 id="authorization-heading" className="mt-1 text-xl font-bold">Government and Fabsy authorization</h2></div>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-primary">Please read before signing</p>
+              <h2 id="authorization-heading" className="mt-1 text-xl font-bold">Representation authorization</h2>
+            </div>
             <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div><p className="font-semibold text-foreground">Alberta Consent for Representation</p><p className="mt-1 text-sm text-muted-foreground">{governmentForm?.code || "APTO13348"}{governmentForm?.revision ? ` · Revision ${governmentForm.revision}` : " · Revision 2023-08"}</p></div>
+                <div>
+                  <p className="font-semibold text-foreground">Alberta Consent for Representation</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{governmentForm?.code || "APTO13348"}{governmentForm?.revision ? ` · Revision ${governmentForm.revision}` : " · Revision 2023-08"}</p>
+                </div>
                 <a className="inline-flex min-h-11 items-center gap-2 self-start font-semibold text-primary underline underline-offset-4" href={officialFormUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">View official form<ExternalLink className="h-4 w-4" aria-hidden="true" /></a>
               </div>
-              <p className="mt-4 text-sm">By signing, you authorize the representative named above to act for all matters related to the listed violation ticket number(s).</p>
-              <p className="mt-4 text-sm font-semibold">You understand that your representative:</p>
-              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6">
-                <li>may access all information related to the listed violation ticket number(s) in the Traffic Ticket Digital Service (TTDS) portal;</li>
-                <li>may request and obtain full disclosure for the listed violation ticket number(s); and</li>
-                <li>remains authorized from the date signed until you withdraw consent, including by contacting TTDS at JSG.TrafficTicketsSupport@gov.ab.ca.</li>
-              </ul>
+              <p className="mt-4 text-sm leading-6">By signing, you authorize the representative named above to act for the listed ticket number(s), access the related information in Alberta's Traffic Ticket Digital Service, and request and receive full disclosure.</p>
+              <p className="mt-3 text-sm leading-6">The authorization begins on the date signed and continues until you withdraw it, including by contacting TTDS at <span className="break-all">JSG.TrafficTicketsSupport@gov.ab.ca</span>.</p>
             </div>
-            <Alert><ShieldCheck aria-hidden="true" /><AlertTitle>{governmentForm?.securityClassification || "Protected B when completed"}</AlertTitle><AlertDescription>Your completed government form contains sensitive personal information. Fabsy stores and provides it only through this secure invitation.</AlertDescription></Alert>
-            <div><h3 className="mb-3 text-lg font-semibold">Fabsy client authorization and scope</h3><ConsentText text={consent.text} /></div>
-            <Alert><AlertCircle aria-hidden="true" /><AlertTitle>No guaranteed outcome</AlertTitle><AlertDescription>Fabsy does not promise a withdrawal, reduction, acquittal, demerit result, insurance result, premium result, or any other specific outcome. A guilty plea or final negotiated disposition will not be accepted without your instructions.</AlertDescription></Alert>
-            <Alert><LockKeyhole aria-hidden="true" /><AlertTitle>Deadlines still apply</AlertTitle><AlertDescription>Signing does not extend a response date, payment date, court date, appeal period, or statutory deadline. Continue following existing notices until Fabsy confirms in writing that it has assumed conduct of the matter.</AlertDescription></Alert>
-            <p className="text-xs text-muted-foreground">Consent text version: {consent.version}</p>
+            <Alert><ShieldCheck aria-hidden="true" /><AlertTitle>{governmentForm?.securityClassification || "Protected B when completed"}</AlertTitle><AlertDescription>Your completed consent contains sensitive personal information. Fabsy stores and provides it only through this secure invitation.</AlertDescription></Alert>
+            <details className="rounded-lg border bg-muted/20 p-4 sm:p-5">
+              <summary className="cursor-pointer font-semibold text-primary underline-offset-4 hover:underline">Read the complete consent wording</summary>
+              <ConsentText text={consent.text} />
+              <p className="mt-4 text-xs text-muted-foreground">Consent version: {consent.version}</p>
+            </details>
           </section>
         </Card>
 
@@ -870,7 +821,7 @@ export default function RepresentationConsent() {
             <legend className="text-xl font-bold">Choose how to sign</legend>
             <RadioGroup value={signatureMethod} onValueChange={selectSignatureMethod} className="grid gap-3 sm:grid-cols-2" aria-label="Signature method">
               <Label htmlFor="signature-typed" className={`flex min-h-28 cursor-pointer items-start gap-3 rounded-lg border p-4 font-normal transition-colors ${signatureMethod === "typed" ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:bg-muted/40"}`}>
-                <RadioGroupItem id="signature-typed" value="typed" className="mt-1 h-5 w-5 shrink-0" /><span><span className="block font-semibold text-foreground">Type my name for Fabsy</span><span className="mt-1 block text-sm leading-5 text-muted-foreground">Recommended. Sign Fabsy's secure companion authorization online.</span></span>
+                <RadioGroupItem id="signature-typed" value="typed" className="mt-1 h-5 w-5 shrink-0" /><span><span className="block font-semibold text-foreground">Sign electronically</span><span className="mt-1 block text-sm leading-5 text-muted-foreground">Recommended. Type your name to sign this secure consent online.</span></span>
               </Label>
               <Label htmlFor="signature-manual" className={`flex min-h-28 cursor-pointer items-start gap-3 rounded-lg border p-4 font-normal transition-colors ${signatureMethod === "manual_scan" ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:bg-muted/40"}`}>
                 <RadioGroupItem id="signature-manual" value="manual_scan" className="mt-1 h-5 w-5 shrink-0" /><span><span className="block font-semibold text-foreground">Sign by hand and upload</span><span className="mt-1 block text-sm leading-5 text-muted-foreground">Print the official form, sign it, then upload one complete scan or photo.</span></span>
@@ -879,7 +830,7 @@ export default function RepresentationConsent() {
 
             {signatureMethod === "typed" ? (
               <div className="space-y-2">
-                <Alert className="mb-4"><FileSignature aria-hidden="true" /><AlertTitle>This does not digitally sign APTO13348</AlertTitle><AlertDescription>Your typed name signs Fabsy's secure companion authorization. Alberta or TTDS may still require the separate prescribed Consent for Representation form.</AlertDescription></Alert>
+                <Alert className="mb-4"><FileSignature aria-hidden="true" /><AlertTitle>Electronic Fabsy consent</AlertTitle><AlertDescription>Your typed name signs this secure consent record. If Alberta requires the prescribed APTO PDF, Fabsy will contact you.</AlertDescription></Alert>
                 <Label htmlFor="consent-signature">Type your full legal name exactly as shown above</Label>
                 <Input id="consent-signature" autoComplete="name" maxLength={200} required className="font-serif text-lg" aria-invalid={Boolean(fieldErrors.digitalSignature)} aria-describedby={fieldErrors.digitalSignature ? "signature-error" : "signature-help"} value={form.digitalSignature} onChange={(event) => updateField("digitalSignature", event.target.value)} />
                 <p id="signature-help" className={`text-xs ${form.digitalSignature && !typedSignatureMatches ? "text-destructive" : "text-muted-foreground"}`}>{form.digitalSignature && !typedSignatureMatches ? `Signature must match: ${fullName}` : `Required signature: ${fullName}`}</p>
@@ -928,7 +879,7 @@ export default function RepresentationConsent() {
 
             <div className="flex items-start gap-3 rounded-lg border bg-muted/40 p-4">
               <Checkbox id="consent-accepted" checked={form.accepted} onCheckedChange={(checked) => updateField("accepted", checked === true)} aria-invalid={Boolean(fieldErrors.accepted)} aria-describedby={fieldErrors.accepted ? "consent-accepted-error" : "consent-confirmation"} />
-              <div><Label id="consent-confirmation" htmlFor="consent-accepted" className="cursor-pointer text-sm font-normal leading-6">{signatureMethod === "typed" ? "I am the person named above. I have read and understood Fabsy's client authorization, agree to the quoted fee terms, and intend my typed name to be my electronic signature on Fabsy's secure companion authorization. I understand this does not digitally sign APTO13348 and the prescribed form may still be required separately." : "I am the person named above. I have read and understood the government and Fabsy authorization, agree to the quoted fee terms, and confirm that the uploaded file is a complete and unaltered copy of the official APTO form I signed by hand."}</Label><InlineError id="consent-accepted-error" message={fieldErrors.accepted} /></div>
+              <div><Label id="consent-confirmation" htmlFor="consent-accepted" className="cursor-pointer text-sm font-normal leading-6">{signatureMethod === "typed" ? "I am the person named above. I have reviewed and understood the representation authorization and complete consent wording, and I intend my typed name to be my electronic signature." : "I am the person named above. I have reviewed and understood the representation authorization and confirm that the uploaded file is a complete and unaltered copy of the official APTO form I signed by hand."}</Label><InlineError id="consent-accepted-error" message={fieldErrors.accepted} /></div>
             </div>
           </fieldset>
 
@@ -938,7 +889,7 @@ export default function RepresentationConsent() {
               <AlertDescription>
                 <p>{formError}</p>
                 {Object.entries(fieldErrors).length ? <ul className="mt-2 list-disc space-y-1 pl-5">{Object.entries(fieldErrors).map(([field, message]) => {
-                  const targets: Record<string, string> = { clientIdentity: "government-details", ticketNumbers: "consent-ticket-numbers", representative: "representative-details", dateOfBirth: "consent-dob", phone: "consent-phone", address: "consent-address", city: "consent-city", postalCode: "consent-postal", driversLicense: "consent-licence", digitalSignature: "consent-signature", manualSignedName: "manual-signed-name", manualSignedDate: "manual-signed-date", manualFile: "manual-file-section", accepted: "consent-accepted" };
+                  const targets: Record<string, string> = { clientIdentity: "government-details", ticketNumbers: "consent-ticket-numbers", representative: "representative-details", dateOfBirth: "consent-dob", phone: "consent-phone", address: "consent-address", city: "consent-city", postalCode: "consent-postal", digitalSignature: "consent-signature", manualSignedName: "manual-signed-name", manualSignedDate: "manual-signed-date", manualFile: "manual-file-section", accepted: "consent-accepted" };
                   return <li key={field}><a className="underline" href={`#${targets[field] || "government-details"}`}>{message}</a></li>;
                 })}</ul> : null}
               </AlertDescription>
@@ -949,7 +900,7 @@ export default function RepresentationConsent() {
             {pageState === "submitting" ? <Loader2 className="animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <FileSignature aria-hidden="true" />}
             {pageState === "submitting" ? (signatureMethod === "manual_scan" ? "Uploading and submitting…" : "Securely saving…") : (signatureMethod === "manual_scan" ? "Upload and submit signed form" : "Sign and submit consent")}
           </Button>
-          <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground"><LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />Your secure invitation is required to view or submit this form. This page does not request payment.</p>
+          <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground"><LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />Your secure invitation is required to view or submit this consent.</p>
         </Card>
       </form>
     );
@@ -965,7 +916,7 @@ export default function RepresentationConsent() {
             <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10"><FileSignature className="h-5 w-5" aria-hidden="true" /></div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light">Secure client document</p>
             <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">Traffic ticket representation consent</h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/80 sm:text-base">Confirm the government-form details, review Fabsy's terms, and sign online or upload a hand-signed copy. No payment is requested.</p>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/80 sm:text-base">Confirm the government-form details, review the authorization, and sign online or upload the official hand-signed form.</p>
           </div>
         </section>
         <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-12">{renderContent()}</div>
