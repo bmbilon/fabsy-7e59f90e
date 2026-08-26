@@ -428,6 +428,7 @@ export default function RepresentationConsent() {
   const alertRef = useRef<HTMLDivElement>(null);
   const completionRef = useRef<HTMLHeadingElement>(null);
   const submitStartedRef = useRef(false);
+  const tokenReloadStartedRef = useRef(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
 
@@ -441,7 +442,14 @@ export default function RepresentationConsent() {
   useEffect(() => {
     const reloadForNewBearerToken = () => {
       const nextToken = readBearerToken();
-      if (nextToken && nextToken !== token) window.location.reload();
+      if (!nextToken) return;
+      if (nextToken === token) {
+        window.history.replaceState(window.history.state, "", window.location.pathname);
+        return;
+      }
+      if (tokenReloadStartedRef.current) return;
+      tokenReloadStartedRef.current = true;
+      window.location.reload();
     };
 
     window.addEventListener("hashchange", reloadForNewBearerToken);
