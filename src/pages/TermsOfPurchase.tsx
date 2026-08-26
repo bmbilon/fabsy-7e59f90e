@@ -1,23 +1,20 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import useSafeHead from "@/hooks/useSafeHead";
 import { CheckCircle2, CreditCard, FileCheck2, ReceiptText } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
 const TermsOfPurchase = () => {
+  useSafeHead({
+    title: "Terms of Purchase | Fabsy Traffic Ticket Services",
+    description: "Concise purchase terms for Fabsy ticket reviews and Alberta traffic ticket representation services.",
+    canonical: "https://fabsy.ca/terms-of-purchase",
+    robots: "index, follow",
+  });
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
-      <Helmet>
-        <title>Terms of Purchase | Fabsy Traffic Ticket Services</title>
-        <meta
-          name="description"
-          content="Concise purchase terms for Fabsy ticket reviews and Alberta traffic ticket representation services."
-        />
-        <link rel="canonical" href="https://fabsy.ca/terms-of-purchase" />
-        <meta name="robots" content="index,follow" />
-      </Helmet>
-
       <Header />
 
       <div className="border-b border-slate-200 bg-white">
@@ -32,7 +29,7 @@ const TermsOfPurchase = () => {
             These terms apply when you buy a Fabsy service. They are separate from any consent you
             sign to let Fabsy act on a traffic-ticket matter.
           </p>
-          <p className="mt-4 text-sm text-slate-500">Last updated: August 26, 2026</p>
+          <p className="mt-4 text-sm text-slate-500">Last reviewed: August 26, 2026</p>
         </div>
       </div>
 
