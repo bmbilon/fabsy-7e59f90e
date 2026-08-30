@@ -47,7 +47,7 @@ export const getFabsyEmailSignature = () => {
             
             <!-- Pricing -->
             <div style="margin-top: 12px; padding: 8px 12px; background: linear-gradient(135deg, #FDF2F8 0%, #FAE8FF 100%); border-radius: 6px; display: inline-block;">
-              <span style="font-size: 11px; color: #86198F; font-weight: 600;">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</span>
+              <span style="font-size: 11px; color: #86198F; font-weight: 600;">Rapid Resolution is $198 CAD plus GST for eligible Alberta pre-trial matters. Trial and government fines are separate.</span>
             </div>
           </td>
         </tr>

@@ -3,8 +3,8 @@
 
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
   }
 }
 
@@ -16,7 +16,7 @@ export const isGA4Available = (): boolean => {
 // Track page views (usually handled automatically, but useful for SPA routing)
 export const trackPageView = (page_title: string, page_location?: string): void => {
   if (isGA4Available()) {
-    window.gtag('event', 'page_view', {
+    window.gtag?.('event', 'page_view', {
       page_title,
       page_location: page_location || `${window.location.origin}${window.location.pathname}`,
       page_path: window.location.pathname,
@@ -25,9 +25,9 @@ export const trackPageView = (page_title: string, page_location?: string): void 
 };
 
 // Track custom events
-export const trackEvent = (eventName: string, parameters?: Record<string, any>): void => {
+export const trackEvent = (eventName: string, parameters?: Record<string, unknown>): void => {
   if (isGA4Available()) {
-    window.gtag('event', eventName, {
+    window.gtag?.('event', eventName, {
       ...parameters,
     });
   }

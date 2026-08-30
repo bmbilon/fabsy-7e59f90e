@@ -13,6 +13,7 @@ import ReviewStep from "./form-steps/ReviewStep";
 import { useToast } from "@/hooks/use-toast";
 import { useTicketCache } from "@/hooks/useTicketCache";
 import { Link } from "react-router-dom";
+import { RAPID_RESOLUTION } from "@/config/offers";
 
 export interface FormData {
   // Unified intake handoff
@@ -132,7 +133,7 @@ const steps = [
   { id: 1, title: "Ticket Details", description: "Information about your ticket" },
   { id: 2, title: "Personal Info", description: "Your basic information" },
   { id: 3, title: "Your Account", description: "Your account of what happened" },
-  { id: 4, title: "Consent Form", description: "Authorization for representation" },
+  { id: 4, title: "Consent Form", description: "Authorization for the Rapid Resolution service" },
   { id: 5, title: "Review", description: "Review your information" },
   { id: 6, title: "Payment", description: "Secure payment processing" }
 ];
@@ -353,11 +354,12 @@ const TicketForm = ({
     switch (currentStep) {
       case 1: // Ticket Details
         return !!(
+          (formData.ticketImage || formData.sourceAssessmentId) &&
           formData.ticketNumber &&
           formData.issueDate &&
           formData.location &&
-          formData.officer &&
-          formData.fineAmount
+          formData.fineAmount &&
+          !formData.vehicleSeized
         );
       case 2: // Personal Info
         return !!(
@@ -396,11 +398,12 @@ const TicketForm = ({
     const m: string[] = [];
     switch (currentStep) {
       case 1:
+        if (!formData.ticketImage && !formData.sourceAssessmentId) m.push("Ticket PDF or photo");
         if (!formData.ticketNumber) m.push("Ticket number");
         if (!formData.issueDate) m.push("Issue date");
         if (!formData.location) m.push("Location");
-        if (!formData.officer) m.push("Officer name");
         if (!formData.fineAmount) m.push("Fine amount");
+        if (formData.vehicleSeized) m.push("A separate review is required for a vehicle-seizure matter");
         break;
       case 2:
         if (!formData.firstName) m.push("First name");
@@ -438,15 +441,16 @@ const TicketForm = ({
         {/* Header */}
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Fight Your Ticket
+            {RAPID_RESOLUTION.name}
           </Badge>
-          <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-white">
-            Full Ticket <span className="text-gradient-primary">Representation</span>
+          <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-foreground">
+            Start your <span className="text-gradient-primary">pre-trial resolution</span>
           </h1>
-          <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Complete the representation-only details and separate authorization. Your source ticket stays attached. Want the report without representation?{" "}
-            <Link to="/traffic-ticket-assessment" className="font-semibold text-white underline underline-offset-4">
-              See the $149 Priority Ticket Review with policy-based insurance scenarios and an initial dispute plan.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
+            and continue to the transparent ${RAPID_RESOLUTION.priceCad} CAD plus GST checkout. Want the insurance report by itself?{" "}
+            <Link to="/insurance-damage-report" className="font-semibold text-primary underline underline-offset-4">
+              See the Insurance Impact &amp; Renewal Planning Report.
             </Link>
           </p>
         </div>

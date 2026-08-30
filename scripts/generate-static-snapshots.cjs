@@ -19,6 +19,14 @@ const {
   curatedPageIssues,
   textGuardrailIssues,
 } = require('./curated-content-guardrails.cjs');
+const {
+  INSURANCE_REPORT_NAME,
+  RAPID_RESOLUTION_ACTION_COMMITMENT,
+  RAPID_RESOLUTION_NAME,
+  RAPID_RESOLUTION_OUTCOME_DISCLAIMER,
+  RAPID_RESOLUTION_SPEED_DISCLAIMER,
+  canonicalFaqs,
+} = require('./normalize-rapid-resolution-content.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const SITE = 'https://fabsy.ca';
@@ -164,24 +172,7 @@ function reviewedLabel(value) {
 }
 
 function fallbackFaqs() {
-  return [
-    {
-      q: 'What should I do after receiving an Alberta traffic ticket?',
-      a: 'Check the dispute deadline printed on the ticket, keep a copy, and gather any relevant photos, video, or documents before choosing how to respond.',
-    },
-    {
-      q: 'How much does Fabsy charge for representation?',
-      a: PRICING_TEXT,
-    },
-    {
-      q: 'Is Fabsy a law firm?',
-      a: 'No. Fabsy is an agent service for Alberta traffic matters, not a law firm.',
-    },
-    {
-      q: 'What is Ticket Triage?',
-      a: 'Ticket Triage is a $149 CAD total, GST-included, human-reviewed assessment of an Alberta traffic ticket, its likely insurance significance, the economics of representation, and the recommended next step.',
-    },
-  ];
+  return canonicalFaqs();
 }
 
 function safeLegacyCity(page) {
@@ -244,10 +235,7 @@ function legacyTitle(h1) {
 }
 
 function legacyDescription(page) {
-  const city = safeLegacyCity(page);
-  const violation = safeLegacyViolation(page).toLowerCase();
-  const place = city === 'Alberta' ? ' in Alberta' : ` in ${city}`;
-  return `Got a ${violation} ticket${place}? Review your options or get human-reviewed Ticket Triage for $149 CAD total.`;
+  return 'Rapid Resolution for an eligible Alberta traffic ticket: secure intake, disclosure analysis, prosecutor review and immediate client updates.';
 }
 
 function normalizedPage(basePage, curated) {
@@ -276,8 +264,10 @@ function normalizedPage(basePage, curated) {
     hook: 'Check the dispute deadline printed on your ticket and review your options before deciding how to respond.',
     bullets: [
       'The dispute deadline is printed on the ticket.',
-      'Keep the ticket and any relevant photos, video, or documents.',
-      'Fabsy provides agent services for Alberta traffic matters and is not a law firm.',
+      'Secure digital ticket intake, eligibility review and authorization.',
+      'Disclosure request, document tracking and technology-assisted analysis with qualified review.',
+      RAPID_RESOLUTION_ACTION_COMMITMENT,
+      'Trial representation, government fines and out-of-scope matters are separate.',
     ],
     what: '',
     how: '',
@@ -360,8 +350,17 @@ function fallbackSections(page) {
         <li>Keep the ticket and gather any relevant photos, video, or documents.</li>
         <li>Review the available response options before the printed deadline.</li>
       </ol>
-      <h2>How Fabsy can help</h2>
-      <p>Fabsy provides agent services for Alberta traffic matters and is not a law firm.</p>
+      <h2>How ${RAPID_RESOLUTION_NAME} works</h2>
+      <ol>
+        <li>Upload the ticket and complete the digital consent and authorization.</li>
+        <li>Fabsy requests disclosure and tracks it to the file.</li>
+        <li>Technology-assisted disclosure analysis receives qualified review before a fact-specific prosecutor-review request is prepared.</li>
+        <li>Fabsy immediately notifies the client about file changes and explains any Crown response in plain language.</li>
+      </ol>
+      <p>${RAPID_RESOLUTION_ACTION_COMMITMENT}</p>
+      <p>${RAPID_RESOLUTION_SPEED_DISCLAIMER}</p>
+      <p>${RAPID_RESOLUTION_OUTCOME_DISCLAIMER}</p>
+      <p>Fabsy provides agent services for eligible Alberta pre-trial traffic matters and is not a law firm.</p>
       <p>${PRICING_TEXT}</p>`;
 }
 
@@ -428,7 +427,7 @@ ${articleSchema ? `  <script type="application/ld+json">${safeJsonLd(articleSche
       <a href="/">Fabsy</a>
       <a href="/how-it-works">How It Works</a>
       <a href="/faq">FAQ</a>
-      <a href="/traffic-ticket-assessment">Ticket Triage - $149</a>
+      <a href="/submit-ticket">Rapid Resolution</a>
       <a href="/submit-ticket">Submit Your Ticket</a>
     </nav>
   </header>
@@ -441,18 +440,20 @@ ${articleSchema ? `  <script type="application/ld+json">${safeJsonLd(articleSche
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}
       </ul>
 ${sections}
-${sourcesHtml ? `${sourcesHtml}\n` : ''}      <section class="triage" aria-labelledby="ticket-triage-heading">
-        <h2 id="ticket-triage-heading">Need a ticket-specific answer?</h2>
-        <p><strong>Ticket Triage</strong> is Fabsy's $149 CAD total, GST-included, human-reviewed assessment for Alberta traffic tickets.</p>
+${sourcesHtml ? `${sourcesHtml}\n` : ''}      <section class="triage" aria-labelledby="rapid-resolution-heading">
+        <h2 id="rapid-resolution-heading">Start ${RAPID_RESOLUTION_NAME}</h2>
+        <p>Rapid Resolution is Fabsy's end-to-end agent service for eligible Alberta pre-trial traffic matters.</p>
         <ul>
-          <li>The charge, ticket instructions, and important deadline</li>
-          <li>Fine, demerit, conviction, and likely insurance significance</li>
-          <li>Available response options and representation economics</li>
-          <li>A direct recommended next step</li>
+          <li>Secure digital intake and authorization</li>
+          <li>Disclosure request, tracking and qualified analysis</li>
+          <li>A fact-specific prosecutor-review submission</li>
+          <li>Immediate client updates and a plain-language Crown-response comparison</li>
         </ul>
-        <p>If representation appears worthwhile and the same matter is eligible, the $149 can be applied to Fabsy's $488 base representation fee, leaving a $339 base-fee balance plus applicable tax. Eligible clients receive priority placement in Fabsy's representation queue. The 30% success fee applies only to any fine reduction; there is no success fee if the fine is not reduced.</p>
-        <p><a class="cta" href="/traffic-ticket-assessment">See Ticket Triage - $149</a></p>
-        <p><a href="/submit-ticket">Only need the free Representation Eligibility Check?</a></p>
+        <p>${RAPID_RESOLUTION_ACTION_COMMITMENT}</p>
+        <p>${RAPID_RESOLUTION_SPEED_DISCLAIMER}</p>
+        <p>${PRICING_TEXT}</p>
+        <p>The ${INSURANCE_REPORT_NAME} provides consumer research and planning information, not an insurer quote or licensed broker recommendation.</p>
+        <p><a class="cta" href="/submit-ticket">Start Rapid Resolution</a></p>
       </section>
       <section>
         <h2>Frequently Asked Questions</h2>

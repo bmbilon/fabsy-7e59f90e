@@ -9,6 +9,12 @@ import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import useSafeHead from "@/hooks/useSafeHead";
+import { Link } from "react-router-dom";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 
 const Contact = () => {
   useSafeHead({
@@ -71,7 +77,7 @@ const Contact = () => {
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Ready to fight your traffic ticket? Get in touch with Alberta's trusted traffic representation specialists.
+            Ask about an Alberta ticket, an existing file, Rapid Resolution, or the Insurance Impact & Renewal Planning Report.
           </p>
         </div>
 
@@ -85,7 +91,7 @@ const Contact = () => {
                   Get in Touch
                 </CardTitle>
                 <CardDescription>
-                  We're here to help you fight your traffic ticket and protect your driving record.
+                  We can explain service eligibility, scope, pricing, and the next step for a submitted ticket.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -136,9 +142,9 @@ const Contact = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Representation uses a $488 base representation fee plus 30% of any fine reduction achieved;
-                  there is no success fee if the fine is not reduced.
+                  {RAPID_RESOLUTION.name} is ${RAPID_RESOLUTION.priceCad} CAD, the {INSURANCE_IMPACT_REPORT.shortName} is ${INSURANCE_IMPACT_REPORT.priceCad} CAD, and both services are ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD, plus applicable GST. Rapid Resolution excludes trial representation, which is quoted separately if available.
                 </p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{RAPID_RESOLUTION.speedDisclaimer}</p>
               </CardContent>
             </Card>
           </div>
@@ -233,12 +239,12 @@ const Contact = () => {
             <CardHeader>
               <CardTitle>Ready to Submit Your Ticket?</CardTitle>
               <CardDescription>
-                Skip the questions and get started immediately with our online ticket submission form.
+                Start the secure intake, upload your ticket, and complete the authorization for an eligibility review.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow">
-                Submit Your Ticket Now
+              <Button asChild size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow">
+                <Link to={RAPID_RESOLUTION.intakePath}>Start Rapid Resolution</Link>
               </Button>
             </CardContent>
           </Card>

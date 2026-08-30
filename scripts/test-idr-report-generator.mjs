@@ -111,12 +111,12 @@ function completeInput() {
 }
 
 test("exports the exact IDR product constants and disclaimer", () => {
-  assert.equal(IDR_PRICE_STANDALONE, 129);
-  assert.equal(IDR_PRICE_ADDON, 99);
+  assert.equal(IDR_PRICE_STANDALONE, 49);
+  assert.equal(IDR_PRICE_ADDON, 31);
   assert.equal(ABSTRACT_SELF_ORDER, true);
   assert.equal(
     IDR_DISCLAIMER,
-    "This report is consumer research based on publicly available information. Fabsy is not an insurance agent or broker and does not sell, quote, or place insurance.",
+    "This report provides consumer research and planning information, not an insurer quote, licensed broker recommendation or promise of eligibility, premium savings or a particular insurance outcome. Fabsy is not an insurance agent or broker and does not sell, quote or place insurance.",
   );
 });
 
@@ -149,6 +149,8 @@ test("creates a deterministic delivery-ready report with the required 45-day rem
     ["Carrier Alpha", "Carrier Beta", "Carrier Gamma"],
   );
   assert.equal(first.carrierCallList.status, "ready");
+  assert.equal(first.carrierCallList.heading, "Public insurer research directory");
+  assert.ok(first.carrierCallList.framing.includes("not ranked or recommended"));
   assert.deepEqual(first.renewalSchedule[0], {
     renewalDate: "2026-10-01",
     reminderDates: [
@@ -221,7 +223,7 @@ test("uses a projected current-ticket conviction without listing it on the abstr
   });
   assert.equal(report.gridBenchmark.annualPremiumCents, 355375);
   assert.ok(report.gridBenchmark.basis.includes("projected current-ticket conviction scenario"));
-  assert.ok(report.carrierCallList.framing.includes("projected current-ticket conviction scenario"));
+  assert.ok(report.carrierCallList.framing.includes("not ranked or recommended"));
   assert.ok(report.estimatedThreeYearPremiumImpact.basis.includes("projected current-ticket conviction scenario"));
   for (const carrier of report.carrierCallList.entries) {
     assert.equal(carrier.evaluatedPostures[0].activeConvictionCount, 1);

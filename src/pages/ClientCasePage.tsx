@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import useSafeHead from "@/hooks/useSafeHead";
 import { idrDb } from "@/lib/idr/supabase";
+import { INSURANCE_IMPACT_REPORT, RAPID_RESOLUTION } from "@/config/offers";
 
 interface CaseRecord {
   id: string;
@@ -119,28 +120,28 @@ function CaseContent({ caseId }: { caseId: string }) {
               <ShieldCheck className="h-4 w-4" />
               <AlertTitle>Payment has not been confirmed</AlertTitle>
               <AlertDescription>
-                This submission is not an active ticket defense case. Return to the ticket form to start the secure $488 checkout.
+                This submission is not an active Rapid Resolution matter. Return to the ticket form to start the secure ${RAPID_RESOLUTION.priceCad} CAD plus GST checkout.
               </AlertDescription>
             </Alert>
           ) : !caseRecord.verdict ? (
             <Alert>
               <ShieldCheck className="h-4 w-4" />
-              <AlertTitle>Your assessment is in progress</AlertTitle>
-              <AlertDescription>Fabsy has not posted a verdict yet. Your $488 ticket defense service remains the core service while the review is completed.</AlertDescription>
+              <AlertTitle>Your file is in progress</AlertTitle>
+              <AlertDescription>Fabsy is reviewing the current file state and will notify you when an action or decision is required.</AlertDescription>
             </Alert>
           ) : caseRecord.verdict === "unwinnable" || caseRecord.case_outcome === "conviction_stands" ? (
             <div className="space-y-6">
               <div>
                 <Badge variant="destructive">
-                  {caseRecord.case_outcome === "conviction_stands" ? "Case outcome: conviction stands" : "Honest verdict: unwinnable"}
+                  {caseRecord.case_outcome === "conviction_stands" ? "Case outcome: conviction stands" : "No supported pre-trial path identified"}
                 </Badge>
                 <h2 className="mt-4 text-3xl font-bold">
                   {caseRecord.case_outcome === "conviction_stands"
                     ? "The conviction stands. Here is the damage-control plan."
-                    : "Fabsy does not see a viable path to beat this ticket. Here is the damage-control plan."}
+                    : "The current record does not support advancing a pre-trial request. Here is the renewal-planning option."}
                 </h2>
                 <p className="mt-3 text-muted-foreground">
-                  The Insurance Damage Report focuses on the estimated insurance impact, conviction aging dates, and carriers worth calling. It is separate from the $488 ticket defense service already purchased.
+                  The {INSURANCE_IMPACT_REPORT.name} provides source-backed conviction-impact scenarios, aging dates, public research sources and questions for a licensed broker. It is separate from Rapid Resolution unless purchased in the bundle.
                 </p>
               </div>
               {hasIdr ? (
@@ -154,20 +155,20 @@ function CaseContent({ caseId }: { caseId: string }) {
           ) : (
             <div className="space-y-6">
               <div>
-                <Badge>{caseRecord.verdict === "winnable" ? "Winnable" : "Reducible"}</Badge>
-                <h2 className="mt-4 text-3xl font-bold">Fabsy can take this ticket forward</h2>
-                <p className="mt-3 text-muted-foreground">The ticket defense base fee is $488. A 30% success fee applies to any fine reduction Fabsy achieves and is additional to the $488. If no fine reduction is achieved, no success fee is charged. This assessment is not a promise of dismissal, a lower fine, or fewer demerits.</p>
+                <Badge>Pre-trial review can proceed</Badge>
+                <h2 className="mt-4 text-3xl font-bold">Fabsy can advance the next authorized step</h2>
+                <p className="mt-3 text-muted-foreground">Rapid Resolution is ${RAPID_RESOLUTION.priceCad} CAD plus GST for eligible pre-trial matters. Trial representation and government fines are separate. {RAPID_RESOLUTION.outcomeDisclaimer}</p>
               </div>
               {hasIdr ? (
                 <Button asChild><Link to="/portal/insurance-reports">Open your IDR order</Link></Button>
               ) : (
                 <>
                   <p className="rounded-lg border border-primary/25 bg-primary/5 p-4 leading-relaxed">
-                    Add the Insurance Damage Report for ${IDR_PRICE_ADDON}. Know your estimated insurance exposure whichever way the ticket goes.
+                    Add the {INSURANCE_IMPACT_REPORT.name} for ${IDR_PRICE_ADDON}. Understand possible conviction impact and prepare for renewal with source-backed planning information.
                   </p>
                   <p className="rounded-lg bg-muted/40 p-4 text-sm text-muted-foreground">{IDR_DISCLAIMER}</p>
                   <Button size="lg" onClick={startAddonCheckout} disabled={isCheckingOut}>
-                    <FileSearch className="mr-2 h-5 w-5" /> {isCheckingOut ? "Opening checkout..." : `Add the IDR for $${IDR_PRICE_ADDON}`}
+                    <FileSearch className="mr-2 h-5 w-5" /> {isCheckingOut ? "Opening checkout..." : `Add the insurance report for $${IDR_PRICE_ADDON}`}
                   </Button>
                 </>
               )}

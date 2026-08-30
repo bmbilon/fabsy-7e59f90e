@@ -1,4 +1,7 @@
 # Permanent redirects for legacy bare content paths.
+/traffic-ticket-assessment  /rapid-resolution  301
+/traffic-ticket-assessment/examples  /rapid-resolution  301
+/traffic-ticket-assessment/start  /submit-ticket  301
 /fight-careless-ticket-calgary  /content/fight-careless-ticket-calgary  301
 /fight-careless-ticket-edmonton  /content/fight-careless-ticket-edmonton  301
 /fight-careless-ticket-fort-mcmurray  /content/fight-careless-ticket-fort-mcmurray  301

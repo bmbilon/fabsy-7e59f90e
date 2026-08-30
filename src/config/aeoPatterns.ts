@@ -297,9 +297,4 @@ export function getCityToneNote(city: string): string {
   return faqPAABank.city_tone_notes[cityKey] || faqPAABank.city_tone_notes.default;
 }
 
-// Export all for easy importing
-export {
-  aeoPatterns as default,
-  faqPAABank,
-  renderingRules
-};
+export { aeoPatterns as default };

@@ -1,5 +1,7 @@
-import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { RAPID_RESOLUTION } from "@/config/offers";
 import { readMarketingAttribution } from "@/lib/marketingAttribution";
+
+const RAPID_RESOLUTION_OFFER_VARIANT = "rapid_resolution_198_v1";
 
 type AssessmentEvent =
   | "assessment_offer_view"
@@ -40,8 +42,8 @@ export function trackAssessmentEvent(
 
   window.gtag("event", event, {
     page_path: window.location.pathname,
-    offer_variant: TICKET_ASSESSMENT.offerVariant,
-    currency: TICKET_ASSESSMENT.currency,
+    offer_variant: RAPID_RESOLUTION_OFFER_VARIANT,
+    currency: RAPID_RESOLUTION.currency,
     ...readMarketingAttribution(),
     ...parameters,
   });

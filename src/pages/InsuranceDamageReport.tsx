@@ -23,13 +23,18 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import useSafeHead from "@/hooks/useSafeHead";
-import { IDR_DISCLAIMER, IDR_PRICE_ADDON, IDR_PRICE_STANDALONE } from "@/config/idr";
+import { IDR_DISCLAIMER, IDR_PRICE_STANDALONE } from "@/config/idr";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 
 const faqs = [
   {
-    question: "What is a Fabsy Insurance Damage Report?",
+    question: `What is the ${INSURANCE_IMPACT_REPORT.name}?`,
     answer:
-      "It is a personalized consumer research report that reviews the convictions shown on your commercial 5-year Alberta driver's abstract and identifies carriers worth calling based on publicly available information.",
+      "It is a personalized, source-backed consumer planning report covering potential conviction impact, renewal timing, conviction-aging dates, and insurance carriers worth researching or calling.",
   },
   {
     question: "What document do I need?",
@@ -44,12 +49,12 @@ const faqs = [
   {
     question: "What will the report show me?",
     answer:
-      "The report verifies the convictions transcribed from your abstract, shows their three-year aging dates, provides an estimated premium-exposure range, and highlights 3 to 5 carriers worth calling. It also includes renewal and conviction-aging reminders. Each carrier makes its own underwriting and pricing decisions.",
+      "The report verifies the convictions transcribed from your abstract, explains possible conviction scenarios, shows relevant aging dates, and provides a renewal-planning checklist with carriers worth researching or calling. Each carrier makes its own eligibility, underwriting, and pricing decisions.",
   },
   {
     question: "How much does the report cost?",
     answer:
-      `The standalone Insurance Damage Report costs $${IDR_PRICE_STANDALONE}. It is also available as a $${IDR_PRICE_ADDON} add-on in the $488 Fabsy ticket defense checkout. The ticket defense service has a separate 30% success fee on any fine reduction Fabsy achieves.`,
+      `The standalone ${INSURANCE_IMPACT_REPORT.name} costs $${IDR_PRICE_STANDALONE} CAD plus applicable GST. It is also included with ${RAPID_RESOLUTION.name} in the $${RAPID_RESOLUTION_BUNDLE.priceCad} CAD plus GST bundle.`,
   },
   {
     question: "Is the report insurance advice?",
@@ -62,7 +67,7 @@ const steps = [
     icon: ReceiptText,
     title: "Purchase the report",
     description:
-      `Choose the $${IDR_PRICE_STANDALONE} standalone report, or add it for $${IDR_PRICE_ADDON} in the Fabsy ticket defense checkout.`,
+      `Choose the $${IDR_PRICE_STANDALONE} standalone report, or choose both the report and ${RAPID_RESOLUTION.name} for $${RAPID_RESOLUTION_BUNDLE.priceCad}.`,
   },
   {
     icon: Upload,
@@ -74,7 +79,7 @@ const steps = [
     icon: FileSearch,
     title: "Review your completed report",
     description:
-      "Fabsy transcribes the abstract and prepares a private report identifying carriers worth calling based on current public information.",
+      "Fabsy prepares a private, source-backed planning report with potential conviction impact, aging dates, renewal questions, and carriers worth researching or calling.",
   },
 ] as const;
 
@@ -87,17 +92,17 @@ const keyFacts = [
   {
     icon: CalendarClock,
     title: "Conviction aging timeline",
-    description: "See the calculated three-year aging date for every conviction shown on the reviewed abstract.",
+    description: "See calculated conviction-aging dates and confirm the applicable lookback period with your insurer or licensed broker.",
   },
   {
     icon: ChartNoAxesCombined,
-    title: "Estimated premium exposure",
-    description: "Review an estimated three-year range built from current public Alberta Grid data and sourced carrier rules. It is never presented as a quote.",
+    title: "Potential impact scenarios",
+    description: "Understand how possible conviction outcomes may interact with common Alberta insurance-rating factors. No premium amount or savings is promised.",
   },
   {
     icon: PhoneCall,
-    title: "3 to 5 carriers worth calling",
-    description: "Get a focused research list with a reason and public contact or quote-page details. You make every call and decision.",
+    title: "Carriers worth researching",
+    description: "Get a focused research list based on public information. You make every call and coverage decision, or consult a licensed broker.",
   },
   {
     icon: BellRing,
@@ -108,9 +113,9 @@ const keyFacts = [
 
 const InsuranceDamageReport = () => {
   useSafeHead({
-    title: "Insurance Damage Report | Fabsy Alberta",
+    title: `${INSURANCE_IMPACT_REPORT.name} | Fabsy Alberta`,
     description:
-      `Get a personalized Insurance Damage Report based on your commercial 5-year Alberta driver's abstract. Standalone price: $${IDR_PRICE_STANDALONE}.`,
+      `Get a personalized, source-backed insurance impact and renewal-planning report for $${IDR_PRICE_STANDALONE} CAD plus applicable GST.`,
     canonical: "https://fabsy.ca/insurance-damage-report",
   });
 
@@ -136,20 +141,20 @@ const InsuranceDamageReport = () => {
         <section className="container mx-auto px-4 py-16 lg:py-24">
           <div className="mx-auto max-w-4xl text-center">
             <Badge className="mb-5 border-primary/20 bg-primary/10 text-primary">
-              Insurance Damage Report
+              {INSURANCE_IMPACT_REPORT.name}
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg sm:text-5xl lg:text-6xl">
-              See which insurance carriers are worth calling
+              Understand what a conviction could mean before renewal
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-white/90 sm:text-xl">
-              For ${IDR_PRICE_STANDALONE}, Fabsy reviews the convictions on your commercial 5-year Alberta driver's
-              abstract and prepares a personalized consumer research report. You receive a clear
-              summary and a focused list of carriers worth calling.
+              For ${IDR_PRICE_STANDALONE} CAD plus applicable GST, Fabsy prepares a personalized,
+              source-backed planning report covering potential conviction impact, renewal timing,
+              aging dates, and carriers worth researching or calling.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="min-h-12 px-7 text-base shadow-glow">
                 <Link to="/insurance-damage-report/checkout">
-                  Get the standalone report for ${IDR_PRICE_STANDALONE}
+                  Get the report for ${IDR_PRICE_STANDALONE}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -168,9 +173,9 @@ const InsuranceDamageReport = () => {
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-3xl text-center">
               <Badge variant="outline" className="mb-4">What you receive</Badge>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Five practical parts in one private report</h2>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Five practical parts in one private planning report</h2>
               <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-                Every estimate stays clearly labelled, sourced, and separate from the verified abstract record.
+                Report conclusions are labelled, sourced, and kept separate from the verified abstract record.
               </p>
             </div>
             <div className="mx-auto mt-10 grid max-w-6xl gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -197,7 +202,7 @@ const InsuranceDamageReport = () => {
                 Three simple steps
               </Badge>
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                From abstract to a useful calling list
+                From secure upload to a clearer renewal plan
               </h2>
             </div>
 
@@ -231,8 +236,7 @@ const InsuranceDamageReport = () => {
               <div className="text-center">
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Transparent pricing</h2>
                 <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-                  The price depends on whether the report is purchased by itself or with the
-                  Fabsy ticket defense service.
+                  Purchase the report by itself or combine it with Rapid Resolution.
                 </p>
               </div>
 
@@ -244,7 +248,7 @@ const InsuranceDamageReport = () => {
                     ${IDR_PRICE_STANDALONE} <span className="text-base font-medium text-muted-foreground">CAD</span>
                   </p>
                   <p className="mt-4 leading-relaxed text-muted-foreground">
-                    Buy the Insurance Damage Report as a separate service. You order the required
+                    Buy the {INSURANCE_IMPACT_REPORT.name} as a separate service. You order the required
                     abstract separately, and government or registry fees apply.
                   </p>
                   <Button asChild size="lg" className="mt-6 w-full">
@@ -254,17 +258,20 @@ const InsuranceDamageReport = () => {
 
                 <Card className="p-7 shadow-fab">
                   <Badge variant="outline" className="mb-4">
-                    With ticket defense checkout
+                    Rapid Resolution bundle
                   </Badge>
-                  <h3 className="text-2xl font-bold">Ticket checkout add-on</h3>
+                  <h3 className="text-2xl font-bold">Both services</h3>
                   <p className="mt-3 text-4xl font-bold text-primary">
-                    ${IDR_PRICE_ADDON} <span className="text-base font-medium text-muted-foreground">CAD</span>
+                    ${RAPID_RESOLUTION_BUNDLE.priceCad} <span className="text-base font-medium text-muted-foreground">CAD</span>
                   </p>
                   <p className="mt-4 leading-relaxed text-muted-foreground">
-                    Add the report to the $488 ticket defense checkout. A separate 30% success fee
-                    applies to any fine reduction Fabsy achieves. If no fine reduction is achieved,
-                    no success fee is charged.
+                    Combine the report with ${RAPID_RESOLUTION.priceCad} Rapid Resolution for an
+                    eligible Alberta pre-trial ticket. Applicable GST is extra, trial is separate,
+                    and no ticket or insurance outcome is promised.
                   </p>
+                  <Button asChild size="lg" variant="outline" className="mt-6 w-full">
+                    <Link to={RAPID_RESOLUTION.intakePath}>Choose the ${RAPID_RESOLUTION_BUNDLE.priceCad} bundle</Link>
+                  </Button>
                 </Card>
               </div>
 
@@ -281,7 +288,7 @@ const InsuranceDamageReport = () => {
             <div className="mx-auto max-w-3xl">
               <div className="text-center">
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                  Insurance Damage Report FAQs
+                  Insurance Impact Report FAQs
                 </h2>
               </div>
 
@@ -302,7 +309,7 @@ const InsuranceDamageReport = () => {
                 <h2 className="text-2xl font-bold">Ready to get your report?</h2>
                 <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
                   Purchase the standalone report, then follow the secure instructions to order and
-                  upload your commercial 5-year Alberta driver's abstract.
+                  upload your commercial 5-year Alberta driver's abstract and provide the requested renewal context.
                 </p>
                 <Button asChild size="lg" className="mt-6">
                   <Link to="/insurance-damage-report/checkout">

@@ -148,27 +148,29 @@ const handler = async (req: Request): Promise<Response> => {
     yPosition -= 25;
 
     // Authorization
-    addText("AUTHORIZATION FOR AGENT SERVICES", sectionSize, boldFont, leftMargin, yPosition);
+    addText("RAPID RESOLUTION AUTHORIZATION", sectionSize, boldFont, leftMargin, yPosition);
     yPosition -= 20;
     
     const authLines = [
-      "I authorize Fabsy Traffic Ticket Defense and its designated agents to assist with",
-      "the ticket identified above, if the matter is eligible for Fabsy's agent services.",
+      "I authorize Fabsy Traffic Ticket Services and its designated agents to deliver",
+      "Rapid Resolution for the ticket above, if accepted and within permitted agent scope.",
       "",
       "Within the scope permitted by applicable law and court or tribunal rules, I authorize",
       "Fabsy's agents to:",
-      "• Communicate with authorized court, tribunal, and prosecution contacts about this ticket",
-      "• Submit permitted forms or information for this ticket using my instructions",
-      "• Attend or arrange an appearance only when permitted and agreed with me",
-      "• Take steps I have instructed Fabsy to take within the permitted agent scope",
+      "• Request, receive, track, and review disclosure for this ticket",
+      "• Communicate with court, prosecution, and government contacts where authorized",
+      "• Prepare and submit a fact-specific prosecutor-review request",
+      "• Receive and explain a Crown response and its stated consequences",
+      "• Finalize a resolution only after receiving my case-specific instruction",
       "",
       "I understand that:",
       "• Fabsy is an agent service, not a law firm, and does not provide legal advice",
-      "• Fabsy will not choose or change a plea or strategy without my instructions",
+      "• Fabsy will not accept an offer or enter a plea without my specific instruction",
       "• Fabsy may access only information actually needed and lawfully available for this matter",
       "• Outcomes vary and Fabsy does not promise a particular result",
-      "• Representation uses a $488 base representation fee plus 30% of any fine",
-      "  reduction achieved; there is no success fee if the fine is not reduced"
+      "• Rapid Resolution costs $198 CAD plus GST; trial and government fines are separate",
+      "• The 48-hour commitment starts after complete disclosure is received and matched",
+      "• The 48-hour commitment excludes Crown response and final-outcome timing"
     ];
 
     authLines.forEach(line => {
@@ -193,7 +195,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Consent text
     const consentLines = [
       "By signing this form, I consent to the processing of my personal information",
-      "for this ticket matter as described in Fabsy's Privacy Policy. Fabsy may use only",
+      "for this ticket matter, including controlled technology-assisted document analysis,",
+      "as described in Fabsy's Privacy Policy. Fabsy may use only",
       "the information it actually accesses for the requested service and may disclose it",
       "to authorized service providers or public bodies when needed or required by law."
     ];

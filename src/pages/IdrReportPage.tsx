@@ -43,13 +43,13 @@ function ReportContent({ orderId }: { orderId: string }) {
     setIsDownloading(true);
     const { data, error: signedError } = await supabase.storage
       .from("idr-reports")
-      .createSignedUrl(report.pdf_url, 60, { download: "fabsy-insurance-damage-report.pdf" });
+      .createSignedUrl(report.pdf_url, 60, { download: "fabsy-insurance-impact-renewal-planning-report.pdf" });
     if (signedError || !data?.signedUrl) {
       setError(signedError?.message || "Unable to create a secure download link.");
     } else {
       const link = document.createElement("a");
       link.href = data.signedUrl;
-      link.download = "fabsy-insurance-damage-report.pdf";
+      link.download = "fabsy-insurance-impact-renewal-planning-report.pdf";
       link.rel = "noopener";
       link.click();
     }
@@ -79,7 +79,7 @@ function ReportContent({ orderId }: { orderId: string }) {
 
 export default function IdrReportPage() {
   const { orderId = "" } = useParams();
-  useSafeHead({ title: "Private Insurance Damage Report | Fabsy", robots: "noindex, nofollow" });
+  useSafeHead({ title: "Private Insurance Impact & Renewal Planning Report | Fabsy", robots: "noindex, nofollow" });
   return (
     <div className="min-h-screen bg-background">
       <div className="print:hidden"><Header /></div>

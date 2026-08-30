@@ -86,16 +86,13 @@ const report = {
     ],
   },
   carrierCallList: {
-    heading: "Carriers worth calling",
+    heading: "Public insurer research directory",
     status: "ready",
-    framing: "This ranked call list is a research starting point. Confirm eligibility and pricing directly.",
-    entries: ["Alpha Mutual", "Prairie Insurance", "Northern Direct"].map((carrierName, index) => ({
-      rank: index + 1,
+    framing: "Entries are listed alphabetically from current public sources. They are not ranked or recommended.",
+    entries: ["Alpha Mutual", "Northern Direct", "Prairie Insurance"].map((carrierName, index) => ({
       carrierId: `sample-${index + 1}`,
       carrierName,
-      reason: "The sourced rule indicates this record is worth discussing directly with the carrier.",
       phone: `1-800-555-010${index}`,
-      rankingScore: 100 - index,
       researchSources: [source],
       evaluatedPostures: [{
         convictionClass: "minor",
@@ -111,7 +108,7 @@ const report = {
       reminderDates: [{ leadDays: 45, reminderDate: "2026-10-01" }],
     },
   ],
-  disclaimer: "This report is consumer research based on publicly available information. Fabsy is not an insurance agent or broker and does not sell, quote, or place insurance.",
+  disclaimer: "This report provides consumer research and planning information, not an insurer quote, licensed broker recommendation or promise of eligibility, premium savings or a particular insurance outcome. Fabsy is not an insurance agent or broker and does not sell, quote or place insurance.",
 };
 
 writeFileSync(outputPath, buildIdrPdf(report, "Sample Client"));

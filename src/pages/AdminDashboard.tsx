@@ -39,7 +39,7 @@ export default function AdminDashboard() {
       color: "from-blue-500 to-blue-600"
     },
     {
-      title: "Insurance Damage Reports",
+      title: "Insurance Planning Reports",
       description: "Review abstracts, build reports, and maintain carrier research",
       icon: FileSearch,
       path: "/admin/idr",

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import useSafeHead from '@/hooks/useSafeHead';
 import { readMarketingAttribution } from '@/lib/marketingAttribution';
+import { RAPID_RESOLUTION } from '@/config/offers';
 
 type Gtag = (...args: unknown[]) => void;
 
@@ -121,8 +122,8 @@ const ThankYou: React.FC = () => {
       <div className="container mx-auto px-4 py-16 max-w-3xl text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Thank You!</h1>
         <p className="text-lg text-muted-foreground mb-8">
-          We received your request and emailed you a confirmation. Our team will review the
-          submission and follow up with the next steps.
+          We received your Rapid Resolution intake and emailed a confirmation. We will validate the
+          authorization and deadlines, request disclosure where authorized, and notify you as the file advances.
           If it’s urgent, call us at{' '}
           <a href="tel:+18257932279" className="underline decoration-dashed underline-offset-4 text-primary hover:text-primary/80">(825) 793-2279</a>.
         </p>
@@ -130,25 +131,24 @@ const ThankYou: React.FC = () => {
         <div className="grid gap-4 sm:grid-cols-3 text-left">
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">What happens next</h2>
-            <p className="text-sm text-muted-foreground">We’ll confirm your details, request disclosure if needed, and outline the plan.</p>
+            <p className="text-sm text-muted-foreground">We confirm the intake and authorization, then request and track disclosure where available.</p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">How our pricing works</h2>
             <p className="text-sm text-muted-foreground">
-              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved;
-              there is no success fee if the fine is not reduced.
+              Rapid Resolution is ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST. Trial and government fines are separate.
             </p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">Outcome standard</h2>
             <p className="text-sm text-muted-foreground">
-              Results depend on the facts, evidence, procedure, and available options. No outcome is promised.
+              {RAPID_RESOLUTION.speedDisclaimer} {RAPID_RESOLUTION.outcomeDisclaimer}
             </p>
           </div>
         </div>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link to="/traffic-ticket-assessment/start" className="inline-block">
+          <Link to="/submit-ticket" className="inline-block">
             <span className="inline-flex items-center rounded-md bg-primary px-6 py-3 font-semibold text-white hover:opacity-90 transition">Submit another ticket</span>
           </Link>
           <Link to="/how-it-works" className="inline-block">

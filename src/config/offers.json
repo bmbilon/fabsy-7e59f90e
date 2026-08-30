@@ -1,0 +1,59 @@
+{
+  "rapidResolution": {
+    "name": "Rapid Resolution",
+    "shortName": "Rapid Resolution",
+    "slug": "/rapid-resolution",
+    "intakePath": "/submit-ticket",
+    "priceCad": 198,
+    "priceCents": 19800,
+    "currency": "CAD",
+    "taxTreatment": "plus applicable GST",
+    "oneLineDescription": "Rapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits.",
+    "actionCommitmentHours": 48,
+    "actionCommitment": "Complete, readable disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours after it is received and matched to your file.",
+    "included": [
+      "Secure digital ticket intake",
+      "Eligibility and deadline review",
+      "Digital consent and authorization",
+      "Disclosure request and document tracking",
+      "Technology-assisted disclosure analysis with qualified review",
+      "Fact-specific prosecutor-review submission",
+      "Immediate client notifications when the file changes",
+      "Plain-language comparison of the original ticket and any Crown response",
+      "Client-directed acceptance of an available pre-trial resolution"
+    ],
+    "excluded": [
+      "Trial representation",
+      "Appeals, reopenings and extraordinary applications",
+      "Immediate Roadside Sanctions and Notices of Administrative Penalty",
+      "Government fines, court charges and third-party fees",
+      "Matters outside Fabsy's permitted or accepted agent scope"
+    ],
+    "speedDisclaimer": "The 48-hour clock begins only after complete, readable disclosure is received and matched to the file. It covers Fabsy's review and next authorized action, not Crown response time or the date of a final outcome.",
+    "outcomeDisclaimer": "Outcomes depend on the charge, evidence, procedure and prosecutor. A withdrawal, reduction, lower fine, fewer demerits or insurance result is not promised."
+  },
+  "insuranceReport": {
+    "name": "Insurance Impact & Renewal Planning Report",
+    "shortName": "Insurance Impact Report",
+    "slug": "/insurance-damage-report",
+    "checkoutPath": "/insurance-damage-report/checkout",
+    "priceCad": 49,
+    "priceCents": 4900,
+    "currency": "CAD",
+    "taxTreatment": "plus applicable GST",
+    "description": "A personalized, source-backed planning report covering potential conviction impact, renewal timing, conviction-aging dates, public insurance research sources and questions to ask a licensed broker.",
+    "disclaimer": "This report provides consumer research and planning information, not an insurer quote, licensed broker recommendation or promise of eligibility, premium savings or a particular insurance outcome. Fabsy is not an insurance agent or broker and does not sell, quote or place insurance."
+  },
+  "bundle": {
+    "name": "Rapid Resolution + Insurance Planning",
+    "shortName": "Rapid Resolution Bundle",
+    "priceCad": 229,
+    "priceCents": 22900,
+    "reportAddOnCad": 31,
+    "reportAddOnCents": 3100,
+    "currency": "CAD",
+    "taxTreatment": "plus applicable GST",
+    "description": "Rapid Resolution for an eligible Alberta ticket plus the Insurance Impact & Renewal Planning Report for one transparent bundle price."
+  },
+  "canonicalPricingCopy": "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate."
+}

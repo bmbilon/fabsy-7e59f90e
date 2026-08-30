@@ -3,12 +3,17 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FAQSection from "@/components/FAQSection";
 import useSafeHead from "@/hooks/useSafeHead";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 
 const FAQPage: React.FC = () => {
   const faqs = [
     {
       q: "How much does Fabsy charge?",
-      a: "The Free Ticket Review costs $0. The Priority Ticket Review costs $149 CAD total including applicable GST and requires relevant policy documents. Full Representation uses a $488 base fee plus applicable tax and includes the $149 review deliverables; a 30% fee applies only to a fine reduction achieved."
+      a: `${RAPID_RESOLUTION.name} costs $${RAPID_RESOLUTION.priceCad} CAD plus applicable GST for an eligible Alberta pre-trial matter. The ${INSURANCE_IMPACT_REPORT.name} costs $${INSURANCE_IMPACT_REPORT.priceCad} CAD plus GST, or both services cost $${RAPID_RESOLUTION_BUNDLE.priceCad} CAD plus GST. Government fines, third-party fees, trial representation, and out-of-scope work are separate.`
     },
     {
       q: "Is Fabsy a law firm?",
@@ -24,11 +29,11 @@ const FAQPage: React.FC = () => {
     },
     {
       q: "How long will my matter take?",
-      a: "Timing varies by matter, court, and available process. The response deadline is printed on the ticket. Follow the ticket instructions before that date."
+      a: RAPID_RESOLUTION.speedDisclaimer
     },
     {
-      q: "Will I have to attend court?",
-      a: "Attendance depends on the matter, court requirements, and the scope of any permitted representation. Some clients may need to attend or complete steps personally. Fabsy will explain the expected process after reviewing the ticket."
+      q: "Does Rapid Resolution include a trial?",
+      a: "No. Rapid Resolution covers an accepted, eligible pre-trial matter. Trial representation, appeals, reopenings, government charges, and out-of-scope work are separate. If you want to proceed to trial, any available representation is quoted separately on a case-by-case basis."
     },
     {
       q: "What matters does Fabsy review?",
@@ -36,13 +41,21 @@ const FAQPage: React.FC = () => {
     },
     {
       q: "What happens after I submit my ticket?",
-      a: "Fabsy reviews the information and documents you provide, then explains whether the service is available and what the next steps may be. Keep following every instruction and deadline printed on the ticket unless Fabsy confirms otherwise."
+      a: "Fabsy reviews eligibility and deadlines, confirms the accepted scope, requests and tracks disclosure, analyzes complete disclosure, and prepares or submits the next authorized prosecutor-review step. You receive updates as the file changes and direct whether an available pre-trial resolution is accepted. Keep following every instruction and deadline printed on the ticket unless Fabsy confirms otherwise."
+    },
+    {
+      q: "Will Fabsy automatically accept a Crown response?",
+      a: "No. Fabsy explains the original ticket and any Crown response in plain language, then obtains your file-specific instruction before an available resolution is accepted."
+    },
+    {
+      q: `What is the $${INSURANCE_IMPACT_REPORT.priceCad} insurance report?`,
+      a: `${INSURANCE_IMPACT_REPORT.description} ${INSURANCE_IMPACT_REPORT.disclaimer}`
     }
   ];
 
   useSafeHead({
     title: "Traffic Ticket FAQ, Alberta | Fabsy",
-    description: "Conservative answers about Fabsy's Alberta traffic ticket agent service, pricing, attendance, insurance, scope, and next steps.",
+    description: "Answers about Fabsy Rapid Resolution, the 48-hour post-disclosure action commitment, trial exclusions, insurance planning, pricing, and client decisions.",
     canonical: "https://fabsy.ca/faq"
     // Schema removed - FAQSection component already handles FAQPage structured data
   });
@@ -54,7 +67,7 @@ const FAQPage: React.FC = () => {
         <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl font-bold mb-4 text-white">Frequently Asked Questions</h1>
           <p className="text-lg text-white/80 mb-8">
-            Clear answers about Fabsy's Alberta ticket review and traffic ticket agent service.
+            Clear answers about Rapid Resolution, timing, pricing, service scope, and insurance planning.
           </p>
           <FAQSection faqs={faqs} pageName="FAQ" pageUrl="https://fabsy.ca/faq" />
         </div>

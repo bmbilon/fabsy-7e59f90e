@@ -4,6 +4,7 @@ import { ArrowLeft, CreditCard, FileSearch, LockKeyhole, ShieldCheck } from "luc
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import useSafeHead from "@/hooks/useSafeHead";
 import { supabase } from "@/integrations/supabase/client";
-import { IDR_DISCLAIMER, IDR_PRICE_ADDON, IDR_PRICE_STANDALONE } from "@/config/idr";
+import { IDR_DISCLAIMER, IDR_PRICE_STANDALONE } from "@/config/idr";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 
 type CheckoutForm = {
   firstName: string;
@@ -44,8 +50,8 @@ function getStandaloneOrderId() {
 
 const IdrCheckout = () => {
   useSafeHead({
-    title: "Insurance Damage Report Checkout | Fabsy",
-    description: `Purchase a standalone Fabsy Insurance Damage Report for $${IDR_PRICE_STANDALONE} CAD.`,
+    title: `${INSURANCE_IMPACT_REPORT.name} Checkout | Fabsy`,
+    description: `Purchase the standalone Fabsy ${INSURANCE_IMPACT_REPORT.name} for $${IDR_PRICE_STANDALONE} CAD plus applicable GST.`,
     canonical: "https://fabsy.ca/insurance-damage-report/checkout",
     robots: "noindex, nofollow",
   });
@@ -151,11 +157,11 @@ const IdrCheckout = () => {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <FileSearch className="h-6 w-6" />
                 </div>
-                <h1 className="text-3xl font-bold tracking-tight">Standalone report checkout</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{INSURANCE_IMPACT_REPORT.name} checkout</h1>
                 <p className="mt-2 leading-relaxed text-muted-foreground">
-                  Enter the information that will identify your order. After payment, Fabsy will
-                  provide secure instructions for ordering and uploading your commercial 5-year
-                  Alberta driver's abstract.
+                  Enter the information that will identify your standalone report order. After
+                  payment, Fabsy will provide secure instructions for ordering and uploading your
+                  commercial 5-year Alberta driver's abstract and supplying the requested renewal context.
                 </p>
               </div>
 
@@ -262,7 +268,7 @@ const IdrCheckout = () => {
                 <h2 className="text-xl font-bold">Order summary</h2>
                 <div className="mt-5 flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-semibold">Insurance Damage Report</p>
+                    <p className="font-semibold">{INSURANCE_IMPACT_REPORT.name}</p>
                     <p className="mt-1 text-sm text-muted-foreground">Standalone purchase</p>
                   </div>
                   <p className="font-bold">${IDR_PRICE_STANDALONE} CAD</p>
@@ -276,10 +282,20 @@ const IdrCheckout = () => {
                   Applicable tax is calculated at Stripe checkout.
                 </p>
                 <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                  The ${IDR_PRICE_ADDON} add-on is available in the Fabsy ticket defense checkout. It cannot
-                  be selected from this standalone checkout. The required abstract is ordered
+                  This checkout is for the standalone report. The required abstract is ordered
                   separately, and government or registry fees apply.
                 </p>
+              </Card>
+
+              <Card className="border-primary/30 bg-primary/5 p-6">
+                <Badge className="mb-3">Need ticket help too?</Badge>
+                <h2 className="text-xl font-bold">Both services for ${RAPID_RESOLUTION_BUNDLE.priceCad}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  The bundle combines this report with ${RAPID_RESOLUTION.priceCad} {RAPID_RESOLUTION.name} for an eligible Alberta pre-trial matter. Applicable GST is extra; trial representation is separate.
+                </p>
+                <Button asChild variant="outline" className="mt-4 w-full">
+                  <Link to={RAPID_RESOLUTION.intakePath}>Choose the bundle instead</Link>
+                </Button>
               </Card>
 
               <Card className="p-6">

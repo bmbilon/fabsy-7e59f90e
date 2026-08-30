@@ -16,6 +16,7 @@ interface PlacedLine extends PdfLine {
 const PAGE_WIDTH = 612;
 const PAGE_HEIGHT = 792;
 const MARGIN = 48;
+const CURRENT_DISCLAIMER = "This report provides consumer research and planning information, not an insurer quote, licensed broker recommendation or promise of eligibility, premium savings or a particular insurance outcome. Fabsy is not an insurance agent or broker and does not sell, quote or place insurance.";
 
 function record(value: unknown): JsonRecord {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -171,17 +172,18 @@ function reportLines(report: JsonRecord): PdfLine[] {
   }
 
   const callList = record(report.carrierCallList);
-  const carriers = records(callList.entries);
-  section("4. Carriers worth calling");
-  add(String(callList.framing || "Confirm eligibility and pricing directly with each carrier or a licensed broker."));
-  if (!carriers.length) add("No carrier met the current verified rule and contact criteria.");
+  const carriers = records(callList.entries).sort((left, right) =>
+    String(left.carrierName || "").localeCompare(String(right.carrierName || ""), "en-CA")
+  );
+  section("4. Public insurer research directory");
+  add("Entries are listed alphabetically from public sources. They are not ranked or recommended, and inclusion does not predict eligibility, pricing or coverage. Ask a licensed broker for insurer-specific advice or quotes.");
+  if (!carriers.length) add("No current public insurer research entries are available.");
   for (const carrier of carriers) {
-    add(`${carrier.rank || ""}. ${carrier.carrierName || "Carrier"}`, { bold: true, gapAfter: 1 });
-    add(String(carrier.reason || "Confirm current underwriting eligibility directly."), { indent: 12, gapAfter: 1 });
-    add(`Contact: ${carrier.phone || carrier.quoteUrl || "Unavailable"}`, { indent: 12, gapAfter: 1 });
+    add(String(carrier.carrierName || "Insurer"), { bold: true, gapAfter: 1 });
+    if (carrier.phone) add(`Public phone: ${carrier.phone}`, { indent: 12, gapAfter: 1 });
     for (const source of records(carrier.researchSources)) {
       if (source.url) {
-        add(`Research source: ${source.publisher || "Public source"}, ${source.title || "source"}, ${source.url}`, { indent: 12 });
+        add(`Public information: ${source.publisher || "Public source"}, ${source.title || "source"}, ${source.url}`, { indent: 12 });
       }
     }
   }
@@ -195,7 +197,7 @@ function reportLines(report: JsonRecord): PdfLine[] {
   }
 
   section("Important consumer research disclaimer");
-  add(String(report.disclaimer || ""), { bold: true });
+  add(CURRENT_DISCLAIMER, { bold: true });
   return lines;
 }
 
@@ -247,7 +249,7 @@ function contentStream(lines: PlacedLine[], pageIndex: number, pageCount: number
   if (pageIndex === 0) {
     commands.push("0.07 0.09 0.15 rg 0 616 612 176 re f");
     commands.push(`BT /F2 12 Tf 0.77 0.56 0.96 rg 48 742 Td (FABSY) Tj ET`);
-    commands.push(`BT /F2 25 Tf 1 1 1 rg 48 702 Td (Insurance Damage Report) Tj ET`);
+    commands.push(`BT /F2 21 Tf 1 1 1 rg 48 702 Td (Insurance Impact & Renewal Planning Report) Tj ET`);
     commands.push(`BT /F1 13 Tf 0.88 0.90 0.94 rg 48 671 Td (${pdfString(clientName)}) Tj ET`);
     commands.push(`BT /F1 10 Tf 0.72 0.75 0.80 rg 48 648 Td (Prepared ${pdfString(formatDate(reportDate))}) Tj ET`);
   }
@@ -255,7 +257,7 @@ function contentStream(lines: PlacedLine[], pageIndex: number, pageCount: number
     commands.push(`BT /${line.bold ? "F2" : "F1"} ${line.size} Tf ${line.color} rg ${MARGIN + line.indent} ${line.y.toFixed(1)} Td (${pdfString(line.text)}) Tj ET`);
   }
   commands.push("0.75 0.77 0.81 RG 0.5 w 48 42 m 564 42 l S");
-  commands.push(`BT /F1 8 Tf 0.40 0.43 0.48 rg 48 26 Td (Fabsy IDR | Page ${pageIndex + 1} of ${pageCount}) Tj ET`);
+  commands.push(`BT /F1 8 Tf 0.40 0.43 0.48 rg 48 26 Td (Fabsy insurance planning | Page ${pageIndex + 1} of ${pageCount}) Tj ET`);
   return commands.join("\n");
 }
 

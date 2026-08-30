@@ -26,14 +26,14 @@ const MANIFEST_PATH = path.resolve(
 );
 const SITE = 'https://fabsy.ca';
 const PRICING_TEXT = EXACT_FABSY_PRICING;
-const ASSESSMENT_NAMES = new Set(['Ticket Triage', 'Priority Ticket Review']);
-const ASSESSMENT_TITLES = new Set([
-  'Ticket Triage | Alberta Traffic Ticket Review | $149 CAD',
-  'Ticket Triage | Human-Reviewed Alberta Ticket Assessment | $149',
-]);
-const ASSESSMENT_DESCRIPTIONS = new Set([
-  "Ticket Triage is Fabsy's $149 CAD total, human-reviewed Alberta traffic ticket and insurance-impact assessment with a practical next-step recommendation.",
-  'Ticket Triage is a $149 CAD total, human-reviewed Alberta traffic ticket assessment covering options, likely insurance impact and whether fighting it is worth the money.',
+const OFFER_DATA = require('../src/config/offers.json');
+const APPROVED_OFFER_PRICES = new Map([
+  [OFFER_DATA.rapidResolution.name, OFFER_DATA.rapidResolution.priceCad],
+  [OFFER_DATA.rapidResolution.shortName, OFFER_DATA.rapidResolution.priceCad],
+  [OFFER_DATA.insuranceReport.name, OFFER_DATA.insuranceReport.priceCad],
+  [OFFER_DATA.insuranceReport.shortName, OFFER_DATA.insuranceReport.priceCad],
+  [OFFER_DATA.bundle.name, OFFER_DATA.bundle.priceCad],
+  [OFFER_DATA.bundle.shortName, OFFER_DATA.bundle.priceCad],
 ]);
 const VERIFIED_CLIENT_TESTIMONIALS = require('../src/content/client-testimonials.json').filter(
   (testimonial) => testimonial.publicationPermissionConfirmed === true
@@ -158,6 +158,121 @@ function renderedPageText(value) {
   ).replace(/\s+/g, ' ').trim();
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Curated/generated articles require the complete approved pricing paragraph.
+ * Browser UI also contains named price cards, navigation and checkout links.
+ * Recognize those short commercial facts without allowing the same numbers to
+ * pass as legal fines, insurance savings, or a different product's price.
+ */
+function redactBrowserCommercialFacts(value, slug) {
+  let text = String(value);
+  const rapid = escapeRegExp(OFFER_DATA.rapidResolution.name);
+  const report = `(?:${[OFFER_DATA.insuranceReport.name, OFFER_DATA.insuranceReport.shortName].map(escapeRegExp).join('|')})`;
+  const bundle = `(?:${[OFFER_DATA.bundle.name, OFFER_DATA.bundle.shortName].map(escapeRegExp).join('|')})`;
+  const currency = String.raw`(?:\s+CAD)?(?:\s*(?:\+|plus)\s+(?:applicable\s+)?GST)?`;
+  const priceRules = [
+    [OFFER_DATA.rapidResolution.priceCad, [
+      `${rapid}\\s*(?:[·(–-]\\s*)?`,
+      `${rapid}\\s+(?:costs?|is|for)\\s+`,
+      `${rapid}\\s+One flat pre-trial service fee\\s+`,
+      `${rapid}\\s*\\|\\s*Alberta (?:Traffic )?Ticket (?:Help|Service)\\s*\\|\\s*`,
+      `${rapid} provides eligible Alberta pre-trial traffic ticket agent services for\\s+`,
+      '(?:Start|Start Rapid Resolution)\\s*·\\s*',
+      'Start Rapid Resolution View everything included\\s+',
+      ...(slug === 'submit-ticket' ? ['continue to the transparent\\s+'] : []),
+      ...(slug === 'index' || slug === 'rapid-resolution'
+        ? ['What (?:is included for|does the)\\s+'] : []),
+    ], [
+      `${currency}\\s+${rapid}(?!\\s*(?:Bundle|\\+))\\b`,
+      `${currency}\\s*·\\s*(?:trial separate|Eligible pre-trial matters)\\b`,
+    ]],
+    [OFFER_DATA.insuranceReport.priceCad, [
+      `${report}\\s*(?:\\(\\s*)?`,
+      `${report}\\s+(?:costs?|is)\\s+`,
+      '(?:Get the report for|Standalone report)\\s+',
+      ...(slug === 'insurance-damage-report' ? ['Get started for\\s+'] : []),
+    ], [
+      '\\s+(?:standalone |insurance )?report\\b',
+      `${currency}\\s+${report}\\b`,
+      `${currency}, Fabsy prepares a personalized, source-backed planning report\\b`,
+    ]],
+    [OFFER_DATA.bundle.priceCad, [
+      `${bundle}\\s+`,
+      `${bundle}\\s+(?:bundle\\s+)?costs?\\s+`,
+      `${rapid} bundle Both services\\s+`,
+      `${rapid} Bundle ${rapid} plus the ${escapeRegExp(OFFER_DATA.insuranceReport.shortName)}\\.\\s+`,
+      `both the report and ${rapid} for\\s+`,
+      'both(?: products| services)? (?:costs?|are)\\s+',
+    ], [
+      '\\s+bundle\\b',
+      `${currency}\\s+${bundle}\\b`,
+    ]],
+  ];
+  for (const [price, prefixes, suffixes] of priceRules) {
+    const amount = String.raw`\$\s*${price}(?:\.00)?(?![\d,]|\.\d)`;
+    for (const prefix of prefixes) {
+      text = text.replace(new RegExp(`(?:${prefix})(${amount})`, 'gi'),
+        (match) => match.replace(new RegExp(amount), '[approved offer amount]'));
+    }
+    for (const suffix of suffixes) {
+      text = text.replace(new RegExp(`(${amount})(?:${suffix})`, 'gi'),
+        (match) => match.replace(new RegExp(amount), '[approved offer amount]'));
+    }
+  }
+
+  // Short headings/questions must share the full service-clock boundary with
+  // the page. An arbitrary "resolved within 48 hours" remains a failing claim.
+  if (text.includes(OFFER_DATA.rapidResolution.speedDisclaimer)) {
+    const hours = OFFER_DATA.rapidResolution.actionCommitmentHours;
+    const approvedActionCopy = [
+      `${hours}-hour Fabsy action commitment`,
+      `When does the ${hours}-hour commitment begin?`,
+      `Is the matter resolved within ${hours} hours?`,
+      `The ${hours}-hour commitment, precisely defined`,
+      `The ${hours}-hour commitment Complete disclosure in. Fabsy's next action within ${hours} hours.`,
+      `Fabsy acts within ${hours} hours of complete disclosure`,
+      `The ${hours}-hour commitment covers Fabsy's next authorized action, not Crown timing.`,
+      `Complete, readable disclosure is reviewed and the next authorized step is prepared or submitted within ${hours} hours after it is matched to your file.`,
+      `Within ${hours} hours after complete disclosure is received and matched, Fabsy prepares or submits the next authorized prosecutor-review step. The clock covers Fabsy's action, not Crown response time.`,
+    ];
+    for (const copy of approvedActionCopy) {
+      text = text.split(copy).join('[approved Fabsy action description]');
+    }
+  }
+  // This is a named document input, not a premium/conviction lookback claim.
+  // Verified: https://www.alberta.ca/commercial-driver-abstract (3/5/10-year CDA).
+  if (slug === 'insurance-damage-report') {
+    text = text.replace(/\bcommercial 5-year Alberta driver['’]s abstract\b/gi, '[approved abstract input]');
+  }
+  return text;
+}
+
+function browserTextGuardrailIssues(html, slug, { numeric = true } = {}) {
+  const raw = redactVerifiedClientTestimonials(html);
+  // The strict article paragraph rule is replaced here, not disabled globally:
+  // browser prices have product-specific checks below and JSON-LD is validated
+  // separately. Marketing claims remain checked in the complete raw document.
+  const issues = textGuardrailIssues(raw, slug, { numeric: false })
+    .filter((issue) => issue !== 'partial or inexact Fabsy pricing');
+  const rendered = renderedPageText(raw);
+  const candidate = redactBrowserCommercialFacts(rendered, slug);
+  if (/\$\s*\d/.test(rendered) && !/(?:\bplus|\+)\s+(?:applicable\s+)?GST\b/i.test(rendered)) {
+    issues.push('Fabsy pricing must disclose applicable GST separately');
+  }
+  if (numeric) {
+    issues.push(...textGuardrailIssues(candidate, slug, { marketing: false }));
+  } else if (/\$\s*\d/.test(candidate.split(PRICING_TEXT).join(''))) {
+    // Blog article numeric facts have their own gate, but an unsupported UI
+    // price cannot escape merely because it appears on a blog route.
+    issues.push('unsupported monetary legal claim');
+  }
+  return [...new Set(issues)];
+}
+
 function extractFaqSchema(html, label) {
   const scripts = html.matchAll(
     /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
@@ -174,19 +289,30 @@ function extractFaqSchema(html, label) {
   return null;
 }
 
-function isApprovedAssessmentOffer(value, inheritedItemName) {
+function isApprovedFabsyOffer(value, inheritedItemName) {
   const types = Array.isArray(value?.['@type']) ? value['@type'] : [value?.['@type']];
   if (!types.includes('Offer')) return false;
 
   const itemOffered = value?.itemOffered;
   const specification = value?.priceSpecification;
+  const itemName = itemOffered?.name || inheritedItemName;
+  const approvedPrice = APPROVED_OFFER_PRICES.get(itemName);
+  const offeredPrice = Number(value?.price);
+  const specifiedPrice = specification?.price === undefined ? offeredPrice : Number(specification.price);
+  const isCanonicalRapidResolutionOffer =
+    offeredPrice === OFFER_DATA.rapidResolution.priceCad &&
+    value?.description === PRICING_TEXT &&
+    value?.url === `${SITE}${OFFER_DATA.rapidResolution.intakePath}`;
+  const expectedPrice = isCanonicalRapidResolutionOffer
+    ? OFFER_DATA.rapidResolution.priceCad
+    : approvedPrice;
   return (
-    String(value?.price) === '149.00' &&
+    (Number.isFinite(approvedPrice) || isCanonicalRapidResolutionOffer) &&
+    offeredPrice === expectedPrice &&
     value?.priceCurrency === 'CAD' &&
-    ASSESSMENT_NAMES.has(itemOffered?.name || inheritedItemName) &&
-    String(specification?.price) === '149.00' &&
-    specification?.priceCurrency === 'CAD' &&
-    specification?.valueAddedTaxIncluded === true
+    specifiedPrice === expectedPrice &&
+    (specification?.priceCurrency === undefined || specification.priceCurrency === 'CAD') &&
+    specification?.valueAddedTaxIncluded !== true
   );
 }
 
@@ -205,7 +331,7 @@ function containsDisallowedOfferPricing(value, inheritedItemName) {
     (Object.prototype.hasOwnProperty.call(value, 'price') ||
       Object.prototype.hasOwnProperty.call(value, 'priceCurrency'))
   ) {
-    return !isApprovedAssessmentOffer(value, itemName);
+    return !isApprovedFabsyOffer(value, itemName);
   }
   return Object.values(value).some((item) => containsDisallowedOfferPricing(item, itemName));
 }
@@ -405,16 +531,19 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     if (!html.includes('Fabsy is an agent service') || !html.includes('not a law firm')) {
       fail(`${label}: agent-service disclaimer missing`);
     }
-    const chatGptDiscoverySignals = [
-      'Ticket Triage',
-      '$149 CAD total',
-      'human-reviewed',
-      'priority placement',
-      '$339 base-fee balance',
-      'href="/traffic-ticket-assessment"',
+    const discoverySignals = [
+      'Rapid Resolution',
+      'secure digital intake',
+      'technology-assisted',
+      '48-hour clock',
+      'Insurance Impact &amp; Renewal Planning Report',
+      'Trial representation',
+      'href="/submit-ticket"',
     ];
-    for (const signal of chatGptDiscoverySignals) {
-      if (!html.includes(signal)) fail(`${label}: ChatGPT discovery signal missing: ${signal}`);
+    for (const signal of discoverySignals) {
+      if (!html.toLowerCase().includes(signal.toLowerCase())) {
+        fail(`${label}: Rapid Resolution discovery signal missing: ${signal}`);
+      }
     }
     if (!html.includes(`<link rel="canonical" href="${SITE}/content/${slug}">`)) {
       fail(`${label}: self-referential canonical missing`);
@@ -436,8 +565,8 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
       if (/^Traffic Ticket Options in\b/i.test(title)) {
         fail(`${label}: fallback title is generic instead of offence-specific`);
       }
-      if (!description.includes('Ticket Triage') || !description.includes('$149 CAD total')) {
-        fail(`${label}: fallback description does not connect the answer to Ticket Triage`);
+      if (!description.includes('Rapid Resolution')) {
+        fail(`${label}: fallback description does not connect the answer to Rapid Resolution`);
       }
     }
 
@@ -497,13 +626,12 @@ function validateAllPrerendered() {
     // Shared marketing claims are checked in raw HTML so JSON-LD and other
     // machine-readable blocks cannot bypass the same publication rules.
     const pageSlug = contentSlug || (relativeParts[0] === 'index.html' ? 'index' : relativeParts[0]);
-    guardedText(html, label, pageSlug, { numeric: false });
-    // Blog numeric claims are validated against rendered article fields by
-    // validate-blog-snapshot-guardrails.mjs. Other routes receive numeric
-    // checks on rendered text, excluding dates and values confined to schema.
-    if (!isBlogSnapshot) {
-      guardedText(renderedPageText(html), label, pageSlug, { marketing: false });
+    for (const issue of browserTextGuardrailIssues(html, pageSlug, { numeric: !isBlogSnapshot })) {
+      fail(`${label}: ${issue}`);
     }
+    // Blog numeric claims are validated against rendered article fields by
+    // validate-blog-snapshot-guardrails.mjs; browser UI prices are still checked
+    // above. Other routes also receive all numeric rendered-text checks.
     if (/"@type"\s*:\s*"LegalService"/.test(html)) {
       fail(`${label}: Fabsy must not be represented as a LegalService`);
     }
@@ -518,21 +646,15 @@ function validateAllPrerendered() {
     }
 
     const titles = [...html.matchAll(/<title>([\s\S]*?)<\/title>/gi)].map((match) => tagText(match[1]));
-    const approvedAssessmentTitle =
-      (relative === 'index.html' || relative === 'traffic-ticket-assessment/index.html') &&
-      ASSESSMENT_TITLES.has(titles[0]);
-    if (titles.length !== 1 || !titles[0] || (titles[0].length > 60 && !approvedAssessmentTitle)) {
+    if (titles.length !== 1 || !titles[0] || titles[0].length > 60) {
       fail(`${label}: must contain one title of at most 60 characters`);
     }
     const descriptionTags = [...html.matchAll(/<meta\b[^>]*name=["']description["'][^>]*>/gi)];
     const description = metaContent(html, 'description');
-    const approvedAssessmentDescription =
-      (relative === 'index.html' || relative === 'traffic-ticket-assessment/index.html') &&
-      ASSESSMENT_DESCRIPTIONS.has(description);
     if (
       descriptionTags.length !== 1 ||
       !description ||
-      (description.length > 155 && !approvedAssessmentDescription)
+      description.length > 155
     ) {
       fail(`${label}: must contain one meta description of at most 155 characters`);
     }
@@ -544,17 +666,8 @@ function validateAllPrerendered() {
     if (robotsTags.length !== 1) fail(`${label}: must contain exactly one robots directive`);
 
     const text = renderedPageText(html);
-    if (/\$488|30%/.test(text)) {
-      const required = [
-        '$488 base representation fee',
-        '30% of any fine reduction achieved',
-        'no success fee if the fine is not reduced',
-      ];
-      for (const phrase of required) {
-        if (!text.toLowerCase().includes(phrase.toLowerCase())) {
-          fail(`${label}: pricing mention is missing "${phrase}"`);
-        }
-      }
+    if (/\$(?:149|339|488)\b|\b30%\b/.test(text)) {
+      fail(`${label}: legacy Fabsy pricing remains in rendered content`);
     }
   }
 
@@ -623,19 +736,30 @@ function validateAllPrerendered() {
   return files.length;
 }
 
-const dbInventory = readSourceInventory(DB_DIR, 'page_content');
-const curatedInventory = readSourceInventory(CURATED_DIR, 'curated');
-if (dbInventory.slugs.length === 0) fail('page_content source contains zero usable rows');
-const curatedValidation = validateCuratedPages(curatedInventory, dbInventory);
-const snapshotCount = validateSnapshots(dbInventory, curatedInventory, curatedValidation);
-const allPrerenderedCount = validateAllPrerendered();
+function run() {
+  const dbInventory = readSourceInventory(DB_DIR, 'page_content');
+  const curatedInventory = readSourceInventory(CURATED_DIR, 'curated');
+  if (dbInventory.slugs.length === 0) fail('page_content source contains zero usable rows');
+  const curatedValidation = validateCuratedPages(curatedInventory, dbInventory);
+  const snapshotCount = validateSnapshots(dbInventory, curatedInventory, curatedValidation);
+  const allPrerenderedCount = validateAllPrerendered();
 
-if (errors.length) {
-  console.error(`Snapshot guardrail validation failed with ${errors.length} issue(s):`);
-  errors.forEach((error) => console.error(` - ${error}`));
-  process.exit(1);
+  if (errors.length) {
+    console.error(`Snapshot guardrail validation failed with ${errors.length} issue(s):`);
+    errors.forEach((error) => console.error(` - ${error}`));
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(
+    `Snapshot guardrails valid: ${curatedValidation.count} curated input(s), ${snapshotCount} generated content snapshot(s), ${allPrerenderedCount} full-tree snapshot(s).`
+  );
 }
 
-console.log(
-  `Snapshot guardrails valid: ${curatedValidation.count} curated input(s), ${snapshotCount} generated content snapshot(s), ${allPrerenderedCount} full-tree snapshot(s).`
-);
+if (require.main === module) run();
+
+module.exports = {
+  browserTextGuardrailIssues,
+  containsDisallowedOfferPricing,
+  redactBrowserCommercialFacts,
+};

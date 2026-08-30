@@ -2,7 +2,11 @@
 
 import assert from 'node:assert/strict';
 import { normalizeGeneratedArticle, validateArticle } from './generate-post.mjs';
-import { EXACT_FABSY_PRICING } from '../../src/lib/published-content-guardrails-core.js';
+import {
+  EXACT_FABSY_ACTION_COMMITMENT,
+  EXACT_FABSY_PRICING,
+  EXACT_FABSY_SPEED_DISCLAIMER,
+} from '../../src/lib/published-content-guardrails-core.js';
 
 const filler = Array.from({ length: 910 }, () => 'guidance').join(' ');
 const approvedSources = `
@@ -17,7 +21,7 @@ function article(overrides = {}) {
     title: 'Responding to an Alberta Traffic Ticket',
     slug: 'responding-to-an-alberta-traffic-ticket',
     meta_description: 'General information about reviewing an Alberta traffic ticket and considering available response options.',
-    content: `Review the notice and use current official information. ${filler}${approvedSources}\n\nGet Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
+    content: `Review the notice and use current official information. ${filler}${approvedSources}\n\nStart Rapid Resolution at https://fabsy.ca/submit-ticket.`,
     ...overrides,
   };
 }
@@ -41,7 +45,7 @@ assert.ok(
 );
 
 const bodyPricingErrors = validateArticle(article({
-  content: `Our **fee**\n\nis outcome-**based**. ${filler}${approvedSources}\n\nGet Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
+  content: `Our **fee**\n\nis outcome-**based**. ${filler}${approvedSources}\n\nStart Rapid Resolution at https://fabsy.ca/submit-ticket.`,
 }));
 assert.ok(
   bodyPricingErrors.some((error) => error.includes('pricing claim does not use the exact formula')),
@@ -55,7 +59,7 @@ Fabsy's pricing is $488 plus a 30% contingency fee on fines saved.
 
 ${filler}${approvedSources}
 
-Get Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
+Start Rapid Resolution at https://fabsy.ca/submit-ticket.`,
 }));
 assert.deepEqual(
   validateArticle(normalizedGeneratedDraft),
@@ -77,7 +81,7 @@ const prohibitedPricingDraft = normalizeGeneratedArticle(article({
 
 ${filler}${approvedSources}
 
-Get Ticket Triage at https://fabsy.ca/traffic-ticket-assessment.`,
+Start Rapid Resolution at https://fabsy.ca/submit-ticket.`,
 }));
 assert.deepEqual(
   validateArticle(prohibitedPricingDraft),
@@ -88,6 +92,14 @@ assert.equal(
   prohibitedPricingDraft.content.split(EXACT_FABSY_PRICING).length - 1,
   1,
   'prohibited pricing wording should become the exact Fabsy pricing statement'
+);
+
+assert.deepEqual(
+  validateArticle(article({
+    content: `${EXACT_FABSY_ACTION_COMMITMENT}\n\n${EXACT_FABSY_SPEED_DISCLAIMER}\n\n${filler}${approvedSources}\n\nStart Rapid Resolution at https://fabsy.ca/submit-ticket.`,
+  })),
+  [],
+  'the exact, bounded Fabsy action commitment should pass generated-content validation'
 );
 
 console.log('Content-engine publication validation tests passed.');

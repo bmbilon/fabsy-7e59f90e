@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { guardPublishedBlogPost } from '@/lib/published-content-guardrails';
 import useSafeHead from '@/hooks/useSafeHead';
+import { RAPID_RESOLUTION } from '@/config/offers';
 
 interface BlogPost {
   id: string;
@@ -361,11 +362,11 @@ const BlogPost = () => {
                 <div className="bg-primary/10 border border-primary/20 rounded-lg p-8 text-center shadow-lg">
                   <h3 className="text-2xl font-bold mb-4 text-white">Need Help with Your Traffic Ticket?</h3>
                   <p className="text-xl mb-6 text-white/80">
-                    Ticket Triage applies the general information to your ticket and explains whether representation appears worth the cost.
+                    Rapid Resolution handles secure intake, disclosure review, prosecutor review, file updates and your final decision for an eligible pre-trial matter.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg" className="bg-primary text-white hover:bg-primary-dark border-0">
-                      <Link to="/traffic-ticket-assessment/start">Start Free Ticket Review</Link>
+                      <Link to={RAPID_RESOLUTION.intakePath}>Start Rapid Resolution - ${RAPID_RESOLUTION.priceCad}</Link>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-primary/20">
                       <Link to="/how-it-works">See How It Works</Link>

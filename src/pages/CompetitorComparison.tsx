@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import useSafeHead from "@/hooks/useSafeHead";
+import { CANONICAL_OFFER_PRICING, RAPID_RESOLUTION } from "@/config/offers";
 
 const CompetitorComparison = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const CompetitorComparison = () => {
     },
     {
       title: "Get the full pricing formula",
-      text: "Compare every fixed and variable charge in writing. Ask how any amount tied to a fine reduction is calculated.",
+      text: "Compare every fixed and variable charge in writing. Confirm whether trial, taxes, government fines, added appearances or other work are separate.",
     },
     {
       title: "Understand the process",
@@ -71,13 +72,14 @@ const CompetitorComparison = () => {
             <h2 className="text-3xl font-bold mb-6 text-foreground">Verified Fabsy information</h2>
             <ul className="space-y-4 text-muted-foreground">
               <li><strong className="text-foreground">Service status:</strong> Fabsy is an agent service for Alberta traffic matters, not a law firm.</li>
-              <li><strong className="text-foreground">Scope:</strong> Fabsy reviews tickets and disclosure, handles paperwork, and provides agent representation where permitted.</li>
-              <li><strong className="text-foreground">Pricing:</strong> A $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</li>
+              <li><strong className="text-foreground">Scope:</strong> Rapid Resolution covers an accepted matter through the eligible pre-trial process; trial is separately quoted.</li>
+              <li><strong className="text-foreground">Pricing:</strong> {CANONICAL_OFFER_PRICING}</li>
+              <li><strong className="text-foreground">Processing commitment:</strong> {RAPID_RESOLUTION.actionCommitment} Crown response time is separate.</li>
               <li><strong className="text-foreground">Outcome standard:</strong> Fabsy does not promise a withdrawal, reduction, demerit result, insurance result, or other outcome.</li>
             </ul>
             <div className="mt-8 text-center">
-              <Button size="lg" onClick={() => navigate("/traffic-ticket-assessment/start")} className="text-lg px-8 py-6">
-                Start the Free Ticket Review
+              <Button size="lg" onClick={() => navigate("/rapid-resolution")} className="text-lg px-8 py-6">
+                See Rapid Resolution
               </Button>
             </div>
           </div>

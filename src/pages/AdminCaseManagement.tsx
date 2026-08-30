@@ -10,6 +10,7 @@ import { getIdrStaffRole } from "@/hooks/useIdrAuth";
 import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle, Mail, Phone, Ticket, DollarSign, type LucideIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
+import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 
 interface TicketSubmission {
   id: string;
@@ -118,7 +119,7 @@ export default function AdminCaseManagement() {
 
       if (error) throw error;
 
-      const transformedData = data?.map(sub => ({
+      const transformedData = data?.map((sub): TicketSubmission => ({
         id: sub.id,
         first_name: sub.clients?.first_name || '',
         last_name: sub.clients?.last_name || '',
@@ -128,7 +129,9 @@ export default function AdminCaseManagement() {
         violation: sub.violation,
         fine_amount: sub.fine_amount,
         status: sub.status,
-        service_type: sub.service_type || 'representation',
+        service_type: sub.service_type === 'ticket_insurance_assessment'
+          ? 'ticket_insurance_assessment'
+          : 'representation',
         created_at: sub.created_at
       })) || [];
 
@@ -191,7 +194,7 @@ export default function AdminCaseManagement() {
           </Button>
           <h1 className="text-2xl font-bold">Client Case Management</h1>
           <p className="text-sm text-muted-foreground">
-            Manage paid representation matters and Ticket Triage orders
+            Manage active ticket matters and historical Ticket Triage orders
           </p>
         </div>
       </header>
@@ -280,7 +283,7 @@ export default function AdminCaseManagement() {
                             </h3>
                             {getStatusBadge(submission.status)}
                             {submission.service_type === 'ticket_insurance_assessment' && (
-                              <Badge variant="secondary">Ticket Triage</Badge>
+                              <Badge variant="secondary">Legacy Ticket Triage · ${TICKET_ASSESSMENT.priceCad}</Badge>
                             )}
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">

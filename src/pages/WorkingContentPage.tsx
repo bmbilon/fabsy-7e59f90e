@@ -12,10 +12,27 @@ import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnswerBox from '@/components/AnswerBox';
-import { TICKET_ASSESSMENT } from '@/config/ticketAssessment';
-import { trackAssessmentEvent } from '@/lib/assessment/analytics';
+import { CANONICAL_OFFER_PRICING, RAPID_RESOLUTION } from '@/config/offers';
+import type { FAQItem } from '@/components/FAQSchema';
 
 type PageRecord = Record<string, unknown>;
+type DisplayPage = PageRecord & {
+  slug: string;
+  meta_title: string;
+  meta_description: string;
+  h1: string;
+  hook: string;
+  what: string;
+  how: string;
+  next: string;
+  content: string;
+  local_info: string;
+  city: string;
+  violation: string;
+  created_at?: string;
+  updated_at?: string;
+  faqs: FAQItem[];
+};
 
 const BANNED_CONTENT_RE = /(?:no\s+win\s+no\s+fee|risk[\s-]*free|money\s+back|guarantee|zero[\s-]*risk)/i;
 const SEMANTIC_OVER_CAP_RE = /\b(?:above|greater\s+than|more\s+than|over)\s+95\s*%\+?|\b95\s*%\+?\s+(?:or\s+(?:higher|more)|and\s+above)\b/i;
@@ -25,6 +42,50 @@ const ALLOWED_CONTENT_TAGS = new Set(['a', 'b', 'h2', 'li', 'p', 'strong', 'ul']
 let curatedSlugsPromise: Promise<Set<string>> | null = null;
 
 const text = (value: unknown): string => typeof value === 'string' ? value.trim() : '';
+const stringField = (value: unknown): string => typeof value === 'string' ? value : '';
+
+const parseFaqItems = (value: unknown): { items: FAQItem[]; valid: boolean } => {
+  let candidate = value;
+  if (typeof candidate === 'string') {
+    try {
+      candidate = JSON.parse(candidate || '[]');
+    } catch {
+      return { items: [], valid: false };
+    }
+  }
+  if (!Array.isArray(candidate)) return { items: [], valid: false };
+  const items = candidate.flatMap((item) => {
+    if (!item || typeof item !== 'object') return [];
+    const record = item as Record<string, unknown>;
+    return typeof record.q === 'string' && typeof record.a === 'string'
+      ? [{ q: record.q, a: record.a }]
+      : [];
+  });
+  return { items, valid: items.length === candidate.length };
+};
+
+const displayPage = (page: PageRecord, faqs: FAQItem[]): DisplayPage => {
+  const createdAt = stringField(page.created_at);
+  const updatedAt = stringField(page.updated_at);
+  return {
+    ...page,
+    slug: stringField(page.slug),
+    meta_title: stringField(page.meta_title),
+    meta_description: stringField(page.meta_description),
+    h1: stringField(page.h1),
+    hook: stringField(page.hook),
+    what: stringField(page.what),
+    how: stringField(page.how),
+    next: stringField(page.next),
+    content: stringField(page.content),
+    local_info: stringField(page.local_info),
+    city: stringField(page.city),
+    violation: stringField(page.violation),
+    ...(createdAt ? { created_at: createdAt } : {}),
+    ...(updatedAt ? { updated_at: updatedAt } : {}),
+    faqs,
+  };
+};
 
 const hasUnsafeHtml = (value: string): boolean => {
   if (UNSAFE_HTML_RE.test(value)) return true;
@@ -43,14 +104,10 @@ const hasOverCapPercentage = (value: string): boolean => {
 };
 
 const hasFabsyPricingSignal = (value: string): boolean =>
-  /\$\s*488\b|\bflat\s+\$\s*\d|\b(?:admin|base|contingency|representation|service)\s+fee\b|\bFabsy\b[^.!?\n]{0,100}(?:\$\s*\d|\b(?:charges?|costs?|fees?|pricing)\b)|\b(?:pricing|fee\s+structure|only\s+pay)\b|\b30\s*(?:%|percent)\b[^.!?\n]{0,100}\bfine\s+reduction\b/i.test(value);
+  /\$\s*(?:49|198|229|488)\b|\bflat\s+\$\s*\d|\b(?:admin|base|contingency|representation|service)\s+fee\b|\bFabsy\b[^.!?\n]{0,100}(?:\$\s*\d|\b(?:charges?|costs?|fees?|pricing)\b)|\b(?:pricing|fee\s+structure|only\s+pay)\b|\b30\s*(?:%|percent)\b[^.!?\n]{0,100}\bfine\s+reduction\b/i.test(value);
 
 const hasCompleteFabsyPricing = (value: string): boolean =>
-  /\$\s*488\b/i.test(value)
-  && /\b30\s*(?:%|percent)\b/i.test(value)
-  && /\bfine\s+reduction\b/i.test(value)
-  && /\bno\s+additional\s+charge\b/i.test(value)
-  && /\bfine\s+is\s+not\s+reduced\b/i.test(value);
+  value.includes(CANONICAL_OFFER_PRICING);
 
 const pricingClaimsAreComplete = (page: PageRecord): boolean => {
   const fields: string[] = [
@@ -176,19 +233,20 @@ const safeLegacyTitle = (h1: string): string => {
   return `${h1.slice(0, 60 - suffix.length).trim()}${suffix}`;
 };
 
-const safeLegacyPage = (page: PageRecord): PageRecord => {
+const safeLegacyPage = (page: PageRecord): DisplayPage => {
   const h1 = safeLegacyH1(page);
   const safeCity = safeLegacyCity(page);
   const safeViolation = safeLegacyViolation(page);
   const metaTitle = safeLegacyTitle(h1);
   const ticketLabel = `${safeViolation.toLowerCase()} ticket`;
   const place = safeCity === 'Alberta' ? ' in Alberta' : ` in ${safeCity}`;
-  const pricing = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
+  const pricing = CANONICAL_OFFER_PRICING;
 
+  const normalized = displayPage(page, []);
   return {
-    ...page,
+    ...normalized,
     meta_title: metaTitle,
-    meta_description: `Got a ${ticketLabel}${place}? Review your options or get human-reviewed Ticket Triage for $149 CAD total.`,
+    meta_description: `Got a ${ticketLabel}${place}? See the available steps and Fabsy's $198 Rapid Resolution service for eligible pre-trial matters.`,
     h1,
     hook: `Check the dispute deadline printed on your ${ticketLabel} and review your options before deciding how to respond.`,
     bullets: [
@@ -197,10 +255,12 @@ const safeLegacyPage = (page: PageRecord): PageRecord => {
       'Fabsy is an Alberta traffic ticket agent service, not a law firm.',
     ],
     what: `<h2>What to do next</h2><p>Follow the instructions and deadline printed on the ticket. Keep a copy and gather any relevant documents before choosing how to respond.</p>`,
-    how: `<h2>How Fabsy can help</h2><p>Fabsy can assess the ticket, explain the available options, and provide agent representation where permitted.</p>`,
+    how: `<h2>How Fabsy can help</h2><p>Rapid Resolution can handle secure intake, disclosure review, a prosecutor-review request, status notifications and your decision for an eligible pre-trial matter.</p>`,
     next: `<h2>Pricing</h2><p>${pricing}</p>`,
     content: '',
-    local_info: city ? `Fabsy serves ${city} where paid traffic ticket agent representation is permitted.` : '',
+    local_info: safeCity !== 'Alberta'
+      ? `Fabsy serves ${safeCity} where paid traffic ticket agent representation is permitted.`
+      : '',
     stats: {},
     faqs: [
       {
@@ -208,7 +268,7 @@ const safeLegacyPage = (page: PageRecord): PageRecord => {
         a: 'Check the dispute deadline printed on the ticket, keep a copy, and gather any relevant photos, video, or documents before choosing how to respond.',
       },
       {
-        q: 'How much does Fabsy charge for representation?',
+        q: 'How much does Rapid Resolution cost?',
         a: pricing,
       },
       {
@@ -216,35 +276,22 @@ const safeLegacyPage = (page: PageRecord): PageRecord => {
         a: 'No. Fabsy is an agent service for Alberta traffic matters, not a law firm.',
       },
       {
-        q: 'What is Ticket Triage?',
-        a: 'Ticket Triage is a $149 CAD total, GST-included, human-reviewed assessment of an Alberta traffic ticket, its likely insurance significance, the economics of representation, and the recommended next step.',
+        q: 'What is Rapid Resolution?',
+        a: RAPID_RESOLUTION.oneLineDescription,
       },
     ],
   };
 };
 
-const normalizePageForDisplay = (page: PageRecord, curated: boolean): PageRecord => {
-  let faqs: unknown = page.faqs || [];
-  let faqsValid = Array.isArray(faqs);
-  if (typeof page.faqs === 'string') {
-    try {
-      faqs = JSON.parse(page.faqs || '[]');
-      faqsValid = Array.isArray(faqs);
-    } catch {
-      faqs = [];
-      faqsValid = false;
-    }
-  }
-  const parsed = {
-    ...page,
-    faqs,
-  };
+const normalizePageForDisplay = (page: PageRecord, curated: boolean): DisplayPage => {
+  const { items: faqs, valid: faqsValid } = parseFaqItems(page.faqs || []);
+  const parsed = displayPage(page, faqs);
   return curated && faqsValid && hasReviewedCuratedBody(parsed) ? parsed : safeLegacyPage(parsed);
 };
 
 const WorkingContentPage = () => {
   const { slug } = useParams();
-  const [pageData, setPageData] = useState<Record<string, unknown> | null>(null);
+  const [pageData, setPageData] = useState<DisplayPage | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const canonicalUrl = slug ? `https://fabsy.ca/content/${slug}` : undefined;
@@ -358,9 +405,9 @@ const WorkingContentPage = () => {
     return null;
   };
   
-  const cityName: string | undefined = pageData.city 
-    || detectCityFromSlug(pageData.slug as string || '') 
-    || (pageData.h1 && /\bin\s+([A-Za-z\-\s]+)$/.exec(pageData.h1 as string)?.[1]?.trim()) 
+  const cityName: string | undefined = pageData.city
+    || detectCityFromSlug(pageData.slug)
+    || (pageData.h1 && /\bin\s+([A-Za-z\-\s]+)$/.exec(pageData.h1)?.[1]?.trim())
     || undefined;
     
   const serviceName: string = pageData.h1 || `Traffic Ticket Dispute${cityName ? ` in ${cityName}` : ''}`;
@@ -385,7 +432,7 @@ const WorkingContentPage = () => {
         serviceType={serviceType}
         url={currentUrl}
         cityName={cityName}
-        offerDescription="Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
+        offerDescription={CANONICAL_OFFER_PRICING}
       />
       {/* Enhanced LocalBusiness schema for Alberta city pages */}
       {cityName && (
@@ -402,7 +449,7 @@ const WorkingContentPage = () => {
         steps={[
           { name: 'Upload your ticket', text: 'Send us a photo or PDF of your ticket and basic details.' },
           { name: 'We check the court file', text: 'We obtain and review disclosure for errors and defenses.' },
-          { name: 'Confirm the plan', text: 'We explain the options and provide agent representation where permitted.' },
+          { name: 'Decide on the response', text: 'Fabsy explains any Crown response and acts only on your final instruction.' },
         ]}
       />
       <Header />
@@ -438,7 +485,7 @@ const WorkingContentPage = () => {
             <AnswerBox 
               offence={offence}
               city={cityName}
-              ctaHref="/traffic-ticket-assessment/start"
+              ctaHref="/submit-ticket"
             />
           )}
 
@@ -452,14 +499,14 @@ const WorkingContentPage = () => {
                 <ol className="mt-2 list-decimal ml-5 space-y-1 text-foreground">
                   <li>Upload your ticket</li>
                   <li>We check the court file and disclosure</li>
-                  <li>Confirm the plan (we represent you)</li>
+                  <li>Review the Crown response and give your instruction</li>
                 </ol>
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-foreground">What happens next</h3>
-                <p className="text-foreground">We review the ticket and disclosure, explain the available options, and provide agent representation where permitted.</p>
+                <p className="text-foreground">Rapid Resolution requests and reviews disclosure, advances the next authorized prosecutor step, and keeps you informed.</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Pricing</h3>
-                <p className="text-foreground">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</p>
+                <p className="text-foreground">{CANONICAL_OFFER_PRICING}</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>
                 <p className="text-foreground">{cityName || 'Alberta'} • {offence.charAt(0).toUpperCase() + offence.slice(1)}</p>
               </div>
@@ -598,28 +645,23 @@ const WorkingContentPage = () => {
                 <div className="w-12 h-12 rounded-lg bg-primary-foreground/20 flex items-center justify-center mb-4">
                   <Shield className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Get a ticket-specific recommendation</h3>
+                <h3 className="text-xl font-bold mb-2">Start Rapid Resolution</h3>
                 <p className="text-sm mb-5 opacity-95">
-                  Ticket Triage reviews the ticket, demerit implications, likely insurance significance, and whether representation appears worth the cost.
+                  Upload, authorize and pay online. Fabsy requests disclosure, reviews the file and advances the next authorized pre-trial step.
                 </p>
                 <Link
-                  to="/traffic-ticket-assessment/start"
-                  onClick={() => trackAssessmentEvent(
-                    "assessment_cta_click",
-                    { location: "content_sidebar", destination: "assessment_intake", value: TICKET_ASSESSMENT.priceCad },
-                    `content_sidebar:${window.location.pathname}`,
-                  )}
+                  to="/submit-ticket"
                 >
                   <Button 
                     size="lg"
                     className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
                   >
-                    Start Free Ticket Review →
+                    Start Rapid Resolution →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">Human reviewed · GST included · $149 can be applied to eligible representation when worthwhile · Priority placement on eligible upgrades</p>
+                <p className="text-xs mt-3 opacity-80 text-center">$198 CAD plus GST · Eligible pre-trial matters · Trial separately quoted</p>
                 <p className="mt-3 text-center text-xs opacity-80">
-                  Upload once, then choose a $149 priority review or $488 representation.
+                  {RAPID_RESOLUTION.speedDisclaimer}
                 </p>
               </div>
 

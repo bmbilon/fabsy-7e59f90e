@@ -10,13 +10,94 @@ import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnswerBox from '@/components/AnswerBox';
+import type { FAQItem } from '@/components/FAQSchema';
+
+type ContentPageData = {
+  slug: string;
+  meta_title: string;
+  meta_description: string;
+  h1: string;
+  hook: string;
+  what: string;
+  how: string;
+  next: string;
+  content: string;
+  local_info: string;
+  city: string;
+  violation: string;
+  created_at?: string;
+  updated_at?: string;
+  faqs: FAQItem[];
+};
+
+type RelatedPage = Pick<ContentPageData, 'slug' | 'city' | 'violation' | 'h1'>;
+
+const stringField = (value: unknown): string => typeof value === 'string' ? value : '';
+
+const faqItems = (value: unknown): FAQItem[] => {
+  let candidate = value;
+  if (typeof candidate === 'string') {
+    try {
+      candidate = JSON.parse(candidate || '[]');
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(candidate)) return [];
+  return candidate.flatMap((item) => {
+    if (!item || typeof item !== 'object') return [];
+    const record = item as Record<string, unknown>;
+    return typeof record.q === 'string' && typeof record.a === 'string'
+      ? [{ q: record.q, a: record.a }]
+      : [];
+  });
+};
+
+const contentPageData = (value: unknown): ContentPageData | null => {
+  if (!value || typeof value !== 'object') return null;
+  const record = value as Record<string, unknown>;
+  const slug = stringField(record.slug);
+  if (!slug) return null;
+  const createdAt = stringField(record.created_at);
+  const updatedAt = stringField(record.updated_at);
+  return {
+    slug,
+    meta_title: stringField(record.meta_title),
+    meta_description: stringField(record.meta_description),
+    h1: stringField(record.h1),
+    hook: stringField(record.hook),
+    what: stringField(record.what),
+    how: stringField(record.how),
+    next: stringField(record.next),
+    content: stringField(record.content),
+    local_info: stringField(record.local_info),
+    city: stringField(record.city),
+    violation: stringField(record.violation),
+    ...(createdAt ? { created_at: createdAt } : {}),
+    ...(updatedAt ? { updated_at: updatedAt } : {}),
+    faqs: faqItems(record.faqs),
+  };
+};
+
+const relatedPage = (value: unknown): RelatedPage | null => {
+  if (!value || typeof value !== 'object') return null;
+  const record = value as Record<string, unknown>;
+  const slug = stringField(record.slug);
+  if (!slug) return null;
+  return {
+    slug,
+    city: stringField(record.city),
+    violation: stringField(record.violation),
+    h1: stringField(record.h1),
+  };
+};
 
 const ContentPage = () => {
   const { slug } = useParams();
-  const [pageData, setPageData] = useState<Record<string, unknown> | null>(null);
+  const [pageData, setPageData] = useState<ContentPageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [relatedPages, setRelatedPages] = useState<Record<string, unknown>[]>([]);
+  const [relatedPages, setRelatedPages] = useState<RelatedPage[]>([]);
 
   useEffect(() => {
     async function fetchPage() {
@@ -36,11 +117,8 @@ const ContentPage = () => {
         if (fetchError) throw fetchError;
         if (!data) throw new Error('Page not found');
 
-        // Parse JSON fields if they exist
-        const parsedData = {
-          ...data,
-          faqs: typeof data.faqs === 'string' ? JSON.parse(data.faqs || '[]') : (data.faqs || []),
-        };
+        const parsedData = contentPageData(data);
+        if (!parsedData) throw new Error('Page data is invalid');
 
         setPageData(parsedData);
 
@@ -55,7 +133,10 @@ const ContentPage = () => {
           if (!relErr && Array.isArray(related)) {
             // Pick two with different violation than current
             const currentViolation = (parsedData.violation || '').toLowerCase();
-            const filtered = related.filter((r) => (r.violation || '').toLowerCase() !== currentViolation);
+            const filtered = related
+              .map(relatedPage)
+              .filter((item): item is RelatedPage => item !== null)
+              .filter((item) => item.violation.toLowerCase() !== currentViolation);
             setRelatedPages(filtered.slice(0, 2));
           } else {
             setRelatedPages([]);
@@ -77,7 +158,7 @@ const ContentPage = () => {
   // Set GA4 user properties for AEO context (city, violation) when data loads
   useEffect(() => {
     if (pageData?.city || pageData?.violation) {
-      const gtag = (window as Record<string, unknown>).gtag as undefined | ((...args: unknown[]) => void);
+      const gtag = window.gtag;
       if (typeof gtag === 'function') {
         try {
           gtag('set', 'user_properties', {
@@ -157,7 +238,7 @@ const ContentPage = () => {
     return null;
   };
   
-  const detectedCity = pageData.city || detectCityFromSlug(pageData.slug as string || '');
+  const detectedCity = pageData.city || detectCityFromSlug(pageData.slug);
   const shouldRenderLocalBusiness = !!detectedCity;
 
   // Select 1–2 hub links based on context
@@ -228,7 +309,7 @@ const ContentPage = () => {
           {/* Answer Box - 60-second answer above the fold */}
           {detectedCity && pageData.violation && (
             <AnswerBox 
-              offence={pageData.violation as string}
+              offence={pageData.violation}
               city={detectedCity}
               ctaHref="/traffic-ticket-assessment/start"
               className="mb-8"
@@ -348,16 +429,16 @@ const ContentPage = () => {
           {/* CTA */}
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-2xl p-8 text-white text-center">
             <Shield className="w-16 h-16 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold mb-3">Get a Ticket-Specific Recommendation</h2>
+            <h2 className="text-3xl font-bold mb-3">Start Rapid Resolution</h2>
               <p className="text-xl mb-6 text-green-50">
-              Ticket Triage is a $149 CAD total, human-reviewed assessment of the ticket, likely insurance significance, and whether representation appears worth the cost.
+              Handle an eligible Alberta pre-trial ticket through secure intake, disclosure review, prosecutor review, immediate updates and your final decision for $198 CAD plus GST.
             </p>
-            <Link to="/traffic-ticket-assessment/start">
+            <Link to="/submit-ticket">
               <Button 
                 size="lg"
                 className="bg-white text-green-600 hover:bg-green-50 text-lg px-8 py-6"
               >
-                Start Free Ticket Review
+                Start Rapid Resolution
               </Button>
             </Link>
           </div>

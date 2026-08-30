@@ -1,6 +1,11 @@
 import { Separator } from "@/components/ui/separator";
 import { Scale, Mail, MapPin, Phone, Facebook, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -18,11 +23,11 @@ const Footer = () => {
       { name: "Terms of Service", path: "/terms-of-service" },
     ],
     support: [
-      { name: "Priority Ticket Review ($149)", path: "/traffic-ticket-assessment" },
-      { name: "Free Ticket Review", path: "/traffic-ticket-assessment/start" },
+      { name: `${RAPID_RESOLUTION.name} ($${RAPID_RESOLUTION.priceCad})`, path: RAPID_RESOLUTION.slug },
+      { name: "Submit Your Ticket", path: RAPID_RESOLUTION.intakePath },
       { name: "Contact Us", path: "/contact" },
       { name: "FAQ", path: "/faq" },
-      { name: "Insurance Damage Report", path: "/insurance-damage-report" },
+      { name: `${INSURANCE_IMPACT_REPORT.shortName} ($${INSURANCE_IMPACT_REPORT.priceCad})`, path: INSURANCE_IMPACT_REPORT.slug },
       { name: "Client Portal", path: "/portal" },
     ]
   };
@@ -140,7 +145,8 @@ const Footer = () => {
         {/* Service Description */}
         <div className="text-[10px] text-center text-muted-foreground mb-2">
           <p>
-            Traffic ticket agent services in Alberta, Canada, where representation is permitted and available.
+            Rapid Resolution provides eligible Alberta pre-trial traffic ticket agent services for
+            ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST. Trial representation is separate.
           </p>
         </div>
 
@@ -153,11 +159,11 @@ const Footer = () => {
             <div className="space-y-1">
               <p>
                 <strong>Important Notice:</strong> The information provided on this website is for general information purposes only. 
-                We provide traffic ticket representation services, not legal advice. Our services are limited to representation in provincial traffic court matters. 
+                We provide traffic ticket agent services, not legal advice. Rapid Resolution is limited to accepted, eligible pre-trial matters.
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. These terms apply only when expressly included in the written quote or order, and a written waiver controls. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised.
+                {RAPID_RESOLUTION.name} is ${RAPID_RESOLUTION.priceCad} CAD, the {INSURANCE_IMPACT_REPORT.shortName} is ${INSURANCE_IMPACT_REPORT.priceCad} CAD, and both are ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD, plus applicable GST. Government and third-party fees are separate. Accepted orders retain their original written terms, and any written fee waiver controls. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised.
               </p>
             </div>
             
@@ -171,7 +177,7 @@ const Footer = () => {
           </div>
 
           <p className="text-center">
-            *By continuing past the Free Ticket Review into a paid service, you agree to share your contact information and supplied ticket or policy documents so Fabsy can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
+            *By continuing into a paid service, you agree to share your contact information and supplied ticket or policy documents so Fabsy can review and respond. See our <Link to="/privacy-policy" className="underline underline-offset-2">Privacy Policy</Link>.
           </p>
         </div>
 

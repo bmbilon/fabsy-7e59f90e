@@ -15,6 +15,7 @@ import {
   Calendar,
   DollarSign
 } from "lucide-react";
+import { RAPID_RESOLUTION } from "@/config/offers";
 
 interface ReviewStepProps {
   formData: FormData;
@@ -32,7 +33,8 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
         <h2 className="text-3xl font-bold">Review Your Application</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Please review the information below before continuing to secure payment. Fabsy's traffic
-          ticket agent team will review the paid submission and confirm the next steps.
+          ticket agent team will review the paid submission, request disclosure where authorized,
+          and notify you as the file advances.
         </p>
       </div>
 
@@ -170,8 +172,8 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
         </div>
         <div className="space-y-3">
           <div className="flex justify-between">
-            <span>Fabsy ticket defense base fee</span>
-            <span>$488.00 CAD</span>
+            <span>{RAPID_RESOLUTION.name}</span>
+            <span>${RAPID_RESOLUTION.priceCad}.00 CAD</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Applicable tax</span>
@@ -183,9 +185,8 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
             </div>
           )}
           <p className="border-t pt-3 text-sm text-muted-foreground">
-            A 30% success fee applies to any fine reduction Fabsy achieves and is additional to the
-            $488 base fee. If no fine reduction is achieved, no success fee is charged. Results vary,
-            and a dismissal, lower fine, or fewer demerits are not promised.
+            This fee covers the eligible pre-trial service described above. Trial representation,
+            government fines and out-of-scope work are separate. {RAPID_RESOLUTION.outcomeDisclaimer}
           </p>
         </div>
       </Card>
@@ -201,28 +202,28 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
             <div>
               <div className="font-medium">Secure Checkout</div>
-              <div className="text-muted-foreground">Review the final subtotal, tax, and any optional IDR add-on in the next step</div>
+              <div className="text-muted-foreground">Review the final subtotal, tax, and any optional insurance-report add-on in the next step</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
             <div>
-              <div className="font-medium">Agent Review</div>
-              <div className="text-muted-foreground">Our traffic ticket agent team reviews the information you provided after payment</div>
+              <div className="font-medium">Disclosure request and tracking</div>
+              <div className="text-muted-foreground">Fabsy checks deadlines, requests disclosure where authorized, and tracks the file</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
             <div>
-              <div className="font-medium">Representation Planning</div>
-              <div className="text-muted-foreground">We outline the next steps and any applicable court requirements</div>
+              <div className="font-medium">Analysis and prosecutor review</div>
+              <div className="text-muted-foreground">Complete disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
             <div>
-              <div className="font-medium">Results Notification</div>
-              <div className="text-muted-foreground">We keep you informed as the matter progresses</div>
+              <div className="font-medium">Immediate status notifications</div>
+              <div className="text-muted-foreground">You receive a plain-language comparison and give the final instruction on any Crown response</div>
             </div>
           </div>
         </div>
@@ -239,8 +240,7 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
         </Button>
         
         <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-          By continuing, you confirm the information above and proceed to the $488 ticket defense
-          checkout. Fabsy is an agent service, not a law firm.
+          By continuing, you confirm the information above and proceed to the ${RAPID_RESOLUTION.priceCad} CAD plus GST Rapid Resolution checkout. Fabsy is an agent service, not a law firm.
         </p>
       </div>
     </div>

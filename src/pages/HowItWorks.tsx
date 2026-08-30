@@ -1,141 +1,134 @@
-import React from "react";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  BellRing,
+  CheckCircle2,
+  Clock3,
+  FileCheck2,
+  FileSearch,
+  MessageSquareText,
+  Upload,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HowToSchema from "@/components/HowToSchema";
-import { Shield, Upload, FileCheck, Scale, Trophy } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { RAPID_RESOLUTION } from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
 
-/**
- * HowItWorks, content + schema in sync; short meta for AEO.
- */
+const steps = [
+  {
+    name: "Complete secure intake",
+    text: "Upload a clear ticket image or PDF, confirm the ticket details, answer the focused intake questions, and sign the digital authorization.",
+    url: `https://fabsy.ca${RAPID_RESOLUTION.intakePath}`,
+    icon: Upload,
+  },
+  {
+    name: "Disclosure is requested",
+    text: "Fabsy checks the accepted service scope, requests available disclosure, and tracks the request. Keep following every deadline and instruction unless Fabsy confirms otherwise.",
+    url: `https://fabsy.ca${RAPID_RESOLUTION.slug}`,
+    icon: FileSearch,
+  },
+  {
+    name: "Disclosure is analyzed",
+    text: "Once complete, readable disclosure is received and matched to your file, technology-assisted analysis and qualified review examine the evidence and practical pre-trial options.",
+    url: `https://fabsy.ca${RAPID_RESOLUTION.slug}`,
+    icon: FileCheck2,
+  },
+  {
+    name: "Fabsy advances the prosecutor review",
+    text: "Within 48 hours after complete disclosure is received and matched, Fabsy prepares or submits the next authorized prosecutor-review step. The clock covers Fabsy's action, not Crown response time.",
+    url: `https://fabsy.ca${RAPID_RESOLUTION.slug}`,
+    icon: MessageSquareText,
+  },
+  {
+    name: "You review and direct the response",
+    text: "Fabsy notifies you when a Crown response arrives and explains it against the original ticket. You decide whether an available pre-trial resolution should be accepted.",
+    url: "https://fabsy.ca/portal/cases",
+    icon: BellRing,
+  },
+] as const;
 
-const HowItWorks: React.FC = () => {
-  const navigate = useNavigate();
+const HowItWorks = () => {
   useSafeHead({
-    title: "How Fabsy Works | Alberta Traffic Ticket Help",
-    description: "See Fabsy's five-step Alberta traffic ticket process, from ticket submission and assessment through agent representation where permitted.",
+    title: "How Rapid Resolution Works | Fabsy Alberta",
+    description:
+      "See the Fabsy Rapid Resolution process from secure ticket intake and disclosure request through analysis, prosecutor review, updates, and client direction.",
     canonical: "https://fabsy.ca/how-it-works",
   });
-  
-  // Carry the source file into the connected review intake.
-  const handleTicketUpload = (file?: File | null) => {
-    if (!file) return;
-    navigate("/traffic-ticket-assessment/start", { state: { ticketImage: file, source: "how_it_works" } });
-  };
-  
-  const steps = [
-    {
-      name: "Upload your ticket",
-      text: "Upload a clear image or PDF of the ticket so Fabsy can review the information you provide.",
-      url: "https://fabsy.ca/traffic-ticket-assessment/start",
-      icon: Upload,
-    },
-    {
-      name: "Check the Free Ticket Review",
-      text: "Review and correct the ticket details captured from the file. Keep following the instructions and deadlines printed on the ticket unless Fabsy confirms otherwise.",
-      url: "https://fabsy.ca/traffic-ticket-assessment/start",
-      icon: FileCheck,
-    },
-    {
-      name: "Review the service scope",
-      text: "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Fabsy confirms the available service scope before the matter proceeds.",
-      url: "https://fabsy.ca/services",
-      icon: Shield,
-    },
-    {
-      name: "Proceed with the accepted service",
-      text: "If Fabsy accepts the matter, it provides traffic ticket agent services where permitted and available. Court requirements and client attendance depend on the matter.",
-      url: "https://fabsy.ca/how-it-works",
-      icon: Scale,
-    },
-    {
-      name: "Receive the outcome",
-      text: "Fabsy communicates the outcome information it receives and explains any next steps within the accepted service scope. Individual outcomes vary.",
-      url: "https://fabsy.ca/testimonials",
-      icon: Trophy,
-    },
-  ];
 
   return (
     <main className="min-h-screen bg-gradient-hero">
       <HowToSchema
-        name="How to Fight a Traffic Ticket in Alberta"
-        description="A clear five-step process for submitting an Alberta traffic ticket, reviewing available options, and receiving agent representation where permitted."
-        steps={steps.map((s) => ({ name: s.name, text: s.text, url: s.url }))}
+        name="How Fabsy Rapid Resolution Works"
+        description="A five-step pre-trial process for an eligible Alberta traffic ticket, from secure intake through a client-directed response."
+        steps={steps.map((step) => ({ name: step.name, text: step.text, url: step.url }))}
       />
-
       <Header />
 
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold mb-4 text-white">How Fabsy's Ticket Review Process Works</h1>
-          <p className="text-lg text-white/80 mb-8">
-            Five steps from ticket submission through the scope and outcome of an accepted agent service.
-          </p>
+      <section className="px-4 py-16 sm:py-20">
+        <div className="container mx-auto max-w-6xl">
+          <div className="mx-auto max-w-4xl text-center">
+            <Badge className="border-primary/30 bg-primary/10 text-primary-light">Rapid Resolution · ${RAPID_RESOLUTION.priceCad} CAD + GST</Badge>
+            <h1 className="mt-5 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              One connected journey for your ticket
+            </h1>
+            <p className="mx-auto mt-5 max-w-3xl text-lg leading-relaxed text-white/80 sm:text-xl">
+              Fabsy keeps the ticket, consent, disclosure, review, Crown response, and your instructions together from start to finish of the accepted pre-trial service.
+            </p>
+          </div>
 
-          <div className="space-y-8">
-            {steps.map((step, idx) => {
+          <div className="mx-auto mt-12 max-w-5xl space-y-5">
+            {steps.map((step, index) => {
               const Icon = step.icon;
               return (
-                <div key={step.name} className="bg-card rounded-xl p-6 shadow-elegant border border-primary/20 hover:shadow-glow transition-smooth">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-gradient-primary text-white rounded-full w-12 h-12 flex items-center justify-center shadow-md">
-                      <Icon className="w-6 h-6" />
+                <Card key={step.name} className="overflow-hidden border-white/20 shadow-elevated">
+                  <div className="grid sm:grid-cols-[120px_1fr]">
+                    <div className="flex items-center justify-between bg-primary/10 p-6 sm:flex-col sm:justify-center sm:gap-3">
+                      <span className="text-sm font-bold uppercase tracking-[0.14em] text-primary">Step {index + 1}</span>
+                      <Icon className="h-8 w-8 text-primary" aria-hidden="true" />
                     </div>
-                    <div className="flex-1">
-                      <div className="mb-2">
-                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mr-2">Step {idx + 1}</span>
-                        <h3 className="font-bold text-xl inline-block text-foreground">{step.name}</h3>
-                      </div>
-                      <p className="text-muted-foreground leading-relaxed mb-4">{step.text}</p>
-                      
-                      {/* Upload interface for first step */}
-                      {idx === 0 && (
-                        <div className="bg-gradient-soft border border-primary/30 rounded-lg p-4 mt-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label htmlFor={`drag-upload-${idx}`} className="flex flex-col items-center p-4 border-2 border-dashed border-primary/30 rounded-lg hover:border-primary transition-colors cursor-pointer bg-white/50">
-                              <svg className="h-8 w-8 text-primary/70 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                              </svg>
-                              <span className="text-sm font-medium text-primary">Drag & Drop</span>
-                              <span className="text-xs text-muted-foreground">or click to browse</span>
-                              <input 
-                                type="file" 
-                                accept="image/*,.heic,.heif,.pdf" 
-                                className="sr-only" 
-                                id={`drag-upload-${idx}`} 
-                                onChange={(e) => handleTicketUpload(e.target.files?.[0])} 
-                              />
-                            </label>
-                            <label htmlFor={`camera-upload-${idx}`} className="flex flex-col items-center p-4 border-2 border-dashed border-primary/30 rounded-lg hover:border-primary transition-colors cursor-pointer bg-white/50">
-                              <svg className="h-8 w-8 text-primary/70 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2-2V9z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              <span className="text-sm font-medium text-primary">Camera</span>
-                              <span className="text-xs text-muted-foreground">Take photo</span>
-                              <input 
-                                type="file" 
-                                accept="image/*,.heic,.heif" 
-                                capture="environment" 
-                                className="sr-only" 
-                                id={`camera-upload-${idx}`} 
-                                onChange={(e) => handleTicketUpload(e.target.files?.[0])} 
-                              />
-                            </label>
-                          </div>
-                          <p className="text-xs text-muted-foreground text-center mt-2">
-                            Supported formats: JPG, PNG, HEIC, PDF • Max 10MB
-                          </p>
-                        </div>
-                      )}
+                    <div className="p-6 sm:p-8">
+                      <h2 className="text-2xl font-bold text-foreground">{step.name}</h2>
+                      <p className="mt-3 leading-relaxed text-muted-foreground">{step.text}</p>
                     </div>
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>
+
+          <Card className="mx-auto mt-8 max-w-5xl border-primary/30 bg-slate-950 p-7 text-white sm:p-9">
+            <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
+              <Clock3 className="h-9 w-9 text-primary-light" aria-hidden="true" />
+              <div>
+                <h2 className="text-2xl font-bold text-white">The 48-hour commitment, precisely defined</h2>
+                <p className="mt-3 leading-relaxed text-slate-300">{RAPID_RESOLUTION.speedDisclaimer}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="mx-auto mt-8 max-w-5xl p-7 shadow-elevated sm:p-9">
+            <div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
+                  <h2 className="text-2xl font-bold">Pre-trial scope, clearly priced</h2>
+                </div>
+                <p className="mt-4 leading-relaxed text-muted-foreground">
+                  Rapid Resolution costs ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST for an eligible Alberta pre-trial matter. Trial representation, appeals, government charges, and out-of-scope work are separate. Outcomes vary and are not promised.
+                </p>
+              </div>
+              <Button asChild size="lg" className="min-h-12 px-7">
+                <Link to={RAPID_RESOLUTION.intakePath}>
+                  Start Rapid Resolution
+                  <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
         </div>
       </section>
 

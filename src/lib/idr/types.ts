@@ -206,13 +206,16 @@ export interface RenewalScheduleItem {
 }
 
 export interface CarrierCallListItem {
-  rank: number;
+  /** Legacy compatibility only; current renderers do not display ranking metadata. */
+  rank?: number;
   carrierId: string;
   carrierName: string;
-  reason: string;
+  /** Legacy compatibility only; current renderers do not display personalized reasons. */
+  reason?: string;
   phone?: string;
   quoteUrl?: string;
-  rankingScore: number;
+  /** Legacy compatibility only; omitted from newly generated reports. */
+  rankingScore?: number;
   researchSources: readonly SourceReference[];
   evaluatedPostures: readonly {
     convictionClass: ConvictionClass;
@@ -258,7 +261,8 @@ export interface IdrReport {
   estimatedThreeYearPremiumImpact: PremiumImpactEstimate;
   gridBenchmark: GridBenchmark;
   carrierCallList: {
-    heading: "Carriers worth calling";
+    /** Legacy reports may retain the former heading; renderers must use the current neutral label. */
+    heading: "Public insurer research directory" | "Carriers worth calling";
     status: "ready" | "incomplete";
     framing: string;
     entries: readonly CarrierCallListItem[];

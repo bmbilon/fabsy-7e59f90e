@@ -1,269 +1,169 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Zap, 
-  Phone, 
-  Camera, 
-  Car, 
-  AlertTriangle, 
-  Clock,
-  Shield,
-  CheckCircle,
-  DollarSign
-} from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Camera,
+  Car,
+  CheckCircle2,
+  Clock3,
+  FileCheck2,
+  FileSearch,
+  Phone,
+  Scale,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ProductLadder from "@/components/ProductLadder";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
+
+const ticketTypes = [
+  { icon: Zap, title: "Speeding tickets", description: "Officer-issued speeding allegations and eligible related provincial ticket matters." },
+  { icon: AlertTriangle, title: "Excessive speeding", description: "Ticket review and service-scope confirmation based on the allegation and available process." },
+  { icon: Phone, title: "Distracted driving", description: "Pre-trial review of the allegation, disclosure, and available prosecutor-review path." },
+  { icon: Camera, title: "Automated enforcement", description: "Review of eligible photo-enforcement and red-light ticket information." },
+  { icon: Car, title: "Careless driving", description: "Eligibility assessment and review of disclosure and circumstances for an accepted matter." },
+  { icon: Clock3, title: "Other traffic violations", description: "Selected Alberta provincial traffic tickets where agent services are permitted and accepted." },
+] as const;
 
 const Services = () => {
   useSafeHead({
-    title: "Traffic Ticket Agent Services | Fabsy Alberta",
-    description: "Alberta traffic ticket agent services for speeding, red light, distracted driving, careless driving, and other provincial traffic matters.",
-    canonical: "https://fabsy.ca/services"
+    title: "Rapid Resolution & Insurance Impact Report | Fabsy Alberta",
+    description:
+      "Compare Fabsy Rapid Resolution for eligible Alberta traffic tickets, the Insurance Impact & Renewal Planning Report, and the combined bundle.",
+    canonical: "https://fabsy.ca/services",
   });
-
-  const ticketTypes = [
-    {
-      icon: Zap,
-      title: "Speeding Tickets",
-      description: "We review the ticket, available disclosure, and the circumstances you provide."
-    },
-    {
-      icon: AlertTriangle,
-      title: "Excessive Speeding",
-      description: "We assess the ticket details and explain whether agent representation is available."
-    },
-    {
-      icon: Phone,
-      title: "Distracted Driving",
-      description: "We review the allegation, the available information, and possible next steps."
-    },
-    {
-      icon: Camera,
-      title: "Photo Radar",
-      description: "We review automated-enforcement tickets and the options shown on the ticket."
-    },
-    {
-      icon: Car,
-      title: "Careless Driving",
-      description: "We assess service availability and the information relevant to the allegation."
-    },
-    {
-      icon: Clock,
-      title: "Other Violations",
-      description: "We also review red-light, lane-change, and other Alberta traffic tickets."
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: Shield,
-      title: "Understand the Stakes",
-      description: "Review the ticket and its possible record implications before choosing how to respond.",
-      value: "Informed decisions"
-    },
-    {
-      icon: CheckCircle,
-      title: "Review Your Options",
-      description: "Get a focused assessment of the ticket information and available next steps.",
-      value: "Ticket-specific review"
-    },
-    {
-      icon: DollarSign,
-      title: "Know the Pricing",
-      description: "Pricing is explained before checkout, including when an additional charge applies.",
-      value: "Clear fee structure"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-hero">
       <Header />
-      
-      <main className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Traffic Ticket Defense
-          </Badge>
-          <h1 className="text-4xl lg:text-6xl font-bold text-white drop-shadow-lg mb-6">
-            What We <span className="text-gradient-hero font-script">Help</span> With
+
+      <main>
+        <section className="container mx-auto px-4 py-16 text-center sm:py-20">
+          <Badge className="border-primary/20 bg-primary/10 text-primary-light">Fabsy services</Badge>
+          <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Resolve the ticket. Understand the insurance questions.
           </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-sm">
-            Fabsy provides traffic ticket agent services across Alberta. Fabsy is not a law firm
-            and does not provide legal advice.
+          <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-white/85 sm:text-xl">
+            Choose pre-trial ticket help, a source-backed insurance planning report, or both in one clearly priced bundle.
           </p>
-        </div>
+        </section>
 
-        {/* Ticket Types Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {ticketTypes.map((ticket, index) => (
-            <Card key={index} className="p-8 bg-gradient-card shadow-fab border-white/20 backdrop-blur-sm hover:shadow-elevated transition-all duration-300">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-button rounded-full flex items-center justify-center shadow-glow flex-shrink-0">
-                  <ticket.icon className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-card-foreground mb-2">
-                  {ticket.title}
-                </h3>
+        <section className="container mx-auto px-4 pb-16" aria-labelledby="service-options-heading">
+          <h2 id="service-options-heading" className="sr-only">Service options</h2>
+          <div className="grid gap-6 lg:grid-cols-3">
+            <Card className="flex flex-col border-primary/30 p-7 shadow-elevated sm:p-8">
+              <Scale className="h-8 w-8 text-primary" aria-hidden="true" />
+              <h3 className="mt-5 text-2xl font-bold">{RAPID_RESOLUTION.name}</h3>
+              <div className="mt-3 flex items-end gap-2">
+                <span className="text-4xl font-bold">${RAPID_RESOLUTION.priceCad}</span>
+                <span className="pb-1 text-sm text-muted-foreground">CAD + GST</span>
               </div>
-              
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                {ticket.description}
+              <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">
+                Secure intake, disclosure request and tracking, analysis with qualified review, prosecutor-review submission, client updates, and client-directed acceptance of an available pre-trial resolution.
               </p>
-              
-              <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-                Alberta agent service
-              </Badge>
+              <Button asChild className="mt-7">
+                <Link to={RAPID_RESOLUTION.intakePath}>
+                  Start Rapid Resolution
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
             </Card>
-          ))}
-        </div>
 
-        <ProductLadder compact className="mb-16 rounded-2xl" />
+            <Card className="flex flex-col p-7 shadow-fab sm:p-8">
+              <FileCheck2 className="h-8 w-8 text-primary" aria-hidden="true" />
+              <h3 className="mt-5 text-2xl font-bold">{INSURANCE_IMPACT_REPORT.name}</h3>
+              <div className="mt-3 flex items-end gap-2">
+                <span className="text-4xl font-bold">${INSURANCE_IMPACT_REPORT.priceCad}</span>
+                <span className="pb-1 text-sm text-muted-foreground">CAD + GST</span>
+              </div>
+              <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">{INSURANCE_IMPACT_REPORT.description}</p>
+              <Button asChild variant="outline" className="mt-7">
+                <Link to={INSURANCE_IMPACT_REPORT.slug}>View report details</Link>
+              </Button>
+            </Card>
 
-        {/* Benefits Section */}
-        <div className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white drop-shadow-lg mb-4">
-              Why Fight Your <span className="text-gradient-hero">Ticket</span>?
-            </h2>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              A ticket can affect more than the amount printed on it
-            </p>
+            <Card className="flex flex-col border-primary/40 bg-primary/5 p-7 shadow-elevated sm:p-8">
+              <Badge className="w-fit">Both services</Badge>
+              <h3 className="mt-5 text-2xl font-bold">{RAPID_RESOLUTION_BUNDLE.shortName}</h3>
+              <div className="mt-3 flex items-end gap-2">
+                <span className="text-4xl font-bold text-primary">${RAPID_RESOLUTION_BUNDLE.priceCad}</span>
+                <span className="pb-1 text-sm text-muted-foreground">CAD + GST</span>
+              </div>
+              <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">{RAPID_RESOLUTION_BUNDLE.description}</p>
+              <Button asChild className="mt-7">
+                <Link to={RAPID_RESOLUTION.intakePath}>Choose the bundle</Link>
+              </Button>
+            </Card>
           </div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {benefits.map((benefit, index) => (
-              <Card key={index} className="p-8 text-center bg-gradient-card shadow-fab border-white/20 backdrop-blur-sm">
-                <div className="w-16 h-16 bg-gradient-button rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
-                  <benefit.icon className="h-8 w-8 text-white" />
-                </div>
-                
-                <h3 className="text-xl font-bold text-card-foreground mb-4">
-                  {benefit.title}
-                </h3>
-                
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  {benefit.description}
-                </p>
-                
-                <Badge className="bg-primary/10 text-primary border-primary/20">
-                  {benefit.value}
-                </Badge>
+        <section className="bg-background px-4 py-16 sm:py-20" aria-labelledby="ticket-types-heading">
+          <div className="container mx-auto max-w-6xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <Badge variant="outline">Eligibility varies by matter</Badge>
+              <h2 id="ticket-types-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Tickets Fabsy can review</h2>
+              <p className="mt-4 text-muted-foreground">Submission does not ensure acceptance. Fabsy confirms whether the matter fits the permitted service scope.</p>
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {ticketTypes.map(({ icon: Icon, title, description }) => (
+                <Card key={title} className="p-6 shadow-fab">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <h3 className="mt-4 text-xl font-bold">{title}</h3>
+                  <p className="mt-3 leading-relaxed text-muted-foreground">{description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-950 px-4 py-16 text-white sm:py-20" aria-labelledby="service-commitment-heading">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
+              <div>
+                <Badge className="border-primary/30 bg-primary/10 text-primary-light">Rapid Resolution service commitment</Badge>
+                <h2 id="service-commitment-heading" className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Fabsy acts within 48 hours of complete disclosure
+                </h2>
+                <p className="mt-4 text-lg leading-relaxed text-slate-300">{RAPID_RESOLUTION.actionCommitment}</p>
+                <p className="mt-4 text-sm leading-relaxed text-slate-400">{RAPID_RESOLUTION.speedDisclaimer}</p>
+              </div>
+              <Card className="border-slate-700 bg-slate-900 p-7 text-white">
+                <h3 className="text-2xl font-bold text-white">Important scope limits</h3>
+                <ul className="mt-5 space-y-4 text-slate-300">
+                  <li className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary-light" aria-hidden="true" /><span>Trial representation is not included and, if available, is quoted separately.</span></li>
+                  <li className="flex items-start gap-3"><FileSearch className="mt-0.5 h-5 w-5 shrink-0 text-primary-light" aria-hidden="true" /><span>The 48-hour commitment covers Fabsy's next authorized action, not Crown timing.</span></li>
+                  <li className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary-light" aria-hidden="true" /><span>No withdrawal, reduction, demerit, or insurance result is promised.</span></li>
+                </ul>
               </Card>
-            ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Process Overview */}
-        <div className="mb-16">
-          <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-card-foreground mb-4">
-                Our <span className="text-gradient-hero">Review</span> Process
-              </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                We examine the information available and identify practical next steps
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-card-foreground">
-                  Ticket Information We Review:
-                </h3>
-                <ul className="space-y-3 text-muted-foreground">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    The allegation and offence details shown on the ticket
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Available disclosure and supporting material
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Filing, service, and court information
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Any documents or evidence you provide
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-card-foreground">
-                  Circumstances We Consider:
-                </h3>
-                <ul className="space-y-3 text-muted-foreground">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Weather and road conditions at the time
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Traffic flow and safety considerations
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Emergency or necessity situations
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    Mistaken identity or vehicle confusion
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Special Note */}
-        <div className="mb-16">
-          <Card className="p-8 bg-gradient-accent border-primary/20">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold text-card-foreground mb-4">
-                A Note on Insurance Increases
-              </h3>
-              <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
-                Insurance consequences vary by driver, conviction, insurer, and renewal timing.
-                Fabsy's $149 Priority Ticket Review can estimate likely risk and financial significance,
-                but it is not an insurer-issued quote and does not promise savings. It also includes
-                priority placement and a $149 representation credit if the same eligible matter is upgraded.
-              </p>
-            </div>
-          </Card>
-        </div>
-
-        {/* CTA Section */}
-        <div className="text-center">
-          <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold text-card-foreground mb-4">
-              Get Your Ticket Reviewed
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
-              If the fine is not reduced, there is no success fee.
+        <section className="bg-background px-4 py-16 sm:py-20">
+          <Card className="container mx-auto max-w-4xl p-8 text-center shadow-elevated sm:p-12">
+            <h2 className="text-3xl font-bold">Ready to put your ticket into motion?</h2>
+            <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-muted-foreground">
+              Upload the ticket, complete the secure intake and authorization, and choose Rapid Resolution or the combined insurance-planning bundle.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/traffic-ticket-assessment/start">
-                <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                  Start Free Ticket Review
-                </Button>
+            <Button asChild size="lg" className="mt-7 min-h-12 px-8">
+              <Link to={RAPID_RESOLUTION.intakePath}>
+                Start your secure intake
+                <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
               </Link>
-              <Link to="/how-it-works">
-                <Button variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 transition-smooth">
-                  Learn How It Works
-                </Button>
-              </Link>
-            </div>
+            </Button>
           </Card>
-        </div>
+        </section>
       </main>
 
       <Footer />

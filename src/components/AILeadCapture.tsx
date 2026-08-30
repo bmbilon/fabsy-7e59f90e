@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Zap } from "lucide-react";
 import { EligibilityChecker } from "./EligibilityChecker";
+import { RAPID_RESOLUTION } from "@/config/offers";
 
 interface AILeadCaptureProps {
   variant?: "open" | "gated";
@@ -64,8 +65,8 @@ export default function AILeadCapture({
           </Button>
 
           <p className="text-xs text-muted-foreground">
-            There is no charge to use this upload tool. If Fabsy can assist, representation uses a $488 base representation fee
-            plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.
+            There is no charge to use this upload tool. Eligible Rapid Resolution matters cost
+            ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST. Trial and government fines are separate.
           </p>
         </CardContent>
       </Card>

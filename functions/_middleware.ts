@@ -62,6 +62,16 @@ export const onRequest: PagesFunction = async (context) => {
 
   // `_redirects` rules do not run for routes handled by Pages Functions, so
   // these redirects must happen in middleware for every user agent.
+  if (pathname === "/traffic-ticket-assessment" || pathname === "/traffic-ticket-assessment/examples") {
+    const destination = new URL(request.url);
+    destination.pathname = "/rapid-resolution";
+    return Response.redirect(destination, 301);
+  }
+  if (pathname === "/traffic-ticket-assessment/start") {
+    const destination = new URL(request.url);
+    destination.pathname = "/submit-ticket";
+    return Response.redirect(destination, 301);
+  }
   if (LEGACY_CONTENT_PATHS.has(pathname)) {
     const destination = new URL(request.url);
     destination.pathname = `/content${pathname}`;

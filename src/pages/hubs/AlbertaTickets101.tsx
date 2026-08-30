@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
 import useSafeHead from '@/hooks/useSafeHead';
+import { RAPID_RESOLUTION } from '@/config/offers';
 
 const AlbertaTickets101: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/alberta-tickets-101';
@@ -64,8 +65,8 @@ const AlbertaTickets101: React.FC = () => {
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Unsure whether to pay or fight?</h2>
-          <p className="mt-2 text-muted-foreground">Fabsy's $149 CAD total Ticket Triage explains the charge, likely consequences, options and whether paying for representation appears financially sensible. The $149 can be applied if representation is worthwhile and the same matter is eligible.</p>
-          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Ticket Triage - $149</Link>
+          <p className="mt-2 text-muted-foreground">Rapid Resolution handles an eligible pre-trial ticket through intake, disclosure review, prosecutor review, file updates and your final decision.</p>
+          <Link to={RAPID_RESOLUTION.slug} className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Rapid Resolution - ${RAPID_RESOLUTION.priceCad}</Link>
         </section>
 
         <section className="mb-10">

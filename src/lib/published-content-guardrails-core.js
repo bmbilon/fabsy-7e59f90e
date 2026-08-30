@@ -1,5 +1,9 @@
-export const EXACT_FABSY_PRICING =
-  'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
+import offerData from '../config/offers.json' with { type: 'json' };
+
+export const EXACT_FABSY_PRICING = offerData.canonicalPricingCopy;
+export const EXACT_FABSY_ONE_LINE = offerData.rapidResolution.oneLineDescription;
+export const EXACT_FABSY_ACTION_COMMITMENT = offerData.rapidResolution.actionCommitment;
+export const EXACT_FABSY_SPEED_DISCLAIMER = offerData.rapidResolution.speedDisclaimer;
 
 export const SAFE_BLOG_FALLBACK_TITLE = 'How to Respond to an Alberta Traffic Ticket';
 export const SAFE_BLOG_FALLBACK_DESCRIPTION =
@@ -21,9 +25,13 @@ Depending on the matter, you may be able to respond yourself, use an authorized 
 
 Fabsy provides agent services for Alberta traffic matters and is not a law firm. ${EXACT_FABSY_PRICING}
 
-## Ticket Triage
+## Rapid Resolution
 
-For a human-reviewed assessment of the ticket, likely insurance significance, and whether representation appears worth the cost, [review Ticket Triage](https://fabsy.ca/traffic-ticket-assessment) before the response deadline printed on the ticket.
+Rapid Resolution provides secure digital intake and authorization, a disclosure request, technology-assisted disclosure analysis with qualified review, a fact-specific prosecutor-review submission and immediate client updates for eligible Alberta pre-trial matters. ${EXACT_FABSY_ACTION_COMMITMENT}
+
+${EXACT_FABSY_SPEED_DISCLAIMER}
+
+[Start Rapid Resolution](https://fabsy.ca/submit-ticket) before the response deadline printed on the ticket. The optional Insurance Impact & Renewal Planning Report provides consumer research and planning information, not an insurer quote or licensed broker recommendation.
 
 This article provides general information and is not legal advice.`;
 
@@ -94,9 +102,13 @@ No. Historical results describe past matters only. The charge, evidence, procedu
 
 ${EXACT_FABSY_PRICING}
 
-## Ticket Triage
+## Rapid Resolution
 
-For a human-reviewed assessment of the ticket, likely insurance significance, and whether representation appears worth the cost, [review Ticket Triage](https://fabsy.ca/traffic-ticket-assessment) before the response deadline printed on the ticket.
+Rapid Resolution provides secure digital intake and authorization, a disclosure request, technology-assisted disclosure analysis with qualified review, a fact-specific prosecutor-review submission and immediate client updates for eligible Alberta pre-trial matters. ${EXACT_FABSY_ACTION_COMMITMENT}
+
+${EXACT_FABSY_SPEED_DISCLAIMER}
+
+[Start Rapid Resolution](https://fabsy.ca/submit-ticket) before the response deadline printed on the ticket. Trial representation is separate.
 
 This article provides general information and is not legal advice.`;
 
@@ -122,7 +134,7 @@ const DIGIT_OR_WORD_NUMBER = `(?:\\d[\\d,]*(?:\\.\\d+)?|${NUMBER_WORD})`;
 const CALENDAR_DATE =
   '(?:\\d{4}-\\d{1,2}-\\d{1,2}|\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4}|(?:january|february|march|april|may|june|july|august|september|october|november|december)\\s+\\d{1,2}(?:,?\\s+\\d{4})?)';
 const INEXACT_PRICING_PATTERNS = [
-  /\$\s*488\b/i,
+  /\$\s*(?:49|149|198|229|339|488)\b/i,
   /\b\d+(?:\.\d+)?\s*%(?!\d).{0,80}\b(?:fine\s+reduction|fines?\s+saved|savings?|amount\s+saved|fee|charge|pricing|pay|contingency)\b/i,
   /\bno[\s-]*win[\s,;-]+no[\s-]*fee\b/i,
   /\b(?:only\s+pay|pay\s+only|charged?\s+only|no\s+(?:fee|charge)|no[\s-]*win[\s,;-]+no[\s-]*fee)\b.{0,100}\b(?:if|unless|when|win|won|success|successful|succeed|save|saved|reduce|reduced|reduction|result|outcome)\b/i,
@@ -145,6 +157,7 @@ const NUMERIC_LEGAL_PATTERNS = [
   [new RegExp(`\\b${DIGIT_OR_WORD_NUMBER}\\s+(?:dollar[-\\s]+)?(?:fines?|penalt(?:y|ies)|surcharges?)\\b`, 'i'), 'unsupported fine or penalty claim'],
   [new RegExp(`\\b${DIGIT_OR_WORD_NUMBER}\\s*(?:demerits?|demerit\\s+points?|points?\\s+on\\s+(?:a|your)\\s+(?:licen[cs]e|driving\\s+record))\\b`, 'i'), 'unsupported demerit claim'],
   [new RegExp(`\\b(?:demerits?|demerit\\s+points?)\\D{0,24}${DIGIT_OR_WORD_NUMBER}\\b`, 'i'), 'unsupported demerit claim'],
+  [/\b(?:fabsy|rapid resolution|we)\b[^.!?]{0,100}\b(?:within|in|under)\s+\d{1,3}\s+hours?\b/i, 'unsupported service-timing claim'],
   [/\b(?:within|no\s+later\s+than|up\s+to)\s+\d{1,3}\s+(?:(?:business|calendar)\s+)?(?:days?|weeks?|months?)\b/i, 'unsupported deadline claim'],
   [new RegExp(`\\b(?:within|no\\s+later\\s+than|up\\s+to)\\s+${NUMBER_WORD}\\s+(?:(?:business|calendar)\\s+)?(?:days?|weeks?|months?)\\b`, 'i'), 'unsupported deadline claim'],
   [/\b\d{1,3}[-\s](?:day|week|month)\s+(?:deadline|limit|window|period)\b/i, 'unsupported deadline claim'],
@@ -167,6 +180,13 @@ function withoutExactPricing(value) {
   return String(value || '').split(EXACT_FABSY_PRICING).join('');
 }
 
+function withoutExactCommercialFacts(value) {
+  return withoutExactPricing(value)
+    .split(EXACT_FABSY_ONE_LINE).join('')
+    .split(EXACT_FABSY_ACTION_COMMITMENT).join('')
+    .split(EXACT_FABSY_SPEED_DISCLAIMER).join('');
+}
+
 export function hasInexactFabsyPricingClaim(value) {
   const candidate = withoutExactPricing(value);
   return INEXACT_PRICING_PATTERNS.some((pattern) => pattern.test(candidate));
@@ -177,11 +197,10 @@ export function hasFabsyPricingClaim(value) {
 }
 
 function stripPricingClaimsForLegalScan(value) {
-  return String(value || '')
+  return withoutExactCommercialFacts(value)
     .split('\n')
     .map((line) => {
-      const withoutExact = withoutExactPricing(line);
-      return hasInexactFabsyPricingClaim(withoutExact) ? '' : withoutExact;
+      return hasInexactFabsyPricingClaim(line) ? '' : line;
     })
     .join('\n');
 }

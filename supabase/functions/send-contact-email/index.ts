@@ -82,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 15px; border-radius: 5px; margin: 20px 0;">
                   <strong style="color: #92400e;">Pricing</strong><br>
-                  <span style="color: #92400e;">Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.</span>
+                  <span style="color: #92400e;">Rapid Resolution costs $198 CAD plus GST for eligible Alberta pre-trial matters. Trial and government fines are separate.</span>
                 </div>
                 
                 <p style="margin-top: 30px;">Have questions? Simply reply to this email or call us during business hours.</p>

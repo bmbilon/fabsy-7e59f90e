@@ -236,7 +236,7 @@ export class LightweightTelemetry {
     const context: { city?: string; offence?: string } = {};
     
     // Extract city and offence from URL pattern: /content/{offence}-ticket-{city}
-    const match = path.match(/\/content\/([^-]+)-ticket-([^\/]+)/);
+    const match = path.match(/\/content\/([^-]+)-ticket-([^/]+)/);
     if (match) {
       context.offence = match[1];
       context.city = match[2].replace(/-/g, ' ');
@@ -245,18 +245,18 @@ export class LightweightTelemetry {
     return context;
   }
 
-  public track(event: string, data: Record<string, any> = {}): void {
+  public track(event: string, data: Record<string, unknown> = {}): void {
     if (!this.config.enabled) return;
 
     const pageContext = this.extractPageContext();
     
     const telemetryEvent: TelemetryEvent = {
+      ...data,
       event,
       path: window.location.pathname,
       ts: Date.now(),
       session_id: this.sessionId,
-      ...pageContext,
-      ...data
+      ...pageContext
     };
 
     if (this.config.debug) {
@@ -267,7 +267,7 @@ export class LightweightTelemetry {
     this.flushEvents();
   }
 
-  private async flushEvents(): void {
+  private async flushEvents(): Promise<void> {
     if (this.eventQueue.length === 0) return;
 
     const events = [...this.eventQueue];
@@ -303,7 +303,7 @@ export class LightweightTelemetry {
   }
 
   // Manual tracking methods
-  public trackCustomEvent(event: string, data: Record<string, any> = {}): void {
+  public trackCustomEvent(event: string, data: Record<string, unknown> = {}): void {
     this.track(event, data);
   }
 

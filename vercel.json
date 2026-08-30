@@ -4,6 +4,9 @@
   "outputDirectory": "dist",
   "trailingSlash": false,
   "redirects": [
+    { "source": "/traffic-ticket-assessment", "destination": "/rapid-resolution", "permanent": true },
+    { "source": "/traffic-ticket-assessment/examples", "destination": "/rapid-resolution", "permanent": true },
+    { "source": "/traffic-ticket-assessment/start", "destination": "/submit-ticket", "permanent": true },
     { "source": "/fight-careless-ticket-calgary", "destination": "/content/fight-careless-ticket-calgary", "permanent": true },
     { "source": "/fight-careless-ticket-edmonton", "destination": "/content/fight-careless-ticket-edmonton", "permanent": true },
     { "source": "/fight-careless-ticket-fort-mcmurray", "destination": "/content/fight-careless-ticket-fort-mcmurray", "permanent": true },
@@ -36,7 +39,23 @@
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/admin/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/portal/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/submit-ticket",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/thank-you",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/payment-(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     },
     {

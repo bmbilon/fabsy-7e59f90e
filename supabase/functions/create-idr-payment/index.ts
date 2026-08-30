@@ -3,6 +3,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 
 type IdrOrderType = "standalone" | "addon";
+// This Edge Function intentionally uses the dynamic service-role client without generated DB types.
+// deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseAdmin = ReturnType<typeof createClient<any>>;
 
 interface CheckoutRequest {
   orderId?: unknown;
@@ -24,6 +28,19 @@ interface Purchaser {
   phone: string;
 }
 
+interface IdrCheckoutIntent {
+  id: string;
+  client_id: string | null;
+  ticket_submission_id: string | null;
+  type: IdrOrderType;
+  checkout_kind: string;
+  expected_amount_cents: number;
+  purchaser_email: string;
+  stripe_checkout_session_id: string | null;
+  status: string;
+  attempts: number;
+}
+
 class RequestError extends Error {
   status: number;
 
@@ -34,7 +51,11 @@ class RequestError extends Error {
 }
 
 const DISCLAIMER = "This report is consumer research based on publicly available information. Fabsy is not an insurance agent or broker and does not sell, quote, or place insurance.";
-const PRICE_CENTS: Record<IdrOrderType, number> = { standalone: 12900, addon: 9900 };
+const PRICE_CENTS: Record<IdrOrderType, number> = {
+  standalone: 4900,
+  addon: 3100,
+};
+const PRICING_VERSION = "rapid_resolution_2026_08";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^[\d\s+().-]+$/;
@@ -67,25 +88,36 @@ function responseHeaders(origin: string | null) {
 }
 
 function json(body: unknown, status: number, origin: string | null) {
-  return new Response(JSON.stringify(body), { status, headers: responseHeaders(origin) });
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: responseHeaders(origin),
+  });
 }
 
 function text(value: unknown, field: string, maxLength: number) {
-  if (typeof value !== "string" || !value.trim()) throw new RequestError(`${field} is required.`);
+  if (typeof value !== "string" || !value.trim()) {
+    throw new RequestError(`${field} is required.`);
+  }
   const normalized = value.trim();
-  if (normalized.length > maxLength) throw new RequestError(`${field} is too long.`);
+  if (normalized.length > maxLength) {
+    throw new RequestError(`${field} is too long.`);
+  }
   return normalized;
 }
 
 function uuid(value: unknown, field: string) {
   const normalized = text(value, field, 36).toLowerCase();
-  if (!UUID_PATTERN.test(normalized)) throw new RequestError(`${field} must be a valid UUID.`);
+  if (!UUID_PATTERN.test(normalized)) {
+    throw new RequestError(`${field} must be a valid UUID.`);
+  }
   return normalized;
 }
 
 function email(value: unknown) {
   const normalized = text(value, "email", 255).toLowerCase();
-  if (!EMAIL_PATTERN.test(normalized)) throw new RequestError("email is invalid.");
+  if (!EMAIL_PATTERN.test(normalized)) {
+    throw new RequestError("email is invalid.");
+  }
   return normalized;
 }
 
@@ -119,9 +151,15 @@ function siteOrigin() {
   return parsed.origin;
 }
 
-async function signedInIdentity(req: Request, supabaseUrl: string, anonKey: string) {
+async function signedInIdentity(
+  req: Request,
+  supabaseUrl: string,
+  anonKey: string,
+) {
   const authorization = req.headers.get("authorization");
-  if (!authorization) throw new RequestError("Secure portal sign-in is required.", 401);
+  if (!authorization) {
+    throw new RequestError("Secure portal sign-in is required.", 401);
+  }
   const client = createClient(supabaseUrl, anonKey, {
     global: { headers: { Authorization: authorization } },
   });
@@ -134,22 +172,30 @@ async function signedInIdentity(req: Request, supabaseUrl: string, anonKey: stri
 
 async function resolveCasePurchaser(
   req: Request,
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseAdmin,
   supabaseUrl: string,
   anonKey: string,
   body: CheckoutRequest,
   type: IdrOrderType,
 ): Promise<Purchaser> {
-  const ticketSubmissionId = uuid(body.ticketSubmissionId, "ticketSubmissionId");
+  const ticketSubmissionId = uuid(
+    body.ticketSubmissionId,
+    "ticketSubmissionId",
+  );
   const authenticated = await signedInIdentity(req, supabaseUrl, anonKey);
   const requestedEmail = email(body.email);
   if (authenticated.email !== requestedEmail) {
-    throw new RequestError("The signed-in email does not match this case.", 403);
+    throw new RequestError(
+      "The signed-in email does not match this case.",
+      403,
+    );
   }
 
   const { data: submission, error: submissionError } = await admin
     .from("ticket_submissions")
-    .select("id,client_id,status,verdict,case_outcome,clients(first_name,last_name,email,phone,auth_user_id)")
+    .select(
+      "id,client_id,status,verdict,case_outcome,clients(first_name,last_name,email,phone,auth_user_id)",
+    )
     .eq("id", ticketSubmissionId)
     .maybeSingle();
   if (submissionError) throw submissionError;
@@ -163,23 +209,33 @@ async function resolveCasePurchaser(
     throw new RequestError("Case ownership could not be verified.", 403);
   }
   if (submission.status === "awaiting_payment") {
-    throw new RequestError("The $488 ticket defense checkout has not been completed.", 403);
+    throw new RequestError(
+      "The Rapid Resolution checkout has not been completed.",
+      403,
+    );
   }
   if (
     type === "addon" &&
     (
-      (submission.verdict !== "winnable" && submission.verdict !== "reducible") ||
+      (submission.verdict !== "winnable" &&
+        submission.verdict !== "reducible") ||
       submission.case_outcome === "conviction_stands"
     )
   ) {
-    throw new RequestError("The $99 add-on is unavailable for this case verdict.", 403);
+    throw new RequestError(
+      "The $31 add-on is unavailable for this case verdict.",
+      403,
+    );
   }
   if (
     type === "standalone" &&
     submission.verdict !== "unwinnable" &&
     submission.case_outcome !== "conviction_stands"
   ) {
-    throw new RequestError("The $129 damage-control report is unavailable for this case state.", 403);
+    throw new RequestError(
+      "The $49 Insurance Impact & Renewal Planning Report is unavailable for this case state.",
+      403,
+    );
   }
 
   const { data: existingOrder, error: existingOrderError } = await admin
@@ -188,7 +244,12 @@ async function resolveCasePurchaser(
     .eq("ticket_submission_id", ticketSubmissionId)
     .maybeSingle();
   if (existingOrderError) throw existingOrderError;
-  if (existingOrder) throw new RequestError("An IDR order already exists for this ticket.", 409);
+  if (existingOrder) {
+    throw new RequestError(
+      "An Insurance Impact & Renewal Planning Report already exists for this ticket.",
+      409,
+    );
+  }
 
   return {
     clientId: submission.client_id,
@@ -217,7 +278,7 @@ async function standaloneFingerprint(req: Request, salt: string) {
 }
 
 async function reserveIdrCheckout(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseAdmin,
   stripe: Stripe,
   requestedOrderId: string,
   type: IdrOrderType,
@@ -227,11 +288,14 @@ async function reserveIdrCheckout(
   const selectFields = "id,client_id,ticket_submission_id,type,checkout_kind,expected_amount_cents,purchaser_email,stripe_checkout_session_id,status,attempts";
   let query = admin.from("idr_checkout_intents").select(selectFields);
   query = purchaser.ticketSubmissionId
-    ? query.eq("ticket_submission_id", purchaser.ticketSubmissionId).eq("checkout_kind", "idr_only")
+    ? query.eq("ticket_submission_id", purchaser.ticketSubmissionId).eq(
+      "checkout_kind",
+      "idr_only",
+    )
     : query.eq("id", requestedOrderId);
   const initialIntent = await query.maybeSingle();
   if (initialIntent.error) throw initialIntent.error;
-  let intent = initialIntent.data;
+  let intent = initialIntent.data as IdrCheckoutIntent | null;
 
   if (!intent) {
     if (fingerprint) {
@@ -246,11 +310,16 @@ async function reserveIdrCheckout(
       );
       if (reserveError) {
         if (reserveError.message?.includes("IDR_CHECKOUT_RATE_LIMIT")) {
-          throw new RequestError("Too many checkout attempts. Please try again later.", 429);
+          throw new RequestError(
+            "Too many checkout attempts. Please try again later.",
+            429,
+          );
         }
         throw reserveError;
       }
-      intent = Array.isArray(reservedRows) ? reservedRows[0] : reservedRows;
+      intent = (Array.isArray(reservedRows) ? reservedRows[0] : reservedRows) as
+        | IdrCheckoutIntent
+        | null;
     } else {
       const { data: inserted, error: insertError } = await admin
         .from("idr_checkout_intents")
@@ -267,16 +336,17 @@ async function reserveIdrCheckout(
         .select(selectFields)
         .single();
       if (insertError?.code !== "23505" && insertError) throw insertError;
-      if (!insertError) intent = inserted;
+      if (!insertError) intent = inserted as IdrCheckoutIntent;
     }
     if (!intent) {
       let racedQuery = admin.from("idr_checkout_intents").select(selectFields);
       racedQuery = purchaser.ticketSubmissionId
-        ? racedQuery.eq("ticket_submission_id", purchaser.ticketSubmissionId).eq("checkout_kind", "idr_only")
+        ? racedQuery.eq("ticket_submission_id", purchaser.ticketSubmissionId)
+          .eq("checkout_kind", "idr_only")
         : racedQuery.eq("id", requestedOrderId);
       const raced = await racedQuery.maybeSingle();
       if (raced.error) throw raced.error;
-      intent = raced.data;
+      intent = raced.data as IdrCheckoutIntent | null;
     }
   }
 
@@ -286,13 +356,68 @@ async function reserveIdrCheckout(
     (intent.ticket_submission_id || null) !== purchaser.ticketSubmissionId ||
     intent.type !== type ||
     intent.checkout_kind !== "idr_only" ||
-    Number(intent.expected_amount_cents) !== PRICE_CENTS[type] ||
     intent.purchaser_email.toLowerCase() !== purchaser.email
   ) {
-    throw new RequestError("The existing IDR checkout does not match this purchase.", 409);
+    throw new RequestError(
+      "The existing report checkout does not match this purchase.",
+      409,
+    );
   }
   if (intent.status === "paid") {
-    throw new RequestError("This IDR order has already been paid.", 409);
+    throw new RequestError(
+      "This report has already been paid.",
+      409,
+    );
+  }
+
+  if (Number(intent.expected_amount_cents) !== PRICE_CENTS[type]) {
+    if (intent.stripe_checkout_session_id) {
+      const existingSession = await stripe.checkout.sessions.retrieve(
+        intent.stripe_checkout_session_id,
+      );
+      if (existingSession.status === "complete") {
+        throw new RequestError(
+          "Payment is being confirmed for this report.",
+          409,
+        );
+      }
+      if (existingSession.status === "open") {
+        await stripe.checkout.sessions.expire(
+          intent.stripe_checkout_session_id,
+        );
+      }
+    }
+
+    const previousAttempt = Number(intent.attempts || 1);
+    const nextAttempt = previousAttempt + 1;
+    let conversion = admin
+      .from("idr_checkout_intents")
+      .update({
+        expected_amount_cents: PRICE_CENTS[type],
+        attempts: nextAttempt,
+        status: "creating",
+        stripe_checkout_session_id: null,
+      })
+      .eq("id", intent.id)
+      .eq("attempts", previousAttempt)
+      .neq("status", "paid");
+    conversion = intent.stripe_checkout_session_id
+      ? conversion.eq(
+        "stripe_checkout_session_id",
+        intent.stripe_checkout_session_id,
+      )
+      : conversion.is("stripe_checkout_session_id", null);
+    const { data: converted, error: conversionError } = await conversion
+      .select(selectFields)
+      .maybeSingle();
+    if (conversionError) throw conversionError;
+    if (!converted) {
+      throw new RequestError(
+        "The checkout price changed elsewhere. Please try again.",
+        409,
+      );
+    }
+    intent = converted as IdrCheckoutIntent;
   }
 
   let attempt = Number(intent.attempts || 1);
@@ -312,17 +437,29 @@ async function reserveIdrCheckout(
       .maybeSingle();
     if (refreshError) throw refreshError;
     if (!refreshed) {
-      throw new RequestError("This checkout is already being refreshed. Please try again.", 409);
+      throw new RequestError(
+        "This checkout is already being refreshed. Please try again.",
+        409,
+      );
     }
     attempt = nextAttempt;
   }
   if (intent.stripe_checkout_session_id) {
-    const existingSession = await stripe.checkout.sessions.retrieve(intent.stripe_checkout_session_id);
+    const existingSession = await stripe.checkout.sessions.retrieve(
+      intent.stripe_checkout_session_id,
+    );
     if (existingSession.status === "open" && existingSession.url) {
-      return { orderId: intent.id as string, attempt, url: existingSession.url };
+      return {
+        orderId: intent.id as string,
+        attempt,
+        url: existingSession.url,
+      };
     }
     if (existingSession.status === "complete") {
-      throw new RequestError("Payment is being confirmed for this IDR order.", 409);
+      throw new RequestError(
+        "Payment is being confirmed for this report.",
+        409,
+      );
     }
 
     const nextAttempt = attempt + 1;
@@ -340,7 +477,10 @@ async function reserveIdrCheckout(
       .maybeSingle();
     if (refreshError) throw refreshError;
     if (!refreshed) {
-      throw new RequestError("This checkout is already being refreshed. Please try again.", 409);
+      throw new RequestError(
+        "This checkout is already being refreshed. Please try again.",
+        409,
+      );
     }
     attempt = nextAttempt;
   }
@@ -350,9 +490,15 @@ async function reserveIdrCheckout(
 
 serve(async (req) => {
   const origin = req.headers.get("origin");
-  if (origin && !allowedOrigins().has(origin)) return json({ error: "Origin is not allowed." }, 403, origin);
-  if (req.method === "OPTIONS") return new Response(null, { headers: responseHeaders(origin) });
-  if (req.method !== "POST") return json({ error: "Method not allowed." }, 405, origin);
+  if (origin && !allowedOrigins().has(origin)) {
+    return json({ error: "Origin is not allowed." }, 403, origin);
+  }
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: responseHeaders(origin) });
+  }
+  if (req.method !== "POST") {
+    return json({ error: "Method not allowed." }, 405, origin);
+  }
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -376,26 +522,35 @@ serve(async (req) => {
       .eq("id", orderId)
       .maybeSingle();
     if (existingOrderError) throw existingOrderError;
-    if (existingOrder) throw new RequestError("This IDR order has already been paid.", 409);
-
-    const purchaser = body.ticketSubmissionId
-      ? await resolveCasePurchaser(req, admin, supabaseUrl, anonKey, body, type)
-      : {
-          clientId: null,
-          ticketSubmissionId: null,
-          firstName: text(body.firstName, "firstName", 100),
-          lastName: text(body.lastName, "lastName", 100),
-          email: email(body.email),
-          phone: phone(body.phone),
-        };
-    if (type === "addon" && !purchaser.ticketSubmissionId) {
-      throw new RequestError("The $99 add-on requires an active ticket case.", 403);
+    if (existingOrder) {
+      throw new RequestError(
+        "This report has already been paid.",
+        409,
+      );
     }
 
-    const stripe = new Stripe(stripeSecretKey, { apiVersion: "2025-08-27.basil" });
-    const fingerprint = purchaser.ticketSubmissionId
-      ? null
-      : await standaloneFingerprint(req, Deno.env.get("IDR_CHECKOUT_RATE_SALT") || serviceRoleKey);
+    const purchaser = body.ticketSubmissionId ? await resolveCasePurchaser(req, admin, supabaseUrl, anonKey, body, type) : {
+      clientId: null,
+      ticketSubmissionId: null,
+      firstName: text(body.firstName, "firstName", 100),
+      lastName: text(body.lastName, "lastName", 100),
+      email: email(body.email),
+      phone: phone(body.phone),
+    };
+    if (type === "addon" && !purchaser.ticketSubmissionId) {
+      throw new RequestError(
+        "The $31 add-on requires an active ticket case.",
+        403,
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2025-08-27.basil",
+    });
+    const fingerprint = purchaser.ticketSubmissionId ? null : await standaloneFingerprint(
+      req,
+      Deno.env.get("IDR_CHECKOUT_RATE_SALT") || serviceRoleKey,
+    );
     const reservation = await reserveIdrCheckout(
       admin,
       stripe,
@@ -405,11 +560,15 @@ serve(async (req) => {
       fingerprint,
     );
     if (reservation.url) {
-      return json({
-        url: reservation.url,
-        orderId: reservation.orderId,
-        reused: true,
-      }, 200, origin);
+      return json(
+        {
+          url: reservation.url,
+          orderId: reservation.orderId,
+          reused: true,
+        },
+        200,
+        origin,
+      );
     }
 
     const reservedOrderId = reservation.orderId;
@@ -419,13 +578,17 @@ serve(async (req) => {
       idr_type: type,
       idr_checkout_kind: "idr_only",
       idr_price_cents: String(amountCents),
+      fabsy_product: type === "standalone" ? "insurance_impact_review" : "insurance_impact_review_addon",
+      fabsy_pricing_version: PRICING_VERSION,
       checkout_attempt: String(reservation.attempt),
       purchaser_first_name: purchaser.firstName,
       purchaser_last_name: purchaser.lastName,
       purchaser_phone: purchaser.phone,
     };
     if (purchaser.clientId) metadata.idr_client_id = purchaser.clientId;
-    if (purchaser.ticketSubmissionId) metadata.ticket_submission_id = purchaser.ticketSubmissionId;
+    if (purchaser.ticketSubmissionId) {
+      metadata.ticket_submission_id = purchaser.ticketSubmissionId;
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -437,20 +600,26 @@ serve(async (req) => {
         quantity: 1,
         price_data: {
           currency: "cad",
+          tax_behavior: "exclusive",
           unit_amount: amountCents,
           product_data: {
             name: type === "standalone"
-              ? "Fabsy Insurance Damage Report"
-              : "Fabsy Insurance Damage Report Add-on",
+              ? "Fabsy Insurance Impact & Renewal Planning Report"
+              : "Fabsy Insurance Impact & Renewal Planning Report Add-on",
             description: DISCLAIMER,
-            metadata: { fabsy_product: "insurance_damage_report" },
+            metadata: {
+              fabsy_product: type === "standalone" ? "insurance_impact_review" : "insurance_impact_review_addon",
+              fabsy_pricing_version: PRICING_VERSION,
+            },
           },
         },
       }],
       metadata,
       success_url: `${siteOrigin()}/insurance-damage-report/intake?checkout=success&order_id=${reservedOrderId}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteOrigin()}/insurance-damage-report?checkout=cancelled`,
-    }, { idempotencyKey: `idr-checkout:${reservedOrderId}:${reservation.attempt}` });
+    }, {
+      idempotencyKey: `idr-checkout:${reservedOrderId}:${reservation.attempt}`,
+    });
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL.");
     const { data: linkedIntent, error: intentUpdateError } = await admin
@@ -474,15 +643,28 @@ serve(async (req) => {
         currentIntent?.status === "failed" ||
         currentIntent?.status === "expired"
       ) {
-        throw currentIntentError || new Error("The checkout reservation could not be linked.");
+        throw currentIntentError ||
+          new Error("The checkout reservation could not be linked.");
       }
     }
-    return json({ url: session.url, orderId: reservedOrderId, checkoutSessionId: session.id }, 200, origin);
+    return json(
+      {
+        url: session.url,
+        orderId: reservedOrderId,
+        checkoutSessionId: session.id,
+      },
+      200,
+      origin,
+    );
   } catch (error) {
     const status = error instanceof RequestError ? error.status : 500;
     if (status >= 500) console.error("create-idr-payment failed");
-    return json({
-      error: status >= 500 ? "Unable to create IDR checkout." : (error as Error).message,
-    }, status, origin);
+    return json(
+      {
+        error: status >= 500 ? "Unable to create the insurance report checkout." : (error as Error).message,
+      },
+      status,
+      origin,
+    );
   }
 });

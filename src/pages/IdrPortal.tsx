@@ -48,7 +48,7 @@ function PortalContent() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <Badge className="mb-3">Private portal</Badge>
-          <h1 className="text-3xl font-bold sm:text-4xl">Your Insurance Damage Reports</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">Your Insurance Impact &amp; Renewal Planning Reports</h1>
           <p className="mt-2 text-muted-foreground">Signed in as {session?.user.email}</p>
         </div>
         <Button variant="outline" onClick={() => signOut()}><LogOut className="mr-2 h-4 w-4" /> Sign out</Button>
@@ -60,8 +60,8 @@ function PortalContent() {
         <Card><CardContent className="p-6 text-destructive">{error}</CardContent></Card>
       ) : orders.length === 0 ? (
         <Card>
-          <CardHeader><CardTitle>No IDR orders found</CardTitle><CardDescription>Use the same email address entered at checkout.</CardDescription></CardHeader>
-          <CardContent><Button asChild><Link to="/insurance-damage-report">View the IDR service</Link></Button></CardContent>
+          <CardHeader><CardTitle>No insurance report orders found</CardTitle><CardDescription>Use the same email address entered at checkout.</CardDescription></CardHeader>
+          <CardContent><Button asChild><Link to="/insurance-damage-report">View the report service</Link></Button></CardContent>
         </Card>
       ) : (
         <div className="grid gap-5 md:grid-cols-2">
@@ -72,7 +72,7 @@ function PortalContent() {
                   <Badge variant="outline" className="capitalize">{order.status.replace("_", " ")}</Badge>
                   <span className="text-sm text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</span>
                 </div>
-                <CardTitle>{order.type === "addon" ? "Ticket checkout add-on" : "Standalone IDR"}</CardTitle>
+                <CardTitle>{order.type === "addon" ? "Ticket checkout report add-on" : "Standalone insurance planning report"}</CardTitle>
                 <CardDescription>${Number(order.price_paid).toFixed(2)} CAD</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-3">
@@ -91,6 +91,6 @@ function PortalContent() {
 }
 
 export default function IdrPortal() {
-  useSafeHead({ title: "Your Insurance Damage Reports | Fabsy", robots: "noindex, nofollow" });
+  useSafeHead({ title: "Your Insurance Impact & Renewal Planning Reports | Fabsy", robots: "noindex, nofollow" });
   return <div className="min-h-screen bg-background"><Header /><IdrAccessGate redirectPath="/portal/insurance-reports"><PortalContent /></IdrAccessGate><Footer /></div>;
 }

@@ -14,6 +14,11 @@ import {
   IDR_PRICE_ADDON,
 } from "@/config/idr";
 import { validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 
 interface PaymentStepProps {
   formData: FormData;
@@ -41,9 +46,9 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
   const [isProcessing, setIsProcessing] = useState(false);
   const [idrOrderId] = useState(() => crypto.randomUUID());
   const { toast } = useToast();
-  const includesPriorityReview = Boolean(formData.sourceAssessmentId && formData.sourceAssessmentAccessToken);
+  const hasLegacyAssessment = Boolean(formData.sourceAssessmentId && formData.sourceAssessmentAccessToken);
 
-  const checkoutSubtotal = 488 + (includeIdrAddon ? IDR_PRICE_ADDON : 0);
+  const checkoutSubtotal = RAPID_RESOLUTION.priceCad + (includeIdrAddon ? IDR_PRICE_ADDON : 0);
 
   const handleStripeCheckout = async () => {
     if (!agreedToTerms) {
@@ -67,8 +72,12 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
       if (!sourceAssessment && !ticketFile) {
         throw new Error("Return to Ticket Details and attach the ticket PDF or photo before checkout.");
       }
-      const ticketDescriptor = ticketFile ? validateTicketCaptureFile(ticketFile) : null;
-      if (ticketDescriptor && "error" in ticketDescriptor) throw new Error(ticketDescriptor.error);
+      let ticketMimeType: string | undefined;
+      if (ticketFile) {
+        const ticketDescriptor = validateTicketCaptureFile(ticketFile);
+        if ("error" in ticketDescriptor) throw new Error(ticketDescriptor.error);
+        ticketMimeType = ticketDescriptor.mimeType;
+      }
 
       const { data: submission, error: submissionError } = await supabase.functions.invoke("submit-ticket", {
         body: {
@@ -98,7 +107,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           ].filter(Boolean).join("\n"),
           insuranceCompany: formData.insuranceCompany,
           ...(sourceAssessment ? { sourceAssessment } : {
-            file: { contentType: ticketDescriptor!.mimeType, size: ticketFile!.size },
+            file: { contentType: ticketMimeType!, size: ticketFile!.size },
           }),
         },
       });
@@ -115,10 +124,11 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
       const clientId = submission.clientId as string;
       const representationAccessToken = submission.accessToken as string;
       if (submission.upload?.path && submission.upload?.token && ticketFile) {
+        if (!ticketMimeType) throw new Error("The ticket file type could not be validated.");
         const { error: uploadError } = await supabase.storage
           .from("assessment-tickets")
           .uploadToSignedUrl(submission.upload.path, submission.upload.token, ticketFile, {
-            contentType: ticketDescriptor!.mimeType,
+            contentType: ticketMimeType,
             upsert: true,
           });
         if (uploadError) throw new Error("Your ticket was saved, but the private file upload did not finish. Please try again.");
@@ -169,24 +179,24 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
       <Card className="border-primary/10 bg-gradient-card p-6 shadow-fab">
         <div className="mb-5 flex items-center gap-3">
           <DollarSign className="h-6 w-6 text-primary" />
-          <h3 className="text-xl font-bold">Ticket defense checkout</h3>
+          <h3 className="text-xl font-bold">Rapid Resolution checkout</h3>
         </div>
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-semibold">Fabsy ticket defense base fee</p>
+              <p className="font-semibold">Rapid Resolution</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Covers the ticket defense service. Results vary, and a dismissal, lower fine, or fewer demerits are not promised.
+                Eligible Alberta pre-trial service through disclosure, prosecutor review, Crown-response explanation and your decision. Trial representation is separate.
               </p>
             </div>
-            <p className="shrink-0 font-bold">$488 CAD</p>
+            <p className="shrink-0 font-bold">${RAPID_RESOLUTION.priceCad} CAD</p>
           </div>
           <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-4 text-sm">
-            A 30% success fee applies to any fine reduction Fabsy achieves. That success fee is additional to the $488 base fee. If no fine reduction is achieved, no success fee is charged.
+            {RAPID_RESOLUTION.actionCommitment} {RAPID_RESOLUTION.speedDisclaimer}
           </div>
-          {includesPriorityReview && (
+          {hasLegacyAssessment && (
             <div className="rounded-lg border border-primary/25 bg-primary/5 p-4 text-sm">
-              Included at no extra charge: the $149 Priority Ticket Review deliverables, including policy-based insurance-impact scenarios, a fast report and an initial dispute plan.
+              A previous assessment is linked to this matter. Any credit available under its original terms is validated securely before payment.
             </div>
           )}
           <div className="border-t pt-4">
@@ -195,11 +205,11 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
               <span className="text-primary">${checkoutSubtotal} CAD</span>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Applicable tax is calculated at Stripe checkout. The 30% success fee is collected only if Fabsy achieves a fine reduction.
+              Applicable GST is calculated at Stripe checkout. Government fines, trial representation and out-of-scope work are separate.
             </p>
             {includeIdrAddon && (
               <p className="mt-2 text-xs text-muted-foreground">
-                Promotion codes cannot be combined with the ${IDR_PRICE_ADDON} IDR add-on in the same checkout.
+                Promotion codes cannot be combined with the ${IDR_PRICE_ADDON} report add-on in the same checkout.
               </p>
             )}
           </div>
@@ -223,7 +233,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
             />
           </div>
 
-          {!includesPriorityReview && <div className="rounded-lg border border-primary/25 bg-primary/5 p-4">
+          {!hasLegacyAssessment && <div className="rounded-lg border border-primary/25 bg-primary/5 p-4">
             <div className="flex items-start gap-3">
               <Checkbox
                 id="idr-addon"
@@ -233,10 +243,10 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
               />
               <div>
                 <Label htmlFor="idr-addon" className="cursor-pointer text-base font-semibold">
-                  Add the Insurance Damage Report for ${IDR_PRICE_ADDON}
+                  Add the {INSURANCE_IMPACT_REPORT.shortName} for ${IDR_PRICE_ADDON}
                 </Label>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Know your estimated insurance exposure whichever way the ticket goes. The report includes conviction aging dates and carriers worth calling.
+                  Get both services for ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD plus GST. The report provides source-backed conviction-impact scenarios, aging dates, public research sources and a renewal checklist.
                 </p>
                 {ABSTRACT_SELF_ORDER && (
                   <p className="mt-2 text-xs text-muted-foreground">
@@ -266,7 +276,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
                   I agree to the <a href="/terms-of-purchase" className="text-primary underline">Terms of Purchase</a>, <a href="/terms-of-service" className="text-primary underline">Terms of Service</a>, and <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a>.
                 </Label>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Payment activates the ticket defense service under the signed consent. Fabsy is a traffic ticket agent service, not a law firm.
+                  Payment activates Rapid Resolution under the signed consent. Fabsy is a traffic ticket agent service, not a law firm, and no outcome is promised.
                 </p>
               </div>
             </div>

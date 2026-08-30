@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import AILeadCapture from "./AILeadCapture";
 import { trackAIQuery } from "@/hooks/useAEOAnalytics";
 import FAQSection from "@/components/FAQSection";
+import { CANONICAL_OFFER_PRICING, RAPID_RESOLUTION } from "@/config/offers";
 
 interface AIAnswer {
   hook: string;
@@ -20,7 +21,8 @@ interface AIAnswer {
 type UnknownRecord = Record<string, unknown>;
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
-const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
+const EXACT_PRICING = CANONICAL_OFFER_PRICING;
+const EXACT_RAPID_RESOLUTION = RAPID_RESOLUTION.actionCommitment;
 const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent review. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
 
 const forbiddenOutputPatterns = [
@@ -57,7 +59,7 @@ const hasOverCapPercentage = (text: string): boolean => {
 };
 
 const hasUnsupportedNumericClaim = (text: string): boolean => {
-  const withoutApprovedPricing = text.split(EXACT_PRICING).join("");
+  const withoutApprovedPricing = text.split(EXACT_PRICING).join("").split(EXACT_RAPID_RESOLUTION).join("");
   const numberWord = "(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand)";
   const wordNumericClaim = new RegExp(
     `\\b${numberWord}(?:[-\\s]+${numberWord}){0,4}[-\\s]+(?:dollars?|demerit(?:s|\\s+points?)?|days?|weeks?|months?|years?|percent)\\b`,
@@ -105,7 +107,7 @@ const validateAiAnswer = (value: unknown): AIAnswer | null => {
   const hasGenderedAudience = /\b(?:for women|women-only|female drivers?)\b/i.test(serialized);
   const attributesLawyersToFabsy = /\bFabsy(?:'s)?\s+(?:lawyers?|attorneys?|legal team)\b/i.test(serialized);
   const givesCaseSpecificDirection = /\b(?:you should|I recommend that you|your best option is|you need to)\s+(?:plead|file|dispute|fight|pay|admit|accept|go to trial)\b/i.test(serialized);
-  const withoutApprovedPricing = serialized.split(EXACT_PRICING).join("");
+  const withoutApprovedPricing = serialized.split(EXACT_PRICING).join("").split(EXACT_RAPID_RESOLUTION).join("");
   const hasInexactPricing = /\b(?:price|pricing|fee|cost)\b|\bFabsy\b[^.!?\n]{0,80}(?:\bcharges?\b|\$)/i.test(withoutApprovedPricing);
 
   if (

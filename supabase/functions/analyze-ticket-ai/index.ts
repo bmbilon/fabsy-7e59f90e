@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
-const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
-const EXACT_TICKET_TRIAGE = "Ticket Triage is Fabsy's human-reviewed traffic ticket and insurance-impact assessment. It costs $149 CAD total, including applicable GST. If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax; eligible clients receive priority placement and the 30% success fee still applies to any fine reduction.";
+const EXACT_PRICING = "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate.";
+const EXACT_RAPID_RESOLUTION = "Rapid Resolution includes secure intake, digital authorization, disclosure request and review, a fact-specific prosecutor-review submission, prompt status notifications, a plain-language Crown-response comparison and the client's final decision. Complete, readable disclosure is reviewed and the next authorized action is prepared or submitted within 48 hours; Crown response and final-outcome timing are separate.";
 const REQUIRED_DISCLAIMER = `This tool provides general automated extraction plus a Fabsy agent review. It is not case-specific legal advice. ${SERVICE_STATUS} Outcomes vary.`;
 
 const SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket information.
@@ -29,8 +29,8 @@ FACT SAFETY:
 - Do not state unsourced statistics or any success-rate percentage.
 
 PRICING:
-- For representation pricing, use this exact sentence: "${EXACT_PRICING}"
-- For assessment pricing or upgrade benefits, use this exact wording: "${EXACT_TICKET_TRIAGE}"
+- For current pricing, use this exact sentence: "${EXACT_PRICING}"
+- For Rapid Resolution scope or timing, use this exact wording: "${EXACT_RAPID_RESOLUTION}"
 
 OUTPUT SHAPE:
 {
@@ -269,7 +269,7 @@ const hasOverCapPercentage = (text: string): boolean => {
 
 const hasUnsupportedTicketNumbers = (text: string, ticketData: unknown): boolean => {
   const evidence = collectTicketEvidence(ticketData);
-  const withoutApprovedPricing = text.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
+  const withoutApprovedPricing = text.split(EXACT_PRICING).join("").split(EXACT_RAPID_RESOLUTION).join("");
   const numberWord = "(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand)";
   const wordNumericClaim = new RegExp(
     `\\b${numberWord}(?:[-\\s]+${numberWord}){0,4}[-\\s]+(?:dollars?|demerit(?:s|\\s+points?)?|days?|weeks?|months?|years?|percent)\\b`,
@@ -391,7 +391,7 @@ const validateAndNormalizeResponse = (
     normalized.page_json.how,
     normalized.page_json.next,
   ].join("\n");
-  const withoutApprovedPricing = visibleText.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
+  const withoutApprovedPricing = visibleText.split(EXACT_PRICING).join("").split(EXACT_RAPID_RESOLUTION).join("");
   const hasInexactPricing = /\b(?:price|pricing|fee|cost)\b|\bFabsy\b[^.!?\n]{0,80}(?:\bcharges?\b|\$)/i.test(withoutApprovedPricing);
 
   if (

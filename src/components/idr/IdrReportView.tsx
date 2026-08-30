@@ -1,5 +1,6 @@
 import { AlertTriangle, CalendarClock, CheckCircle2, ExternalLink, Phone } from "lucide-react";
 import type { IdrReport } from "@/lib/idr/types";
+import { IDR_DISCLAIMER } from "@/config/idr";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -25,12 +26,15 @@ const formatMoney = (cents: number) =>
 export default function IdrReportView({ report }: IdrReportViewProps) {
   const estimate = report.estimatedThreeYearPremiumImpact;
   const ticketScenario = report.ticketScenario;
+  const directoryEntries = [...report.carrierCallList.entries].sort((left, right) =>
+    left.carrierName.localeCompare(right.carrierName, "en-CA"),
+  );
 
   return (
     <article className="space-y-8 print:space-y-5">
       <section className="rounded-2xl bg-gradient-to-br from-slate-950 to-slate-800 p-7 text-white sm:p-10">
-        <Badge className="mb-4 bg-black/20 text-white">Insurance Damage Report</Badge>
-        <h1 className="text-3xl font-bold sm:text-4xl">Your insurance exposure research</h1>
+        <Badge className="mb-4 bg-black/20 text-white">Insurance Impact &amp; Renewal Planning Report</Badge>
+        <h1 className="text-3xl font-bold sm:text-4xl">Your insurance impact and renewal research</h1>
         <p className="mt-3 max-w-2xl text-white/80">
           Prepared from the driver abstract and ticket particulars reviewed by Fabsy as of {formatDate(report.asOfDate)}.
         </p>
@@ -224,18 +228,21 @@ export default function IdrReportView({ report }: IdrReportViewProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>{report.carrierCallList.heading}</CardTitle>
-          <p className="text-sm text-muted-foreground">{report.carrierCallList.framing}</p>
+          <CardTitle>Public insurer research directory</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Entries are listed alphabetically from public sources. They are not ranked or recommended,
+            and inclusion does not predict eligibility, pricing or coverage. Ask a licensed broker for
+            insurer-specific advice or quotes.
+          </p>
         </CardHeader>
         <CardContent className="space-y-3">
-          {report.carrierCallList.entries.length === 0 ? (
-            <p className="text-muted-foreground">No carrier met the current verified rule criteria.</p>
-          ) : report.carrierCallList.entries.map((carrier) => (
+          {directoryEntries.length === 0 ? (
+            <p className="text-muted-foreground">No current public insurer research entries are available.</p>
+          ) : directoryEntries.map((carrier) => (
             <div key={carrier.carrierId} className="rounded-lg border p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="font-semibold">{carrier.rank}. {carrier.carrierName}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{carrier.reason}</p>
+                  <p className="font-semibold">{carrier.carrierName}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {carrier.phone && (
@@ -245,7 +252,7 @@ export default function IdrReportView({ report }: IdrReportViewProps) {
                   )}
                   {carrier.quoteUrl && (
                     <a className="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium" href={carrier.quoteUrl} target="_blank" rel="noreferrer">
-                      Quote page <ExternalLink className="ml-1.5 h-4 w-4" />
+                      Public information <ExternalLink className="ml-1.5 h-4 w-4" />
                     </a>
                   )}
                   {carrier.researchSources.map((item, sourceIndex) => (
@@ -287,7 +294,7 @@ export default function IdrReportView({ report }: IdrReportViewProps) {
 
       <footer className="rounded-lg border-2 border-slate-300 bg-slate-50 p-5 text-sm leading-relaxed text-slate-700">
         <p className="font-semibold text-slate-950">Important consumer research disclaimer</p>
-        <p className="mt-2">{report.disclaimer}</p>
+        <p className="mt-2">{IDR_DISCLAIMER}</p>
       </footer>
     </article>
   );

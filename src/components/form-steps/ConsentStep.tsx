@@ -31,7 +31,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
     <div className="space-y-6">
       <Card className="p-6 bg-muted/30">
         <h3 className="text-lg font-semibold mb-4 text-center">
-          Digital Consent Form for Traffic Ticket Representation
+          Digital Authorization for Rapid Resolution
         </h3>
         <p className="text-center text-sm text-muted-foreground mb-4">
           Fabsy.ca Traffic Defense Services
@@ -85,21 +85,22 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
 
             <Separator />
 
-            {/* Consent to Representation */}
+            {/* Consent to Rapid Resolution */}
             <div>
-              <h4 className="font-semibold mb-3 text-primary">Consent to Representation</h4>
+              <h4 className="font-semibold mb-3 text-primary">Scope of Authorization</h4>
               <p className="text-sm leading-relaxed mb-4">
                 I, <span className="font-semibold">{formData.firstName} {formData.lastName}</span>, hereby consent to and authorize Fabsy.ca and its agents to:
               </p>
               <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
-                <li>Represent me in all proceedings related to the traffic ticket identified above</li>
-                <li>Review and dispute my traffic ticket on my behalf</li>
-                <li>Appear in court or administrative proceedings as my authorized representative</li>
-                <li>Communicate with courts, prosecutors, and government agencies regarding my case</li>
-                <li>Access my driving record and ticket information as necessary for my defense</li>
-                <li>Make procedural decisions in the best interest of my case</li>
-                <li>Negotiate resolutions including plea arrangements, reduced charges, or alternative disposals</li>
+                <li>Request, receive and review disclosure for the traffic ticket identified above</li>
+                <li>Use the Traffic Tickets Digital Service and communicate with the court, prosecutor and relevant government offices as my authorized agent where permitted</li>
+                <li>Prepare and submit a fact-specific prosecutor-review request based on my instructions and the available record</li>
+                <li>Receive a prosecutor response or proposed resolution and explain the stated charge, fine and demerit consequences to me</li>
+                <li>Take only the final resolution step that I expressly authorize after receiving the Crown response</li>
               </ul>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                This authorization does not include a contested trial, appeal, reopening, Immediate Roadside Sanction or Notice of Administrative Penalty. Fabsy will not accept a guilty plea or Crown offer without my case-specific instruction. A separate agreement and fee are required for any trial work. I may also be required to complete a prescribed Government of Alberta consent form.
+              </p>
             </div>
 
             <Separator />
@@ -109,12 +110,13 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
               <h4 className="font-semibold mb-3 text-primary">Terms of Service Agreement</h4>
               <p className="text-sm leading-relaxed mb-2">By signing below, I acknowledge and agree that:</p>
               <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
-                <li>I have voluntarily retained Fabsy.ca for traffic ticket representation services</li>
-                <li>I understand the scope of representation as outlined above</li>
+                <li>I have voluntarily retained Fabsy.ca for the Rapid Resolution pre-trial service</li>
+                <li>I understand the included work and exclusions outlined above</li>
                 <li>I will provide accurate and complete information regarding my case</li>
                 <li>I authorize digital communication via email and text regarding my case</li>
-                <li>Payment for services is due according to the fee schedule provided</li>
-                <li>Fabsy.ca will make reasonable efforts to defend my ticket but does not promise a specific outcome</li>
+                <li>The service fee is $198 CAD plus applicable GST; government fines, trial work and other excluded services are separate</li>
+                <li>The 48-hour commitment covers Fabsy's review and next authorized action after complete, readable disclosure is received and matched to my file—not Crown response time or final outcome timing</li>
+                <li>Fabsy.ca does not promise a withdrawal, reduction, lower fine, fewer demerits or insurance result</li>
                 <li>I may withdraw this consent at any time by providing written notice</li>
                 <li>This consent remains valid until the matter is resolved or withdrawn</li>
               </ul>
@@ -127,7 +129,8 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
               <h4 className="font-semibold mb-3 text-primary">Data Processing Consent</h4>
               <p className="text-sm leading-relaxed mb-2">I consent to Fabsy.ca:</p>
               <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
-                <li>Collecting and processing my personal information for legal representation purposes</li>
+                <li>Collecting and processing my personal information to deliver Rapid Resolution</li>
+                <li>Using technology-assisted document extraction and analysis, subject to qualified review, for my ticket and disclosure</li>
                 <li>Storing my case files securely for record-keeping requirements</li>
                 <li>Communicating with me via email, phone, and text regarding my case</li>
                 <li>Sharing necessary information with courts and legal authorities as required</li>
@@ -183,7 +186,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
                 <ul className="space-y-1 list-disc list-inside">
                   <li>I am the person named above and authorized to enter into this agreement</li>
                   <li>I have read and understand this consent form</li>
-                  <li>I agree to all terms and authorize representation as described</li>
+                <li>I agree to all terms and authorize the limited pre-trial service described</li>
                   <li>My digital signature has the same legal effect as a handwritten signature</li>
                 </ul>
               </Label>
@@ -198,10 +201,10 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
         </div>
 
         <div className="mt-6 pt-4 border-t text-xs text-muted-foreground space-y-1">
-          <p>Form Version: 2025-09-30</p>
+          <p>Form Version: 2026-08-27</p>
           <p>Contact: support@fabsy.ca</p>
           <p className="mt-2 italic">
-            This consent form complies with Alberta legal requirements for traffic ticket representation and data protection regulations.
+            This digital authorization records your consent to Fabsy's service. Any prescribed government consent form remains separately required.
           </p>
         </div>
       </Card>

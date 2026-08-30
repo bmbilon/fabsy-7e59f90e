@@ -23,6 +23,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
+  EXACT_FABSY_ACTION_COMMITMENT,
+  EXACT_FABSY_PRICING,
+  EXACT_FABSY_SPEED_DISCLAIMER,
   articleViolations,
   normalizeFabsyPricingClaims,
   sanitizeMarketingText,
@@ -38,7 +41,7 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const PUBLISH_STATUS = process.env.PUBLISH_STATUS || 'draft';
 const TREND_MODE = (process.env.TREND_MODE || 'on').toLowerCase();
 const MODEL = 'claude-sonnet-4-6';
-const CTA_URL = 'https://fabsy.ca/traffic-ticket-assessment';
+const CTA_URL = 'https://fabsy.ca/submit-ticket';
 const APPROVED_OFFICIAL_SOURCES = [
   'https://traffictickets.alberta.ca/',
   'https://www.alberta.ca/demerit-points',
@@ -416,9 +419,12 @@ export function validateArticle(a) {
   if (/\b(?:women?|men|mothers?|moms?|fathers?|dads?|female|male)\b/i.test(blob)) {
     errs.push('gendered audience wording');
   }
-  const unsupportedCurrency = [...blob.matchAll(/\$\d[\d,]*(?:\.\d{2})?/g)]
-    .map((match) => match[0])
-    .filter((amount) => amount !== '$488');
+  const legalClaimsBlob = blob
+    .split(EXACT_FABSY_PRICING).join(' ')
+    .split(EXACT_FABSY_ACTION_COMMITMENT).join(' ')
+    .split(EXACT_FABSY_SPEED_DISCLAIMER).join(' ');
+  const unsupportedCurrency = [...legalClaimsBlob.matchAll(/\$\d[\d,]*(?:\.\d{2})?/g)]
+    .map((match) => match[0]);
   if (unsupportedCurrency.length) errs.push('contains an unverified money amount');
   if (/\b\d+\s+demerit(?:\s+points?)?\b|\bdemerit(?:\s+points?)?[^\n.]{0,20}\b\d+\b/i.test(blob)) {
     errs.push('contains an unverified demerit count');
@@ -426,14 +432,8 @@ export function validateArticle(a) {
   if (/(?:deadline|response period)[^\n.]{0,40}\b\d+\b|\b\d+\s+(?:days?|hours?|months?)[^\n.]{0,40}(?:deadline|respond|file|dispute)/i.test(blob)) {
     errs.push('contains an unverified deadline');
   }
-  if (/\$488/.test(blob)) {
-    for (const phrase of [
-      '$488 base representation fee',
-      '30% of any fine reduction achieved',
-      'no success fee if the fine is not reduced',
-    ]) {
-      if (!blob.toLowerCase().includes(phrase)) errs.push(`incomplete pricing: missing "${phrase}"`);
-    }
+  if (/\$\s*(?:49|149|198|229|339|488)\b/.test(legalClaimsBlob)) {
+    errs.push('contains partial or legacy Fabsy pricing');
   }
   for (const violation of articleViolations({
     title: a.title,
@@ -442,7 +442,7 @@ export function validateArticle(a) {
   })) {
     errs.push(`publication guard: ${violation}`);
   }
-  if (!(a.content || '').includes(CTA_URL)) errs.push('missing Ticket Triage CTA URL');
+  if (!(a.content || '').includes(CTA_URL)) errs.push('missing Rapid Resolution CTA URL');
   const officialSourceCount = APPROVED_OFFICIAL_SOURCES.filter((source) =>
     (a.content || '').includes(source)
   ).length;
@@ -458,14 +458,17 @@ async function generateArticleOnce(picked, existingSlugs, corrective) {
   const prompt = `You are the content writer for fabsy.ca, a traffic ticket defense service for Alberta drivers.
 
 Business facts (must respect exactly):
-- Service: Fabsy fights traffic tickets for Alberta drivers.
-- Product: Ticket Triage is a $149 CAD total, human-reviewed traffic ticket and insurance-impact assessment. Applicable GST is included.
-- Upgrade: If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax. Eligible clients receive priority placement. The 30% success fee still applies to any fine reduction.
-- Pricing (use exactly): "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
+- Service: Fabsy provides agent services for eligible Alberta pre-trial traffic matters and is not a law firm.
+- Product: Rapid Resolution includes secure digital intake and authorization, a disclosure request, technology-assisted disclosure analysis with qualified review, a fact-specific prosecutor-review submission, immediate client updates and a client-directed pre-trial resolution decision.
+- Action commitment (use exactly if discussing speed): "${EXACT_FABSY_ACTION_COMMITMENT}"
+- Action boundary (include whenever using the action commitment): "${EXACT_FABSY_SPEED_DISCLAIMER}"
+- Pricing (use exactly): "${EXACT_FABSY_PRICING}"
+- The Insurance Impact & Renewal Planning Report is consumer research and planning information, not an insurer quote, licensed broker recommendation or promise of savings or eligibility.
+- Trial representation, government fines and out-of-scope matters are separate.
 - Never use "no win, no fee", "no-fee", "zero risk", "risk-free", "money back", "refund", or the word "guarantee" in any form.
 - Do not state or imply a success-rate percentage. Say that results vary and no outcome is promised.
 - Audience: Alberta drivers generally. Do not gender the audience.
-- Primary CTA: direct readers to Ticket Triage at ${CTA_URL}
+- Primary CTA: direct readers to Rapid Resolution at ${CTA_URL}
 
 Topic: "${picked.topic}"
 Target keywords: ${(picked.target_keywords || []).length ? picked.target_keywords.join(', ') : 'choose 3-5 sensible Alberta traffic keywords'}${newsLine}

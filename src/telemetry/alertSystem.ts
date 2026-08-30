@@ -9,7 +9,7 @@
 interface AlertCondition {
   id: string;
   name: string;
-  condition: (metrics: ConversionMetrics) => boolean;
+  condition: (metrics: ConversionMetrics, threshold: number) => boolean;
   threshold: number;
   comparison: 'less_than' | 'greater_than';
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -94,7 +94,7 @@ class ConversionAlertSystem {
       {
         id: 'low_cta_ctr',
         name: 'Low CTA Click-Through Rate',
-        condition: (m) => m.funnel.conversion_rates.cta_rate < this.threshold,
+        condition: (m, threshold) => m.funnel.conversion_rates.cta_rate < threshold,
         threshold: 0.025, // 2.5%
         comparison: 'less_than',
         severity: 'medium',
@@ -104,7 +104,7 @@ class ConversionAlertSystem {
       {
         id: 'low_form_completion',
         name: 'Low Form Completion Rate',
-        condition: (m) => m.funnel.conversion_rates.form_complete_rate < this.threshold,
+        condition: (m, threshold) => m.funnel.conversion_rates.form_complete_rate < threshold,
         threshold: 0.30, // 30%
         comparison: 'less_than',
         severity: 'high',
@@ -114,7 +114,7 @@ class ConversionAlertSystem {
       {
         id: 'high_bounce_rate',
         name: 'High Bounce Rate',
-        condition: (m) => m.dwellTime.bounce_rate > this.threshold,
+        condition: (m, threshold) => m.dwellTime.bounce_rate > threshold,
         threshold: 0.65, // 65%
         comparison: 'greater_than',
         severity: 'medium',
@@ -124,7 +124,7 @@ class ConversionAlertSystem {
       {
         id: 'low_scroll_engagement',
         name: 'Low Scroll Engagement',
-        condition: (m) => m.funnel.conversion_rates.scroll_rate < this.threshold,
+        condition: (m, threshold) => m.funnel.conversion_rates.scroll_rate < threshold,
         threshold: 0.50, // 50%
         comparison: 'less_than',
         severity: 'low',
@@ -134,9 +134,9 @@ class ConversionAlertSystem {
       {
         id: 'city_underperformance',
         name: 'City Performance Below Average',
-        condition: (m) => {
+        condition: (m, threshold) => {
           const avgCTR = m.cityPerformance.reduce((sum, c) => sum + c.cta_ctr, 0) / m.cityPerformance.length;
-          return m.cityPerformance.some(c => c.cta_ctr < avgCTR * 0.7);
+          return m.cityPerformance.some(c => c.cta_ctr < avgCTR * threshold);
         },
         threshold: 0.7, // 70% of average
         comparison: 'less_than',
@@ -147,7 +147,7 @@ class ConversionAlertSystem {
       {
         id: 'critical_form_drop',
         name: 'Critical Form Completion Drop',
-        condition: (m) => m.funnel.conversion_rates.form_complete_rate < this.threshold,
+        condition: (m, threshold) => m.funnel.conversion_rates.form_complete_rate < threshold,
         threshold: 0.15, // 15% - critical level
         comparison: 'less_than',
         severity: 'critical',
@@ -199,13 +199,7 @@ class ConversionAlertSystem {
 
   private evaluateCondition(condition: AlertCondition, metrics: ConversionMetrics): boolean {
     try {
-      // Create a dynamic evaluation context
-      const context = {
-        threshold: condition.threshold,
-        ...metrics
-      };
-      
-      return condition.condition.call(context, metrics);
+      return condition.condition(metrics, condition.threshold);
     } catch (error) {
       console.error(`Error evaluating condition ${condition.id}:`, error);
       return false;
@@ -234,12 +228,13 @@ class ConversionAlertSystem {
         value = metrics.funnel.conversion_rates.scroll_rate;
         description = `Scroll engagement is ${(value * 100).toFixed(1)}%, below threshold of ${(condition.threshold * 100).toFixed(1)}%`;
         break;
-      case 'city_underperformance':
+      case 'city_underperformance': {
         const avgCTR = metrics.cityPerformance.reduce((sum, c) => sum + c.cta_ctr, 0) / metrics.cityPerformance.length;
         const underperforming = metrics.cityPerformance.filter(c => c.cta_ctr < avgCTR * condition.threshold);
         value = avgCTR * condition.threshold;
         description = `Cities underperforming: ${underperforming.map(c => `${c.city} (${(c.cta_ctr * 100).toFixed(1)}%)`).join(', ')}`;
         break;
+      }
       default:
         value = 0;
         description = `Alert triggered for ${condition.name}`;
@@ -280,6 +275,8 @@ class ConversionAlertSystem {
   }
 
   private async sendEmailAlert(alert: Alert): Promise<void> {
+    // This optional server-side adapter is supplied by the deployment that enables SMTP alerts.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const nodemailer = require('nodemailer');
     
     const transporter = nodemailer.createTransporter({

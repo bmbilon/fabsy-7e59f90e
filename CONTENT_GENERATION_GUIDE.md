@@ -32,8 +32,9 @@ Rules:
 4) Keep meta lengths under the limits.
 5) Output valid JSON only, minified or pretty is OK.
 6) Fabsy is an agent service, not a law firm.
-7) If pricing is mentioned, use exactly: "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
-8) Do not use "no win no fee", "risk-free", "money back", "guarantee", "zero-risk", or em dashes. Do not invent fines, demerits, deadlines, insurance figures, turnaround times, or outcomes.
+7) If pricing is mentioned, use exactly: "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate."
+8) The only approved service-speed statement is: "Complete, readable disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours after it is received and matched to your file." Pair it with: "The 48-hour clock begins only after complete, readable disclosure is received and matched to the file. It covers Fabsy's review and next authorized action, not Crown response time or the date of a final outcome."
+9) Do not use "no win no fee", "risk-free", "money back", "guarantee", "zero-risk", or em dashes. Do not invent fines, demerits, deadlines, insurance figures, turnaround times, outcomes, prosecutor relationships, or claims about handling every court appearance.
 
 Example topic: "How to fight a traffic ticket in Alberta"
 ```
@@ -85,8 +86,8 @@ console.log(result);
   "bullets": [
     "Request disclosure to review evidence",
     "Gather photos, dashcam, and witness details",
-    "Many cases resolve without trial",
-    "Local courts have specific timelines",
+    "A dispute may resolve or may proceed to trial, depending on the matter",
+    "Use the response deadline and court information printed on the ticket",
     "Fabsy provides a free eligibility read"
   ],
   "what": "<p>Fighting a ticket means formally disputing the charge. Request disclosure to see the evidence, then decide how to respond.</p>",
@@ -115,7 +116,7 @@ console.log(result);
   "bullets": [
     "Request disclosure from Calgary Traffic Court",
     "Local court names and addresses included",
-    "Many cases reduced without trial",
+    "Available outcomes depend on the allegation, evidence, procedure, and individual facts",
     "Gather dashcam and photo evidence",
     "Fabsy offers free eligibility reviews"
   ],

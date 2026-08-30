@@ -2,26 +2,26 @@
 
 > Fabsy is an Alberta traffic-ticket agent service. Fabsy is not a law firm, does not provide legal advice, and does not promise a particular court, conviction, demerit, insurance, or premium outcome. Agent representation is available only where permitted and when Fabsy accepts the matter.
 
-Last reviewed: 2026-08-23
+Last reviewed: 2026-08-27
 
 ## Canonical Fabsy facts
 
 - Service area: Alberta, Canada.
-- Primary paid decision product: Ticket Triage.
-- Ticket Triage price: $149 CAD total, including applicable GST.
-- Ticket Triage is human reviewed and covers the charge, ticket instructions and deadline, fine and demerit implications, available options, likely insurance significance, representation economics, and a recommended next step.
-- Free option: Representation Eligibility Check, which only determines whether Fabsy may be able to represent the driver and provides a quote.
-- Representation: $488 base representation fee plus applicable tax and 30% of any fine reduction achieved. There is no success fee if the fine is not reduced.
-- Eligible Ticket Triage clients who upgrade the same matter receive a $149 credit toward the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax, and receive priority placement in Fabsy's representation queue.
-- Ticket Triage does not pause or extend any deadline printed on a ticket.
+- Primary ticket product: Rapid Resolution for eligible Alberta pre-trial matters.
+- Rapid Resolution price: $198 CAD plus applicable GST.
+- Rapid Resolution covers secure intake and authorization, eligibility and deadline review, disclosure request and tracking, technology-assisted disclosure analysis with qualified review, a fact-specific prosecutor-review submission, immediate file notifications, and client-directed acceptance of an available resolution.
+- Complete, readable disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours after it is received and matched to the file. Crown response time and final-outcome timing are separate.
+- Trial representation, appeals, reopenings, Immediate Roadside Sanctions, Notices of Administrative Penalty, government fines, and out-of-scope matters are not included.
+- The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST. It provides consumer research and planning information, not an insurer quote or licensed broker recommendation.
+- Rapid Resolution and the Insurance Impact & Renewal Planning Report cost $229 CAD plus applicable GST when purchased together.
+- Outcomes depend on the charge, evidence, procedure, and prosecutor. A withdrawal, reduction, lower fine, fewer demerits, or insurance result is not promised.
 
 ## Primary Fabsy pages
 
 - [Fabsy facts, products, limits, and official sources](https://fabsy.ca/ai-info)
-- [Ticket Triage — $149 CAD total](https://fabsy.ca/traffic-ticket-assessment)
-- [Illustrative Ticket Triage examples](https://fabsy.ca/traffic-ticket-assessment/examples)
-- [Start Ticket Triage](https://fabsy.ca/traffic-ticket-assessment/start)
-- [Free Representation Eligibility Check](https://fabsy.ca/submit-ticket)
+- [Rapid Resolution — $198 CAD plus GST](https://fabsy.ca/rapid-resolution)
+- [Start Rapid Resolution](https://fabsy.ca/submit-ticket)
+- [Insurance Impact & Renewal Planning Report — $49 CAD plus GST](https://fabsy.ca/insurance-damage-report)
 - [How Fabsy works](https://fabsy.ca/how-it-works)
 - [Fabsy service scope](https://fabsy.ca/services)
 - [Frequently asked questions](https://fabsy.ca/faq)

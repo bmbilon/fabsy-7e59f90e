@@ -1,24 +1,25 @@
 import { CheckCircle, Phone, Scale, Shield } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { CANONICAL_OFFER_PRICING, RAPID_RESOLUTION } from "@/config/offers";
 
 const TrustBar = () => {
   const trustPoints = [
     {
       icon: Shield,
       stat: "Straightforward Pricing",
-      detail: "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.",
+      detail: CANONICAL_OFFER_PRICING,
       color: "text-primary"
     },
     {
       icon: CheckCircle,
-      stat: "Human Reviewed",
-      detail: "Paid Ticket Triage recommendations are reviewed by a Fabsy team member.",
+      stat: "Qualified Review",
+      detail: "Technology-assisted disclosure analysis is reviewed before the next authorized action.",
       color: "text-green-600"
     },
     {
       icon: Scale,
-      stat: "Traffic Ticket Agent",
-      detail: "Fabsy is an agent service, not a law firm.",
+      stat: "48-Hour Action",
+      detail: RAPID_RESOLUTION.actionCommitment,
       color: "text-primary"
     }
   ];

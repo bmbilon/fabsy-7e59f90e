@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { RAPID_RESOLUTION } from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
 import { supabase } from "@/integrations/supabase/client";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
@@ -36,8 +37,8 @@ export default function TicketAssessmentConfirmation() {
   const [message, setMessage] = useState("");
 
   useSafeHead({
-    title: "Ticket Triage Received | Fabsy",
-    description: "Fabsy received your Ticket Triage order and private Alberta traffic-ticket submission.",
+    title: "Legacy Ticket Triage Received | Fabsy",
+    description: "Fabsy received your legacy $149 Ticket Triage order and private Alberta traffic-ticket submission.",
     robots: "noindex, nofollow",
   });
 
@@ -60,6 +61,7 @@ export default function TicketAssessmentConfirmation() {
 
       const isAssessment = data.line_items?.some((item) =>
         item.description === TICKET_ASSESSMENT.name ||
+        item.description === TICKET_ASSESSMENT.internalName ||
         item.description === "Traffic Ticket + Insurance Impact Assessment"
       );
       const validAmount = data.amount_subtotal === TICKET_ASSESSMENT.priceCents &&
@@ -116,8 +118,8 @@ export default function TicketAssessmentConfirmation() {
           <>
             <div className="text-center">
               <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-600" aria-hidden="true" />
-              <p className="mt-5 text-sm font-bold uppercase tracking-[0.15em] text-emerald-700">Payment received</p>
-              <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Your assessment is in Fabsy's review queue</h1>
+              <p className="mt-5 text-sm font-bold uppercase tracking-[0.15em] text-emerald-700">Legacy $149 order · payment received</p>
+              <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Your legacy Ticket Triage is in Fabsy's review queue</h1>
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
                 We received the ticket and assessment details submitted before checkout. A human reviewer will assess the full picture and email the result to the purchase address.
               </p>
@@ -149,9 +151,12 @@ export default function TicketAssessmentConfirmation() {
 
             <Alert className="mt-4 border-violet-200 bg-violet-50">
               <ShieldCheck className="h-4 w-4" />
-              <AlertTitle>Your representation upgrade benefits are active</AlertTitle>
+              <AlertTitle>Rapid Resolution is a separate current service</AlertTitle>
               <AlertDescription>
-                If representation is worthwhile and this matter is eligible, your $149 assessment payment can be applied to Fabsy's $488 base representation fee, leaving a $339 base-fee balance plus applicable tax. Eligible assessment clients also receive priority placement. The 30% success fee still applies to any fine reduction.
+                This receipt confirms the legacy $149 assessment only. Rapid Resolution currently
+                costs ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST and is purchased
+                separately; no credit is automatically applied on this page. If you need Fabsy to
+                review terms associated with an older order, contact us before making another payment.
               </AlertDescription>
             </Alert>
 
@@ -162,7 +167,7 @@ export default function TicketAssessmentConfirmation() {
               </p>
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <Button asChild><Link to="/">Return home</Link></Button>
-                <Button asChild variant="outline"><Link to={TICKET_ASSESSMENT.slug}>Review what is included</Link></Button>
+                <Button asChild variant="outline"><Link to={RAPID_RESOLUTION.slug}>Review Rapid Resolution</Link></Button>
               </div>
             </Card>
           </>

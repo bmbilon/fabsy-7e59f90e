@@ -1,0 +1,16 @@
+# Preview builds use source and guarded snapshots, never local credentials or data.
+.env
+.env.*
+**/.env
+**/.env.*
+**/.temp/**
+supabase/.temp
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+dist/
+node_modules/
+.vercel/
+reports/
+tmp/

@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { RAPID_RESOLUTION } from "@/config/offers";
 import { supabase } from "@/integrations/supabase/client";
 import { useTicketCache } from "@/hooks/useTicketCache";
 import { toast } from "sonner";
@@ -92,7 +92,7 @@ function numericFine(value: string) {
   return value.replace(/[^0-9.]/g, "");
 }
 
-function priorityReviewPrefill(ticketData: TicketData) {
+function rapidResolutionPrefill(ticketData: TicketData) {
   const fineAmount = ticketData.fineAmount || ticketData.fine || "";
   const offence = ticketData.offenceDescription || ticketData.violation || "";
 
@@ -219,19 +219,19 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
       console.error("Free ticket review OCR failed", error);
       setSelectedFile(null);
       setImagePreview(null);
-      toast.error("We could not read that ticket image. Try another image or continue from the Priority Review page.");
+      toast.error("We could not read that ticket image. Try another image or continue from the Rapid Resolution intake.");
     } finally {
       if (reviewRequestRef.current === requestId) setIsProcessing(false);
     }
   };
 
-  const continueToPriorityReview = () => {
+  const continueToRapidResolution = () => {
     if (!ticketData || !selectedFile) {
       toast.error("Choose and review a ticket image first.");
       return;
     }
 
-    const prefillTicketData = priorityReviewPrefill(ticketData);
+    const prefillTicketData = rapidResolutionPrefill(ticketData);
     try {
       window.localStorage.setItem("eligibility-ocr-data", JSON.stringify(prefillTicketData));
       if (cacheKey) window.localStorage.setItem("ticket-cache-key", cacheKey);
@@ -248,7 +248,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
     resetReview();
     onOpenChange(false);
-    navigate(TICKET_ASSESSMENT.intakePath, { state: navigationState });
+    navigate(RAPID_RESOLUTION.intakePath, { state: navigationState });
   };
 
   return (
@@ -395,18 +395,18 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
             </div>
 
             <div className="rounded-xl border border-primary/25 bg-primary/5 p-5">
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Optional next step</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Handle the ticket online</p>
               <div className="mt-2 flex flex-wrap items-end justify-between gap-2">
                 <div>
-                  <h4 className="text-lg font-bold">$149 Priority Review</h4>
-                  <p className="text-sm text-muted-foreground">Human-reviewed ticket and insurance-impact assessment.</p>
+                  <h4 className="text-lg font-bold">{RAPID_RESOLUTION.name} · ${RAPID_RESOLUTION.priceCad}</h4>
+                  <p className="text-sm text-muted-foreground">Eligible pre-trial service from intake through your decision on any Crown response.</p>
                 </div>
-                <p className="text-sm font-semibold">CAD total · GST included</p>
+                <p className="text-sm font-semibold">CAD · plus GST</p>
               </div>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
-                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Charge, deadline, fine and demerit implications</li>
-                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Likely insurance significance and practical options</li>
-                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Representation economics and a recommended next step</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Digital authorization, disclosure request and tracking</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Disclosure analysis and fact-specific prosecutor review</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Immediate updates and your final instruction on any Crown response</li>
               </ul>
             </div>
 
@@ -414,23 +414,21 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
               <div className="flex items-start gap-3">
                 <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
                 <p className="text-xs leading-relaxed text-slate-600">
-                  Full Representation is a separate later choice for eligible matters. It uses a $488 base
-                  representation fee plus applicable tax and 30% of any fine reduction achieved; there is no
-                  success fee if the fine is not reduced. Priority Review has no success fee. Government fines
-                  are separate. Fabsy is an Alberta traffic ticket agent service, not a law firm, and no result is promised.
+                  {RAPID_RESOLUTION.actionCommitment} Trial representation and government fines are separate.
+                  {" "}{RAPID_RESOLUTION.outcomeDisclaimer}
                 </p>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-[0.8fr_1.2fr]">
               <Button type="button" variant="outline" onClick={resetReview}>Review Another Ticket</Button>
-              <Button type="button" size="lg" onClick={continueToPriorityReview}>
-                Continue to $149 Priority Review
+              <Button type="button" size="lg" onClick={continueToRapidResolution}>
+                Continue to Rapid Resolution
               </Button>
             </div>
 
             <p className="text-center text-xs leading-relaxed text-muted-foreground">
-              Continuing opens the secure Priority Review intake with your ticket image and captured details attached in this browser session.
+              Continuing opens the secure Rapid Resolution intake with your ticket image and captured details attached in this browser session.
             </p>
           </div>
         )}

@@ -11,6 +11,7 @@ import { idrDb } from "@/lib/idr/supabase";
 import { ArrowLeft, Calendar, MapPin, Shield, FileText, Phone, Mail, User as UserIcon, Download } from "lucide-react";
 import { format } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
+import { RAPID_RESOLUTION } from "@/config/offers";
 
 interface TicketSubmission {
   id: string;
@@ -195,7 +196,7 @@ export default function AdminSubmissionDetail() {
     if (submission.status === "awaiting_payment") {
       toast({
         title: "Payment not confirmed",
-        description: "A verdict or outcome cannot be sent until Stripe activates the $488 ticket defense service.",
+        description: `A verdict or outcome cannot be sent until Stripe activates the $${RAPID_RESOLUTION.priceCad} CAD plus GST Rapid Resolution service.`,
         variant: "destructive",
       });
       return;
@@ -511,8 +512,8 @@ export default function AdminSubmissionDetail() {
                 <CardTitle>Case Assessment</CardTitle>
                 <CardDescription>
                   {submission.status === "awaiting_payment"
-                    ? "Stripe has not activated this $488 ticket defense service. Assessment messages are disabled."
-                    : "The verdict is informational in the client portal and does not block the core defense checkout."}
+                    ? `Stripe has not activated this $${RAPID_RESOLUTION.priceCad} CAD plus GST Rapid Resolution service. Assessment messages are disabled.`
+                    : "The verdict is informational in the client portal and does not change the stored service or payment history."}
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-5 sm:grid-cols-2">
@@ -603,9 +604,9 @@ export default function AdminSubmissionDetail() {
                     <Download className="mr-2 h-4 w-4" />Download Representation Consent
                   </Button>}
                   {submission.source_assessment_id && <Button variant="outline" className="w-full" onClick={() => navigate(`/admin/assessments/${submission.source_assessment_id}`)}>
-                    <FileText className="mr-2 h-4 w-4" />Open Included Priority Review
+                    <FileText className="mr-2 h-4 w-4" />Open Linked Legacy Ticket Triage
                   </Button>}
-                  {submission.representation_includes_assessment && <p className="text-sm text-muted-foreground">The $149 report deliverables are included with this representation order.</p>}
+                  {submission.representation_includes_assessment && <p className="text-sm text-muted-foreground">This historical record contains the legacy included-assessment flag. It does not confirm a separate paid $149 order or an available credit. Stored payment and linkage data remain unchanged.</p>}
                 </CardContent>
               </Card>
             )}

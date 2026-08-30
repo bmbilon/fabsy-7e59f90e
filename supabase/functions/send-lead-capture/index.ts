@@ -63,8 +63,8 @@ serve(async (req) => {
           </p>
 
           <p style="font-size: 14px; color: #555; line-height: 1.6;">
-            If Fabsy can assist, representation uses a $488 base representation fee plus 30% of any fine reduction achieved;
-            there is no success fee if the fine is not reduced.
+            If Fabsy can assist, Rapid Resolution costs $198 CAD plus applicable GST for an eligible
+            pre-trial matter. Trial representation and government fines are separate.
           </p>
 
           ${getFabsyEmailSignature()}

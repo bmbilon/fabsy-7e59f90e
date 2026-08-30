@@ -1,6 +1,10 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
 import { CheckCircle2, CreditCard, FileCheck2, ReceiptText } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -8,7 +12,7 @@ import { Link } from "react-router-dom";
 const TermsOfPurchase = () => {
   useSafeHead({
     title: "Terms of Purchase | Fabsy Traffic Ticket Services",
-    description: "Concise purchase terms for Fabsy ticket reviews and Alberta traffic ticket representation services.",
+    description: "Purchase terms for Fabsy Rapid Resolution, insurance planning reports, and bundles, including pricing, tax, scope, payment, and refunds.",
     canonical: "https://fabsy.ca/terms-of-purchase",
     robots: "index, follow",
   });
@@ -29,7 +33,7 @@ const TermsOfPurchase = () => {
             These terms apply when you buy a Fabsy service. They are separate from any consent you
             sign to let Fabsy act on a traffic-ticket matter.
           </p>
-          <p className="mt-4 text-sm text-slate-500">Last reviewed: August 26, 2026</p>
+          <p className="mt-4 text-sm text-slate-500">Last reviewed: August 30, 2026</p>
         </div>
       </div>
 
@@ -57,20 +61,29 @@ const TermsOfPurchase = () => {
             <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
               <li className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                <span>Prices are in Canadian dollars. Applicable GST is included or added as shown before payment.</span>
+                <span>Current offer prices are in Canadian dollars, plus applicable GST. The tax and total charge are shown before payment.</span>
               </li>
               <li className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                 <span>
-                  The Priority Ticket Review is ${TICKET_ASSESSMENT.priceCad} CAD total, including
-                  applicable GST. It is a review and report, not representation.
+                  {RAPID_RESOLUTION.name} costs ${RAPID_RESOLUTION.priceCad} CAD {RAPID_RESOLUTION.taxTreatment}
+                  {" "}for an accepted, eligible Alberta pre-trial matter. There is no percentage-based success fee.
                 </span>
               </li>
               <li className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                 <span>
-                  Representation generally uses a $488 base fee plus applicable GST, subject to
-                  eligibility and the written quote for the matter.
+                  The {INSURANCE_IMPACT_REPORT.name} costs ${INSURANCE_IMPACT_REPORT.priceCad} CAD
+                  {" "}{INSURANCE_IMPACT_REPORT.taxTreatment}. It provides consumer research and planning
+                  information, not ticket representation or a licensed broker recommendation.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                <span>
+                  The {RAPID_RESOLUTION_BUNDLE.name} bundle costs ${RAPID_RESOLUTION_BUNDLE.priceCad}
+                  {" "}CAD {RAPID_RESOLUTION_BUNDLE.taxTreatment} and includes both services. Trial
+                  representation is not included and is quoted separately.
                 </span>
               </li>
             </ul>
@@ -82,28 +95,34 @@ const TermsOfPurchase = () => {
             <p className="mt-4 text-sm leading-6 text-slate-600">
               By completing checkout or paying an invoice or payment link, you authorize the
               one-time charge displayed, including any displayed tax. Fabsy will not treat a
-              consent form by itself as payment authorization. Any later success-based charge must
-              be expressly included in the written terms you accept.
+              consent form by itself as payment authorization. New {RAPID_RESOLUTION.name} orders
+              have no success-based charge. Any separately quoted work or additional charge requires
+              the written terms and payment authorization you accept.
             </p>
           </section>
         </div>
 
         <div className="mt-6 space-y-6">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="text-xl font-bold">Upgrade credit and conditional success fee</h2>
+            <h2 className="text-xl font-bold">Existing orders and separately quoted work</h2>
             <div className="mt-4 space-y-4 leading-7 text-slate-600">
               <p>
-                If representation is worthwhile and the same matter is eligible, the $
-                {TICKET_ASSESSMENT.representationCredit.amountCad} Priority Ticket Review payment
-                can be applied to the $488 base representation fee. The remaining base-fee balance
-                is ${TICKET_ASSESSMENT.representationCredit.upgradeBalanceCad} plus applicable tax.
-                The credit is not automatic representation, and you are not required to upgrade.
+                An already accepted order keeps its original written price, tax treatment, scope,
+                eligible credits, and agreed fee waivers unless a change is agreed in writing.
+                Current website pricing does not automatically amend an existing order. Any
+                eligible historical review credit is subject to the original terms and secure
+                verification; it does not start representation or require you to upgrade.
               </p>
               <p>
-                A 30% fee on a fine reduction applies only when it is expressly stated in the
-                written quote or order terms you accept. If the fine is not reduced, no such fee is
-                charged. If your written quote waives or removes that fee, the written waiver
-                controls.
+                A success-based fee under a historical order applies only if it was expressly
+                included in the written quote or order terms you accepted. If the fine is not
+                reduced, no such fee is charged. A written waiver controls. No percentage-based
+                success fee applies to new {RAPID_RESOLUTION.name} orders.
+              </p>
+              <p>
+                If you choose to go to trial or request other work outside the accepted pre-trial
+                scope, any available service is quoted separately and requires your acceptance.
+                You are not required to purchase additional services.
               </p>
             </div>
           </section>
@@ -112,10 +131,25 @@ const TermsOfPurchase = () => {
             <h2 className="text-xl font-bold">What is not included</h2>
             <p className="mt-3 leading-7 text-slate-600">
               Government fines, court costs, driver abstracts or other third-party records, and
-              services not expressly listed in your order are separate. A ticket review does not
-              start representation. Representation is available only after Fabsy confirms that the
-              matter is eligible and accepts the engagement.
+              trial representation, appeals, reopenings, and services not expressly listed in your
+              order are separate. {RAPID_RESOLUTION.name} does not include Immediate Roadside
+              Sanctions, Notices of Administrative Penalty, or matters outside Fabsy's permitted
+              or accepted agent scope. A report purchase or consent form alone does not start
+              representation. Representation is available only after Fabsy confirms that the matter
+              is eligible and accepts the engagement.
             </p>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-xl font-bold">The Rapid Resolution action commitment</h2>
+            <div className="mt-3 space-y-3 leading-7 text-slate-600">
+              <p>{RAPID_RESOLUTION.actionCommitment}</p>
+              <p>{RAPID_RESOLUTION.speedDisclaimer}</p>
+              <p>
+                Fabsy explains any Crown response and obtains your file-specific instructions before
+                accepting an available resolution. Nothing is accepted automatically.
+              </p>
+            </div>
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

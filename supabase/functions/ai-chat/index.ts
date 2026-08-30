@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 const SERVICE_STATUS = "Fabsy is an agent service, not a law firm.";
-const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
-const EXACT_TICKET_TRIAGE = "Ticket Triage is Fabsy's human-reviewed traffic ticket and insurance-impact assessment. It costs $149 CAD total, including applicable GST. If representation is worthwhile and the same matter is eligible, the $149 can be applied to the $488 base representation fee, leaving a $339 base-fee balance plus applicable tax; eligible clients receive priority placement and the 30% success fee still applies to any fine reduction.";
+const EXACT_PRICING = "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate.";
+const EXACT_RAPID_RESOLUTION = "Rapid Resolution includes secure intake, digital authorization, disclosure request and review, a fact-specific prosecutor-review submission, prompt status notifications, a plain-language Crown-response comparison and the client's final decision. Complete, readable disclosure is reviewed and the next authorized action is prepared or submitted within 48 hours; Crown response and final-outcome timing are separate.";
 const SAFE_REPLY = `I can provide general process information, but I cannot provide case-specific legal advice or calculate a fine, demerit count, or response deadline. Check the values and instructions printed on your ticket. ${SERVICE_STATUS} ${EXACT_PRICING} Outcomes vary.`;
 
 const CHAT_SYSTEM_PROMPT = `You are Fabsy's automated assistant for Alberta traffic ticket questions.
@@ -28,12 +28,12 @@ FACT SAFETY:
 - Use a standard hyphen or comma instead of a long dash.
 
 PRICING:
-- For representation pricing, use this exact sentence: "${EXACT_PRICING}"
-- For assessment pricing or upgrade benefits, use this exact wording: "${EXACT_TICKET_TRIAGE}"
+- For current pricing, use this exact sentence: "${EXACT_PRICING}"
+- For Rapid Resolution scope or timing, use this exact wording: "${EXACT_RAPID_RESOLUTION}"
 
 STYLE:
 - Be concise, calm, and plain-language.
-- Offer Ticket Triage when a user needs a human-reviewed ticket-specific recommendation. Mention the Free Representation Eligibility Check only when the user solely wants to know whether Fabsy may provide representation.
+- Offer Rapid Resolution when a user needs Fabsy to handle an eligible pre-trial ticket. Explain that a free upload tool captures ticket details but does not provide case-specific advice or extend a deadline.
 - Do not claim that a consultation or outcome is free.`;
 
 type UnknownRecord = Record<string, unknown>;
@@ -138,7 +138,7 @@ const hasOverCapPercentage = (text: string): boolean => {
 
 const hasUnsupportedTicketNumbers = (text: string, ticketData: unknown): boolean => {
   const evidence = collectTicketEvidence(ticketData);
-  const withoutApprovedPricing = text.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
+  const withoutApprovedPricing = text.split(EXACT_PRICING).join("").split(EXACT_RAPID_RESOLUTION).join("");
 
   const amountPattern = /(?:CA\$|CAD\s*\$?)\s*\d[\d,.]*|\$\s*\d[\d,.]*|\b\d[\d,.]*\s*(?:CAD|dollars?)\b|\bfine(?:\s+\w+){0,3}\s+\d[\d,.]*/gi;
   const demeritPattern = /\b\d+(?:\.\d+)?\s+demerit(?:\s+points?)?\b/gi;
@@ -163,7 +163,7 @@ const sanitizeAiReply = (reply: unknown, ticketData: unknown): string => {
 
   const hasForbiddenLanguage = forbiddenOutputPatterns.some((pattern) => pattern.test(normalized));
   const hasGenderedAudience = /\b(?:for women|women-only|female drivers?)\b/i.test(normalized);
-  const withoutApprovedPricing = normalized.split(EXACT_PRICING).join("").split(EXACT_TICKET_TRIAGE).join("");
+  const withoutApprovedPricing = normalized.split(EXACT_PRICING).join("").split(EXACT_RAPID_RESOLUTION).join("");
   const hasInexactPricing = /\b(?:price|pricing|fee|cost)\b|\bFabsy\b[^.!?\n]{0,80}(?:\bcharges?\b|\$)/i.test(withoutApprovedPricing);
 
   if (

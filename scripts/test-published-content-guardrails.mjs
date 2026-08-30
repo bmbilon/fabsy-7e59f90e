@@ -2,7 +2,10 @@
 
 import assert from 'node:assert/strict';
 import {
+  EXACT_FABSY_ACTION_COMMITMENT,
+  EXACT_FABSY_ONE_LINE,
   EXACT_FABSY_PRICING,
+  EXACT_FABSY_SPEED_DISCLAIMER,
   SAFE_BLOG_FALLBACK_TITLE,
   articleViolations,
   guardPublishedBlogFields,
@@ -37,6 +40,9 @@ for (const claim of [
 
 for (const pricing of [
   'Our fee is $399 and you only pay if we reduce the fine.',
+  'Rapid Resolution costs $198.',
+  'The insurance report is $49.',
+  'The bundle costs $229.',
   'Fabsy offers no win no fee pricing.',
   'Pricing is 30% of the amount saved.',
   'You only pay when we are successful.',
@@ -67,6 +73,7 @@ for (const unsupportedClaim of [
   'Insurance premiums can rise 25 percent.',
   'Insurance premiums can rise twenty five percent.',
   'The conviction can affect insurance for three years.',
+  'Fabsy completes its review within 24 hours.',
   `${EXACT_FABSY_PRICING} The fine is $500.`,
 ]) {
   const guarded = guard({ content: unsupportedClaim });
@@ -79,6 +86,15 @@ assert.equal(unsafeTitle.title, SAFE_BLOG_FALLBACK_TITLE);
 
 const speedOnly = guard({ content: 'A report described a vehicle travelling at 182 km/h.' });
 assert.match(speedOnly.content, /182 km\/h/);
+
+for (const approvedActionCopy of [
+  EXACT_FABSY_ONE_LINE,
+  EXACT_FABSY_ACTION_COMMITMENT,
+  EXACT_FABSY_SPEED_DISCLAIMER,
+]) {
+  const guarded = guard({ content: approvedActionCopy });
+  assert.match(guarded.content, /48[- ]hour|48 hours/i);
+}
 
 assert.ok(articleViolations(post({ content: 'Fabsy wins more than 95% of cases.' })).length > 0);
 assert.ok(

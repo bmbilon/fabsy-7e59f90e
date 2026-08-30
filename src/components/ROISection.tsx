@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, DollarSign, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
+import { RAPID_RESOLUTION, RAPID_RESOLUTION_BUNDLE } from "@/config/offers";
 
 const ROISection = () => {
   return (
@@ -16,8 +17,8 @@ const ROISection = () => {
             Know How <span className="text-gradient-hero">Fabsy Charges</span>
           </h2>
           <p className="text-xl text-foreground/90 max-w-3xl mx-auto drop-shadow-sm mb-6">
-            Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
-            If the fine is not reduced, there is no success fee.
+            One posted ${RAPID_RESOLUTION.priceCad} CAD plus GST price for eligible pre-trial service.
+            Add insurance planning and pay ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD plus GST for both.
           </p>
 
         </div>
@@ -33,16 +34,16 @@ const ROISection = () => {
 
                 <div className="space-y-4">
                   <div className="flex justify-between gap-4 p-4 bg-accent/50 rounded-lg">
-                    <span className="text-secondary">Base representation fee</span>
-                    <span className="font-bold text-primary">$488 CAD</span>
+                    <span className="text-secondary">Rapid Resolution</span>
+                    <span className="font-bold text-primary">${RAPID_RESOLUTION.priceCad} CAD</span>
                   </div>
                   <div className="flex justify-between gap-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
-                    <span className="text-secondary">Fine reduction charge</span>
-                    <span className="font-bold text-primary text-right">30% of reduction achieved</span>
+                    <span className="text-secondary">Insurance report add-on</span>
+                    <span className="font-bold text-primary text-right">$31 CAD</span>
                   </div>
                   <div className="flex justify-between gap-4 p-4 bg-accent/50 rounded-lg">
-                    <span className="text-secondary">If the fine is not reduced</span>
-                    <span className="font-bold text-primary text-right">No additional charge</span>
+                    <span className="text-secondary">Both services</span>
+                    <span className="font-bold text-primary text-right">${RAPID_RESOLUTION_BUNDLE.priceCad} CAD</span>
                   </div>
                 </div>
               </div>
@@ -70,23 +71,23 @@ const ROISection = () => {
               </h3>
               <p className="text-lg text-foreground/90 leading-relaxed drop-shadow-sm">
                 Fabsy reviews the ticket information you provide and offers traffic ticket agent
-                representation where that service is permitted and available.
+                Rapid Resolution where that pre-trial agent service is permitted and accepted.
               </p>
             </div>
 
             <div className="space-y-4">
               {[
                 {
-                  title: "Ticket Review",
-                  description: "Review of the ticket, available documents, and circumstances you provide",
+                  title: "Disclosure Request & Tracking",
+                  description: "Digital authorization and active tracking of the evidence request",
                 },
                 {
-                  title: "Representation Planning",
-                  description: "A ticket-specific plan based on the available information",
+                  title: "48-Hour Fabsy Action",
+                  description: "Complete disclosure reviewed and the next authorized action prepared or submitted within 48 hours",
                 },
                 {
                   title: "Case Updates",
-                  description: "Clear communication as the matter moves through the applicable process",
+                  description: "Immediate notifications and a plain-language comparison when the Crown responds",
                 },
               ].map((item) => (
                 <div key={item.title} className="flex items-start gap-4 p-4 bg-white/20 backdrop-blur-sm rounded-lg border border-primary/20">
@@ -99,9 +100,9 @@ const ROISection = () => {
               ))}
             </div>
 
-            <Link to="/traffic-ticket-assessment/start">
+            <Link to="/submit-ticket">
               <Button size="lg" className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                Start Free Ticket Review
+                Start Rapid Resolution
               </Button>
             </Link>
           </div>

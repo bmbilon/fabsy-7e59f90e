@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldPath, type FieldPathValue } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { Camera, Upload, Loader2, Check } from "lucide-react";
@@ -91,7 +91,10 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   };
 
   // Auto-save on blur
-  const handleFieldUpdate = <K extends keyof PersonalInfoSchema>(field: K, value: PersonalInfoSchema[K]) => {
+  const handleFieldUpdate = <K extends FieldPath<PersonalInfoSchema>>(
+    field: K,
+    value: FieldPathValue<PersonalInfoSchema, K>,
+  ) => {
     setValue(field, value);
     updateFormData({ [field]: value } as Partial<FormData>);
   };
@@ -645,8 +648,9 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
 
       <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
         <p className="text-sm text-muted-foreground">
-          <span className="font-semibold text-primary">Privacy Note:</span> Your personal information 
-          is encrypted and only used for your ticket defense case. We never share your data with third parties.
+          <span className="font-semibold text-primary">Privacy Note:</span> Your personal information
+          is protected and used to deliver Rapid Resolution. It is shared only as authorized or needed
+          for the ticket process and with service providers described in our Privacy Policy.
         </p>
       </div>
     </form>

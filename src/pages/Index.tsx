@@ -6,20 +6,20 @@ import Header from "@/components/Header";
 import useSafeHead from "@/hooks/useSafeHead";
 import AssessmentHomepageJourney from "@/components/AssessmentHomepageJourney";
 import StaticJsonLd from "@/components/StaticJsonLd";
-import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { RAPID_RESOLUTION } from "@/config/offers";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 
 const Index = () => {
   useSafeHead({
-    title: "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
-    description: "Ticket Triage is Fabsy's $149 CAD total, human-reviewed Alberta traffic ticket and insurance-impact assessment with a practical next-step recommendation.",
+    title: `Rapid Resolution | Alberta Traffic Ticket Help | $${RAPID_RESOLUTION.priceCad} CAD`,
+    description: "Fabsy handles your Alberta ticket intake, disclosure, review, prosecutor follow-up, and client updates through one pre-trial service.",
     canonical: "https://fabsy.ca/",
   });
 
   useEffect(() => {
     trackAssessmentEvent(
       "assessment_offer_view",
-      { location: "homepage", value: TICKET_ASSESSMENT.priceCad },
+      { location: "homepage", value: RAPID_RESOLUTION.priceCad },
       "homepage",
     );
   }, []);
@@ -27,22 +27,21 @@ const Index = () => {
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: TICKET_ASSESSMENT.name,
-    alternateName: TICKET_ASSESSMENT.descriptor,
-    description: TICKET_ASSESSMENT.heroSubheadline,
-    url: `https://fabsy.ca${TICKET_ASSESSMENT.slug}`,
+    name: RAPID_RESOLUTION.name,
+    description: RAPID_RESOLUTION.oneLineDescription,
+    url: `https://fabsy.ca${RAPID_RESOLUTION.slug}`,
     brand: { "@type": "Brand", name: "Fabsy" },
     offers: {
       "@type": "Offer",
-      url: `https://fabsy.ca${TICKET_ASSESSMENT.intakePath}`,
-      price: TICKET_ASSESSMENT.priceCad.toFixed(2),
-      priceCurrency: TICKET_ASSESSMENT.currency,
+      url: `https://fabsy.ca${RAPID_RESOLUTION.intakePath}`,
+      price: RAPID_RESOLUTION.priceCad.toFixed(2),
+      priceCurrency: RAPID_RESOLUTION.currency,
       availability: "https://schema.org/InStock",
       priceSpecification: {
         "@type": "UnitPriceSpecification",
-        price: TICKET_ASSESSMENT.priceCad.toFixed(2),
-        priceCurrency: TICKET_ASSESSMENT.currency,
-        valueAddedTaxIncluded: true,
+        price: RAPID_RESOLUTION.priceCad.toFixed(2),
+        priceCurrency: RAPID_RESOLUTION.currency,
+        valueAddedTaxIncluded: false,
       },
     },
   } as const;

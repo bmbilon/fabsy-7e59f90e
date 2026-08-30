@@ -74,7 +74,7 @@ export function generateProfessionalServiceJsonLd(data: {
       "@type": "AdministrativeArea",
       "name": data.areaServed || "Alberta"
     },
-    "priceRange": data.priceRange || "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced."
+    "priceRange": data.priceRange || "$49–$229 CAD plus applicable GST"
   };
 }
 

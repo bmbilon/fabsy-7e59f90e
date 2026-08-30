@@ -181,7 +181,7 @@ function statusVariant(status: IdrOrderRow["status"]) {
 }
 
 export default function AdminIdrDashboard() {
-  useSafeHead({ title: "IDR Operations | Fabsy", robots: "noindex, nofollow" });
+  useSafeHead({ title: "Insurance Report Operations | Fabsy", robots: "noindex, nofollow" });
   const navigate = useNavigate();
   const { toast } = useToast();
   const [role, setRole] = useState<StaffRole | null>(null);
@@ -320,11 +320,11 @@ export default function AdminIdrDashboard() {
       try {
         quoteUrl = new URL(ruleForm.quote_url);
       } catch {
-        setError("Quote URL must be a valid HTTPS URL when provided.");
+        setError("Public information URL must be a valid HTTPS URL when provided.");
         return;
       }
       if (!isPublicHttpsUrl(quoteUrl)) {
-        setError("Quote URL must be a valid HTTPS URL when provided.");
+        setError("Public information URL must be a valid HTTPS URL when provided.");
         return;
       }
     }
@@ -473,8 +473,8 @@ export default function AdminIdrDashboard() {
           </Button>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Insurance Damage Report operations</h1>
-              <p className="text-sm text-muted-foreground">Manual abstract review, orders, and sourced insurer rules.</p>
+              <h1 className="text-2xl font-bold">Insurance Impact &amp; Renewal Planning Report operations</h1>
+              <p className="text-sm text-muted-foreground">Manual abstract review, report orders, and sourced public insurer research.</p>
             </div>
             <Badge variant="outline" className="w-fit"><ShieldCheck className="mr-1 h-3.5 w-3.5" />{role?.replace("_", " ")}</Badge>
           </div>
@@ -529,7 +529,7 @@ export default function AdminIdrDashboard() {
           <div className="mb-4 flex items-center gap-3">
             <ClipboardList className="h-6 w-6 text-primary" />
             <div>
-              <h2 id="orders-heading" className="text-xl font-semibold">IDR orders</h2>
+              <h2 id="orders-heading" className="text-xl font-semibold">Insurance report orders</h2>
               <p className="text-sm text-muted-foreground">Open any order to review its abstract and report data.</p>
             </div>
           </div>
@@ -549,7 +549,7 @@ export default function AdminIdrDashboard() {
                   </TableHeader>
                   <TableBody>
                     {orders.length === 0 ? (
-                      <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No IDR orders found.</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No insurance report orders found.</TableCell></TableRow>
                     ) : orders.map((order) => (
                       <TableRow key={order.id}>
                         <TableCell className="font-medium">{clientLabel(order.clients)}</TableCell>
@@ -647,7 +647,7 @@ export default function AdminIdrDashboard() {
                     <Input id="carrier-phone" type="tel" value={ruleForm.phone} onChange={(event) => setRuleForm((value) => ({ ...value, phone: event.target.value }))} />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="quote-url">Verified HTTPS quote URL</Label>
+                    <Label htmlFor="quote-url">Verified HTTPS public information URL</Label>
                     <Input id="quote-url" type="url" pattern="https://.*" placeholder="https://" value={ruleForm.quote_url} onChange={(event) => setRuleForm((value) => ({ ...value, quote_url: event.target.value }))} />
                   </div>
                   <fieldset className="grid gap-4 rounded-lg border p-4 md:col-span-2 md:grid-cols-2 xl:col-span-3 xl:grid-cols-3">
@@ -738,7 +738,7 @@ export default function AdminIdrDashboard() {
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
                             {rule.phone && <a className="text-primary hover:underline" href={`tel:${rule.phone}`}>{rule.phone}</a>}
-                            {rule.quote_url && <a className="text-primary hover:underline" href={rule.quote_url} target="_blank" rel="noreferrer">Quote page</a>}
+                            {rule.quote_url && <a className="text-primary hover:underline" href={rule.quote_url} target="_blank" rel="noreferrer">Public information</a>}
                             {!rule.phone && !rule.quote_url && <span className="text-muted-foreground">Not verified</span>}
                           </div>
                         </TableCell>

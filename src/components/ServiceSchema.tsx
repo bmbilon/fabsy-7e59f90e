@@ -1,5 +1,6 @@
 import React from 'react';
 import StaticJsonLd from '@/components/StaticJsonLd';
+import { CANONICAL_OFFER_PRICING, RAPID_RESOLUTION } from '@/config/offers';
 
 type Props = {
   name: string;
@@ -21,7 +22,7 @@ const ServiceSchema: React.FC<Props> = ({
   providerName = 'Fabsy Traffic Ticket Services',
   providerUrl = 'https://fabsy.ca',
   cityName,
-  offerDescription = 'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.',
+  offerDescription = CANONICAL_OFFER_PRICING,
 }) => {
   if (!name || !serviceType || !url) return null;
 
@@ -35,6 +36,9 @@ const ServiceSchema: React.FC<Props> = ({
     offers: {
       '@type': 'Offer',
       description: offerDescription,
+      price: RAPID_RESOLUTION.priceCad.toFixed(2),
+      priceCurrency: RAPID_RESOLUTION.currency,
+      url: `https://fabsy.ca${RAPID_RESOLUTION.intakePath}`,
     },
   };
 

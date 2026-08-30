@@ -1,7 +1,11 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { IDR_PRICE_ADDON, IDR_PRICE_STANDALONE } from "@/config/idr";
-import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import {
+  CANONICAL_OFFER_PRICING,
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 
 const TermsOfService = () => {
   return (
@@ -17,19 +21,22 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Service Description</h2>
             <p className="mb-4">
-              Fabsy Traffic Ticket Services is an agent service that provides traffic ticket
-              representation for eligible non-criminal provincial traffic offences in Alberta,
-              Canada. Our services include:
+              Fabsy Traffic Ticket Services is an Alberta traffic ticket agent service. Our current
+              paid services are Rapid Resolution for eligible pre-trial matters and the Insurance
+              Impact &amp; Renewal Planning Report. Fabsy is not a law firm.
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Court representation for traffic violations</li>
-              <li>Administrative assistance with traffic ticket procedures</li>
-              <li>Consultation on traffic ticket matters</li>
-              <li>Ticket Triage assessments based on customer-supplied information and ticket documents</li>
-              <li>Optional Insurance Damage Reports based on client-supplied records and public research</li>
+              <li>Secure ticket intake, eligibility and deadline review</li>
+              <li>Digital authorization, disclosure request and disclosure tracking</li>
+              <li>Technology-assisted disclosure analysis with qualified review</li>
+              <li>A fact-specific prosecutor-review submission where authorized and supported</li>
+              <li>Prompt file notifications, Crown-response explanation and a client-directed decision</li>
+              <li>Optional insurance-impact and renewal-planning reports based on client-supplied records and approved public sources</li>
             </ul>
             <p className="mt-4">
-              <strong>Important:</strong> We provide representation services, not legal advice. We are not lawyers and do not practice law.
+              <strong>Important:</strong> Rapid Resolution is limited to the accepted pre-trial scope.
+              It does not include a contested trial, appeal, reopening, Immediate Roadside Sanction,
+              Notice of Administrative Penalty, government fine, or work outside Fabsy's permitted scope.
             </p>
           </section>
 
@@ -47,64 +54,62 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">3. Geographic Limitations</h2>
             <p>
-              Some Alberta court locations do not permit paid non-lawyer agents to provide representation. Service availability varies by jurisdiction within the province. We will inform you if representation is not available at your specific court location.
+              Service availability depends on the charge, procedure, deadline, court location, portal
+              requirements and whether paid agent services are permitted and accepted by Fabsy. We may
+              decline or refer a matter that is outside the Rapid Resolution scope.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">4. How Our Pricing Works</h2>
             <p className="mb-4">
-              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
-              If the fine is not reduced, there is no success fee.
+              {CANONICAL_OFFER_PRICING}
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">5. Fees and Payment</h2>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Service fees are charged according to the pricing terms in Section 4</li>
+              <li>Rapid Resolution is ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST</li>
+              <li>The standalone report is ${INSURANCE_IMPACT_REPORT.priceCad} CAD plus applicable GST</li>
+              <li>The bundle is ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD plus applicable GST</li>
               <li>Additional court costs or fines beyond our control remain the client's responsibility</li>
               <li>All fees are quoted in Canadian dollars</li>
+              <li>The complete subtotal and tax are shown before payment through Stripe</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5A. Insurance Damage Report Terms</h2>
+            <h2 className="text-2xl font-semibold mb-4">5A. Rapid Resolution Terms</h2>
             <p className="mb-4">
-              The standalone Insurance Damage Report costs ${IDR_PRICE_STANDALONE} CAD. The optional report add-on
-              costs ${IDR_PRICE_ADDON} CAD when offered with an eligible Fabsy ticket matter. Applicable tax is
-              calculated at checkout. The cost of ordering a driver abstract is separate.
+              Rapid Resolution begins after intake, authorization and payment are complete and Fabsy
+              accepts the matter. Requesting disclosure does not itself extend a response date, trial date
+              or other deadline. You remain responsible for monitoring every deadline and attending if a
+              court or the procedure requires you personally.
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>You order and upload your own Alberta driver abstract and provide accurate ticket, policy, renewal, and rating information needed for the report</li>
-              <li>Report estimates are labelled ranges based on public information and the records supplied; they are not insurance quotes</li>
-              <li>Carrier call lists are research starting points. You decide whom to contact and make every call yourself</li>
-              <li>Fabsy does not contact insurers for you, recommend a particular switch, or promise eligibility, savings, or a premium outcome</li>
-              <li>Reminder emails are a convenience. You remain responsible for renewal dates, carrier contact, and decisions about insurance coverage</li>
+              <li>Fabsy will request and review available disclosure where authorized and operationally available</li>
+              <li>The 48-hour commitment begins when complete, readable disclosure is received and matched to your file</li>
+              <li>The commitment covers Fabsy's review and next authorized action, not Crown response time or final-outcome timing</li>
+              <li>Fabsy will not accept a Crown offer, enter a guilty plea or finalize a proposed resolution without your case-specific instruction</li>
+              <li>If you choose trial, trial representation is subject to a separate eligibility review, agreement and quote</li>
             </ul>
-            <p className="mt-4">
-              This report is consumer research based on publicly available information. Fabsy is
-              not an insurance agent or broker and does not sell, quote, or place insurance.
-            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5B. Ticket Triage Terms</h2>
+            <h2 className="text-2xl font-semibold mb-4">5B. Insurance Impact &amp; Renewal Planning Report Terms</h2>
             <p className="mb-4">
-              Ticket Triage, Fabsy's human-reviewed traffic ticket and insurance-impact assessment, costs ${TICKET_ASSESSMENT.priceCad} CAD total as a
-              one-time payment, including applicable GST, charged at checkout. Government fines, court costs,
-              driver records, and any later representation service are separate.
+              The report is a one-time consumer research and planning product. The cost of obtaining
+              a driver abstract, broker service, insurer quote or other third-party record is separate.
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>You must provide accurate contact, ticket, driving-record, and insurance context and securely upload a legible Alberta ticket</li>
-              <li>You remain responsible for every response, payment, appearance, limitation, and court deadline; submitting or purchasing an assessment does not extend or pause one</li>
-              <li>The assessment is a human-reviewed decision aid, not legal advice, an insurance quote, or a promise of a court, conviction, demerit, insurer, or premium result</li>
-              <li>Insurance impact is described cautiously using the supplied context; an insurer determines underwriting, eligibility, rating, and renewal</li>
-              <li>Fabsy may recommend paying or handling a matter directly when representation does not appear economically worthwhile</li>
-              <li>Representation availability, eligibility, scope, and pricing are confirmed separately and are not included in the assessment</li>
-              <li>{TICKET_ASSESSMENT.representationPriority.publicCopy}</li>
-              <li>{TICKET_ASSESSMENT.representationCredit.publicCopy}</li>
+              <li>You provide accurate ticket, driving-record, policy, renewal and rating information needed for the report</li>
+              <li>Scenarios and ranges are based on approved public information and supplied records; they are not insurer quotes</li>
+              <li>Public research sources and questions are planning aids, not recommendations to buy, cancel, renew or change coverage</li>
+              <li>Fabsy does not contact insurers, submit applications, negotiate renewals or promise eligibility, savings or a premium outcome</li>
+              <li>A licensed insurance broker or insurer must provide insurer-specific advice and quotes</li>
             </ul>
+            <p className="mt-4">{INSURANCE_IMPACT_REPORT.disclaimer}</p>
           </section>
 
           <section>
@@ -113,6 +118,7 @@ const TermsOfService = () => {
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide accurate and complete information about their traffic ticket</li>
               <li>Respond promptly to requests for information or documentation</li>
+              <li>Review every Crown response and provide a clear instruction before an offer expires</li>
               <li>Attend court proceedings if required by the court</li>
               <li>Pay all applicable fees and court costs</li>
               <li>Understand that we provide representation services, not legal advice</li>
@@ -122,7 +128,9 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. No Promised Result</h2>
             <p>
-              While we strive to achieve the best possible outcome for each client, we cannot and do not promise specific results. Court decisions are ultimately at the discretion of the presiding judicial officer.
+              Outcomes depend on the charge, evidence, procedure, prosecutor and court. Fabsy does
+              not promise a withdrawal, reduced charge, lower fine, fewer demerits, premium saving,
+              insurer eligibility or any other result. The 48-hour service commitment is not an outcome promise.
             </p>
           </section>
 
@@ -143,7 +151,7 @@ const TermsOfService = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Termination</h2>
+            <h2 className="text-2xl font-semibold mb-4">10. Cancellation, Refunds and Termination</h2>
             <p className="mb-4">Either party may terminate the representation agreement:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>By mutual agreement</li>
@@ -151,6 +159,12 @@ const TermsOfService = () => {
               <li>For failure to provide required information or cooperation</li>
               <li>If representation becomes impossible or impractical</li>
             </ul>
+            <p className="mt-4">
+              Contact Fabsy promptly to request cancellation. Refund eligibility depends on the work
+              already performed, third-party charges, the checkout disclosure and applicable law. If
+              Fabsy declines an otherwise complete paid matter before substantive work begins, Fabsy
+              will refund the applicable service fee. Statutory cancellation rights are not limited by these terms.
+            </p>
           </section>
 
           <section>

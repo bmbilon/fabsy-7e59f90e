@@ -737,8 +737,6 @@ interface EvaluatedCarrier {
   group: CarrierRuleGroup;
   phone?: string;
   quoteUrl?: string;
-  rankingScore: number;
-  reason: string;
   researchSources: readonly SourceReference[];
   postures: readonly EvaluatedPosture[];
 }
@@ -791,7 +789,7 @@ function validateInsurerRules(
       assertPhone(rule.phone, `Phone for rule ${rule.carrierId}`);
     }
     if (rule.quoteUrl) {
-      assertHttpsUrl(rule.quoteUrl, `Quote URL for rule ${rule.carrierId}`);
+      assertHttpsUrl(rule.quoteUrl, `Public information URL for rule ${rule.carrierId}`);
     }
 
     const percentRange = rule.estimatedAnnualImpactPercentRange;
@@ -873,13 +871,6 @@ function activeClassCounts(
   return counts;
 }
 
-function postureSummary(posture: EvaluatedPosture): string {
-  const className = posture.convictionClass;
-  const convictionWord = posture.activeConvictionCount === 1 ? "conviction" : "convictions";
-  const behavior = posture.behavior === "no_surcharge" ? "no-surcharge" : "surcharge";
-  return `${behavior} for ${posture.activeConvictionCount} active ${className} ${convictionWord}`;
-}
-
 function evaluateCarrier(
   group: CarrierRuleGroup,
   convictions: readonly ConvictionTimelineItem[],
@@ -927,24 +918,14 @@ function evaluateCarrier(
     });
   }
 
-  const hasSurcharge = postures.some((posture) => posture.behavior === "surcharge");
-  const hasForgiveness = postures.some((posture) =>
-    posture.selectedRules.some((rule) => rule.forgivenessProduct),
-  );
-  const rankingScore = (hasSurcharge ? 100 : 200) + (hasForgiveness ? 10 : 0);
   const matchedRules = postures.flatMap((posture) => posture.matchedRules);
   const phone = matchedRules.find((rule) => rule.phone)?.phone;
   const quoteUrl = matchedRules.find((rule) => rule.quoteUrl)?.quoteUrl;
-  const forgivenessSentence = hasForgiveness
-    ? " A forgiveness product is documented, so ask whether it applies to this exact profile."
-    : "";
 
   return {
     group,
     ...(phone ? { phone } : {}),
     ...(quoteUrl ? { quoteUrl } : {}),
-    rankingScore,
-    reason: `Current exact-count research shows ${postures.map(postureSummary).join(" and ")}.${forgivenessSentence}`,
     researchSources: uniqueSources(matchedRules.map((rule) => rule.researchSource)),
     postures,
   };
@@ -967,31 +948,20 @@ function buildCarrierCallList(
       );
       continue;
     }
-    if (!evaluated.phone && !evaluated.quoteUrl) {
-      appendUnique(
-        issues,
-        `Carrier ${group.carrierName} was excluded because its exact matched rows have no contact.`,
-      );
-      continue;
-    }
     candidates.push(evaluated);
   }
 
   candidates.sort(
     (left, right) =>
-      right.rankingScore - left.rankingScore ||
       compareStrings(left.group.carrierName, right.group.carrierName) ||
       compareStrings(left.group.carrierId, right.group.carrierId),
   );
   const selected = candidates.slice(0, IDR_MAX_CARRIERS_TO_CALL);
-  const entries = selected.map((candidate, index): CarrierCallListItem => ({
-    rank: index + 1,
+  const entries = selected.map((candidate): CarrierCallListItem => ({
     carrierId: candidate.group.carrierId,
     carrierName: candidate.group.carrierName,
-    reason: candidate.reason,
     ...(candidate.phone ? { phone: candidate.phone } : {}),
     ...(candidate.quoteUrl ? { quoteUrl: candidate.quoteUrl } : {}),
-    rankingScore: candidate.rankingScore,
     researchSources: candidate.researchSources,
     evaluatedPostures: candidate.postures.map((posture) => ({
       convictionClass: posture.convictionClass,
@@ -1003,7 +973,7 @@ function buildCarrierCallList(
 
   const status = entries.length >= IDR_MIN_CARRIERS_TO_CALL ? "ready" : "incomplete";
   if (status === "incomplete") {
-    const issue = `Only ${entries.length} unique eligible carriers have current exact rules and verified contact data; ${IDR_MIN_CARRIERS_TO_CALL} are required.`;
+    const issue = `Only ${entries.length} unique insurers have current public research data; ${IDR_MIN_CARRIERS_TO_CALL} are required.`;
     appendUnique(issues, issue);
     appendUnique(blockers, issue);
   }
@@ -1305,10 +1275,10 @@ export function generateIdrReport(input: IdrReportInput): IdrReport {
     estimatedThreeYearPremiumImpact,
     gridBenchmark,
     carrierCallList: {
-      heading: "Carriers worth calling",
+      heading: "Public insurer research directory",
       status: carrierCallList.status,
       framing:
-        `This ranked call list is a research starting point based only on the supplied rules and contact data.${scenarioResult.scenario?.status === "projected" ? " Its exact-count evaluation includes the separately labelled projected current-ticket conviction scenario." : scenarioResult.scenario?.status === "already-reflected" ? " The matched current ticket was already reflected in the abstract counts and was not added again." : ""} Confirm eligibility and pricing directly with each carrier or a licensed broker.`,
+        "Entries are listed alphabetically from current public sources. They are not ranked or recommended, and inclusion does not predict eligibility, pricing or coverage. Use the public links for independent research and ask a licensed broker for insurer-specific advice or quotes.",
       entries: carrierCallList.entries,
     },
     renewalSchedule,

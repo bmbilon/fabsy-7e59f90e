@@ -38,15 +38,15 @@ async function verify(path, assertions, viewport = { width: 1280, height: 900 })
 
 try {
   await verify("/insurance-damage-report", async (page, body) => {
-    for (const expected of ["$129", "$99", "$488", "30%"]) {
+    for (const expected of ["$49", "$229", "Insurance Impact & Renewal Planning Report"]) {
       if (!body.includes(expected)) throw new Error(`Product page is missing ${expected}.`);
     }
-    if (!body.toLowerCase().includes("carriers worth calling")) {
-      throw new Error("Product page is missing the carrier-call framing.");
+    if (!body.toLowerCase().includes("carriers worth researching")) {
+      throw new Error("Product page is missing the public insurer research framing.");
     }
-    const disclaimer = "This report is consumer research based on publicly available information. Fabsy is not an insurance agent or broker and does not sell, quote, or place insurance.";
+    const disclaimer = "This report provides consumer research and planning information, not an insurer quote, licensed broker recommendation or promise of eligibility, premium savings or a particular insurance outcome. Fabsy is not an insurance agent or broker and does not sell, quote or place insurance.";
     if (!body.includes(disclaimer)) throw new Error("Product page is missing the exact disclaimer.");
-    if (await page.getByRole("link", { name: /Get the standalone report for \$129/i }).count() !== 1) {
+    if (await page.getByRole("link", { name: /Get the report for \$49/i }).count() !== 1) {
       throw new Error("Standalone report call to action is unavailable.");
     }
     const faqSchema = await page.locator('script[type="application/ld+json"][data-faq="true"]').textContent();
@@ -55,7 +55,7 @@ try {
   });
 
   await verify("/insurance-damage-report/checkout", async (page, body) => {
-    if (!body.includes("Standalone report checkout") || !body.includes("$129 CAD")) {
+    if (!body.includes("Insurance Impact & Renewal Planning Report checkout") || !body.includes("$49 CAD")) {
       throw new Error("Standalone checkout summary is incomplete.");
     }
     for (const id of ["idr-first-name", "idr-last-name", "idr-email", "idr-phone", "idr-terms"]) {
@@ -70,8 +70,8 @@ try {
   });
 
   await verify("/submit-ticket", async (_page, body) => {
-    if (!body.includes("$488") || !body.includes("30%")) {
-      throw new Error("Core ticket flow does not disclose the $488 base fee plus 30% success fee.");
+    if (!body.includes("$198") || !body.includes("Rapid Resolution")) {
+      throw new Error("Core ticket flow does not disclose the Rapid Resolution offer.");
     }
   });
 

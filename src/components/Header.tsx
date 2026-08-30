@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Scale, Phone } from "lucide-react";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
-import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
-import { EligibilityChecker } from "@/components/EligibilityChecker";
+import { RAPID_RESOLUTION } from "@/config/offers";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_HREF = "tel:+18257932279";
@@ -15,14 +14,13 @@ const NAV_ITEMS = [
   { name: "How It Works", path: "/how-it-works" },
   { name: "About", path: "/about" },
   { name: "What We Help With", path: "/services" },
-  { name: "Priority Review", path: "/traffic-ticket-assessment" },
+  { name: "Rapid Resolution", path: RAPID_RESOLUTION.slug },
   { name: "Success Stories", path: "/testimonials" },
   { name: "Blog", path: "/blog" },
 ] as const;
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [reviewOpen, setReviewOpen] = useState(false);
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -48,11 +46,11 @@ const Header = () => {
                 key={item.name}
                 to={item.path}
                 onClick={() => {
-                  if (item.path === TICKET_ASSESSMENT.slug) {
-                    trackAssessmentEvent(
-                      "assessment_cta_click",
-                      { location: "desktop_nav", destination: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
-                      `desktop_nav:${location.pathname}`,
+                if (item.path === RAPID_RESOLUTION.slug) {
+                  trackAssessmentEvent(
+                    "assessment_cta_click",
+                    { location: "desktop_nav", destination: "rapid_resolution_landing", value: RAPID_RESOLUTION.priceCad },
+                    `desktop_nav:${location.pathname}`,
                     );
                   }
                 }}
@@ -75,12 +73,8 @@ const Header = () => {
                 {PHONE_DISPLAY}
               </Button>
             </a>
-            <Button
-              type="button"
-              className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
-              onClick={() => setReviewOpen(true)}
-            >
-              Free Ticket Review
+            <Button asChild className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
+              <Link to={RAPID_RESOLUTION.intakePath}>Start · ${RAPID_RESOLUTION.priceCad}</Link>
             </Button>
           </div>
 
@@ -110,10 +104,10 @@ const Header = () => {
                       key={item.name}
                       to={item.path}
                       onClick={() => {
-                        if (item.path === TICKET_ASSESSMENT.slug) {
+                        if (item.path === RAPID_RESOLUTION.slug) {
                           trackAssessmentEvent(
                             "assessment_cta_click",
-                            { location: "mobile_nav", destination: "assessment_landing", value: TICKET_ASSESSMENT.priceCad },
+                            { location: "mobile_nav", destination: "rapid_resolution_landing", value: RAPID_RESOLUTION.priceCad },
                             `mobile_nav:${location.pathname}`,
                           );
                         }
@@ -140,15 +134,10 @@ const Header = () => {
                       Call {PHONE_DISPLAY}
                     </Button>
                   </a>
-                  <Button
-                    type="button"
-                    className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0"
-                    onClick={() => {
-                      setIsOpen(false);
-                      setReviewOpen(true);
-                    }}
-                  >
-                    Free Ticket Review
+                  <Button asChild className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
+                    <Link to={RAPID_RESOLUTION.intakePath} onClick={() => setIsOpen(false)}>
+                      Start Rapid Resolution · ${RAPID_RESOLUTION.priceCad}
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -157,7 +146,6 @@ const Header = () => {
           </div>
         </div>
       </header>
-      <EligibilityChecker open={reviewOpen} onOpenChange={setReviewOpen} />
     </>
   );
 };

@@ -66,8 +66,8 @@ const FABSY = {
   areaServed: "Alberta, Canada",
 } as const;
 
-const EXACT_PRICING = "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
-const SERVICE_DESCRIPTION = `Traffic ticket agent services for Alberta drivers. Fabsy is not a law firm. ${EXACT_PRICING}`;
+const EXACT_PRICING = "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate.";
+const SERVICE_DESCRIPTION = `Rapid Resolution is an eligible pre-trial traffic ticket agent service for Alberta drivers. Fabsy is not a law firm. ${EXACT_PRICING}`;
 
 const unsafeClaimReplacements: Array<[RegExp, string]> = [
   [/\b(?:no[- ]win[- ]no[- ]fee|money[- ]back|risk[- ]free|zero[- ]risk)\b/gi, "case-specific service"],
@@ -78,7 +78,7 @@ const unsafeClaimReplacements: Array<[RegExp, string]> = [
   [/\bguarantee(?:d|s|ing)?\b/gi, "case-specific"],
 ];
 
-const pricingSignal = /(?:\$|\b(?:price|pricing|fee|fees|cost|costs)\b|\b30\s*%|\b488\b)/i;
+const pricingSignal = /(?:\$|\b(?:price|pricing|fee|fees|cost|costs)\b|\b30\s*%|\b(?:49|149|198|229|488)\b)/i;
 
 function sanitizeText(value: unknown, fallback = ""): string {
   let text = typeof value === "string" ? value : fallback;

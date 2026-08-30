@@ -31,4 +31,4 @@ Copy into the repo root, preserving paths:
 
 ## Notes
 
-- Generation prompt enforces the exact pricing formula and Ticket Triage positioning, bans outcome-rate percentages and prohibited claim wording, uses a non-gendered audience, avoids em dashes, and prohibits invented legal numbers.
+- Generation prompt enforces the canonical Rapid Resolution, Insurance Impact & Renewal Planning Report and bundle pricing, permits only the exact bounded 48-hour Fabsy-action commitment, keeps trial representation separate, bans outcome-rate percentages and prohibited claim wording, uses a non-gendered audience, avoids em dashes, and prohibits invented legal numbers.

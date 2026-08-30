@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, FileImage, Loader2, Check, ChevronsUpDown, X } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Upload, FileImage, Loader2, Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -13,7 +13,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Download } from "lucide-react";
 import { albertaCourts } from "@/data/albertaCourts";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
 import { FormData } from "../TicketForm";
@@ -28,7 +27,7 @@ const ticketDetailsSchema = z.object({
     required_error: "Issue date is required",
   }),
   location: z.string().min(5, "Please provide the location where you received the ticket"),
-  officer: z.string().min(2, "Officer name is required"),
+  officer: z.string().optional(),
   officerBadge: z.string().optional(),
   offenceSection: z.string().optional(),
   offenceSubSection: z.string().optional(),
@@ -602,13 +601,13 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         <h3 className="text-lg font-semibold mb-4 text-primary">Officer Details</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="officer" className="font-medium">Officer Name *</Label>
+              <Label htmlFor="officer" className="font-medium">Officer or enforcement agency</Label>
             <Input
               id="officer"
               {...register("officer")}
               onChange={(e) => handleFieldUpdate("officer", e.target.value)}
               className="h-11"
-              placeholder="Last name"
+                placeholder="If shown on the ticket"
             />
             {errors.officer && (
               <p className="text-sm text-destructive">{errors.officer.message}</p>
@@ -659,14 +658,15 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               : "border-destructive/40 bg-destructive/5"
           )}>
             <p className="text-sm">
-              Agent representation permitted:{" "}
+              Initial location screen:{" "}
               <span className="font-semibold">
-                {formData.agentRepresentationPermitted ? "Yes" : "No"}
+                {formData.agentRepresentationPermitted ? "No location issue flagged" : "Manual review required"}
               </span>
             </p>
-            {!formData.agentRepresentationPermitted && (
+            {formData.agentRepresentationPermitted === false && (
               <p className="text-xs text-muted-foreground mt-1">
-                We can still assist with guidance or refer you to appropriate counsel.
+                Rapid Resolution eligibility still requires Fabsy's review. Do not rely on this
+                intake to extend the response date shown on your ticket.
               </p>
             )}
           </div>
@@ -928,28 +928,14 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         {formData.vehicleSeized && (
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 mt-4">
             <div className="flex items-center gap-3 mb-2">
-              <Download className="h-5 w-5 text-primary" />
-              <span className="font-semibold text-primary">Required Form</span>
+              <AlertTriangle className="h-5 w-5 text-amber-700" />
+              <span className="font-semibold text-amber-900">Separate process may apply</span>
             </div>
             <p className="text-sm text-muted-foreground mb-3">
-              Since your vehicle was seized, you'll need to complete Form SRA12675 (Written Consent). 
-              Please download, print, sign, and bring this form to your consultation.
+              A vehicle seizure may involve a SafeRoads or other administrative process that is
+              outside Rapid Resolution and can have a short deadline. Do not continue to checkout.
+              Follow the notice you received and contact Fabsy or an Alberta lawyer promptly.
             </p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="text-primary border-primary hover:bg-primary/10"
-              onClick={() => {
-                const link = document.createElement('a');
-                link.href = '/forms/Form-SRA12675-Written-Consent.pdf';
-                link.download = 'Form-SRA12675-Written-Consent.pdf';
-                link.click();
-              }}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download Form SRA12675
-            </Button>
           </div>
         )}
       </div>
@@ -958,8 +944,8 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
       <div className="bg-secondary/5 p-4 rounded-lg border border-secondary/10">
         <p className="text-sm text-muted-foreground">
-          <span className="font-semibold text-secondary">Pro Tip:</span> The more accurate information 
-          you provide, the better we can defend your case. Double-check all details match your ticket exactly.
+          <span className="font-semibold text-secondary">Accuracy matters:</span> The more accurate information
+          you provide, the more reliably Fabsy can review the file. Double-check that the details match your ticket.
         </p>
       </div>
 

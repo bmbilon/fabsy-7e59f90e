@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
 import useSafeHead from '@/hooks/useSafeHead';
+import { RAPID_RESOLUTION } from '@/config/offers';
 
 const PhotoRadarVsOfficer: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/photo-radar-vs-officer-issued';
@@ -53,8 +54,8 @@ const PhotoRadarVsOfficer: React.FC = () => {
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Need the distinction applied to your ticket?</h2>
-          <p className="mt-2 text-muted-foreground">Ticket Triage is a $149 CAD total, human-reviewed assessment of the ticket, likely consequences, and whether representation appears worth the cost.</p>
-          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Ticket Triage - $149</Link>
+          <p className="mt-2 text-muted-foreground">Rapid Resolution handles secure intake, disclosure review, prosecutor review, file updates and your final decision for an eligible pre-trial matter.</p>
+          <Link to={RAPID_RESOLUTION.slug} className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Rapid Resolution - ${RAPID_RESOLUTION.priceCad}</Link>
         </section>
 
         <section className="mb-10">

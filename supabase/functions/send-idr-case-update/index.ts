@@ -200,9 +200,9 @@ serve(async (req) => {
       ? "Your case result and the next practical step"
       : "Your ticket assessment is ready";
     const mainCopy = eventType === "conviction_stands_offer"
-      ? "The case outcome records the conviction standing. Fabsy's optional $129 Insurance Damage Report can map the estimated insurance exposure, conviction aging dates, and carriers worth calling."
+      ? "The case outcome records the conviction standing. Fabsy's optional $49 Insurance Impact & Renewal Planning Report can map source-backed conviction-impact scenarios, aging dates and renewal-planning questions."
       : submission.verdict === "unwinnable"
-        ? "Fabsy's review does not identify a viable path to beat this ticket. Your $488 ticket defense purchase remains the core service. The private case page also explains the optional $129 Insurance Damage Report."
+        ? "Fabsy's review does not identify a supported pre-trial path. Your $198 Rapid Resolution purchase remains the core service. The private case page also explains the optional Insurance Impact & Renewal Planning Report."
         : "Open your private case page to review the verdict and the next steps for your active ticket defense service. This assessment is not a promise of dismissal, a lower fine, or fewer demerits.";
 
     let providerAccepted = false;

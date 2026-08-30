@@ -1,5 +1,11 @@
 export const EXACT_FABSY_PRICING =
-  "Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.";
+  "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate.";
+export const EXACT_FABSY_ONE_LINE =
+  "Rapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits.";
+export const EXACT_FABSY_ACTION_COMMITMENT =
+  "Complete, readable disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours after it is received and matched to your file.";
+export const EXACT_FABSY_SPEED_DISCLAIMER =
+  "The 48-hour clock begins only after complete, readable disclosure is received and matched to the file. It covers Fabsy's review and next authorized action, not Crown response time or the date of a final outcome.";
 
 const bannedPatterns: Array<[RegExp, string]> = [
   [/\bno[\s-]*win[\s,;-]+no[\s-]*fee\b/i, "no-win-no-fee wording"],
@@ -11,7 +17,7 @@ const bannedPatterns: Array<[RegExp, string]> = [
 ];
 
 const inexactPricingPatterns = [
-  /\$\s*488\b/i,
+  /\$\s*(?:49|149|198|229|339|488)\b/i,
   /\b30\s*(?:%|percent)\b.{0,80}\bfine\s+reduction\b/i,
   /\b(?:fabsy(?:'s)?|our)\s+(?:price|pricing|fee|fees|cost|costs|charge|charges)\b/i,
   /\b(?:we\s+(?:charge|cost)|fabsy\s+(?:charges|costs))\b/i,
@@ -25,6 +31,7 @@ const unsupportedLegalNumberPatterns: Array<[RegExp, string]> = [
   [/(?:CA\$|CAD\s*\$?)\s*\d[\d,.]*|\$\s*\d[\d,.]*|\b\d[\d,.]*\s*(?:CAD|dollars?)\b/i, "unsupported monetary claim"],
   [/\b(?:fines?|penalt(?:y|ies)|surcharges?)\D{0,28}\d[\d,.]*(?:\.\d+)?\b/i, "unsupported fine or penalty number"],
   [/\b\d+(?:\.\d+)?\s*(?:demerits?|demerit\s+points?)\b|\b(?:demerits?|demerit\s+points?)\D{0,24}\d+(?:\.\d+)?\b/i, "unsupported demerit number"],
+  [/\b(?:fabsy|rapid resolution|we)\b[^.!?]{0,100}\b(?:within|in|under)\s+\d{1,3}\s+hours?\b/i, "unsupported service-timing claim"],
   [/\b(?:within|no\s+later\s+than|up\s+to|typically|usually)\s+\d{1,3}\s+(?:(?:business|calendar)\s+)?(?:days?|weeks?|months?)\b/i, "unsupported response period"],
   [/\b\d{1,3}[-\s](?:day|week|month)\s+(?:deadline|limit|window|period)\b|\b\d{1,3}\s+(?:days?|weeks?|months?)\s+to\s+(?:pay|respond|dispute|contest|file|appeal|request)\b/i, "unsupported response period"],
   [/\b(?:deadline|time\s+limit|response\s+period)\D{0,36}\d{1,4}\b/i, "unsupported deadline"],
@@ -91,12 +98,16 @@ const addTextViolations = (value: string, violations: Set<string>) => {
     violations.add("unverified rating or review claim");
   }
 
-  const withoutApprovedPricing = value.split(EXACT_FABSY_PRICING).join(" ");
-  if (inexactPricingPatterns.some((pattern) => pattern.test(withoutApprovedPricing))) {
+  const withoutApprovedCommercialFacts = value
+    .split(EXACT_FABSY_PRICING).join(" ")
+    .split(EXACT_FABSY_ONE_LINE).join(" ")
+    .split(EXACT_FABSY_ACTION_COMMITMENT).join(" ")
+    .split(EXACT_FABSY_SPEED_DISCLAIMER).join(" ");
+  if (inexactPricingPatterns.some((pattern) => pattern.test(withoutApprovedCommercialFacts))) {
     violations.add("inexact or partial Fabsy pricing");
   }
   for (const [pattern, label] of unsupportedLegalNumberPatterns) {
-    if (pattern.test(withoutApprovedPricing)) violations.add(label);
+    if (pattern.test(withoutApprovedCommercialFacts)) violations.add(label);
   }
 };
 

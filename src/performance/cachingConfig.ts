@@ -164,6 +164,9 @@ export class CachingOptimizer {
    * Generate Cloudflare Worker for edge optimization
    */
   generateCloudflareWorker(): string {
+    const htmlHeaders = this.generateCacheHeaders('text/html', '/');
+    const staticAssetHeaders = this.generateCacheHeaders('application/octet-stream', '/asset');
+
     return `
       // Cloudflare Worker for AEO Performance Optimization
       addEventListener('fetch', event => {
@@ -211,7 +214,7 @@ export class CachingOptimizer {
           }
           
           // Apply cache headers
-          const headers = ${JSON.stringify(this.generateCacheHeaders('text/html', url.pathname))};
+          const headers = ${JSON.stringify(htmlHeaders)};
           
           return new Response(html, {
             status: response.status,
@@ -221,7 +224,7 @@ export class CachingOptimizer {
         }
         
         // Static asset optimization
-        const headers = ${JSON.stringify(this.generateCacheHeaders(contentType, url.pathname))};
+        const headers = ${JSON.stringify(staticAssetHeaders)};
         
         return new Response(response.body, {
           status: response.status,

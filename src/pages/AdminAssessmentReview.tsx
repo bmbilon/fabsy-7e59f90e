@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { RAPID_RESOLUTION } from "@/config/offers";
 
 type InsuranceRisk = "trivial" | "moderate" | "material" | "uncertain";
 
@@ -137,7 +138,7 @@ export default function AdminAssessmentReview() {
         .select("id,ticket_number,violation,status,service_type,assessment_intake,assessment_result,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at,assessment_delivered_at,representation_credit_eligible,created_at,clients(first_name,last_name,email,phone)")
         .eq("id", id).single();
       if (error || !data || data.service_type !== "ticket_insurance_assessment") {
-        toast({ title: "Ticket Triage not found", description: "This case is not a Ticket Triage order.", variant: "destructive" });
+        toast({ title: "Legacy Ticket Triage not found", description: "This case is not a historical $149 Ticket Triage order.", variant: "destructive" });
         navigate("/admin/cases");
         return;
       }
@@ -260,7 +261,7 @@ export default function AdminAssessmentReview() {
           <Button variant="ghost" onClick={() => navigate("/admin/cases")}><ArrowLeft className="mr-2 h-4 w-4" />Back to cases</Button>
           <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <div className="flex flex-wrap items-center gap-2"><Badge>Priority Ticket Review</Badge><Badge variant={locked ? "default" : "outline"}>{assessment.status.replace(/_/g, " ")}</Badge></div>
+              <div className="flex flex-wrap items-center gap-2"><Badge>Legacy Ticket Triage · $149</Badge><Badge variant={locked ? "default" : "outline"}>{assessment.status.replace(/_/g, " ")}</Badge></div>
               <h1 className="mt-3 text-3xl font-bold">{client.first_name} {client.last_name}</h1>
               <p className="mt-1 text-sm text-muted-foreground">{client.email} · {client.phone || "No phone supplied"} · {assessment.ticket_number}</p>
             </div>
@@ -272,7 +273,7 @@ export default function AdminAssessmentReview() {
       <main className="container mx-auto grid max-w-7xl gap-7 px-4 py-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>Customer intake</CardTitle><CardDescription>Structured context collected before the $149 checkout.</CardDescription></CardHeader>
+            <CardHeader><CardTitle>Customer intake</CardTitle><CardDescription>Structured context retained from the legacy $149 checkout.</CardDescription></CardHeader>
             <CardContent className="space-y-6">
               <IntakeGroup title="Ticket" values={assessment.assessment_intake.ticket} />
               <IntakeGroup title="Driving" values={assessment.assessment_intake.driving} />
@@ -317,15 +318,20 @@ export default function AdminAssessmentReview() {
           {assessment.representation_credit_eligible ? (
             <Alert className="border-violet-200 bg-violet-50">
               <ShieldAlert className="h-4 w-4" />
-              <AlertTitle>Priority Ticket Triage upgrade</AlertTitle>
-              <AlertDescription>If representation is worthwhile and this matter is eligible, apply the $149 assessment payment to the $488 base representation fee. Quote a $339 base-fee balance plus applicable tax; priority placement and the 30% success fee on any fine reduction still apply.</AlertDescription>
+              <AlertTitle>Legacy credit flag requires manual review</AlertTitle>
+              <AlertDescription>
+                This historical record contains the legacy representation-credit flag. Do not quote
+                or automatically apply a credit from this flag. Rapid Resolution currently costs
+                ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST as a separate service. Escalate
+                any customer request involving earlier order terms for manual review before payment.
+              </AlertDescription>
             </Alert>
           ) : null}
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-primary" />Human-reviewed assessment</CardTitle>
+            <CardTitle className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-primary" />Human-reviewed legacy assessment</CardTitle>
             <CardDescription>Every field is required for delivery. “Not reasonably supportable from the supplied information” is preferable to false precision.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -342,7 +348,7 @@ export default function AdminAssessmentReview() {
             <TextField id="representation-economics" label="Representation break-even analysis" value={result.representationEconomics} onChange={(value) => update("representationEconomics", value)} disabled={locked} />
             <TextField id="recommendation" label="Recommended action" value={result.recommendation} onChange={(value) => update("recommendation", value)} disabled={locked} />
             <TextField id="next-step" label="Fabsy action path / next step" value={result.nextStep} onChange={(value) => update("nextStep", value)} disabled={locked} />
-            <div className="flex items-start gap-3 rounded-lg border p-4"><Checkbox id="representation-recommended" checked={result.representationRecommended} onCheckedChange={(value) => update("representationRecommended", value === true)} disabled={locked} /><Label htmlFor="representation-recommended" className="cursor-pointer leading-relaxed">Professional representation may be economically worthwhile and the delivery email should include the Fabsy representation path.</Label></div>
+            <div className="flex items-start gap-3 rounded-lg border p-4"><Checkbox id="representation-recommended" checked={result.representationRecommended} onCheckedChange={(value) => update("representationRecommended", value === true)} disabled={locked} /><Label htmlFor="representation-recommended" className="cursor-pointer leading-relaxed">Rapid Resolution may be appropriate for this eligible pre-trial matter and the delivery email should include the current ${RAPID_RESOLUTION.priceCad} CAD plus GST path. Trial representation is separate.</Label></div>
 
             {locked ? (
               <Alert className="border-emerald-200 bg-emerald-50"><AlertTitle>Delivered and locked</AlertTitle><AlertDescription>The emailed assessment is immutable. Create a documented correction workflow rather than changing this record.</AlertDescription></Alert>

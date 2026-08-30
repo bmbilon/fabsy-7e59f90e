@@ -4,7 +4,8 @@ import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { buildIdrPdf } from "../_shared/idr-pdf.ts";
 import { sendResendEmail } from "../_shared/resend-email.ts";
 
-const DISCLAIMER = "This report is consumer research based on publicly available information. Fabsy is not an insurance agent or broker and does not sell, quote, or place insurance.";
+const DISCLAIMER = "This report provides consumer research and planning information, not an insurer quote, licensed broker recommendation or promise of eligibility, premium savings or a particular insurance outcome. Fabsy is not an insurance agent or broker and does not sell, quote or place insurance.";
+const LEGACY_DISCLAIMER = "This report is consumer research based on publicly available information. Fabsy is not an insurance agent or broker and does not sell, quote, or place insurance.";
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -131,7 +132,9 @@ function isValidSource(value: unknown) {
 
 function validateReport(report: JsonRecord) {
   if (!report || typeof report !== "object") throw new Error("Stored report JSON is invalid.");
-  if (report.disclaimer !== DISCLAIMER) throw new Error("Stored report is missing the required disclaimer.");
+  if (![DISCLAIMER, LEGACY_DISCLAIMER].includes(report.disclaimer)) {
+    throw new Error("Stored report is missing a recognized consumer research disclaimer.");
+  }
   if (!Array.isArray(report.convictions)) throw new Error("Stored report convictions are invalid.");
   for (const conviction of report.convictions) {
     if (conviction.applicableLookbackSource && !isValidSource(conviction.applicableLookbackSource)) {
@@ -178,7 +181,7 @@ function validateReport(report: JsonRecord) {
     throw new Error("The stored carrier call list is not ready for delivery.");
   }
   if (report.carrierCallList.entries.length < 3 || report.carrierCallList.entries.length > 5) {
-    throw new Error("A delivery-ready report requires 3 to 5 carriers worth calling.");
+    throw new Error("A delivery-ready report requires 3 to 5 public insurer research entries.");
   }
   const carrierIds = new Set<string>();
   for (const carrier of report.carrierCallList.entries) {
@@ -188,15 +191,15 @@ function validateReport(report: JsonRecord) {
     const carrierId = carrier.carrierId.trim().toLowerCase();
     if (carrierIds.has(carrierId)) throw new Error("The carrier call list contains duplicate carriers.");
     carrierIds.add(carrierId);
-    if ((!carrier.phone && !carrier.quoteUrl) || (carrier.quoteUrl && !isHttpsUrl(carrier.quoteUrl))) {
-      throw new Error("Every carrier entry requires a verified phone number or HTTPS quote page.");
+    if (carrier.quoteUrl && !isHttpsUrl(carrier.quoteUrl)) {
+      throw new Error("Every legacy insurer information URL must use HTTPS.");
     }
     if (
       !Array.isArray(carrier.researchSources) ||
       carrier.researchSources.length === 0 ||
       carrier.researchSources.some((source: unknown) => !isValidSource(source))
     ) {
-      throw new Error("Every carrier entry requires verified contact and research source data.");
+      throw new Error("Every insurer directory entry requires verified public research source data.");
     }
     if (!Array.isArray(carrier.evaluatedPostures) || carrier.evaluatedPostures.length === 0) {
       throw new Error("Every carrier entry requires at least one evaluated underwriting posture.");
@@ -353,9 +356,12 @@ function buildHtml(report: JsonRecord, clientName: string) {
   const sourceLinks = (sources: JsonRecord[]) => sources
     .map((source) => `<a href="${escapeHtml(source.url)}">${escapeHtml(source.publisher)}: ${escapeHtml(source.title)}</a>`)
     .join("; ");
-  const carrierHtml = report.carrierCallList.entries.map((item: JsonRecord) => {
+  const directoryEntries = [...report.carrierCallList.entries].sort((left: JsonRecord, right: JsonRecord) =>
+    String(left.carrierName || "").localeCompare(String(right.carrierName || ""), "en-CA")
+  );
+  const carrierHtml = directoryEntries.map((item: JsonRecord) => {
     const sources = Array.isArray(item.researchSources) ? item.researchSources : [];
-    return `<li><strong>${escapeHtml(item.rank)}. ${escapeHtml(item.carrierName)}</strong><br>${escapeHtml(item.reason)}<br>${item.phone ? `Phone: ${escapeHtml(item.phone)}` : ""}${item.quoteUrl ? ` <a href="${escapeHtml(item.quoteUrl)}">Quote page</a>` : ""}<br>Research sources: ${sourceLinks(sources)}</li>`;
+    return `<li><strong>${escapeHtml(item.carrierName)}</strong>${item.phone ? `<br>Public phone: ${escapeHtml(item.phone)}` : ""}<br>Public information: ${sourceLinks(sources)}</li>`;
   }).join("");
   const estimate = report.estimatedThreeYearPremiumImpact;
   const estimateText = estimate.status === "estimated" && estimate.range
@@ -376,7 +382,7 @@ function buildHtml(report: JsonRecord, clientName: string) {
   const scenarioHtml = scenario
     ? `<div class="scenario"><h2>${escapeHtml(scenario.label)}</h2><p><strong>Mode:</strong> ${escapeHtml(scenario.mode)}. <strong>Status:</strong> ${escapeHtml(String(scenario.status).replaceAll("-", " "))}.${scenario.convictionClass ? ` <strong>Class:</strong> ${escapeHtml(scenario.convictionClass)}.` : ""}${scenario.assumedConvictionDate ? ` <strong>${scenario.status === "projected" ? "Assumed" : "Matched"} conviction date:</strong> ${escapeHtml(formatDate(scenario.assumedConvictionDate))}.` : ""}</p><p>${escapeHtml(scenario.basis)}</p><p><strong>${scenario.appliedAsAdditionalConviction ? "Applied as one additional conviction in the projection." : "Not added as another conviction in the projection."}</strong></p></div>`
     : "";
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Fabsy Insurance Damage Report</title><style>body{font:16px/1.55 Arial,sans-serif;color:#1f2937;max-width:850px;margin:0 auto;padding:40px}header{background:#111827;color:white;padding:36px;border-radius:14px}h1{margin:0}h2{color:#5b21b6;margin-top:34px;border-bottom:1px solid #ddd;padding-bottom:8px}li{margin:12px 0}.scenario{border:2px solid #c4b5fd;background:#f5f3ff;padding:18px;margin-top:28px}.notice{border:2px solid #cbd5e1;background:#f8fafc;padding:18px;margin-top:36px}@media print{body{padding:0}header{border-radius:0}}</style></head><body><header><p>FABSY</p><h1>Insurance Damage Report</h1><p>${escapeHtml(clientName)} | Prepared ${escapeHtml(formatDate(report.asOfDate))}</p></header><main><h2>Abstract verification</h2><p>Status: ${escapeHtml(report.verification.status)}. Convictions checked: ${escapeHtml(report.verification.checkedConvictions)}.</p>${scenarioHtml}<h2>Conviction aging timeline</h2><ol>${convictionHtml || "<li>No convictions transcribed.</li>"}</ol><h2>Estimated premium exposure</h2><p><strong>${escapeHtml(estimateText)}</strong></p><p>${escapeHtml(estimate.basis)}</p>${estimateBaseline}${estimateSources}<h2>Public Alberta Grid benchmark</h2><p>${escapeHtml(grid.basis)}</p>${gridSource}${gridLimitations}<h2>Carriers worth calling</h2><p>${escapeHtml(report.carrierCallList.framing)}</p><ol>${carrierHtml || "<li>No carrier met the current verified rule and contact criteria.</li>"}</ol><div class="notice"><strong>Important consumer research disclaimer</strong><p>${escapeHtml(DISCLAIMER)}</p></div></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Fabsy Insurance Impact &amp; Renewal Planning Report</title><style>body{font:16px/1.55 Arial,sans-serif;color:#1f2937;max-width:850px;margin:0 auto;padding:40px}header{background:#111827;color:white;padding:36px;border-radius:14px}h1{margin:0}h2{color:#5b21b6;margin-top:34px;border-bottom:1px solid #ddd;padding-bottom:8px}li{margin:12px 0}.scenario{border:2px solid #c4b5fd;background:#f5f3ff;padding:18px;margin-top:28px}.notice{border:2px solid #cbd5e1;background:#f8fafc;padding:18px;margin-top:36px}@media print{body{padding:0}header{border-radius:0}}</style></head><body><header><p>FABSY</p><h1>Insurance Impact &amp; Renewal Planning Report</h1><p>${escapeHtml(clientName)} | Prepared ${escapeHtml(formatDate(report.asOfDate))}</p></header><main><h2>Abstract verification</h2><p>Status: ${escapeHtml(report.verification.status)}. Convictions checked: ${escapeHtml(report.verification.checkedConvictions)}.</p>${scenarioHtml}<h2>Conviction aging timeline</h2><ol>${convictionHtml || "<li>No convictions transcribed.</li>"}</ol><h2>Estimated premium exposure</h2><p><strong>${escapeHtml(estimateText)}</strong></p><p>${escapeHtml(estimate.basis)}</p>${estimateBaseline}${estimateSources}<h2>Public Alberta Grid benchmark</h2><p>${escapeHtml(grid.basis)}</p>${gridSource}${gridLimitations}<h2>Public insurer research directory</h2><p>Entries are listed alphabetically from public sources. They are not ranked or recommended, and inclusion does not predict eligibility, pricing or coverage. Ask a licensed broker for insurer-specific advice or quotes.</p><ul>${carrierHtml || "<li>No current public insurer research entries are available.</li>"}</ul><div class="notice"><strong>Important consumer research disclaimer</strong><p>${escapeHtml(DISCLAIMER)}</p></div></main></body></html>`;
 }
 
 async function sendReportDeliveryEmail(
@@ -413,8 +419,8 @@ async function sendReportDeliveryEmail(
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "hello@fabsy.ca",
       to: [client.email],
-      subject: "Your Fabsy Insurance Damage Report is ready",
-      html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;color:#1f2937"><h1>Your Insurance Damage Report is ready</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Open your private Fabsy portal to review the report and download the PDF.</p><p style="margin:28px 0"><a href="${siteUrl}/portal/insurance-reports/${encodeURIComponent(orderId)}" style="background:#7c3aed;color:white;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:700">Open your private report</a></p><p style="font-size:13px;color:#6b7280;line-height:1.5">${DISCLAIMER}</p>${getFabsyEmailSignature()}</div>`,
+      subject: "Your Fabsy Insurance Impact & Renewal Planning Report is ready",
+      html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;color:#1f2937"><h1>Your Insurance Impact &amp; Renewal Planning Report is ready</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Open your private Fabsy portal to review the report and download the PDF.</p><p style="margin:28px 0"><a href="${siteUrl}/portal/insurance-reports/${encodeURIComponent(orderId)}" style="background:#7c3aed;color:white;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:700">Open your private report</a></p><p style="font-size:13px;color:#6b7280;line-height:1.5">${DISCLAIMER}</p>${getFabsyEmailSignature()}</div>`,
     }, `idr-report/${reportId}`);
     providerAccepted = true;
     const { data: sentEvent, error: sentError } = await admin.from("idr_email_events").update({

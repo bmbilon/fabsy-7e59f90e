@@ -1,5 +1,10 @@
-const EXACT_FABSY_PRICING =
-  'Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced.';
+const {
+  CANONICAL_PRICE_RANGE_COPY,
+  CANONICAL_PRICING_COPY: EXACT_FABSY_PRICING,
+  RAPID_RESOLUTION_ACTION_COMMITMENT,
+  RAPID_RESOLUTION_ONE_LINE,
+  RAPID_RESOLUTION_SPEED_DISCLAIMER,
+} = require('./normalize-rapid-resolution-content.cjs');
 
 const BANNED_PHRASE_RE =
   /(?:no\s+win\s+no\s+fee|risk[\s-]*free|money\s+back|guarantee|zero[\s-]*risk)/i;
@@ -37,7 +42,8 @@ function present(value) {
 function visibleText(value) {
   return String(value ?? '')
     .replace(/<[^>]+>/g, ' ')
-    .replace(/&(?:nbsp|amp|quot|apos|#39);/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&(?:nbsp|quot|apos|#39);/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -154,6 +160,16 @@ function redactSlugVerifiedFacts(value, slug) {
 function redactVerifiedNumericClaims(value, slug) {
   let text = visibleText(value);
 
+  // These are narrowly approved commercial facts from src/config/offers.json.
+  // Remove only the exact complete statements before scanning for unsupported
+  // legal numbers, so an arbitrary "48 hours" or partial price still fails.
+  text = text
+    .split(EXACT_FABSY_PRICING).join('[verified Fabsy offer pricing]')
+    .split(CANONICAL_PRICE_RANGE_COPY).join('[verified Fabsy price range]')
+    .split(RAPID_RESOLUTION_ONE_LINE).join('[verified Rapid Resolution summary]')
+    .split(RAPID_RESOLUTION_ACTION_COMMITMENT).join('[verified Fabsy action commitment]')
+    .split(RAPID_RESOLUTION_SPEED_DISCLAIMER).join('[verified Fabsy action boundary]');
+
   // Official source: current Alberta Driver's Guide speeding bands. Redact
   // both the point value and its matching speed threshold only when they
   // appear near one another, so unrelated numeric claims remain guarded.
@@ -202,42 +218,6 @@ function redactVerifiedNumericClaims(value, slug) {
     /\b(?:(?:Free\s+)?Representation Eligibility Check|Free Ticket Review)\b/i,
     '[verified representation eligibility price]'
   );
-
-  text = replaceWhenNearby(
-    text,
-    /\$\s*149\b/gi,
-    /\b(?:Ticket Triage|Priority(?: Ticket)? Review|priority report|review deliverables|assessment|representation credit|already paid|can be applied)\b/i,
-    '[verified assessment price]'
-  );
-
-  text = replaceWhenNearby(
-    text,
-    /\$\s*339\b/gi,
-    /\b(?:base-fee balance|assessment credit|assessment payment)\b/i,
-    '[verified assessment-credit balance]'
-  );
-
-  if (slug === 'traffic-ticket-assessment' || slug === 'index') {
-    // Verified Fabsy product pricing. Keep this exemption narrowly scoped to
-    // the assessment conversion routes so unrelated legal claims remain guarded.
-    text = text
-      .replace(/\$\s*149\b/gi, '[verified assessment price]')
-      .replace(/\b149\s*CAD\b/gi, '[verified assessment price]')
-      // These values appear only in the explicitly labelled illustrative
-      // report example, not as claims about a real ticket or guaranteed result.
-      .replace(/\$\s*500\s*[–-]\s*\$\s*1,000\b/gi, '[illustrative representation range]')
-      .replace(/\$\s*1,200\s*[–-]\s*\$\s*2,400\b/gi, '[illustrative insurance range]')
-      .replace(/\$\s*700\b/gi, '[illustrative break-even]')
-      .replace(/\bSeptember\s+15,?\s+2026\b/gi, '[illustrative deadline]')
-      .replace(/\b3\s+demerits?\b/gi, '[illustrative demerit exposure]')
-      .replace(/\bthree\s+years?\b/gi, '[illustrative period]');
-  }
-
-  if (hasCompleteFabsyPricing(text)) {
-    text = text
-      .replace(/\$\s*488\b/gi, '[verified price]')
-      .replace(/\b30\s*(?:%|percent)(?!\d)/gi, '[verified percentage]');
-  }
 
   text = text
     .replace(/\b\d{1,3}\s*%\s+complete\b/gi, '[form progress]')

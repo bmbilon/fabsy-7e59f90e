@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
 import useSafeHead from '@/hooks/useSafeHead';
+import { RAPID_RESOLUTION } from '@/config/offers';
 
 const DemeritsInsurance: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/demerits-and-insurance';
@@ -62,8 +63,8 @@ const DemeritsInsurance: React.FC = () => {
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Need a ticket-specific answer?</h2>
-          <p className="mt-2 text-muted-foreground">Fabsy's $149 CAD total Ticket Triage reviews an Alberta ticket, likely insurance significance and whether representation appears worth the cost. The $149 can be applied if representation is worthwhile and the same matter is eligible.</p>
-          <Link to="/traffic-ticket-assessment" className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Ticket Triage - $149</Link>
+          <p className="mt-2 text-muted-foreground">Rapid Resolution handles an eligible pre-trial ticket through disclosure review, prosecutor review, file updates and your final decision. Insurance planning is available separately or in the bundle.</p>
+          <Link to={RAPID_RESOLUTION.slug} className="mt-4 inline-flex font-semibold text-primary underline underline-offset-4">See Rapid Resolution - ${RAPID_RESOLUTION.priceCad}</Link>
         </section>
 
         <section className="mb-10">

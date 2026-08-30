@@ -20,7 +20,7 @@ const PrivacyPolicy = () => {
             <ul className="list-disc pl-6 space-y-2">
               <li>Personal identification information (name, address, phone number, email)</li>
               <li>Driver's license information</li>
-              <li>Driver abstracts and conviction records you upload for an Insurance Damage Report</li>
+              <li>Driver abstracts and conviction records you upload for an Insurance Impact &amp; Renewal Planning Report</li>
               <li>Traffic ticket documents, details, violation information, deadlines, and your description of what happened</li>
               <li>Driving-history context you provide, including years licensed, recent tickets, demerit context, licence class, and commercial-driving status</li>
               <li>Policy renewal dates and rating inputs you provide, such as territory, liability limit, prior claims, and current premium</li>
@@ -34,13 +34,13 @@ const PrivacyPolicy = () => {
             <h2 className="text-2xl font-semibold mb-4">2. How We Use Your Information</h2>
             <p className="mb-4">We use the information we collect to:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Provide traffic ticket representation services</li>
-              <li>Review a submitted ticket and deliver a private Ticket Triage assessment</li>
-              <li>Assess the practical relationship among the fine, demerits, driving-record implications, possible insurance exposure, and representation economics</li>
-              <li>Verify uploaded abstract information and generate private Insurance Damage Reports</li>
-              <li>Prepare estimated premium-exposure ranges and sourced carrier call lists</li>
+              <li>Deliver Rapid Resolution, including intake, authorization, disclosure requests, file tracking and prosecutor-review submissions where authorized</li>
+              <li>Extract and analyze ticket and disclosure documents using technology-assisted tools subject to qualified review</li>
+              <li>Compare the original ticket with a Crown response and record your final instruction</li>
+              <li>Verify uploaded abstract and policy information and generate private Insurance Impact &amp; Renewal Planning Reports</li>
+              <li>Prepare sourced conviction-impact scenarios, aging dates, public research sources and renewal-planning checklists</li>
               <li>Send requested renewal, conviction-aging, delivery, and outcome survey reminders</li>
-              <li>Communicate with you about your case</li>
+              <li>Send immediate case-status and decision-needed notifications by the communication channels you authorize</li>
               <li>Process payments and billing</li>
               <li>Comply with legal obligations and court requirements</li>
               <li>Improve our services and website functionality</li>
@@ -53,7 +53,7 @@ const PrivacyPolicy = () => {
               We may share your personal information in the following circumstances:
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Court Proceedings:</strong> As required for your traffic ticket representation</li>
+              <li><strong>Ticket Process:</strong> With courts, prosecutors and government services as authorized and required to deliver Rapid Resolution</li>
               <li><strong>Legal Compliance:</strong> When required by law, regulation, or court order</li>
               <li><strong>Service Providers:</strong> With trusted third-party service providers who assist in our operations</li>
               <li><strong>Business Transfers:</strong> In connection with any merger, sale, or transfer of company assets</li>
@@ -62,10 +62,17 @@ const PrivacyPolicy = () => {
               We do not sell, trade, or rent your personal information to third parties for marketing purposes.
             </p>
             <p className="mt-4">
-              Fabsy does not send your driver abstract or report to insurance carriers and does not
-              contact carriers on your behalf. Ticket documents and other private files are shared only with authorized Fabsy
-              staff and service providers needed to store files, process payments, authenticate
-              access, review and deliver assessments or reports, and send requested messages.
+              Fabsy does not send your driver abstract, policy or report to insurers or brokers unless
+              you make a separate, explicit request and consent. Ticket and disclosure files are shared
+              only with authorized Fabsy personnel, the government participants needed for the service,
+              and service providers needed to store files, process payments, authenticate access,
+              perform controlled document processing, deliver reports and send requested messages.
+            </p>
+            <p className="mt-4">
+              Some technology providers may process information outside Canada. Fabsy uses contractual,
+              access and security controls appropriate to the service and can provide information about
+              its service-provider policies through the privacy contact below. Customer documents are not
+              authorized for general model training unless the customer gives separate, purpose-specific consent.
             </p>
           </section>
 
@@ -90,15 +97,15 @@ const PrivacyPolicy = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">6. Your Rights Under PIPEDA</h2>
+            <h2 className="text-2xl font-semibold mb-4">6. Your Privacy Rights</h2>
             <p className="mb-4">
-              Under Canada's Personal Information Protection and Electronic Documents Act (PIPEDA), you have the right to:
+              Subject to Alberta's Personal Information Protection Act and any other applicable privacy law, you may:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Access your personal information we hold</li>
               <li>Request correction of inaccurate information</li>
               <li>Withdraw consent where consent is the legal basis for processing</li>
-              <li>File a complaint with the Privacy Commissioner of Canada</li>
+              <li>Ask questions or make a complaint to Fabsy's privacy contact or the applicable privacy regulator</li>
             </ul>
           </section>
 

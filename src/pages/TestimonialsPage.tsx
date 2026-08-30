@@ -8,11 +8,12 @@ import Header from "@/components/Header";
 import StaticJsonLd from "@/components/StaticJsonLd";
 import { VERIFIED_CLIENT_TESTIMONIALS } from "@/content/clientTestimonials";
 import useSafeHead from "@/hooks/useSafeHead";
+import { RAPID_RESOLUTION } from "@/config/offers";
 
 const TestimonialsPage = () => {
   useSafeHead({
     title: "Client Testimonials & Service Standards | Fabsy Alberta",
-    description: "Read verified client feedback and review Fabsy's evidence standard, service limitations, and pricing for Alberta traffic ticket agent services.",
+    description: `Read verified client feedback and review the scope, limits, and $${RAPID_RESOLUTION.priceCad} CAD plus GST pricing for Fabsy Rapid Resolution.`,
     canonical: "https://fabsy.ca/testimonials",
   });
 
@@ -38,8 +39,8 @@ const TestimonialsPage = () => {
     {
       icon: FileCheck,
       value: "Human",
-      label: "Ticket Review",
-      description: "Paid Ticket Triage recommendations are reviewed by a Fabsy team member.",
+      label: "Qualified Review",
+      description: "Technology-assisted disclosure analysis is checked before the file advances.",
     },
     {
       icon: Scale,
@@ -127,20 +128,19 @@ const TestimonialsPage = () => {
         <div className="text-center">
           <Card className="p-12 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-card-foreground mb-4">
-              Ready to Have Your Ticket Reviewed?
+              Ready to Put Your Ticket Into Motion?
             </h2>
             <p className="text-lg text-muted-foreground mb-3 max-w-3xl mx-auto">
-              Representation uses a $488 base representation fee plus 30% of any fine reduction achieved.
-              If the fine is not reduced, there is no success fee.
+              {RAPID_RESOLUTION.name} costs ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST for an eligible Alberta pre-trial matter. Trial representation is separate.
             </p>
             <p className="text-sm text-muted-foreground mb-8">
-              Outcomes depend on the facts and are not promised.
+              {RAPID_RESOLUTION.speedDisclaimer} Outcomes depend on the facts and are not promised.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/traffic-ticket-assessment/start">
+              <Link to={RAPID_RESOLUTION.intakePath}>
                 <Button size="lg" className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0 text-lg px-8">
-                  Start Free Ticket Review
+                  Start Rapid Resolution
                 </Button>
               </Link>
               <Link to="/how-it-works">

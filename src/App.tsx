@@ -51,12 +51,10 @@ import ClientCasesPage from "./pages/ClientCasesPage";
 import ClientCasePage from "./pages/ClientCasePage";
 import AdminIdrDashboard from "./pages/AdminIdrDashboard";
 import AdminIdrReview from "./pages/AdminIdrReview";
-import TicketAssessment from "./pages/TicketAssessment";
-import TicketAssessmentIntake from "./pages/TicketAssessmentIntake";
 import TicketAssessmentConfirmation from "./pages/TicketAssessmentConfirmation";
-import TicketTriageExamples from "./pages/TicketTriageExamples";
 import AdminAssessmentReview from "./pages/AdminAssessmentReview";
 import RepresentationConsent from "./pages/RepresentationConsent";
+import RapidResolution from "./pages/RapidResolution";
 
 const queryClient = new QueryClient();
 
@@ -101,13 +99,14 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/founder" element={<Founder />} />
           <Route path="/ai-info" element={<AIInfo />} />
-          <Route path="/ticket-analysis" element={<Navigate to="/traffic-ticket-assessment/start" replace />} />
+          <Route path="/ticket-analysis" element={<Navigate to="/rapid-resolution" replace />} />
           <Route path="/insurance-damage-report" element={<InsuranceDamageReport />} />
           <Route path="/insurance-damage-report/checkout" element={<IdrCheckout />} />
           <Route path="/insurance-damage-report/intake" element={<IdrIntake />} />
-          <Route path="/traffic-ticket-assessment" element={<TicketAssessment />} />
-          <Route path="/traffic-ticket-assessment/examples" element={<TicketTriageExamples />} />
-          <Route path="/traffic-ticket-assessment/start" element={<TicketAssessmentIntake />} />
+          <Route path="/rapid-resolution" element={<RapidResolution />} />
+          <Route path="/traffic-ticket-assessment" element={<Navigate to="/rapid-resolution" replace />} />
+          <Route path="/traffic-ticket-assessment/examples" element={<Navigate to="/rapid-resolution" replace />} />
+          <Route path="/traffic-ticket-assessment/start" element={<Navigate to="/submit-ticket" replace />} />
           <Route path="/traffic-ticket-assessment/confirmation" element={<TicketAssessmentConfirmation />} />
           <Route path="/portal" element={<Navigate to="/portal/cases" replace />} />
           <Route path="/portal/cases" element={<ClientCasesPage />} />
