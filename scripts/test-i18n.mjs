@@ -88,12 +88,15 @@ try {
   const english = await readBundle('en');
   for (const code of WAVE_ONE_LOCALES) {
     const bundle = await readBundle(code);
-    const instance = createLocaleInstance(code, english, bundle, [...WAVE_ONE_LOCALES], { price: '$198', reportPrice: '$49', bundlePrice: '$229', email: 'hello@fabsy.ca' });
+    const instance = createLocaleInstance(code, english, bundle, [...WAVE_ONE_LOCALES], { price: '$198', reportPrice: '$49', bundlePrice: '$229', proDiscountPercent: '20', proDiscountPrice: '$158.40', proSavings: '$39.60', proBundlePrice: '$183.20', email: 'hello@fabsy.ca' });
     assert.equal(instance.resolvedLanguage, code, `${code} must not resolve to the English fallback`);
     assert.equal(instance.t('home.title'), bundle.home.title, `${code} must render its native homepage`);
     assert.equal(instance.t('language.selector'), bundle.language.selector);
     assert.equal(instance.t('intake.consent.confirm'), bundle.intake.consent.confirm);
     assert.ok(!instance.t('checkout.scope').includes('{{'), `${code} offer interpolation must resolve`);
+    assert.ok(!instance.t('proDriver.title').includes('{{'), `${code} promotion percentage must resolve`);
+    assert.ok(!instance.t('proDriver.savings').includes('{{'), `${code} promotion savings must resolve`);
+    assert.ok(!instance.t('proDriver.bundlePrice').includes('{{'), `${code} promotion bundle price must resolve`);
   }
   // Render the actual route and document component. Isolate unrelated shell and
   // intake components; keep React Router, i18next, links and locale context real.
@@ -113,13 +116,14 @@ try {
       import { localizePath } from './src/i18n/locale-policy.mjs';
       import { lastHead } from '@/hooks/useSafeHead';
       export function render(code, english, bundle, basePath, isReleased = false) {
-        const instance = createLocaleInstance(code, english, bundle, [code, 'en'], { price: '$198', reportPrice: '$49', bundlePrice: '$229', email: 'hello@fabsy.ca' });
+        const instance = createLocaleInstance(code, english, bundle, [code, 'en'], { price: '$198', reportPrice: '$49', bundlePrice: '$229', proDiscountPercent: '20', proDiscountPrice: '$158.40', proSavings: '$39.60', proBundlePrice: '$183.20', email: 'hello@fabsy.ca' });
         const context = { locale: code, basePath, isReleased, direction: code === 'ar' ? 'rtl' : 'ltr', href: path => localizePath(path, code), availableLocales: [], intakeHandoff: null, setIntakeHandoff: () => undefined };
         const html = renderToStaticMarkup(<StaticRouter location={localizePath(basePath, code) + '?source=review#purchase'}><I18nextProvider i18n={instance}><LocaleContext.Provider value={context}><Routes><Route path="/:locale/*" element={<LocalizedPage />} /></Routes></LocaleContext.Provider></I18nextProvider></StaticRouter>);
         return { html, head: lastHead };
       }
     ` },
     bundle: true, platform: 'node', format: 'cjs', jsx: 'automatic', outfile: handoffFile, logLevel: 'silent',
+    loader: { '.png': 'dataurl', '.svg': 'dataurl' },
     plugins: [{ name: 'purchase-route-boundary', setup(builder) {
       builder.onResolve({ filter: /.*/ }, args => {
         if (['@/components/Header', '@/components/Footer'].includes(args.path)) return { path: 'empty-shell', namespace: 'purchase-fixture' };

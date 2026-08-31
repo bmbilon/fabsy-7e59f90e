@@ -353,5 +353,25 @@
       "body": "Hola {{name}}, recibimos el pago de {{total}} CAD para el expediente {{reference}}. El pago no promete un resultado ni amplía ningún plazo. Consulta el recibo y los siguientes pasos: {{url}}"
     },
     "disclaimer": "Fabsy ofrece representación mediante agentes para infracciones de tránsito; no es un despacho de abogados. Prevalecen las condiciones del servicio en inglés. No envíes datos de tarjetas de pago por correo ni por mensaje de texto."
+  },
+  "insuranceContext": {
+    "eyebrow": "Contexto del seguro",
+    "title": "Pensado para tu aseguradora real y tu póliza individual",
+    "description": "Las consecuencias para el seguro no son iguales para todos. Fabsy revisa la información de la póliza que proporcionas junto con la infracción, el historial de conducción y las circunstancias para explicar el posible impacto y las opciones prácticas.",
+    "listLabel": "Ejemplos de aseguradoras",
+    "disclaimer": "Las marcas de aseguradoras se muestran como ejemplos únicamente para su identificación. Los logotipos son marcas comerciales de sus respectivos propietarios. Fabsy es independiente y no está afiliada a las aseguradoras mostradas ni cuenta con su respaldo. El tratamiento del seguro varía según la aseguradora, la póliza, el historial de conducción y las normas de suscripción; no se promete ningún resultado en cuanto a primas, cobertura o suscripción del seguro."
+  },
+  "proDriver": {
+    "eyebrow": "Una oferta de Fabsy para conductores profesionales",
+    "title": "{{proDiscountPercent}}% de descuento para conductores profesionales",
+    "description": "Para conductores profesionales, incluidos los de Clase 1, taxis y plataformas de transporte. Disponible para titulares de una licencia de Alberta de Clase 1, 2 o 4 verificada, con una multa de tránsito elegible emitida por un agente de la autoridad.",
+    "regularPrice": "Tarifa habitual del servicio",
+    "discountedPrice": "Tu tarifa como conductor profesional tras la verificación",
+    "savings": "Ahorra {{proSavings}} sobre la tarifa habitual de {{price}} por el servicio.",
+    "bundlePrice": "Rapid Resolution Bundle: {{proBundlePrice}} CAD más el GST aplicable.",
+    "claimHint": "La foto de tu licencia debe coincidir con la clase que declaras y con tu identidad. Las compras sin verificar se realizan al precio habitual, con un reembolso parcial después de la verificación.",
+    "scope": "Disponible para Rapid Resolution y Rapid Resolution Bundle. Excluye avisos de fotoradar y cámaras, repartidores por encargo con licencia de Clase 5 e informes de seguro comprados por separado. No se puede combinar con otros descuentos. Las multas gubernamentales, la representación en juicio y el trabajo fuera del alcance aceptado son conceptos separados.",
+    "cta": "Consultar los requisitos del descuento para conductores profesionales",
+    "englishDetails": "Los requisitos y el proceso para solicitar el descuento están en inglés."
   }
 }

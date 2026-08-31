@@ -353,5 +353,25 @@
       "body": "{{name}}，您好。檔案 {{reference}} 的 {{total}} 加元付款已收到。付款不保證任何結果，也不會延長截止日期。查看收據及後續步驟：{{url}}"
     },
     "disclaimer": "Fabsy 提供交通告票代理服務，並非律師事務所。以英文服務條款為準。請勿通過電子郵件或短訊發送支付卡資料。"
+  },
+  "insuranceContext": {
+    "eyebrow": "保險相關情況",
+    "title": "結合您的實際保險公司與個人保單",
+    "description": "保險影響因人而異。Fabsy 會結合您提供的保單資訊、告票、駕駛紀錄和具體情況，說明可能的影響及可行的選擇。",
+    "listLabel": "保險公司範例",
+    "disclaimer": "展示的保險品牌僅用於識別和舉例。標誌為各自所有者的商標。Fabsy 獨立運作，與展示的保險公司沒有關聯，也未獲其背書。保險處理方式因保險公司、保單、駕駛紀錄及核保規則而異；不承諾任何保費、保障範圍或核保結果。"
+  },
+  "proDriver": {
+    "eyebrow": "Fabsy 為職業駕駛者提供的優惠",
+    "title": "職業駕駛者服務費減免 {{proDiscountPercent}}%",
+    "description": "面向職業駕駛者，包括 Class 1 駕駛者、的士及網約車司機。須持有經核實的阿爾伯塔 Class 1、2 或 4 駕駛執照，並持有由執法人員開出的合資格交通告票。",
+    "regularPrice": "標準服務費",
+    "discountedPrice": "核實資格後的職業駕駛者服務費",
+    "savings": "在標準服務費 {{price}} 的基礎上節省 {{proSavings}}。",
+    "bundlePrice": "Rapid Resolution Bundle：{{proBundlePrice}} CAD，另加適用的 GST。",
+    "claimHint": "您駕駛執照的照片必須與您申報的駕照類別及身分相符。尚未通過核實的購買按標準價格收費，核實後退還部分款項。",
+    "scope": "適用於 Rapid Resolution 和 Rapid Resolution Bundle。不適用於雷達測速照相或攝影機通知、持 Class 5 駕照的零工配送員，以及單獨購買的保險報告。不能與其他折扣同時使用。政府罰款、庭審代理及已接受服務範圍以外的工作另行處理。",
+    "cta": "查看職業駕駛者折扣資格",
+    "englishDetails": "資格詳情和申請折扣的流程以英文提供。"
   }
 }

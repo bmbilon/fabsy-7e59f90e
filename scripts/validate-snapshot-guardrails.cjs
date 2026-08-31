@@ -32,6 +32,7 @@ const LOCALE_REGISTRY = require(path.resolve(process.env.LOCALE_REGISTRY_PATH ||
 const LOCALE_ROOTS = new Set(LOCALE_REGISTRY.locales.filter((locale) => locale.code !== 'en' && locale.wave <= 1).map((locale) => `/${locale.code}`));
 const PRICING_TEXT = EXACT_FABSY_PRICING;
 const OFFER_DATA = require('../src/config/offers.json');
+const { redactProDriverPromotion } = require('./pro-driver-promotion-guardrail.cjs');
 const APPROVED_OFFER_PRICES = new Map([
   [OFFER_DATA.rapidResolution.name, OFFER_DATA.rapidResolution.priceCad],
   [OFFER_DATA.rapidResolution.shortName, OFFER_DATA.rapidResolution.priceCad],
@@ -50,6 +51,7 @@ const fail = (message) => errors.push(message);
 let localeCatalogForms = new Map();
 let englishTermsSourceClauses = new Set();
 let englishTermsHasUpdateLabel = false;
+let promotionContext = null;
 
 function redactVerifiedClientTestimonials(value) {
   return VERIFIED_CLIENT_TESTIMONIALS.reduce(
@@ -623,6 +625,7 @@ async function admitExactLocaleCatalogs() {
   // This also checks noindex, exact locale routes, reciprocal equivalents and
   // the current source/bundle fingerprints and approval/service gates.
   verifyLocaleSnapshotCoverage(path.dirname(SNAPSHOT_DIR), context);
+  promotionContext = { context, snapshotTranslator };
   const termsSource = fs.readFileSync(path.join(
     process.env.LOCALE_SOURCE_ROOT || ROOT, 'src/pages/TermsOfService.tsx'
   ), 'utf8').replace(/\s+/g, ' ');
@@ -647,6 +650,9 @@ async function admitExactLocaleCatalogs() {
     const t = snapshotTranslator(context, locale.code);
     const forms = new Set();
     for (const key of keysUnder(context.bundles[locale.code])) {
+      // Discount copy must qualify as one complete homepage section. A
+      // source-matched title/amount alone cannot license a discount elsewhere.
+      if (key.startsWith('proDriver.')) continue;
       // The English browser agreement is authoritative source, not a copy of
       // every translated UI label. Only complete terms paragraphs qualify.
       if (locale.code === 'en' && !/^terms\.sections\.[^.]+\.body$/.test(key)) continue;
@@ -727,7 +733,17 @@ function validateAllPrerendered() {
     // Catalog admission is limited to complete strings from the current,
     // fingerprint-verified locale source. All remaining text still receives
     // the existing product-specific commercial and legal-claim checks.
-    const sourceCheckedHtml = catalogCode === 'en' ? redactVerifiedEnglishTerms(html) : html;
+    const promotionCode = catalogCode && catalogCode !== 'en' ? catalogCode : 'en';
+    const promotionRoute = relative === 'index.html' ? '/' :
+      relative.endsWith(`${path.sep}index.html`) ? `/${relativeParts.slice(0, -1).join('/')}${relativeParts.length === 2 && LOCALE_ROOTS.has(`/${relativeParts[0]}`) ? '/' : ''}` : `/${relative.replace(/\.html$/, '')}`;
+    const promotion = redactProDriverPromotion(html, {
+      offers: promotionContext.context.offers,
+      translate: promotionContext.snapshotTranslator(promotionContext.context, promotionCode),
+      code: promotionCode, route: promotionRoute,
+      required: promotionRoute === '/' || LOCALE_ROOTS.has(promotionRoute.replace(/\/$/, '')),
+    });
+    for (const issue of promotion.issues) fail(`${label}: ${issue}`);
+    const sourceCheckedHtml = catalogCode === 'en' ? redactVerifiedEnglishTerms(promotion.html) : promotion.html;
     const candidate = redactExactLocaleStrings(sourceCheckedHtml, catalogCode);
     for (const issue of browserTextGuardrailIssues(candidate, pageSlug, { numeric: !isBlogSnapshot })) {
       fail(`${label}: ${issue}`);

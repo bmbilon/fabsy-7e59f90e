@@ -55,5 +55,16 @@
     "taxTreatment": "plus applicable GST",
     "description": "Rapid Resolution for an eligible Alberta ticket plus the Insurance Impact & Renewal Planning Report for one transparent bundle price."
   },
+  "proDriverPromotion": {
+    "id": "pro-driver-20",
+    "percentOff": 20,
+    "eligibleLicenceClasses": ["1", "2", "4"],
+    "licenceProvince": "AB",
+    "verificationRequired": true,
+    "eligibleTicketType": "officer",
+    "appliesTo": ["rapid_resolution", "rapid_resolution_insurance_bundle"],
+    "combinable": false,
+    "detailsPath": "/pro-drivers"
+  },
   "canonicalPricingCopy": "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate."
 }

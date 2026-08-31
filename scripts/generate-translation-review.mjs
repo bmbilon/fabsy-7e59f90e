@@ -17,6 +17,7 @@ const legalPrefixes = [
   'common.clientDecision', 'common.priceLine', 'home.education', 'home.scope',
   'contact.availability', 'contact.staffAvailability', 'contact.whatsapp',
   'intake.fields.smsOptIn', 'intake.review.languageNote',
+  'insuranceContext.', 'proDriver.',
 ];
 const sha256 = text => createHash('sha256').update(text, 'utf8').digest('hex');
 const rowId = row => JSON.stringify([row.locale, row.key]);

@@ -1,10 +1,10 @@
 # Wave 1 translation review
 
-Updated 2026-08-30. **Brett authorized publishing all seven machine-translated interfaces without waiting for native review.** They are public language options with intake and checkout enabled, a small translation note, and the existing English agreements. No native or legal reviewer has approved these translations, and no reviewer has been hired or contacted by this task. Publication must not be represented as professional review or staffed native-language support.
+Updated 2026-08-31. **Brett authorized publishing all seven machine-translated interfaces without waiting for native review.** They are public language options with intake and checkout enabled, a small translation note, and the existing English agreements. No native or legal reviewer has approved these translations, and no reviewer has been hired or contacted by this task. Publication must not be represented as professional review or staffed native-language support.
 
 ## Files and scope
 
-`src/i18n/locales/en.json` is the shared English string contract. Each of the seven other files in that directory has the same 245 leaf keys and interpolation variables. The separate `translation-review.csv` provides one review row per key per non-English language: 1,715 rows. Blank reviewer and approval fields are intentional; publishing a language does not fill them.
+`src/i18n/locales/en.json` is the shared English string contract. Each of the seven other files in that directory has the same 261 leaf keys and interpolation variables. The separate `translation-review.csv` provides one review row per key per non-English language: 1,827 rows. Blank reviewer and approval fields are intentional; publishing a language does not fill them.
 
 | Bundle | Intended written language | Status |
 | --- | --- | --- |
@@ -26,12 +26,15 @@ The current release also preserves the distinct English `src/pages/TermsOfPurcha
 
 ## Review priorities
 
+The insurer context and Pro Driver homepage section add 16 strings to the original 245-key inventory. All 16 are marked legal-adjacent. The Pro Driver section is a marketing-only change that must release with the separate verified checkout program and English `/pro-drivers` page; see [the coordinated release notes](../pro-driver-homepage-release.md). Its translations disclose the English eligibility and claim process and do not establish a localized Pro Driver purchase flow.
+
 Native review remains a follow-up quality improvement, not a prerequisite for this owner-authorized launch. Familiarity with Canadian traffic, court and insurance terminology matters. Legal-adjacent copy benefits from review by a person qualified to assess the agreement and representations being made. Native fluency alone is not evidence of legal equivalence or legal compliance. A bilingual Hindi/Urdu reviewer can later serve both languages only if competent in both scripts.
 
 Check these meanings wherever they appear, including headings, snippets, metadata, buttons, FAQs, consent and notification templates:
 
 - Fabsy is a traffic-ticket agent service, not a law firm; it does not provide legal advice. Translations must not describe its agents as lawyers.
 - The current Rapid Resolution service is **$198 CAD plus applicable GST**, for eligible pre-trial matters. The separate report is **$49 CAD plus applicable GST** and the bundle **$229 CAD plus applicable GST**. Copy uses offer interpolation values so pricing is not independently hardcoded into language bundles.
+- The Pro Driver promotion is **20% off** for independently verified **Alberta Class 1, 2 or 4** licence holders with an eligible **officer-issued** ticket: **$158.40 CAD** for Rapid Resolution or **$183.20 CAD** for the bundle, plus applicable GST. The licence photo must match the declared class and identity; unverified purchases start at the regular price with a partial refund after verification. Preserve the camera/photo-radar, Class 5 gig courier, standalone report and other-discount exclusions. This is a Fabsy service-fee discount, not an insurer offer or promised insurance saving.
 - There is one flat service fee and no percentage-based success fee. This does not make service fees, government fines or excluded work free.
 - The **48-hour** commitment begins only when disclosure is **complete, readable, received and matched to the client's file**. It covers Fabsy's review and preparation or submission of the next authorized action. It does not promise the prosecutor's response time or final-outcome timing.
 - No withdrawal, charge reduction, lower fine, fewer demerits, insurance saving, insurer eligibility or other result is promised.

@@ -15,6 +15,10 @@ export const translationValues = {
   price: `$${offers.rapidResolution.priceCad}`,
   reportPrice: `$${offers.insuranceReport.priceCad}`,
   bundlePrice: `$${offers.bundle.priceCad}`,
+  proDiscountPercent: String(offers.proDriverPromotion.percentOff),
+  proDiscountPrice: `$${((offers.rapidResolution.priceCents - Math.round(offers.rapidResolution.priceCents * offers.proDriverPromotion.percentOff / 100)) / 100).toFixed(2)}`,
+  proSavings: `$${(Math.round(offers.rapidResolution.priceCents * offers.proDriverPromotion.percentOff / 100) / 100).toFixed(2)}`,
+  proBundlePrice: `$${((offers.bundle.priceCents - Math.round(offers.bundle.priceCents * offers.proDriverPromotion.percentOff / 100)) / 100).toFixed(2)}`,
   email: 'hello@fabsy.ca',
 };
 

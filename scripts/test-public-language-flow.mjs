@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Offline transaction-control regression only: this never presses checkout,
+// Offline public UI and transaction-control regression: this never presses checkout,
 // submits a form, authorizes a real matter, or verifies translation quality.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -10,6 +10,7 @@ import { MessageChannel } from 'node:worker_threads';
 import { build } from 'esbuild';
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { fingerprint, isLocaleReleased, LEGAL_SOURCE_DOCUMENT_PATHS, WAVE_ONE_LOCALES } from '../src/i18n/locale-policy.mjs';
+import { redactProDriverPromotion } from './pro-driver-promotion-guardrail.cjs';
 
 const repoRoot = fileURLToPath(new URL('../', import.meta.url));
 const readJson = async file => JSON.parse(await fs.readFile(path.join(repoRoot, file), 'utf8'));
@@ -31,7 +32,12 @@ assert.equal(availableLocales.length, 8, 'The actual publication record and curr
 assert.deepEqual(new Set(availableLocales.map(item => item.code)), new Set(WAVE_ONE_LOCALES));
 const values = {
   price: `$${offers.rapidResolution.priceCad}`, reportPrice: `$${offers.insuranceReport.priceCad}`,
-  bundlePrice: `$${offers.bundle.priceCad}`, email: 'hello@fabsy.ca',
+  bundlePrice: `$${offers.bundle.priceCad}`,
+  proDiscountPercent: String(offers.proDriverPromotion.percentOff),
+  proDiscountPrice: `$${((offers.rapidResolution.priceCents - Math.round(offers.rapidResolution.priceCents * offers.proDriverPromotion.percentOff / 100)) / 100).toFixed(2)}`,
+  proSavings: `$${(Math.round(offers.rapidResolution.priceCents * offers.proDriverPromotion.percentOff / 100) / 100).toFixed(2)}`,
+  proBundlePrice: `$${((offers.bundle.priceCents - Math.round(offers.bundle.priceCents * offers.proDriverPromotion.percentOff / 100)) / 100).toFixed(2)}`,
+  email: 'hello@fabsy.ca',
 };
 
 const unexpectedCalls = [];
@@ -85,13 +91,15 @@ try {
       import PaymentStep from './src/components/form-steps/PaymentStep';
       import LanguageSelector from './src/components/LanguageSelector';
       import LanguageMessages from './src/components/LanguageMessages';
+      import InsuranceContextSection from './src/components/InsuranceContextSection';
+      import ProDriverSection from './src/components/ProDriverSection';
       import type { FormData } from './src/components/TicketForm';
       import { LocaleContext } from './src/i18n/locale-context';
       import { createLocaleInstance } from './src/i18n/instance';
       import { localizePath } from './src/i18n/locale-policy.mjs';
       import { validateLocalizedIntakeStep } from './src/i18n/intake-validation';
 
-      export async function runChecks({ bundles, review, availableLocales, releaseStates, values }) {
+      export async function runChecks({ bundles, review, offers, availableLocales, releaseStates, values, redactProDriverPromotion }) {
         const codes = availableLocales.map(item => item.code);
         const formData: FormData = {
           sourceAssessmentId: '', sourceAssessmentAccessToken: '',
@@ -189,10 +197,96 @@ try {
             container.remove();
           }
         }
+
+        // Render the actual homepage sections in every language, including the
+        // English source. Inspect links and prices without following a CTA.
+        const insurerNames = ['Intact Insurance', 'TD Insurance', 'Wawanesa Insurance', 'Co-operators', 'Desjardins Insurance', 'Allstate Insurance', 'Aviva Canada'];
+        const promotionKeys = ['eyebrow', 'title', 'description', 'regularPrice', 'discountedPrice', 'savings', 'bundlePrice', 'claimHint', 'scope', 'cta', 'englishDetails'];
+        const savingsCents = Math.round(offers.rapidResolution.priceCents * offers.proDriverPromotion.percentOff / 100);
+        const discountedPrice = '$' + ((offers.rapidResolution.priceCents - savingsCents) / 100).toFixed(2);
+        const discountedBundle = '$' + ((offers.bundle.priceCents - Math.round(offers.bundle.priceCents * offers.proDriverPromotion.percentOff / 100)) / 100).toFixed(2);
+        const normalizeText = text => String(text).replace(/\\s+/g, ' ').trim();
+        assert.equal(values.proDiscountPrice, discountedPrice);
+        assert.equal(values.proBundlePrice, discountedBundle);
+        assert.equal(values.proSavings, '$' + (savingsCents / 100).toFixed(2));
+
+        for (const item of availableLocales) {
+          const code = item.code;
+          for (const key of promotionKeys) {
+            assert.equal(typeof bundles[code].proDriver?.[key], 'string', code + ' must provide its own proDriver.' + key + ' without an English fallback');
+            assert.ok(bundles[code].proDriver[key].trim(), code + ' proDriver.' + key + ' must not be blank');
+          }
+          const instance = createLocaleInstance(code, bundles.en, bundles[code], codes, values);
+          const route = localizePath('/', code);
+          const context = {
+            locale: code, basePath: '/', isReleased: releaseStates[code], direction: item.dir,
+            href: target => localizePath(target, code), availableLocales, intakeHandoff: null,
+            setIntakeHandoff: () => globalThis.__fabsyOfflineForbidCall('unexpected homepage intake handoff'),
+          };
+          const container = document.createElement('div');
+          document.body.append(container);
+          const root = createRoot(container);
+          try {
+            await act(async () => root.render(
+              <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <I18nextProvider i18n={instance}><LocaleContext.Provider value={context}>
+                  <InsuranceContextSection /><ProDriverSection />
+                </LocaleContext.Provider></I18nextProvider>
+              </MemoryRouter>
+            ));
+            assert.equal(instance.resolvedLanguage, code);
+            const insurance = container.querySelector('section[aria-labelledby="insurance-context-heading"]');
+            assert.ok(insurance, code + ' must render the actual insurance context section');
+            assert.equal(insurance.querySelector('h2')?.textContent, instance.t('insuranceContext.title'));
+            const insurerList = insurance.querySelector('ul');
+            assert.equal(insurerList?.getAttribute('aria-label'), instance.t('insuranceContext.listLabel'));
+            const insurerItems = [...insurerList.querySelectorAll('li')];
+            assert.deepEqual(insurerItems.map(item => item.querySelector('span')?.textContent), insurerNames, code + ' must visibly identify Allstate alongside the other six insurers');
+            for (const item of insurerItems) {
+              const logo = item.querySelector('img');
+              assert.ok(logo?.getAttribute('src')?.startsWith('data:image/'), 'The actual bundled logo must be present without an external image request');
+              assert.equal(logo.getAttribute('alt'), '');
+              assert.equal(logo.getAttribute('aria-hidden'), 'true');
+            }
+            const allstate = insurerItems.find(item => item.querySelector('span')?.textContent === 'Allstate Insurance');
+            assert.ok(allstate.querySelector('img').getAttribute('src').startsWith('data:image/svg+xml'), 'Allstate must use its actual SVG asset');
+            assert.ok([...insurance.querySelectorAll('p')].some(node => node.textContent === instance.t('insuranceContext.disclaimer')), code + ' must preserve the insurance affiliation and outcome disclaimer');
+
+            const promotion = container.querySelector('section[data-promotion="' + offers.proDriverPromotion.id + '"]');
+            assert.ok(promotion, code + ' must render the actual Pro Driver section');
+            assert.equal(promotion.getAttribute('aria-labelledby'), 'pro-driver-heading');
+            assert.equal(promotion.querySelector('h2')?.textContent, instance.t('proDriver.title'));
+            assert.ok(promotion.querySelector('h2').textContent.includes(String(offers.proDriverPromotion.percentOff)));
+            assert.equal(promotion.querySelector('s')?.textContent, '$' + offers.rapidResolution.priceCad + ' CAD');
+            assert.equal(promotion.querySelector('s')?.getAttribute('dir'), 'ltr');
+            assert.equal(normalizeText(promotion.querySelector('p[dir="ltr"]')?.textContent), discountedPrice + ' CAD + GST', code + ' must show the configured discounted service fee with currency and GST');
+            const paragraphs = [...promotion.querySelectorAll('p')];
+            for (const key of ['eyebrow', 'description', 'scope', 'discountedPrice', 'savings', 'bundlePrice', 'claimHint']) {
+              assert.ok(paragraphs.some(node => node.textContent === instance.t('proDriver.' + key)), code + ' must preserve its complete proDriver.' + key);
+            }
+            assert.ok(instance.t('proDriver.savings').includes(values.proSavings));
+            assert.ok(instance.t('proDriver.savings').includes(values.price));
+            assert.ok(instance.t('proDriver.bundlePrice').includes(discountedBundle), code + ' must discount the full bundle price');
+            assert.equal(paragraphs.filter(node => node.textContent === instance.t('proDriver.englishDetails')).length, code === 'en' ? 0 : 1, code + ' must disclose that eligibility and claim details are in English');
+            assert.ok(!/\\{\\{|\\}\\}|proDriver\\./.test(promotion.textContent), code + ' must not expose an unresolved interpolation or translation key');
+            const links = [...promotion.querySelectorAll('a')];
+            assert.equal(links.length, 1, code + ' must have one details CTA');
+            assert.equal(links[0].getAttribute('href'), '/pro-drivers', code + ' must link to the English verified-program route without preselecting checkout eligibility');
+            assert.equal(links[0].textContent, instance.t('proDriver.cta'));
+            assert.equal(promotion.querySelector('form, input, select, button'), null, 'The homepage must not introduce self-attestation checkout controls');
+            assert.deepEqual(redactProDriverPromotion(promotion.outerHTML, {
+              offers, translate: key => instance.t(key), code, route, required: true,
+            }).issues, [], code + ' actual React markup must satisfy the exact promotion snapshot contract');
+          } finally {
+            await act(async () => root.unmount());
+            container.remove();
+          }
+        }
       }
     ` },
     bundle: true, platform: 'node', format: 'cjs', jsx: 'automatic', outfile, logLevel: 'silent',
     define: { 'process.env.NODE_ENV': '"test"' },
+    loader: { '.png': 'dataurl', '.svg': 'dataurl' },
     plugins: [{ name: 'offline-language-boundaries', setup(builder) {
       builder.onResolve({ filter: /^@\/(?:i18n\/config|integrations\/supabase\/client)$/ }, args => ({ path: args.path, namespace: 'offline-language' }));
       builder.onLoad({ filter: /.*/, namespace: 'offline-language' }, args => ({ resolveDir: repoRoot, contents: args.path.includes('/supabase/')
@@ -216,7 +310,7 @@ try {
     } }],
   });
   const { runChecks } = (await import(pathToFileURL(outfile).href)).default;
-  await runChecks({ bundles, review, availableLocales, releaseStates, values });
+  await runChecks({ bundles, review, offers, availableLocales, releaseStates, values, redactProDriverPromotion });
   assert.deepEqual(unexpectedCalls, [], 'Rendering and accepting terms must never invoke a backend, payment, or network operation');
   assert.deepEqual(domErrors, [], 'The real React DOM flow must not produce unhandled browser errors');
 } finally {
@@ -228,4 +322,4 @@ try {
     else delete globalThis[name];
   }
 }
-console.log('Offline public language flow passed: 7 payment steps, 8 selector choices, publication notes, explicit terms gating, English legal links, and zero backend/network calls.');
+console.log('Offline public language flow passed: 7 payment steps, 8 selector choices, publication notes, explicit terms gating, English legal links, 8 actual Allstate/Pro Driver sections with scoped prices and English details CTAs, and zero backend/network calls.');

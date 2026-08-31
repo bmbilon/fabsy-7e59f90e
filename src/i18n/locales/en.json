@@ -29,6 +29,26 @@
     "notFound": "This page is not available in this language.",
     "returnHome": "Return to home"
   },
+  "insuranceContext": {
+    "eyebrow": "Insurance context",
+    "title": "Built for your actual insurer and individual policy",
+    "description": "Insurance consequences are not one-size-fits-all. Fabsy reviews the policy information you provide alongside the ticket, driving record and circumstances to explain the likely significance and practical options.",
+    "listLabel": "Examples of insurance providers",
+    "disclaimer": "Examples of insurer brands, shown for identification only. Logos are trademarks of their respective owners. Fabsy is independent and is not affiliated with or endorsed by the insurers shown. Insurance treatment varies by provider, policy, driving record and underwriting rules; no premium, coverage or underwriting outcome is promised."
+  },
+  "proDriver": {
+    "eyebrow": "A Fabsy offer for professional drivers",
+    "title": "{{proDiscountPercent}}% Pro Driver Discount",
+    "description": "For professional drivers, including Class 1, taxi and rideshare drivers. Available to verified Alberta Class 1, 2 or 4 licence holders with an eligible officer-issued traffic ticket.",
+    "regularPrice": "Regular service fee",
+    "discountedPrice": "Your verified Pro Driver service fee",
+    "savings": "Save {{proSavings}} on the regular {{price}} service fee.",
+    "bundlePrice": "Rapid Resolution Bundle: {{proBundlePrice}} CAD + applicable GST.",
+    "claimHint": "Your licence photo must match your declared class and identity. Unverified purchases start at the regular price, with a partial refund after verification.",
+    "scope": "Available on Rapid Resolution and the Rapid Resolution Bundle. Excludes photo radar and camera notices, Class 5 gig couriers and standalone insurance reports. Other discounts cannot be combined. Government fines, trial representation and work outside the accepted scope are separate.",
+    "cta": "See Pro Driver eligibility",
+    "englishDetails": "Eligibility details and the claim process are in English."
+  },
   "language": {
     "selector": "Choose your language",
     "offer": "Prefer to read this page in {{language}}?",

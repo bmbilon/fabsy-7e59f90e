@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadLocaleSeoContext, normalizeStagedEnglishSnapshots, snapshotFile, verifyLocaleSnapshotCoverage } from './locale-seo.mjs';
-import { assertLocalizedMainContent } from './generate-localized-snapshots.mjs';
+import { assertLocalizedMainContent, refreshEnglishHomepageSections } from './generate-localized-snapshots.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = path.resolve(process.env.PRERENDER_SRC_DIR || path.join(ROOT, 'public/prerendered'));
@@ -172,6 +172,10 @@ function verifyLocales(root, localeContext) {
   for (const record of localeManifest.records) {
     const html = fs.readFileSync(snapshotFile(root, record.route), 'utf8');
     assertLocalizedMainContent(html, localeContext, record.code, record.basePath);
+  }
+  const englishHome = fs.readFileSync(snapshotFile(root, '/'), 'utf8');
+  if (refreshEnglishHomepageSections(englishHome, localeContext) !== englishHome) {
+    throw new Error('English homepage insurance and Pro Driver sections must match the current source before copying');
   }
   return localeManifest;
 }

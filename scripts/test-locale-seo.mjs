@@ -11,7 +11,8 @@ import {
   SITE, SOURCE_DOCUMENT_PATHS, alternateLinks, assertSnapshotHead, isIndexable, loadLocaleSeoContext, localeSnapshotRecords,
   normalizeSnapshotHead, snapshotFile, verifyLocaleSnapshotCoverage,
 } from './locale-seo.mjs';
-import { assertLocalizedMainContent, generateLocalizedSnapshots, renderLocalizedSnapshot } from './generate-localized-snapshots.mjs';
+import { assertLocalizedMainContent, generateLocalizedSnapshots, renderInsuranceContextSnapshot, refreshEnglishHomepageSections, renderLocalizedSnapshot, snapshotTranslator } from './generate-localized-snapshots.mjs';
+import promotionPolicy from './pro-driver-promotion-guardrail.cjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fabsy-locale-seo-'));
@@ -68,13 +69,38 @@ try {
   fs.mkdirSync(env.SNAPSHOT_CURATED_DIR, { recursive: true });
   const run = (script, extraEnv = {}) => execFileSync(process.execPath, [path.join(ROOT, script)], { cwd: ROOT, env: { ...env, ...extraEnv }, encoding: 'utf8', stdio: 'pipe', timeout: 30000 });
   run('scripts/generate-static-snapshots.cjs');
-  const englishHtml = route => `<!doctype html><html lang="en-CA"><head><title>English fixture</title><meta name="description" content="Offline fixture description."><link rel="canonical" href="${SITE}${route}"><meta name="robots" content="index, follow"></head><body><h1>Original English fixture for ${route}</h1></body></html>`;
+  const englishHtml = route => `<!doctype html><html lang="en-CA"><head><title>English fixture</title><meta name="description" content="Offline fixture description."><link rel="canonical" href="${SITE}${route}"><meta name="robots" content="index, follow"></head><body><h1>Original English fixture for ${route}</h1>${route === '/' ? renderInsuranceContextSnapshot(snapshotTranslator(draft, 'en')) + promotionPolicy.renderProDriverSnapshot(offers, snapshotTranslator(draft, 'en'), 'en') : ''}</body></html>`;
   for (const route of draft.indexableRoutes) {
     if (route === '/terms-of-service') continue; // Exercise creation of the missing counterpart.
     const filename = snapshotFile(outDir, route);
     fs.mkdirSync(path.dirname(filename), { recursive: true });
     fs.writeFileSync(filename, englishHtml(route));
   }
+
+  check('English homepage refresh changes only identified sections and is idempotent', () => {
+    const prefix = '<!doctype html><main><h1>Keep this exact English heading.</h1><!-- retain spacing -->\n';
+    const suffix = '\n<section id="untouched"><p>Unchanged Rapid Resolution terms and other page content.</p></section></main>';
+    const oldSection = '<section aria-labelledby="insurance-context-heading"><h2 id="insurance-context-heading">Earlier insurer context</h2><p>Earlier source wording.</p><ul><li>Aviva Canada</li></ul></section>';
+    const updated = refreshEnglishHomepageSections(prefix + oldSection + suffix, draft);
+    assert(updated.startsWith(prefix));
+    assert(updated.endsWith(suffix));
+    assert(updated.includes('Allstate Insurance'));
+    assert(updated.includes('data-promotion="pro-driver-20"'));
+    assert(updated.includes('$158.40') && updated.includes('$183.20'));
+    assert(updated.includes('href="/pro-drivers"'));
+    assert(!updated.includes('Earlier source wording.'));
+    assert.equal(refreshEnglishHomepageSections(updated, draft), updated);
+    const stalePromotion = updated.replace('$158.40', '$150.00');
+    assert.equal(refreshEnglishHomepageSections(stalePromotion, draft), updated);
+    for (const bad of [
+      prefix + suffix,
+      prefix + oldSection + oldSection + suffix,
+      updated.replace('data-promotion="pro-driver-20"', 'data-promotion="unrecognized"'),
+      updated.replace('data-promotion="pro-driver-20"', 'data-promotion="pro-driver-20" data-promotion="pro-driver-20"'),
+      updated.replace('</section><section data-promotion', '</section><p>Intervening unrelated content</p><section data-promotion'),
+      updated.replace('</section>', ''),
+    ]) assert.throws(() => refreshEnglishHomepageSections(bad, draft), /marker|immediately follow/);
+  });
 
   check('only actual Phase 1 translated routes enter the snapshot inventory', () => {
     const records = localeSnapshotRecords(draft);
@@ -95,6 +121,31 @@ try {
     assert(SOURCE_DOCUMENT_PATHS.includes('src/pages/TermsOfPurchase.tsx'));
   });
   const draftManifest = generateLocalizedSnapshots({ context: draft, outDir });
+  check('all localized homes include insurer context then the exact verified promotion, without adding routes', () => {
+    for (const record of draftManifest.records) {
+      const html = fs.readFileSync(snapshotFile(outDir, record.route), 'utf8');
+      assert.equal(html.includes('data-promotion="pro-driver-20"'), record.basePath === '/');
+      if (record.basePath !== '/') continue;
+      assert(html.indexOf('insurance-context-heading') < html.indexOf('data-promotion="pro-driver-20"'));
+      assert(html.includes('Allstate Insurance'));
+      assert(html.includes('$158.40') && html.includes('$183.20'));
+      assert(html.includes('href="/pro-drivers"'));
+      assert(!html.includes(`href="/${record.code}/pro-drivers"`));
+    }
+    assert(!draftManifest.records.some(record => record.route.includes('pro-drivers')));
+  });
+  check('ambiguous English homepage input cannot partially replace locale output', () => {
+    const homeFile = snapshotFile(outDir, '/');
+    const home = fs.readFileSync(homeFile, 'utf8');
+    const before = fs.readFileSync(snapshotFile(outDir, '/pa/'), 'utf8');
+    const manifest = fs.readFileSync(path.join(outDir, 'locale-manifest.json'), 'utf8');
+    try {
+      fs.writeFileSync(homeFile, home.replace('aria-labelledby="insurance-context-heading"', 'aria-labelledby="missing"'));
+      assert.throws(() => generateLocalizedSnapshots({ context: draft, outDir }), /insurance-context marker/);
+      assert.equal(fs.readFileSync(snapshotFile(outDir, '/pa/'), 'utf8'), before);
+      assert.equal(fs.readFileSync(path.join(outDir, 'locale-manifest.json'), 'utf8'), manifest);
+    } finally { fs.writeFileSync(homeFile, home); }
+  });
   check('draft pages have translated headings, script tags, RTL, self canonicals and noindex', () => {
     assert.equal(verifyLocaleSnapshotCoverage(outDir, draft).generatedCount, 56);
     for (const record of draftManifest.records) {
@@ -241,6 +292,24 @@ try {
     assert.match(purchase, /name="robots" content="index, follow"/);
     assert(!purchase.includes('hreflang="pa"'));
     verifyLocaleSnapshotCoverage(env.DIST_PRERENDER_DIR, approved);
+  });
+  check('copy rejects stale English and changed localized promotions before touching prior output', () => {
+    for (const [route, mutation] of [
+      ['/', html => html.replace('$158.40', '$150.00')],
+      ['/pa/', html => html.replace('$183.20', '$183.21')],
+      ['/ar/', html => html.replace('href="/pro-drivers"', 'href="/ar/pro-drivers"')],
+    ]) {
+      const filename = snapshotFile(outDir, route);
+      const original = fs.readFileSync(filename, 'utf8');
+      const previous = fs.readFileSync(snapshotFile(env.DIST_PRERENDER_DIR, route), 'utf8');
+      try {
+        fs.writeFileSync(filename, mutation(original));
+        const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts/copy-prerendered.js')], { cwd: ROOT, env, encoding: 'utf8', timeout: 30000 });
+        assert.notEqual(result.status, 0);
+        assert.match(result.stderr, /promotion|Pro Driver/);
+        assert.equal(fs.readFileSync(snapshotFile(env.DIST_PRERENDER_DIR, route), 'utf8'), previous);
+      } finally { fs.writeFileSync(filename, original); }
+    }
   });
   check('withdrawing approval rejects stale artifacts without touching prior output', () => {
     writeJson(options.reviewPath, review);

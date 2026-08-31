@@ -353,5 +353,25 @@
       "body": "{{name}}，您好。档案 {{reference}} 的 {{total}} 加元付款已收到。付款不保证任何结果，也不会延长截止日期。查看收据及后续步骤：{{url}}"
     },
     "disclaimer": "Fabsy 提供交通罚单代理服务，并非律师事务所。以英文服务条款为准。请勿通过电子邮件或短信发送支付卡资料。"
+  },
+  "insuranceContext": {
+    "eyebrow": "保险相关情况",
+    "title": "结合您的实际保险公司与个人保单",
+    "description": "保险影响因人而异。Fabsy 会结合您提供的保单信息、罚单、驾驶记录和具体情况，说明可能的影响及可行的选择。",
+    "listLabel": "保险公司示例",
+    "disclaimer": "展示的保险品牌仅用于识别和举例。标志为各自所有者的商标。Fabsy 独立运营，与展示的保险公司没有关联，也未获得其背书。保险处理方式因保险公司、保单、驾驶记录及核保规则而异；不承诺任何保费、保障范围或核保结果。"
+  },
+  "proDriver": {
+    "eyebrow": "Fabsy 为职业驾驶员提供的优惠",
+    "title": "职业驾驶员服务费减免 {{proDiscountPercent}}%",
+    "description": "面向职业驾驶员，包括 Class 1 驾驶员、出租车及网约车司机。须持有经核实的阿尔伯塔 Class 1、2 或 4 驾驶执照，并持有由执法人员开具的符合条件的交通罚单。",
+    "regularPrice": "标准服务费",
+    "discountedPrice": "核实资格后的职业驾驶员服务费",
+    "savings": "在标准服务费 {{price}} 的基础上节省 {{proSavings}}。",
+    "bundlePrice": "Rapid Resolution Bundle：{{proBundlePrice}} CAD，另加适用的 GST。",
+    "claimHint": "您驾驶执照的照片必须与您申报的驾照类别及身份相符。尚未通过核实的购买按标准价格收费，核实后退还部分款项。",
+    "scope": "适用于 Rapid Resolution 和 Rapid Resolution Bundle。不适用于雷达测速照相或摄像头通知、持 Class 5 驾照的零工配送员，以及单独购买的保险报告。不能与其他折扣同时使用。政府罚款、庭审代理及已接受服务范围以外的工作另行处理。",
+    "cta": "查看职业驾驶员折扣资格",
+    "englishDetails": "资格详情和申请折扣的流程以英文提供。"
   }
 }

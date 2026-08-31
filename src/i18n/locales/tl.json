@@ -353,5 +353,25 @@
       "body": "Kumusta {{name}}, natanggap ang bayad na {{total}} CAD para sa file {{reference}}. Hindi nangangako ng resulta o nagpapahaba ng deadline ang pagbabayad. Tingnan ang resibo at susunod na hakbang: {{url}}"
     },
     "disclaimer": "Ang Fabsy ay serbisyo ng kinatawan para sa traffic ticket, hindi law firm. Ang mga kondisyon ng serbisyo sa Ingles ang mananaig. Huwag magpadala ng detalye ng payment card sa email o text."
+  },
+  "insuranceContext": {
+    "eyebrow": "Konteksto ng seguro",
+    "title": "Isinasaalang-alang ang iyong mismong insurer at indibidwal na polisa",
+    "description": "Hindi pare-pareho ang epekto sa seguro. Sinusuri ng Fabsy ang impormasyon ng polisa na ibinibigay mo kasama ng ticket, rekord sa pagmamaneho at mga pangyayari upang ipaliwanag ang posibleng epekto at praktikal na mga opsyon.",
+    "listLabel": "Mga halimbawa ng kompanya ng seguro",
+    "disclaimer": "Mga halimbawa ng tatak ng insurer, ipinapakita para sa pagkakakilanlan lamang. Ang mga logo ay mga trademark ng kani-kanilang may-ari. Independiyente ang Fabsy at hindi ito kaanib o ineendorso ng mga insurer na ipinapakita. Nag-iiba ang pagtrato sa seguro ayon sa insurer, polisa, rekord sa pagmamaneho at mga tuntunin sa underwriting o pagtatasa ng panganib; walang ipinapangakong resulta sa premium, saklaw o underwriting."
+  },
+  "proDriver": {
+    "eyebrow": "Alok ng Fabsy para sa mga propesyonal na drayber",
+    "title": "{{proDiscountPercent}}% Diskuwento para sa Propesyonal na Drayber",
+    "description": "Para sa mga propesyonal na drayber, kabilang ang mga drayber na may lisensiyang Class 1, mga drayber ng taxi at rideshare. Available sa mga may napatunayang lisensiya sa Alberta na Class 1, 2 o 4 at kuwalipikadong traffic ticket na inisyu ng opisyal na nagpapatupad ng batas.",
+    "regularPrice": "Karaniwang bayad sa serbisyo",
+    "discountedPrice": "Bayad mo sa serbisyo matapos mapatunayan ang pagiging kuwalipikadong propesyonal na drayber",
+    "savings": "Makatipid ng {{proSavings}} sa karaniwang bayad sa serbisyo na {{price}}.",
+    "bundlePrice": "Rapid Resolution Bundle: {{proBundlePrice}} CAD at ang naaangkop na GST.",
+    "claimHint": "Dapat tumugma ang larawan ng iyong lisensiya sa idineklara mong klase at pagkakakilanlan. Ang mga pagbiling hindi pa nabeberipika ay nagsisimula sa karaniwang presyo, na may bahagyang refund matapos ang beripikasyon.",
+    "scope": "Available sa Rapid Resolution at Rapid Resolution Bundle. Hindi kasama ang mga notice mula sa photo radar at camera, mga gig courier na may lisensiyang Class 5 at mga hiwalay na ulat sa seguro. Hindi maaaring isabay sa ibang diskuwento. Hiwalay ang mga multa ng gobyerno, representasyon sa paglilitis at trabahong labas sa tinanggap na saklaw.",
+    "cta": "Tingnan kung kuwalipikado sa diskuwento para sa propesyonal na drayber",
+    "englishDetails": "Nasa Ingles ang mga detalye ng pagiging kuwalipikado at proseso ng pagkuha ng diskuwento."
   }
 }

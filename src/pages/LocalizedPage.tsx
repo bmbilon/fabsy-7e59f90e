@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, CheckCircle2, Clock3, Mail, MessageCircle, ShieldCheck, XCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import InsuranceContextSection from '@/components/InsuranceContextSection';
+import ProDriverSection from '@/components/ProDriverSection';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -147,6 +149,7 @@ function LocalizedContent() {
             </Card>
           </div>
         </section>
+        {isHome && <><InsuranceContextSection /><ProDriverSection /></>}
         <div className="container mx-auto max-w-6xl space-y-14 px-4 py-14">
           {isHome && <section className="max-w-3xl space-y-4"><h2 className="text-3xl font-bold">{t('home.educationTitle')}</h2><p className="text-lg leading-relaxed text-slate-600">{t('home.educationBody')}</p></section>}
           {isRapid && <div className="grid gap-8 lg:grid-cols-2">{['included', 'excluded'].map((kind) => <section key={kind} className="space-y-5"><h2 className="text-2xl font-bold">{t(`rapid.${kind}Title`)}</h2><ul className="space-y-4">{Object.values(t(`rapid.${kind}`, { returnObjects: true }) as Record<string, string>).map(text => <li key={text} className="flex items-start gap-3 text-sm leading-relaxed text-slate-700">{kind === 'included' ? <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden="true" /> : <XCircle className="mt-1 h-5 w-5 shrink-0 text-slate-500" aria-hidden="true" />}{text}</li>)}</ul></section>)}</div>}

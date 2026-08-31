@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import promotionPolicy from './pro-driver-promotion-guardrail.cjs';
 import {
   LOCALE_MANIFEST_NAME,
   SITE,
@@ -17,6 +18,7 @@ import {
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const EMAIL = 'hello@fabsy.ca';
+const INSURER_NAMES = ['Intact Insurance', 'TD Insurance', 'Wawanesa Insurance', 'Co-operators', 'Desjardins Insurance', 'Allstate Insurance', 'Aviva Canada'];
 const NAV = [
   ['/', 'nav.home'], ['/rapid-resolution', 'nav.rapid'], ['/how-it-works', 'nav.howItWorks'],
   ['/faq', 'nav.faq'], ['/contact', 'nav.contact'], ['/terms-of-service', 'nav.terms'],
@@ -31,6 +33,57 @@ function lookup(bundle, key) {
   return key.split('.').reduce((value, part) => value?.[part], bundle);
 }
 
+function blockText(value) {
+  return String(value).replace(/<[^>]+>/g, ' ')
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16)))
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+}
+
+export function renderInsuranceContextSnapshot(translate) {
+  const p = key => `<p>${esc(translate(`insuranceContext.${key}`))}</p>`;
+  return `<section aria-labelledby="insurance-context-heading">${p('eyebrow')}<h2 id="insurance-context-heading">${esc(translate('insuranceContext.title'))}</h2>${p('description')}<ul aria-label="${esc(translate('insuranceContext.listLabel'))}">${INSURER_NAMES.map(name => `<li>${esc(name)}</li>`).join('')}</ul>${p('disclaimer')}</section>`;
+}
+
+/** Refresh only the two identified homepage sections; keep every other byte. */
+export function refreshEnglishHomepageSections(html, context) {
+  const source = String(html);
+  const t = snapshotTranslator(context, 'en');
+  const sections = [...source.matchAll(/<section\b[^>]*>[\s\S]*?<\/section>/gi)];
+  const insurance = sections.filter(match => /^<section\b[^>]*\baria-labelledby=["']insurance-context-heading["']/i.test(match[0]));
+  const insuranceMarkers = [...source.matchAll(/\baria-labelledby\s*=\s*["']insurance-context-heading["']/gi)];
+  const insuranceHeadings = [...source.matchAll(/\bid\s*=\s*["']insurance-context-heading["']/gi)];
+  if (insurance.length !== 1 || insuranceMarkers.length !== 1 || insuranceHeadings.length !== 1 ||
+      [...insurance[0][0].matchAll(/<section\b/gi)].length !== 1) {
+    throw new Error('English homepage insurance-context marker is missing, malformed or ambiguous');
+  }
+  const promotionMarkers = [...source.matchAll(/\bdata-promotion\s*=/gi)];
+  const promotions = sections.filter(match => /^<section\b[^>]*\bdata-promotion=["']pro-driver-20["']/i.test(match[0]));
+  if (promotionMarkers.length > 1 || promotions.length !== promotionMarkers.length ||
+      (promotions[0] && [...promotions[0][0].matchAll(/<section\b/gi)].length !== 1)) {
+    throw new Error('English homepage promotion marker is malformed or ambiguous');
+  }
+  const insuranceStart = insurance[0].index;
+  const insuranceEnd = insuranceStart + insurance[0][0].length;
+  const promotion = promotions[0];
+  if (promotion && (promotion.index < insuranceEnd || !/^\s*$/.test(source.slice(insuranceEnd, promotion.index)))) {
+    throw new Error('English homepage promotion must immediately follow its insurance-context section');
+  }
+  const insurerHtml = renderInsuranceContextSnapshot(t);
+  const promotionHtml = promotionPolicy.renderProDriverSnapshot(context.offers, t, 'en');
+  const insuranceCurrent = blockText(insurance[0][0]) === blockText(insurerHtml);
+  const promotionCurrent = promotion && promotionPolicy.redactProDriverPromotion(promotion[0], {
+    offers: context.offers, translate: t, code: 'en', route: '/', required: true,
+  }).issues.length === 0;
+  // Retain fresh React markup, including its logos, SVG icons and classes.
+  if (insuranceCurrent && promotionCurrent) return source;
+  const end = promotion ? promotion.index + promotion[0].length : insuranceEnd;
+  const between = promotion ? source.slice(insuranceEnd, promotion.index) : '';
+  return source.slice(0, insuranceStart) + (insuranceCurrent ? insurance[0][0] : insurerHtml) + between +
+    (promotionCurrent ? promotion[0] : promotionHtml) + source.slice(end);
+}
+
 export function snapshotTranslator(context, code) {
   const bundle = context.bundles[code];
   if (!bundle) throw new Error(`Missing translation bundle: ${code}`);
@@ -39,6 +92,7 @@ export function snapshotTranslator(context, code) {
     price: `$${prices.rapidResolution.priceCad}`,
     reportPrice: `$${prices.insuranceReport.priceCad}`,
     bundlePrice: `$${prices.bundle.priceCad}`,
+    ...promotionPolicy.proDriverPromotionValues(prices).translationValues,
     email: EMAIL,
   };
   return key => {
@@ -66,6 +120,11 @@ export function assertLocalizedMainContent(html, context, code, basePath) {
     .replaceAll('&quot;', '"').replaceAll('&#39;', "'").replaceAll('&apos;', "'")
     .replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&').replace(/\s+/g, ' ').trim();
   if (decode(h1) !== decode(esc(title))) throw new Error(`Localized snapshot main heading does not match its bundle: ${code}${basePath}`);
+  const promotion = promotionPolicy.redactProDriverPromotion(html, {
+    offers: context.offers, translate: snapshotTranslator(context, code), code,
+    route: localePath(code, basePath), required: basePath === '/',
+  });
+  if (promotion.issues.length) throw new Error(`Localized snapshot promotion is invalid: ${code}${basePath}: ${promotion.issues.join('; ')}`);
   if (context.released(code) && context.review.locales[code]?.status === 'published') {
     const notices = [...html.matchAll(/<aside\b(?=[^>]*\bdata-translation-status=["']machine-translated["'])[^>]*>([\s\S]*?)<\/aside>/gi)];
     const t = snapshotTranslator(context, code);
@@ -99,7 +158,7 @@ export function renderLocalizedSnapshot(context, record) {
 
   switch (basePath) {
     case '/':
-      body = `${p('home.description')}${cta}${section('home.educationTitle', p('home.educationBody'))}${p('home.scope')}${p('common.priceLine')}`;
+      body = `${p('home.description')}${cta}${renderInsuranceContextSnapshot(t)}${promotionPolicy.renderProDriverSnapshot(context.offers, t, code)}${section('home.educationTitle', p('home.educationBody'))}${p('home.scope')}${p('common.priceLine')}`;
       break;
     case '/rapid-resolution':
       body = `${p('rapid.description')}${section('rapid.priceLabel', p('common.priceLine') + p('common.noSuccessFee'))}${section('rapid.includedTitle', list('rapid.included'))}${section('rapid.excludedTitle', list('rapid.excluded'))}${section('rapid.speedTitle', p('rapid.speedBody') + p('rapid.speedDisclaimer'))}${cta}`;
@@ -173,6 +232,12 @@ export function generateLocalizedSnapshots(options = {}) {
   const records = localeSnapshotRecords(context);
   // Finish all rendering/validation before replacing any previous snapshot.
   const rendered = records.map(record => ({ record, html: renderLocalizedSnapshot(context, record) }));
+  const englishHomeFile = snapshotFile(outDir, '/');
+  if (!fs.existsSync(englishHomeFile)) throw new Error('English homepage snapshot is required before localized generation');
+  const englishHome = fs.readFileSync(englishHomeFile, 'utf8');
+  const refreshedEnglishHome = refreshEnglishHomepageSections(englishHome, context);
+  const refreshEnglishHome = refreshedEnglishHome !== englishHome;
+  if (refreshEnglishHome) rendered.push({ record: { route: '/' }, html: refreshedEnglishHome });
   const createEnglishTerms = !fs.existsSync(snapshotFile(outDir, '/terms-of-service'));
   if (createEnglishTerms) {
     if (fs.existsSync(path.join(outDir, 'terms-of-service'))) throw new Error('Existing English terms directory has no snapshot; refusing to replace it');
@@ -205,7 +270,7 @@ export function generateLocalizedSnapshots(options = {}) {
     fs.mkdirSync(outDir, { recursive: true });
     // These reserved locale directories are owned by this generator; all
     // English content, browser snapshots and unrelated assets stay untouched.
-    for (const name of [...context.locales.filter(locale => locale.code !== 'en').map(locale => locale.code), ...(createEnglishTerms ? ['terms-of-service'] : []), LOCALE_MANIFEST_NAME]) {
+    for (const name of [...context.locales.filter(locale => locale.code !== 'en').map(locale => locale.code), ...(createEnglishTerms ? ['terms-of-service'] : []), ...(refreshEnglishHome ? ['index.html'] : []), LOCALE_MANIFEST_NAME]) {
       if (fs.existsSync(path.join(outDir, name))) {
         fs.renameSync(path.join(outDir, name), path.join(backup, name));
         moved.push(name);

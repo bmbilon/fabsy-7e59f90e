@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Hero from "@/components/Hero";
 import InsuranceContextSection from "@/components/InsuranceContextSection";
+import ProDriverSection from "@/components/ProDriverSection";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import useSafeHead from "@/hooks/useSafeHead";
@@ -52,6 +53,7 @@ const Index = () => {
       <Header />
       <Hero />
       <InsuranceContextSection />
+      <ProDriverSection />
       <AssessmentHomepageJourney />
       <Footer />
     </main>
