@@ -69,7 +69,7 @@ function snapshotPath(pathname: string): string | null {
   return `/prerendered${clean}/`;
 }
 
-export const onRequest: PagesFunction = async (context) => {
+const servePage: PagesFunction = async (context) => {
   const { request, env, next } = context;
   const requestUrl = new URL(request.url);
   const pathname = requestUrl.pathname === "/" ? "/" : requestUrl.pathname.replace(/\/+$/, "");
@@ -154,4 +154,17 @@ export const onRequest: PagesFunction = async (context) => {
     }
   } catch (_) { /* fall through to SPA */ }
   return noindexFallback();
+};
+
+// Applies to SPA, crawler, redirects and private documents. An authorization or
+// checkout URL must never become the next document's immutable HTTP referrer.
+export const onRequest: PagesFunction = async (context) => {
+  const response = await servePage(context);
+  const headers = new Headers(response.headers);
+  headers.set('Referrer-Policy', 'no-referrer');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 };

@@ -30,6 +30,8 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_GOOGLE_MEASUREMENT_ENABLED: ${{ vars.VITE_GOOGLE_MEASUREMENT_ENABLED }}
+          VITE_GA4_MEASUREMENT_ID: G-26G8CMWTKY
           VITE_GADS_ID: ${{ secrets.VITE_GADS_ID }}
           VITE_GADS_CONVERSION_LABEL: ${{ secrets.VITE_GADS_CONVERSION_LABEL }}
           VITE_GADS_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PURCHASE_LABEL }}
@@ -41,6 +43,13 @@ jobs:
       - run: node ci/validate-faq-jsonld.js
       - run: node scripts/validate-faq-parity.cjs
       - run: npx playwright install --with-deps chromium
+      - name: Verify private document navigation in Chromium
+        run: node scripts/test-measurement-navigation-browser.mjs
+
+      - name: Verify enabled measurement with inert Google fixtures
+        if: github.ref == 'refs/heads/main' && vars.VITE_GOOGLE_MEASUREMENT_ENABLED == 'true'
+        run: node scripts/test-google-measurement-network.mjs --offline --pending-navigation-guardian --artifact-dir "${{ runner.temp }}/fabsy-google-measurement"
+
       - name: Serve dist
         run: nohup npx serve -s dist -l 4173 >/dev/null 2>&1 & sleep 3
       - name: Prerender to static HTML

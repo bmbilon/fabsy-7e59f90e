@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
+import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import GlobalSchema from "@/components/GlobalSchema";
 import Index from "./pages/Index";
@@ -38,6 +38,8 @@ import CityQuirks from "./pages/hubs/CityQuirks";
 import ThankYou from "./pages/ThankYou";
 import Founder from "./pages/Founder";
 import Analytics from "./components/Analytics";
+import GoogleConsent from "./components/GoogleConsent";
+import MeasurementRouter from "./components/MeasurementRouter";
 import AcquisitionTracker from "./components/AcquisitionTracker";
 import ScrollToTop from "./components/ScrollToTop";
 import CallBar from "./components/CallBar";
@@ -95,7 +97,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <GlobalSchema />
-        <BrowserRouter>
+        <MeasurementRouter>
         <LocaleProvider>
         <LocaleAlternates />
         {/* Analytics must be inside the router; secure bearer-token routes are excluded. */}
@@ -178,8 +180,9 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <CallBar />
+        <GoogleConsent />
         </LocaleProvider>
-        </BrowserRouter>
+        </MeasurementRouter>
       </TooltipProvider>
     </HelmetProvider>
   </QueryClientProvider>

@@ -1,5 +1,9 @@
 import type { PaidPurchaseConfig, PaidPurchaseContext } from './paidPurchaseMeasurement';
 import { purchaseAdsDestination } from './checkoutReceipt';
+import { getGoogleConsentChoice } from './googleConsent';
+import {
+  googleTagMayLoadInDocument, markGoogleTagPending, scrubCheckoutReceiptUrl,
+} from './measurementNavigation';
 
 declare global {
   interface Window {
@@ -21,8 +25,8 @@ interface MeasurementEnvironment {
   VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL?: string;
 }
 
-// Fail closed until tag settings and private SPA navigation have been checked.
-// Merely supplying destination IDs must not enable collection.
+// The deployment gate and exact production origins are necessary, but never
+// sufficient: a visitor's explicit consent and a safe document are also needed.
 export function googleMeasurementConfig(env: MeasurementEnvironment, origin: string): PaidPurchaseConfig {
   if (!env.PROD || env.VITE_GOOGLE_MEASUREMENT_ENABLED !== 'true' ||
       !['https://fabsy.ca', 'https://www.fabsy.ca'].includes(origin)) return {};
@@ -41,7 +45,7 @@ export function currentGoogleMeasurementConfig(): PaidPurchaseConfig {
 }
 
 const publicPaths = new Set([
-  '/', '/rapid-resolution', '/photo-radar', '/pro-drivers', '/fleet', '/refer',
+  '/', '/rapid-resolution', '/photo-radar', '/pro-drivers', '/refer',
   '/how-it-works', '/about', '/about/comparison', '/services', '/testimonials',
   '/faq', '/founder', '/ai-info', '/privacy-policy', '/terms-of-service',
   '/terms-of-purchase', '/insurance-damage-report', '/blog', '/thank-you',
@@ -68,12 +72,17 @@ function hasOnlyClickIdentifiers(url: URL): boolean {
   return true;
 }
 
+/** Router classification only; destination/origin and referrer gates stay separate. */
+export function publicGoogleMeasurementUrl(url: URL): boolean {
+  return Boolean(publicMeasurementPath(url.pathname)) && !url.username && !url.password && hasOnlyClickIdentifiers(url);
+}
+
 export function safeGooglePageContext(href: string, referrer: string): PaidPurchaseContext | null {
   try {
     const url = new URL(href);
     const path = publicMeasurementPath(url.pathname);
-    if (!path || url.username || url.password || !['https://fabsy.ca', 'https://www.fabsy.ca'].includes(url.origin) ||
-        !hasOnlyClickIdentifiers(url)) return null;
+    if (!path || !['https://fabsy.ca', 'https://www.fabsy.ca'].includes(url.origin) ||
+        !publicGoogleMeasurementUrl(url)) return null;
     // Ads does not document a complete immutable-referrer override. Do not
     // initialize in a document whose actual referrer may contain private data.
     if (referrer) {
@@ -98,24 +107,18 @@ export function currentGooglePageContext(): PaidPurchaseContext | null {
 /** Call only after the receipt component has retained its session ID in memory. */
 export function removeCheckoutTokenFromUrl(expectedSessionId: string | null): void {
   if (!expectedSessionId || typeof window === 'undefined') return;
-  const url = new URL(window.location.href);
-  const path = publicMeasurementPath(url.pathname);
-  if (!path || !/(?:^|\/)thank-you$/.test(path) ||
-      url.searchParams.get('session_id') !== expectedSessionId) return;
-  // Preserve React Router's history state, without persisting the bearer token.
-  try {
-    window.history.replaceState(window.history.state, '', url.pathname);
-  } catch {
-    // An unavailable History API must not break payment confirmation. The
-    // unchanged tokenized URL keeps initialization and dispatch ineligible.
-    return;
+  if (scrubCheckoutReceiptUrl(expectedSessionId, window)) {
+    window.dispatchEvent(new Event(GOOGLE_CONTEXT_READY));
   }
-  window.dispatchEvent(new Event(GOOGLE_CONTEXT_READY));
 }
 
 let configured: PaidPurchaseConfig = {};
 let tagLoaded = false;
 let lastPageLocation: string | undefined;
+let loaderEpoch = 0;
+let documentTouched = false;
+let activeScript: HTMLScriptElement | null = null;
+let restarting = false;
 
 function queue(..._args: unknown[]): void {
   // Google requires the arguments object in its dataLayer queue.
@@ -125,7 +128,8 @@ function queue(..._args: unknown[]): void {
 
 export function dispatchGoogleMeasurement(eventName: string, params: Record<string, unknown>): boolean {
   const context = currentGooglePageContext();
-  if (!tagLoaded || !context || !window.fabsyAnalyticsInitialized) return false;
+  if (!tagLoaded || !context || !window.fabsyAnalyticsInitialized || restarting ||
+      getGoogleConsentChoice() !== 'accepted' || !googleTagMayLoadInDocument(window)) return false;
   const destination = params.send_to;
   const adsConfig = { destinationId: configured.adsId, officerPurchaseLabel: configured.rrLabel, photoRadarPurchaseLabel: configured.photoLabel };
   const allowed = eventName === 'conversion'
@@ -145,15 +149,46 @@ export function sendGooglePageView(): void {
   if (dispatchGoogleMeasurement('page_view', { send_to: configured.ga4Id })) lastPageLocation = context.page_location;
 }
 
+/** A loaded script's listeners cannot be removed reliably. Retire its document. */
+export function stopGoogleMeasurementAndReload(): void {
+  loaderEpoch += 1;
+  tagLoaded = false;
+  if (activeScript) {
+    activeScript.onload = null;
+    activeScript.onerror = null;
+  }
+  if (typeof window === 'undefined' || !documentTouched || restarting) return;
+  restarting = true;
+  if (configured.ga4Id) {
+    (window as unknown as Record<string, unknown>)[`ga-disable-${configured.ga4Id}`] = true;
+  }
+  // Do not queue a denied-mode ping. The persisted choice prevents any Google
+  // request in the replacement document. Already-sent requests cannot be recalled.
+  window.gtag = () => undefined;
+  window.location.reload();
+}
+
+export function recheckGoogleMeasurementConsent(): void {
+  if (getGoogleConsentChoice() !== 'accepted') {
+    stopGoogleMeasurementAndReload();
+    return;
+  }
+  initializeGoogleMeasurement();
+}
+
 /** Never copy raw acquisition fields, document titles, forms or user data. */
 export function initializeGoogleMeasurement(): void {
   const context = currentGooglePageContext();
   const config = currentGoogleMeasurementConfig();
-  if (!context || (!config.ga4Id && !config.adsId)) return;
+  if (restarting || getGoogleConsentChoice() !== 'accepted' ||
+      !googleTagMayLoadInDocument(window) || !context || (!config.ga4Id && !config.adsId)) return;
   if (window.fabsyAnalyticsInitialized) {
     sendGooglePageView();
     return;
   }
+  if (!markGoogleTagPending(window)) return;
+  const epoch = ++loaderEpoch;
+  documentTouched = true;
   configured = config;
   window.dataLayer = window.dataLayer || [];
   // Retire legacy unvalidated direct events. The scoped page-view and verified
@@ -163,8 +198,12 @@ export function initializeGoogleMeasurement(): void {
     analytics_storage: 'denied', ad_storage: 'denied',
     ad_user_data: 'denied', ad_personalization: 'denied',
   });
-  // Denied Consent Mode can still send cookieless data. This is not a consent
-  // UI or a zero-collection claim; the explicit build gate remains off.
+  // Basic mode: nothing above is sent until this explicit visitor choice.
+  // Ads measurement is permitted; personalization and enhanced data stay off.
+  queue('consent', 'update', {
+    analytics_storage: 'granted', ad_storage: 'granted',
+    ad_user_data: 'granted', ad_personalization: 'denied',
+  });
   queue('set', {
     allow_google_signals: false, allow_ad_personalization_signals: false,
     ads_data_redaction: true, url_passthrough: false, ...context,
@@ -175,15 +214,26 @@ export function initializeGoogleMeasurement(): void {
   if (config.adsId) queue('config', config.adsId, options);
   window.fabsyAnalyticsInitialized = true;
   const script = document.createElement('script');
+  activeScript = script;
   script.id = 'fabsy-google-tag';
   script.async = true;
   script.referrerPolicy = 'no-referrer';
   script.src = `https://www.googletagmanager.com/gtag/js?id=${config.ga4Id || config.adsId}`;
   script.onload = () => {
+    if (epoch !== loaderEpoch || restarting || getGoogleConsentChoice() !== 'accepted' ||
+        !googleTagMayLoadInDocument(window) || !currentGooglePageContext()) return;
     tagLoaded = true;
     sendGooglePageView();
     window.dispatchEvent(new Event(GOOGLE_MEASUREMENT_READY));
   };
-  script.onerror = () => { tagLoaded = false; };
+  script.onerror = () => {
+    if (epoch !== loaderEpoch) return;
+    loaderEpoch += 1;
+    tagLoaded = false;
+    window.fabsyAnalyticsInitialized = false;
+    activeScript = null;
+    // No retry loop: a later route/consent/readiness action may try again.
+    script.remove();
+  };
   document.head.appendChild(script);
 }

@@ -8,7 +8,14 @@ import {
 } from '@/lib/googleMeasurement';
 
 // Retain memory deduplication across remounts; storage is optional.
-const report = createPaidPurchaseReporter(dispatchGoogleMeasurement, {
+const report = createPaidPurchaseReporter((eventName, params) => {
+  // Hashing is asynchronous. A receipt may finish after this route unmounts;
+  // require the same safe receipt page before the dispatcher rechecks consent.
+  const current = currentGooglePageContext();
+  if (!current || current.page_location !== params.page_location ||
+      !/\/thank-you$/.test(new URL(current.page_location).pathname)) return false;
+  return dispatchGoogleMeasurement(eventName, params);
+}, {
   getItem: key => window.sessionStorage.getItem(key),
   setItem: (key, value) => window.sessionStorage.setItem(key, value),
 });
@@ -23,7 +30,8 @@ export function usePaidPurchaseTracking(receipt: CheckoutReceipt | null, session
       const context = currentGooglePageContext();
       const config = currentGoogleMeasurementConfig();
       if (!context || !/\/thank-you$/.test(new URL(context.page_location).pathname)) return;
-      report(receipt, sessionId, config, context, Boolean(config.ga4Id || config.adsId));
+      void report(receipt, sessionId, config, context, Boolean(config.ga4Id || config.adsId))
+        .catch(() => { /* Measurement must not interrupt a receipt or expose its token. */ });
     };
     window.addEventListener(GOOGLE_MEASUREMENT_READY, attempt);
     attempt();

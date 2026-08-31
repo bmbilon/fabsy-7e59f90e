@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash, webcrypto } from "node:crypto";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
@@ -16,6 +17,28 @@ const bundled = await build({
 const { createPaidPurchaseReporter } = await import(
   `data:text/javascript;base64,${Buffer.from(bundled.outputFiles[0].text).toString("base64")}`
 );
+// Exercise the actual hook with inert effect/event fixtures. Google dispatch is
+// replaced by a consent-aware collector, not a network client or a loaded tag.
+const hookBundle = await build({
+  entryPoints: [fileURLToPath(new URL("../src/hooks/usePaidPurchaseTracking.ts", import.meta.url))],
+  bundle: true, write: false, platform: "node", format: "esm", logLevel: "silent",
+  plugins: [{ name: "inert-purchase-hook", setup(builder) {
+    builder.onResolve({ filter: /^(react|@\/lib\/googleMeasurement)$/ }, args => ({ path: args.path, namespace: "purchase-fixture" }));
+    builder.onLoad({ filter: /.*/, namespace: "purchase-fixture" }, args => ({ contents: args.path === "react"
+      ? "export const useEffect = effect => globalThis.__paidHookFixture.effects.push(effect);"
+      : `const state = globalThis.__paidHookFixture;
+         export const currentGoogleMeasurementConfig = () => state.config;
+         export const currentGooglePageContext = () => state.context;
+         export const dispatchGoogleMeasurement = (eventName, params) => {
+           if (!state.accepted) return false;
+           state.events.push({ eventName, params }); return true;
+         };
+         export const GOOGLE_MEASUREMENT_READY = 'fabsy:google-measurement-ready';
+         export const removeCheckoutTokenFromUrl = id => state.scrubbed.push(id);`, loader: "js" }));
+  } }],
+});
+const hookUrl = `data:text/javascript;base64,${Buffer.from(hookBundle.outputFiles[0].text).toString("base64")}`;
+let hookInstance = 0;
 
 const config = { ga4Id: "G-TEST123456", adsId: "AW-123456789", rrLabel: "RR_TEST_1", photoLabel: "PHOTO_TEST_1" };
 const rrDestination = `${config.adsId}/${config.rrLabel}`;
@@ -47,7 +70,7 @@ function collector(storage) {
   return { events, report };
 }
 
-test("discounted RR reports actual net revenue, separate GST and only whitelisted fields", () => {
+test("discounted RR reports actual net revenue, separate GST and only whitelisted fields", async () => {
   const receipt = {
     ...rr, amount_total: 16632, pro_discount_applied: true,
     total_details: { amount_tax: 792, amount_discount: 3960 },
@@ -56,10 +79,10 @@ test("discounted RR reports actual net revenue, separate GST and only whiteliste
     line_items: [{ description: "SYNTHETIC-PRIVATE-DESCRIPTION" }],
   };
   const { events, report } = collector();
-  assert.deepEqual(report(receipt, receipt.id, config, {
+  assert.deepEqual(await report(receipt, receipt.id, config, {
     ...context, customer_email: receipt.customer_email, gclid: "SYNTHETIC-ATTRIBUTION", send_to: "UNTRUSTED",
   }, true), [config.ga4Id, rrDestination]);
-  const expectedCommon = { transaction_id: rr.id, order_type: "rapid_resolution", value: 158.4, currency: "CAD", ...context };
+  const expectedCommon = { transaction_id: createHash("sha256").update(rr.id).digest("hex"), order_type: "rapid_resolution", value: 158.4, currency: "CAD", ...context };
   assert.deepEqual(events, [
     { eventName: "purchase", params: {
       ...expectedCommon, tax: 7.92,
@@ -70,9 +93,9 @@ test("discounted RR reports actual net revenue, separate GST and only whiteliste
   ]);
 });
 
-test("Photo Radar uses $79 net, $3.95 GST and only its separate Ads destination", () => {
+test("Photo Radar uses $79 net, $3.95 GST and only its separate Ads destination", async () => {
   const { events, report } = collector();
-  assert.deepEqual(report(photo, photo.id, config, context, true), [config.ga4Id, photoDestination]);
+  assert.deepEqual(await report(photo, photo.id, config, context, true), [config.ga4Id, photoDestination]);
   assert.equal(events[0].params.value, 79);
   assert.equal(events[0].params.tax, 3.95);
   assert.equal(events[0].params.items[0].item_id, "photo_radar");
@@ -81,85 +104,85 @@ test("Photo Radar uses $79 net, $3.95 GST and only its separate Ads destination"
   assert.ok(events.every(event => event.params.send_to !== rrDestination));
 });
 
-test("a missing Photo label can be supplied later without repeating GA4 or falling back to RR", () => {
+test("a missing Photo label can be supplied later without repeating GA4 or falling back to RR", async () => {
   const { events, report } = collector();
-  assert.deepEqual(report(photo, photo.id, { ...config, photoLabel: undefined }, context, true), [config.ga4Id]);
-  assert.deepEqual(report(photo, photo.id, config, context, true), [photoDestination]);
-  assert.deepEqual(report(photo, photo.id, config, context, true), []);
+  assert.deepEqual(await report(photo, photo.id, { ...config, photoLabel: undefined }, context, true), [config.ga4Id]);
+  assert.deepEqual(await report(photo, photo.id, config, context, true), [photoDestination]);
+  assert.deepEqual(await report(photo, photo.id, config, context, true), []);
   assert.deepEqual(events.map(event => event.params.send_to), [config.ga4Id, photoDestination]);
 });
 
-test("Photo cannot use an identical RR label or a malformed separate label", () => {
+test("Photo cannot use an identical RR label or a malformed separate label", async () => {
   for (const photoLabel of [config.rrLabel, "", "PHOTO/OTHER", "PHOTO\n"]) {
     const { events, report } = collector();
-    assert.deepEqual(report(photo, photo.id, { ...config, photoLabel }, context, true), [config.ga4Id]);
+    assert.deepEqual(await report(photo, photo.id, { ...config, photoLabel }, context, true), [config.ga4Id]);
     assert.deepEqual(events.map(event => event.eventName), ["purchase"]);
   }
 });
 
-test("false dispatch does not deduplicate or persist either destination", () => {
+test("false dispatch does not deduplicate or persist either destination", async () => {
   const storage = memoryStorage();
   let ready = false;
   let attempts = 0;
   const report = createPaidPurchaseReporter(() => { attempts += 1; return ready; }, storage);
-  assert.deepEqual(report(rr, rr.id, config, context, true), []);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), []);
   assert.equal(storage.values.size, 0);
   ready = true;
-  assert.deepEqual(report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
   assert.equal(storage.values.size, 2);
-  assert.deepEqual(report(rr, rr.id, config, context, true), []);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), []);
   assert.equal(attempts, 4);
 });
 
-test("readiness is independent for GA4 and Ads", () => {
+test("readiness is independent for GA4 and Ads", async () => {
   const attempts = [];
   let adsReady = false;
   const report = createPaidPurchaseReporter((eventName, params) => {
     attempts.push(params.send_to);
     return eventName === "purchase" || adsReady;
   });
-  assert.deepEqual(report(rr, rr.id, config, context, true), [config.ga4Id]);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), [config.ga4Id]);
   adsReady = true;
-  assert.deepEqual(report(rr, rr.id, config, context, true), [rrDestination]);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), [rrDestination]);
   assert.deepEqual(attempts, [config.ga4Id, rrDestination, rrDestination]);
 });
 
-test("dispatch exceptions remain retryable and do not block the other destination", () => {
+test("dispatch exceptions remain retryable and do not block the other destination", async () => {
   let ga4Ready = false;
   const report = createPaidPurchaseReporter(eventName => {
     if (eventName === "purchase" && !ga4Ready) throw new Error("Synthetic unavailable dispatcher");
     return true;
   });
-  assert.deepEqual(report(rr, rr.id, config, context, true), [rrDestination]);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), [rrDestination]);
   ga4Ready = true;
-  assert.deepEqual(report(rr, rr.id, config, context, true), [config.ga4Id]);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), [config.ga4Id]);
 });
 
-test("memory and supplied session storage deduplicate reloads but allow another transaction", () => {
+test("memory and supplied session storage deduplicate reloads but allow another transaction", async () => {
   const storage = memoryStorage();
   const first = collector(storage);
-  assert.deepEqual(first.report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
-  assert.deepEqual(first.report(rr, rr.id, config, context, true), []);
+  assert.deepEqual(await first.report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
+  assert.deepEqual(await first.report(rr, rr.id, config, context, true), []);
   const reloaded = collector(storage);
-  assert.deepEqual(reloaded.report(rr, rr.id, config, context, true), []);
+  assert.deepEqual(await reloaded.report(rr, rr.id, config, context, true), []);
   const second = { ...rr, id: "cs_live_SYNTHETICrr2" };
-  assert.deepEqual(reloaded.report(second, second.id, config, context, true), [config.ga4Id, rrDestination]);
+  assert.deepEqual(await reloaded.report(second, second.id, config, context, true), [config.ga4Id, rrDestination]);
   assert.equal(first.events.length, 2);
   assert.equal(reloaded.events.length, 2);
 });
 
-test("unavailable storage retains memory deduplication", () => {
+test("unavailable storage retains memory deduplication", async () => {
   const storage = {
     getItem() { throw new Error("Synthetic storage denied"); },
     setItem() { throw new Error("Synthetic storage denied"); },
   };
   const { report, events } = collector(storage);
-  assert.deepEqual(report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
-  assert.deepEqual(report(rr, rr.id, config, context, true), []);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), []);
   assert.equal(events.length, 2);
 });
 
-test("test, nonproduction, mismatched and explicitly non-live receipts never dispatch", () => {
+test("test, nonproduction, mismatched and explicitly non-live receipts never dispatch", async () => {
   const { report, events } = collector();
   const cases = [
     [{ ...rr, id: "cs_test_SYNTHETICrr1" }, "cs_test_SYNTHETICrr1", true],
@@ -170,12 +193,12 @@ test("test, nonproduction, mismatched and explicitly non-live receipts never dis
     [rr, null, true],
     [rr, undefined, true],
   ];
-  for (const [receipt, expected, eligible] of cases) assert.deepEqual(report(receipt, expected, config, context, eligible), []);
+  for (const [receipt, expected, eligible] of cases) assert.deepEqual(await report(receipt, expected, config, context, eligible), []);
   assert.deepEqual(events, []);
-  assert.deepEqual(report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
+  assert.deepEqual(await report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
 });
 
-test("invalid receipts, standalone reports and inherited object keys never become purchases", () => {
+test("invalid receipts, standalone reports and inherited object keys never become purchases", async () => {
   const { report, events } = collector();
   const invalid = [
     null, undefined, {},
@@ -195,41 +218,192 @@ test("invalid receipts, standalone reports and inherited object keys never becom
     { ...rr, order_type: "constructor" },
     { ...photo, amount_subtotal: 8000, amount_total: 8400, total_details: { amount_tax: 400 } },
   ];
-  for (const receipt of invalid) assert.deepEqual(report(receipt, receipt?.id, config, context, true), []);
+  for (const receipt of invalid) assert.deepEqual(await report(receipt, receipt?.id, config, context, true), []);
   assert.deepEqual(events, []);
 });
 
-test("valid RR bundles remain eligible without admitting standalone reports", () => {
+test("valid RR bundles remain eligible without admitting standalone reports", async () => {
   const bundle = {
     ...rr, id: "cs_live_SYNTHETICbundle1", order_type: "rapid_resolution_bundle",
     amount_subtotal: 29700, amount_total: 31185, total_details: { amount_tax: 1485, amount_discount: 0 },
   };
   const { report, events } = collector();
-  assert.deepEqual(report(bundle, bundle.id, config, context, true), [config.ga4Id, rrDestination]);
+  assert.deepEqual(await report(bundle, bundle.id, config, context, true), [config.ga4Id, rrDestination]);
   assert.equal(events[0].params.value, 297);
   assert.equal(events[0].params.tax, 14.85);
   assert.equal(events[0].params.items[0].item_id, "rapid_resolution_bundle");
 });
 
-test("GA4 and Ads require valid explicit destinations and can be configured independently", () => {
+test("GA4 and Ads require valid explicit destinations and can be configured independently", async () => {
   for (const ga4Id of [undefined, "", "AW-123456789", "G-", "G-TEST,AW-OTHER", "G-TEST\n"]) {
     const { report, events } = collector();
-    assert.deepEqual(report(rr, rr.id, { ...config, ga4Id }, context, true), [rrDestination]);
+    assert.deepEqual(await report(rr, rr.id, { ...config, ga4Id }, context, true), [rrDestination]);
     assert.deepEqual(events.map(event => event.eventName), ["conversion"]);
   }
   for (const overrides of [{ adsId: undefined }, { adsId: "AW-bad" }, { rrLabel: undefined }, { rrLabel: "RR/OTHER" }, { rrLabel: "RR\n" }]) {
     const { report, events } = collector();
-    assert.deepEqual(report(rr, rr.id, { ...config, ...overrides }, context, true), [config.ga4Id]);
+    assert.deepEqual(await report(rr, rr.id, { ...config, ...overrides }, context, true), [config.ga4Id]);
     assert.deepEqual(events.map(event => event.eventName), ["purchase"]);
   }
   const { report, events } = collector();
-  assert.deepEqual(report(rr, rr.id, {}, context, true), []);
+  assert.deepEqual(await report(rr, rr.id, {}, context, true), []);
   assert.deepEqual(events, []);
 });
 
-test("live receipts remain compatible before the server adds the livemode field", () => {
+test("live receipts remain compatible before the server adds the livemode field", async () => {
   const receipt = { ...rr };
   delete receipt.livemode;
   const { report } = collector();
-  assert.deepEqual(report(receipt, receipt.id, config, context, true), [config.ga4Id, rrDestination]);
+  assert.deepEqual(await report(receipt, receipt.id, config, context, true), [config.ga4Id, rrDestination]);
+});
+
+async function withCrypto(value, run) {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "crypto");
+  Object.defineProperty(globalThis, "crypto", { configurable: true, value });
+  try {
+    await run();
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, "crypto", descriptor);
+    else delete globalThis.crypto;
+  }
+}
+
+test("transaction IDs are stable SHA-256 hex and neither events nor storage contain the bearer", async () => {
+  const storage = memoryStorage();
+  const first = collector(storage);
+  assert.deepEqual(await first.report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
+  const expected = createHash("sha256").update(rr.id).digest("hex");
+  assert.match(expected, /^[a-f0-9]{64}$/);
+  assert.ok(first.events.every(event => event.params.transaction_id === expected));
+  assert.deepEqual([...storage.values.keys()], [config.ga4Id, rrDestination]
+    .map(destination => `fabsy-paid-purchase:v2:${destination}:${expected}`));
+
+  const withoutSharedStorage = collector();
+  await withoutSharedStorage.report(rr, rr.id, config, context, true);
+  assert.equal(withoutSharedStorage.events[0].params.transaction_id, expected);
+  const anotherReceipt = { ...rr, id: "cs_live_SYNTHETICdifferent" };
+  await first.report(anotherReceipt, anotherReceipt.id, config, context, true);
+  assert.notEqual(first.events[2].params.transaction_id, expected);
+  assert.equal(first.events[2].params.transaction_id, createHash("sha256").update(anotherReceipt.id).digest("hex"));
+  const serialized = JSON.stringify({ events: first.events, storage: [...storage.values] });
+  assert.ok(!serialized.includes(rr.id));
+  assert.ok(!serialized.includes(anotherReceipt.id));
+  assert.ok(!serialized.includes("cs_live_"));
+});
+
+test("concurrent hash completions claim each destination only once", async () => {
+  const pending = [];
+  await withCrypto({ subtle: { digest(algorithm, data) {
+    assert.equal(algorithm, "SHA-256");
+    assert.equal(new TextDecoder().decode(data), rr.id);
+    return new Promise(resolve => pending.push(async () => resolve(await webcrypto.subtle.digest(algorithm, data))));
+  } } }, async () => {
+    const storage = memoryStorage();
+    const { report, events } = collector(storage);
+    const attempts = Array.from({ length: 6 }, () => report(rr, rr.id, config, context, true));
+    assert.equal(pending.length, 6);
+    assert.deepEqual(events, []);
+    assert.equal(storage.values.size, 0);
+    await Promise.all(pending.reverse().map(finish => finish()));
+    const destinations = (await Promise.all(attempts)).flat();
+    assert.deepEqual(destinations.sort(), [config.ga4Id, rrDestination].sort());
+    assert.equal(events.length, 2);
+    assert.equal(storage.values.size, 2);
+  });
+});
+
+test("missing or failing WebCrypto fails closed without marking destinations and remains retryable", async () => {
+  const unavailable = [
+    undefined,
+    {},
+    { subtle: {} },
+    { subtle: { digest() { throw new Error("Synthetic crypto failure"); } } },
+    { subtle: { digest() { return Promise.reject(new Error("Synthetic digest rejection")); } } },
+    { subtle: { digest() { return Promise.resolve(new ArrayBuffer(0)); } } },
+    { subtle: { digest() { return Promise.resolve(new ArrayBuffer(31)); } } },
+  ];
+  for (const implementation of unavailable) {
+    const storage = memoryStorage();
+    const { report, events } = collector(storage);
+    await withCrypto(implementation, async () => {
+      assert.deepEqual(await report(rr, rr.id, config, context, true), []);
+    });
+    assert.deepEqual(events, []);
+    assert.equal(storage.values.size, 0);
+    assert.deepEqual(await report(rr, rr.id, config, context, true), [config.ga4Id, rrDestination]);
+  }
+});
+
+async function withHookFixture(run) {
+  const state = {
+    effects: [], events: [], scrubbed: [], pendingHashes: [], accepted: true,
+    context: { ...context }, config: { ...config }, storage: memoryStorage(), listeners: new Map(),
+  };
+  const savedWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const savedFixture = Object.getOwnPropertyDescriptor(globalThis, "__paidHookFixture");
+  Object.defineProperty(globalThis, "window", { configurable: true, value: {
+    sessionStorage: state.storage,
+    addEventListener: (name, callback) => state.listeners.set(name, callback),
+    removeEventListener: (name, callback) => {
+      if (state.listeners.get(name) === callback) state.listeners.delete(name);
+    },
+  } });
+  Object.defineProperty(globalThis, "__paidHookFixture", { configurable: true, value: state });
+  const finishHash = async () => {
+    assert.ok(state.pendingHashes.length > 0);
+    state.pendingHashes.shift()();
+    await new Promise(resolve => setImmediate(resolve));
+  };
+  try {
+    await withCrypto({ subtle: { digest(algorithm, input) {
+      assert.equal(algorithm, "SHA-256");
+      const bytes = Uint8Array.from(createHash("sha256").update(input).digest()).buffer;
+      return new Promise(resolve => state.pendingHashes.push(() => resolve(bytes)));
+    } } }, async () => {
+      const { usePaidPurchaseTracking } = await import(`${hookUrl}#${++hookInstance}`);
+      usePaidPurchaseTracking(rr, rr.id);
+      const cleanups = state.effects.map(effect => effect());
+      try { await run(state, finishHash); }
+      finally { cleanups.forEach(cleanup => cleanup?.()); }
+      assert.equal(state.listeners.size, 0);
+    });
+  } finally {
+    if (savedWindow) Object.defineProperty(globalThis, "window", savedWindow);
+    else delete globalThis.window;
+    if (savedFixture) Object.defineProperty(globalThis, "__paidHookFixture", savedFixture);
+    else delete globalThis.__paidHookFixture;
+  }
+}
+
+test("the hook drops a hash that finishes after navigation to private or different public pages", async () => {
+  for (const nextContext of [null, { ...context, page_location: "https://fabsy.ca/" },
+    { ...context, page_location: "https://fabsy.ca/pa/thank-you" }]) {
+    await withHookFixture(async (state, finishHash) => {
+      assert.deepEqual(state.scrubbed, [rr.id]);
+      state.context = nextContext;
+      await finishHash();
+      assert.deepEqual(state.events, []);
+      assert.equal(state.storage.values.size, 0);
+    });
+  }
+});
+
+test("the hook rechecks consent at dispatch and retries on measurement readiness without duplicates", async () => {
+  await withHookFixture(async (state, finishHash) => {
+    state.accepted = false;
+    await finishHash();
+    assert.deepEqual(state.events, []);
+    assert.equal(state.storage.values.size, 0);
+    state.accepted = true;
+    const ready = state.listeners.get("fabsy:google-measurement-ready");
+    assert.equal(typeof ready, "function");
+    ready();
+    await finishHash();
+    assert.deepEqual(state.events.map(event => event.params.send_to), [config.ga4Id, rrDestination]);
+    assert.ok(state.events.every(event => /^[a-f0-9]{64}$/.test(event.params.transaction_id)));
+    ready();
+    await finishHash();
+    assert.equal(state.events.length, 2);
+    assert.equal(state.storage.values.size, 2);
+  });
 });

@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-31T11:07:13.917Z",
+  "generatedAt": "2026-08-31T13:26:01.693Z",
   "sourceVersion": "rapid-resolution-2026-08-30",
   "sourceFingerprint": "fnv1a-c22d9df5",
   "sourceDocuments": {
     "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
     "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
     "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
-    "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+    "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
     "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
     "src/config/offers.ts": "fnv1a-4b290fd6",
     "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"

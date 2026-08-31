@@ -1,5 +1,8 @@
 # Headers for bot detection and prerendering
 
+/*
+  Referrer-Policy: no-referrer
+
 /faq
   X-Robots-Tag: index, follow
   Cache-Control: public, max-age=3600

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useLocale } from '@/i18n/locale-context';
@@ -11,6 +11,7 @@ export default function LanguageMessages() {
   const { t } = useTranslation();
   const { locale, basePath, isReleased, availableLocales, intakeHandoff } = useLocale();
   const location = useLocation();
+  const navigate = useNavigate();
   const [suggestion, setSuggestion] = useState<LocaleCode | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const isEnglish = locale === 'en';
@@ -47,11 +48,16 @@ export default function LanguageMessages() {
   }, [isEnglish, basePath, availableCodes]);
 
   const englishUrl = localizePath(basePath + location.search + location.hash, 'en');
+  // The Router retains receipt capabilities after the visible URL is scrubbed.
+  // Keep those values out of href attributes in a potentially tagged document.
+  const privateReceiptSwitch = basePath === '/thank-you' && new URLSearchParams(location.search).has('session_id');
   if (!isEnglish && !isReleased) {
     return <aside className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950" data-translation-status="draft">
       <div className="container mx-auto max-w-6xl">
         <strong>{t('language.draftTitle')}</strong>{' '}{t('language.draftBody')}{' '}
-        <Link className="font-semibold underline underline-offset-2" to={englishUrl} state={intakeHandoff || location.state}>{t('language.readEnglish')}</Link>
+        {privateReceiptSwitch
+          ? <button type="button" className="font-semibold underline underline-offset-2" onClick={() => navigate(englishUrl, { state: intakeHandoff || location.state })}>{t('language.readEnglish')}</button>
+          : <Link className="font-semibold underline underline-offset-2" to={englishUrl} state={intakeHandoff || location.state}>{t('language.readEnglish')}</Link>}
       </div>
     </aside>;
   }
@@ -66,13 +72,18 @@ export default function LanguageMessages() {
   if (!suggestion || dismissed) return null;
   const candidate = locales.find(item => item.code === suggestion)!;
   const translated = getLocaleInstance(suggestion)!;
+  const suggestedUrl = localizePath(basePath + location.search + location.hash, suggestion);
+  const rememberSuggestion = () => { try { localStorage.setItem(LANGUAGE_PREFERENCE_KEY, suggestion); } catch { /* optional */ } };
   return <aside className="border-b border-primary/20 bg-primary/5 px-4 py-2.5 text-sm text-slate-900">
     <div className="container mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
       <p lang={candidate.languageTag} dir={candidate.dir as 'ltr' | 'rtl'}>{translated.t('language.offer', { language: candidate.nativeName })}{' '}
-        <Link className="font-semibold text-primary underline" to={localizePath(basePath + location.search + location.hash, suggestion)} state={intakeHandoff || location.state}
-          onClick={() => { try { localStorage.setItem(LANGUAGE_PREFERENCE_KEY, suggestion); } catch { /* optional */ } }}>
-          {translated.t('language.switch', { language: candidate.nativeName })}
-        </Link>
+        {privateReceiptSwitch
+          ? <button type="button" className="font-semibold text-primary underline" onClick={() => {
+            rememberSuggestion();
+            navigate(suggestedUrl, { state: intakeHandoff || location.state });
+          }}>{translated.t('language.switch', { language: candidate.nativeName })}</button>
+          : <Link className="font-semibold text-primary underline" to={suggestedUrl} state={intakeHandoff || location.state}
+            onClick={rememberSuggestion}>{translated.t('language.switch', { language: candidate.nativeName })}</Link>}
       </p>
       <button type="button" aria-label={t('language.dismiss')} className="rounded p-2 focus-visible:outline focus-visible:outline-primary" onClick={() => {
         setDismissed(true);

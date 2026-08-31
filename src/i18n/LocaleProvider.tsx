@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import { englishInstance, getLocaleInstance, loadLocale, loadReleaseCandidates, localeIsReleased, locales, registry, type LocaleCode } from './config';
 import { localizePath, splitLocalePath } from './locale-policy.mjs';
@@ -7,6 +7,7 @@ import { LocaleContext, type IntakeHandoff } from './locale-context';
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { locale, path: basePath } = splitLocalePath(location.pathname);
   const [loaded, setLoaded] = useState(() => getLocaleInstance(locale));
   const [loadFailed, setLoadFailed] = useState<string | null>(null);
@@ -56,10 +57,13 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   // Do not briefly render English legal copy under a translated URL while its
   // bundle is loading, or leave the previous locale active on back navigation.
   if (!instance) {
+    const englishFallback = localizePath(location.pathname + location.search + location.hash, 'en');
     return (
       <main className="grid min-h-screen place-content-center gap-5 px-6 text-center" lang="en" dir="ltr">
         <p role="status">{loadFailed === locale ? 'This translation could not be loaded.' : 'Loading…'}</p>
-        {loadFailed === locale && <a className="text-primary underline" href={localizePath(location.pathname + location.search + location.hash, 'en')}>Continue in English</a>}
+        {loadFailed === locale && (basePath === '/thank-you' && new URLSearchParams(location.search).has('session_id')
+          ? <button type="button" className="text-primary underline" onClick={() => navigate(englishFallback)}>Continue in English</button>
+          : <a className="text-primary underline" href={englishFallback}>Continue in English</a>)}
       </main>
     );
   }

@@ -125,13 +125,32 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
             <p>
-              Fabsy uses Google Analytics 4 on public website pages to understand traffic,
-              navigation, and assessment-funnel performance. Google Analytics may use cookies
-              and similar technologies and may process device, browser, approximate-location,
-              page-view, referring-site, campaign, AI-referral source, and interaction information
-              on our behalf. Fabsy does not send uploaded ticket contents, names, email addresses,
-              or phone numbers to Google Analytics. You can control or
-              delete cookies through your browser settings. Learn more in the{' '}
+              Google Analytics 4 and Google Ads measurement are optional. Their measurement
+              scripts do not load before you choose Allow measurement. If you decline, fresh
+              page loads do not load those scripts. You can revisit Privacy choices to change
+              your choice. We remember your choice in this browser for up to 180 days;
+              clearing browser storage or using another browser may remove that choice.
+            </p>
+            <p className="mt-4">
+              With your permission, Google measurement records visits to approved public
+              information pages and completed purchases confirmed by our server. Google may
+              use cookies and similar technologies and process device and browser information,
+              approximate location derived from your IP address, public page information and
+              advertising click identifiers. Purchase events include the service, purchase
+              value, currency, tax and an opaque transaction reference used to prevent
+              duplicate counting.
+            </p>
+            <p className="mt-4">
+              Google measurement stays off ticket intake, contact and fleet forms, other
+              personal-information forms, client portals, admin pages, and representation
+              authorization and document-verification flows. We do not include names,
+              email addresses, phone numbers, licence or plate details, ticket numbers,
+              uploaded files, free-text answers, assessment results, private access tokens
+              or case identifiers in Google measurement events.
+            </p>
+            <p className="mt-4">
+              Google personalized advertising, Google signals and enhanced conversions
+              remain disabled. Learn more about Google's practices in the{' '}
               <a
                 href="https://policies.google.com/privacy"
                 className="underline"
@@ -142,15 +161,11 @@ const PrivacyPolicy = () => {
               </a>.
             </p>
             <p className="mt-4">
-              Fabsy suppresses analytics page-view tracking on private client portal and admin
-              routes. Payment session identifiers, private order identifiers, and case identifiers
-              are not intentionally sent as analytics page paths.
-            </p>
-            <p className="mt-4">
-              Assessment funnel events use offer, page, checkout-stage, and campaign-attribution
-              fields. Fabsy does not intentionally send names, email addresses, phone numbers,
-              ticket numbers, uploaded documents, free-text answers, or assessment results to its
-              website analytics service.
+              This choice controls optional Google measurement, not every website provider.
+              Providers needed for hosting, security, payments and case services remain
+              separate. Existing Cloudflare infrastructure and performance analytics are
+              also separate from this Google choice. Declining Google measurement does not turn off
+              all cookies, infrastructure or service providers.
             </p>
             <p className="mt-4">
               Referral links and manually entered codes are stored with an attribution date in the browser's intake
