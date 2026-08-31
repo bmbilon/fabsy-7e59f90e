@@ -78,7 +78,13 @@ try {
             assert.ok(!html.includes('Stale insurance data'));
           }
           assert.ok(consent.includes('Enter a not-guilty plea'));
-          assert.ok(consent.includes('fee is not refunded based on outcome'));
+          assert.ok(consent.includes('within 30 days of receiving that offer'));
+          assert.ok(consent.includes('does not reduce the original fine'));
+          assert.ok(consent.includes('service fee is paid upfront'));
+          assert.ok(!consent.includes('fee is not refunded based on outcome'));
+          assert.ok((consent.match(/<a[^>]+>/g) || []).some(link =>
+            link.includes('href="/terms-of-service#fee-refund-guarantee"') &&
+            link.includes('target="_blank"') && link.includes('rel="noopener noreferrer"')));
           assert.ok(consent.includes('final resolution step that I expressly authorize'));
         });
 

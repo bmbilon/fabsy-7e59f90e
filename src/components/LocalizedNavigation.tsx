@@ -5,6 +5,7 @@ import { Menu, Scale, X } from 'lucide-react';
 import { useLocale } from '@/i18n/locale-context';
 import LanguageSelector from './LanguageSelector';
 import LanguageMessages from './LanguageMessages';
+import { FEE_REFUND } from '@/config/feeRefund';
 
 const navigation = [
   ['home', '/'], ['rapid', '/rapid-resolution'], ['howItWorks', '/how-it-works'], ['faq', '/faq'], ['contact', '/contact'],
@@ -50,6 +51,7 @@ export function LocalizedFooter() {
       <p className="max-w-3xl text-sm leading-relaxed">{t('common.notLawFirm')}</p>
       <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
         <Link className="underline underline-offset-4" to={href('/terms-of-service')}>{t('nav.terms')}</Link>
+        <Link className="underline underline-offset-4" to={FEE_REFUND.termsPath}>{t('feeRefund.details')} <span lang="en">(English)</span></Link>
         <Link className="underline underline-offset-4" to={href('/contact')}>{t('nav.contact')}</Link>
         <Link className="underline underline-offset-4" to={href('/faq')}>{t('nav.faq')}</Link>
         <a className="underline underline-offset-4" href="mailto:hello@fabsy.ca" dir="ltr">hello@fabsy.ca</a>

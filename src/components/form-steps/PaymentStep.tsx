@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
 import { CreditCard, DollarSign, FileSearch, Shield } from "lucide-react";
 import { FormData } from "../TicketForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -276,6 +277,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
       <p className="text-sm leading-relaxed text-slate-600">{t('common.noSuccessFee')}</p>
       <p className="text-sm leading-relaxed text-slate-600">{t('rapid.speedDisclaimer')}</p>
       <p className="text-sm leading-relaxed text-slate-600">{t('common.noOutcomePromise')}</p>
+      <FeeRefundNotice compact openTermsInNewTab />
       <div className="flex justify-between border-t pt-4 font-semibold"><span>{t('checkout.subtotal')}</span><span dir="ltr">${checkoutSubtotal} CAD</span></div>
     </section>
     {!isReleased && <aside className="space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
@@ -337,7 +339,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
             </div>
             {isPhotoRadar && <p className="mt-3 text-sm font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>}
             <p className="mt-2 text-xs text-muted-foreground">
-              {isPhotoRadar ? `GST is $${PHOTO_RADAR.gstCad.toFixed(2)}. The total charged is $${PHOTO_RADAR.totalCad.toFixed(2)} CAD. Government fines are separate. No outcome is promised and the fee is not refunded based on outcome.` : "Applicable GST is calculated at Stripe checkout. Government fines, trial representation and out-of-scope work are separate."}
+              {isPhotoRadar ? `GST is $${PHOTO_RADAR.gstCad.toFixed(2)}. The total charged is $${PHOTO_RADAR.totalCad.toFixed(2)} CAD. Government fines are separate. No legal outcome is guaranteed; the fee-refund terms below apply.` : "Applicable GST is calculated at Stripe checkout. Government fines, trial representation and out-of-scope work are separate."}
             </p>
             {includeIdrAddon && (
               <p className="mt-2 text-xs text-muted-foreground">
@@ -347,6 +349,8 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           </div>
         </div>
       </Card>
+
+      <FeeRefundNotice photoRadar={isPhotoRadar} compact openTermsInNewTab />
 
       <Card className="p-6">
         <div className="space-y-6">

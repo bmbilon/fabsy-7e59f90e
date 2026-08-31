@@ -18,6 +18,7 @@ import {
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const EMAIL = 'hello@fabsy.ca';
+const FEE_REFUND_TERMS_PATH = '/terms-of-service#fee-refund-guarantee';
 const INSURER_NAMES = ['Intact Insurance', 'TD Insurance', 'Wawanesa Insurance', 'Co-operators', 'Desjardins Insurance', 'Allstate Insurance', 'Aviva Canada'];
 const NAV = [
   ['/', 'nav.home'], ['/rapid-resolution', 'nav.rapid'], ['/how-it-works', 'nav.howItWorks'],
@@ -44,6 +45,14 @@ function blockText(value) {
 export function renderInsuranceContextSnapshot(translate) {
   const p = key => `<p>${esc(translate(`insuranceContext.${key}`))}</p>`;
   return `<section aria-labelledby="insurance-context-heading">${p('eyebrow')}<h2 id="insurance-context-heading">${esc(translate('insuranceContext.title'))}</h2>${p('description')}<ul aria-label="${esc(translate('insuranceContext.listLabel'))}">${INSURER_NAMES.map(name => `<li>${esc(name)}</li>`).join('')}</ul>${p('disclaimer')}</section>`;
+}
+
+/** Keep the same translated refund trigger and payment disclosure visible as React. */
+export function renderFeeRefundSnapshot(translate, code, { openTermsInNewTab = false } = {}) {
+  const p = key => `<p>${esc(translate(`feeRefund.${key}`))}</p>`;
+  const english = code === 'en' ? '' : ' <span lang="en">(English)</span>';
+  const target = openTermsInNewTab ? ' target="_blank" rel="noopener noreferrer"' : '';
+  return `<aside data-fee-refund-notice="ticket-representation"><h2>${esc(translate('feeRefund.headline'))}</h2>${p('condition')}${p('payment')}<a href="${FEE_REFUND_TERMS_PATH}"${target}>${esc(translate('feeRefund.details'))}${english}</a></aside>`;
 }
 
 /** Refresh only the two identified homepage sections; keep every other byte. */
@@ -158,10 +167,10 @@ export function renderLocalizedSnapshot(context, record) {
 
   switch (basePath) {
     case '/':
-      body = `${p('home.description')}${cta}${renderInsuranceContextSnapshot(t)}${promotionPolicy.renderProDriverSnapshot(context.offers, t, code)}${section('home.educationTitle', p('home.educationBody'))}${p('home.scope')}${p('common.priceLine')}`;
+      body = `${p('home.description')}${renderFeeRefundSnapshot(t, code)}${cta}${renderInsuranceContextSnapshot(t)}${promotionPolicy.renderProDriverSnapshot(context.offers, t, code)}${section('home.educationTitle', p('home.educationBody'))}${p('home.scope')}${p('common.priceLine')}`;
       break;
     case '/rapid-resolution':
-      body = `${p('rapid.description')}${section('rapid.priceLabel', p('common.priceLine') + p('common.noSuccessFee'))}${section('rapid.includedTitle', list('rapid.included'))}${section('rapid.excludedTitle', list('rapid.excluded'))}${section('rapid.speedTitle', p('rapid.speedBody') + p('rapid.speedDisclaimer'))}${cta}`;
+      body = `${p('rapid.description')}${renderFeeRefundSnapshot(t, code)}${section('rapid.priceLabel', p('common.priceLine') + p('common.noSuccessFee'))}${section('rapid.includedTitle', list('rapid.included'))}${section('rapid.excludedTitle', list('rapid.excluded'))}${section('rapid.speedTitle', p('rapid.speedBody') + p('rapid.speedDisclaimer'))}${cta}`;
       break;
     case '/how-it-works':
       body = `<h2>${esc(t('process.title'))}</h2>${p('process.description')}<ol class="steps">${Object.keys(context.bundles.en.process.steps).map(name => `<li>${section(`process.steps.${name}.title`, p(`process.steps.${name}.body`))}</li>`).join('')}</ol>${cta}`;
@@ -181,10 +190,10 @@ export function renderLocalizedSnapshot(context, record) {
       break;
     }
     case '/terms-of-service':
-      body = `${code === 'en' ? '' : `${p('terms.intro')}<aside>${p('terms.englishControls')}<a href="${SITE}/terms-of-service" lang="en">${esc(t('language.readEnglish'))}</a></aside>`}${Object.keys(context.bundles.en.terms.sections).map(name => section(`terms.sections.${name}.title`, p(`terms.sections.${name}.body`))).join('')}`;
+      body = `${code === 'en' ? '' : `${p('terms.intro')}<aside>${p('terms.englishControls')}<a href="${SITE}/terms-of-service" lang="en">${esc(t('language.readEnglish'))}</a></aside>`}<section id="fee-refund-guarantee" aria-label="${esc(t('feeRefund.details'))}">${renderFeeRefundSnapshot(t, code)}${p('feeRefund.scope')}</section>${Object.keys(context.bundles.en.terms.sections).map(name => section(`terms.sections.${name}.title`, p(`terms.sections.${name}.body`))).join('')}`;
       break;
     case '/submit-ticket':
-      body = `${p('intake.description')}${section('intake.steps.ticket', `<ul>${['ticketNumber', 'issueDate', 'location', 'offenceDescription', 'fineAmount', 'ticketImage'].map(name => `<li>${esc(t(`intake.fields.${name}`))}</li>`).join('')}</ul>`)}${section('intake.steps.account', p('intake.review.languageNote'))}${section('intake.consent.title', ['scope', 'approval', 'exclusions', 'fee', 'data', 'withdrawal', 'confirm'].map(name => p(`intake.consent.${name}`)).join(''))}${section('checkout.title', p('checkout.scope') + p('checkout.termsAcceptance'))}`;
+      body = `${p('intake.description')}${section('intake.steps.ticket', `<ul>${['ticketNumber', 'issueDate', 'location', 'offenceDescription', 'fineAmount', 'ticketImage'].map(name => `<li>${esc(t(`intake.fields.${name}`))}</li>`).join('')}</ul>`)}${section('intake.steps.account', p('intake.review.languageNote'))}${section('intake.consent.title', ['scope', 'approval', 'exclusions', 'fee', 'data', 'withdrawal', 'confirm'].map(name => p(`intake.consent.${name}`)).join(''))}${section('checkout.title', p('checkout.scope') + renderFeeRefundSnapshot(t, code, { openTermsInNewTab: true }) + p('checkout.termsAcceptance'))}`;
       break;
     case '/payment-canceled':
       body = `${p('checkout.paymentFailed')}${p('checkout.scope')}${cta}`;
@@ -216,7 +225,7 @@ body{font-family:system-ui,sans-serif;max-width:820px;margin:auto;padding:24px;l
 <header><nav>${NAV.map(([href, key]) => `<a href="${localePath(code, href)}">${esc(t(key))}</a>`).join('')}</nav></header>
 ${translationNotice}
 <main data-fabsy-locale="${code}"><h1>${esc(title)}</h1>${body}</main>
-<footer>${p('common.notLawFirm')}${p('common.noOutcomePromise')}${p('common.clientDecision')}<p><a href="${localePath(code, '/terms-of-service')}">${esc(t('nav.terms'))}</a> · <a href="${SITE}${basePath}">${esc(t('language.readEnglish'))}</a></p></footer>
+<footer>${p('common.notLawFirm')}${p('common.noOutcomePromise')}${p('common.clientDecision')}<p><a href="${localePath(code, '/terms-of-service')}">${esc(t('nav.terms'))}</a> · <a href="${FEE_REFUND_TERMS_PATH}">${esc(t('feeRefund.details'))}${code === 'en' ? '' : ' <span lang="en">(English)</span>'}</a> · <a href="${SITE}${basePath}">${esc(t('language.readEnglish'))}</a></p></footer>
 </body>
 </html>
 `;

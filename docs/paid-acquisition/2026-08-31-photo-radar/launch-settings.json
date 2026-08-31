@@ -9,7 +9,39 @@
   "total_budget_cad": null,
   "start_date": null,
   "end_date": null,
-  "billing_status": "Last recorded account-only setup has not completed billing submission; current account not inspected.",
+  "billing_status": "Separate account owner verified Fabsy 938-501-7797 active in CAD with accepted billing/tax information on August 31. Advertiser identity is now verified as EXECOM INC., CA; do not repeat completed billing or identity verification.",
+  "provider_receipt": {
+    "observed_on": "2026-08-31",
+    "source": "../2026-08-30/google-ads-account-setup.md",
+    "configuration_receipt_only": true,
+    "customer_id": "938-501-7797",
+    "account_status": "Active",
+    "currency": "CAD",
+    "billing_tax_status": "Accepted",
+    "advertiser_identity": {
+      "status": "Verified",
+      "name": "EXECOM INC.",
+      "country": "CA"
+    },
+    "saved_purchase_action_count": 2,
+    "saved_secondary_purchase_action_count": 2,
+    "saved_primary_purchase_action_count": 0,
+    "campaign_count": 0,
+    "ad_spend_cad": 0,
+    "tag_detection": "No tag found for this account",
+    "existing_rapid_resolution_label": "MyAbCPiLj-scEPmV_s5E",
+    "separate_account_owner_checked_saved_inventory_and_details": true
+  },
+  "release_owner_report": {
+    "reported_on": "2026-08-31",
+    "evidence": "Coordinating release-owner report; this docs task did not inspect secrets or deployed configuration",
+    "google_ads_id_in_github_secrets": true,
+    "photo_radar_label_in_github_secrets": true,
+    "photo_radar_label_ci_build_environment_count": 2,
+    "full_build_and_deployment_verified": false,
+    "production_paid_receipt_verified": false,
+    "rapid_resolution_build_configuration": "Pending Ads/release-owner coordination under existing Google pixel setup authorization; RR label unchanged, no separate permission request from this pack"
+  },
   "destination": "https://fabsy.ca/photo-radar",
   "source_offer": {
     "name": "Rapid Resolution: Photo Radar",
@@ -21,11 +53,12 @@
     "intake_path": "/submit-ticket?ticket_type=photo_radar"
   },
   "manual_gates": [
-    "Approve actual budget type, amount, dates and activation. Blank Budget is deliberately not import-ready.",
-    "Finish authorized account billing and verify the actual Ads customer ID, CAD currency and advertiser status.",
+    "Approve the daily advertising budget, total ad-spend test cap (total_budget_cad), budget type, dates, zero-conversion stop-loss and activation. Blank Budget is deliberately not import-ready.",
+    "Preserve the verified active Fabsy Ads account 938-501-7797 in CAD and advertiser identity EXECOM INC., CA. Billing and identity are complete; individual ad-policy and campaign-readiness checks remain.",
     "Verify production /photo-radar on mobile and desktop; HTTP 200 alone does not pass.",
     "Complete eligible owner-notice checkout and ATE order routing validation in the authorized test environment.",
-    "Validate one paid Photo Radar purchase action, value CAD 79 excluding GST, transaction deduplication and attribution.",
+    "Verify the authorized release uses the saved Photo Radar destination and label. Google reported no tag found; provider provisioning is not deployment evidence.",
+    "Validate an actual paid receipt for the saved Secondary Photo Radar action, value CAD 79 excluding GST, stable Stripe Checkout session transaction_id, deduplication and attribution. Keep both saved actions Secondary until checks pass and the intended campaign goal is approved.",
     "Confirm campaign-level Alberta presence targeting, network exclusions, negative-list inheritance and reviewed assets in Editor/account.",
     "Approve claims, privacy/data use, conversion lag and the evaluation window before activation."
   ],
@@ -58,22 +91,44 @@
     "unrelated_purchase_goals": "Exclude RR, IIR and bundle purchases from this campaign goal"
   },
   "measurement": {
-    "conversion_name_proposal": "Fabsy paid Photo Radar",
-    "platform_action_id": null,
-    "platform_action_label": null,
+    "conversion_name": "Fabsy paid Photo Radar",
+    "platform_action_id": "7740881425",
+    "platform_action_id_kind": "Google Ads conversion type ID",
+    "google_ads_destination": "AW-18419256057",
+    "platform_action_label": "TEo-CJH0kescEPmV_s5E",
+    "send_to": "AW-18419256057/TEo-CJH0kescEPmV_s5E",
+    "implementation_inputs": {
+      "VITE_GADS_ID": "AW-18419256057",
+      "VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL": "TEo-CJH0kescEPmV_s5E"
+    },
     "category": "Purchase",
-    "state": "Not created or verified by this pack; keep secondary until validation",
+    "website_source": "Website, manually with code",
+    "state": "saved_secondary_production_receipt_unverified",
+    "action_optimization": "Secondary",
+    "created_directly_as_secondary": true,
     "one_primary_action_per_purchase": true,
-    "source_choice": "Direct Google Ads paid purchase OR one GA4 import of that purchase; do not optimize to both",
+    "source_choice": "Direct Google Ads website paid purchase using the saved Photo Radar action; no duplicate GA4 purchase import",
+    "saved_value_mode": "Dynamic",
+    "saved_fallback_value_cad": 0,
     "value_cad_excluding_gst": 79,
     "currency": "CAD",
     "count": "Every",
+    "tracking_status": "Awaiting conversions",
+    "enhanced_conversions_status": "Not configured",
+    "production_configuration_verified": false,
+    "production_paid_receipt_verified": false,
+    "production_attribution_verified": false,
+    "frozen_receipt_source_contract": "Photo Radar orders use only the dedicated Photo Radar label, verified service revenue CAD 79 excluding GST, and the stable Stripe Checkout session ID as transaction_id. Local source behavior is not deployment or production receipt evidence.",
+    "safe_validation_methods": "Authorized Stripe test-mode sessions, signed synthetic receipt checks and supported tag/debug tooling can proceed without a new spending permission gate. Record the environment and limits; synthetic checks are not paid customers or proof of production attribution. No live card charge is authorized or required by this plan.",
     "paid_filter": "Server-confirmed paid order_type=photo_radar; no checkout URL/page-view substitute",
-    "deduplication": "Stable opaque transaction/order identifier shared by supported delivery paths; no client/case details",
+    "deduplication": "Stable server-confirmed Stripe Checkout session ID as transaction_id, shared by any supported delivery paths; no client/case details",
     "return_page_abandonment": "Validate delivery or document conversion loss before launch; do not claim webhook coverage without a test",
     "refunds_and_cancellations": "Reconcile against paid orders and use supported adjustments where needed",
-    "click_through_window": null,
-    "attribution_model": null,
+    "click_through_window_days": 90,
+    "engaged_view_window_days": 3,
+    "view_through_window_days": 1,
+    "attribution_model": "Data-driven",
+    "attribution_channels": "Google paid channels",
     "reporting_lag_observed": null
   },
   "economics": {
@@ -94,5 +149,5 @@
       "weak_pitch_response": "Review consumer acquisition and fleet economics; do not invent outcomes or automatically shift budget"
     }
   },
-  "files_are_not_proof_of_account_configuration": true
+  "files_are_not_proof_of_live_delivery_or_campaign_readiness": true
 }

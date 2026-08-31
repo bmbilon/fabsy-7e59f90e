@@ -22,7 +22,8 @@ export interface ConsentFormData {
   digitalSignature: string;
 }
 
-// Existing English authorization wording, preserved verbatim. These clauses
+// English authorization wording. Refund eligibility follows each written order.
+// Existing saved signed PDFs must never be regenerated to amend purchase terms. These clauses
 // must all print; long original fields must never cause a clause to be skipped.
 export const CONSENT_AUTHORIZATION_LINES = [
   "I authorize Fabsy Traffic Ticket Services and its designated agents to deliver",
@@ -41,6 +42,7 @@ export const CONSENT_AUTHORIZATION_LINES = [
   "• Fabsy will not accept an offer or enter a plea without my specific instruction",
   "• Fabsy may access only information actually needed and lawfully available for this matter",
   "• Outcomes vary and Fabsy does not promise a particular result",
+  "• Service-fee refund rights follow the written purchase terms for my order",
   "• Rapid Resolution costs $198 CAD plus GST; trial and government fines are separate",
   "• The 48-hour commitment starts after complete disclosure is received and matched",
   "• The 48-hour commitment excludes Crown response and final-outcome timing",
@@ -63,7 +65,7 @@ export const PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES = [
   "• Owner-liability camera notices have no demerits or insurance impact",
   "• Only the fine is at issue; no Insurance Impact Report is included or needed",
   "• The one-time service fee is $79 CAD plus 5% GST ($82.95 total) at checkout",
-  "• No outcome is promised and the fee is not refunded based on outcome",
+  "• No legal outcome is promised; service-fee refund rights follow my written purchase terms",
   "• There is no success fee and no trial representation; government fines are separate",
   "• Fabsy takes its next authorized step within 48 hours after complete disclosure",
   "• The 48-hour commitment excludes Crown response and final-outcome timing",

@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
+import { FEE_REFUND } from "@/config/feeRefund";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
 
 interface ConsentStepProps {
   formData: FormData;
@@ -117,7 +119,8 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
                 <li>I authorize digital communication via email and text regarding my case</li>
                 <li>{isPhotoRadar ? `The service fee is ${PHOTO_RADAR_PRICE_LABEL}, one-time, charged at checkout. No trial and no success fee. Government fines are separate.` : `The service fee is $${RAPID_RESOLUTION.priceCad} CAD plus applicable GST; government fines, trial work and other excluded services are separate`}</li>
                 <li>The 48-hour commitment covers Fabsy's review and next authorized action after complete, readable disclosure is received and matched to my file—not Crown response time or final outcome timing</li>
-                <li>{isPhotoRadar ? "Fabsy pursues a resolution with the Crown; no outcome is promised and the fee is not refunded based on outcome." : "Fabsy.ca does not promise a withdrawal, reduction, lower fine, fewer demerits or insurance result"}</li>
+                <li>{FEE_REFUND.payment}</li>
+                <li>{isPhotoRadar ? FEE_REFUND.photoCondition : FEE_REFUND.condition}</li>
                 {isPhotoRadar && <li>This registered-owner notice carries no demerits and has no insurance impact. Only the fine is on the table; no insurance report is included or needed.</li>}
                 <li>I may withdraw this consent at any time by providing written notice</li>
                 <li>This consent remains valid until the matter is resolved or withdrawn</li>
@@ -144,6 +147,8 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
           </div>
         </ScrollArea>
       </Card>
+
+      <FeeRefundNotice photoRadar={isPhotoRadar} compact openTermsInNewTab />
 
       {/* Digital Signature Section */}
       <Card className="p-6 bg-gradient-card">

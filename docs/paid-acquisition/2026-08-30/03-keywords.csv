@@ -1,0 +1,72 @@
+Campaign,Ad Group,Keyword,Match type,Status
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,fight traffic ticket alberta,Exact,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,dispute traffic ticket alberta,Exact,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,traffic ticket agent alberta,Exact,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,contest traffic ticket alberta,Exact,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,fight traffic ticket calgary,Exact,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,dispute traffic ticket calgary,Exact,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,fight traffic ticket,Phrase,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,dispute traffic ticket,Phrase,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,contest traffic ticket,Phrase,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,traffic ticket agent,Phrase,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,traffic ticket help,Phrase,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,traffic ticket defence,Phrase,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,traffic ticket defense,Phrase,Paused
+RR-Pilot-Calgary-202608,AG1-Ticket-Dispute,fight my ticket,Phrase,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,fight speeding ticket alberta,Exact,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,dispute speeding ticket alberta,Exact,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,speeding ticket help alberta,Exact,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,fight speeding ticket calgary,Exact,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,dispute speeding ticket calgary,Exact,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,fight speeding ticket,Phrase,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,dispute speeding ticket,Phrase,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,speeding ticket help,Phrase,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,speeding ticket defence,Phrase,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,speeding ticket defense,Phrase,Paused
+RR-Pilot-Calgary-202608,AG2-Speeding,speeding ticket representation,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,fight traffic ticket alberta,Exact,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,dispute traffic ticket alberta,Exact,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,traffic ticket agent alberta,Exact,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,contest traffic ticket alberta,Exact,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,fight traffic ticket edmonton,Exact,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,dispute traffic ticket edmonton,Exact,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,fight traffic ticket,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,dispute traffic ticket,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,contest traffic ticket,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,traffic ticket agent,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,traffic ticket help,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,traffic ticket defence,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,traffic ticket defense,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG1-Ticket-Dispute,fight my ticket,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,fight speeding ticket alberta,Exact,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,dispute speeding ticket alberta,Exact,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,speeding ticket help alberta,Exact,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,fight speeding ticket edmonton,Exact,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,dispute speeding ticket edmonton,Exact,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,fight speeding ticket,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,dispute speeding ticket,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,speeding ticket help,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,speeding ticket defence,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,speeding ticket defense,Phrase,Paused
+RR-Pilot-Edmonton-202608,AG2-Speeding,speeding ticket representation,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,fight traffic ticket alberta,Exact,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,dispute traffic ticket alberta,Exact,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,traffic ticket agent alberta,Exact,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,contest traffic ticket alberta,Exact,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,fight traffic ticket,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,dispute traffic ticket,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,contest traffic ticket,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,traffic ticket agent,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,traffic ticket help,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,traffic ticket defence,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,traffic ticket defense,Phrase,Paused
+RR-Pilot-Alberta-202608,AG1-Ticket-Dispute,fight my ticket,Phrase,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,fight speeding ticket alberta,Exact,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,dispute speeding ticket alberta,Exact,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,speeding ticket help alberta,Exact,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,fight speeding ticket,Phrase,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,dispute speeding ticket,Phrase,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,speeding ticket help,Phrase,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,speeding ticket defence,Phrase,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,speeding ticket defense,Phrase,Paused
+RR-Pilot-Alberta-202608,AG2-Speeding,speeding ticket representation,Phrase,Paused

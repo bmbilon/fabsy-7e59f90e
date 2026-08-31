@@ -9,10 +9,58 @@ const {
 const PHOTO_RADAR = require('../src/config/offers.json').photoRadar;
 const PHOTO_RADAR_CONTENT = require('../src/config/photoRadarContent.json');
 const PHOTO_RADAR_CONTENT_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
+const FEE_REFUND = require('../src/config/feeRefund.json');
+const REVIEWED_REFUND_SOURCE_HASHES = Object.freeze({
+  'src/config/feeRefund.json': '7e8280729a197d3e36426a174ddac8580dbba498a6a82b20fcac146a70a4bd19',
+  'src/config/photoRadarContent.json': 'e6f022d9ad7dea736876e5018cbd85a2a4764a0f956278b189f01523f69414a3',
+});
+// These are reviewed business-policy passages, not a licence for arbitrary
+// future config values to become legal facts. A copy change requires review.
+for (const [relative, expected] of Object.entries(REVIEWED_REFUND_SOURCE_HASHES)) {
+  const bytes = require('node:fs').readFileSync(require('node:path').resolve(__dirname, '..', relative));
+  if (require('node:crypto').createHash('sha256').update(bytes).digest('hex') !== expected) {
+    throw new Error(`Fee-refund copy changed without updating its reviewed contract: ${relative}`);
+  }
+}
 // Public offer pages use their separate whole-element/source contract.
 // These article passages apply only to the three frozen owner-notice guides.
 const PHOTO_RADAR_OFFER_SLUGS = new Set(PHOTO_RADAR_CONTENT_SLUGS);
 const PHOTO_RADAR_COMPLETE_PRICE = `${PHOTO_RADAR.name} costs $${PHOTO_RADAR.priceCad} CAD plus 5% GST ($${PHOTO_RADAR.totalCad.toFixed(2)} total).`;
+const PHOTO_REFUND_GUIDE_FAQ = `${PHOTO_RADAR_COMPLETE_PRICE} ${FEE_REFUND.payment} The fee covers the authorized not-guilty plea, disclosure request and review, pursuit of a Crown reduction or withdrawal and client approval of any deal. ${FEE_REFUND.photoCondition} No trial or success surcharge. Government fines are separate. See the fee refund guarantee in our Terms of Service for details.`;
+const PHOTO_REFUND_GUIDE_NOTICE = `<h3>${FEE_REFUND.photoHeadline}</h3><p>${FEE_REFUND.photoCondition}</p><p>${FEE_REFUND.payment}</p><p><a href="${FEE_REFUND.termsPath}">${FEE_REFUND.details}</a>.</p>`;
+const PHOTO_REFUND_GUIDE_CLAUSES = [FEE_REFUND.photoHeadline, FEE_REFUND.photoCondition, FEE_REFUND.payment, PHOTO_REFUND_GUIDE_FAQ];
+const REVIEWED_RAPID_REFUND_DISCLAIMER = `Outcomes depend on the charge, evidence, procedure and prosecutor. A withdrawal, reduction, lower fine, fewer demerits or insurance result is not promised. ${FEE_REFUND.condition}`;
+
+function redactReviewedFeeRefund(value, slug) {
+  const photoGuide = PHOTO_RADAR_CONTENT_SLUGS.has(slug);
+  const text = String(value ?? '');
+  const rapidCopyMatches = require('../src/config/offers.json').rapidResolution.outcomeDisclaimer === REVIEWED_RAPID_REFUND_DISCLAIMER;
+  const clauses = photoGuide ? PHOTO_REFUND_GUIDE_CLAUSES : rapidCopyMatches ? [REVIEWED_RAPID_REFUND_DISCLAIMER] : [];
+  const approved = new Set(clauses.map(clause => clause.replace(/\s+/g, ' ').trim()));
+  // An entire editorial field (FAQ answer/bullet) or an entire plain-text
+  // element must match. A substring cannot excuse an appended outcome claim.
+  if (!/<[^>]+>/.test(text)) return approved.has(text.replace(/\s+/g, ' ').trim()) ? '[reviewed fee-refund clause]' : text;
+  let candidate = text.replace(/<(p|li|h[1-6])\b([^>]*)>([^<]*)<\/\1>/gi, (block, tag, attributes, inner) => {
+    if (/\bhidden\b|\baria-hidden\s*=|\bstyle\s*=|\bon\w+\s*=/i.test(attributes) || !approved.has(visibleText(inner))) return block;
+    return `<${tag}${attributes}>[reviewed fee-refund clause]</${tag}>`;
+  });
+  // The deterministic article renderer also emits these exact FAQ answers.
+  // Do not strip arbitrary JSON strings or other properties on the question.
+  const question = photoGuide ? 'What does Fabsy charge to review a photo radar notice?' : 'Does Rapid Resolution promise a withdrawal or reduction?';
+  const answer = photoGuide ? PHOTO_REFUND_GUIDE_FAQ : rapidCopyMatches ? REVIEWED_RAPID_REFUND_DISCLAIMER : null;
+  if (answer) candidate = candidate.replace(/(<script\b[^>]*type=["']application\/ld\+json["'][^>]*>)([\s\S]*?)(<\/script>)/gi, (block, open, json, close) => {
+    let schema;
+    try { schema = JSON.parse(json); } catch (_) { return block; }
+    if (schema?.['@type'] !== 'FAQPage' || !Array.isArray(schema.mainEntity)) return block;
+    for (const entry of schema.mainEntity) {
+      if (entry?.['@type'] === 'Question' && entry.name === question && entry.acceptedAnswer?.['@type'] === 'Answer' && entry.acceptedAnswer.text === answer) {
+        entry.acceptedAnswer.text = '[reviewed fee-refund FAQ answer]';
+      }
+    }
+    return open + JSON.stringify(schema).replace(/</g, '\\u003c') + close;
+  });
+  return candidate;
+}
 const PHOTO_RADAR_COMMERCIAL_CLAIMS = [
   PHOTO_RADAR_COMPLETE_PRICE,
   PHOTO_RADAR.actionCommitment,
@@ -303,7 +351,7 @@ function redactVerifiedNumericClaims(value, slug) {
 }
 
 function textGuardrailIssues(value, slug, options = {}) {
-  const text = visibleText(value);
+  const text = visibleText(redactReviewedFeeRefund(value, slug));
   const issues = [];
   if (options.marketing !== false) {
     const marketingText = text.replace(
@@ -421,6 +469,9 @@ function curatedPageIssues(page) {
       !visibleText(page?.next).includes(PHOTO_RADAR_COMPLETE_PRICE)) {
     issues.push('next: complete Photo Radar pricing is required');
   }
+  if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) && !String(page?.next ?? '').includes(PHOTO_REFUND_GUIDE_NOTICE)) {
+    issues.push('next: complete reviewed Photo Radar fee-refund notice is required');
+  }
   for (const [field, value] of textFields) {
     if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) && hasCompleteFabsyPricing(value)) {
       issues.push(`${field}: Photo Radar guides must use their own offer, not general product pricing`);
@@ -451,11 +502,16 @@ module.exports = {
   BANNED_PHRASE_RE,
   EXACT_FABSY_PRICING,
   PHOTO_RADAR_COMPLETE_PRICE,
+  PHOTO_REFUND_GUIDE_FAQ,
+  PHOTO_REFUND_GUIDE_NOTICE,
+  REVIEWED_REFUND_SOURCE_HASHES,
+  REVIEWED_RAPID_REFUND_DISCLAIMER,
   UNSAFE_HTML_RE,
   canonicalFaq,
   curatedPageIssues,
   hasCompleteFabsyPricing,
   present,
+  redactReviewedFeeRefund,
   redactVerifiedNumericClaims,
   textGuardrailIssues,
 };

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
 import {
   INSURANCE_IMPACT_REPORT,
   RAPID_RESOLUTION,
@@ -50,6 +51,8 @@ const Hero = () => (
             Upload your ticket and authorize Fabsy online. We request disclosure, analyze it,
             advance an authorized prosecutor review, and keep you informed along the way.
           </p>
+
+          <FeeRefundNotice tone="dark" className="mt-6 max-w-3xl" />
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button

@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const offers = require('../src/config/offers.json');
 const source = require('../src/config/proReferralContent.json');
+const feeRefund = require('../src/config/feeRefund.json');
 
 const ROOT = path.resolve(__dirname, '..');
 const SITE = 'https://fabsy.ca';
@@ -70,7 +71,7 @@ function renderProDrivers() {
   };
   const intake = `${offers.rapidResolution.intakePath}?ticket_type=officer_issued`;
   return shell('pro-drivers', copy, `
-<section><p>${esc(copy.badge)}</p><h1>${esc(copy.heading)}</h1><p>${esc(copy.intro)}</p><a class="cta" href="${esc(intake)}">Upload your ticket</a><p>${esc(copy.scope)}</p>
+<section><p>${esc(copy.badge)}</p><h1>${esc(copy.heading)}</h1><p>${esc(copy.intro)}</p><aside data-fee-refund-notice="ticket-representation"><h2>${esc(feeRefund.headline)}</h2><p>${esc(feeRefund.condition)}</p><p>${esc(feeRefund.payment)}</p><p><a href="${esc(feeRefund.termsPath)}">${esc(feeRefund.details)}</a></p></aside><a class="cta" href="${esc(intake)}">Upload your ticket</a><p>${esc(copy.scope)}</p>
 <h2>${esc(copy.pricingLabel)}</h2><p>${esc(copy.pricingHeading)}</p><h3>${esc(copy.rapidLabel)}</h3><p class="price">$${pricing.rapidPrice} CAD + GST</p><p>${esc(copy.rapidRegularLine)}</p><h3>${esc(copy.bundleLabel)}</h3><p class="price">$${pricing.bundlePrice} CAD + GST</p>${paragraphs([copy.bundleRegularLine, copy.bundleNote])}</section>
 <section aria-labelledby="pro-eligibility"><h2 id="pro-eligibility">${esc(copy.eligibilityHeading)}</h2><p>${esc(copy.eligibilityIntro)}</p>${copy.licenceClasses.map(item => `<h3>${esc(item.licence)}: ${esc(item.title)}</h3><p>${esc(item.detail)}</p>`).join('\n')}<p>${esc(copy.exclusions)}</p></section>
 <section aria-labelledby="pro-work"><h2 id="pro-work">${esc(copy.abstractHeading)}</h2><p>${esc(copy.abstractText)}</p><p><a href="${esc(copy.abstractSource.url)}">${esc(copy.abstractSource.title)}</a></p><h3>${esc(copy.amendmentHeading)}</h3>${paragraphs([copy.amendmentText, copy.outcomeDisclaimer])}</section>

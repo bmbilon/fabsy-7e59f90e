@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, CheckCircle2, Clock3, Mail, MessageCircle, ShieldCheck, XCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import FeeRefundNotice from '@/components/FeeRefundNotice';
 import InsuranceContextSection from '@/components/InsuranceContextSection';
 import ProDriverSection from '@/components/ProDriverSection';
 import StaticJsonLd from '@/components/StaticJsonLd';
@@ -84,6 +85,10 @@ function TermsSection() {
         <Link to={href('/terms-of-purchase')} className="font-semibold underline" lang="en" dir="ltr">Terms of Purchase (English)</Link>
       </div>
     </aside>
+    <section id="fee-refund-guarantee" className="space-y-3" aria-label={t('feeRefund.details')}>
+      <FeeRefundNotice />
+      <p className="text-sm leading-relaxed text-slate-600">{t('feeRefund.scope')}</p>
+    </section>
     {['service', 'practice', 'eligibility', 'pricing', 'payment', 'rapid', 'report', 'responsibilities', 'outcomes', 'privacy', 'liability', 'cancellation', 'website', 'law', 'changes', 'contact'].map(key => <section className="space-y-3" key={key}>
       <h2 className="text-2xl font-bold">{t(`terms.sections.${key}.title`)}</h2><p className="leading-8 text-slate-700">{t(`terms.sections.${key}.body`)}</p>
     </section>)}
@@ -134,6 +139,7 @@ function LocalizedContent() {
               <p className="text-sm font-semibold text-emerald-200">{t(`${prefix}.eyebrow`)}</p>
               <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">{t(`${prefix}.title`)}</h1>
               <p className="max-w-2xl text-lg leading-relaxed text-slate-200">{t(`${prefix}.description`)}</p>
+              <FeeRefundNotice tone="dark" />
               <div className="flex flex-wrap gap-3">
                 <Button asChild size="lg" className="h-auto min-h-12 whitespace-normal py-3"><Link to={href('/submit-ticket')}>{t('home.primaryCta')}<ArrowRight className="ms-2 h-5 w-5 shrink-0 rtl:rotate-180" aria-hidden="true" /></Link></Button>
                 <Button asChild size="lg" variant="outline" className="h-auto min-h-12 whitespace-normal border-slate-500 bg-transparent py-3 text-white hover:bg-slate-800 hover:text-white"><Link to={href('/how-it-works')}>{t('home.secondaryCta')}</Link></Button>

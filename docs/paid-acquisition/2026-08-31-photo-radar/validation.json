@@ -1,6 +1,8 @@
 {
   "status": "draft_valid_not_launch_ready",
   "launch_ready": false,
+  "current_measurement_status": "production_google_activation_verified_paid_receipt_unverified",
+  "counts_scope": "Prepared draft assets, not live provider inventory",
   "counts": {
     "campaigns": 1,
     "ad_groups": 3,
@@ -9,13 +11,23 @@
     "negative_keywords": 44,
     "meta_variants": 3
   },
-  "max_rsa_headline_length": 30,
-  "max_rsa_description_length": 89,
+  "max_rsa_headline_length": 28,
+  "max_rsa_description_length": 90,
   "checks": [
-    "All entities with a status are paused",
-    "No assigned or authorized spend",
+    "All draft entities with a status are paused",
+    "No assigned or authorized advertising spend; total_budget_cad is the ad-spend test cap",
+    "Account identity and exact Photo Radar destination/label match archived provider metadata; an optional private record must match its archived SHA-256 and contents",
+    "Historical provider inventory retains two Secondary purchase actions, zero Primary actions and zero campaigns; activation did not change paid-action optimization or campaigns",
+    "Dynamic CAD fallback 0, Every, 90/3/1-day windows and Data-driven Google paid channels preserved",
+    "Historical no-tag/deployment-pending observations are preserved; the separate activation summary supplies current measurement evidence",
+    "Activation summary SHA-256, publication commits/deployment and three successful CI runs checked",
+    "Isolated pre-release real-Google 11/11 capture is distinguished from independent live Tag Assistant Page View/DOM evidence",
+    "Google explicit-consent defaults/opt-in, private-intake exclusion and completed withdrawal/Tag Assistant cleanup preserved",
+    "Actual paid receipt, attribution, fee-refund publication and advertising approvals remain open",
+    "Authorized test-mode/synthetic/debug checks are distinguished from actual paid-customer evidence; no live charge required",
     "Canonical CAD 79 / GST 3.95 / total 82.95",
-    "RSA copy limits and mandatory pins",
+    "RSA copy limits and mandatory refund/price/condition pins",
+    "Upfront fee and original-fine Crown-offer refund within 30 days of Fabsy receiving the offer; no legal outcome promise",
     "Exact/Phrase pairs and all four camera-notice families",
     "No blanket holdout negatives or literal positive-negative conflicts",
     "Alberta presence and restricted network settings",
@@ -23,30 +35,235 @@
     "Paid purchase value and CAC/reduction threshold contract"
   ],
   "limitations": [
-    "Offline content checks do not validate Ads Editor import, account policy approval, actual matching or production behavior",
+    "Without --provider-record, archived provider metadata is checked but the private/local source file is neither required nor read; its recorded SHA-256 is retained as historical evidence",
+    "The activation summary and its hash are checked offline; this validator does not replay the local release records, browser checks or live provider observations",
+    "Production Tag Assistant observed a Page View, not a Purchase; the 11/11 network capture was an isolated pre-release harness, not production-browser request capture",
+    "The existing Cloudflare beacon is unchanged; the Google consent checks do not establish behavior of every analytics service",
+    "Offline content checks do not validate Ads Editor import, account policy approval, actual matching or current production behavior",
     "Literal negative matching does not model every Google close variant",
     "This validator intentionally validates a paused draft, not authorization to launch"
   ],
+  "historical_evidence_scope": "provider_configuration_receipt, release_owner_report and destination-audit.json preserve their earlier observations. The activation summary supersedes no-tag/deployment-pending status only; it is not paid-purchase evidence.",
+  "provider_record_validation": {
+    "mode": "archived_metadata_only",
+    "private_record_supplied": false,
+    "source_hash_verified_this_run": false,
+    "source_sha256": "a1e6417339ea3b73aa9cda13dd73d3a4b111d946b316f57393749a54f0c7ccff",
+    "source_storage": "Private/local evidence, excluded from this repository"
+  },
+  "provider_configuration_receipt": {
+    "observed_on": "2026-08-31",
+    "source": "../2026-08-30/google-ads-account-setup.md",
+    "configuration_receipt_only": true,
+    "customer_id": "938-501-7797",
+    "account_status": "Active",
+    "currency": "CAD",
+    "billing_tax_status": "Accepted",
+    "advertiser_identity": {
+      "status": "Verified",
+      "name": "EXECOM INC.",
+      "country": "CA"
+    },
+    "saved_purchase_action_count": 2,
+    "saved_secondary_purchase_action_count": 2,
+    "saved_primary_purchase_action_count": 0,
+    "campaign_count": 0,
+    "ad_spend_cad": 0,
+    "tag_detection": "No tag found for this account",
+    "existing_rapid_resolution_label": "MyAbCPiLj-scEPmV_s5E",
+    "separate_account_owner_checked_saved_inventory_and_details": true,
+    "source_sha256": "a1e6417339ea3b73aa9cda13dd73d3a4b111d946b316f57393749a54f0c7ccff",
+    "photo_radar_action": {
+      "conversion_name": "Fabsy paid Photo Radar",
+      "platform_action_id": "7740881425",
+      "platform_action_id_kind": "Google Ads conversion type ID",
+      "google_ads_destination": "AW-18419256057",
+      "platform_action_label": "TEo-CJH0kescEPmV_s5E",
+      "send_to": "AW-18419256057/TEo-CJH0kescEPmV_s5E",
+      "action_optimization": "Secondary",
+      "created_directly_as_secondary": true,
+      "saved_value_mode": "Dynamic",
+      "saved_fallback_value_cad": 0,
+      "currency": "CAD",
+      "count": "Every",
+      "click_through_window_days": 90,
+      "engaged_view_window_days": 3,
+      "view_through_window_days": 1,
+      "attribution_model": "Data-driven",
+      "attribution_channels": "Google paid channels",
+      "enhanced_conversions_status": "Not configured",
+      "tracking_status": "Awaiting conversions",
+      "production_configuration_verified": false,
+      "production_paid_receipt_verified": false,
+      "production_attribution_verified": false
+    }
+  },
+  "release_owner_report": {
+    "reported_on": "2026-08-31",
+    "evidence": "Coordinating release-owner report; this docs task did not inspect secrets or deployed configuration",
+    "google_ads_id_in_github_secrets": true,
+    "photo_radar_label_in_github_secrets": true,
+    "photo_radar_label_ci_build_environment_count": 2,
+    "full_build_and_deployment_verified": false,
+    "production_paid_receipt_verified": false,
+    "rapid_resolution_build_configuration": "Pending Ads/release-owner coordination under existing Google pixel setup authorization; RR label unchanged, no separate permission request from this pack"
+  },
+  "measurement_activation_receipt": {
+    "source": "measurement-activation-receipt.json",
+    "source_sha256": "762387c5e7ef006221c75827f8260496dee1e963e49d85f6c00fa41c1682a13b",
+    "recorded_on": "2026-08-31",
+    "source_recorded_at": "2026-08-31T14:07:08.434883+00:00",
+    "status": "production_google_activation_verified_paid_receipt_unverified",
+    "documentation_scope": "Read-only summary of the release-owner records and independent owner verification; this docs correction performs no browser, provider, payment or deployment action.",
+    "source_records": [
+      {
+        "filename": "production-publication.json",
+        "sha256": "cd3d016a3443f95d26d67eed1fa899e71cd1d6d61cdb4276b6575ae890f45c0b",
+        "storage": "Local release evidence, not copied into this repository"
+      },
+      {
+        "filename": "independent-tag-assistant.json",
+        "sha256": "54ad49c089ddf68bcd965ad4c83fff0d7f4dfb1863c64561bf7ef20c72b2da5a",
+        "storage": "Local release evidence, not copied into this repository"
+      }
+    ],
+    "publication": {
+      "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+      "generated_main_commit": "cd5eef208e4ade776e4a947278dbad29edae77f0",
+      "production_site": "https://fabsy.ca/",
+      "pages_deployment_id": "fa1d2d1a-e7d2-47ef-98c5-3a3fdd6af739",
+      "pages_deployment_url": "https://fa1d2d1a.fabsy-9qa.pages.dev",
+      "deployed_at": "2026-08-31T13:39:03Z",
+      "asset_path": "/assets/index-7BSE-DuM.js",
+      "asset_sha256": "31357ba0cd3dc639b2e137c767ace06f1912735e5d6e1121ee71bfa046e25aed",
+      "ci": [
+        {
+          "name": "Build and Deploy",
+          "run_id": 33397537321,
+          "conclusion": "success",
+          "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+          "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33397537321"
+        },
+        {
+          "name": "Prerender refresh",
+          "run_id": 33397537324,
+          "conclusion": "success",
+          "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+          "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33397537324"
+        },
+        {
+          "name": "Validate FAQ parity",
+          "run_id": 33397537305,
+          "conclusion": "success",
+          "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+          "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33397537305"
+        }
+      ]
+    },
+    "measurement": {
+      "ga4_id": "G-26G8CMWTKY",
+      "ads_id": "AW-18419256057",
+      "rapid_resolution_label": "MyAbCPiLj-scEPmV_s5E",
+      "photo_radar_label": "TEo-CJH0kescEPmV_s5E",
+      "production_build_gate_enabled": true,
+      "explicit_consent_required": true,
+      "consent_defaults": {
+        "ad_storage": "denied",
+        "analytics_storage": "denied",
+        "ad_user_data": "denied",
+        "ad_personalization": "denied"
+      },
+      "consent_after_opt_in": {
+        "ad_storage": "granted",
+        "analytics_storage": "granted",
+        "ad_user_data": "granted",
+        "ad_personalization": "denied"
+      },
+      "private_intake_untagged_observed": true,
+      "paid_actions": "Secondary, unchanged",
+      "primary_action_change": false
+    },
+    "verification": {
+      "real_google_request_capture": {
+        "context": "Isolated pre-release harness against real configured Google properties; not production-browser request capture",
+        "checks": 11,
+        "passed": 11,
+        "failures": 0,
+        "anonymous_ga4_page_views": 15
+      },
+      "independent_live_tag_assistant": {
+        "connected": true,
+        "observed_tags": [
+          "G-26G8CMWTKY / GT-WFFLZ6X8",
+          "AW-18419256057"
+        ],
+        "observed_hit": "GA4 Page View",
+        "consent_table_confirmed": true,
+        "private_intake_google_scripts": 0,
+        "private_intake_referrer": "",
+        "public_destinations_restored_on_return": true
+      }
+    },
+    "cleanup": {
+      "tag_assistant_stopped": true,
+      "measurement_permission_withdrawn": true,
+      "clean_home_reload": true,
+      "google_script_elements_after_withdrawal": 0,
+      "document_referrer_after_withdrawal": "",
+      "tag_assistant_tab_closed": true
+    },
+    "remaining_gates": {
+      "actual_paid_purchase_receipt_verified": false,
+      "actual_paid_attribution_verified": false,
+      "fee_refund_website_release_verified": false,
+      "fee_refund_website_status": "Website publication pending; release owner reports capture-guard validation passed before this handoff",
+      "advertising_budget_approved": false,
+      "total_advertising_test_cap_approved": false,
+      "campaign_activation_authorized": false,
+      "fee_refund_capture_guard_validation_reported_passed": true
+    },
+    "actions_not_performed": [
+      "Ad campaigns or spend",
+      "Budgets or bidding",
+      "Audiences or remarketing",
+      "Enhanced conversions",
+      "Real or fabricated purchase/conversion submission",
+      "Customer form or upload",
+      "Checkout or payment",
+      "Refund",
+      "Email"
+    ],
+    "limitations": [
+      "Pre-release enabled-tag tests recorded anonymous page visits in the real configured Google properties.",
+      "No actual paid conversion ingestion, matching or attribution has been exercised.",
+      "Production browser verification used read-only DOM; raw request capture is in the separate isolated pre-release real-Google harness.",
+      "Native browser back-forward cache restoration was not observed under request interception; its consent event branch passed the separate regression suite.",
+      "Tag Assistant observed a GA4 Page View, not a Purchase. No real paid conversion ingestion, matching or attribution was tested.",
+      "The earlier Photo provider setup receipt and release-owner report remain historical; this activation record supersedes their no-tag/deployment-pending status without rewriting them.",
+      "The existing Cloudflare beacon is unchanged; this is not a claim about every analytics service."
+    ]
+  },
   "launch_blockers": [
-    "No budget or activation authorization; campaign CSV Budget is intentionally blank.",
-    "Billing/account identity and advertiser status need an authorized account check.",
-    "Production Photo Radar destination and checkout are not verified.",
-    "A single paid Photo Radar conversion with CAD 79 value and deduplication is not verified.",
-    "Targeting, inherited negatives, assets, privacy and evaluation settings need account review."
+    "No concrete approved daily advertising budget, total ad-spend test cap, dates, stop-loss or campaign activation; campaign CSV Budget is intentionally blank.",
+    "The fee-refund website publication is pending; capture-guard validation has passed per the release owner. The matching Photo Radar destination, terms and checkout still require publication review.",
+    "Google measurement activation and a live Page View are verified in the recorded evidence. Actual paid Photo Radar receipt, CAD 79 excluding-GST value, deduplication and attribution remain unverified.",
+    "Targeting, inherited negatives, assets, claims, policy, privacy and evaluation settings need account review.",
+    "Both saved purchase actions remain Secondary. Receipt validation and explicit campaign-goal approval are required before promotion or activation."
   ],
   "asset_sha256": {
     "01-campaigns.csv": "a4a5291dc3b08fe5dcd7b0bae9f0e3315eece1027c9040495a69b5985f2cb81f",
     "02-ad-groups.csv": "41fa7520f0f31c4478216a4f56372772c3bb4d6292a12d30b383e81777e596c8",
     "03-keywords.csv": "f3e7a084485ec56477280b732f5d86dd1fbeb14026ac4ae0d5d4ce269a130688",
-    "04-responsive-search-ads.csv": "55fb6c78e5284e2aec7b1328acc8e18d3c9dab87bd533f68a65d07ebaedb55a6",
+    "04-responsive-search-ads.csv": "9db49c8a46eabd61d396f9c9a6b3e38e2ce5670633127665d2f65aabd6a28cc1",
     "05-negative-keywords.csv": "f5c9ff66f4517967113a57b1fbfa21a162faf48d46e3567825799e761498da8a",
-    "README.md": "1134366149fb27db214ba33c81f8f9be1f1ae059a441f9e821aa5378fdf47ab4",
+    "README.md": "91e824ef6680b100b700d8648da2e5dc138ad1bc364623827ed77061b1496a35",
     "destination-audit.json": "a17ab0c03f439fc9a6d5c6606143cdece09dcde62c0a841d8f23beb8e6b2a08d",
-    "launch-checklist.md": "d77f94cb5c407b2794ed8c1c632b8ca9e444d7470be2c9f31aac1c016e57e78c",
-    "launch-settings.json": "7adc7012eefead8b0cdca509566ebe0361e75fed739afd32eb7e877f3a9be16a",
-    "measurement-plan.md": "f72a996c6278b91297ae0312ada000458d3231e62304732274e602303c8dffb4",
-    "meta-copy.json": "cae0014364be3dcf1f36bbe28d80432b5819fc12645c9b8d34c7cf5e22c87531",
-    "meta-creative-brief.md": "a484b35d35ad111b2cabf1f7e0ae213489751b5fc627b93e4f8281d0af4c644b",
-    "validate.py": "3fbddd1c59219b41f36efd3853c75edf500bd1db239787a07d92ee16f9a39dba"
+    "launch-checklist.md": "cccdcc946e416f8ced5e2ba2d2cfa116a75f1633a6c4a5b7583b7efd579efc93",
+    "launch-settings.json": "4b2e04876874b1baecada46f51f52defd229bd8ed6415d0c2628514bfe9c48d6",
+    "measurement-activation-receipt.json": "762387c5e7ef006221c75827f8260496dee1e963e49d85f6c00fa41c1682a13b",
+    "measurement-plan.md": "571c1d4cbd47b0a3c393fb477964b7608d85657b842ae7efe7ee0dd61d043add",
+    "meta-copy.json": "c6b47672c6628c088d10143ba49f3061f7ae327dbb651f473511690e96ce49b4",
+    "meta-creative-brief.md": "bf207f8734da79a2840fd3b860db2d68d2bb300072ca3fbf72229b0f23c7c184",
+    "validate.py": "8daa232d6471603c4030f17a46b3280e2b3c64d6fe082f9a0869d452d223e38b"
   }
 }

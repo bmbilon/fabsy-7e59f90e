@@ -26,6 +26,8 @@ import {
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
+import { FEE_REFUND } from "@/config/feeRefund";
 
 const processSteps = [
   {
@@ -94,7 +96,7 @@ const faqs = [
   },
   {
     question: "Is a withdrawal or reduction promised?",
-    answer: RAPID_RESOLUTION.outcomeDisclaimer,
+    answer: `${FEE_REFUND.payment} ${FEE_REFUND.condition}`,
   },
 ] as const;
 
@@ -154,6 +156,7 @@ const RapidResolution = () => {
                   We handle intake, disclosure, analysis, prosecutor review, and client updates for
                   an eligible Alberta traffic ticket, from one secure online journey.
                 </p>
+                <FeeRefundNotice tone="dark" className="mt-6" />
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Button asChild size="lg" className="min-h-12 px-7 text-base font-bold shadow-glow">
                     <Link to={RAPID_RESOLUTION.intakePath}>

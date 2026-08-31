@@ -5,6 +5,8 @@ const crypto = require('node:crypto');
 const { JSDOM } = require('jsdom');
 const offers = require('../src/config/offers.json');
 const photo = require('../src/config/photoRadarContent.json');
+const feeRefund = require('../src/config/feeRefund.json');
+const { PHOTO_REFUND_GUIDE_FAQ, PHOTO_REFUND_GUIDE_NOTICE, REVIEWED_REFUND_SOURCE_HASHES, REVIEWED_RAPID_REFUND_DISCLAIMER, redactReviewedFeeRefund } = require('./curated-content-guardrails.cjs');
 const fleet = require('../src/config/fleetContent.json');
 const { publicContent, pricing, renderProDrivers } = require('./generate-pro-referral-snapshots.cjs');
 const { renderPhotoRadar, renderFleet } = require('./generate-photo-radar-snapshots.cjs');
@@ -18,11 +20,19 @@ const MAIN_OFFER_CONTEXTS = {
   '/ai-info': ['src/pages/AIInfo.tsx', 'section[aria-labelledby="products-heading"]'],
 };
 const PHOTO_GUIDE_ROUTES = new Set(require('../src/config/photoRadarPages.json').map(slug => `/content/${slug}`));
+const REFUND_NOTICE_SOURCES = {
+  '/': 'src/components/Hero.tsx', '/rapid-resolution': 'src/pages/RapidResolution.tsx',
+  '/photo-radar': 'src/pages/PhotoRadar.tsx', '/pro-drivers': 'src/pages/ProDrivers.tsx',
+  '/faq': 'src/pages/FAQ.tsx', '/terms-of-service': 'src/pages/TermsOfService.tsx',
+  '/terms-of-purchase': 'src/pages/TermsOfPurchase.tsx',
+};
+const REVIEWED_PHOTO_OUTCOME_COPY = 'No legal outcome is guaranteed. If a Crown offer does not reduce the original fine, Fabsy refunds the service fee paid within 30 days of receiving that offer. No trial. No success fee. Government fines are separate.';
+const REVIEWED_RAPID_OUTCOME_COPY = REVIEWED_RAPID_REFUND_DISCLAIMER;
 // The owners froze these public copy files for this release. A changed source
 // must receive a new explicit review of the admission contract and fixtures.
 const SOURCE_HASHES = Object.freeze({
   'src/config/photoRadarPages.json': 'fefdefef911b906d3e42e871af6392a5d928a0ab66becdfaac23e3e832aa48f8',
-  'src/config/photoRadarContent.json': '974b4c31f0dc4881e5b7d737ae5b3dbb1df6c6dbfaaf8c7c9f50aa48b360b01c',
+  ...REVIEWED_REFUND_SOURCE_HASHES,
   'src/config/fleetContent.json': '5652afcc1a158a70446dfdf2850ac289280ab4ad4d72c5c8be3fdb89853d2720',
   'src/config/proReferralContent.json': '44c9aca3a399fa5cef0d5d04eca14655ff271dfcf32f371487d95ed066c48449',
 });
@@ -63,7 +73,7 @@ function requiredCopy(route) {
   if (route === '/refer') return [publicContent.referral.heading, publicContent.referral.scope,
     publicContent.referral.termsEffective, ...publicContent.referral.rules.map(rule => rule.text)];
   if (route === '/photo-radar') return ['Photo radar ticket in the mail? $79 flat.', offers.photoRadar.speedDisclaimer,
-    'No demerits', 'No insurance impact', 'No trial', 'No success fee', 'You approve any deal'];
+    'No demerits', 'No insurance impact', 'No trial', 'No success surcharge', 'You approve any deal'];
   if (route === '/fleet') return [fleet.headline, fleet.accountPricing, offers.photoRadar.speedDisclaimer,
     'No demerits', 'No insurance impact', 'No success fee', 'You approve each Crown deal'];
   return ['Free Ticket Check', 'does not retain Fabsy', 'No payment is required'];
@@ -74,6 +84,7 @@ function publicCopy(route) {
   if (route === '/refer') return strings(publicContent.referral);
   const priceLabel = `$${offers.photoRadar.priceCad} + 5% GST ($${offers.photoRadar.totalCad.toFixed(2)} total)`;
   if (route === '/photo-radar') return [...strings(photo), offers.photoRadar.actionCommitment, offers.photoRadar.speedDisclaimer,
+    ...(offers.photoRadar.outcomeDisclaimer === REVIEWED_PHOTO_OUTCOME_COPY ? [REVIEWED_PHOTO_OUTCOME_COPY] : []),
     'Photo radar ticket in the mail? $79 flat.',
     'Fabsy action within 48 hours after complete disclosure',
     `${offers.photoRadar.speedDisclaimer} A disclosure request does not itself extend a response or court deadline.`,
@@ -89,6 +100,160 @@ function replaceWholeBlocks(root, allowed) {
   for (const element of Array.from(root.querySelectorAll('p,li,h1,h2,h3,h4,div')).reverse()) {
     if (!element.isConnected || element.querySelector('p,li,h1,h2,h3,h4,section,article,div,ul,ol,details') || !safeElement(element)) continue;
     if (admitted.has(key(element.textContent))) element.textContent = '[exact public source clause]';
+  }
+}
+
+function safeRefundElement(element, icons = 0) {
+  if (element.closest('[hidden],[aria-hidden="true"]')) return false;
+  const safe = element.cloneNode(true);
+  const decorative = Array.from(safe.querySelectorAll('svg[aria-hidden="true"]'));
+  if (decorative.length !== icons || decorative.some(icon => icon.textContent.trim() || icon.querySelector('script,style,foreignObject,text,title,desc,a,image'))) return false;
+  for (const icon of decorative) icon.remove();
+  return safeElement(safe);
+}
+
+function safeRefundNotice(element, icons = 0) {
+  if (!safeRefundElement(element, icons)) return false;
+  const safe = element.cloneNode(true);
+  for (const icon of safe.querySelectorAll('svg')) icon.remove();
+  const attributes = {
+    ASIDE: ['class', 'data-fee-refund-notice'], SECTION: ['class', 'aria-labelledby'],
+    DIV: ['class'], H2: ['class', 'id'], P: ['class'], A: ['class', 'href', 'target', 'rel'],
+  };
+  // Component admission must not erase a new claim in an accessibility label
+  // or an added element merely because its visible text still looks familiar.
+  return [safe, ...safe.querySelectorAll('*')].every(node =>
+    attributes[node.tagName] && Array.from(node.attributes).every(attribute => attributes[node.tagName].includes(attribute.name)));
+}
+
+function redactExactRefundNotices(document, route, issues) {
+  const sourceFile = REFUND_NOTICE_SOURCES[route];
+  const source = sourceFile && sourceText(sourceFile);
+  const component = sourceText('src/components/FeeRefundNotice.tsx');
+  const photoNotice = route === '/photo-radar';
+  const headline = photoNotice ? feeRefund.photoHeadline : feeRefund.headline;
+  const condition = photoNotice ? feeRefund.photoCondition : feeRefund.condition;
+  const marker = photoNotice ? 'photo-radar' : 'ticket-representation';
+  const copies = [headline, condition, feeRefund.payment, feeRefund.details];
+  if (source?.includes('<FeeRefundNotice') && component.includes('to={FEE_REFUND.termsPath}') &&
+      ['{copy(photoRadar ? "photoHeadline" : "headline")}', '{copy(photoRadar ? "photoCondition" : "condition")}', '{copy("payment")}', '{copy("details")}'].every(value => component.includes(value))) {
+    const notices = Array.from(document.querySelectorAll('main aside[data-fee-refund-notice]'));
+    if (notices.length > 1) issues.push('Fee-refund notice is duplicated');
+    for (const notice of notices) {
+      const generatedChildren = Array.from(notice.children);
+      const generatedLink = generatedChildren[3]?.querySelector('a');
+      if (route === '/pro-drivers' && sourceText('scripts/generate-pro-referral-snapshots.cjs').includes('<aside data-fee-refund-notice="ticket-representation"><h2>${esc(feeRefund.headline)}</h2>') &&
+          notice.getAttribute('data-fee-refund-notice') === marker && generatedChildren.length === 4 &&
+          generatedChildren.map(child => child.tagName).join(',') === 'H2,P,P,P' &&
+          generatedChildren.slice(0, 3).every((child, index) => !child.children.length && exact(child.textContent, copies[index])) &&
+          generatedChildren[3].children.length === 1 && generatedLink && !generatedLink.children.length &&
+          generatedLink.getAttribute('href') === feeRefund.termsPath && exact(generatedChildren[3].textContent, feeRefund.details) &&
+          exact(notice.textContent, copies.join('')) && safeRefundNotice(notice)) {
+        notice.textContent = '[exact source-scoped generated fee-refund notice]';
+        continue;
+      }
+      const fields = Array.from(notice.querySelectorAll('h2,p,a'));
+      const exactEnglishTemplate = route === '/terms-of-service' && notice.closest('main')?.getAttribute('data-fabsy-locale') === 'en' &&
+        sourceText('scripts/generate-localized-snapshots.mjs').includes('<aside data-fee-refund-notice="ticket-representation"><h2>${esc(translate(\'feeRefund.headline\'))}</h2>') &&
+        notice.children.length === 4 && Array.from(notice.children).map(child => child.tagName).join(',') === 'H2,P,P,A';
+      if (notice.getAttribute('data-fee-refund-notice') !== marker || fields.length !== 4 ||
+          fields.some((field, index) => field.children.length || !exact(field.textContent, copies[index])) ||
+          fields.map(field => field.tagName).join(',') !== 'H2,P,P,A' || fields[3].getAttribute('href') !== feeRefund.termsPath ||
+          !exact(notice.textContent, copies.join('')) || !safeRefundNotice(notice, exactEnglishTemplate ? 0 : 1)) {
+        issues.push('Fee-refund notice must retain its exact promise, Crown trigger, payment disclosure and terms link');
+        continue;
+      }
+      notice.textContent = '[exact source-scoped fee-refund notice]';
+      if (exactEnglishTemplate && notice.parentElement.id === 'fee-refund-guarantee' &&
+          sourceText('scripts/generate-localized-snapshots.mjs').includes("${p('feeRefund.scope')}")) {
+        const scope = notice.nextElementSibling;
+        if (scope?.tagName === 'P' && !scope.children.length && safeRefundElement(scope) && exact(scope.textContent, feeRefund.scope)) {
+          scope.textContent = '[exact source-scoped fee-refund scope]';
+        }
+      }
+    }
+  }
+  if (route === '/photo-radar' && sourceText('scripts/generate-photo-radar-snapshots.cjs').includes('aria-labelledby="photo-fee-refund-heading"')) {
+    for (const notice of document.querySelectorAll('main section[aria-labelledby="photo-fee-refund-heading"]')) {
+      const children = Array.from(notice.children);
+      const link = children[3]?.querySelector('a');
+      if (children.length !== 4 || children.map(child => child.tagName).join(',') !== 'H2,P,P,P' ||
+          children[0].id !== 'photo-fee-refund-heading' || children.slice(0, 3).some((child, index) => child.children.length || !exact(child.textContent, copies[index])) ||
+          children[3].children.length !== 1 || !link || link.children.length || link.getAttribute('href') !== feeRefund.termsPath ||
+          !exact(children[3].textContent, feeRefund.details) || !exact(notice.textContent, copies.join('')) || !safeRefundNotice(notice)) {
+        issues.push('Photo Radar snapshot must retain its complete exact fee-refund notice');
+        continue;
+      }
+      notice.textContent = '[exact source-scoped Photo Radar fee-refund notice]';
+    }
+  }
+  if (PHOTO_GUIDE_ROUTES.has(route)) {
+    const slug = route.slice('/content/'.length);
+    const sourcePage = JSON.parse(fs.readFileSync(path.join(ROOT, `src/content/pages/${slug}.json`), 'utf8'));
+    if (!sourcePage.next.includes(PHOTO_REFUND_GUIDE_NOTICE)) return;
+    for (const heading of document.querySelectorAll('main h3')) {
+      if (!exact(heading.textContent, feeRefund.photoHeadline)) continue;
+      const conditionNode = heading.nextElementSibling;
+      const paymentNode = conditionNode?.nextElementSibling;
+      const termsNode = paymentNode?.nextElementSibling;
+      const fields = [heading, conditionNode, paymentNode, termsNode];
+      if (fields.some(field => !field || !safeRefundElement(field)) ||
+          fields.map(field => field.tagName).join(',') !== 'H3,P,P,P' ||
+          fields.slice(0, 3).some((field, index) => field.children.length || !exact(field.textContent, [feeRefund.photoHeadline, feeRefund.photoCondition, feeRefund.payment][index])) ||
+          termsNode.children.length !== 1 || termsNode.firstElementChild.tagName !== 'A' || termsNode.firstElementChild.children.length ||
+          termsNode.firstElementChild.getAttribute('href') !== feeRefund.termsPath || !exact(termsNode.textContent, `${feeRefund.details}.`)) {
+        issues.push('Photo Radar guide must retain its complete exact fee-refund notice');
+        continue;
+      }
+      for (const field of fields) field.textContent = '[exact source-scoped Photo Radar fee-refund clause]';
+    }
+    // The same complete Crown-trigger sentence is an approved source bullet.
+    if (sourcePage.bullets.includes(feeRefund.photoCondition)) {
+      for (const item of document.querySelectorAll('main li')) {
+        if (!item.children.length && safeRefundElement(item) && exact(item.textContent, feeRefund.photoCondition)) item.textContent = '[exact Photo Radar fee-refund source bullet]';
+      }
+    }
+  }
+}
+
+function redactExactRefundFaqs(document, route, issues) {
+  let entries = [];
+  if (route === '/photo-radar') entries = photo.faqs.filter(faq => faq.question === 'How does the Photo Radar fee refund guarantee work?');
+  else if (PHOTO_GUIDE_ROUTES.has(route)) {
+    const source = JSON.parse(fs.readFileSync(path.join(ROOT, `src/content/pages/${route.slice('/content/'.length)}.json`), 'utf8'));
+    if (source.faqs.some(faq => faq.q === 'What does Fabsy charge to review a photo radar notice?' && faq.a === PHOTO_REFUND_GUIDE_FAQ)) {
+      entries = [{ question: 'What does Fabsy charge to review a photo radar notice?', answer: PHOTO_REFUND_GUIDE_FAQ }];
+    }
+  } else if (route === '/rapid-resolution' && sourceText(REFUND_NOTICE_SOURCES[route]).includes('answer: `${FEE_REFUND.payment} ${FEE_REFUND.condition}`')) {
+    entries = [{ question: 'Is a withdrawal or reduction promised?', answer: `${feeRefund.payment} ${feeRefund.condition}` }];
+  } else if (route === '/faq' && sourceText(REFUND_NOTICE_SOURCES[route]).includes('a: `${FEE_REFUND.payment} ${FEE_REFUND.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.`')) {
+    entries = [{ question: 'Does Fabsy promise a particular result?', answer: `${feeRefund.payment} ${feeRefund.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.` }];
+  }
+  if (!entries.length) return;
+  // FAQSection's effect uses the same formatter as its visible answer. Only
+  // this exact single plain paragraph is an alternate serialization on /faq.
+  const paragraphAnswer = route === '/faq' && sourceText('src/components/FAQSchema.tsx').includes('const visibleAnswerHtml = faqAnswerHtml(f.a);') &&
+    sourceText('src/components/FAQSection.tsx').includes('dangerouslySetInnerHTML={{ __html: faqAnswerHtml(faq.a) }}');
+  const answerMatches = (actual, expected) => actual === expected || (paragraphAnswer && actual === `<p>${expected.replace(/[&<>"']/g, character =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character])}</p>`);
+  replaceWholeBlocks(document.querySelector('main') || document.createElement('main'), entries.flatMap(faq => [faq.question, faq.answer]));
+  for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
+    let schema;
+    try { schema = JSON.parse(script.textContent); } catch (_) { continue; }
+    if (schema?.['@type'] !== 'FAQPage' || !Array.isArray(schema.mainEntity)) continue;
+    for (const question of schema.mainEntity) {
+      if (question?.['@type'] !== 'Question' || question.acceptedAnswer?.['@type'] !== 'Answer') continue;
+      if (entries.some(faq => question.name === faq.question && !answerMatches(question.acceptedAnswer.text, faq.answer))) {
+        issues.push('Fee-refund FAQ schema must retain its exact source question and answer');
+        continue;
+      }
+      if (!entries.some(faq => question.name === faq.question && answerMatches(question.acceptedAnswer.text, faq.answer))) continue;
+      // Preserve every other property: an appended or unrelated schema claim
+      // never inherits this one exact Question/Answer admission.
+      question.name = '[exact source fee-refund question]';
+      question.acceptedAnswer.text = '[exact source fee-refund answer]';
+    }
+    script.textContent = JSON.stringify(schema).replace(/</g, '\\u003c');
   }
 }
 
@@ -146,6 +311,15 @@ function redactExactNavigation(document, route) {
   const context = MAIN_OFFER_CONTEXTS[route];
   const mainContext = context && sourceText(context[0]).includes('<PricingLadder />') ? document.querySelector(context[1]) : null;
   const navigationRoots = [...document.querySelectorAll('footer,section[aria-labelledby="product-ladder-heading"]'), ...(mainContext ? [mainContext] : [])];
+  if (offers.rapidResolution.outcomeDisclaimer === REVIEWED_RAPID_OUTCOME_COPY &&
+      sourceText('src/components/ProductLadder.tsx').includes('{RAPID_RESOLUTION.speedDisclaimer} {RAPID_RESOLUTION.outcomeDisclaimer}')) {
+    for (const paragraph of document.querySelectorAll('section[aria-labelledby="product-ladder-heading"] p')) {
+      if (!paragraph.children.length && safeRefundElement(paragraph) &&
+          exact(paragraph.textContent, `${offers.rapidResolution.speedDisclaimer} ${REVIEWED_RAPID_OUTCOME_COPY}`)) {
+        paragraph.textContent = '[exact source-scoped action and fee-refund boundary]';
+      }
+    }
+  }
   if (ladderSource.includes(proLabel) && ladderSource.includes(proScope)) {
     for (const element of navigationRoots.flatMap(root => Array.from(root.querySelectorAll('p')))) {
       const links = element.querySelectorAll('a');
@@ -160,6 +334,16 @@ function redactExactNavigation(document, route) {
     const text = link.textContent;
     if (link.getAttribute('href') === '/photo-radar' && exact(text, 'Photo Radar ($79 + GST)') &&
         footer.includes('Photo Radar ($${PHOTO_RADAR.priceCad} + GST)')) link.textContent = '[exact Photo Radar navigation]';
+    const item = link.parentElement;
+    const list = item.parentElement;
+    const heading = list?.previousElementSibling;
+    if (footer.includes('{ name: "Fee-refund guarantee", path: FEE_REFUND.termsPath }') && footer.includes('footerLinks.legal.map((link) => (') &&
+        link.getAttribute('href') === feeRefund.termsPath && exact(text, 'Fee-refund guarantee') && !link.children.length &&
+        Array.from(link.attributes).every(attribute => ['class', 'href'].includes(attribute.name)) &&
+        item.tagName === 'LI' && !item.attributes.length && item.children.length === 1 && exact(item.textContent, text) &&
+        list?.tagName === 'UL' && heading?.tagName === 'H3' && !heading.children.length && exact(heading.textContent, 'Legal') && safeRefundElement(item)) {
+      link.textContent = '[exact source-scoped fee-refund terms navigation]';
+    }
   }
   for (const element of navigationRoots.flatMap(root => Array.from(root.querySelectorAll('p[aria-label="Fabsy pricing ladder, paid prices in Canadian dollars plus GST"]')))) {
     const pairs = Array.from(element.querySelectorAll('a')).map(link => [key(link.textContent), link.getAttribute('href')]);
@@ -258,6 +442,8 @@ function redactTermsAdditions(document) {
     'PRO_DRIVER_DISCOUNT_PERCENT': '20',
     '(PRO_DRIVER_RAPID_CENTS / 100).toFixed(2)': pricing.rapidPrice,
     '(PRO_DRIVER_BUNDLE_CENTS / 100).toFixed(2)': pricing.bundlePrice,
+    'FEE_REFUND.headline': feeRefund.headline, 'FEE_REFUND.payment': feeRefund.payment,
+    'FEE_REFUND.condition': feeRefund.condition, '" "': ' ',
   };
   const source = sourceText('src/pages/TermsOfService.tsx', process.env.LOCALE_SOURCE_ROOT || ROOT).replace(/\{([^{}]+)\}/g,
     (original, expression) => substitutions[expression.trim()] ?? original);
@@ -266,7 +452,7 @@ function redactTermsAdditions(document) {
       'Rapid Resolution: Photo Radar is $79 CAD plus 5% GST ($82.95 total)',
     ]],
     ['5C. Rapid Resolution: Photo Radar Terms', 'photo-radar-terms', [
-      'Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown; no outcome is promised and the fee is not refunded based on outcome.',
+      'Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is guaranteed; the fee-refund guarantee in section 5F applies.',
       offers.photoRadar.speedDisclaimer,
     ]],
     ['5D. Pro Driver Discount', 'pro-driver-terms', [
@@ -278,6 +464,22 @@ function redactTermsAdditions(document) {
       'A valid referral link or code must be recorded before payment. Attribution lasts 30 days. The most recent valid referral takes precedence; a code may also be entered at step 3 of intake.',
       "The referred driver's Stripe payment must settle and Fabsy must accept the Alberta matter into its service pipeline. The payout is due seven days after both conditions are met, subject to the eligibility, fraud, refund and payout-information checks below.",
       "Fabsy collects information needed for applicable tax reporting and issues required slips, including a T4A where applicable. The CRA's general annual threshold is more than $500 for reportable payments, subject to its rules and exceptions. Additional identifiers, if required, are requested through an appropriate secure process; do not send a SIN through referral messages or this profile form. You are responsible for reporting your income.",
+    ]],
+    ['5F. Fee-Refund Guarantee', 'fee-refund-guarantee', [
+      feeRefund.headline, feeRefund.payment, feeRefund.condition,
+      'A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.',
+      'Photo radar and red-light camera owner notices have no demerits, so the comparison is to the original fine only.',
+      'The guarantee covers the service fee actually paid for Rapid Resolution, Rapid Resolution: Photo Radar, or the Rapid Resolution and insurance-planning bundle, including a discounted Pro Driver order. A standalone insurance report is not a ticket-representation service and is not covered by this outcome-based guarantee.',
+      'The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. Work performed and payment-processing costs do not reduce a refund due under this guarantee.',
+      'The 30-calendar-day period starts when Fabsy receives the Crown offer that provides no reduction in either penalty. It does not start at checkout and is not a promise that the Crown will respond or the case will finish within 30 days.',
+      'You do not have to accept a Crown offer or plead guilty to receive a refund due under this guarantee. Your case-specific instructions are still required for any resolution; ticket and court deadlines continue to apply.',
+      "This is a promise about Fabsy's service fee, not a guarantee of a legal result. Government fines, court charges and third-party costs remain separate. The ordinary cancellation provisions below do not limit a refund due under this guarantee or any statutory rights.",
+    ]],
+    ['7. No Promised Result', null, [
+      'Outcomes depend on the charge, evidence, procedure, prosecutor and court. Fabsy does not promise a withdrawal, reduced charge, lower fine, fewer demerits, premium saving, insurer eligibility or any other result. The 48-hour service commitment is not an outcome promise. The service-fee refund guarantee in section 5F applies independently of this limitation.',
+    ]],
+    ['10. Cancellation, Refunds and Termination', null, [
+      'The fee-refund guarantee in section 5F is separate from cancellation. For other refunds, contact Fabsy promptly to request cancellation. Eligibility depends on the work already performed, third-party charges, the checkout disclosure and applicable law. If Fabsy declines an otherwise complete paid matter before substantive work begins, Fabsy will refund the applicable service fee. Statutory cancellation rights are not limited by these terms.',
     ]],
   ];
   for (const [heading, id, clauses] of rules) {
@@ -293,6 +495,13 @@ function redactTermsAdditions(document) {
     const sourceClauses = ['p', 'li'].flatMap(tag => Array.from(sourceDom.querySelectorAll(tag)))
       .filter(node => !node.children.length).map(node => node.textContent);
     const verified = clauses.filter(clause => sourceClauses.some(value => exact(value, clause)));
+    if (id === 'fee-refund-guarantee' && (verified.length !== clauses.length ||
+        !clauses.every(clause => Array.from(sections[0].querySelectorAll('p,li')).some(node =>
+          !node.children.length && safeRefundElement(node) && exact(node.textContent, clause))))) continue;
+    if (id === 'fee-refund-guarantee' && verified.length === clauses.length &&
+        exact(sourceDom.querySelector('h2')?.textContent, heading) && safeRefundElement(sections[0].querySelector('h2'))) {
+      sections[0].querySelector('h2').textContent = '[exact source-scoped fee-refund terms heading]';
+    }
     // Only these complete plain-text elements within the matching original
     // section qualify. Inline additions, repeats elsewhere, and changed
     // amounts/eligibility/tax language stay visible to the normal checks.
@@ -308,14 +517,53 @@ function redactTermsAdditions(document) {
   }
 }
 
+function redactRefundSourceClauses(document, route) {
+  const photoPriceNote = 'Government fines are separate. The service fee is paid upfront and covered by our fee refund guarantee. See refund details.';
+  const purchaseRefund = 'The fee-refund guarantee applies if a Crown offer reduces neither your original fine nor your original demerits. Fabsy refunds the service fee you actually paid, together with the corresponding GST, within 30 calendar days of receiving that offer. Photo radar and red-light owner notices are assessed on the fine only. The guarantee covers Rapid Resolution, Photo Radar and the Rapid Resolution bundle, including discounted Pro Driver orders; it does not cover a standalone insurance report. Work already performed and payment-processing costs do not reduce a refund due under this guarantee. Amounts already refunded are not paid twice. Read the complete fee-refund terms.';
+  const purchaseLimit = "Fabsy does not promise a withdrawal, reduced fine, fewer demerits, a particular court result, insurance savings, or any premium outcome. Courts, prosecutors, registries, and insurers make their own decisions. The fee-refund guarantee is a commitment to refund Fabsy's fee when its stated conditions are met, not a promise of a particular legal outcome.";
+  const rules = route === '/photo-radar' ? [
+    [photoPriceNote, 'p', 0, 'See refund details'],
+    ['Read the full fee refund guarantee.', 'p', 0, 'Read the full fee refund guarantee'],
+  ] : route === '/terms-of-purchase' ? [
+    ['Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total), paid upfront for an accepted, eligible registered-owner camera notice. The fee-refund guarantee applies.', 'li', 1, null],
+    [purchaseRefund, 'p', 0, 'complete fee-refund terms'],
+    [purchaseLimit, 'p', 0, null],
+  ] : [];
+  if (rules.length) {
+    const substitutions = { 'PHOTO_RADAR.name': offers.photoRadar.name, 'PHOTO_RADAR.priceCad': '79',
+      'PHOTO_RADAR.totalCad.toFixed(2)': '82.95', '" "': ' ' };
+    const source = sourceText(REFUND_NOTICE_SOURCES[route])
+      .replaceAll('to={FEE_REFUND.termsPath}', `href="${feeRefund.termsPath}"`)
+      .replace(/<Link\b/g, '<a').replace(/<\/Link>/g, '</a>')
+      .replace(/\{([^{}]+)\}/g, (original, expression) => substitutions[expression.trim()] ?? original);
+    const sourceClauses = [...source.matchAll(/<(p|li)\b[^>]*>[\s\S]*?<\/\1>/gi)].map(match => JSDOM.fragment(match[0]).textContent);
+    for (const [clause, tag, icons, linkText] of rules) {
+      if (!sourceClauses.some(value => exact(value, clause))) continue;
+      for (const node of document.querySelectorAll(`main ${tag}`)) {
+        const links = Array.from(node.querySelectorAll('a'));
+        if (links.length !== (linkText ? 1 : 0) || (linkText && (links[0].getAttribute('href') !== feeRefund.termsPath || !exact(links[0].textContent, linkText)))) continue;
+        if (exact(node.textContent, clause) && safeRefundElement(node, icons)) node.textContent = '[exact source-scoped fee-refund purchase clause]';
+      }
+    }
+  }
+  if (route === '/ai-info' && offers.rapidResolution.outcomeDisclaimer === REVIEWED_RAPID_OUTCOME_COPY && sourceText('src/pages/AIInfo.tsx').includes('RAPID_RESOLUTION.outcomeDisclaimer')) {
+    for (const item of document.querySelectorAll('section[aria-labelledby="limits-heading"] li')) {
+      if (exact(item.textContent, REVIEWED_RAPID_OUTCOME_COPY) && safeRefundElement(item, 1)) item.textContent = '[exact source-scoped fee-refund limit]';
+    }
+  }
+}
+
 function redactPublicOfferSnapshot(html, { route }) {
   const original = String(html);
-  const relevant = PUBLIC_ROUTES.has(route) || PHOTO_GUIDE_ROUTES.has(route) || route === '/terms-of-service' || route === '/services' || original.includes('Fabsy pricing ladder') || original.includes('20% off') || original.includes('Photo Radar ($79') || original.includes('Photo radar or red-light camera notice?');
+  const relevant = PUBLIC_ROUTES.has(route) || PHOTO_GUIDE_ROUTES.has(route) || REFUND_NOTICE_SOURCES[route] || route === '/ai-info' || route === '/services' || original.includes('Fabsy pricing ladder') || original.includes('20% off') || original.includes('Photo Radar ($79') || original.includes('Photo radar or red-light camera notice?') || original.includes(REVIEWED_RAPID_OUTCOME_COPY) || original.includes('Fee-refund guarantee');
   if (!relevant) return { html: original, issues: [] };
   const dom = new JSDOM(original);
   const document = dom.window.document;
   const issues = [];
   try {
+    redactExactRefundNotices(document, route, issues);
+    redactExactRefundFaqs(document, route, issues);
+    redactRefundSourceClauses(document, route);
     if (PUBLIC_ROUTES.has(route)) {
       if (document.querySelector('title')) {
         if (!PUBLIC_TITLES[route].includes(document.title)) issues.push('Public offer title differs from its exact source');
@@ -343,7 +591,8 @@ function redactPublicOfferSnapshot(html, { route }) {
     redactExactPhotoStrip(document, route);
     redactExactPhotoControls(document, route);
     redactExactNavigation(document, route);
-    return { html: dom.serialize(), issues: [...new Set(issues)] };
+    const slug = route.startsWith('/content/') ? route.slice('/content/'.length) : route.replace(/^\//, '') || 'index';
+    return { html: redactReviewedFeeRefund(dom.serialize(), slug), issues: [...new Set(issues)] };
   } finally { dom.window.close(); }
 }
 

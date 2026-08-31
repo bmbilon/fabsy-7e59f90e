@@ -24,10 +24,19 @@
     "priceLine": "{{price}} CAD plus applicable GST",
     "notLawFirm": "Fabsy is a traffic ticket agent service, not a law firm. We do not provide legal advice.",
     "noOutcomePromise": "No withdrawal, reduction, lower fine, fewer demerits or insurance result is promised.",
-    "noSuccessFee": "One flat service fee. No percentage-based success fee.",
+    "noSuccessFee": "One flat service fee, paid upfront. No percentage-based success fee.",
     "clientDecision": "You direct whether to accept any proposed resolution. Nothing is accepted automatically.",
     "notFound": "This page is not available in this language.",
     "returnHome": "Return to home"
+  },
+  "feeRefund": {
+    "headline": "Fine or demerits reduced—or your fee refunded",
+    "photoHeadline": "Fine reduced or ticket dismissed—or your fee refunded",
+    "payment": "The service fee is paid upfront. No legal outcome is guaranteed.",
+    "condition": "If a Crown offer reduces neither your original fine nor your original demerits, Fabsy refunds the service fee you paid within 30 days of receiving that offer.",
+    "photoCondition": "If a Crown offer does not reduce the original fine on your photo radar or red-light camera notice, Fabsy refunds the service fee you paid within 30 days of receiving that offer. These notices have no demerits.",
+    "details": "Fee-refund terms",
+    "scope": "For ticket-representation services, including Rapid Resolution, Photo Radar and the Rapid Resolution bundle. Government fines are separate."
   },
   "insuranceContext": {
     "eyebrow": "Insurance context",
@@ -158,8 +167,8 @@
         "answer": "Only after your case-specific instruction. Fabsy will not accept a Crown offer, enter a guilty plea or finalize a proposed resolution automatically."
       },
       "outcome": {
-        "question": "Is a withdrawal or reduction promised?",
-        "answer": "No. The result depends on the charge, evidence, procedure, prosecutor and court. There is no promise of a withdrawal, reduction, lower fine, fewer demerits or insurance result."
+        "question": "Is an outcome guaranteed? How does the fee refund work?",
+        "answer": "No legal outcome is guaranteed. The result depends on the charge, evidence, procedure, prosecutor and court. For ticket-representation services, the fee is paid upfront. If a Crown offer reduces neither your original fine nor your original demerits, Fabsy refunds the service fee you paid within 30 days of receiving that offer. For photo radar and red-light camera notices, only the fine is compared because these notices have no demerits. Government fines are separate."
       },
       "language": {
         "question": "Can I write in my language?",
@@ -303,7 +312,7 @@
       },
       "payment": {
         "title": "5. Fees and payment",
-        "body": "All fees are in Canadian dollars. Court costs, fines and other charges beyond Fabsy's control remain your responsibility. The complete subtotal and tax are displayed before payment through Stripe."
+        "body": "Service fees are paid upfront in Canadian dollars. Court costs, fines and other charges beyond Fabsy's control remain your responsibility. The complete subtotal and tax are displayed before payment through Stripe."
       },
       "rapid": {
         "title": "5A. Rapid Resolution",
@@ -319,7 +328,7 @@
       },
       "outcomes": {
         "title": "7. No promised result",
-        "body": "Results depend on the charge, evidence, procedure, prosecutor and court. No withdrawal, charge reduction, lower fine, fewer demerits, premium savings, insurer eligibility or other result is promised. The 48-hour commitment is not a promise of an outcome."
+        "body": "Results depend on the charge, evidence, procedure, prosecutor and court. No withdrawal, charge reduction, lower fine, fewer demerits, premium savings, insurer eligibility or other result is promised. The 48-hour commitment is not a promise of an outcome. The fee-refund promise described above concerns Fabsy's service fee; it does not guarantee a Crown offer or a court decision."
       },
       "privacy": {
         "title": "8. Confidentiality",
@@ -331,7 +340,7 @@
       },
       "cancellation": {
         "title": "10. Cancellation, refunds and termination",
-        "body": "Either party may terminate by mutual agreement, for non-payment, failure to provide information or cooperation, or if representation becomes impossible or impractical. Contact Fabsy promptly to request cancellation. Refund eligibility depends on work already performed, third-party charges, checkout disclosures and applicable law. If Fabsy declines an otherwise complete paid matter before substantive work begins, the applicable service fee will be refunded. Statutory cancellation rights are not limited."
+        "body": "Either party may terminate by mutual agreement, for non-payment, failure to provide information or cooperation, or if representation becomes impossible or impractical. Contact Fabsy promptly to request cancellation. The fee-refund promise described above applies separately from ordinary cancellation refunds. For cancellation requests outside that promise, refund eligibility depends on work already performed, third-party charges, checkout disclosures and applicable law. If Fabsy declines an otherwise complete paid matter before substantive work begins, the applicable service fee will be refunded. Statutory cancellation rights are not limited."
       },
       "website": {
         "title": "11. Website use",

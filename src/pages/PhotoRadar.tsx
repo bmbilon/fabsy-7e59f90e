@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Camera, CheckCircle2, Clock3, FileSearch, Upload } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
 import StaticJsonLd from "@/components/StaticJsonLd";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
+import { FEE_REFUND } from "@/config/feeRefund";
 import photoRadarContent from "@/config/photoRadarContent.json";
 import useSafeHead from "@/hooks/useSafeHead";
 
@@ -68,6 +70,7 @@ const PhotoRadar = () => {
                 <p className="mt-4 max-w-2xl leading-relaxed text-slate-300">
                   Fabsy enters your not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal.
                 </p>
+                <FeeRefundNotice photoRadar tone="dark" className="mt-6" />
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Button asChild size="lg" className="min-h-12 px-7 text-base font-bold shadow-glow">
                     <Link to={PHOTO_RADAR.intakePath}>
@@ -80,7 +83,7 @@ const PhotoRadar = () => {
                   </Button>
                 </div>
                 <p className="mt-5 text-sm leading-relaxed text-slate-300">
-                  Registered-owner automated notices under Traffic Safety Act s.160(1). No trial. No success fee. No outcome promised.
+                  Registered-owner automated notices under Traffic Safety Act s.160(1). No trial. No success surcharge.
                 </p>
               </div>
               <Card className="overflow-hidden border-white/15 bg-white shadow-2xl">
@@ -111,7 +114,8 @@ const PhotoRadar = () => {
                     <Link to={PHOTO_RADAR.intakePath}>Upload your notice</Link>
                   </Button>
                   <p className="mt-4 text-xs leading-relaxed text-slate-600">
-                    Government fines are separate. The service fee is not refunded based on outcome.
+                    Government fines are separate. The service fee is paid upfront and covered by our fee refund guarantee.{" "}
+                    <Link to={FEE_REFUND.termsPath} className="underline underline-offset-4">See refund details</Link>.
                   </p>
                 </div>
               </Card>
@@ -200,6 +204,9 @@ const PhotoRadar = () => {
                 </AccordionItem>
               ))}
             </Accordion>
+            <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+              <Link to={FEE_REFUND.termsPath} className="underline underline-offset-4">Read the full fee refund guarantee</Link>.
+            </p>
             <aside className="mt-8 text-sm leading-relaxed text-muted-foreground" aria-label="Official sources">
               <p className="font-semibold">Official sources checked August 31, 2026</p>
               <ul className="mt-2 space-y-2">

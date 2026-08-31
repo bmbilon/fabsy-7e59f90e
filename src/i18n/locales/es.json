@@ -24,10 +24,19 @@
     "priceLine": "{{price}} CAD más el GST aplicable",
     "notLawFirm": "Fabsy ofrece representación mediante agentes para infracciones de tránsito; no es un despacho de abogados. No brindamos asesoría jurídica.",
     "noOutcomePromise": "No se promete retirar o reducir el cargo, bajar la multa, disminuir los puntos de penalización ni obtener ningún resultado en el seguro.",
-    "noSuccessFee": "Una tarifa fija por el servicio. Sin honorarios de éxito calculados como porcentaje.",
+    "noSuccessFee": "Una tarifa fija por el servicio, pagada por adelantado. Sin honorarios de éxito calculados como porcentaje.",
     "clientDecision": "Tú indicas si se acepta alguna resolución propuesta. Nada se acepta automáticamente.",
     "notFound": "Esta página no está disponible en este idioma.",
     "returnHome": "Volver al inicio"
+  },
+  "feeRefund": {
+    "headline": "Menos multa o puntos de penalización, o te devolvemos la tarifa",
+    "photoHeadline": "Multa reducida o infracción desestimada, o te devolvemos la tarifa",
+    "payment": "La tarifa del servicio se paga por adelantado. No se garantiza ningún resultado legal.",
+    "condition": "Si una oferta de la fiscalía (Crown) no reduce ni tu multa original ni tus puntos de penalización originales, Fabsy te devuelve la tarifa del servicio que pagaste dentro de los 30 días siguientes a la recepción de esa oferta por Fabsy.",
+    "photoCondition": "Si una oferta de la fiscalía (Crown) no reduce la multa original de tu aviso de foto radar o cámara de semáforo en rojo, Fabsy te devuelve la tarifa del servicio que pagaste dentro de los 30 días siguientes a la recepción de esa oferta por Fabsy. Estos avisos no conllevan puntos de penalización.",
+    "details": "Condiciones de devolución de la tarifa",
+    "scope": "Para servicios de representación por infracciones, incluidos Rapid Resolution, Photo Radar y el paquete Rapid Resolution. Las multas gubernamentales son aparte."
   },
   "language": {
     "selector": "Elige tu idioma",
@@ -138,8 +147,8 @@
         "answer": "Solo después de tus instrucciones específicas para el caso. Fabsy no aceptará automáticamente una propuesta de la fiscalía, presentará una declaración de culpabilidad ni formalizará una resolución propuesta."
       },
       "outcome": {
-        "question": "¿Se promete retirar o reducir el cargo?",
-        "answer": "No. El resultado depende del cargo, las pruebas, el procedimiento, la fiscalía y el tribunal. No se promete retirar o reducir el cargo, bajar la multa, disminuir los puntos de penalización ni ningún resultado en el seguro."
+        "question": "¿Se garantiza un resultado? ¿Cómo funciona la devolución de la tarifa?",
+        "answer": "No se garantiza ningún resultado legal. El resultado depende del cargo, las pruebas, el procedimiento, la fiscalía y el tribunal. En los servicios de representación por infracciones, la tarifa se paga por adelantado. Si una oferta de la fiscalía (Crown) no reduce ni tu multa original ni tus puntos de penalización originales, Fabsy te devuelve la tarifa del servicio que pagaste dentro de los 30 días siguientes a la recepción de esa oferta por Fabsy. En los avisos de foto radar y cámara de semáforo en rojo, solo se compara la multa porque estos avisos no conllevan puntos de penalización. Las multas gubernamentales son aparte."
       },
       "language": {
         "question": "¿Puedo escribir en mi idioma?",
@@ -283,7 +292,7 @@
       },
       "payment": {
         "title": "5. Honorarios y pago",
-        "body": "Todas las tarifas se expresan en dólares canadienses. Los costos judiciales, multas y otros cargos fuera del control de Fabsy siguen siendo tu responsabilidad. El subtotal y los impuestos completos se muestran antes de pagar mediante Stripe."
+        "body": "Las tarifas del servicio se pagan por adelantado en dólares canadienses. Los costos judiciales, multas y otros cargos fuera del control de Fabsy siguen siendo tu responsabilidad. El subtotal y los impuestos completos se muestran antes de pagar mediante Stripe."
       },
       "rapid": {
         "title": "5A. Rapid Resolution",
@@ -299,7 +308,7 @@
       },
       "outcomes": {
         "title": "7. No se promete ningún resultado",
-        "body": "Los resultados dependen del cargo, las pruebas, el procedimiento, la fiscalía y el tribunal. No se promete retirar o reducir el cargo, bajar la multa, disminuir los puntos de penalización, ahorrar en primas, obtener elegibilidad para un seguro ni ningún otro resultado. El compromiso de 48 horas no es una promesa de resultado."
+        "body": "Los resultados dependen del cargo, las pruebas, el procedimiento, la fiscalía y el tribunal. No se promete retirar o reducir el cargo, bajar la multa, disminuir los puntos de penalización, ahorrar en primas, obtener elegibilidad para un seguro ni ningún otro resultado. El compromiso de 48 horas no es una promesa de resultado. La promesa de devolución descrita arriba se refiere a la tarifa del servicio de Fabsy; no garantiza una oferta de la fiscalía ni una decisión judicial."
       },
       "privacy": {
         "title": "8. Confidencialidad",
@@ -311,7 +320,7 @@
       },
       "cancellation": {
         "title": "10. Cancelación, reembolsos y terminación",
-        "body": "Cualquiera de las partes puede terminar el acuerdo por consentimiento mutuo, falta de pago, falta de información o cooperación, o si la representación se vuelve imposible o impracticable. Contacta a Fabsy con prontitud para solicitar la cancelación. La elegibilidad para reembolso depende del trabajo realizado, los cargos de terceros, la información revelada al pagar y la legislación aplicable. Si Fabsy rechaza un asunto pagado y completo en los demás aspectos antes de comenzar el trabajo sustancial, reembolsará la tarifa de servicio correspondiente. No se limitan los derechos legales de cancelación."
+        "body": "Cualquiera de las partes puede terminar el acuerdo por consentimiento mutuo, falta de pago, falta de información o cooperación, o si la representación se vuelve imposible o impracticable. Contacta a Fabsy con prontitud para solicitar la cancelación. La promesa de devolución de la tarifa descrita arriba se aplica por separado de los reembolsos ordinarios por cancelación. Para las solicitudes de cancelación fuera de esa promesa, la elegibilidad para reembolso depende del trabajo realizado, los cargos de terceros, la información revelada al pagar y la legislación aplicable. Si Fabsy rechaza un asunto pagado y completo en los demás aspectos antes de comenzar el trabajo sustancial, reembolsará la tarifa de servicio correspondiente. No se limitan los derechos legales de cancelación."
       },
       "website": {
         "title": "11. Uso del sitio web",

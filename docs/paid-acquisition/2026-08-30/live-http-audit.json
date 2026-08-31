@@ -1,0 +1,227 @@
+{
+  "checked_at_utc": "2026-08-30T23:18:17.370605+00:00",
+  "base_url": "https://fabsy.ca",
+  "method": "Read-only public HTTP GET, redirects disabled; ordinary and Googlebot user agents. Literal text counts are diagnostic and not semantic assertions.",
+  "browser_observations": {
+    "observed_date": "2026-08-30",
+    "rapid_resolution": {
+      "visible_heading": "404",
+      "visible_message": "Oops! Page not found",
+      "classification": "soft_404_http_200_react_route_not_found"
+    },
+    "homepage": {
+      "visible_retired_offers": [
+        "$149 Priority Review",
+        "$488 Full Representation"
+      ],
+      "visible_navigation": "Priority Review"
+    },
+    "no_checkout_or_customer_data_submitted": true
+  },
+  "checks": [
+    {
+      "path": "/",
+      "user_agent": "Mozilla/5.0",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/",
+      "user_agent": "Googlebot",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 81265,
+      "literal_text_counts": {
+        "$149": 18,
+        "Priority Review": 6,
+        "Ticket Triage": 9,
+        "$488": 8,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/rapid-resolution",
+      "user_agent": "Mozilla/5.0",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/rapid-resolution",
+      "user_agent": "Googlebot",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/services",
+      "user_agent": "Mozilla/5.0",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/services",
+      "user_agent": "Googlebot",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Traffic Ticket Agent Services | Fabsy Alberta",
+      "html_bytes": 62265,
+      "literal_text_counts": {
+        "$149": 11,
+        "Priority Review": 3,
+        "Ticket Triage": 3,
+        "$488": 8,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/terms-of-purchase",
+      "user_agent": "Mozilla/5.0",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/terms-of-purchase",
+      "user_agent": "Googlebot",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Terms of Purchase | Fabsy Traffic Ticket Services",
+      "html_bytes": 44569,
+      "literal_text_counts": {
+        "$149": 5,
+        "Priority Review": 1,
+        "Ticket Triage": 3,
+        "$488": 6,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/traffic-ticket-assessment",
+      "user_agent": "Mozilla/5.0",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/traffic-ticket-assessment",
+      "user_agent": "Googlebot",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Human-Reviewed Alberta Ticket Assessment | $149",
+      "html_bytes": 100318,
+      "literal_text_counts": {
+        "$149": 35,
+        "Priority Review": 7,
+        "Ticket Triage": 11,
+        "$488": 13,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/traffic-ticket-assessment/start",
+      "user_agent": "Mozilla/5.0",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    },
+    {
+      "path": "/traffic-ticket-assessment/start",
+      "user_agent": "Googlebot",
+      "http_status": 200,
+      "redirect_location": null,
+      "title": "Ticket Triage | Alberta Traffic Ticket Review | $149 CAD",
+      "html_bytes": 6997,
+      "literal_text_counts": {
+        "$149": 8,
+        "Priority Review": 0,
+        "Ticket Triage": 9,
+        "$488": 3,
+        "$198": 0,
+        "Rapid Resolution": 0
+      },
+      "cache_status": "DYNAMIC"
+    }
+  ]
+}

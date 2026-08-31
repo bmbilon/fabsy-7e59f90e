@@ -1,26 +1,26 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-31T13:34:58.437Z",
+  "generatedAt": "2026-08-31T14:19:50.078Z",
   "sourceVersion": "rapid-resolution-2026-08-30",
-  "sourceFingerprint": "fnv1a-c22d9df5",
+  "sourceFingerprint": "fnv1a-61975b5a",
   "sourceDocuments": {
-    "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
-    "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-    "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+    "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
+    "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+    "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
     "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
     "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
     "src/config/offers.ts": "fnv1a-4b290fd6",
-    "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
+    "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
   },
   "bundleFingerprints": {
-    "en": "fnv1a-615388e7",
-    "pa": "fnv1a-484ffceb",
-    "tl": "fnv1a-80ce3e56",
-    "zh-hans": "fnv1a-a5665426",
-    "zh-hant": "fnv1a-670580d3",
-    "ar": "fnv1a-ca38fbf4",
-    "hi": "fnv1a-adce9837",
-    "es": "fnv1a-ca778501"
+    "en": "fnv1a-b86c4e75",
+    "pa": "fnv1a-52c16667",
+    "tl": "fnv1a-37973218",
+    "zh-hans": "fnv1a-7f74c801",
+    "zh-hant": "fnv1a-373217b1",
+    "ar": "fnv1a-ddf83060",
+    "hi": "fnv1a-eb7d2d7a",
+    "es": "fnv1a-78659c2a"
   },
   "generatedCount": 56,
   "records": [

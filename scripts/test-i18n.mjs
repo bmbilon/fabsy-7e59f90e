@@ -163,7 +163,15 @@ try {
     const service = renderLocalizedRoute(code, english, bundle, '/terms-of-service');
     assert.ok(service.html.includes(bundle.terms.title), `${code} service terms must retain their own document title`);
     assert.match(service.html, new RegExp('href="/' + code + '/terms-of-purchase"'), `${code} service terms must link to the purchase handoff`);
-    assert.equal((service.html.match(/<h2\b/g) || []).length, 16, 'The complete service-term sections must remain intact');
+    const serviceHeadings = [...service.html.matchAll(/<h2\b[^>]*>(.*?)<\/h2>/g)].map(match => match[1]);
+    const escapeHtml = value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#x27;');
+    assert.equal(Object.keys(bundle.terms.sections).length, 16, 'The original service-term sections must remain intact');
+    for (const section of Object.values(bundle.terms.sections)) {
+      assert.ok(serviceHeadings.includes(escapeHtml(section.title)), `${code} must retain service-term section: ${section.title}`);
+    }
+    assert.equal(serviceHeadings.length, 17, 'Service terms must include the 16 original sections and one fee-refund notice');
+    assert.equal(serviceHeadings.filter(heading => heading === escapeHtml(bundle.feeRefund.headline)).length, 1, `${code} must show the current refund heading exactly once`);
+    assert.match(service.html, /id="fee-refund-guarantee"/, `${code} must expose a direct refund-terms anchor`);
   }
   const outfile = path.join(temporary, 'intake-validation.mjs');
   await build({ entryPoints: ['src/i18n/intake-validation.ts'], bundle: true, platform: 'node', format: 'esm', outfile, logLevel: 'silent' });

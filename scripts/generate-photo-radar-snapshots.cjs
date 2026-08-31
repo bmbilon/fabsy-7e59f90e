@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const offers = require('../src/config/offers.json');
 const content = require('../src/config/photoRadarContent.json');
+const feeRefund = require('../src/config/feeRefund.json');
 const fleet = require('../src/config/fleetContent.json');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -36,16 +37,17 @@ function shell(route, title, description, body, schemas = []) {
 ${schemas.map(schema => `<script type="application/ld+json">${json(schema)}</script>`).join('\n')}
 <style>body{font-family:system-ui,sans-serif;max-width:850px;margin:auto;padding:24px;line-height:1.7;color:#162033}a{color:#6d28d9}nav{display:flex;flex-wrap:wrap;gap:18px}section{margin:36px 0}h1{font-size:2.6rem;line-height:1.15}details{border-bottom:1px solid #ddd;padding:16px 0}summary h3{display:inline;font-size:1rem}.price{font-size:1.5rem;font-weight:700}.cta{display:inline-block;background:#6d28d9;color:#fff;border-radius:8px;padding:12px 20px}footer{border-top:1px solid #ddd;padding-top:24px;font-size:.875rem}</style>
 </head><body><header><nav><a href="/">Fabsy</a><a href="/services">Services</a><a href="/photo-radar">Photo Radar</a><a href="/fleet">Fleet</a><a href="/contact">Contact</a></nav></header>
-<main>${body}</main><footer><p>Free Ticket Check / Photo Radar $79 / Rapid Resolution $198 / Bundle $229 / Trial representation quoted. Paid prices are CAD plus GST. Government fines are separate.</p><p>Fabsy is an Alberta traffic ticket agent service, not a law firm. No outcome is promised.</p><p><a href="/terms-of-service#photo-radar-terms">Terms of Service</a> · <a href="/privacy-policy">Privacy Policy</a></p></footer></body></html>\n`;
+<main>${body}</main><footer><p>Free Ticket Check / Photo Radar $79 / Rapid Resolution $198 / Bundle $229 / Trial representation quoted. Paid prices are CAD plus GST. Government fines are separate.</p><p>Fabsy is an Alberta traffic ticket agent service, not a law firm. No outcome is promised.</p><p><a href="/terms-of-service#photo-radar-terms">Terms of Service</a> · <a href="${esc(feeRefund.termsPath)}">${esc(feeRefund.details)}</a> · <a href="/privacy-policy">Privacy Policy</a></p></footer></body></html>\n`;
 }
 
 function renderPhotoRadar() {
   const faq = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: content.faqs.map(item => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) };
-  return shell('photo-radar', 'Photo Radar Ticket in Alberta? $79 + GST | Fabsy', 'Alberta photo radar and red-light owner notices: $79 + GST. No demerits, no insurance impact, no success fee. You approve any Crown deal.', `
+  return shell('photo-radar', 'Photo Radar Ticket in Alberta? $79 + GST | Fabsy', 'Alberta photo radar and red-light owner notices: $79 + GST. No demerits or insurance impact. Fee refund terms apply. You approve any Crown deal.', `
 <h1>Photo radar ticket in the mail? $79 flat.</h1>
 <p>Alberta automated enforcement notices mailed to a registered owner under Traffic Safety Act s.160(1), including photo radar speeding and red-light camera notices.</p>
+<section aria-labelledby="photo-fee-refund-heading"><h2 id="photo-fee-refund-heading">${esc(feeRefund.photoHeadline)}</h2><p>${esc(feeRefund.photoCondition)}</p><p>${esc(feeRefund.payment)}</p><p><a href="${esc(feeRefund.termsPath)}">${esc(feeRefund.details)}</a></p></section>
 <section aria-label="Three facts">${content.heroFacts.map(fact => `<h2>${esc(fact.title)}</h2><p>${esc(fact.description)}</p>`).join('')}</section>
-<section><h2>Rapid Resolution: Photo Radar</h2><p class="price">$79 + 5% GST ($82.95 total)</p><p>No trial. No success fee. No Insurance Impact Report: these owner notices have no insurance impact. Government fines are separate.</p><a class="cta" href="${esc(photo.intakePath)}">Start Photo Radar · $79 + GST</a><p>${esc(photo.outcomeDisclaimer)}</p></section>
+<section><h2>Rapid Resolution: Photo Radar</h2><p class="price">$79 + 5% GST ($82.95 total)</p><p>No trial. No success surcharge. No Insurance Impact Report: these owner notices have no insurance impact. Government fines are separate.</p><a class="cta" href="${esc(photo.intakePath)}">Start Photo Radar · $79 + GST</a><p>${esc(photo.outcomeDisclaimer)}</p></section>
 <section><h2>How it works</h2><ol>${content.processSteps.map(step => `<li><h3>${esc(step.title)}</h3><p>${esc(step.description)}</p></li>`).join('')}</ol><p>${esc(photo.speedDisclaimer)}</p></section>
 <section><h2>What we check in disclosure</h2><ul>${content.reviewChecks.map(check => `<li>${esc(check)}</li>`).join('')}</ul><p>A missing item becomes a review question or request to the Crown; it does not prove that a notice must be withdrawn.</p></section>
 <section><h2>Frequently asked questions</h2>${content.faqs.map(item => `<details><summary><h3>${esc(item.question)}</h3></summary><p>${esc(item.answer)}</p></details>`).join('')}</section>

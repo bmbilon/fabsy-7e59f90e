@@ -1,7 +1,10 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
+import { FEE_REFUND } from "@/config/feeRefund";
 import {
   INSURANCE_IMPACT_REPORT,
+  PHOTO_RADAR,
   RAPID_RESOLUTION,
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
@@ -33,11 +36,12 @@ const TermsOfPurchase = () => {
             These terms apply when you buy a Fabsy service. They are separate from any consent you
             sign to let Fabsy act on a traffic-ticket matter.
           </p>
-          <p className="mt-4 text-sm text-slate-500">Last reviewed: August 30, 2026</p>
+          <p className="mt-4 text-sm text-slate-500">Last reviewed: August 31, 2026</p>
         </div>
       </div>
 
       <div className="container mx-auto max-w-4xl px-4 py-10 sm:py-14">
+        <FeeRefundNotice className="mb-6" />
         <section className="rounded-2xl border border-primary/20 bg-white p-6 shadow-sm sm:p-8">
           <div className="flex items-start gap-4">
             <span className="mt-0.5 rounded-xl bg-primary/10 p-2.5 text-primary" aria-hidden="true">
@@ -62,6 +66,10 @@ const TermsOfPurchase = () => {
               <li className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                 <span>Current offer prices are in Canadian dollars, plus applicable GST. The tax and total charge are shown before payment.</span>
+              </li>
+              <li className="flex gap-3">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                <span>{PHOTO_RADAR.name} costs ${PHOTO_RADAR.priceCad} CAD plus 5% GST (${PHOTO_RADAR.totalCad.toFixed(2)} total), paid upfront for an accepted, eligible registered-owner camera notice. The fee-refund guarantee applies.</span>
               </li>
               <li className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
@@ -161,7 +169,18 @@ const TermsOfPurchase = () => {
                 begins.
               </p>
               <p>
-                Any refund is determined by the written terms for your order, the work already
+                The fee-refund guarantee applies if a Crown offer reduces neither your original
+                fine nor your original demerits. Fabsy refunds the service fee you actually paid,
+                together with the corresponding GST, within 30 calendar days of receiving that
+                offer. Photo radar and red-light owner notices are assessed on the fine only.
+                The guarantee covers Rapid Resolution, Photo Radar and the Rapid Resolution bundle,
+                including discounted Pro Driver orders; it does not cover a standalone insurance report.
+                Work already performed and payment-processing costs do not reduce a refund due under
+                this guarantee. Amounts already refunded are not paid twice. Read the{" "}
+                <Link to={FEE_REFUND.termsPath} className="font-semibold text-primary underline underline-offset-4">complete fee-refund terms</Link>.
+              </p>
+              <p>
+                Other refunds are determined by the written terms for your order, the work already
                 performed or delivered, non-recoverable third-party costs, and applicable law. A
                 cancellation request does not pause a court date, response deadline, payment date,
                 or other obligation unless Fabsy confirms that in writing.
@@ -175,6 +194,8 @@ const TermsOfPurchase = () => {
               Fabsy does not promise a withdrawal, reduced fine, fewer demerits, a particular court
               result, insurance savings, or any premium outcome. Courts, prosecutors, registries,
               and insurers make their own decisions.
+              {" "}The fee-refund guarantee is a commitment to refund Fabsy's fee when its stated
+              conditions are met, not a promise of a particular legal outcome.
             </p>
           </section>
 

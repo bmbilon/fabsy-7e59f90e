@@ -2,6 +2,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useSafeHead from "@/hooks/useSafeHead";
 import useHashScroll from "@/hooks/useHashScroll";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
+import { FEE_REFUND } from "@/config/feeRefund";
 import {
   CANONICAL_OFFER_PRICING,
   INSURANCE_IMPACT_REPORT,
@@ -28,6 +30,8 @@ const TermsOfService = () => {
         <p className="text-white/70 mb-8">
           Last updated: August 31, 2026
         </p>
+
+        <FeeRefundNotice tone="dark" className="mb-8" />
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
           <section>
@@ -127,7 +131,7 @@ const TermsOfService = () => {
 
           <section id="photo-radar-terms" className="scroll-mt-24">
             <h2 className="text-2xl font-semibold mb-4">5C. Rapid Resolution: Photo Radar Terms</h2>
-            <p className="mb-4">Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown; no outcome is promised and the fee is not refunded based on outcome.</p>
+            <p className="mb-4">Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is guaranteed; the fee-refund guarantee in section 5F applies.</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>The service applies to Alberta automated enforcement notices mailed to the registered owner under Traffic Safety Act section 160(1), including photo radar speeding and red-light camera notices.</li>
               <li>Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal after accepting the file and receiving your authorization.</li>
@@ -181,6 +185,23 @@ const TermsOfService = () => {
             </p>
           </section>
 
+          <section id="fee-refund-guarantee" className="scroll-mt-24 rounded-xl border border-emerald-300/40 bg-white/10 p-6">
+            <h2 className="text-2xl font-semibold mb-4">5F. Fee-Refund Guarantee</h2>
+            <p className="mb-4 font-semibold">{FEE_REFUND.headline}</p>
+            <p className="mb-4">{FEE_REFUND.payment}</p>
+            <p className="mb-4">{FEE_REFUND.condition}</p>
+            <ul className="list-disc pl-6 space-y-3">
+              <li>A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.</li>
+              <li>Photo radar and red-light camera owner notices have no demerits, so the comparison is to the original fine only.</li>
+              <li>The guarantee covers the service fee actually paid for Rapid Resolution, Rapid Resolution: Photo Radar, or the Rapid Resolution and insurance-planning bundle, including a discounted Pro Driver order. A standalone insurance report is not a ticket-representation service and is not covered by this outcome-based guarantee.</li>
+              <li>The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. Work performed and payment-processing costs do not reduce a refund due under this guarantee.</li>
+              <li>The 30-calendar-day period starts when Fabsy receives the Crown offer that provides no reduction in either penalty. It does not start at checkout and is not a promise that the Crown will respond or the case will finish within 30 days.</li>
+              <li>You do not have to accept a Crown offer or plead guilty to receive a refund due under this guarantee. Your case-specific instructions are still required for any resolution; ticket and court deadlines continue to apply.</li>
+            </ul>
+            <p className="mt-4">This is a promise about Fabsy's service fee, not a guarantee of a legal result. Government fines, court charges and third-party costs remain separate. The ordinary cancellation provisions below do not limit a refund due under this guarantee or any statutory rights.</p>
+            <p className="mt-4">For questions about a refund, contact <a href="mailto:hello@fabsy.ca" className="underline underline-offset-4">hello@fabsy.ca</a> or call <a href="tel:+18257932279" className="underline underline-offset-4">(825) 793-2279</a>.</p>
+          </section>
+
           <section>
             <h2 className="text-2xl font-semibold mb-4">6. Client Responsibilities</h2>
             <p className="mb-4">Clients agree to:</p>
@@ -200,6 +221,7 @@ const TermsOfService = () => {
               Outcomes depend on the charge, evidence, procedure, prosecutor and court. Fabsy does
               not promise a withdrawal, reduced charge, lower fine, fewer demerits, premium saving,
               insurer eligibility or any other result. The 48-hour service commitment is not an outcome promise.
+              {" "}The service-fee refund guarantee in section 5F applies independently of this limitation.
             </p>
           </section>
 
@@ -229,7 +251,8 @@ const TermsOfService = () => {
               <li>If representation becomes impossible or impractical</li>
             </ul>
             <p className="mt-4">
-              Contact Fabsy promptly to request cancellation. Refund eligibility depends on the work
+              The fee-refund guarantee in section 5F is separate from cancellation. For other refunds,
+              contact Fabsy promptly to request cancellation. Eligibility depends on the work
               already performed, third-party charges, the checkout disclosure and applicable law. If
               Fabsy declines an otherwise complete paid matter before substantive work begins, Fabsy
               will refund the applicable service fee. Statutory cancellation rights are not limited by these terms.

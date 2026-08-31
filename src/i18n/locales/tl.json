@@ -24,10 +24,19 @@
     "priceLine": "{{price}} CAD at karagdagang naaangkop na GST",
     "notLawFirm": "Ang Fabsy ay serbisyo ng kinatawan para sa mga traffic ticket, hindi isang law firm. Hindi kami nagbibigay ng legal na payo.",
     "noOutcomePromise": "Walang ipinapangakong pagbawi o pagbawas ng kaso, mas mababang multa, mas kaunting demerit point, o resulta sa insurance.",
-    "noSuccessFee": "Isang nakapirming bayad sa serbisyo. Walang success fee na nakabatay sa porsiyento.",
+    "noSuccessFee": "Isang nakapirming bayad sa serbisyo, na binabayaran muna. Walang success fee na nakabatay sa porsiyento.",
     "clientDecision": "Ikaw ang magbibigay ng tagubilin kung tatanggapin ang anumang mungkahing pag-aayos. Walang awtomatikong tinatanggap.",
     "notFound": "Hindi available ang pahinang ito sa wikang ito.",
     "returnHome": "Bumalik sa home"
+  },
+  "feeRefund": {
+    "headline": "Bawas multa o demerit points, o ibabalik ang bayad mo sa serbisyo",
+    "photoHeadline": "Mababawasan ang multa o mababasura ang tiket, o ibabalik ang bayad mo sa serbisyo",
+    "payment": "Binabayaran muna ang serbisyo. Walang garantisadong legal na resulta.",
+    "condition": "Kung hindi mabawasan ng alok ng Crown ang alinman sa orihinal mong multa o orihinal mong demerit points, ibabalik ng Fabsy ang ibinayad mo sa serbisyo sa loob ng 30 araw mula nang matanggap ng Fabsy ang alok na iyon.",
+    "photoCondition": "Kung hindi mabawasan ng alok ng Crown ang orihinal na multa sa iyong photo radar o red-light camera notice, ibabalik ng Fabsy ang ibinayad mo sa serbisyo sa loob ng 30 araw mula nang matanggap ng Fabsy ang alok na iyon. Walang demerit points ang mga notice na ito.",
+    "details": "Mga tuntunin sa pagbabalik ng bayad",
+    "scope": "Para sa mga serbisyong representasyon sa tiket, kabilang ang Rapid Resolution, Photo Radar at ang Rapid Resolution bundle. Hiwalay ang mga multa ng gobyerno."
   },
   "language": {
     "selector": "Piliin ang iyong wika",
@@ -138,8 +147,8 @@
         "answer": "Pagkatapos lamang ng iyong tiyak na tagubilin para sa kaso. Hindi awtomatikong tatanggap ng alok ng prosekusyon, maghahain ng guilty plea o magtatapos ng mungkahing pag-aayos ang Fabsy."
       },
       "outcome": {
-        "question": "Ipinapangako ba ang pagbawi o pagbawas ng kaso?",
-        "answer": "Hindi. Nakadepende ang resulta sa kaso, ebidensiya, proseso, piskal at hukuman. Walang pangako ng pagbawi o pagbawas ng kaso, mas mababang multa, mas kaunting demerit point o resulta sa insurance."
+        "question": "May garantisadong resulta ba? Paano ibinabalik ang bayad?",
+        "answer": "Walang garantisadong legal na resulta. Nakadepende ang resulta sa kaso, ebidensiya, proseso, piskal at hukuman. Binabayaran muna ang mga serbisyong representasyon sa tiket. Kung hindi mabawasan ng alok ng Crown ang alinman sa orihinal mong multa o orihinal mong demerit points, ibabalik ng Fabsy ang ibinayad mo sa serbisyo sa loob ng 30 araw mula nang matanggap ng Fabsy ang alok na iyon. Para sa photo radar at red-light camera notices, multa lamang ang inihahambing dahil walang demerit points ang mga notice na ito. Hiwalay ang mga multa ng gobyerno."
       },
       "language": {
         "question": "Maaari ba akong sumulat sa sarili kong wika?",
@@ -283,7 +292,7 @@
       },
       "payment": {
         "title": "5. Mga bayad at pagbabayad",
-        "body": "Lahat ng bayad ay nasa Canadian dollar. Responsibilidad mo ang mga gastos sa hukuman, multa at iba pang singil na wala sa kontrol ng Fabsy. Ipapakita ang buong subtotal at buwis bago ang pagbabayad sa Stripe."
+        "body": "Binabayaran muna ang mga serbisyo sa Canadian dollar. Responsibilidad mo ang mga gastos sa hukuman, multa at iba pang singil na wala sa kontrol ng Fabsy. Ipapakita ang buong subtotal at buwis bago ang pagbabayad sa Stripe."
       },
       "rapid": {
         "title": "5A. Rapid Resolution",
@@ -299,7 +308,7 @@
       },
       "outcomes": {
         "title": "7. Walang ipinapangakong resulta",
-        "body": "Nakadepende ang resulta sa kaso, ebidensiya, proseso, piskal at hukuman. Walang pangako ng pagbawi o pagbawas ng kaso, mas mababang multa, mas kaunting demerit point, pagtitipid sa premium, pagiging kwalipikado sa insurance o ibang resulta. Ang 48-oras na pangako ay hindi pangako ng resulta."
+        "body": "Nakadepende ang resulta sa kaso, ebidensiya, proseso, piskal at hukuman. Walang pangako ng pagbawi o pagbawas ng kaso, mas mababang multa, mas kaunting demerit point, pagtitipid sa premium, pagiging kwalipikado sa insurance o ibang resulta. Ang 48-oras na pangako ay hindi pangako ng resulta. Ang pangakong ibabalik ang bayad na inilarawan sa itaas ay tungkol sa bayad sa serbisyo ng Fabsy; hindi nito ginagarantiya ang alok ng Crown o desisyon ng hukuman."
       },
       "privacy": {
         "title": "8. Pagiging kumpidensiyal",
@@ -311,7 +320,7 @@
       },
       "cancellation": {
         "title": "10. Pagkansela, refund at pagwawakas",
-        "body": "Maaaring wakasan ng alinmang panig ang kasunduan sa pamamagitan ng parehong pagsang-ayon, dahil sa hindi pagbabayad, hindi pagbibigay ng impormasyon o pakikipagtulungan, o kung imposible o hindi praktikal ang representasyon. Makipag-ugnayan agad sa Fabsy upang humiling ng pagkansela. Nakadepende ang refund sa gawaing natapos na, singil ng third party, ipinahayag sa checkout at naaangkop na batas. Kung tatanggihan ng Fabsy ang isang bayad at kumpletong kaso bago magsimula ang makabuluhang gawain, ibabalik ang naaangkop na bayad sa serbisyo. Hindi nililimitahan ang karapatang magkansela na itinakda ng batas."
+        "body": "Maaaring wakasan ng alinmang panig ang kasunduan sa pamamagitan ng parehong pagsang-ayon, dahil sa hindi pagbabayad, hindi pagbibigay ng impormasyon o pakikipagtulungan, o kung imposible o hindi praktikal ang representasyon. Makipag-ugnayan agad sa Fabsy upang humiling ng pagkansela. Hiwalay ang pangakong ibabalik ang bayad sa serbisyo na inilarawan sa itaas sa mga karaniwang refund para sa pagkansela. Para sa mga kahilingan sa pagkansela na wala sa saklaw ng pangakong iyon, nakadepende ang refund sa gawaing natapos na, singil ng third party, ipinahayag sa checkout at naaangkop na batas. Kung tatanggihan ng Fabsy ang isang bayad at kumpletong kaso bago magsimula ang makabuluhang gawain, ibabalik ang naaangkop na bayad sa serbisyo. Hindi nililimitahan ang karapatang magkansela na itinakda ng batas."
       },
       "website": {
         "title": "11. Paggamit ng website",

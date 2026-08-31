@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, BadgeCheck, Bus, FileSearch, ShieldCheck, Truck } from "lucide-react";
 import Header from "@/components/Header";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
 import Footer from "@/components/Footer";
 import StaticJsonLd from "@/components/StaticJsonLd";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +56,7 @@ export default function ProDrivers() {
               <Badge className="border-primary/30 bg-primary/10 text-primary-light">{copy.badge}</Badge>
               <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">{copy.heading}</h1>
               <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200">{copy.intro}</p>
+              <FeeRefundNotice tone="dark" className="mt-6 max-w-2xl" />
               <Button asChild size="lg" className="mt-8 min-h-12 font-bold">
                 <Link to={`${RAPID_RESOLUTION.intakePath}?ticket_type=officer_issued`}>Upload your ticket <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" /></Link>
               </Button>

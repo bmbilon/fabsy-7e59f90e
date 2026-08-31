@@ -23,6 +23,12 @@ function flatten(object, prefix = '') {
 const source = new Map(flatten(english));
 const placeholders = value => [...String(value).matchAll(/{{\s*([^{}]+?)\s*}}/g)].map(match => match[1]).sort();
 const failures = [];
+// The public English promise and its translation source must change together.
+// Otherwise a fee-policy edit could leave an apparently released translation stale.
+const feeRefund = read('src/config/feeRefund.json');
+for (const key of ['headline', 'photoHeadline', 'payment', 'condition', 'photoCondition', 'details', 'scope']) {
+  if (english.feeRefund?.[key] !== feeRefund[key]) failures.push(`en: feeRefund.${key} differs from the canonical public offer`);
+}
 const results = [];
 for (const { code, wave } of registry.locales) {
   if (wave > 1) continue;

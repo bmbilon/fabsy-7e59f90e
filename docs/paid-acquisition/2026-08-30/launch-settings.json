@@ -1,0 +1,87 @@
+{
+  "prepared_on": "2026-08-30",
+  "copy_updated_on": "2026-08-31",
+  "currency": "CAD",
+  "state": "draft_paused_not_imported",
+  "spend_authorized": false,
+  "combined_average_daily_budget_cad": 100,
+  "fourteen_day_planning_amount_cad": 1400,
+  "fourteen_day_planning_amount_is_hard_cap": false,
+  "manual_gates": [
+    "Production landing page and intake work on mobile and desktop",
+    "Published offer, purchase terms, legacy redirects and backend retirement agree",
+    "New service-fee refund promise matches the published offer, terms, consent and checkout: actual full fee paid upfront; Crown offer cuts neither original fine nor demerits; refund within 30 days of Fabsy receiving it; full bundle after Pro discount included; standalone report excluded",
+    "Primary paid RR conversion verified for standalone and bundled orders",
+    "Attribution survives intake, checkout, webhook and return-page abandonment",
+    "Consent, sensitive-data restrictions and platform classification reviewed",
+    "Court/Crown claims match authorized pre-trial scope; no universal court-attendance exemption",
+    "Language copy limited to written intake until consent, checkout and support are service-ready",
+    "Correct Google Ads account, currency, billing and advertiser verification confirmed",
+    "Location inclusion, exclusions and presence targeting reviewed on the account map",
+    "Budget type, budget amount, dates and activation explicitly approved by Brett"
+  ],
+  "settings_to_verify_in_account": {
+    "network": "Google Search only",
+    "search_partners": false,
+    "display_network": false,
+    "positive_keyword_match_types": [
+      "Exact",
+      "Phrase"
+    ],
+    "location_option": "Presence: people in or regularly in targeted locations",
+    "schedule": "All day; set approved start and end dates before activation",
+    "language": "en",
+    "bidding": "Maximize conversions only after the correct paid-order action is verified",
+    "target_cpa_cad": null,
+    "auto_tagging": true,
+    "dynamic_keyword_insertion": false,
+    "automated_text_or_keyword_expansion": false,
+    "remarketing": false,
+    "purchase_counting": "Every; verify transaction-ID deduplication",
+    "attribution_model": "Confirm and document in the chosen conversion action",
+    "click_through_conversion_window": "Confirm and document before activation",
+    "normal_reporting_delay": "Measure before evaluating recent CPA/CAC",
+    "calls_and_uploads": "Secondary only",
+    "report_only_purchases": "Separate from the primary RR acquisition goal"
+  },
+  "locations": [
+    {
+      "campaign": "RR-Pilot-Calgary-202608",
+      "include": "Calgary, Alberta + 40 km",
+      "average_daily_budget_cad": 40,
+      "alternative_total_budget_for_14_days_cad": 560
+    },
+    {
+      "campaign": "RR-Pilot-Edmonton-202608",
+      "include": "Edmonton, Alberta + 40 km",
+      "average_daily_budget_cad": 40,
+      "alternative_total_budget_for_14_days_cad": 560
+    },
+    {
+      "campaign": "RR-Pilot-Alberta-202608",
+      "include": "Alberta",
+      "exclude": "Equivalent Calgary and Edmonton catchments; verify supported exclusion geometry in account",
+      "average_daily_budget_cad": 20,
+      "alternative_total_budget_for_14_days_cad": 280
+    }
+  ],
+  "budget_type_note": "The CSV uses average daily budgets. For a firm total cap, choose campaign total budgets while creating new campaign shells, verify availability, approve dates, and skip the campaign CSV. Total budgets have no daily cap.",
+  "files_are_not_proof_of_account_configuration": true,
+  "copy_revision": "service_fee_refund_offer_20260831",
+  "fee_refund_policy": {
+    "authorized_on": "2026-08-31",
+    "fee_paid_upfront": true,
+    "trigger": "A Crown offer that reduces neither the original fine nor the original demerits",
+    "refund_amount": "Full service fee actually paid, including the full bundled fee after any Pro discount",
+    "refund_deadline_days": 30,
+    "refund_clock_starts": "When Fabsy receives that Crown offer",
+    "standalone_report_covered": false,
+    "legal_outcome_guaranteed": false,
+    "final_offer_required": false,
+    "minimum_reduction_required": false,
+    "customer_claim_deadline": null,
+    "client_must_accept_offer": false,
+    "government_fines_covered": false,
+    "publication_requires_matching_site_terms": true
+  }
+}

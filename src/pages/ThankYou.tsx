@@ -88,7 +88,7 @@ const ThankYou: React.FC = () => {
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">Outcome standard</h2>
             <p className="text-sm text-muted-foreground">
-              {offer.speedDisclaimer} {offer.outcomeDisclaimer}
+              {offer.speedDisclaimer} No legal outcome is guaranteed. Your service-fee refund rights follow the written purchase terms for your order.
             </p>
           </div>
         </div> : null}

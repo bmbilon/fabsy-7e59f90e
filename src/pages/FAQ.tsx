@@ -3,6 +3,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FAQSection from "@/components/FAQSection";
 import useSafeHead from "@/hooks/useSafeHead";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
+import { FEE_REFUND } from "@/config/feeRefund";
 import {
   INSURANCE_IMPACT_REPORT,
   RAPID_RESOLUTION,
@@ -21,7 +23,7 @@ const FAQPage: React.FC = () => {
     },
     {
       q: "Does Fabsy promise a particular result?",
-      a: "No. Ticket outcomes depend on the charge, evidence, procedure, available options, and court. Fabsy does not promise a withdrawal, reduction, demerit result, insurance result, or any other outcome."
+      a: `${FEE_REFUND.payment} ${FEE_REFUND.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.`
     },
     {
       q: "Will disputing a ticket affect my insurance?",
@@ -69,6 +71,7 @@ const FAQPage: React.FC = () => {
           <p className="text-lg text-white/80 mb-8">
             Clear answers about Rapid Resolution, timing, pricing, service scope, and insurance planning.
           </p>
+          <FeeRefundNotice tone="dark" className="mb-8" />
           <FAQSection faqs={faqs} pageName="FAQ" pageUrl="https://fabsy.ca/faq" />
         </div>
       </section>

@@ -1,0 +1,133 @@
+{
+  "recorded_on": "2026-08-31",
+  "source_recorded_at": "2026-08-31T14:07:08.434883+00:00",
+  "status": "production_google_activation_verified_paid_receipt_unverified",
+  "documentation_scope": "Read-only summary of the release-owner records and independent owner verification; this docs correction performs no browser, provider, payment or deployment action.",
+  "source_records": [
+    {
+      "filename": "production-publication.json",
+      "sha256": "cd3d016a3443f95d26d67eed1fa899e71cd1d6d61cdb4276b6575ae890f45c0b",
+      "storage": "Local release evidence, not copied into this repository"
+    },
+    {
+      "filename": "independent-tag-assistant.json",
+      "sha256": "54ad49c089ddf68bcd965ad4c83fff0d7f4dfb1863c64561bf7ef20c72b2da5a",
+      "storage": "Local release evidence, not copied into this repository"
+    }
+  ],
+  "publication": {
+    "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+    "generated_main_commit": "cd5eef208e4ade776e4a947278dbad29edae77f0",
+    "production_site": "https://fabsy.ca/",
+    "pages_deployment_id": "fa1d2d1a-e7d2-47ef-98c5-3a3fdd6af739",
+    "pages_deployment_url": "https://fa1d2d1a.fabsy-9qa.pages.dev",
+    "deployed_at": "2026-08-31T13:39:03Z",
+    "asset_path": "/assets/index-7BSE-DuM.js",
+    "asset_sha256": "31357ba0cd3dc639b2e137c767ace06f1912735e5d6e1121ee71bfa046e25aed",
+    "ci": [
+      {
+        "name": "Build and Deploy",
+        "run_id": 33397537321,
+        "conclusion": "success",
+        "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+        "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33397537321"
+      },
+      {
+        "name": "Prerender refresh",
+        "run_id": 33397537324,
+        "conclusion": "success",
+        "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+        "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33397537324"
+      },
+      {
+        "name": "Validate FAQ parity",
+        "run_id": 33397537305,
+        "conclusion": "success",
+        "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
+        "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33397537305"
+      }
+    ]
+  },
+  "measurement": {
+    "ga4_id": "G-26G8CMWTKY",
+    "ads_id": "AW-18419256057",
+    "rapid_resolution_label": "MyAbCPiLj-scEPmV_s5E",
+    "photo_radar_label": "TEo-CJH0kescEPmV_s5E",
+    "production_build_gate_enabled": true,
+    "explicit_consent_required": true,
+    "consent_defaults": {
+      "ad_storage": "denied",
+      "analytics_storage": "denied",
+      "ad_user_data": "denied",
+      "ad_personalization": "denied"
+    },
+    "consent_after_opt_in": {
+      "ad_storage": "granted",
+      "analytics_storage": "granted",
+      "ad_user_data": "granted",
+      "ad_personalization": "denied"
+    },
+    "private_intake_untagged_observed": true,
+    "paid_actions": "Secondary, unchanged",
+    "primary_action_change": false
+  },
+  "verification": {
+    "real_google_request_capture": {
+      "context": "Isolated pre-release harness against real configured Google properties; not production-browser request capture",
+      "checks": 11,
+      "passed": 11,
+      "failures": 0,
+      "anonymous_ga4_page_views": 15
+    },
+    "independent_live_tag_assistant": {
+      "connected": true,
+      "observed_tags": [
+        "G-26G8CMWTKY / GT-WFFLZ6X8",
+        "AW-18419256057"
+      ],
+      "observed_hit": "GA4 Page View",
+      "consent_table_confirmed": true,
+      "private_intake_google_scripts": 0,
+      "private_intake_referrer": "",
+      "public_destinations_restored_on_return": true
+    }
+  },
+  "cleanup": {
+    "tag_assistant_stopped": true,
+    "measurement_permission_withdrawn": true,
+    "clean_home_reload": true,
+    "google_script_elements_after_withdrawal": 0,
+    "document_referrer_after_withdrawal": "",
+    "tag_assistant_tab_closed": true
+  },
+  "remaining_gates": {
+    "actual_paid_purchase_receipt_verified": false,
+    "actual_paid_attribution_verified": false,
+    "fee_refund_website_release_verified": false,
+    "fee_refund_website_status": "Website publication pending; release owner reports capture-guard validation passed before this handoff",
+    "advertising_budget_approved": false,
+    "total_advertising_test_cap_approved": false,
+    "campaign_activation_authorized": false,
+    "fee_refund_capture_guard_validation_reported_passed": true
+  },
+  "actions_not_performed": [
+    "Ad campaigns or spend",
+    "Budgets or bidding",
+    "Audiences or remarketing",
+    "Enhanced conversions",
+    "Real or fabricated purchase/conversion submission",
+    "Customer form or upload",
+    "Checkout or payment",
+    "Refund",
+    "Email"
+  ],
+  "limitations": [
+    "Pre-release enabled-tag tests recorded anonymous page visits in the real configured Google properties.",
+    "No actual paid conversion ingestion, matching or attribution has been exercised.",
+    "Production browser verification used read-only DOM; raw request capture is in the separate isolated pre-release real-Google harness.",
+    "Native browser back-forward cache restoration was not observed under request interception; its consent event branch passed the separate regression suite.",
+    "Tag Assistant observed a GA4 Page View, not a Purchase. No real paid conversion ingestion, matching or attribution was tested.",
+    "The earlier Photo provider setup receipt and release-owner report remain historical; this activation record supersedes their no-tag/deployment-pending status without rewriting them.",
+    "The existing Cloudflare beacon is unchanged; this is not a claim about every analytics service."
+  ]
+}

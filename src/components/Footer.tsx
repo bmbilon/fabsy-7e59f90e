@@ -10,6 +10,7 @@ import {
   RAPID_RESOLUTION,
 } from "@/config/offers";
 import PricingLadder from "./PricingLadder";
+import { FEE_REFUND } from "@/config/feeRefund";
 
 const Footer = () => {
   const { locale } = useLocale();
@@ -28,6 +29,7 @@ const Footer = () => {
       { name: "Privacy Policy", path: "/privacy-policy" },
       { name: "Terms of Purchase", path: "/terms-of-purchase" },
       { name: "Terms of Service", path: "/terms-of-service" },
+      { name: "Fee-refund guarantee", path: FEE_REFUND.termsPath },
     ],
     support: [
       { name: `Photo Radar ($${PHOTO_RADAR.priceCad} + GST)`, path: PHOTO_RADAR.slug },

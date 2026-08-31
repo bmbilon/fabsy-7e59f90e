@@ -14,6 +14,7 @@ const browserFragments = require('./fixtures/public-offer-browser-fragments.json
 const { redactPublicOfferSnapshot, assertPublicOfferSources } = require('./public-offer-snapshot-guardrail.cjs');
 const { renderProDrivers, renderRefer, publicContent } = require('./generate-pro-referral-snapshots.cjs');
 const { renderPhotoRadar, renderFleet, renderFreeCheck, generatePhotoRadarSnapshots } = require('./generate-photo-radar-snapshots.cjs');
+const feeRefund = require('../src/config/feeRefund.json');
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'fabsy-public-offer-guards-'));
 const compact = value => String(value ?? '').replace(/\s+/g, '');
@@ -139,21 +140,113 @@ try {
       import ProDrivers from './src/pages/ProDrivers';
       import Refer from './src/pages/Refer';
       import Terms from './src/pages/TermsOfService';
+      import TermsOfPurchase from './src/pages/TermsOfPurchase';
+      import RapidResolution from './src/pages/RapidResolution';
+      import FAQ from './src/pages/FAQ';
+      import FeeRefundNotice from './src/components/FeeRefundNotice';
+      import Footer from './src/components/Footer';
       import PricingLadder from './src/components/PricingLadder';
       import PhotoRadarOfferStrip from './src/components/PhotoRadarOfferStrip';
-      const pages = { '/photo-radar': PhotoRadar, '/fleet': Fleet, '/free-ticket-check': FreeTicketCheck, '/pro-drivers': ProDrivers, '/refer': Refer, '/terms-of-service': Terms, '/ladder': PricingLadder, '/strip': PhotoRadarOfferStrip };
-      export function render(route) { const Page = pages[route]; return renderToStaticMarkup(<StaticRouter location={route}><Page /></StaticRouter>); }
+      import { createInstance } from 'i18next';
+      import { I18nextProvider } from 'react-i18next';
+      import en from './src/i18n/locales/en.json';
+      const i18n = createInstance();
+      i18n.init({ lng: 'en', fallbackLng: 'en', initImmediate: false, resources: { en: { translation: en } } });
+      const pages = { '/photo-radar': PhotoRadar, '/fleet': Fleet, '/free-ticket-check': FreeTicketCheck, '/pro-drivers': ProDrivers, '/refer': Refer, '/terms-of-service': Terms, '/terms-of-purchase': TermsOfPurchase, '/rapid-resolution': RapidResolution, '/faq': FAQ, '/footer': Footer, '/ladder': PricingLadder, '/strip': PhotoRadarOfferStrip,
+        '/refund-notice': FeeRefundNotice, '/photo-refund-notice': () => <FeeRefundNotice photoRadar /> };
+      export function render(route) { const Page = pages[route]; return renderToStaticMarkup(<I18nextProvider i18n={i18n}><StaticRouter location={route}><Page /></StaticRouter></I18nextProvider>); }
     ` },
     bundle: true, platform: 'node', format: 'cjs', jsx: 'automatic', outfile: bundle, logLevel: 'silent',
     plugins: [{ name: 'offline-public-pages', setup(builder) {
       builder.onResolve({ filter: /^@\/components\/(?:Header|Footer)$/ }, args => ({ path: args.path, namespace: 'navigation' }));
       builder.onLoad({ filter: /.*/, namespace: 'navigation' }, () => ({ contents: 'export default function Navigation() { return null; }', loader: 'js' }));
+      // Render the real English Footer while keeping its unused localized
+      // branch (which requires Vite's locale loader) outside this Node test.
+      builder.onResolve({ filter: /^\.\/LocalizedNavigation$/ }, args => args.importer === path.join(ROOT, 'src/components/Footer.tsx')
+        ? { path: args.path, namespace: 'unused-localized-footer' } : null);
+      builder.onLoad({ filter: /.*/, namespace: 'unused-localized-footer' }, () => ({ contents: 'export function LocalizedFooter() { throw new Error("This regression must render the real English Footer"); }', loader: 'js' }));
       builder.onResolve({ filter: /^@\/integrations\/supabase\/client$/ }, args => ({ path: args.path, namespace: 'no-network' }));
       builder.onLoad({ filter: /.*/, namespace: 'no-network' }, () => ({ contents: 'export const supabase = new Proxy({}, { get() { throw new Error("Network access is forbidden in public-page tests"); } });', loader: 'js' }));
     } }],
   });
   const actual = require(bundle);
   for (const route of routes.keys()) accepted(actual.render(route), route, `${route}: actual React output`);
+  const footer = actual.render('/footer');
+  accepted(footer, '/about', 'Actual Footer admits only its exact Legal navigation entry');
+  accepted(`<main>${footer}</main>`, '/about', 'Exact footer navigation works when the page main encloses the footer');
+  for (const [label, change] of [
+    ['wrong destination', html => html.replace(feeRefund.termsPath, '/submit-ticket')],
+    ['wrong heading', html => html.replace('>Legal</h3>', '>Services</h3>')],
+    ['appended claim', html => html.replace('Fee-refund guarantee</a>', 'Fee-refund guarantee. We guarantee a withdrawal.</a>')],
+    ['hidden child', html => html.replace('Fee-refund guarantee</a>', 'Fee-refund guarantee<span hidden>We guarantee a withdrawal.</span></a>')],
+    ['hidden sibling', html => html.replace('Fee-refund guarantee</a></li>', 'Fee-refund guarantee</a><span hidden>We guarantee a withdrawal.</span></li>')],
+    ['accessibility claim', html => html.replace(`href="${feeRefund.termsPath}"`, `aria-label="We guarantee a withdrawal" href="${feeRefund.termsPath}"`)],
+  ]) {
+    const changed = change(footer);
+    assert.notEqual(changed, footer, `Footer ${label}: mutation applies`);
+    rejected(changed, '/about', `Footer ${label} cannot inherit the navigation exception`);
+  }
+  rejected(footer.replace(/<footer\b/g, '<section').replace(/<\/footer>/g, '</section>'), '/about', 'The exact link is not an exception outside the footer');
+  rejected(footer, '/pa/', 'English footer exception does not bypass localized source checks');
+  const visibleFaqDom = new JSDOM(actual.render('/faq'));
+  const refundQuestion = [...visibleFaqDom.window.document.querySelectorAll('h3')].find(node => node.textContent === 'Does Fabsy promise a particular result?');
+  assert(refundQuestion);
+  const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [{ '@type': 'Question', name: refundQuestion.textContent,
+    acceptedAnswer: { '@type': 'Answer', text: refundQuestion.nextElementSibling.innerHTML } }] };
+  visibleFaqDom.window.close();
+  const schemaMarkup = value => `<script type="application/ld+json">${JSON.stringify(value)}</script>`;
+  accepted(schemaMarkup(faqSchema), '/faq', 'Actual FAQ answer HTML is the exact paragraph serialization emitted by FAQSchema');
+  for (const [from, to] of [['30 days', '60 days'], ['<p>', '<p hidden>'], ['</p>', '</p><p>We guarantee a withdrawal.</p>']]) {
+    const changed = structuredClone(faqSchema);
+    changed.mainEntity[0].acceptedAnswer.text = changed.mainEntity[0].acceptedAnswer.text.replace(from, to);
+    rejected(schemaMarkup(changed), '/faq', 'Changed or extended HTML cannot inherit the exact FAQ paragraph admission');
+  }
+  const notice = `<main>${actual.render('/refund-notice')}</main>`;
+  for (const route of ['/', '/rapid-resolution', '/faq', '/terms-of-service', '/terms-of-purchase']) {
+    accepted(notice, route, `${route}: exact component keeps Crown trigger, upfront payment and details together`);
+  }
+  for (const [label, mutate] of [
+    ['wrong refund window', html => html.replace('30 days', '60 days')],
+    ['wrong clock start', html => html.replace('of receiving that offer', 'after checkout')],
+    ['omitted upfront disclosure', html => html.replace(feeRefund.payment, '')],
+    ['legal result guarantee', html => html.replace(feeRefund.payment, 'Your withdrawal is guaranteed.')],
+    ['wrong terms destination', html => html.replace(feeRefund.termsPath, '/submit-ticket')],
+    ['wrong service marker', html => html.replace('data-fee-refund-notice="ticket-representation"', 'data-fee-refund-notice="photo-radar"')],
+    ['missing marker', html => html.replace('data-fee-refund-notice=', 'data-other-notice=')],
+    ['hidden qualification', html => html.replace(`<p class=`, `<p hidden class=`)],
+    ['added legal amount', html => html.replace('</aside>', '<p>The statutory fine is $79.</p></aside>')],
+    ['added outcome claim', html => html.replace('</aside>', '<p>We guarantee a withdrawal.</p></aside>')],
+    ['accessibility outcome claim', html => html.replace('<aside ', '<aside aria-label="We guarantee a withdrawal" ')],
+  ]) {
+    const changed = mutate(notice);
+    assert.notEqual(changed, notice, `${label}: mutation applied`);
+    rejected(changed, '/rapid-resolution', `Refund component rejects ${label}`);
+  }
+  rejected(notice.replace('</main>', notice + '</main>'), '/rapid-resolution', 'Duplicate notices do not inherit admission');
+  rejected(notice, '/insurance-damage-report', 'Ticket-refund promise cannot migrate to the standalone report');
+  rejected(notice, '/pa/', 'English component exception does not bypass localized copy checks');
+  for (const route of ['/rapid-resolution', '/faq', '/terms-of-purchase']) accepted(actual.render(route), route, `${route}: actual updated refund page`);
+  const photoRefundPage = actual.render('/photo-radar');
+  rejected(photoRefundPage.replace(feeRefund.photoCondition, feeRefund.condition), '/photo-radar', 'Photo Radar must retain its fine-only refund trigger');
+  rejected(photoRefundPage.replace(feeRefund.photoHeadline, feeRefund.headline), '/photo-radar', 'Photo Radar must retain its owner-notice headline');
+  // These pages emit JSON-LD during SSR. FAQSection installs its schema in a
+  // browser effect, so its actual rendered copy is checked above instead.
+  for (const route of ['/photo-radar', '/rapid-resolution']) {
+    const html = actual.render(route);
+    for (const mutation of ['window', 'added']) {
+      const changed = edit(html, document => {
+        const script = [...document.querySelectorAll('script[type="application/ld+json"]')].find(node => JSON.parse(node.textContent)['@type'] === 'FAQPage');
+        assert(script, `${route}: source FAQ schema exists`);
+        const schema = JSON.parse(script.textContent);
+        const question = schema.mainEntity.find(entry => entry.acceptedAnswer.text.includes('30 days'));
+        assert(question, `${route}: refund FAQ exists`);
+        if (mutation === 'window') question.acceptedAnswer.text = question.acceptedAnswer.text.replace('30 days', '60 days');
+        else question.acceptedAnswer.extraClaim = 'We guarantee a withdrawal.';
+        script.textContent = JSON.stringify(schema);
+      });
+      rejected(changed, route, `${route}: ${mutation} schema claim cannot inherit the exact refund answer`);
+    }
+  }
   const ladder = `<footer>${actual.render('/ladder')}</footer>`;
   accepted(ladder, '/rapid-resolution', 'Actual fully qualified officer navigation/pricing ladder');
   rejected(ladder.replace('Verified Alberta licence. Officer-issued tickets only.', ''), '/rapid-resolution', 'Bare footer discount cannot pass');
@@ -180,7 +273,7 @@ try {
   const termsDom = new JSDOM(actual.render('/terms-of-service'));
   const termsDocument = termsDom.window.document;
   const retained = [...termsDocument.querySelectorAll('section')].filter(section =>
-    ['photo-radar-terms', 'pro-driver-terms', 'referral-terms'].includes(section.id) || section.querySelector('h2')?.textContent === '5. Fees and Payment');
+    ['photo-radar-terms', 'pro-driver-terms', 'referral-terms', 'fee-refund-guarantee'].includes(section.id) || section.querySelector('h2')?.textContent === '5. Fees and Payment');
   // Existing ordinary prices and the four original terms clauses retain the
   // independent legacy regression suite. This fixture tests the additions.
   const priceSection = retained.find(section => section.querySelector('h2')?.textContent === '5. Fees and Payment');
@@ -192,6 +285,11 @@ try {
     rejected(newTerms.replaceAll(from, to), '/terms-of-service', `Terms mutation ${from} -> ${to}`);
   }
   rejected(newTerms.replace('pro-driver-terms', 'unrelated-terms'), '/terms-of-service', 'Exact source paragraph requires its correct section');
+  rejected(newTerms.replace('id="fee-refund-guarantee"', 'id="unrelated-terms"'), '/terms-of-service', 'Refund clauses require the correct source section');
+  rejected(newTerms.replace(feeRefund.payment, ''), '/terms-of-service', 'Refund terms cannot omit the upfront-payment and no-outcome disclosure');
+  rejected(newTerms.replace('does not start at checkout', 'starts at checkout'), '/terms-of-service', 'The refund clock cannot become a case outcome deadline');
+  rejected(newTerms.replace('Work performed and payment-processing costs do not reduce', 'Work performed and payment-processing costs reduce'), '/terms-of-service', 'The promised fee cannot acquire an unapproved processing/work deduction');
+  rejected(newTerms.replace('You do not have to accept a Crown offer or plead guilty', 'You have to accept a Crown offer or plead guilty'), '/terms-of-service', 'Refund cannot silently require accepting the Crown offer');
   rejected(newTerms.replace('service discount and corresponding GST to the original payment method.', 'service discount and corresponding GST to the original payment method. This is also an insurance saving.'), '/terms-of-service', 'Appended legal meaning cannot inherit a source clause');
   rejected(newTerms.replace('</main>', '<p>Your response deadline is August 31, 2026.</p></main>'), '/terms-of-service', 'The metadata date is not admitted as a court deadline');
   rejected(newTerms, '/about', 'Terms exemptions cannot migrate to another route');

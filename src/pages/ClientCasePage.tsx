@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { FileSearch, ShieldCheck } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { FEE_REFUND } from "@/config/feeRefund";
 import IdrAccessGate from "@/components/idr/IdrAccessGate";
 import { supabase } from "@/integrations/supabase/client";
 import { IDR_DISCLAIMER, IDR_PRICE_ADDON, IDR_PRICE_STANDALONE } from "@/config/idr";
@@ -127,7 +128,17 @@ function CaseContent({ caseId }: { caseId: string }) {
             </Alert>
           ) : caseRecord.ticket_type === "photo_radar" ? (
             <div className="space-y-6">
-              <div><Badge>Rapid Resolution: Photo Radar</Badge><h2 className="mt-4 text-2xl font-bold">Only the fine is on the table</h2><p className="mt-3 text-muted-foreground">No demerits. No insurance impact. Your service is $79 + 5% GST ($82.95 total), with no trial or success fee. No reduction is promised and the fee is not refunded based on outcome.</p><p className="mt-3 text-sm text-muted-foreground">{PHOTO_RADAR.actionCommitment} {PHOTO_RADAR.speedDisclaimer}</p></div>
+              <div>
+                <Badge>Rapid Resolution: Photo Radar</Badge>
+                <h2 className="mt-4 text-2xl font-bold">Only the fine is on the table</h2>
+                <p className="mt-3 text-muted-foreground">No demerits. No insurance impact. Your service is $79 + 5% GST ($82.95 total), paid upfront, with no trial or success surcharge.</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  No legal outcome is guaranteed. Your service-fee refund rights follow the written purchase terms for your order.{" "}
+                  <Link to={FEE_REFUND.termsPath} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-4">Current fee-refund terms</Link>{" "}
+                  do not replace the terms of an existing order.
+                </p>
+                <p className="mt-3 text-sm text-muted-foreground">{PHOTO_RADAR.actionCommitment} {PHOTO_RADAR.speedDisclaimer}</p>
+              </div>
               {caseRecord.case_outcome ? <p className="rounded-lg border p-4">Recorded outcome: {caseRecord.case_outcome.replace(/_/g, " ")}. No Insurance Impact Report is needed for this registered-owner notice.</p> : <AteClientOffers key={caseRecord.id} submissionId={caseRecord.id} />}
             </div>
           ) : !caseRecord.verdict ? (
@@ -164,7 +175,7 @@ function CaseContent({ caseId }: { caseId: string }) {
               <div>
                 <Badge>Pre-trial review can proceed</Badge>
                 <h2 className="mt-4 text-3xl font-bold">Fabsy can advance the next authorized step</h2>
-                <p className="mt-3 text-muted-foreground">Rapid Resolution is ${RAPID_RESOLUTION.priceCad} CAD plus GST for eligible pre-trial matters. Trial representation and government fines are separate. {RAPID_RESOLUTION.outcomeDisclaimer}</p>
+                <p className="mt-3 text-muted-foreground">Rapid Resolution is ${RAPID_RESOLUTION.priceCad} CAD plus GST for eligible pre-trial matters. Trial representation and government fines are separate. No legal outcome is guaranteed. Your service-fee refund rights follow the written purchase terms for your order.</p>
               </div>
               {hasIdr ? (
                 <Button asChild><Link to="/portal/insurance-reports">Open your IDR order</Link></Button>
