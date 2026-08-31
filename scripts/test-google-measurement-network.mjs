@@ -6,7 +6,8 @@
  * Both modes serve unchanged application GET bytes from --dist at the real
  * production origin; all APIs, Supabase, payments and other hosts are blocked.
  * No analytics events, paid receipts, consent storage or router calls are
- * injected. Test actions are existing UI clicks and synthetic text entry only.
+ * injected. Test actions use existing UI controls, synthetic text and a local
+ * synthetic PDF attachment; no file or form is submitted to a service.
  */
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -144,6 +145,28 @@ function leakedValues(payload, needles) {
     const variants = [value, Buffer.from(value).toString('base64'), Buffer.from(value).toString('base64url'), sha256(value), sha256(value.trim().toLowerCase())].map(item => item.toLowerCase());
     return variants.some(variant => decoded.some(text => text.includes(variant)));
   });
+}
+
+function syntheticTicketPdf() {
+  // A valid, blank one-page PDF exercises the supported manual-review path.
+  // It contains no client data and never needs an OCR/backend request.
+  const objects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] /Contents 4 0 R >>',
+    '<< /Length 0 >>\nstream\nendstream',
+  ];
+  let pdf = '%PDF-1.4\n% Synthetic offline fixture; never submit.\n';
+  const offsets = objects.map((object, index) => {
+    const offset = Buffer.byteLength(pdf);
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+    return offset;
+  });
+  const xref = Buffer.byteLength(pdf);
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (const offset of offsets) pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  return { name: 'synthetic-measurement-ticket.pdf', mimeType: 'application/pdf', buffer: Buffer.from(pdf) };
 }
 
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff': 'font/woff', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8' };
@@ -300,7 +323,7 @@ async function isolatedContext({ holdLoader = false, locale = 'en-CA' } = {}) {
       if (!recordedBlocked && document.querySelector('main[aria-busy="true"]')) {
         recordedBlocked = true; record({ kind: 'blocked-dom' });
       }
-      if (!recordedPrivate && document.querySelector('#ticketNumber, #firstName, #fleet-company, form #message')) {
+      if (!recordedPrivate && document.querySelector('#ticketNumber, #firstName, #fleet-company, form #message, form input[type="file"][accept*="application/pdf"]')) {
         recordedPrivate = true; record({ kind: 'private-dom', tagPresent: Boolean(document.getElementById('fabsy-google-tag')) });
       }
     });
@@ -406,7 +429,14 @@ async function untagged(page, documentId, observationMs = 1000) {
 }
 async function fillPrivate(page, pathname) {
   if (pathname === '/contact') { await page.locator('#name').fill(privateValues[0]); await page.locator('#email').fill(privateValues[1]); await page.locator('#message').fill(privateValues[2]); }
-  else if (pathname === '/submit-ticket') { await page.locator('#ticketNumber').fill(privateValues[3]); await page.locator('#location').fill(privateValues[2]); }
+  else if (pathname === '/submit-ticket') {
+    // Capture must finish before the production form reveals private fields.
+    // A PDF opens manual review locally while all service requests stay blocked.
+    await page.locator('form input[type="file"][accept*="application/pdf"]').setInputFiles(syntheticTicketPdf());
+    await page.locator('#ticketNumber').waitFor({ state: 'visible' });
+    await page.locator('#ticketNumber').fill(privateValues[3]);
+    await page.locator('#location').fill(privateValues[2]);
+  }
   else if (pathname === '/fleet') { await page.locator('#fleet-company').fill(privateValues[0]); await page.locator('#fleet-email').fill(privateValues[1]); await page.locator('#fleet-notes').fill(privateValues[2]); }
 }
 function safeOldDocument(documentId, target) {
