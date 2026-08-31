@@ -65,11 +65,19 @@ export function isLocaleReleased(code, review, expected) {
   const legalSourcesMatch = sourceDocuments && LEGAL_SOURCE_DOCUMENT_PATHS.every(file =>
     typeof sourceDocuments[file] === 'string' && sourceDocuments[file] && entry?.sourceDocuments?.[file] === sourceDocuments[file],
   );
-  return Boolean(
-    entry?.status === 'approved' &&
+  const reviewedRelease = entry?.status === 'approved' &&
     typeof entry.reviewedBy === 'string' && entry.reviewedBy.trim() &&
     typeof entry.reviewedAt === 'string' && Number.isFinite(Date.parse(entry.reviewedAt)) &&
-    entry.serviceReady === true &&
+    entry.serviceReady === true;
+  // Publication is a separate owner decision, not evidence of native review or
+  // staffed language support. Both release paths bind the exact published copy.
+  const publication = entry?.publication;
+  const ownerPublication = entry?.status === 'published' &&
+    publication?.basis === 'owner_authorized_machine_translation' &&
+    typeof publication.authorizedBy === 'string' && publication.authorizedBy.trim() &&
+    typeof publication.authorizedAt === 'string' && Number.isFinite(Date.parse(publication.authorizedAt));
+  return Boolean(
+    (reviewedRelease || ownerPublication) &&
     legalSourcesMatch &&
     review.sourceVersion === expected?.sourceVersion &&
     typeof expected?.sourceFingerprint === 'string' && expected.sourceFingerprint &&

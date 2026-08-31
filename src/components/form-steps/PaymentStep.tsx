@@ -53,7 +53,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
   const { locale, isReleased, href } = useLocale();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [selectedIdrAddon, setIncludeIdrAddon] = useState(false);
-  // The report intake is still English. Offer the reviewed RR service alone on
+  // The report intake is still English. Offer the released RR service alone on
   // localized checkout instead of silently handing off an untranslated add-on.
   const includeIdrAddon = locale === "en" && selectedIdrAddon;
   const [isProcessing, setIsProcessing] = useState(false);

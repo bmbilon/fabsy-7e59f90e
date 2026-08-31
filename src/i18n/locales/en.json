@@ -36,10 +36,12 @@
     "dismiss": "Keep my current language",
     "draftTitle": "Translation preview — review pending",
     "draftBody": "This translation is a draft and has not been approved by a native reviewer. Before purchasing or giving consent, read the English terms or contact Fabsy for clarification.",
-    "englishControls": "The English terms control if the translation differs. This draft does not change the English agreement or limit rights under applicable law.",
+    "englishControls": "The English terms control if the translation differs. This translation does not change the English agreement or limit rights under applicable law.",
     "readEnglish": "Read the English version",
-    "paymentBlocked": "Purchasing and authorization in this language are not available until translation review and language support are confirmed. You may continue in English.",
-    "continueEnglish": "Continue in English"
+    "paymentBlocked": "Purchasing and authorization are temporarily unavailable in this language. You may continue in English.",
+    "continueEnglish": "Continue in English",
+    "translationNoteTitle": "Welcome — write to us in your language.",
+    "translationNoteBody": "This page uses machine translation. We may use translation tools for messages; replies and official documents are currently in English. English terms control."
   },
   "home": {
     "metaTitle": "Alberta traffic ticket help | Fabsy",
@@ -141,21 +143,21 @@
       },
       "language": {
         "question": "Can I write in my language?",
-        "answer": "You may write your account in your preferred language. Ask Fabsy to confirm available language assistance before relying on it. A translated website does not mean a speaker of that language is available by phone."
+        "answer": "Yes. You can write your account or question in your preferred language. We may use translation tools to read it. Replies and official documents are currently in English; phone assistance in your language is not guaranteed."
       }
     }
   },
   "contact": {
     "metaTitle": "Contact Fabsy | Alberta ticket help",
     "title": "Start with a written question",
-    "description": "You can email a question in your preferred language. Include your deadline and ask what language assistance is available.",
+    "description": "Email your question in your preferred language and include any deadline on your ticket.",
     "messageLabel": "Your message",
     "messageHint": "Write in your preferred language. Do not send card details or unnecessary identity documents.",
     "submit": "Send message",
-    "availability": "Language support and response times must be confirmed. WhatsApp and phone service in this language are not currently promised.",
+    "availability": "We may use translation tools to read your message. Replies and official documents are currently in English.",
     "emailCta": "Email {{email}}",
     "whatsappCta": "Text us in your language on WhatsApp",
-    "staffAvailability": "Ask which language support is available before calling.",
+    "staffAvailability": "We may use translation tools to read your message. Replies and official documents are currently in English.",
     "whatsappHint": "Send a written message in your preferred language. Do not send payment-card details."
   },
   "intake": {

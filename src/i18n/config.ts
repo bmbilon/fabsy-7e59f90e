@@ -60,11 +60,11 @@ export function localeIsReleased(locale: LocaleCode) {
   });
 }
 
-// Unreviewed dictionaries remain lazy. Only an approved candidate needs loading
-// to check its fingerprint before it can be offered as a public language.
+// Load explicitly published or reviewed candidates to verify their fingerprints
+// before offering them publicly. Unpublished drafts remain lazy.
 export async function loadReleaseCandidates() {
   const candidates = Object.entries(review.locales)
-    .filter(([, entry]) => entry.status === 'approved')
+    .filter(([, entry]) => entry.status === 'approved' || entry.status === 'published')
     .map(([code]) => loadLocale(code as LocaleCode));
   await Promise.allSettled(candidates);
 }

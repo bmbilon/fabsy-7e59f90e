@@ -49,6 +49,36 @@ for (const patch of [{ status: 'draft' }, { serviceReady: false }, { reviewedBy:
   assert.equal(isLocaleReleased('pa', { ...approval, locales: { pa: { ...approval.locales.pa, ...patch } } }, expected), false);
 }
 
+// The owner may publish machine translations without asserting that a native
+// reviewer or staffed language service exists. The exact-copy checks still hold.
+const ownerPublication = {
+  sourceVersion: expected.sourceVersion,
+  locales: Object.fromEntries(WAVE_ONE_LOCALES.filter(code => code !== 'en').map(code => [code, {
+    status: 'published', reviewedBy: null, reviewedAt: null, serviceReady: false,
+    sourceFingerprint: expected.sourceFingerprint, bundleFingerprint: expected.bundleFingerprint, sourceDocuments,
+    publication: { basis: 'owner_authorized_machine_translation', authorizedBy: 'Offline fixture owner', authorizedAt: '2026-08-31T00:00:00Z' },
+  }])),
+};
+for (const code of WAVE_ONE_LOCALES.filter(code => code !== 'en')) {
+  assert.equal(isLocaleReleased(code, ownerPublication, expected), true, `${code} owner publication must work without a claimed native review`);
+  assert.equal(ownerPublication.locales[code].reviewedBy, null);
+  assert.equal(ownerPublication.locales[code].serviceReady, false);
+}
+for (const patch of [{ publication: undefined }, { status: 'draft' }, { sourceFingerprint: 'stale' }, { bundleFingerprint: 'stale' }, { sourceDocuments: incompleteDocuments }]) {
+  const record = { ...ownerPublication, locales: { ...ownerPublication.locales, pa: { ...ownerPublication.locales.pa, ...patch } } };
+  assert.equal(isLocaleReleased('pa', record, expected), false, 'Publishing must not waive the explicit authorization or exact-copy checks');
+}
+for (const patch of [{ basis: 'automatic' }, { authorizedBy: '' }, { authorizedAt: 'invalid' }]) {
+  const entry = ownerPublication.locales.pa;
+  const record = { ...ownerPublication, locales: { pa: { ...entry, publication: { ...entry.publication, ...patch } } } };
+  assert.equal(isLocaleReleased('pa', record, expected), false);
+}
+for (const file of LEGAL_SOURCE_DOCUMENT_PATHS) {
+  assert.equal(isLocaleReleased('pa', ownerPublication, { ...expected, sourceDocuments: { ...sourceDocuments, [file]: 'changed agreement' } }), false);
+}
+assert.equal(isLocaleReleased('ur', ownerPublication, expected), false);
+assert.equal(isLocaleReleased('pa', ownerPublication, { ...expected, sourceVersion: 'changed source version' }), false);
+
 const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'fabsy-i18n-tests-'));
 try {
   const runtimeFile = path.join(temporary, 'locale-instance.cjs');
@@ -160,4 +190,4 @@ try {
 } finally {
   await fs.rm(temporary, { recursive: true, force: true });
 }
-console.log('i18n runtime dictionaries, routing, English purchase handoffs, language negotiation, three-document review gates and intake validation passed.');
+console.log('i18n runtime dictionaries, routing, English purchase handoffs, language negotiation, reviewed/owner publication gates and intake validation passed.');

@@ -543,7 +543,11 @@ serve(async (req) => {
       email: email(body.email),
       phone: phone(body.phone),
     };
-    requireReleasedServiceLocale(purchaser.preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
+    requireReleasedServiceLocale(
+      purchaser.preferredLocale,
+      Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
+      Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
+    );
     if (type === "addon" && !purchaser.ticketSubmissionId) {
       throw new RequestError(
         "The $31 add-on requires an active ticket case.",

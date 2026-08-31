@@ -40,18 +40,19 @@ for (const { code, wave } of registry.locales) {
   const bundleFingerprint = fingerprint(bundle);
   const released = isLocaleReleased(code, review, { sourceVersion: registry.sourceVersion, sourceFingerprint, bundleFingerprint, sourceDocuments });
   if (review.locales[code]?.status === 'approved' && !released) failures.push(`${code}: approval is incomplete/stale or service is not ready`);
+  if (review.locales[code]?.status === 'published' && !released) failures.push(`${code}: owner publication is incomplete or its source/bundle fingerprints are stale`);
   if (code !== 'en' && released) {
     for (const [file, hash] of Object.entries(sourceDocuments)) {
       if (review.locales[code]?.sourceDocuments?.[file] !== hash) failures.push(`${code}: English legal source changed or was not attested: ${file}`);
     }
   }
-  results.push({ locale: code, strings: strings.size, state: released ? 'released' : 'draft', bundleFingerprint });
+  results.push({ locale: code, strings: strings.size, state: released ? 'released' : 'draft', releaseBasis: review.locales[code]?.publication?.basis || review.locales[code]?.status, bundleFingerprint });
 }
 if (JSON.stringify(registry.locales.filter(item => item.wave <= 1).map(item => item.code)) !== JSON.stringify(WAVE_ONE_LOCALES)) failures.push('Wave 1 registry and route policy differ');
 if (review.sourceVersion !== registry.sourceVersion) failures.push('Registry and review source versions differ');
 
 if (process.argv.includes('--review-values')) console.log(JSON.stringify({ sourceVersion: registry.sourceVersion, sourceFingerprint, sourceDocuments, locales: results }, null, 2));
-else console.log(`i18n: ${results.length} bundles, ${source.size} source strings; ${results.filter(item => item.state === 'draft').length} translation drafts.`);
+else console.log(`i18n: ${results.length} bundles, ${source.size} source strings; ${results.filter(item => item.state === 'draft').length} unpublished drafts, ${results.filter(item => item.state === 'released' && item.releaseBasis === 'owner_authorized_machine_translation').length} owner-published machine translations.`);
 if (failures.length) {
   console.error(failures.join('\n'));
   process.exitCode = 1;

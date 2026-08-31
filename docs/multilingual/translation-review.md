@@ -1,20 +1,20 @@
 # Wave 1 translation review
 
-Prepared 2026-08-30. **All non-English copy is an unapproved machine-authored draft.** No native reviewer or legal reviewer has approved these translations, and no reviewer has been hired or contacted by this task. These files must not be represented as approved translations, staffed language services, or ready-to-spend advertising destinations.
+Updated 2026-08-30. **Brett authorized publishing all seven machine-translated interfaces without waiting for native review.** They are public language options with intake and checkout enabled, a small translation note, and the existing English agreements. No native or legal reviewer has approved these translations, and no reviewer has been hired or contacted by this task. Publication must not be represented as professional review or staffed native-language support.
 
 ## Files and scope
 
-`src/i18n/locales/en.json` is the shared English string contract. Each of the seven other files in that directory has the same 243 leaf keys and interpolation variables. The separate `translation-review.csv` provides one review row per key per non-English language: 1,701 rows. Blank reviewer and approval fields are intentional.
+`src/i18n/locales/en.json` is the shared English string contract. Each of the seven other files in that directory has the same 245 leaf keys and interpolation variables. The separate `translation-review.csv` provides one review row per key per non-English language: 1,715 rows. Blank reviewer and approval fields are intentional; publishing a language does not fill them.
 
 | Bundle | Intended written language | Status |
 | --- | --- | --- |
-| `pa.json` | Punjabi in Gurmukhi script | Draft; native and legal-adjacent review pending |
-| `tl.json` | Tagalog/Filipino | Draft; native and legal-adjacent review pending |
-| `zh-hans.json` | Simplified written Chinese | Draft; native and legal-adjacent review pending |
-| `zh-hant.json` | Traditional written Chinese for Cantonese-reading audiences | Draft; native and legal-adjacent review pending |
-| `ar.json` | Modern Standard Arabic | Draft; native and legal-adjacent review pending |
-| `hi.json` | Hindi in Devanagari script | Draft; native and legal-adjacent review pending |
-| `es.json` | General Spanish | Draft; native and legal-adjacent review pending |
+| `pa.json` | Punjabi in Gurmukhi script | Published machine translation; native review pending |
+| `tl.json` | Tagalog/Filipino | Published machine translation; native review pending |
+| `zh-hans.json` | Simplified written Chinese | Published machine translation; native review pending |
+| `zh-hant.json` | Traditional written Chinese for Cantonese-reading audiences | Published machine translation; native review pending |
+| `ar.json` | Modern Standard Arabic | Published machine translation; native review pending |
+| `hi.json` | Hindi in Devanagari script | Published machine translation; native review pending |
+| `es.json` | General Spanish | Published machine translation; native review pending |
 
 The Traditional Chinese draft was derived from the Simplified Chinese draft using the system's Hans-to-Hant transform, followed by terminology adjustments. It needs independent review for Traditional Chinese usage and the intended Alberta audience. Written Chinese does not establish Cantonese-speaking phone support. Punjabi Gurmukhi must not be substituted for Shahmukhi; Hindi must not be substituted for Urdu script.
 
@@ -26,7 +26,7 @@ The current release also preserves the distinct English `src/pages/TermsOfPurcha
 
 ## Review priorities
 
-Arrange a paid native reviewer for each written language before release. Familiarity with Canadian traffic, court and insurance terminology matters. Legal-adjacent copy also needs review by a person qualified to assess the agreement and representations being made. Native fluency alone is not evidence of legal equivalence or legal compliance. A bilingual Hindi/Urdu reviewer can later serve both languages only if competent in both scripts.
+Native review remains a follow-up quality improvement, not a prerequisite for this owner-authorized launch. Familiarity with Canadian traffic, court and insurance terminology matters. Legal-adjacent copy benefits from review by a person qualified to assess the agreement and representations being made. Native fluency alone is not evidence of legal equivalence or legal compliance. A bilingual Hindi/Urdu reviewer can later serve both languages only if competent in both scripts.
 
 Check these meanings wherever they appear, including headings, snippets, metadata, buttons, FAQs, consent and notification templates:
 
@@ -66,11 +66,18 @@ It exits unsuccessfully if the inventory is absent or differs from current keys,
 
 Then run `npm run test:i18n`. Check Arabic right-to-left layout with punctuation, prices, dates, email addresses, URLs and ticket numbers. Check Gurmukhi/Devanagari shaping, Chinese line breaking, mobile wrapping, keyboard navigation and screen-reader labels. The JSON deliberately contains no bidirectional override characters; direction should be handled by the page and isolated dynamic values.
 
-The application release record is `src/i18n/review-status.json`. The implementation uses its own source and bundle fingerprints, separate from the CSV's SHA-256 digests. Follow that release workflow only after actual approval of the exact source and translated bundle, and confirmation of service capability. Do not paste CSV SHA-256 values into implementation fingerprint fields, invent a reviewer, or set `serviceReady` merely because a bundle compiles. Changing either source or translated wording requires review of the change and a refreshed release record.
+The application release record is `src/i18n/review-status.json`. The implementation uses its own source and bundle fingerprints, separate from the CSV's SHA-256 digests. There are two explicit publication paths:
+
+- `approved` records require actual reviewer identity, review date and `serviceReady: true` for the reviewed, staffed language service.
+- `published` records require `publication.basis: owner_authorized_machine_translation`, the actual authorizing owner's name and the authorization date. This launch uses Brett's explicit instruction to publish the machine translations. `reviewedBy` and `reviewedAt` remain null and `serviceReady` remains false; those fields do not assert native staffing or review.
+
+Both paths require the current source version, source and bundle fingerprints, and hashes for all three English legal documents. Missing or changed fingerprints prevent publication until the changed copy is deliberately included in a new release record. Do not paste CSV SHA-256 values into implementation fingerprint fields, invent a reviewer, automatically refresh publication hashes during a build, or set `serviceReady` merely because a bundle compiles. Use `node scripts/validate-i18n.mjs --review-values` to inspect the current implementation fingerprints. A publication decision does not approve outgoing translated email templates or guarantee translation accuracy.
 
 ## Contact and operational limits
 
-Current written-contact copy permits an emailed question and asks the customer to confirm language assistance and response time. It does not assert real-time translation, a phone speaker, or a response-time guarantee. The WhatsApp CTA and hint are prepared only for a configured and operational channel; a translated button is not evidence of a WhatsApp service or staffing. The release record currently has no WhatsApp number and marks every non-English locale as draft with `serviceReady: false`.
+Current written-contact copy welcomes messages in the customer's language and explains that translation tools may be used; replies and official documents are currently in English. It does not assert real-time translation, a phone speaker, or a response-time guarantee. The WhatsApp CTA requires a configured number and actual service readiness; publication alone cannot enable it. The release record has no WhatsApp number and retains `serviceReady: false` for every non-English locale.
+
+Backend intake acceptance uses the explicit `FABSY_LIVE_SERVICE_LOCALES` allowlist; this deployment enables `pa,tl,zh-hans,zh-hant,ar,hi,es` while English remains supported. The older reviewed-service allowlist is only a fallback when the live allowlist is absent. An explicitly empty live allowlist disables non-English submissions. Neither flag certifies native review or enables translated notifications. Original non-English intake fields remain available for staff and queued for English review. No automatic translation worker is installed by this launch, and pending records must not be represented as translated or reviewed.
 
 `notifications.*` holds five **draft templates only**: receipt of intake details, disclosure arrival, a file update, a request for instructions, and payment receipt. No customer email, text, mailbox draft or WhatsApp message was sent or created by this work. Before any delivery integration, retain the English original, reviewed locale, template/version information, and safe interpolation of names, references and secure links. A “payment received” template must only follow a verified payment event; a “disclosure received” template must not start the 48-hour clock before completeness/readability/file matching is confirmed.
 

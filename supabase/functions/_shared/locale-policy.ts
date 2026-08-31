@@ -22,7 +22,7 @@ export class LocaleRequestError extends Error {
 
 export function parsePreferredLocale(value: unknown): PreferredLocale {
   // Older clients omit this property. Null, aliases and arbitrary browser tags
-  // are not accepted as an implicit opt-in to an unreviewed language.
+  // are not accepted as an implicit language selection.
   if (value === undefined) return "en";
   if (typeof value === "string" && SUPPORTED_LOCALES.some((locale) => locale === value)) {
     return value as PreferredLocale;
@@ -31,16 +31,22 @@ export function parsePreferredLocale(value: unknown): PreferredLocale {
 }
 
 /**
- * Set FABSY_REVIEWED_SERVICE_LOCALES only after the matching frontend bundle,
- * legal strings and staffed service channel have cleared release review.
- * This server-side attestation does not approve any outgoing translations.
+ * FABSY_LIVE_SERVICE_LOCALES is an operator-controlled release allowlist, not
+ * evidence of human translation review or a staffed native-language channel.
+ * The legacy reviewed-locale flag is used only when the live flag is absent.
+ * An explicitly empty live flag closes non-English intake even if the legacy
+ * flag still contains codes. Neither flag approves outgoing translations.
  */
-export function requireReleasedServiceLocale(locale: PreferredLocale, reviewedLocales: string | undefined): void {
+export function requireReleasedServiceLocale(
+  locale: PreferredLocale,
+  liveLocales: string | undefined,
+  legacyReviewedLocales?: string,
+): void {
   if (locale === "en") return;
-  const released = (reviewedLocales || "").split(",").map((value) => value.trim());
+  const released = (liveLocales ?? legacyReviewedLocales ?? "").split(",").map((value) => value.trim());
   if (released.includes(locale)) return;
   throw new LocaleRequestError(
-    `${LOCALE_NAMES[locale]} intake is not available yet. Please use the English form or contact Fabsy.`,
+    `${LOCALE_NAMES[locale]} intake is not currently enabled. Please use the English form or contact Fabsy.`,
     409,
     "locale_not_released",
   );

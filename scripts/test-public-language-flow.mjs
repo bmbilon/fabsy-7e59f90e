@@ -1,0 +1,231 @@
+#!/usr/bin/env node
+// Offline transaction-control regression only: this never presses checkout,
+// submits a form, authorizes a real matter, or verifies translation quality.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { MessageChannel } from 'node:worker_threads';
+import { build } from 'esbuild';
+import { JSDOM, VirtualConsole } from 'jsdom';
+import { fingerprint, isLocaleReleased, LEGAL_SOURCE_DOCUMENT_PATHS, WAVE_ONE_LOCALES } from '../src/i18n/locale-policy.mjs';
+
+const repoRoot = fileURLToPath(new URL('../', import.meta.url));
+const readJson = async file => JSON.parse(await fs.readFile(path.join(repoRoot, file), 'utf8'));
+const [registry, review, offers, bundleEntries, documentEntries] = await Promise.all([
+  readJson('src/i18n/locales.json'),
+  readJson('src/i18n/review-status.json'),
+  readJson('src/config/offers.json'),
+  Promise.all(WAVE_ONE_LOCALES.map(async code => [code, await readJson(`src/i18n/locales/${code}.json`)])),
+  Promise.all(LEGAL_SOURCE_DOCUMENT_PATHS.map(async file => [file, fingerprint(await fs.readFile(path.join(repoRoot, file), 'utf8'))])),
+]);
+const bundles = Object.fromEntries(bundleEntries);
+const sourceDocuments = Object.fromEntries(documentEntries);
+const sourceFingerprint = fingerprint({ english: bundles.en, offers });
+const releaseStates = Object.fromEntries(WAVE_ONE_LOCALES.map(code => [code, isLocaleReleased(code, review, {
+  sourceVersion: registry.sourceVersion, sourceFingerprint, bundleFingerprint: fingerprint(bundles[code]), sourceDocuments,
+})]));
+const availableLocales = registry.locales.filter(item => item.wave <= 1 && releaseStates[item.code]);
+assert.equal(availableLocales.length, 8, 'The actual publication record and current source files must release English and all seven launch languages');
+assert.deepEqual(new Set(availableLocales.map(item => item.code)), new Set(WAVE_ONE_LOCALES));
+const values = {
+  price: `$${offers.rapidResolution.priceCad}`, reportPrice: `$${offers.insuranceReport.priceCad}`,
+  bundlePrice: `$${offers.bundle.priceCad}`, email: 'hello@fabsy.ca',
+};
+
+const unexpectedCalls = [];
+function forbidCall(name) {
+  unexpectedCalls.push(name);
+  throw new Error(`Offline language regression attempted a forbidden operation: ${name}`);
+}
+const virtualConsole = new VirtualConsole();
+const domErrors = [];
+virtualConsole.on('jsdomError', error => domErrors.push(error.message));
+const dom = new JSDOM('<!doctype html><html><body></body></html>', {
+  url: 'https://offline-fabsy.invalid/', pretendToBeVisual: true, virtualConsole,
+});
+const descriptors = new Map();
+function installGlobal(name, value) {
+  descriptors.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
+  Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
+}
+for (const name of ['window', 'document', 'navigator', 'HTMLElement', 'HTMLInputElement', 'Node', 'Event', 'MouseEvent', 'MutationObserver', 'File']) {
+  installGlobal(name, name === 'window' ? dom.window : dom.window[name]);
+}
+installGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+// Bundled React act() uses MessageChannel instead of Node's task scheduler.
+// Track those test-owned ports so successful assertions cannot leave CI open.
+const channels = [];
+installGlobal('MessageChannel', class extends MessageChannel {
+  constructor() { super(); channels.push(this); }
+});
+installGlobal('__fabsyOfflineForbidCall', forbidCall);
+installGlobal('fetch', () => forbidCall('fetch'));
+dom.window.fetch = globalThis.fetch;
+for (const name of ['XMLHttpRequest', 'WebSocket']) {
+  const ForbiddenConstructor = class { constructor() { forbidCall(name); } };
+  installGlobal(name, ForbiddenConstructor);
+  dom.window[name] = ForbiddenConstructor;
+}
+Object.defineProperty(dom.window.navigator, 'sendBeacon', { configurable: true, value: () => forbidCall('sendBeacon') });
+dom.window.open = () => forbidCall('window.open');
+
+const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'fabsy-public-language-flow-'));
+try {
+  const outfile = path.join(temporary, 'public-language-flow.cjs');
+  await build({
+    absWorkingDir: repoRoot,
+    stdin: { loader: 'tsx', resolveDir: repoRoot, sourcefile: 'public-language-flow-fixture.tsx', contents: `
+      import assert from 'node:assert/strict';
+      import React, { act } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import { MemoryRouter } from 'react-router-dom';
+      import { I18nextProvider } from 'react-i18next';
+      import PaymentStep from './src/components/form-steps/PaymentStep';
+      import LanguageSelector from './src/components/LanguageSelector';
+      import LanguageMessages from './src/components/LanguageMessages';
+      import type { FormData } from './src/components/TicketForm';
+      import { LocaleContext } from './src/i18n/locale-context';
+      import { createLocaleInstance } from './src/i18n/instance';
+      import { localizePath } from './src/i18n/locale-policy.mjs';
+      import { validateLocalizedIntakeStep } from './src/i18n/intake-validation';
+
+      export async function runChecks({ bundles, review, availableLocales, releaseStates, values }) {
+        const codes = availableLocales.map(item => item.code);
+        const formData: FormData = {
+          sourceAssessmentId: '', sourceAssessmentAccessToken: '',
+          firstName: 'Offline', lastName: 'Fixture', email: 'offline-fixture@example.invalid', phone: '4035550100',
+          smsOptIn: false, address: 'Synthetic test address', city: 'Calgary', province: 'AB', postalCode: 'T2P 1A1',
+          dateOfBirth: new Date('1990-01-01T12:00:00Z'), driversLicense: 'OFFLINE-TEST',
+          driversLicenseImage: null, addressDifferentFromLicense: false,
+          ticketNumber: 'OFFLINE-100', issueDate: new Date('2026-01-01T12:00:00Z'), location: 'Calgary',
+          officer: '', officerBadge: '', offenceSection: '', offenceSubSection: '',
+          offenceDescription: 'Synthetic test offence', violation: '', fineAmount: '198.00', courtDate: undefined,
+          courtJurisdiction: 'Calgary', agentRepresentationPermitted: true,
+          ticketImage: new File(['%PDF-1.4\\n% Synthetic offline fixture only'], 'offline-ticket.pdf', { type: 'application/pdf' }),
+          vehicleSeized: false, pleaType: 'Review my options', explanation: 'This is synthetic offline test data.',
+          circumstances: '', witnesses: false, witnessDetails: '', evidence: false, evidenceDetails: '', priorTickets: 'none',
+          consentGiven: true, digitalSignature: 'Offline Fixture', insuranceCompany: '', vehicleDetails: '', additionalNotes: '',
+        };
+        for (const step of [1, 2, 3, 4]) assert.deepEqual(validateLocalizedIntakeStep(step, formData), {}, 'The offline fixture must satisfy intake validation');
+
+        for (const item of availableLocales.filter(item => item.code !== 'en')) {
+          const code = item.code;
+          assert.equal(releaseStates[code], true, code + ' must use the actual released policy result');
+          const instance = createLocaleInstance(code, bundles.en, bundles[code], codes, values);
+          const context = {
+            locale: code, basePath: '/submit-ticket', isReleased: releaseStates[code], direction: item.dir,
+            href: target => localizePath(target, code), availableLocales, intakeHandoff: null,
+            setIntakeHandoff: () => globalThis.__fabsyOfflineForbidCall('unexpected intake handoff'),
+          };
+          const container = document.createElement('div');
+          document.body.append(container);
+          const root = createRoot(container);
+          try {
+            await act(async () => root.render(
+              <MemoryRouter initialEntries={[localizePath('/submit-ticket', code)]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <I18nextProvider i18n={instance}><LocaleContext.Provider value={context}>
+                  <LanguageSelector /><LanguageMessages />
+                  <section data-offline-payment>
+                    <PaymentStep formData={formData} updateFormData={() => globalThis.__fabsyOfflineForbidCall('unexpected form data mutation')} />
+                  </section>
+                </LocaleContext.Provider></I18nextProvider>
+              </MemoryRouter>
+            ));
+            assert.equal(instance.resolvedLanguage, code, code + ' must not silently render English');
+            const selector = container.querySelector('select');
+            assert.ok(selector, code + ' must have a language selector');
+            assert.equal(selector.disabled, false);
+            assert.equal(selector.value, code);
+            assert.deepEqual([...selector.options].map(option => option.value), codes, code + ' must offer all eight actually released choices');
+            for (const option of selector.options) {
+              const expected = availableLocales.find(item => item.code === option.value);
+              assert.equal(option.textContent, expected.nativeName);
+              assert.equal(option.lang, expected.languageTag);
+              assert.equal(option.dir, expected.dir);
+            }
+
+            assert.equal(container.querySelector('[data-translation-status="draft"]'), null);
+            for (const key of ['language.draftTitle', 'language.draftBody', 'language.paymentBlocked']) {
+              assert.ok(!container.textContent.includes(instance.t(key)), code + ' must not show ' + key);
+            }
+            const notes = container.querySelectorAll('[data-translation-status="machine-translated"]');
+            if (review.locales[code].status === 'published') {
+              assert.equal(notes.length, 1, code + ' must disclose machine translation once');
+              assert.equal(notes[0].getAttribute('role'), 'note');
+              assert.equal(notes[0].querySelector('strong')?.textContent, instance.t('language.translationNoteTitle'));
+              assert.equal(notes[0].querySelector('p')?.textContent, instance.t('language.translationNoteBody'));
+            } else {
+              assert.equal(notes.length, 0, 'A reviewed locale must not be falsely labelled a machine publication');
+            }
+
+            const payment = container.querySelector('[data-offline-payment]');
+            assert.ok(payment.textContent.includes(instance.t('checkout.termsAcceptance')));
+            for (const href of ['/terms-of-purchase', '/privacy-policy']) {
+              const link = payment.querySelector('a[href="' + href + '"]');
+              assert.ok(link, code + ' must link to the actual English ' + href);
+              assert.equal(link.lang, 'en');
+              assert.ok(link.textContent.includes('(English)'));
+            }
+            assert.ok(payment.querySelector('a[href="/terms-of-service"]'), 'English service terms must remain accessible');
+            assert.ok(payment.querySelector('a[href="/' + code + '/terms-of-service"]'), 'Localized service terms must remain accessible');
+            const terms = payment.querySelector('#localized-payment-terms');
+            const checkout = payment.querySelector('button');
+            assert.ok(terms instanceof HTMLInputElement && terms.type === 'checkbox');
+            assert.equal(terms.disabled, false, code + ' terms checkbox must be usable');
+            assert.equal(terms.checked, false, code + ' purchase terms must not be preaccepted');
+            assert.ok(checkout?.textContent.includes(instance.t('checkout.pay')));
+            assert.equal(checkout.disabled, true, code + ' checkout must start disabled');
+            // Only toggle the terms checkbox. Never click checkout or a link.
+            await act(async () => terms.click());
+            assert.equal(terms.checked, true);
+            assert.equal(checkout.disabled, false, code + ' checkout must enable after explicit terms acceptance');
+            await act(async () => terms.click());
+            assert.equal(terms.checked, false);
+            assert.equal(checkout.disabled, true, code + ' withdrawing terms acceptance must disable checkout again');
+          } finally {
+            await act(async () => root.unmount());
+            container.remove();
+          }
+        }
+      }
+    ` },
+    bundle: true, platform: 'node', format: 'cjs', jsx: 'automatic', outfile, logLevel: 'silent',
+    define: { 'process.env.NODE_ENV': '"test"' },
+    plugins: [{ name: 'offline-language-boundaries', setup(builder) {
+      builder.onResolve({ filter: /^@\/(?:i18n\/config|integrations\/supabase\/client)$/ }, args => ({ path: args.path, namespace: 'offline-language' }));
+      builder.onLoad({ filter: /.*/, namespace: 'offline-language' }, args => ({ resolveDir: repoRoot, contents: args.path.includes('/supabase/')
+        ? `export const supabase = {
+            functions: { invoke: () => globalThis.__fabsyOfflineForbidCall('supabase.functions.invoke') },
+            storage: { from: () => globalThis.__fabsyOfflineForbidCall('supabase.storage.from') },
+          };`
+        // Adapt Vite's import.meta.glob loader to the exact files read above.
+        // Components, i18next, the selector and the release policy stay real.
+        : `import { createLocaleInstance } from './src/i18n/instance';
+           export const registry = ${JSON.stringify(registry)};
+           export const review = ${JSON.stringify(review)};
+           export const locales = registry.locales.filter(item => item.wave <= 1);
+           const bundles = ${JSON.stringify(bundles)};
+           const instances = new Map();
+           export function getLocaleInstance(code) { return instances.get(code); }
+           export async function loadLocale(code) {
+             if (!instances.has(code)) instances.set(code, createLocaleInstance(code, bundles.en, bundles[code], locales.map(item => item.code), ${JSON.stringify(values)}));
+             return instances.get(code);
+           }` }));
+    } }],
+  });
+  const { runChecks } = (await import(pathToFileURL(outfile).href)).default;
+  await runChecks({ bundles, review, availableLocales, releaseStates, values });
+  assert.deepEqual(unexpectedCalls, [], 'Rendering and accepting terms must never invoke a backend, payment, or network operation');
+  assert.deepEqual(domErrors, [], 'The real React DOM flow must not produce unhandled browser errors');
+} finally {
+  await fs.rm(temporary, { recursive: true, force: true });
+  dom.window.close();
+  for (const channel of channels) { channel.port1.close(); channel.port2.close(); }
+  for (const [name, descriptor] of descriptors) {
+    if (descriptor) Object.defineProperty(globalThis, name, descriptor);
+    else delete globalThis[name];
+  }
+}
+console.log('Offline public language flow passed: 7 payment steps, 8 selector choices, publication notes, explicit terms gating, English legal links, and zero backend/network calls.');

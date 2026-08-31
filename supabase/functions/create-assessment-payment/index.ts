@@ -155,7 +155,11 @@ serve(async (req) => {
       throw new RequestError("Assessment checkout could not be verified.", 403);
     }
     const preferredLocale = parsePreferredLocale(submission.preferred_locale);
-    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
+    requireReleasedServiceLocale(
+      preferredLocale,
+      Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
+      Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
+    );
     const storagePath = String(submission.assessment_ticket_path || "");
     if (!storagePath.startsWith(`${submissionId}/`) || storagePath.includes("..")) {
       throw new RequestError("Assessment ticket upload is missing.");

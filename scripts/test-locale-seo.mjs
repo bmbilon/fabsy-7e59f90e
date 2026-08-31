@@ -283,6 +283,99 @@ try {
     assert.equal(fs.readFileSync(snapshotFile(outDir, '/pa/'), 'utf8'), before);
   });
 
+  // Owner-authorized machine publication is a separate state from native
+  // review. These temporary fixtures never alter the production attestation.
+  const publishedReview = clone(review);
+  for (const locale of registry.locales.filter(item => item.wave === 1)) {
+    publishedReview.locales[locale.code] = {
+      ...publishedReview.locales[locale.code], status: 'published',
+      publication: { basis: 'owner_authorized_machine_translation', authorizedBy: 'Brett Bilon', authorizedAt: '2026-08-30T00:00:00Z' },
+      sourceFingerprint: draft.sourceFingerprint, bundleFingerprint: draft.bundleFingerprints[locale.code],
+      sourceDocuments: draft.sourceDocuments,
+    };
+  }
+  writeJson(options.reviewPath, publishedReview);
+  const published = loadLocaleSeoContext(options);
+  const publishedManifest = generateLocalizedSnapshots({ context: published, outDir });
+  const publishedPaHtml = fs.readFileSync(snapshotFile(outDir, '/pa/'), 'utf8');
+  const machineNotice = /<aside\b[^>]*data-translation-status="machine-translated"[^>]*>[\s\S]*?<\/aside>/;
+  const publishedTags = ['en', 'pa', 'tl', 'zh-Hans', 'zh-Hant', 'ar', 'hi', 'es', 'x-default'];
+  check('seven published machine translations expose real equivalents without claiming native review', () => {
+    assert.equal(publishedManifest.records.filter(record => record.indexable).length, 42);
+    assert.equal(publishedManifest.records.filter(record => !record.indexable).length, 14);
+    for (const record of publishedManifest.records) {
+      const entry = published.review.locales[record.code];
+      assert.equal(entry.reviewedBy, null);
+      assert.equal(entry.reviewedAt, null);
+      assert.equal(entry.serviceReady, false);
+      assert(published.released(record.code));
+      const html = fs.readFileSync(snapshotFile(outDir, record.route), 'utf8');
+      assertSnapshotHead(html, record.route, published);
+      assertLocalizedMainContent(html, published, record.code, record.basePath);
+      assert.match(html, machineNotice);
+      assert(!html.includes(published.bundles[record.code].language.draftTitle));
+      assert.deepEqual(alternateLinks(published, record.code, record.basePath).map(link => link.languageTag), record.indexable ? publishedTags : []);
+    }
+    assert(!approvedPaHtml.includes('data-translation-status="machine-translated"'));
+    assert(!publishedPaHtml.includes('https://wa.me/'));
+  });
+  run('scripts/generate-sitemap-from-db.js');
+  run('scripts/validate-snapshot-guardrails.cjs', { VALIDATE_ALL_PRERENDERED: '1' });
+  run('scripts/copy-prerendered.js');
+  check('publication creates seven six-page sitemaps and reciprocal English alternates only', () => {
+    const index = fs.readFileSync(path.join(publicDir, 'sitemap.xml'), 'utf8');
+    for (const locale of registry.locales.filter(item => item.wave === 1)) {
+      const name = `sitemap-${locale.code}.xml`;
+      assert(index.includes(`/sitemaps/${name}`));
+      const xml = fs.readFileSync(path.join(publicDir, 'sitemaps', name), 'utf8');
+      assert.equal([...xml.matchAll(/<loc>/g)].length, 6);
+      assert(!/\/content\/|\/blog\/|submit-ticket|payment-canceled|thank-you|terms-of-purchase/.test(xml));
+      for (const tag of publishedTags) assert(xml.includes(`hreflang="${tag}"`));
+    }
+    for (const route of published.indexableRoutes) {
+      const html = fs.readFileSync(snapshotFile(env.DIST_PRERENDER_DIR, route), 'utf8');
+      assertSnapshotHead(html, route, published);
+      for (const tag of publishedTags) assert(html.includes(`hreflang="${tag}"`));
+    }
+    assert(!fs.readFileSync(path.join(publicDir, 'sitemaps/sitemap-content.xml'), 'utf8').includes('hreflang="pa"'));
+    verifyLocaleSnapshotCoverage(env.DIST_PRERENDER_DIR, published);
+  });
+  check('copy refuses missing, altered or duplicated machine disclosure before replacing output', () => {
+    const filename = snapshotFile(outDir, '/pa/');
+    const before = fs.readFileSync(snapshotFile(env.DIST_PRERENDER_DIR, '/pa/'), 'utf8');
+    for (const replacement of ['', '<aside data-translation-status="machine-translated">Native-reviewed translation.</aside>', '$&$&']) {
+      try {
+        const changed = publishedPaHtml.replace(machineNotice, replacement);
+        assert.notEqual(changed, publishedPaHtml);
+        fs.writeFileSync(filename, changed);
+        assert.throws(() => assertLocalizedMainContent(changed, published, 'pa', '/'), /translation disclosure/);
+        const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts/copy-prerendered.js')], { cwd: ROOT, env, encoding: 'utf8', timeout: 30000 });
+        assert.notEqual(result.status, 0);
+        assert.match(result.stderr, /translation disclosure/);
+        assert.equal(fs.readFileSync(snapshotFile(env.DIST_PRERENDER_DIR, '/pa/'), 'utf8'), before);
+      } finally {
+        fs.writeFileSync(filename, publishedPaHtml);
+      }
+    }
+  });
+  check('withdrawing owner publication rejects stale public artifacts', () => {
+    writeJson(options.reviewPath, review);
+    assert.throws(() => verifyLocaleSnapshotCoverage(outDir, loadLocaleSeoContext(options)), /routes and approval gates/);
+    const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts/copy-prerendered.js')], { cwd: ROOT, env, encoding: 'utf8', timeout: 30000 });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /routes and approval gates/);
+  });
+  generateLocalizedSnapshots({ context: draft, outDir });
+  run('scripts/generate-sitemap-from-db.js');
+  run('scripts/copy-prerendered.js');
+  check('withdrawn publication restores noindex and removes every localized sitemap', () => {
+    for (const locale of registry.locales.filter(item => item.wave === 1)) {
+      assert(!fs.existsSync(path.join(publicDir, 'sitemaps', `sitemap-${locale.code}.xml`)));
+    }
+    assert.match(fs.readFileSync(snapshotFile(outDir, '/pa/'), 'utf8'), /noindex, nofollow/);
+    assert(!fs.readFileSync(snapshotFile(env.DIST_PRERENDER_DIR, '/'), 'utf8').includes('hreflang="pa"'));
+  });
+
   // Use the real catalogs here: the prefixed synthetic translations above do
   // not reproduce a shared, untranslated product name in a browser price card.
   // The captured fragments exercise the CLI, manifest and legal-source gates,
@@ -392,6 +485,7 @@ try {
   const draftResponse = await responseFor('/pa/', paDraftHtml);
   const slashlessResponse = await responseFor('/pa', paDraftHtml);
   const approvedResponse = await responseFor('/pa/', approvedPaHtml);
+  const publishedResponse = await responseFor('/pa/', publishedPaHtml);
   const englishResponse = await responseFor('/', englishHtml('/'));
   check('crawler middleware preserves draft noindex and accepts locale-root canonicals', () => {
     assert.equal(draftResponse.headers.get('X-Prerendered'), 'true');
@@ -399,6 +493,8 @@ try {
     assert.equal(draftResponse.headers.get('Content-Language'), 'pa');
     assert.equal(slashlessResponse.headers.get('X-Prerendered'), 'true');
     assert.equal(approvedResponse.headers.get('X-Robots-Tag'), 'index, follow');
+    assert.equal(publishedResponse.headers.get('X-Robots-Tag'), 'index, follow');
+    assert.equal(publishedResponse.headers.get('Content-Language'), 'pa');
     assert.equal(englishResponse.headers.get('X-Robots-Tag'), 'index, follow');
   });
   const shellResponse = await responseFor('/pa/', englishHtml('/'));

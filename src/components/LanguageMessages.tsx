@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useLocale } from '@/i18n/locale-context';
-import { getLocaleInstance, loadLocale, locales, registry, type LocaleCode } from '@/i18n/config';
+import { getLocaleInstance, loadLocale, locales, registry, review, type LocaleCode } from '@/i18n/config';
 import { localizePath, preferredLocale } from '@/i18n/locale-policy.mjs';
 import { LANGUAGE_PREFERENCE_KEY } from './LanguageSelector';
 
@@ -52,6 +52,14 @@ export default function LanguageMessages() {
       <div className="container mx-auto max-w-6xl">
         <strong>{t('language.draftTitle')}</strong>{' '}{t('language.draftBody')}{' '}
         <Link className="font-semibold underline underline-offset-2" to={englishUrl} state={intakeHandoff || location.state}>{t('language.readEnglish')}</Link>
+      </div>
+    </aside>;
+  }
+  if (!isEnglish && isReleased && review.locales[locale]?.status === 'published') {
+    return <aside role="note" className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs leading-relaxed text-slate-600" data-translation-status="machine-translated">
+      <div className="container mx-auto max-w-6xl">
+        <strong className="font-medium text-slate-700">{t('language.translationNoteTitle')}</strong>
+        <p>{t('language.translationNoteBody')}</p>
       </div>
     </aside>;
   }

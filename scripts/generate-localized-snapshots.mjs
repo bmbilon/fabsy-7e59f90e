@@ -66,6 +66,14 @@ export function assertLocalizedMainContent(html, context, code, basePath) {
     .replaceAll('&quot;', '"').replaceAll('&#39;', "'").replaceAll('&apos;', "'")
     .replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&').replace(/\s+/g, ' ').trim();
   if (decode(h1) !== decode(esc(title))) throw new Error(`Localized snapshot main heading does not match its bundle: ${code}${basePath}`);
+  if (context.released(code) && context.review.locales[code]?.status === 'published') {
+    const notices = [...html.matchAll(/<aside\b(?=[^>]*\bdata-translation-status=["']machine-translated["'])[^>]*>([\s\S]*?)<\/aside>/gi)];
+    const t = snapshotTranslator(context, code);
+    const expected = ['language.translationNoteTitle', 'language.translationNoteBody'].map(key => decode(esc(t(key)))).join(' ');
+    if (notices.length !== 1 || decode(notices[0][1].replace(/<[^>]*>/g, ' ')) !== expected) {
+      throw new Error(`Published machine translation must retain its exact translation disclosure: ${code}${basePath}`);
+    }
+  }
 }
 
 export function renderLocalizedSnapshot(context, record) {
@@ -126,8 +134,10 @@ export function renderLocalizedSnapshot(context, record) {
       throw new Error(`Unimplemented localized snapshot: ${route}`);
   }
 
-  const preview = !context.released(code)
-    ? `<aside class="preview" role="note"><strong>${esc(t('language.draftTitle'))}</strong>${p('language.draftBody')}${p('language.englishControls')}<a href="${SITE}/terms-of-service">${esc(t('language.readEnglish'))}</a>${!indexable && !context.indexableRoutes.has(basePath) ? p('language.paymentBlocked') : ''}</aside>` : '';
+  const translationNotice = !context.released(code)
+    ? `<aside class="preview" role="note"><strong>${esc(t('language.draftTitle'))}</strong>${p('language.draftBody')}${p('language.englishControls')}<a href="${SITE}/terms-of-service">${esc(t('language.readEnglish'))}</a>${!indexable && !context.indexableRoutes.has(basePath) ? p('language.paymentBlocked') : ''}</aside>`
+    : context.review.locales[code]?.status === 'published'
+      ? `<aside class="translation-note" role="note" data-translation-status="machine-translated"><strong>${esc(t('language.translationNoteTitle'))}</strong>${p('language.translationNoteBody')}</aside>` : '';
   const html = `<!DOCTYPE html>
 <html lang="${locale.languageTag}" dir="${locale.dir}">
 <head>
@@ -145,7 +155,7 @@ body{font-family:system-ui,sans-serif;max-width:820px;margin:auto;padding:24px;l
 </head>
 <body>
 <header><nav>${NAV.map(([href, key]) => `<a href="${localePath(code, href)}">${esc(t(key))}</a>`).join('')}</nav></header>
-${preview}
+${translationNotice}
 <main data-fabsy-locale="${code}"><h1>${esc(title)}</h1>${body}</main>
 <footer>${p('common.notLawFirm')}${p('common.noOutcomePromise')}${p('common.clientDecision')}<p><a href="${localePath(code, '/terms-of-service')}">${esc(t('nav.terms'))}</a> · <a href="${SITE}${basePath}">${esc(t('language.readEnglish'))}</a></p></footer>
 </body>
@@ -221,7 +231,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   try {
     const manifest = generateLocalizedSnapshots();
     const indexed = manifest.records.filter(record => record.indexable).length;
-    console.log(`Localized snapshots: ${manifest.generatedCount} translated pages, ${indexed} approved/indexable, ${manifest.generatedCount - indexed} noindex previews/private pages.`);
+    console.log(`Localized snapshots: ${manifest.generatedCount} translated pages, ${indexed} published/indexable, ${manifest.generatedCount - indexed} noindex previews/private pages.`);
   } catch (error) {
     console.error(`Localized snapshot generation failed: ${error.message}`);
     process.exitCode = 1;

@@ -205,7 +205,11 @@ serve(async (req) => {
 
     const body = await req.json() as Record<string, unknown>;
     const preferredLocale = parsePreferredLocale(body.preferred_locale);
-    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
+    requireReleasedServiceLocale(
+      preferredLocale,
+      Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
+      Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
+    );
     if (typeof body.company === "string" && body.company.trim()) {
       return json(origin, { success: true }, 200);
     }

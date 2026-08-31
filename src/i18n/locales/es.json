@@ -36,10 +36,12 @@
     "dismiss": "Mantener mi idioma actual",
     "draftTitle": "Vista previa de traducción — pendiente de revisión",
     "draftBody": "Esta traducción es un borrador y aún no ha sido aprobada por una persona revisora nativa. Antes de comprar o dar tu consentimiento, lee las condiciones en inglés o contacta a Fabsy para aclarar tus dudas.",
-    "englishControls": "Si hay diferencias en la traducción, prevalecen las condiciones en inglés. Este borrador no modifica el acuerdo en inglés ni limita los derechos conforme a la legislación aplicable.",
+    "englishControls": "Si hay diferencias en la traducción, prevalecen las condiciones en inglés. Esta traducción no modifica el acuerdo en inglés ni limita los derechos conforme a la legislación aplicable.",
     "readEnglish": "Leer la versión en inglés",
-    "paymentBlocked": "La compra y la autorización en este idioma no estarán disponibles hasta confirmar la revisión de la traducción y el soporte en el idioma. Puedes continuar en inglés.",
-    "continueEnglish": "Continuar en inglés"
+    "paymentBlocked": "La compra y la autorización en este idioma no están disponibles temporalmente. Puedes continuar en inglés.",
+    "continueEnglish": "Continuar en inglés",
+    "translationNoteTitle": "Te damos la bienvenida: escríbenos en tu idioma.",
+    "translationNoteBody": "Esta página usa traducción automática. Podemos usar herramientas de traducción para los mensajes; las respuestas y los documentos oficiales están actualmente en inglés. Prevalecen las condiciones en inglés."
   },
   "home": {
     "metaTitle": "Ayuda con infracciones de tránsito en Alberta | Fabsy",
@@ -141,21 +143,21 @@
       },
       "language": {
         "question": "¿Puedo escribir en mi idioma?",
-        "answer": "Puedes escribir tu relato en el idioma que prefieras. Antes de depender de la asistencia lingüística, pide a Fabsy que confirme su disponibilidad. Un sitio traducido no significa que haya una persona que hable ese idioma disponible por teléfono."
+        "answer": "Sí. Puedes escribir tu relato o pregunta en el idioma que prefieras. Podemos usar herramientas de traducción para leerlo. Las respuestas y los documentos oficiales están actualmente en inglés; no se garantiza asistencia telefónica en tu idioma."
       }
     }
   },
   "contact": {
     "metaTitle": "Contacta a Fabsy | Ayuda con infracciones en Alberta",
     "title": "Empieza con una pregunta por escrito",
-    "description": "Puedes enviar una pregunta por correo electrónico en el idioma que prefieras. Incluye tu plazo y pregunta qué asistencia lingüística está disponible.",
+    "description": "Envía tu pregunta por correo electrónico en el idioma que prefieras e incluye cualquier plazo que figure en tu infracción.",
     "messageLabel": "Tu mensaje",
     "messageHint": "Escribe en tu idioma preferido. No envíes datos de tarjetas ni documentos de identidad innecesarios.",
     "submit": "Enviar mensaje",
-    "availability": "Deben confirmarse la asistencia lingüística y los tiempos de respuesta. Actualmente no se promete atención por WhatsApp ni por teléfono en este idioma.",
+    "availability": "Podemos usar herramientas de traducción para leer tu mensaje. Las respuestas y los documentos oficiales están actualmente en inglés.",
     "emailCta": "Escribir a {{email}}",
     "whatsappCta": "Escríbenos en tu idioma por WhatsApp",
-    "staffAvailability": "Antes de llamar, pregunta qué asistencia lingüística está disponible.",
+    "staffAvailability": "Podemos usar herramientas de traducción para leer tu mensaje. Las respuestas y los documentos oficiales están actualmente en inglés.",
     "whatsappHint": "Envía un mensaje escrito en tu idioma preferido. No envíes datos de tarjetas de pago."
   },
   "intake": {

@@ -36,10 +36,12 @@
     "dismiss": "Panatilihin ang kasalukuyang wika",
     "draftTitle": "Preview ng salin — hindi pa nasusuri",
     "draftBody": "Burador ang saling ito at hindi pa ito naaprubahan ng tagasuring katutubong nagsasalita ng wika. Bago bumili o pumayag, basahin ang mga kondisyon sa Ingles o makipag-ugnayan sa Fabsy para sa paglilinaw.",
-    "englishControls": "Ang mga kondisyon sa Ingles ang mananaig kung may pagkakaiba sa salin. Hindi binabago ng burador na ito ang kasunduan sa Ingles o nililimitahan ang mga karapatan sa ilalim ng naaangkop na batas.",
+    "englishControls": "Ang mga kondisyon sa Ingles ang mananaig kung may pagkakaiba sa salin. Hindi binabago ng saling ito ang kasunduan sa Ingles o nililimitahan ang mga karapatan sa ilalim ng naaangkop na batas.",
     "readEnglish": "Basahin ang bersiyon sa Ingles",
-    "paymentBlocked": "Hindi pa available ang pagbili at pagbibigay ng awtorisasyon sa wikang ito hangga't hindi nasusuri ang salin at nakukumpirma ang tulong sa wika. Maaari kang magpatuloy sa Ingles.",
-    "continueEnglish": "Magpatuloy sa Ingles"
+    "paymentBlocked": "Pansamantalang hindi available ang pagbili at pagbibigay ng awtorisasyon sa wikang ito. Maaari kang magpatuloy sa Ingles.",
+    "continueEnglish": "Magpatuloy sa Ingles",
+    "translationNoteTitle": "Maligayang pagdating — sumulat sa amin sa iyong wika.",
+    "translationNoteBody": "Awtomatikong isinalin ang pahinang ito. Maaari kaming gumamit ng mga kasangkapan sa pagsasalin para sa mga mensahe; nasa Ingles sa ngayon ang mga sagot at opisyal na dokumento. Ang mga kondisyon sa Ingles ang mananaig."
   },
   "home": {
     "metaTitle": "Tulong sa traffic ticket sa Alberta | Fabsy",
@@ -141,21 +143,21 @@
       },
       "language": {
         "question": "Maaari ba akong sumulat sa sarili kong wika?",
-        "answer": "Maaari mong isulat ang iyong salaysay sa wikang gusto mo. Kumpirmahin muna sa Fabsy kung anong tulong sa wika ang available bago umasa rito. Hindi ibig sabihin ng isang isinaling website na may nagsasalita ng wikang iyon na available sa telepono."
+        "answer": "Oo. Maaari mong isulat ang iyong salaysay o tanong sa wikang gusto mo. Maaari kaming gumamit ng mga kasangkapan sa pagsasalin upang mabasa ito. Nasa Ingles sa ngayon ang mga sagot at opisyal na dokumento; hindi garantisado ang tulong sa telepono sa iyong wika."
       }
     }
   },
   "contact": {
     "metaTitle": "Makipag-ugnayan sa Fabsy | Tulong sa ticket sa Alberta",
     "title": "Magsimula sa isang nakasulat na tanong",
-    "description": "Maaari kang mag-email ng tanong sa wikang gusto mo. Isama ang iyong deadline at itanong kung anong tulong sa wika ang available.",
+    "description": "I-email ang iyong tanong sa wikang gusto mo at isama ang anumang deadline na nakasaad sa iyong ticket.",
     "messageLabel": "Iyong mensahe",
     "messageHint": "Sumulat sa wikang gusto mo. Huwag magpadala ng detalye ng card o hindi kailangang dokumento ng pagkakakilanlan.",
     "submit": "Ipadala ang mensahe",
-    "availability": "Kailangang kumpirmahin ang tulong sa wika at oras ng pagtugon. Sa ngayon, walang pangakong serbisyo sa WhatsApp o telepono sa wikang ito.",
+    "availability": "Maaari kaming gumamit ng mga kasangkapan sa pagsasalin upang mabasa ang iyong mensahe. Nasa Ingles sa ngayon ang mga sagot at opisyal na dokumento.",
     "emailCta": "Mag-email sa {{email}}",
     "whatsappCta": "Mag-text sa amin sa iyong wika sa WhatsApp",
-    "staffAvailability": "Itanong muna kung anong tulong sa wika ang available bago tumawag.",
+    "staffAvailability": "Maaari kaming gumamit ng mga kasangkapan sa pagsasalin upang mabasa ang iyong mensahe. Nasa Ingles sa ngayon ang mga sagot at opisyal na dokumento.",
     "whatsappHint": "Magpadala ng nakasulat na mensahe sa wikang gusto mo. Huwag magpadala ng detalye ng payment card."
   },
   "intake": {

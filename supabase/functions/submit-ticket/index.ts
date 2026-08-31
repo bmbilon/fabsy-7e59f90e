@@ -122,7 +122,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     const formData: SubmissionData = await req.json();
     const preferredLocale = parsePreferredLocale(formData.preferred_locale);
-    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
+    requireReleasedServiceLocale(
+      preferredLocale,
+      Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
+      Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
+    );
     
     console.log("[Submit Ticket] Processing submission");
 

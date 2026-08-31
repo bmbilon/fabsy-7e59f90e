@@ -469,7 +469,11 @@ serve(async (req) => {
 
     // Use the authorized stored preference, never a payment-request override.
     const preferredLocale = parsePreferredLocale(submission.preferred_locale);
-    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
+    requireReleasedServiceLocale(
+      preferredLocale,
+      Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
+      Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
+    );
     const ticketDocumentPath = String(submission.ticket_document_path || "");
     const ticketOwnerId = submission.source_assessment_id || submissionId;
     await requireStoredObject(

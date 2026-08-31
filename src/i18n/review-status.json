@@ -1,14 +1,137 @@
 {
   "sourceVersion": "rapid-resolution-2026-08-30",
   "locales": {
-    "en": { "status": "source" },
-    "pa": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
-    "tl": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
-    "zh-hans": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
-    "zh-hant": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
-    "ar": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
-    "hi": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
-    "es": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false }
+    "en": {
+      "status": "source"
+    },
+    "pa": {
+      "status": "published",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "sourceFingerprint": "fnv1a-8a78359b",
+      "bundleFingerprint": "fnv1a-77724124",
+      "serviceReady": false,
+      "publication": {
+        "basis": "owner_authorized_machine_translation",
+        "authorizedBy": "Brett Bilon",
+        "authorizedAt": "2026-08-31T02:09:07.163Z"
+      },
+      "sourceDocuments": {
+        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+      }
+    },
+    "tl": {
+      "status": "published",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "sourceFingerprint": "fnv1a-8a78359b",
+      "bundleFingerprint": "fnv1a-f8518fa7",
+      "serviceReady": false,
+      "publication": {
+        "basis": "owner_authorized_machine_translation",
+        "authorizedBy": "Brett Bilon",
+        "authorizedAt": "2026-08-31T02:09:07.163Z"
+      },
+      "sourceDocuments": {
+        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+      }
+    },
+    "zh-hans": {
+      "status": "published",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "sourceFingerprint": "fnv1a-8a78359b",
+      "bundleFingerprint": "fnv1a-6b2700f8",
+      "serviceReady": false,
+      "publication": {
+        "basis": "owner_authorized_machine_translation",
+        "authorizedBy": "Brett Bilon",
+        "authorizedAt": "2026-08-31T02:09:07.163Z"
+      },
+      "sourceDocuments": {
+        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+      }
+    },
+    "zh-hant": {
+      "status": "published",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "sourceFingerprint": "fnv1a-8a78359b",
+      "bundleFingerprint": "fnv1a-28b4a50d",
+      "serviceReady": false,
+      "publication": {
+        "basis": "owner_authorized_machine_translation",
+        "authorizedBy": "Brett Bilon",
+        "authorizedAt": "2026-08-31T02:09:07.163Z"
+      },
+      "sourceDocuments": {
+        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+      }
+    },
+    "ar": {
+      "status": "published",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "sourceFingerprint": "fnv1a-8a78359b",
+      "bundleFingerprint": "fnv1a-221a6e8b",
+      "serviceReady": false,
+      "publication": {
+        "basis": "owner_authorized_machine_translation",
+        "authorizedBy": "Brett Bilon",
+        "authorizedAt": "2026-08-31T02:09:07.163Z"
+      },
+      "sourceDocuments": {
+        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+      }
+    },
+    "hi": {
+      "status": "published",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "sourceFingerprint": "fnv1a-8a78359b",
+      "bundleFingerprint": "fnv1a-5e01e296",
+      "serviceReady": false,
+      "publication": {
+        "basis": "owner_authorized_machine_translation",
+        "authorizedBy": "Brett Bilon",
+        "authorizedAt": "2026-08-31T02:09:07.163Z"
+      },
+      "sourceDocuments": {
+        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+      }
+    },
+    "es": {
+      "status": "published",
+      "reviewedBy": null,
+      "reviewedAt": null,
+      "sourceFingerprint": "fnv1a-8a78359b",
+      "bundleFingerprint": "fnv1a-71277100",
+      "serviceReady": false,
+      "publication": {
+        "basis": "owner_authorized_machine_translation",
+        "authorizedBy": "Brett Bilon",
+        "authorizedAt": "2026-08-31T02:09:07.163Z"
+      },
+      "sourceDocuments": {
+        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+      }
+    }
   },
-  "contact": { "whatsappNumber": null }
+  "contact": {
+    "whatsappNumber": null
+  }
 }

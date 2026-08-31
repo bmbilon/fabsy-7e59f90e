@@ -55,9 +55,10 @@ function ServicePrinciples() {
 
 function ContactSection() {
   const { t } = useTranslation();
-  const { isReleased } = useLocale();
+  const { locale, isReleased } = useLocale();
   const number: unknown = review.contact.whatsappNumber;
-  const whatsapp = isReleased && typeof number === 'string' && /^[1-9]\d{7,14}$/.test(number) ? `https://wa.me/${number}` : null;
+  const serviceReady = locale !== 'en' && review.locales[locale]?.serviceReady === true;
+  const whatsapp = isReleased && serviceReady && typeof number === 'string' && /^[1-9]\d{7,14}$/.test(number) ? `https://wa.me/${number}` : null;
   return <div className="mx-auto max-w-3xl space-y-6">
     <h1 className="text-4xl font-bold">{t('contact.title')}</h1><p className="text-lg leading-relaxed text-slate-600">{t('contact.description')}</p>
     <Card className="space-y-4 p-6">

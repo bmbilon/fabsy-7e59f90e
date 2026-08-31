@@ -13,7 +13,7 @@ const evidenceColumns = ['status', 'reviewer_name', 'review_date', 'decision', '
 const legalPrefixes = [
   'terms.', 'intake.consent.', 'checkout.', 'rapid.speed', 'rapid.included.', 'rapid.excluded.',
   'faq.items.', 'notifications.', 'language.englishControls', 'language.paymentBlocked',
-  'language.draft', 'common.notLawFirm', 'common.noOutcomePromise', 'common.noSuccessFee',
+  'language.draft', 'language.translationNote', 'common.notLawFirm', 'common.noOutcomePromise', 'common.noSuccessFee',
   'common.clientDecision', 'common.priceLine', 'home.education', 'home.scope',
   'contact.availability', 'contact.staffAvailability', 'contact.whatsapp',
   'intake.fields.smsOptIn', 'intake.review.languageNote',

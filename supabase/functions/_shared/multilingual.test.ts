@@ -17,7 +17,7 @@ Deno.test("Wave 1 API preserves every distinct script and accepts legacy English
   }
 });
 
-Deno.test("server blocks unreviewed service locales by default and requires exact release attestation", () => {
+Deno.test("server requires an exact operator release allowlist and accepts every Wave 1 locale", () => {
   requireReleasedServiceLocale("en", undefined);
   for (const locale of SUPPORTED_LOCALES.filter((value) => value !== "en")) {
     assert.throws(() => requireReleasedServiceLocale(locale, undefined), (error: unknown) => {
@@ -29,9 +29,44 @@ Deno.test("server blocks unreviewed service locales by default and requires exac
   }
   requireReleasedServiceLocale("pa", "pa, tl");
   requireReleasedServiceLocale("tl", "pa, tl");
+  for (const locale of SUPPORTED_LOCALES) {
+    requireReleasedServiceLocale(locale, "pa,tl,zh-hans,zh-hant,ar,hi,es");
+  }
   assert.throws(() => requireReleasedServiceLocale("ar", "pa,tl"));
   assert.throws(() => requireReleasedServiceLocale("pa", "pa-IN"));
   assert.throws(() => requireReleasedServiceLocale("pa", "*"));
+});
+
+Deno.test("live release overrides the legacy reviewed flag, including an explicit rollback to English", () => {
+  requireReleasedServiceLocale("pa", undefined, "pa,tl");
+  requireReleasedServiceLocale("tl", undefined, "pa,tl");
+  requireReleasedServiceLocale("ar", "ar", "pa,tl");
+  assert.throws(() => requireReleasedServiceLocale("pa", "ar", "pa,tl"));
+  for (const empty of ["", "  ", "en"]) {
+    requireReleasedServiceLocale("en", empty, SUPPORTED_LOCALES.join(","));
+    for (const locale of SUPPORTED_LOCALES.filter((value) => value !== "en")) {
+      assert.throws(() => requireReleasedServiceLocale(locale, empty, SUPPORTED_LOCALES.join(",")));
+    }
+  }
+  for (const invalid of ["*", "PA", "pa-IN", "fil", "zh-Hant", "zh", "ur"]) {
+    for (const locale of SUPPORTED_LOCALES.filter((value) => value !== "en")) {
+      assert.throws(() => requireReleasedServiceLocale(locale, invalid, SUPPORTED_LOCALES.join(",")));
+    }
+  }
+});
+
+Deno.test("a live release cannot make invalid request locale identifiers acceptable", () => {
+  for (const invalid of [null, "", "*", "PA", "pa-IN", "fil", "zh", "zh-Hant", {}, ["pa"]]) {
+    assert.throws(() => requireReleasedServiceLocale(
+      parsePreferredLocale(invalid),
+      "pa,tl,zh-hans,zh-hant,ar,hi,es",
+    ), (error: unknown) => {
+      assert.ok(error instanceof LocaleRequestError);
+      assert.equal(error.status, 400);
+      assert.equal(error.code, "invalid_preferred_locale");
+      return true;
+    });
+  }
 });
 
 Deno.test("public payment return paths preserve locale without changing the query or fragment", () => {
