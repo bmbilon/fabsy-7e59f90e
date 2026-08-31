@@ -5,24 +5,19 @@ import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import useSafeHead from '@/hooks/useSafeHead';
-import { readMarketingAttribution } from '@/lib/marketingAttribution';
+import { usePaidPurchaseTracking } from '@/hooks/usePaidPurchaseTracking';
 import { PHOTO_RADAR, RAPID_RESOLUTION } from '@/config/offers';
-import { paidCheckoutSummary, purchaseAdsDestination, type CheckoutReceipt } from '@/lib/checkoutReceipt';
-
-type Gtag = (...args: unknown[]) => void;
-
-interface AnalyticsWindow extends Window {
-  gtag?: Gtag;
-}
-
-const reportedPurchases = new Set<string>();
+import { paidCheckoutSummary, type CheckoutReceipt } from '@/lib/checkoutReceipt';
 
 const ThankYou: React.FC = () => {
   const [searchParams] = useSearchParams();
+  // React Router retains this in memory when only the browser URL is scrubbed.
+  // A later SPA navigation still supplies its own session rather than a stale one.
   const sessionId = searchParams.get('session_id');
   const [receipt, setReceipt] = useState<CheckoutReceipt | null>(null);
   const [checking, setChecking] = useState(false);
   const summary = paidCheckoutSummary(receipt);
+  usePaidPurchaseTracking(receipt, sessionId);
   const offer = summary?.photoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const url = 'https://fabsy.ca/thank-you';
   useSafeHead({
@@ -58,40 +53,6 @@ const ThankYou: React.FC = () => {
           const paid = paidCheckoutSummary(data);
           if (!paid) return;
           setReceipt(data);
-          const gtag = (window as AnalyticsWindow).gtag;
-          const transaction_id = paid.transactionId;
-          const purchaseKey = `fabsy-paid-purchase:${transaction_id}`;
-          if (typeof gtag !== 'function' || reportedPurchases.has(transaction_id)) return;
-          try { if (window.sessionStorage.getItem(purchaseKey)) return; } catch { /* Storage is optional. */ }
-          const value = paid.serviceValue;
-          const currency = 'CAD';
-          const acq = readMarketingAttribution();
-          gtag('event', 'purchase', {
-            ...acq,
-            transaction_id,
-            value,
-            currency,
-            tax: paid.tax,
-            order_type: paid.orderType,
-            items: [{ item_id: paid.orderType, item_name: paid.name, quantity: 1, price: value }],
-          });
-
-          // A missing Photo label must never fall back to the officer goal.
-          const adsDestination = purchaseAdsDestination(paid.orderType, {
-            destinationId: import.meta.env.VITE_GADS_ID,
-            officerPurchaseLabel: import.meta.env.VITE_GADS_PURCHASE_LABEL,
-            photoRadarPurchaseLabel: import.meta.env.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL,
-          });
-          if (adsDestination) {
-            gtag('event', 'conversion', {
-              send_to: adsDestination,
-              value,
-              currency,
-              transaction_id,
-            });
-          }
-          reportedPurchases.add(transaction_id);
-          try { window.sessionStorage.setItem(purchaseKey, '1'); } catch { /* Storage is optional. */ }
         } catch {
           // Analytics failures must not interrupt the confirmation page.
         } finally {

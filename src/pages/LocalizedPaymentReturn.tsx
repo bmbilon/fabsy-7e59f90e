@@ -7,44 +7,29 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocale } from '@/i18n/locale-context';
 import useSafeHead from '@/hooks/useSafeHead';
-import { readMarketingAttribution } from '@/lib/marketingAttribution';
-
-type SessionResult = { id?: string; payment_status?: string; amount_total?: number; currency?: string; total_details?: { amount_tax?: number } };
-type AnalyticsWindow = Window & { gtag?: (...args: unknown[]) => void };
-const reportedTransactions = new Set<string>();
+import { usePaidPurchaseTracking } from '@/hooks/usePaidPurchaseTracking';
+import { paidCheckoutSummary, type CheckoutReceipt } from '@/lib/checkoutReceipt';
 
 export default function LocalizedPaymentReturn() {
   const { t } = useTranslation();
   const { locale, href, isReleased } = useLocale();
   const location = useLocation();
+  // Read React Router's retained location, never the scrubbed window URL.
   const sessionId = new URLSearchParams(location.search).get('session_id');
-  const [receipt, setReceipt] = useState<SessionResult | null>(null);
+  const [receipt, setReceipt] = useState<CheckoutReceipt | null>(null);
   const [verifying, setVerifying] = useState(false);
+  usePaidPurchaseTracking(isReleased ? receipt : null, sessionId);
   useSafeHead({ title: `${t('checkout.title')} | Fabsy`, description: t('checkout.scope'), canonical: `https://fabsy.ca${href('/thank-you')}`, robots: 'noindex, nofollow' });
 
   useEffect(() => {
     let cancelled = false;
     setReceipt(null);
     setVerifying(false);
-    if (!isReleased || !sessionId || !/^cs_(?:test_|live_)?[A-Za-z0-9_]+$/.test(sessionId)) return;
+    if (!isReleased || !sessionId || !/^cs_(?:test_|live_)[A-Za-z0-9]+$/.test(sessionId)) return;
     setVerifying(true);
-    void supabase.functions.invoke<SessionResult>('get-checkout-session', { body: { sessionId } }).then(({ data, error }) => {
-      if (cancelled || error || data?.payment_status !== 'paid') return;
+    void supabase.functions.invoke<CheckoutReceipt>('get-checkout-session', { body: { sessionId } }).then(({ data, error }) => {
+      if (cancelled || error || data?.id !== sessionId || !paidCheckoutSummary(data)) return;
       setReceipt(data);
-      const gtag = (window as AnalyticsWindow).gtag;
-      const transactionId = data.id || sessionId;
-      // A return URL alone is not evidence of payment or a submitted lead.
-      if (gtag && typeof data.amount_total === 'number' && !reportedTransactions.has(transactionId)) {
-        reportedTransactions.add(transactionId);
-        const value = data.amount_total / 100;
-        const currency = (data.currency || 'CAD').toUpperCase();
-        try {
-          gtag('event', 'purchase', { ...readMarketingAttribution(), transaction_id: transactionId, value, currency, tax: (data.total_details?.amount_tax || 0) / 100, preferred_locale: locale });
-          if (import.meta.env.VITE_GADS_ID && import.meta.env.VITE_GADS_PURCHASE_LABEL) gtag('event', 'conversion', {
-            send_to: `${import.meta.env.VITE_GADS_ID}/${import.meta.env.VITE_GADS_PURCHASE_LABEL}`, value, currency, transaction_id: transactionId,
-          });
-        } catch { /* Measurement must never block the verified receipt. */ }
-      }
     }).catch(() => undefined).finally(() => { if (!cancelled) setVerifying(false); });
     return () => { cancelled = true; };
   }, [sessionId, isReleased, locale]);

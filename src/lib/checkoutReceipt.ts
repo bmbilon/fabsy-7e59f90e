@@ -20,7 +20,8 @@ const productNames: Record<string, string> = {
 export function paidCheckoutSummary(receipt: CheckoutReceipt | null | undefined) {
   if (!receipt || receipt.payment_status !== "paid" || receipt.mode !== "payment" ||
       !/^cs_(?:test_|live_)[A-Za-z0-9]+$/.test(receipt.id || "") ||
-      receipt.currency?.toLowerCase() !== "cad" || !productNames[receipt.order_type || ""]) return null;
+      /\s/.test(receipt.id || "") || receipt.currency?.toLowerCase() !== "cad" ||
+      !Object.prototype.hasOwnProperty.call(productNames, receipt.order_type || "")) return null;
   const total = receipt.amount_total;
   const tax = receipt.total_details?.amount_tax;
   if (!Number.isSafeInteger(total) || !Number.isSafeInteger(tax) || total! < 0 || tax! < 0 || tax! > total!) return null;
@@ -46,11 +47,11 @@ export function purchaseAdsDestination(orderType: string, config: {
   officerPurchaseLabel?: string;
   photoRadarPurchaseLabel?: string;
 }): string | null {
-  if (!/^AW-\d+$/.test(config.destinationId || "")) return null;
+  if (!/^AW-\d+$/.test(config.destinationId || "") || /\s/.test(config.destinationId || "")) return null;
   const photo = orderType === "photo_radar";
   if (!photo && orderType !== "rapid_resolution" && orderType !== "rapid_resolution_bundle") return null;
   const label = photo ? config.photoRadarPurchaseLabel : config.officerPurchaseLabel;
-  if (!label || !/^[A-Za-z0-9_-]+$/.test(label)) return null;
+  if (!label || !/^[A-Za-z0-9_-]+$/.test(label) || /\s/.test(label)) return null;
   if (photo && label === config.officerPurchaseLabel) return null;
   return `${config.destinationId}/${label}`;
 }

@@ -7,7 +7,7 @@ test("a paid Photo Radar order reports79 revenue and3.95GST once under the Strip
   assert.deepEqual(paidCheckoutSummary(photo), { transactionId: photo.id, orderType: "photo_radar", name: "Rapid Resolution: Photo Radar", photoRadar: true, total: 82.95, tax: 3.95, serviceValue: 79, discount: 0, proDiscountApplied: false });
 });
 test("unpaid, unknown, malformed and incorrectly taxed camera receipts cannot become purchases", () => {
-  for (const changed of [{ payment_status: "unpaid" }, { mode: "subscription" }, { id: "unverified" }, { order_type: "unknown" }, { amount_total: 7900 }, { amount_total: -8295 }, { amount_subtotal: 19800 }, { total_details: { amount_tax: 0 } }, { total_details: { amount_tax: 395, amount_discount: 100 } }]) assert.equal(paidCheckoutSummary({ ...photo, ...changed }), null);
+  for (const changed of [{ payment_status: "unpaid" }, { mode: "subscription" }, { id: "unverified" }, { id: "cs_test_syntheticreceipt\n" }, { order_type: "unknown" }, { order_type: "constructor" }, { order_type: "__proto__" }, { amount_total: 7900 }, { amount_total: -8295 }, { amount_subtotal: 19800 }, { total_details: { amount_tax: 0 } }, { total_details: { amount_tax: 395, amount_discount: 100 } }]) assert.equal(paidCheckoutSummary({ ...photo, ...changed }), null);
   assert.equal(paidCheckoutSummary(null), null);
 });
 test("officer discounted purchases use the actual collected service value, not gross subtotal", () => {
@@ -28,4 +28,6 @@ test("camera purchase reporting cannot contaminate the officer-ticket advertisin
   assert.equal(purchaseAdsDestination("rapid_resolution_bundle", config), "AW-123456/officer_test");
   assert.equal(purchaseAdsDestination("unverified", config), null);
   assert.equal(purchaseAdsDestination(paid.orderType, { ...config, destinationId: undefined }), null);
+  assert.equal(purchaseAdsDestination(paid.orderType, { ...config, destinationId: "AW-123456\n" }), null);
+  assert.equal(purchaseAdsDestination(paid.orderType, { ...config, photoRadarPurchaseLabel: "photo_test\n" }), null);
 });
