@@ -35,8 +35,11 @@ The dedicated homepage guard runs against actual server-rendered React output an
 At integration handoff:
 
 - Homepage snapshot guard: 37 positive/negative checks passed after the canonical policy merge, including rejection of both superseded offer-receipt wording and a customer-rejection clock.
-- Existing public-offer guard: 186 checks passed.
+- Existing public-offer guard: 191 checks passed.
 - Full application TypeScript check and Contrast Guard passed.
-- Vite production compilation passed during integration; the final full npm build and browser/prerender verification are owned by the release coordinator.
+- Full `npm run build` passed with required page-sync and snapshot manifests, including the 12 upload/review interaction checks, language checks and measurement regressions.
+- Full-tree validation passed for 1,280 snapshots, including 1,122 generated content pages and 77 rendered blog pages. FAQ JSON-LD and visible-copy parity also passed.
 
-The checked-in English root snapshot initially still contained the prior hero and must be refreshed from the integrated page before final full-tree snapshot validation. The new guard intentionally does not excuse a stale standalone canonical notice on the homepage. Generated snapshots, locale approval records, caches and deployment state are not automatically approved by this visual change.
+The English root and affected static policy snapshots were refreshed from the integrated production preview. Deterministic generators then refreshed the dependent snapshots and manifests. The new guard intentionally does not excuse a stale standalone canonical notice on the homepage. Unrelated workspace changes and local caches are excluded from the release.
+
+Deployment uses the existing main-branch GitHub workflow for Cloudflare Pages so production measurement and Supabase configuration are retained. The only separate backend deployment required is `generate-consent-form`, bundled with Docker and its configured font/WASM assets. No database migrations, customer submissions, payments, refunds or regeneration of existing consent documents are part of this release.
