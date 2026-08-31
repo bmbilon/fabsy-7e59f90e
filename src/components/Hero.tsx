@@ -26,17 +26,13 @@ const Hero = () => (
         <p className="mt-5 text-lg font-semibold text-blue-200 sm:text-xl">
           {HOMEPAGE_REFUND_COPY.headline}
         </p>
-        <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-base">
-          {HOMEPAGE_REFUND_COPY.outcomeQualification}{" "}
-          {HOMEPAGE_REFUND_COPY.refundCondition}
-        </p>
         <p className="mt-4 text-sm text-slate-200">
           <strong className="font-semibold text-white">${RAPID_RESOLUTION.priceCad} CAD + GST</strong>
           {" "}· Paid upfront; refunded if the policy applies
         </p>
 
-        <div className="mt-5 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-6">
-          <Button asChild size="lg" className="min-h-12 bg-primary-dark px-6 text-base font-bold text-white hover:bg-blue-700">
+        <div className="mt-5 flex justify-center">
+          <Button asChild size="lg" className="min-h-12 w-full bg-primary-dark px-6 text-base font-bold text-white hover:bg-blue-700 sm:w-auto">
             <Link
               to={RAPID_RESOLUTION.intakePath}
               onClick={() =>
@@ -51,12 +47,29 @@ const Hero = () => (
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
           </Button>
-          <a href="#fabsy-difference" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm text-sm font-semibold text-slate-100 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
-            See the Fabsy difference
-            <ArrowDown className="h-4 w-4 text-blue-300" aria-hidden="true" />
-          </a>
         </div>
 
+        <figure className="mx-auto mt-5 max-w-2xl overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 sm:mt-6 sm:rounded-3xl">
+          <img
+            src="/fabsy-way-comparison-2026.webp"
+            alt="On your own: research, paperwork, navigating complex and confusing legal procedures, inconvenient deadlines, follow-ups and unpredictable outcomes. The Fabsy way: ticket reviewed, court proceedings handled, options explained, and you in control. Eligible pre-trial matters; trial representation separate."
+            width={1305}
+            height={1206}
+            loading="eager"
+            {...{ fetchpriority: "high" }}
+            decoding="async"
+            className="h-auto w-full"
+          />
+        </figure>
+
+        <a href="#fabsy-difference" className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-sm text-sm font-semibold text-slate-100 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+          See the Fabsy difference
+          <ArrowDown className="h-4 w-4 text-blue-300" aria-hidden="true" />
+        </a>
+        <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-slate-300 sm:text-[13px]">
+          {HOMEPAGE_REFUND_COPY.outcomeQualification}{" "}
+          {HOMEPAGE_REFUND_COPY.refundCondition}
+        </p>
         <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-slate-400">
           For eligible Alberta pre-trial matters. Government fines and trial representation are separate.{" "}
           <a href="#money-back-guarantee" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-blue-200 underline underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">

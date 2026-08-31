@@ -22,7 +22,7 @@ export default function HomepageComparison() {
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.17em] text-primary-dark">The Fabsy difference</p>
               <h2 id="homepage-difference-heading" className="mt-3 text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-[2.75rem]">
-                Less on your plate.<br />More support on your side.
+                Remove the uncertainty and get local expertise on your side
               </h2>
             </div>
             <p className="max-w-sm text-base leading-relaxed text-slate-600">
@@ -30,43 +30,27 @@ export default function HomepageComparison() {
             </p>
           </div>
 
-          <div className="grid items-center gap-8 lg:grid-cols-[1.08fr_1fr] lg:gap-12">
-            <figure className="overflow-hidden rounded-2xl bg-slate-950 sm:rounded-3xl">
-              <img
-                src="/fabsy-way-comparison-2026.webp"
-                alt="On your own: research, paperwork, navigating complex and confusing legal procedures, inconvenient deadlines, follow-ups and unpredictable outcomes. The Fabsy way: ticket reviewed, court proceedings handled, options explained, and you in control. Eligible pre-trial matters; trial representation separate."
-                width={1305}
-                height={1206}
-                loading="lazy"
-                decoding="async"
-                className="h-auto w-full"
-              />
-            </figure>
-
-            <div>
-              <ul className="divide-y divide-slate-200">
-                {differences.map(({ icon: Icon, challenge, answer, detail }) => (
-                  <li key={challenge} className="flex gap-4 py-5 first:pt-0 last:pb-0">
-                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-primary-dark">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-500">{challenge}</p>
-                      <div>
-                        <h3 className="mt-1 text-lg font-bold leading-snug text-slate-950">{answer}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-slate-600">{detail}</p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <Link to={RAPID_RESOLUTION.slug} className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-bold text-primary-dark underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                See everything included for ${RAPID_RESOLUTION.priceCad}
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <p className="mt-1 text-xs text-slate-500">CAD plus GST. Eligible pre-trial matters; trial separate.</p>
-            </div>
-          </div>
+          <ul className="grid gap-6 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-8">
+            {differences.map(({ icon: Icon, challenge, answer, detail }) => (
+              <li key={challenge} className="flex gap-4 border-t border-slate-200 pt-5">
+                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-primary-dark">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500">{challenge}</p>
+                  <div>
+                    <h3 className="mt-1 text-lg font-bold leading-snug text-slate-950">{answer}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{detail}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <Link to={RAPID_RESOLUTION.slug} className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-bold text-primary-dark underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+            See everything included for ${RAPID_RESOLUTION.priceCad}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+          <p className="mt-1 text-xs text-slate-500">CAD plus GST. Eligible pre-trial matters; trial separate.</p>
         </div>
       </section>
 
