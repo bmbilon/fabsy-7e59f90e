@@ -7,6 +7,7 @@ export const LEGAL_SOURCE_DOCUMENT_PATHS = Object.freeze([
   'src/pages/PrivacyPolicy.tsx',
   'src/config/pro-drivers.ts',
   'src/config/offers.ts',
+  'src/config/feeRefund.json',
   'supabase/functions/_shared/consent-pdf.ts',
 ]);
 

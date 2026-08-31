@@ -11,7 +11,7 @@ const PHOTO_RADAR_CONTENT = require('../src/config/photoRadarContent.json');
 const PHOTO_RADAR_CONTENT_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
 const FEE_REFUND = require('../src/config/feeRefund.json');
 const REVIEWED_REFUND_SOURCE_HASHES = Object.freeze({
-  'src/config/feeRefund.json': 'd61d1fe2d10ef5c58f69ebcf4ef4caf277f15b7121cd09d40f64b062819b2767',
+  'src/config/feeRefund.json': '7c71eb69561754d02aae8cb9f178a8229b6a1203de45eab7e1f86e6f99614732',
   'src/config/photoRadarContent.json': '90796ae2642f9fc405c80dc6ab459b1118ad5cdd6dd114668151b75a428754af',
 });
 // These are reviewed business-policy passages, not a licence for arbitrary

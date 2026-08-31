@@ -17,6 +17,7 @@ import {
 } from './locale-seo.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const FEE_REFUND = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/config/feeRefund.json'), 'utf8'));
 const EMAIL = 'hello@fabsy.ca';
 const FEE_REFUND_TERMS_PATH = '/terms-of-service#fee-refund-guarantee';
 const INSURER_NAMES = ['Intact Insurance', 'TD Insurance', 'Wawanesa Insurance', 'Co-operators', 'Desjardins Insurance', 'Allstate Insurance', 'Aviva Canada'];
@@ -51,8 +52,9 @@ export function renderInsuranceContextSnapshot(translate) {
 export function renderFeeRefundSnapshot(translate, code, { openTermsInNewTab = false } = {}) {
   const p = key => `<p>${esc(translate(`feeRefund.${key}`))}</p>`;
   const english = code === 'en' ? '' : ' <span lang="en">(English)</span>';
+  const declinedOffer = `<p lang="en" dir="ltr">${code === 'en' ? '' : '<span class="font-semibold">Refund clarification (English): </span>'}${esc(FEE_REFUND.declinedOfferText)}</p>`;
   const target = openTermsInNewTab ? ' target="_blank" rel="noopener noreferrer"' : '';
-  return `<aside data-fee-refund-notice="ticket-representation"><h2>${esc(translate('feeRefund.headline'))}</h2>${p('condition')}${p('payment')}<a href="${FEE_REFUND_TERMS_PATH}"${target}>${esc(translate('feeRefund.details'))}${english}</a></aside>`;
+  return `<aside data-fee-refund-notice="ticket-representation"><h2>${esc(translate('feeRefund.headline'))}</h2>${p('condition')}${declinedOffer}${p('payment')}<a href="${FEE_REFUND_TERMS_PATH}"${target}>${esc(translate('feeRefund.details'))}${english}</a></aside>`;
 }
 
 /** Refresh only the two identified homepage sections; keep every other byte. */

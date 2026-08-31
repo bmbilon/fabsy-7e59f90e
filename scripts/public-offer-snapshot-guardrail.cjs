@@ -11,6 +11,7 @@ const fleet = require('../src/config/fleetContent.json');
 const { publicContent, pricing, renderProDrivers } = require('./generate-pro-referral-snapshots.cjs');
 const { renderPhotoRadar, renderFleet } = require('./generate-photo-radar-snapshots.cjs');
 const { proDriverPromotionValues } = require('./pro-driver-promotion-guardrail.cjs');
+const { redactHomepageVisualSnapshot } = require('./homepage-visual-snapshot-guardrail.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_ROUTES = new Set(['/photo-radar', '/fleet', '/free-ticket-check', '/pro-drivers', '/refer']);
@@ -118,7 +119,7 @@ function safeRefundNotice(element, icons = 0) {
   for (const icon of safe.querySelectorAll('svg')) icon.remove();
   const attributes = {
     ASIDE: ['class', 'data-fee-refund-notice'], SECTION: ['class', 'aria-labelledby'],
-    DIV: ['class'], H2: ['class', 'id'], P: ['class'], A: ['class', 'href', 'target', 'rel'],
+    DIV: ['class'], H2: ['class', 'id'], P: ['class', 'lang', 'dir'], A: ['class', 'href', 'target', 'rel'],
   };
   // Component admission must not erase a new claim in an accessibility label
   // or an added element merely because its visible text still looks familiar.
@@ -134,20 +135,21 @@ function redactExactRefundNotices(document, route, issues) {
   const headline = photoNotice ? feeRefund.photoHeadline : feeRefund.headline;
   const condition = photoNotice ? feeRefund.photoCondition : feeRefund.condition;
   const marker = photoNotice ? 'photo-radar' : 'ticket-representation';
-  const copies = [headline, condition, feeRefund.payment, feeRefund.details];
+  const copies = [headline, condition, feeRefund.declinedOfferText, feeRefund.payment, feeRefund.details];
   if (source?.includes('<FeeRefundNotice') && component.includes('to={FEE_REFUND.termsPath}') &&
-      ['{copy(photoRadar ? "photoHeadline" : "headline")}', '{copy(photoRadar ? "photoCondition" : "condition")}', '{copy("payment")}', '{copy("details")}'].every(value => component.includes(value))) {
+      ['{copy(photoRadar ? "photoHeadline" : "headline")}', '{copy(photoRadar ? "photoCondition" : "condition")}', '{FEE_REFUND.declinedOfferText}', '{copy("payment")}', '{copy("details")}'].every(value => component.includes(value))) {
     const notices = Array.from(document.querySelectorAll('main aside[data-fee-refund-notice]'));
     if (notices.length > 1) issues.push('Fee-refund notice is duplicated');
     for (const notice of notices) {
       const generatedChildren = Array.from(notice.children);
-      const generatedLink = generatedChildren[3]?.querySelector('a');
+      const generatedLink = generatedChildren[4]?.querySelector('a');
       if (route === '/pro-drivers' && sourceText('scripts/generate-pro-referral-snapshots.cjs').includes('<aside data-fee-refund-notice="ticket-representation"><h2>${esc(feeRefund.headline)}</h2>') &&
-          notice.getAttribute('data-fee-refund-notice') === marker && generatedChildren.length === 4 &&
-          generatedChildren.map(child => child.tagName).join(',') === 'H2,P,P,P' &&
-          generatedChildren.slice(0, 3).every((child, index) => !child.children.length && exact(child.textContent, copies[index])) &&
-          generatedChildren[3].children.length === 1 && generatedLink && !generatedLink.children.length &&
-          generatedLink.getAttribute('href') === feeRefund.termsPath && exact(generatedChildren[3].textContent, feeRefund.details) &&
+          notice.getAttribute('data-fee-refund-notice') === marker && generatedChildren.length === 5 &&
+          generatedChildren.map(child => child.tagName).join(',') === 'H2,P,P,P,P' &&
+          generatedChildren.slice(0, 4).every((child, index) => !child.children.length && exact(child.textContent, copies[index])) &&
+          generatedChildren[2].getAttribute('lang') === 'en' && generatedChildren[2].getAttribute('dir') === 'ltr' &&
+          generatedChildren[4].children.length === 1 && generatedLink && !generatedLink.children.length &&
+          generatedLink.getAttribute('href') === feeRefund.termsPath && exact(generatedChildren[4].textContent, feeRefund.details) &&
           exact(notice.textContent, copies.join('')) && safeRefundNotice(notice)) {
         notice.textContent = '[exact source-scoped generated fee-refund notice]';
         continue;
@@ -155,12 +157,13 @@ function redactExactRefundNotices(document, route, issues) {
       const fields = Array.from(notice.querySelectorAll('h2,p,a'));
       const exactEnglishTemplate = route === '/terms-of-service' && notice.closest('main')?.getAttribute('data-fabsy-locale') === 'en' &&
         sourceText('scripts/generate-localized-snapshots.mjs').includes('<aside data-fee-refund-notice="ticket-representation"><h2>${esc(translate(\'feeRefund.headline\'))}</h2>') &&
-        notice.children.length === 4 && Array.from(notice.children).map(child => child.tagName).join(',') === 'H2,P,P,A';
-      if (notice.getAttribute('data-fee-refund-notice') !== marker || fields.length !== 4 ||
+        notice.children.length === 5 && Array.from(notice.children).map(child => child.tagName).join(',') === 'H2,P,P,P,A';
+      if (notice.getAttribute('data-fee-refund-notice') !== marker || fields.length !== 5 ||
           fields.some((field, index) => field.children.length || !exact(field.textContent, copies[index])) ||
-          fields.map(field => field.tagName).join(',') !== 'H2,P,P,A' || fields[3].getAttribute('href') !== feeRefund.termsPath ||
+          fields.map(field => field.tagName).join(',') !== 'H2,P,P,P,A' || fields[4].getAttribute('href') !== feeRefund.termsPath ||
+          fields[2].getAttribute('lang') !== 'en' || fields[2].getAttribute('dir') !== 'ltr' ||
           !exact(notice.textContent, copies.join('')) || !safeRefundNotice(notice, exactEnglishTemplate ? 0 : 1)) {
-        issues.push('Fee-refund notice must retain its exact promise, Crown trigger, payment disclosure and terms link');
+        issues.push('Fee-refund notice must retain its exact promise, Crown trigger, declined-offer clarification, payment disclosure and terms link');
         continue;
       }
       notice.textContent = '[exact source-scoped fee-refund notice]';
@@ -176,11 +179,12 @@ function redactExactRefundNotices(document, route, issues) {
   if (route === '/photo-radar' && sourceText('scripts/generate-photo-radar-snapshots.cjs').includes('aria-labelledby="photo-fee-refund-heading"')) {
     for (const notice of document.querySelectorAll('main section[aria-labelledby="photo-fee-refund-heading"]')) {
       const children = Array.from(notice.children);
-      const link = children[3]?.querySelector('a');
-      if (children.length !== 4 || children.map(child => child.tagName).join(',') !== 'H2,P,P,P' ||
-          children[0].id !== 'photo-fee-refund-heading' || children.slice(0, 3).some((child, index) => child.children.length || !exact(child.textContent, copies[index])) ||
-          children[3].children.length !== 1 || !link || link.children.length || link.getAttribute('href') !== feeRefund.termsPath ||
-          !exact(children[3].textContent, feeRefund.details) || !exact(notice.textContent, copies.join('')) || !safeRefundNotice(notice)) {
+      const link = children[4]?.querySelector('a');
+      if (children.length !== 5 || children.map(child => child.tagName).join(',') !== 'H2,P,P,P,P' ||
+          children[0].id !== 'photo-fee-refund-heading' || children.slice(0, 4).some((child, index) => child.children.length || !exact(child.textContent, copies[index])) ||
+          children[2].getAttribute('lang') !== 'en' || children[2].getAttribute('dir') !== 'ltr' ||
+          children[4].children.length !== 1 || !link || link.children.length || link.getAttribute('href') !== feeRefund.termsPath ||
+          !exact(children[4].textContent, feeRefund.details) || !exact(notice.textContent, copies.join('')) || !safeRefundNotice(notice)) {
         issues.push('Photo Radar snapshot must retain its complete exact fee-refund notice');
         continue;
       }
@@ -228,6 +232,9 @@ function redactExactRefundFaqs(document, route, issues) {
     entries = [{ question: 'Is a withdrawal or reduction promised?', answer: `${feeRefund.payment} ${feeRefund.condition}` }];
   } else if (route === '/faq' && sourceText(REFUND_NOTICE_SOURCES[route]).includes('a: `${FEE_REFUND.payment} ${FEE_REFUND.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.`')) {
     entries = [{ question: 'Does Fabsy promise a particular result?', answer: `${feeRefund.payment} ${feeRefund.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.` }];
+    if (sourceText(REFUND_NOTICE_SOURCES[route]).includes('q: "Can I get a refund if I decline a reduced Crown offer?", a: FEE_REFUND.declinedOfferText')) {
+      entries.push({ question: 'Can I get a refund if I decline a reduced Crown offer?', answer: feeRefund.declinedOfferText });
+    }
   }
   if (!entries.length) return;
   // FAQSection's effect uses the same formatter as its visible answer. Only
@@ -443,7 +450,7 @@ function redactTermsAdditions(document) {
     '(PRO_DRIVER_RAPID_CENTS / 100).toFixed(2)': pricing.rapidPrice,
     '(PRO_DRIVER_BUNDLE_CENTS / 100).toFixed(2)': pricing.bundlePrice,
     'FEE_REFUND.headline': feeRefund.headline, 'FEE_REFUND.payment': feeRefund.payment,
-    'FEE_REFUND.condition': feeRefund.condition, '" "': ' ',
+    'FEE_REFUND.condition': feeRefund.condition, 'FEE_REFUND.declinedOfferText': feeRefund.declinedOfferText, '" "': ' ',
   };
   const source = sourceText('src/pages/TermsOfService.tsx', process.env.LOCALE_SOURCE_ROOT || ROOT).replace(/\{([^{}]+)\}/g,
     (original, expression) => substitutions[expression.trim()] ?? original);
@@ -466,7 +473,7 @@ function redactTermsAdditions(document) {
       "Fabsy collects information needed for applicable tax reporting and issues required slips, including a T4A where applicable. The CRA's general annual threshold is more than $500 for reportable payments, subject to its rules and exceptions. Additional identifiers, if required, are requested through an appropriate secure process; do not send a SIN through referral messages or this profile form. You are responsible for reporting your income.",
     ]],
     ['5F. Fee-Refund Guarantee', 'fee-refund-guarantee', [
-      feeRefund.headline, feeRefund.payment, feeRefund.condition,
+      feeRefund.headline, feeRefund.payment, feeRefund.condition, feeRefund.declinedOfferText,
       'A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.',
       'Photo radar and red-light camera owner notices have no demerits, so the comparison is to the original fine only.',
       'The guarantee covers the service fee actually paid for Rapid Resolution, Rapid Resolution: Photo Radar, or the Rapid Resolution and insurance-planning bundle, including a discounted Pro Driver order. A standalone insurance report is not a ticket-representation service and is not covered by this outcome-based guarantee.',
@@ -562,6 +569,7 @@ function redactPublicOfferSnapshot(html, { route }) {
   const document = dom.window.document;
   const issues = [];
   try {
+    redactHomepageVisualSnapshot(document, route, issues);
     redactExactRefundNotices(document, route, issues);
     redactExactRefundFaqs(document, route, issues);
     redactRefundSourceClauses(document, route);

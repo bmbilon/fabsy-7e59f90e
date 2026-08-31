@@ -8,6 +8,7 @@ import {
   TICKET_CAPTURE_BROWSE_ACCEPT,
   TICKET_CAPTURE_PHOTO_ACCEPT,
   validateTicketCaptureFile,
+  type TicketCaptureState,
 } from "@/lib/ticket/ticketCapture";
 
 export type TicketOcrData = Record<string, unknown>;
@@ -20,6 +21,7 @@ export interface TicketCaptureProps {
   label?: string;
   required?: boolean;
   skipInitialScan?: boolean;
+  onCaptureStateChange?: (state: TicketCaptureState) => void;
 }
 
 type CaptureStatus =
@@ -64,12 +66,14 @@ export default function TicketCapture({
   label = "Ticket PDF or clear image",
   required = false,
   skipInitialScan = false,
+  onCaptureStateChange,
 }: TicketCaptureProps) {
   const reactId = useId();
   const inputId = reactId.replace(/:/g, "");
   const browseInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const latestOcrHandler = useRef(onOcrData);
+  const latestStateHandler = useRef(onCaptureStateChange);
   const requestId = useRef(0);
   const alreadyCapturedFile = useRef(skipInitialScan ? file : null);
   const [status, setStatus] = useState<CaptureStatus>({ kind: "idle" });
@@ -79,11 +83,16 @@ export default function TicketCapture({
   }, [onOcrData]);
 
   useEffect(() => {
+    latestStateHandler.current = onCaptureStateChange;
+  }, [onCaptureStateChange]);
+
+  useEffect(() => {
     const currentRequest = ++requestId.current;
 
     if (!file) {
       setStatus({ kind: "idle" });
       latestOcrHandler.current(null);
+      latestStateHandler.current?.("empty");
       return;
     }
 
@@ -95,6 +104,7 @@ export default function TicketCapture({
         message: validation.error,
       });
       latestOcrHandler.current(null);
+      latestStateHandler.current?.("invalid");
       return;
     }
 
@@ -102,6 +112,7 @@ export default function TicketCapture({
 
     if (alreadyCapturedFile.current === file) {
       setStatus({ kind: "success", title: "Ticket attached", message: "Your captured details are ready below. Review them before continuing." });
+      latestStateHandler.current?.("complete");
       return;
     }
     alreadyCapturedFile.current = null;
@@ -112,14 +123,17 @@ export default function TicketCapture({
         title: "Ticket attached",
         message: "The PDF is ready to save and will be reviewed manually. Enter any readable details in the form.",
       });
+      latestStateHandler.current?.("manual");
       return;
     }
 
     setStatus({ kind: "processing", message: "Scanning the ticket to help fill in the form…" });
+    latestStateHandler.current?.("processing");
 
     void (async () => {
       try {
         const imageBase64 = await readAsDataUrl(file);
+        if (requestId.current !== currentRequest) return;
         const { data, error } = await supabase.functions.invoke("ocr-ticket", {
           body: { imageBase64 },
         });
@@ -130,11 +144,13 @@ export default function TicketCapture({
         if (requestId.current !== currentRequest) return;
 
         latestOcrHandler.current(ocrData);
+        alreadyCapturedFile.current = file;
         setStatus({
           kind: "success",
           title: "Ticket scanned",
           message: "Review the auto-filled details and correct anything the scan did not read accurately.",
         });
+        latestStateHandler.current?.("complete");
       } catch {
         if (requestId.current !== currentRequest) return;
         setStatus({
@@ -142,6 +158,7 @@ export default function TicketCapture({
           title: "Ticket attached, but the scan did not finish",
           message: "The source file is still selected. Continue by entering the ticket details manually.",
         });
+        latestStateHandler.current?.("manual");
       }
     })();
 
@@ -152,7 +169,7 @@ export default function TicketCapture({
 
   const selectFile = (selectedFile: File | undefined, input: HTMLInputElement) => {
     input.value = "";
-    if (!selectedFile) return;
+    if (!selectedFile || selectedFile === file) return;
 
     const validation = validateTicketCaptureFile(selectedFile);
     if ("error" in validation) {
@@ -164,11 +181,14 @@ export default function TicketCapture({
       return;
     }
 
+    requestId.current += 1;
+    alreadyCapturedFile.current = null;
     onFileChange(selectedFile);
   };
 
   const clearFile = () => {
     requestId.current += 1;
+    alreadyCapturedFile.current = null;
     onFileChange(null);
     latestOcrHandler.current(null);
     setStatus({ kind: "idle" });

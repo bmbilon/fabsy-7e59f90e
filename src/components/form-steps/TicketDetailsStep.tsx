@@ -19,6 +19,8 @@ import TicketCapture, { type TicketOcrData } from "../TicketCapture";
 import TicketTypeFields from "../TicketTypeFields";
 import { detectTicketType, resetTicketTypeForUpload, ticketDateAsLocalDate, ticketDateFromExtraction } from "@/lib/ticket/ticketType";
 import { FormData } from "../TicketForm";
+import type { TicketCaptureState } from "@/lib/ticket/ticketCapture";
+import { hasTicketReviewData, ticketFieldNeedsReview, type TicketReviewField } from "@/lib/ticket/ticketReview";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { albertaTrafficActSections, TrafficActSection } from "@/data/albertaTrafficAct";
@@ -43,9 +45,12 @@ type TicketDetailsSchema = z.infer<typeof ticketDetailsSchema>;
 interface TicketDetailsStepProps {
   formData: FormData;
   updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void;
+  reviewReady?: boolean;
+  skipInitialScan?: boolean;
+  onCaptureStateChange?: (state: TicketCaptureState) => void;
 }
 
-const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps) => {
+const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketReviewData(formData), skipInitialScan = false, onCaptureStateChange }: TicketDetailsStepProps) => {
   const [openOffenceCombobox, setOpenOffenceCombobox] = useState(false);
   const [offenceSearchValue, setOffenceSearchValue] = useState("");
   const manuallyEditedDate = useRef<Date | string | undefined>(formData.issueDate);
@@ -54,7 +59,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   
   const {
     register,
-    handleSubmit,
     formState: { errors },
     setValue,
     watch,
@@ -94,6 +98,15 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   const issueDate = watch("issueDate");
   const courtDate = watch("courtDate");
 
+  const needsReview = (field: TicketReviewField) => reviewReady && ticketFieldNeedsReview(field, formData[field]);
+  const reviewBorder = (field: TicketReviewField) => needsReview(field) ? "border-destructive focus-visible:ring-destructive" : undefined;
+  const reviewHint = (field: TicketReviewField, optional = false) => needsReview(field) ? (
+    <p id={`${field}-scan-help`} className="text-xs text-destructive">
+      {optional ? "Not captured. Add this if it is printed on your ticket; otherwise leave it blank." : "Not captured. Check your ticket and enter this detail."}
+    </p>
+  ) : null;
+  const reviewDescription = (field: TicketReviewField) => needsReview(field) ? `${field}-scan-help` : undefined;
+
   const handleFieldUpdate = (field: keyof TicketDetailsSchema | keyof FormData, value: unknown) => {
     if (field === "issueDate") manuallyEditedDate.current = value instanceof Date ? value : "";
     if (field in formData) {
@@ -112,8 +125,8 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
     }
     for (const key of ["courtDate"] as const) {
       if (typeof extracted[key] === "string") {
-        const date = new Date(extracted[key]);
-        if (Number.isFinite(date.getTime())) updates[key] = date;
+        const date = ticketDateAsLocalDate(extracted[key]);
+        if (date) updates[key] = date;
       }
     }
     const fine = extracted.fineAmount ?? extracted.fine;
@@ -132,21 +145,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       };
     });
   };
-
-  const violationTypes = [
-    "Speeding (1-15 km/h over)",
-    "Speeding (16-30 km/h over)",
-    "Speeding (31+ km/h over)",
-    "Red Light Violation",
-    "Stop Sign Violation", 
-    "Distracted Driving",
-    "Careless Driving",
-    "Improper Lane Change",
-    "Following Too Closely",
-    "Improper Turn",
-    "Parking Violation",
-    "Other"
-  ];
 
   
   const handleOffenceSelect = (section: TrafficActSection) => {
@@ -196,8 +194,36 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   return (
     <>
       <form className="space-y-8" onSubmit={event => event.preventDefault()}>
+        <TicketCapture
+          file={formData.ticketImage}
+          onFileChange={ticketImage => {
+            manuallyEditedDate.current = undefined;
+            lastExtraction.current = null;
+            onCaptureStateChange?.(ticketImage ? "processing" : "empty");
+            updateFormData(current => ({
+              ...resetTicketTypeForUpload(current),
+              ticketImage,
+              ticketNumber: "", plateNumber: "", issueDate: undefined,
+              location: "", officer: "", officerBadge: "", offenceSection: "",
+              offenceSubSection: "", offenceDescription: "", violation: "", fineAmount: "",
+              courtDate: undefined, courtJurisdiction: "", agentRepresentationPermitted: null,
+              vehicleSeized: false, sourceAssessmentId: "", sourceAssessmentAccessToken: "",
+            }));
+          }}
+          onOcrData={applyTicketOCR}
+          onCaptureStateChange={onCaptureStateChange}
+          required={!formData.sourceAssessmentId}
+          skipInitialScan={skipInitialScan}
+        />
+        {formData.sourceAssessmentId && !formData.ticketImage ? <p className="text-sm text-muted-foreground">The ticket from your earlier intake is already linked to this matter.</p> : null}
+
+      {reviewReady && <div className="space-y-6 animate-in fade-in duration-300">
+        <div role="status" className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <h3 className="font-semibold">Review your ticket details</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Check the captured details against your ticket. Red borders show details that need your attention. Fields marked * are required; other details can be left blank if they are not printed on your ticket.</p>
+        </div>
       {/* Basic Ticket Information */}
-      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+      <Card className="p-4 sm:p-6 bg-gradient-card border-2 border-primary/10">
         <h3 className="text-lg font-semibold mb-4 text-primary">Ticket Information</h3>
         
         <div className="mb-6 space-y-5">
@@ -215,18 +241,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             }}
             onOwnerChange={registeredOwnerOnOffenceDate => updateFormData({ registeredOwnerOnOffenceDate })}
           />
-          <TicketCapture
-            file={formData.ticketImage}
-            onFileChange={ticketImage => {
-              manuallyEditedDate.current = undefined;
-              lastExtraction.current = null;
-              updateFormData(current => ({ ...resetTicketTypeForUpload(current), ticketImage, issueDate: undefined, sourceAssessmentId: "", sourceAssessmentAccessToken: "" }));
-            }}
-            onOcrData={applyTicketOCR}
-            required={!formData.sourceAssessmentId}
-            skipInitialScan={Boolean(formData.ticketNumber)}
-          />
-          {formData.sourceAssessmentId && !formData.ticketImage ? <p className="text-sm text-muted-foreground">The ticket from your earlier intake is already linked to this matter.</p> : null}
         </div>
 
         <div className="space-y-4">
@@ -237,9 +251,12 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                 id="ticketNumber"
                 {...register("ticketNumber")}
                 onChange={(e) => handleFieldUpdate("ticketNumber", e.target.value)}
-                className="h-11"
+                className={cn("h-11", reviewBorder("ticketNumber"))}
+                aria-invalid={needsReview("ticketNumber")}
+                aria-describedby={reviewDescription("ticketNumber")}
                 placeholder="AB123456789"
               />
+              {reviewHint("ticketNumber")}
               {errors.ticketNumber && (
                 <p className="text-sm text-destructive">{errors.ticketNumber.message}</p>
               )}
@@ -254,8 +271,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                     variant="outline"
                     className={cn(
                       "w-full h-11 justify-start text-left font-normal",
-                      !issueDate && "text-muted-foreground"
+                      !issueDate && "text-muted-foreground",
+                      reviewBorder("issueDate")
                     )}
+                    aria-invalid={needsReview("issueDate")}
+                    aria-describedby={reviewDescription("issueDate")}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {issueDate ? format(issueDate, "MMM dd, yyyy") : "Select date"}
@@ -272,6 +292,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                   />
                 </PopoverContent>
               </Popover>
+              {reviewHint("issueDate")}
               {formData.ticketType === "photo_radar" && <p className="text-xs text-muted-foreground">Use the offence date printed on the notice, not its issue or mailing date. Enter it manually if the scan could not read it.</p>}
               {errors.issueDate && (
                 <p className="text-sm text-destructive">{formData.ticketType === "photo_radar" ? "Offence date is required" : errors.issueDate.message}</p>
@@ -285,9 +306,12 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               id="location"
               {...register("location")}
               onChange={(e) => handleFieldUpdate("location", e.target.value)}
-              className="h-11"
+              className={cn("h-11", reviewBorder("location"))}
+              aria-invalid={needsReview("location")}
+              aria-describedby={reviewDescription("location")}
               placeholder="Highway 2 near Calgary, Main St & 1st Ave"
             />
+            {reviewHint("location")}
             {errors.location && (
               <p className="text-sm text-destructive">{errors.location.message}</p>
             )}
@@ -300,24 +324,31 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                 id="fineAmount"
                 {...register("fineAmount")}
                 onChange={(e) => handleFieldUpdate("fineAmount", e.target.value)}
-                className="h-11"
+                className={cn("h-11", reviewBorder("fineAmount"))}
+                inputMode="decimal"
+                aria-invalid={needsReview("fineAmount")}
+                aria-describedby={reviewDescription("fineAmount")}
                 placeholder="Enter the amount shown on the ticket"
               />
+              {reviewHint("fineAmount")}
               {errors.fineAmount && (
                 <p className="text-sm text-destructive">{errors.fineAmount.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label className="font-medium">Court Date</Label>
+              <Label htmlFor="ticket-court-date" className="font-medium">Court Date (optional)</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="ticket-court-date"
                     variant="outline"
                     className={cn(
                       "w-full h-11 justify-start text-left font-normal",
-                      !courtDate && "text-muted-foreground"
+                      !courtDate && "text-muted-foreground",
+                      reviewBorder("courtDate")
                     )}
+                    aria-describedby={reviewDescription("courtDate")}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {courtDate ? format(courtDate, "MMM dd, yyyy") : "Not set"}
@@ -334,13 +365,14 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                   />
                 </PopoverContent>
               </Popover>
+              {reviewHint("courtDate", true)}
             </div>
           </div>
         </div>
       </Card>
 
       {/* Officer Information */}
-      <Card className="p-6 bg-gradient-card border-2 border-primary/10">
+      <Card className="p-4 sm:p-6 bg-gradient-card border-2 border-primary/10">
         <h3 className="text-lg font-semibold mb-4 text-primary">{formData.ticketType === "photo_radar" ? "Notice details" : "Officer Details"}</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -349,9 +381,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               id="officer"
               {...register("officer")}
               onChange={(e) => handleFieldUpdate("officer", e.target.value)}
-              className="h-11"
+              className={cn("h-11", reviewBorder("officer"))}
+              aria-describedby={reviewDescription("officer")}
                 placeholder="If shown on the ticket"
             />
+            {reviewHint("officer", true)}
             {errors.officer && (
               <p className="text-sm text-destructive">{errors.officer.message}</p>
             )}
@@ -363,9 +397,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               id="officerBadge"
               {...register("officerBadge")}
               onChange={(e) => handleFieldUpdate("officerBadge", e.target.value)}
-              className="h-11"
+              className={cn("h-11", reviewBorder("officerBadge"))}
+              aria-describedby={reviewDescription("officerBadge")}
               placeholder="Optional"
             />
+            {reviewHint("officerBadge", true)}
           </div>
         </div>
       </Card>
@@ -442,7 +478,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[500px] p-0" align="start">
+            <PopoverContent className="w-[min(500px,calc(100vw-2rem))] p-0" align="start">
               <div className="flex flex-col">
                 <div className="flex items-center border-b px-3">
                   <Input
@@ -537,9 +573,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               id="offenceSection"
               value={formData.offenceSection}
               onChange={(e) => handleFieldUpdate("offenceSection", e.target.value)}
-              className="bg-white dark:bg-white dark:text-foreground transition-smooth focus:ring-2 focus:ring-primary/20"
+              className={cn("bg-white dark:bg-white dark:text-foreground transition-smooth", reviewBorder("offenceSection"))}
+              aria-describedby={reviewDescription("offenceSection")}
               placeholder="e.g., 86"
             />
+            {reviewHint("offenceSection", true)}
             {errors.offenceSection && (
               <p className="text-sm text-destructive">{errors.offenceSection.message}</p>
             )}
@@ -570,9 +608,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
               id="offenceSubSection"
               value={formData.offenceSubSection}
               onChange={(e) => handleFieldUpdate("offenceSubSection", e.target.value)}
-              className="bg-white dark:bg-white dark:text-foreground transition-smooth focus:ring-2 focus:ring-primary/20"
+              className={cn("bg-white dark:bg-white dark:text-foreground transition-smooth", reviewBorder("offenceSubSection"))}
+              aria-describedby={reviewDescription("offenceSubSection")}
               placeholder="e.g., (4)(c)"
             />
+            {reviewHint("offenceSubSection", true)}
             {errors.offenceSubSection && (
               <p className="text-sm text-destructive">{errors.offenceSubSection.message}</p>
             )}
@@ -607,9 +647,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             id="offenceDescription"
             value={formData.offenceDescription}
             onChange={(e) => handleFieldUpdate("offenceDescription", e.target.value)}
-            className="bg-white dark:bg-white dark:text-foreground transition-smooth focus:ring-2 focus:ring-primary/20 min-h-[60px]"
+            className={cn("bg-white dark:bg-white dark:text-foreground transition-smooth min-h-[60px]", reviewBorder("offenceDescription"))}
+            aria-describedby={reviewDescription("offenceDescription")}
             placeholder="e.g., Fail to carry proof of registration or license plate"
           />
+          {reviewHint("offenceDescription", true)}
           {errors.offenceDescription && (
             <p className="text-sm text-destructive">{errors.offenceDescription.message}</p>
           )}
@@ -619,35 +661,6 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           <strong>Tip:</strong> Use the search above or manually enter details from the "DID UNLAWFULLY CONTRAVENE SECTION" area of your ticket.
         </p>
       </div>
-
-      <div className="space-y-2">
-        <Label>Court Date (if scheduled)</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal transition-smooth focus:ring-2 focus:ring-primary/20",
-                !courtDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {courtDate ? format(courtDate, "PPP") : <span>No court date yet</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={courtDate}
-              onSelect={(date) => handleFieldUpdate("courtDate", date)}
-              disabled={(date) => date < new Date()}
-              initialFocus
-              className="p-3 pointer-events-auto"
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-
 
       {/* Vehicle Seizure Checkbox */}
       {formData.ticketType !== "photo_radar" && <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -708,6 +721,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
           courtDate={formData.courtDate}
         />
       )}
+      </div>}
     </form>
     </>
   );

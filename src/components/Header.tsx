@@ -12,6 +12,7 @@ import LanguageMessages from "./LanguageMessages";
 import { LocalizedHeader } from "./LocalizedNavigation";
 
 const PHONE_DISPLAY = "(825) 793-2279";
+const PHONE_VANITY = "825 79 FABSY";
 const PHONE_HREF = "tel:+18257932279";
 
 const NAV_ITEMS = [
@@ -80,12 +81,15 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden xl:flex items-center gap-3">
-            <a className="hidden 2xl:block" href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
-              <Button variant="outline" className="gap-2 border-primary text-primary hover:bg-primary/10 transition-smooth">
-                <Phone className="h-4 w-4" />
-                {PHONE_DISPLAY}
-              </Button>
-            </a>
+            <Button asChild variant="outline" className="hidden h-auto min-h-12 gap-2 border-primary py-1.5 text-primary hover:bg-primary/10 transition-smooth 2xl:inline-flex">
+              <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
+                <Phone className="h-4 w-4" aria-hidden="true" />
+                <span className="flex flex-col gap-0.5 leading-tight">
+                  <span>{PHONE_DISPLAY}</span>
+                  <span className="text-[11px] font-semibold tracking-[0.12em]">{PHONE_VANITY}</span>
+                </span>
+              </a>
+            </Button>
             {!isIntake && <Button asChild className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
               <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath}>{isFleet ? 'Fleet account' : `Start · $${activeOffer.priceCad}${photoContext ? ' + GST' : ''}`}</Link>
             </Button>}
@@ -139,15 +143,19 @@ const Header = () => {
                 </nav>
 
                 <div className="mt-auto space-y-3">
-                  <a href={PHONE_HREF} onClick={() => setIsOpen(false)} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 border-primary text-primary hover:bg-primary/10 transition-smooth"
-                    >
-                      <Phone className="h-4 w-4" />
-                      Call {PHONE_DISPLAY}
-                    </Button>
-                  </a>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto min-h-12 w-full gap-2 border-primary py-1.5 text-primary hover:bg-primary/10 transition-smooth"
+                  >
+                    <a href={PHONE_HREF} onClick={() => setIsOpen(false)} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
+                      <Phone className="h-4 w-4" aria-hidden="true" />
+                      <span className="flex flex-col gap-0.5 leading-tight">
+                        <span>Call {PHONE_DISPLAY}</span>
+                        <span className="text-[11px] font-semibold tracking-[0.12em]">{PHONE_VANITY}</span>
+                      </span>
+                    </a>
+                  </Button>
                   {!isIntake && <Button asChild className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
                     <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} onClick={() => setIsOpen(false)}>
                       {isFleet ? 'Start one fleet intake' : `Start ${photoContext ? 'Photo Radar' : 'Rapid Resolution'} · $${activeOffer.priceCad}${photoContext ? ' + GST' : ''}`}

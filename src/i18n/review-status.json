@@ -17,13 +17,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
+        "src/config/feeRefund.json": "fnv1a-9638f7a8",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
       }
     },
     "tl": {
@@ -39,13 +40,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
+        "src/config/feeRefund.json": "fnv1a-9638f7a8",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
       }
     },
     "zh-hans": {
@@ -61,13 +63,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
+        "src/config/feeRefund.json": "fnv1a-9638f7a8",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
       }
     },
     "zh-hant": {
@@ -83,13 +86,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
+        "src/config/feeRefund.json": "fnv1a-9638f7a8",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
       }
     },
     "ar": {
@@ -105,13 +109,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
+        "src/config/feeRefund.json": "fnv1a-9638f7a8",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
       }
     },
     "hi": {
@@ -127,13 +132,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
+        "src/config/feeRefund.json": "fnv1a-9638f7a8",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
       }
     },
     "es": {
@@ -149,13 +155,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-ba2a4764"
+        "src/config/feeRefund.json": "fnv1a-9638f7a8",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
       }
     }
   },

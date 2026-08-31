@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import PersonalInfoStep from "./form-steps/PersonalInfoStep";
 import TicketDetailsStep from "./form-steps/TicketDetailsStep";
+import type { TicketCaptureState } from "@/lib/ticket/ticketCapture";
+import { hasTicketReviewData, missingRequiredTicketFields } from "@/lib/ticket/ticketReview";
 import DefenseStep from "./form-steps/DefenseStep";
 import ConsentStep from "./form-steps/ConsentStep";
 import PaymentStep from "./form-steps/PaymentStep";
@@ -288,6 +290,18 @@ const TicketForm = ({
   });
   const isPhotoRadar = formData.ticketType === "photo_radar";
   const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
+  const [captureState, setCaptureState] = useState<TicketCaptureState>(() => hasTicketReviewData(formData) ? "complete" : "empty");
+  const [completedTicketFile, setCompletedTicketFile] = useState<File | null>(() => hasTicketReviewData(formData) ? formData.ticketImage : null);
+  const ticketDraftRevision = useRef(0);
+  const cacheLoadStarted = useRef(false);
+  const ticketReviewReady = captureState === "complete" || captureState === "manual"
+    || (!formData.ticketImage && (Boolean(formData.sourceAssessmentId) || hasTicketReviewData(formData)));
+  const captureOnly = currentStep === 1 && !ticketReviewReady;
+  const handleCaptureStateChange = (state: TicketCaptureState) => {
+    setCaptureState(state);
+    if (state === "complete" || state === "manual") setCompletedTicketFile(formData.ticketImage);
+    else setCompletedTicketFile(null);
+  };
   const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
   useEffect(() => {
     const syncReferral = () => setFormData(current => ({ ...current, referral: readActiveReferral() }));
@@ -317,7 +331,10 @@ const TicketForm = ({
 
   // Check for ticket data from eligibility checker on mount
   useEffect(() => {
-    if (locale !== "en" || initialPrefill || initialTicketType) return;
+    if (locale !== "en" || initialPrefill || initialTicketType || cacheLoadStarted.current) return;
+    cacheLoadStarted.current = true;
+    const revision = ticketDraftRevision.current;
+    const canHydrate = () => ticketDraftRevision.current === revision;
     const loadTicketData = async () => {
       console.log('[TicketForm] Starting ticket data loading process...');
       
@@ -332,11 +349,11 @@ const TicketForm = ({
         
         try {
           const cachedData = await getCachedTicketData(cacheKey);
-          if (cachedData?.ticketData && Object.keys(cachedData.ticketData).length > 0) {
+          if (canHydrate() && cachedData?.ticketData && Object.keys(cachedData.ticketData).length > 0) {
             console.log('[TicketForm] Supabase cache data available, updating form...');
             
             // Update form with cached data (may override localStorage)
-            setFormData(prev => mergeCachedTicketData(prev, cachedData.ticketData));
+            setFormData(prev => canHydrate() ? mergeCachedTicketData(prev, cachedData.ticketData) : prev);
             localStorage.removeItem('ticket-cache-key');
             
             console.log('[TicketForm] Form updated with Supabase cache data');
@@ -365,7 +382,8 @@ const TicketForm = ({
           const ocrData = JSON.parse(primaryData);
           
           // Update form with primary data
-          setFormData(prev => mergeCachedTicketData(prev, ocrData));
+          if (!canHydrate()) return false;
+          setFormData(prev => canHydrate() ? mergeCachedTicketData(prev, ocrData) : prev);
           
           // Clean up primary localStorage
           localStorage.removeItem('eligibility-ocr-data');
@@ -387,7 +405,8 @@ const TicketForm = ({
           const ocrData = JSON.parse(backupData);
           
           // Update form with backup data
-          setFormData(prev => mergeCachedTicketData(prev, ocrData));
+          if (!canHydrate()) return false;
+          setFormData(prev => canHydrate() ? mergeCachedTicketData(prev, ocrData) : prev);
           
           // Clean up backup localStorage
           localStorage.removeItem('eligibility-ocr-data-backup');
@@ -411,6 +430,7 @@ const TicketForm = ({
   }, [getCachedTicketData, isCacheKeyValid, toast, locale, initialPrefill, initialTicketType]);
 
   const updateFormData = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => {
+    ticketDraftRevision.current += 1;
     setFormData(prev => {
       const update = typeof updates === 'function' ? updates(prev) : updates;
       const next = { ...prev, ...update };
@@ -455,8 +475,14 @@ const TicketForm = ({
     switch (currentStep) {
       case 1:
         return <>
-          <TicketDetailsStep formData={formData} updateFormData={updateFormData} />
-          {!isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
+          <TicketDetailsStep
+            formData={formData}
+            updateFormData={updateFormData}
+            reviewReady={ticketReviewReady}
+            skipInitialScan={ticketReviewReady && completedTicketFile === formData.ticketImage}
+            onCaptureStateChange={handleCaptureStateChange}
+          />
+          {ticketReviewReady && !isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
             <Label htmlFor="pro-licence-class" className="text-base font-semibold">Alberta licence class</Label>
             <Select value={formData.licenceClass} onValueChange={value => updateFormData({ licenceClass: normalizeLicenceClass(value) })}>
               <SelectTrigger id="pro-licence-class" aria-describedby="pro-licence-class-help"><SelectValue /></SelectTrigger>
@@ -489,11 +515,9 @@ const TicketForm = ({
     switch (currentStep) {
       case 1: // Ticket Details
         return !!(
+          ticketReviewReady &&
           (formData.ticketImage || formData.sourceAssessmentId) &&
-          formData.ticketNumber &&
-          formData.issueDate &&
-          formData.location &&
-          formData.fineAmount &&
+          missingRequiredTicketFields(formData).length === 0 &&
           (!isPhotoRadar || formData.registeredOwnerOnOffenceDate) &&
           !formData.vehicleSeized
         );
@@ -536,10 +560,10 @@ const TicketForm = ({
     switch (currentStep) {
       case 1:
         if (!formData.ticketImage && !formData.sourceAssessmentId) m.push("Ticket PDF or photo");
-        if (!formData.ticketNumber) m.push("Ticket number");
-        if (!formData.issueDate) m.push(isPhotoRadar ? "Offence date" : "Issue date");
-        if (!formData.location) m.push("Location");
-        if (!formData.fineAmount) m.push("Fine amount");
+        m.push(...missingRequiredTicketFields(formData).map(field => ({
+          ticketNumber: "Ticket number", issueDate: isPhotoRadar ? "Offence date" : "Issue date",
+          location: "Location", fineAmount: "Fine amount",
+        })[field]));
         if (isPhotoRadar && !formData.registeredOwnerOnOffenceDate) m.push("Registered owner on the offence date");
         if (formData.vehicleSeized) m.push("A separate review is required for a vehicle-seizure matter");
         break;
@@ -584,18 +608,18 @@ const TicketForm = ({
   if (locale !== "en") return <LocalizedTicketJourney formData={formData} updateFormData={updateFormData} currentStep={currentStep} nextStep={nextStep} prevStep={prevStep} />;
 
   return (
-    <section className="py-20 bg-gradient-soft min-h-screen">
+    <section className={`${captureOnly ? "py-4 sm:py-8" : "py-10 sm:py-16"} bg-gradient-soft min-h-screen`}>
       <div id="ticket-form-container" className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
-        <div className="text-center mb-12">
-          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+        <div className={`text-center ${captureOnly ? "mb-6 sm:mb-8" : "mb-10"}`}>
+          {currentStep > 1 && <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
             {offer.name}
-          </Badge>
-          <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-foreground">
-            Start your <span className="text-gradient-primary">{isPhotoRadar ? "photo radar resolution" : "pre-trial resolution"}</span>
+          </Badge>}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
+            {currentStep === 1 ? (captureOnly ? "Let’s start with your ticket." : "Check your ticket details.") : <>Start your <span className="text-gradient-primary">{isPhotoRadar ? "photo radar resolution" : "pre-trial resolution"}</span></>}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {isPhotoRadar ? <>Upload your Alberta registered-owner notice, confirm ownership and sign the authorization. {PHOTO_RADAR_PRICE_LABEL}. No demerits, no insurance impact. Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee.</> : <>Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
+          <p className={`${captureOnly ? "text-base sm:text-lg" : "text-lg"} text-muted-foreground max-w-3xl mx-auto`}>
+            {currentStep === 1 ? (captureOnly ? "Take a clear photo or upload your ticket. We’ll fill in what we can for you to review." : "Review what we captured, fill in any missing details, then continue.") : isPhotoRadar ? <>Upload your Alberta registered-owner notice, confirm ownership and sign the authorization. {PHOTO_RADAR_PRICE_LABEL}. No demerits, no insurance impact. Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee.</> : <>Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
             and continue to the transparent ${RAPID_RESOLUTION.priceCad} CAD plus GST checkout. Want the insurance report by itself?{" "}
             <Link to="/insurance-damage-report" className="font-semibold text-primary underline underline-offset-4">
               See the Insurance Impact &amp; Renewal Planning Report.
@@ -615,7 +639,7 @@ const TicketForm = ({
         )}
 
         {/* Progress */}
-        <Card className="p-6 mb-8 bg-gradient-card shadow-fab border-primary/10">
+        {currentStep > 1 && <Card className="p-6 mb-8 bg-gradient-card shadow-fab border-primary/10">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-muted-foreground">
@@ -645,17 +669,17 @@ const TicketForm = ({
               ))}
             </div>
           </div>
-        </Card>
+        </Card>}
 
         {/* Form Content */}
-        <Card className="p-8 bg-gradient-card shadow-elevated border-primary/10">
-          <div className="mb-8">
+        <Card className="p-4 sm:p-8 bg-gradient-card shadow-elevated border-primary/10">
+          {currentStep > 1 && <div className="mb-8">
             <h2 className="text-2xl font-bold mb-2">{steps[currentStep - 1].title}</h2>
             <p className="text-muted-foreground">{steps[currentStep - 1].description}</p>
-          </div>
+          </div>}
 
           {/* Navigation - Top */}
-          <div className="flex justify-between mb-8 pb-6 border-b">
+          {currentStep > 1 && <div className="flex justify-between mb-8 pb-6 border-b">
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
@@ -675,12 +699,12 @@ const TicketForm = ({
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               )}
-          </div>
+          </div>}
 
           {renderStep()}
 
           {/* Navigation - Bottom */}
-          <div className="flex justify-between mt-8 pt-6 border-t">
+          {!captureOnly && <div className="flex justify-between mt-8 pt-6 border-t">
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
@@ -700,10 +724,10 @@ const TicketForm = ({
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               )}
-          </div>
+          </div>}
 
           {/* Why Continue is disabled */}
-          {currentStep < 5 && !isStepValid() && missingFields().length > 0 && (
+          {!captureOnly && currentStep < 5 && !isStepValid() && missingFields().length > 0 && (
             <p className="text-sm text-muted-foreground text-right mt-3">
               Still needed: {missingFields().join(", ")}
             </p>
@@ -711,7 +735,7 @@ const TicketForm = ({
         </Card>
 
         {/* Security Note */}
-        <div className="text-center mt-8 text-sm text-white/70">
+        <div className="text-center mt-6 text-xs text-muted-foreground">
           <p>Your information is handled according to our Privacy Policy and processed by the service providers used to manage submissions.</p>
         </div>
       </div>

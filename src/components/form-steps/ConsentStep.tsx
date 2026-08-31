@@ -121,6 +121,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
                 <li>The 48-hour commitment covers Fabsy's review and next authorized action after complete, readable disclosure is received and matched to my file—not Crown response time or final outcome timing</li>
                 <li>{FEE_REFUND.payment}</li>
                 <li>{isPhotoRadar ? FEE_REFUND.photoCondition : FEE_REFUND.condition}</li>
+                <li>{FEE_REFUND.declinedOfferText}</li>
                 {isPhotoRadar && <li>This registered-owner notice carries no demerits and has no insurance impact. Only the fine is on the table; no insurance report is included or needed.</li>}
                 <li>I may withdraw this consent at any time by providing written notice</li>
                 <li>This consent remains valid until the matter is resolved or withdrawn</li>
@@ -208,7 +209,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
         </div>
 
         <div className="mt-6 pt-4 border-t text-xs text-muted-foreground space-y-1">
-          <p>Form Version: {isPhotoRadar ? "2026-08-31-photo-radar" : "2026-08-27"}</p>
+          <p>Form Version: {isPhotoRadar ? "2026-08-31-photo-radar-refund-v2" : "2026-08-31-rr-refund-v2"}</p>
           <p>Contact: support@fabsy.ca</p>
           <p className="mt-2 italic">
             This digital authorization records your consent to Fabsy's service. Any prescribed government consent form remains separately required.

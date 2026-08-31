@@ -38,9 +38,10 @@ const sourceDocuments = {
   'src/pages/PrivacyPolicy.tsx': 'privacy-fixture',
   'src/config/pro-drivers.ts': 'pro-pricing-fixture',
   'src/config/offers.ts': 'offer-contract-fixture',
+  'src/config/feeRefund.json': 'fee-refund-policy-fixture',
   'supabase/functions/_shared/consent-pdf.ts': 'consent-pdf-fixture',
 };
-assert.deepEqual(new Set(LEGAL_SOURCE_DOCUMENT_PATHS), new Set(Object.keys(sourceDocuments)), 'All seven legal, pricing and consent documents must participate in publication');
+assert.deepEqual(new Set(LEGAL_SOURCE_DOCUMENT_PATHS), new Set(Object.keys(sourceDocuments)), 'All legal, pricing, refund-policy and consent documents must participate in publication');
 const expected = { sourceVersion: 'v1', sourceFingerprint: 'source', bundleFingerprint: 'bundle', sourceDocuments };
 const approval = { sourceVersion: 'v1', locales: { pa: { status: 'approved', reviewedBy: 'Test reviewer', reviewedAt: '2026-08-30', sourceFingerprint: 'source', bundleFingerprint: 'bundle', serviceReady: true, sourceDocuments } } };
 assert.equal(isLocaleReleased('en', {}, expected), true);

@@ -204,14 +204,18 @@ try {
     rejected(schemaMarkup(changed), '/faq', 'Changed or extended HTML cannot inherit the exact FAQ paragraph admission');
   }
   const notice = `<main>${actual.render('/refund-notice')}</main>`;
-  for (const route of ['/', '/rapid-resolution', '/faq', '/terms-of-service', '/terms-of-purchase']) {
-    accepted(notice, route, `${route}: exact component keeps Crown rejection, upfront payment and details together`);
+  for (const route of ['/rapid-resolution', '/faq', '/terms-of-service', '/terms-of-purchase']) {
+    accepted(notice, route, `${route}: exact component keeps Crown rejection, declined-offer clarification, upfront payment and details together`);
   }
+  rejected(notice, '/', 'The homepage uses its separately guarded hero and refund section, not the standalone notice');
   for (const [label, mutate] of [
     ['wrong refund window', html => html.replace('30 days', '60 days')],
     ['payment clock start', html => html.replace('of receiving the rejection', 'after checkout')],
     ['preliminary offer clock start', html => html.replace('of receiving the rejection', 'of receiving a preliminary Crown offer')],
     ['omitted upfront disclosure', html => html.replace(feeRefund.payment, '')],
+    ['omitted declined-offer clarification', html => html.replace(feeRefund.declinedOfferText, '')],
+    ['refund after declining an improved offer', html => html.replace('you do not qualify for a refund', 'you qualify for a refund')],
+    ['mislabelled clarification language', html => html.replace('lang="en"', 'lang="fr"')],
     ['legal result guarantee', html => html.replace(feeRefund.payment, 'Your withdrawal is guaranteed.')],
     ['wrong terms destination', html => html.replace(feeRefund.termsPath, '/submit-ticket')],
     ['wrong service marker', html => html.replace('data-fee-refund-notice="ticket-representation"', 'data-fee-refund-notice="photo-radar"')],
@@ -297,6 +301,8 @@ try {
   rejected(newTerms.replace('Payment or checkout does not start this clock.', 'Payment or checkout starts this clock.'), '/terms-of-service', 'Payment cannot start the refund clock');
   rejected(newTerms.replace('does not start it either.', 'starts the refund clock.'), '/terms-of-service', 'A preliminary or unchanged offer cannot start the refund clock');
   rejected(newTerms.replace('does not postpone the refund deadline.', 'postpones the refund deadline.'), '/terms-of-service', 'Negotiation after a qualifying rejection cannot postpone the refund deadline');
+  rejected(newTerms.replace(feeRefund.declinedOfferText, ''), '/terms-of-service', 'Refund terms cannot omit the declined-reduced-offer exclusion');
+  rejected(newTerms.replace('you do not qualify for a refund', 'you qualify for a refund'), '/terms-of-service', 'Declining an improved offer cannot create a guarantee refund');
   rejected(newTerms.replace('Work performed and payment-processing costs do not reduce', 'Work performed and payment-processing costs reduce'), '/terms-of-service', 'The promised fee cannot acquire an unapproved processing/work deduction');
   rejected(newTerms.replace('You do not have to accept a Crown offer or plead guilty', 'You have to accept a Crown offer or plead guilty'), '/terms-of-service', 'Refund cannot silently require accepting the Crown offer');
   rejected(newTerms.replace('service discount and corresponding GST to the original payment method.', 'service discount and corresponding GST to the original payment method. This is also an insurance saving.'), '/terms-of-service', 'Appended legal meaning cannot inherit a source clause');

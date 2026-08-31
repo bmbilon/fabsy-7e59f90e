@@ -1,16 +1,20 @@
 import { useEffect } from "react";
 import Hero from "@/components/Hero";
-import InsuranceContextSection from "@/components/InsuranceContextSection";
-import ProDriverSection from "@/components/ProDriverSection";
+import HomepageComparison from "@/components/HomepageComparison";
+import HomepageOutcomeExplorer from "@/components/HomepageOutcomeExplorer";
+import RapidResolutionGuarantee from "@/components/RapidResolutionGuarantee";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import useSafeHead from "@/hooks/useSafeHead";
+import useHashScroll from "@/hooks/useHashScroll";
 import AssessmentHomepageJourney from "@/components/AssessmentHomepageJourney";
 import StaticJsonLd from "@/components/StaticJsonLd";
 import { RAPID_RESOLUTION } from "@/config/offers";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 
 const Index = () => {
+  useHashScroll();
+
   useSafeHead({
     title: `Rapid Resolution | Alberta Traffic Ticket Help | $${RAPID_RESOLUTION.priceCad} CAD`,
     description: "Fabsy handles your Alberta ticket intake, disclosure, review, prosecutor follow-up, and client updates through one pre-trial service.",
@@ -52,8 +56,9 @@ const Index = () => {
       <StaticJsonLd schema={productSchema} dataAttr="homepage-assessment-product" />
       <Header />
       <Hero />
-      <InsuranceContextSection />
-      <ProDriverSection />
+      <HomepageComparison />
+      <HomepageOutcomeExplorer />
+      <RapidResolutionGuarantee />
       <AssessmentHomepageJourney />
       <Footer />
     </main>

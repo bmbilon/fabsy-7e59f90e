@@ -190,6 +190,7 @@ const TermsOfService = () => {
             <p className="mb-4 font-semibold">{FEE_REFUND.headline}</p>
             <p className="mb-4">{FEE_REFUND.payment}</p>
             <p className="mb-4">{FEE_REFUND.condition}</p>
+            <p className="mb-4">{FEE_REFUND.declinedOfferText}</p>
             <ul className="list-disc pl-6 space-y-3">
               <li>A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.</li>
               <li>Photo radar and red-light camera owner notices have no demerits, so the comparison is to the original fine only.</li>

@@ -1,159 +1,81 @@
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  BellRing,
-  CheckCircle2,
-  Clock3,
-  FileSearch,
-  ShieldCheck,
-  Upload,
-} from "lucide-react";
+import { ArrowDown, ArrowRight, FileCheck2, ShieldCheck, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import FeeRefundNotice from "@/components/FeeRefundNotice";
-import {
-  INSURANCE_IMPACT_REPORT,
-  RAPID_RESOLUTION,
-  RAPID_RESOLUTION_BUNDLE,
-} from "@/config/offers";
+import { RAPID_RESOLUTION } from "@/config/offers";
+import { HOMEPAGE_REFUND_COPY } from "@/content/homepageRefundCopy";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 
-const trustPoints = [
-  { icon: ShieldCheck, label: "Secure digital intake" },
-  { icon: FileSearch, label: "Disclosure requested and tracked" },
-  { icon: Clock3, label: "48-hour Fabsy action commitment" },
-  { icon: BellRing, label: "Updates as your file changes" },
-] as const;
-
-const includedHighlights = [
-  "Ticket upload and digital authorization",
-  "Disclosure request, tracking, and analysis",
-  "Fact-specific prosecutor-review submission",
-  "Plain-language Crown response comparison",
-  "Client-directed acceptance of an available resolution",
+const reassurance = [
+  { icon: Upload, title: "Start from your phone", text: "Secure, simple online intake" },
+  { icon: FileCheck2, title: "Put experience on your side", text: "Evidence analysis with qualified review" },
+  { icon: ShieldCheck, title: "Stay in control", text: "You approve any available resolution" },
 ] as const;
 
 const Hero = () => (
-  <section className="relative overflow-hidden bg-gradient-hero text-white">
-    <div className="container relative z-10 mx-auto px-4 py-16 sm:py-20 lg:py-24">
-      <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-14">
-        <div>
-          <div className="inline-flex items-center rounded-full border border-primary/35 bg-primary/10 px-4 py-1.5">
-            <span className="text-xs font-bold tracking-wide text-primary-light">
-              Rapid Resolution · Alberta traffic tickets
-            </span>
-          </div>
+  <section className="overflow-hidden bg-slate-950 text-white" aria-labelledby="homepage-hero-heading">
+    <div className="container mx-auto max-w-7xl px-5 pb-7 pt-10 sm:px-8 sm:pt-12 lg:pt-14">
+      <div className="mx-auto max-w-5xl text-center">
+        <p className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-[0.17em] text-blue-300">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-400" aria-hidden="true" />
+          Alberta traffic ticket help
+        </p>
+        <h1 id="homepage-hero-heading" className="mt-5 text-[2.4rem] font-bold leading-[1.08] tracking-[-0.045em] text-white sm:text-5xl lg:text-[3.5rem] xl:text-[4rem]">
+          We get your ticket reduced<br className="hidden md:block" />{" "}
+          or thrown out, <span className="text-blue-300">or you don’t pay.</span>
+        </h1>
+        <p className="mt-5 text-lg font-semibold text-blue-200 sm:text-xl">
+          {HOMEPAGE_REFUND_COPY.headline}
+        </p>
+        <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-base">
+          {HOMEPAGE_REFUND_COPY.outcomeQualification}{" "}
+          {HOMEPAGE_REFUND_COPY.refundCondition}
+        </p>
+        <p className="mt-4 text-sm text-slate-200">
+          <strong className="font-semibold text-white">${RAPID_RESOLUTION.priceCad} CAD + GST</strong>
+          {" "}· Paid upfront; refunded if the policy applies
+        </p>
 
-          <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Your ticket, handled through one fast, connected process.
-          </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-200 sm:text-xl">
-            Upload your ticket and authorize Fabsy online. We request disclosure, analyze it,
-            advance an authorized prosecutor review, and keep you informed along the way.
-          </p>
-
-          <FeeRefundNotice tone="dark" className="mt-6 max-w-3xl" />
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button
-              asChild
-              size="lg"
-              className="min-h-12 bg-primary px-7 text-base font-bold text-white hover:bg-primary-dark"
+        <div className="mt-5 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-6">
+          <Button asChild size="lg" className="min-h-12 bg-primary-dark px-6 text-base font-bold text-white hover:bg-blue-700">
+            <Link
+              to={RAPID_RESOLUTION.intakePath}
+              onClick={() =>
+                trackAssessmentEvent(
+                  "assessment_cta_click",
+                  { location: "homepage_hero", destination: "rapid_resolution_intake", value: RAPID_RESOLUTION.priceCad },
+                  "homepage_hero",
+                )
+              }
             >
-              <Link
-                to={RAPID_RESOLUTION.intakePath}
-                onClick={() =>
-                  trackAssessmentEvent(
-                    "assessment_cta_click",
-                    {
-                      location: "homepage_hero",
-                      destination: "rapid_resolution_intake",
-                      value: RAPID_RESOLUTION.priceCad,
-                    },
-                    "homepage_hero",
-                  )
-                }
-              >
-                Start Rapid Resolution
-                <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="min-h-12 border-white/30 bg-transparent px-7 text-base font-bold text-white hover:bg-primary/20 hover:text-white"
-            >
-              <Link to={RAPID_RESOLUTION.slug}>View everything included</Link>
-            </Button>
-          </div>
-
-          <p className="mt-5 max-w-3xl text-sm leading-relaxed text-slate-300">
-            ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST for eligible Alberta pre-trial
-            matters. Trial representation is separate. No outcome is promised.
-          </p>
+              Get help with my ticket
+              <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </Link>
+          </Button>
+          <a href="#fabsy-difference" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm text-sm font-semibold text-slate-100 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+            See the Fabsy difference
+            <ArrowDown className="h-4 w-4 text-blue-300" aria-hidden="true" />
+          </a>
         </div>
 
-        <Card className="overflow-hidden border-white/15 bg-white text-slate-950 shadow-2xl">
-          <div className="border-b bg-primary/5 p-7 sm:p-8">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary">Rapid Resolution</p>
-                <p className="mt-2 text-sm text-slate-600">One flat pre-trial service fee</p>
-              </div>
-              <div className="text-right">
-                <p className="text-4xl font-bold">${RAPID_RESOLUTION.priceCad}</p>
-                <p className="text-xs text-slate-500">CAD + GST</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-7 sm:p-8">
-            <ul className="space-y-4 text-sm text-slate-700">
-              {includedHighlights.map((label) => (
-                <li key={label} className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                  <span>{label}</span>
-                </li>
-              ))}
-            </ul>
-
-            <Button asChild className="mt-6 min-h-11 w-full font-bold">
-              <Link to={RAPID_RESOLUTION.intakePath}>
-                <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
-                Upload your ticket
-              </Link>
-            </Button>
-
-            <div className="my-6 border-t" />
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Add insurance planning</p>
-            <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-bold">{RAPID_RESOLUTION_BUNDLE.shortName}</p>
-                  <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                    Rapid Resolution plus the {INSURANCE_IMPACT_REPORT.shortName}.
-                  </p>
-                </div>
-                <p className="shrink-0 text-xl font-bold text-primary">${RAPID_RESOLUTION_BUNDLE.priceCad}</p>
-              </div>
-              <Link to={INSURANCE_IMPACT_REPORT.slug} className="mt-3 inline-flex items-center text-xs font-bold text-primary hover:underline">
-                Compare the ${INSURANCE_IMPACT_REPORT.priceCad} report
-                <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        </Card>
+        <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-slate-400">
+          For eligible Alberta pre-trial matters. Government fines and trial representation are separate.{" "}
+          <a href="#money-back-guarantee" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-blue-200 underline underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+            How the money-back guarantee works
+          </a>
+        </p>
       </div>
 
-      <div className="mt-10 grid grid-cols-2 gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-4 sm:p-5">
-        {trustPoints.map(({ icon: Icon, label }) => (
-          <div key={label} className="flex items-center gap-2.5 text-sm font-semibold text-slate-100">
-            <Icon className="h-5 w-5 shrink-0 text-primary-light" aria-hidden="true" />
-            <span>{label}</span>
-          </div>
+      <ul className="mt-9 grid gap-5 border-t border-slate-800 pt-6 sm:grid-cols-3 sm:gap-6 lg:mt-10">
+        {reassurance.map(({ icon: Icon, title, text }) => (
+          <li key={title} className="flex items-start gap-3">
+            <Icon className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" aria-hidden="true" />
+            <div>
+              <p className="text-sm font-semibold text-white">{title}</p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-400">{text}</p>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   </section>
 );

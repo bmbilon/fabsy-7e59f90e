@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, FileSearch, Loader2 } from 'lucide-react';
 import type { FormData } from './TicketForm';
 import PaymentStep from './form-steps/PaymentStep';
+import FeeRefundNotice from './FeeRefundNotice';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
@@ -203,6 +204,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
           {['data', 'withdrawal'].map(key => <p key={key}>{t(`intake.consent.${key}`)}</p>)}
         </div>
         <aside className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">{t('language.englishControls')}{' '}<Link className="font-semibold underline" to="/terms-of-service" target="_blank" rel="noopener noreferrer">{t('language.readEnglish')}</Link></aside>
+        <FeeRefundNotice compact openTermsInNewTab />
         <LocalizedCheck name="consentGiven" data={formData} update={update} label={t('intake.consent.confirm')} />
         {errors.consentGiven && <p className="text-sm text-red-700">{t(errors.consentGiven)}</p>}
         {field('digitalSignature', { required: true })}

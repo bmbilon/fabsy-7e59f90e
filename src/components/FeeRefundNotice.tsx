@@ -23,7 +23,7 @@ export default function FeeRefundNotice({
 }: FeeRefundNoticeProps) {
   const { t } = useTranslation();
   const { locale } = useLocale();
-  const copy = (key: Exclude<keyof typeof FEE_REFUND, "termsPath" | "refundWindowDays">) =>
+  const copy = (key: Exclude<keyof typeof FEE_REFUND, "termsPath" | "refundWindowDays" | "declinedOfferText">) =>
     locale === "en" ? FEE_REFUND[key] : t(`feeRefund.${key}`, { defaultValue: FEE_REFUND[key] });
   const dark = tone === "dark";
 
@@ -44,6 +44,10 @@ export default function FeeRefundNotice({
           </h2>
           <p className={cn("text-sm leading-relaxed", dark ? "text-slate-100" : "text-slate-700")}>
             {copy(photoRadar ? "photoCondition" : "condition")}
+          </p>
+          <p lang="en" dir="ltr" className={cn("text-sm leading-relaxed", dark ? "text-slate-100" : "text-slate-700")}>
+            {locale !== "en" && <span className="font-semibold">Refund clarification (English): </span>}
+            {FEE_REFUND.declinedOfferText}
           </p>
           <p className={cn("text-sm font-medium leading-relaxed", dark ? "text-slate-100" : "text-slate-700")}>
             {copy("payment")}

@@ -2,6 +2,7 @@ import { PDFDocument, PDFName, PDFPage, PDFString, rgb, StandardFonts } from "ht
 import { ConsentUnicodeWriter, wrapConsentText } from "./consent-unicode.ts";
 import type { PreferredLocale } from "./locale-policy.ts";
 import { requireEnglishProductLocale } from "./product-locale.ts";
+import feeRefund from "../../../src/config/feeRefund.json" with { type: "json" };
 
 export interface ConsentFormData {
   ticketType?: "photo_radar" | "officer_issued";
@@ -43,6 +44,7 @@ export const CONSENT_AUTHORIZATION_LINES = [
   "• Fabsy may access only information actually needed and lawfully available for this matter",
   "• Outcomes vary and Fabsy does not promise a particular result",
   "• Service-fee refund rights follow the written purchase terms for my order",
+  `• ${feeRefund.declinedOfferText}`,
   "• Rapid Resolution costs $198 CAD plus GST; trial and government fines are separate",
   "• The 48-hour commitment starts after complete disclosure is received and matched",
   "• The 48-hour commitment excludes Crown response and final-outcome timing",
@@ -66,6 +68,7 @@ export const PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES = [
   "• Only the fine is at issue; no Insurance Impact Report is included or needed",
   "• The one-time service fee is $79 CAD plus 5% GST ($82.95 total) at checkout",
   "• No legal outcome is promised; service-fee refund rights follow my written purchase terms",
+  `• ${feeRefund.declinedOfferText}`,
   "• There is no success fee and no trial representation; government fines are separate",
   "• Fabsy takes its next authorized step within 48 hours after complete disclosure",
   "• The 48-hour commitment excludes Crown response and final-outcome timing",

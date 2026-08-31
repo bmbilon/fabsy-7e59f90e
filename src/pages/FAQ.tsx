@@ -26,6 +26,10 @@ const FAQPage: React.FC = () => {
       a: `${FEE_REFUND.payment} ${FEE_REFUND.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.`
     },
     {
+      q: "Can I get a refund if I decline a reduced Crown offer?",
+      a: FEE_REFUND.declinedOfferText
+    },
+    {
       q: "Will disputing a ticket affect my insurance?",
       a: "Disputing a ticket does not itself create a conviction. Insurance treatment may depend on the final outcome, your driving record, and your insurer's underwriting rules. Ask your insurer about your circumstances."
     },

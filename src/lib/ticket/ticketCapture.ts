@@ -114,3 +114,4 @@ export function validateTicketCaptureFile(
     error: "Upload a PDF, JPG, PNG, WebP, HEIC or HEIF ticket file.",
   };
 }
+export type TicketCaptureState = "empty" | "processing" | "complete" | "manual" | "invalid";
