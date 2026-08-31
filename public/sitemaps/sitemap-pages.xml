@@ -5,6 +5,13 @@
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/" />
+    <xhtml:link rel="alternate" hreflang="pa" href="https://fabsy.ca/pa/" />
+    <xhtml:link rel="alternate" hreflang="tl" href="https://fabsy.ca/tl/" />
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://fabsy.ca/zh-hans/" />
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://fabsy.ca/zh-hant/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://fabsy.ca/ar/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://fabsy.ca/hi/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://fabsy.ca/es/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/" />
   </url>
   <url>
@@ -12,6 +19,13 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/how-it-works" />
+    <xhtml:link rel="alternate" hreflang="pa" href="https://fabsy.ca/pa/how-it-works" />
+    <xhtml:link rel="alternate" hreflang="tl" href="https://fabsy.ca/tl/how-it-works" />
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://fabsy.ca/zh-hans/how-it-works" />
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://fabsy.ca/zh-hant/how-it-works" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://fabsy.ca/ar/how-it-works" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://fabsy.ca/hi/how-it-works" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://fabsy.ca/es/how-it-works" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/how-it-works" />
   </url>
   <url>
@@ -33,6 +47,13 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/rapid-resolution" />
+    <xhtml:link rel="alternate" hreflang="pa" href="https://fabsy.ca/pa/rapid-resolution" />
+    <xhtml:link rel="alternate" hreflang="tl" href="https://fabsy.ca/tl/rapid-resolution" />
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://fabsy.ca/zh-hans/rapid-resolution" />
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://fabsy.ca/zh-hant/rapid-resolution" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://fabsy.ca/ar/rapid-resolution" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://fabsy.ca/hi/rapid-resolution" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://fabsy.ca/es/rapid-resolution" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/rapid-resolution" />
   </url>
   <url>
@@ -54,6 +75,13 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/contact" />
+    <xhtml:link rel="alternate" hreflang="pa" href="https://fabsy.ca/pa/contact" />
+    <xhtml:link rel="alternate" hreflang="tl" href="https://fabsy.ca/tl/contact" />
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://fabsy.ca/zh-hans/contact" />
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://fabsy.ca/zh-hant/contact" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://fabsy.ca/ar/contact" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://fabsy.ca/hi/contact" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://fabsy.ca/es/contact" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/contact" />
   </url>
   <url>
@@ -61,6 +89,13 @@
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/terms-of-service" />
+    <xhtml:link rel="alternate" hreflang="pa" href="https://fabsy.ca/pa/terms-of-service" />
+    <xhtml:link rel="alternate" hreflang="tl" href="https://fabsy.ca/tl/terms-of-service" />
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://fabsy.ca/zh-hans/terms-of-service" />
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://fabsy.ca/zh-hant/terms-of-service" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://fabsy.ca/ar/terms-of-service" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://fabsy.ca/hi/terms-of-service" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://fabsy.ca/es/terms-of-service" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/terms-of-service" />
   </url>
   <url>

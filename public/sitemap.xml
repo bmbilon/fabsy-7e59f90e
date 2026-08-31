@@ -4,4 +4,11 @@
   <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-content.xml</loc></sitemap>
   <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-content-2.xml</loc></sitemap>
   <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-faq.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-pa.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-tl.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-zh-hans.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-zh-hant.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-ar.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-hi.xml</loc></sitemap>
+  <sitemap><loc>https://fabsy.ca/sitemaps/sitemap-es.xml</loc></sitemap>
 </sitemapindex>
