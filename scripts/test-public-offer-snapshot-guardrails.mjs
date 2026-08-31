@@ -145,6 +145,7 @@ try {
       import FAQ from './src/pages/FAQ';
       import FeeRefundNotice from './src/components/FeeRefundNotice';
       import Footer from './src/components/Footer';
+      import { faqAnswerHtml } from './src/lib/faq-format';
       import PricingLadder from './src/components/PricingLadder';
       import PhotoRadarOfferStrip from './src/components/PhotoRadarOfferStrip';
       import { createInstance } from 'i18next';
@@ -155,6 +156,7 @@ try {
       const pages = { '/photo-radar': PhotoRadar, '/fleet': Fleet, '/free-ticket-check': FreeTicketCheck, '/pro-drivers': ProDrivers, '/refer': Refer, '/terms-of-service': Terms, '/terms-of-purchase': TermsOfPurchase, '/rapid-resolution': RapidResolution, '/faq': FAQ, '/footer': Footer, '/ladder': PricingLadder, '/strip': PhotoRadarOfferStrip,
         '/refund-notice': FeeRefundNotice, '/photo-refund-notice': () => <FeeRefundNotice photoRadar /> };
       export function render(route) { const Page = pages[route]; return renderToStaticMarkup(<I18nextProvider i18n={i18n}><StaticRouter location={route}><Page /></StaticRouter></I18nextProvider>); }
+      export function formatFaqAnswer(answer) { return faqAnswerHtml(answer); }
     ` },
     bundle: true, platform: 'node', format: 'cjs', jsx: 'automatic', outfile: bundle, logLevel: 'silent',
     plugins: [{ name: 'offline-public-pages', setup(builder) {
@@ -192,22 +194,23 @@ try {
   const refundQuestion = [...visibleFaqDom.window.document.querySelectorAll('h3')].find(node => node.textContent === 'Does Fabsy promise a particular result?');
   assert(refundQuestion);
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [{ '@type': 'Question', name: refundQuestion.textContent,
-    acceptedAnswer: { '@type': 'Answer', text: refundQuestion.nextElementSibling.innerHTML } }] };
+    acceptedAnswer: { '@type': 'Answer', text: actual.formatFaqAnswer(refundQuestion.nextElementSibling.textContent) } }] };
   visibleFaqDom.window.close();
   const schemaMarkup = value => `<script type="application/ld+json">${JSON.stringify(value)}</script>`;
   accepted(schemaMarkup(faqSchema), '/faq', 'Actual FAQ answer HTML is the exact paragraph serialization emitted by FAQSchema');
-  for (const [from, to] of [['30 days', '60 days'], ['<p>', '<p hidden>'], ['</p>', '</p><p>We guarantee a withdrawal.</p>']]) {
+  for (const [from, to] of [['30 days', '60 days'], ['of receiving the rejection', 'after payment'], ['of receiving the rejection', 'of receiving a preliminary Crown offer'], ['<p>', '<p hidden>'], ['</p>', '</p><p>We guarantee a withdrawal.</p>']]) {
     const changed = structuredClone(faqSchema);
     changed.mainEntity[0].acceptedAnswer.text = changed.mainEntity[0].acceptedAnswer.text.replace(from, to);
     rejected(schemaMarkup(changed), '/faq', 'Changed or extended HTML cannot inherit the exact FAQ paragraph admission');
   }
   const notice = `<main>${actual.render('/refund-notice')}</main>`;
   for (const route of ['/', '/rapid-resolution', '/faq', '/terms-of-service', '/terms-of-purchase']) {
-    accepted(notice, route, `${route}: exact component keeps Crown trigger, upfront payment and details together`);
+    accepted(notice, route, `${route}: exact component keeps Crown rejection, upfront payment and details together`);
   }
   for (const [label, mutate] of [
     ['wrong refund window', html => html.replace('30 days', '60 days')],
-    ['wrong clock start', html => html.replace('of receiving that offer', 'after checkout')],
+    ['payment clock start', html => html.replace('of receiving the rejection', 'after checkout')],
+    ['preliminary offer clock start', html => html.replace('of receiving the rejection', 'of receiving a preliminary Crown offer')],
     ['omitted upfront disclosure', html => html.replace(feeRefund.payment, '')],
     ['legal result guarantee', html => html.replace(feeRefund.payment, 'Your withdrawal is guaranteed.')],
     ['wrong terms destination', html => html.replace(feeRefund.termsPath, '/submit-ticket')],
@@ -227,7 +230,11 @@ try {
   rejected(notice, '/pa/', 'English component exception does not bypass localized copy checks');
   for (const route of ['/rapid-resolution', '/faq', '/terms-of-purchase']) accepted(actual.render(route), route, `${route}: actual updated refund page`);
   const photoRefundPage = actual.render('/photo-radar');
-  rejected(photoRefundPage.replace(feeRefund.photoCondition, feeRefund.condition), '/photo-radar', 'Photo Radar must retain its fine-only refund trigger');
+  rejected(edit(photoRefundPage, document => {
+    const condition = [...document.querySelectorAll('aside[data-fee-refund-notice="photo-radar"] p')].find(node => node.textContent === feeRefund.photoCondition);
+    assert(condition, 'The actual Photo Radar rejection trigger is present');
+    condition.textContent = feeRefund.condition;
+  }), '/photo-radar', 'Photo Radar must retain its fine-or-withdrawal-only refund trigger');
   rejected(photoRefundPage.replace(feeRefund.photoHeadline, feeRefund.headline), '/photo-radar', 'Photo Radar must retain its owner-notice headline');
   // These pages emit JSON-LD during SSR. FAQSection installs its schema in a
   // browser effect, so its actual rendered copy is checked above instead.
@@ -287,7 +294,9 @@ try {
   rejected(newTerms.replace('pro-driver-terms', 'unrelated-terms'), '/terms-of-service', 'Exact source paragraph requires its correct section');
   rejected(newTerms.replace('id="fee-refund-guarantee"', 'id="unrelated-terms"'), '/terms-of-service', 'Refund clauses require the correct source section');
   rejected(newTerms.replace(feeRefund.payment, ''), '/terms-of-service', 'Refund terms cannot omit the upfront-payment and no-outcome disclosure');
-  rejected(newTerms.replace('does not start at checkout', 'starts at checkout'), '/terms-of-service', 'The refund clock cannot become a case outcome deadline');
+  rejected(newTerms.replace('Payment or checkout does not start this clock.', 'Payment or checkout starts this clock.'), '/terms-of-service', 'Payment cannot start the refund clock');
+  rejected(newTerms.replace('does not start it either.', 'starts the refund clock.'), '/terms-of-service', 'A preliminary or unchanged offer cannot start the refund clock');
+  rejected(newTerms.replace('does not postpone the refund deadline.', 'postpones the refund deadline.'), '/terms-of-service', 'Negotiation after a qualifying rejection cannot postpone the refund deadline');
   rejected(newTerms.replace('Work performed and payment-processing costs do not reduce', 'Work performed and payment-processing costs reduce'), '/terms-of-service', 'The promised fee cannot acquire an unapproved processing/work deduction');
   rejected(newTerms.replace('You do not have to accept a Crown offer or plead guilty', 'You have to accept a Crown offer or plead guilty'), '/terms-of-service', 'Refund cannot silently require accepting the Crown offer');
   rejected(newTerms.replace('service discount and corresponding GST to the original payment method.', 'service discount and corresponding GST to the original payment method. This is also an insurance saving.'), '/terms-of-service', 'Appended legal meaning cannot inherit a source clause');

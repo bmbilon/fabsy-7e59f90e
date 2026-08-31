@@ -169,10 +169,13 @@ const TermsOfPurchase = () => {
                 begins.
               </p>
               <p>
-                The fee-refund guarantee applies if a Crown offer reduces neither your original
-                fine nor your original demerits. Fabsy refunds the service fee you actually paid,
-                together with the corresponding GST, within 30 calendar days of receiving that
-                offer. Photo radar and red-light owner notices are assessed on the fine only.
+                The fee-refund guarantee applies when the Crown rejects Fabsy's efforts to reduce
+                your original fine or demerits, or obtain a withdrawal, and none of those improvements
+                has been obtained. Fabsy refunds the service fee you actually paid, together with
+                the corresponding GST, within 30 calendar days of Fabsy receiving that rejection.
+                Payment does not start the clock; an opening or unchanged offer before Fabsy's
+                negotiation efforts have been rejected does not start it either. Photo radar and
+                red-light owner notices are assessed on the original fine or withdrawal only.
                 The guarantee covers Rapid Resolution, Photo Radar and the Rapid Resolution bundle,
                 including discounted Pro Driver orders; it does not cover a standalone insurance report.
                 Work already performed and payment-processing costs do not reduce a refund due under

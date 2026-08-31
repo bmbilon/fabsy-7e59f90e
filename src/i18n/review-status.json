@@ -8,8 +8,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-61975b5a",
-      "bundleFingerprint": "fnv1a-52c16667",
+      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "bundleFingerprint": "fnv1a-cfda4b6d",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -17,8 +17,8 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
-        "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
@@ -30,8 +30,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-61975b5a",
-      "bundleFingerprint": "fnv1a-37973218",
+      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "bundleFingerprint": "fnv1a-e6f20b3a",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -39,8 +39,8 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
-        "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
@@ -52,8 +52,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-61975b5a",
-      "bundleFingerprint": "fnv1a-7f74c801",
+      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "bundleFingerprint": "fnv1a-a49640e8",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -61,8 +61,8 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
-        "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
@@ -74,8 +74,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-61975b5a",
-      "bundleFingerprint": "fnv1a-373217b1",
+      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "bundleFingerprint": "fnv1a-bd0ec53a",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -83,8 +83,8 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
-        "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
@@ -96,8 +96,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-61975b5a",
-      "bundleFingerprint": "fnv1a-ddf83060",
+      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "bundleFingerprint": "fnv1a-2ea2eaaf",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -105,8 +105,8 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
-        "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
@@ -118,8 +118,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-61975b5a",
-      "bundleFingerprint": "fnv1a-eb7d2d7a",
+      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "bundleFingerprint": "fnv1a-9a04fa33",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -127,8 +127,8 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
-        "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
@@ -140,8 +140,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-61975b5a",
-      "bundleFingerprint": "fnv1a-78659c2a",
+      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "bundleFingerprint": "fnv1a-f6850a18",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -149,8 +149,8 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-685c77d1",
-        "src/pages/TermsOfPurchase.tsx": "fnv1a-3f6ae56d",
+        "src/pages/TermsOfService.tsx": "fnv1a-80c0fc44",
+        "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-0e44aaa0",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",

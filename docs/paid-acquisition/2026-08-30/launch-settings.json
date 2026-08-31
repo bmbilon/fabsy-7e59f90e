@@ -10,7 +10,7 @@
   "manual_gates": [
     "Production landing page and intake work on mobile and desktop",
     "Published offer, purchase terms, legacy redirects and backend retirement agree",
-    "New service-fee refund promise matches the published offer, terms, consent and checkout: actual full fee paid upfront; Crown offer cuts neither original fine nor demerits; refund within 30 days of Fabsy receiving it; full bundle after Pro discount included; standalone report excluded",
+    "Crown-rejection timing correction is published consistently across offer, terms, service authorization and checkout: upfront payment; Crown rejects Fabsy's negotiations for lower original fine/demerits or withdrawal with none obtained; full actual service fee plus GST refunded within 30 days of Fabsy receiving the rejection; initial/unchanged offers and payment do not start the clock; full bundle after Pro discount included; standalone report excluded",
     "Primary paid RR conversion verified for standalone and bundled orders",
     "Attribution survives intake, checkout, webhook and return-page abandonment",
     "Consent, sensitive-data restrictions and platform classification reviewed",
@@ -67,14 +67,14 @@
   ],
   "budget_type_note": "The CSV uses average daily budgets. For a firm total cap, choose campaign total budgets while creating new campaign shells, verify availability, approve dates, and skip the campaign CSV. Total budgets have no daily cap.",
   "files_are_not_proof_of_account_configuration": true,
-  "copy_revision": "service_fee_refund_offer_20260831",
+  "copy_revision": "crown_negotiation_rejection_refund_20260831",
   "fee_refund_policy": {
     "authorized_on": "2026-08-31",
     "fee_paid_upfront": true,
-    "trigger": "A Crown offer that reduces neither the original fine nor the original demerits",
-    "refund_amount": "Full service fee actually paid, including the full bundled fee after any Pro discount",
+    "trigger": "The Crown rejects Fabsy's efforts to reduce the original fine or demerits or obtain withdrawal, and none of those improvements is obtained",
+    "refund_amount": "Full service fee and GST actually paid, including the full bundled fee and GST after any Pro discount",
     "refund_deadline_days": 30,
-    "refund_clock_starts": "When Fabsy receives that Crown offer",
+    "refund_clock_starts": "When Fabsy receives the Crown's rejection of those negotiation efforts",
     "standalone_report_covered": false,
     "legal_outcome_guaranteed": false,
     "final_offer_required": false,
@@ -82,6 +82,19 @@
     "customer_claim_deadline": null,
     "client_must_accept_offer": false,
     "government_fines_covered": false,
-    "publication_requires_matching_site_terms": true
+    "publication_requires_matching_site_terms": true,
+    "payment_starts_refund_clock": false,
+    "initial_or_unchanged_offer_starts_refund_clock": false,
+    "crown_negotiation_rejection_required": true,
+    "no_improvement_obtained_required": true,
+    "gst_paid_is_refunded": true,
+    "canonical_policy_source": "../../../src/config/feeRefund.json"
+  },
+  "timing_correction": {
+    "prepared_on": "2026-08-31",
+    "state": "prepared_not_live",
+    "website_publication_verified": false,
+    "campaign_activation_authorized": false,
+    "earlier_release_evidence_is_not_this_correction": true
   }
 }

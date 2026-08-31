@@ -1,0 +1,11 @@
+# Crown-rejection refund clock correction
+
+Prepared August 31, 2026 in an isolated worktree from source baseline `d0424cd2a36a6fb849f77146f53abd9bebc20cf9`, following Brett's clarification. Validation and publication receipts for this correction are recorded separately under `/Users/brettbilon/.cache/fabsy-refund-crown-rejection-evidence/`; this document alone does not claim deployment.
+
+The 30-calendar-day clock starts when Fabsy receives the Crown's rejection of Fabsy's negotiation efforts for a lower original fine, fewer original demerits or withdrawal, with none of those improvements obtained. Payment and an opening or unchanged offer before those efforts are rejected do not start the clock. Once triggered, further negotiation or waiting for instructions does not postpone the deadline. No final-offer, appeal-exhaustion, client acceptance or guilty-plea prerequisite has been added.
+
+The correction applies to the reusable site notice, terms, FAQ, Photo guides, seven existing translated interfaces and prepared ad copy. Photo uses original-fine reduction or withdrawal only. The actual fee paid plus corresponding GST, including the full bundle or discounted Pro fee, remains the refund scope. There is no guaranteed legal outcome. Government fines, separate trial work and standalone reports are not covered.
+
+Pricing, intake, payment, receipt math, opaque conversion IDs, distinct RR/Photo routing, consent/private-navigation boundaries, provider configuration and campaign states are unchanged. No backend function is redeployed: the existing future consent template already refers to the written terms for the order. Historical signed documents and prior written order terms are preserved. Refund execution remains manual; no refund was performed.
+
+The nine prepared Google RSAs retain their headline/price/condition pins, length limits, targeting and paused status. The Meta owner prepares a separate qualified Crown-rejection revision, preserving the requested alternative and historical saved-qualified revision, then saves it only after matching live terms and a scoped release receipt. No campaign, budget, schedule, audience, enhanced-conversion setting or ad delivery is enabled by this correction.

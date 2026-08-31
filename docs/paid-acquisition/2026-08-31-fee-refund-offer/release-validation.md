@@ -1,5 +1,7 @@
 # Refund offer release validation
 
+**Historical first-release validation.** The clock wording below was superseded by Brett's Crown-rejection clarification. See [the correction record](crown-rejection-clock-correction.md) and the current operating checklist. These earlier test counts and wording are not evidence that the later correction has been deployed.
+
 Prepared August 31, 2026 in an isolated worktree based on `cd5eef208e4ade776e4a947278dbad29edae77f0`. This is a validation record, not a claim that the website or ads have already been published. The final publication receipt is recorded separately after deployment.
 
 ## Validated behavior

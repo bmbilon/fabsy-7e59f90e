@@ -38,7 +38,8 @@ for (const slug of slugs) {
   for (const [from, to] of [
     [feeRefund.payment, 'No payment is required.'],
     [feeRefund.photoCondition, feeRefund.photoCondition.replace('30 days', '60 days')],
-    [feeRefund.photoCondition, feeRefund.photoCondition.replace('of receiving that offer', 'after checkout')],
+    [feeRefund.photoCondition, feeRefund.photoCondition.replace('of receiving the rejection', 'after checkout')],
+    [feeRefund.photoCondition, feeRefund.photoCondition.replace('of receiving the rejection', 'of receiving a preliminary Crown offer')],
     [feeRefund.termsPath, '/submit-ticket'],
   ]) {
     const changed = { ...page, next: page.next.replace(from, to) };
@@ -61,11 +62,13 @@ assert.ok(textGuardrailIssues(verifiedFine, 'speeding-ticket-alberta').includes(
 assert.ok(textGuardrailIssues('Pay Fabsy a $79 fee.', slugs[0]).includes('partial or inexact Fabsy pricing'), 'Incomplete service pricing stays blocked');
 assert.ok(textGuardrailIssues('A withdrawal is guaranteed.', slugs[0]).includes('banned phrase'), 'Outcome promise stays blocked');
 assert.ok(textGuardrailIssues('All fines are $999.', slugs[0]).includes('unsupported monetary legal claim'), 'Arbitrary numeric claims stay blocked');
-assert.deepEqual(textGuardrailIssues(feeRefund.photoCondition, slugs[0]), [], 'The entire reviewed Crown-trigger business-policy bullet is admitted');
+assert.deepEqual(textGuardrailIssues(feeRefund.photoCondition, slugs[0]), [], 'The entire reviewed Crown-rejection business-policy bullet is admitted');
 assert.ok(textGuardrailIssues(feeRefund.photoCondition, 'speeding-ticket-alberta').includes('unsupported duration or deadline claim'), 'The camera-only clause does not migrate to an officer guide');
 for (const [copy, issue] of [
   [feeRefund.photoCondition.replace('30 days', '31 days'), 'unsupported duration or deadline claim'],
-  [feeRefund.photoCondition.replace('of receiving that offer', 'after checkout'), 'unsupported duration or deadline claim'],
+  [feeRefund.photoCondition.replace('of receiving the rejection', 'after checkout'), 'unsupported duration or deadline claim'],
+  [feeRefund.photoCondition.replace('of receiving the rejection', 'of receiving a preliminary Crown offer'), 'unsupported duration or deadline claim'],
+  ['If a Crown offer does not reduce the original fine on your photo radar or red-light camera notice, Fabsy refunds the service fee you paid within 30 days of receiving that offer. These notices have no demerits.', 'unsupported duration or deadline claim'],
   [`${feeRefund.photoCondition} A withdrawal is guaranteed.`, 'banned phrase'],
   [`${feeRefund.photoCondition} The statutory fine is $79.`, 'unsupported monetary legal claim'],
   ['We guarantee fewer demerits within 30 days.', 'banned phrase'],

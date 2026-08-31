@@ -1,7 +1,16 @@
 {
   "status": "draft_valid_not_launch_ready",
   "launch_ready": false,
-  "current_measurement_status": "production_google_activation_verified_paid_receipt_unverified",
+  "recorded_measurement_status": "production_google_activation_verified_paid_receipt_unverified",
+  "fee_refund_policy": {
+    "source": "src/config/feeRefund.json",
+    "source_sha256": "d61d1fe2d10ef5c58f69ebcf4ef4caf277f15b7121cd09d40f64b062819b2767",
+    "photo_condition": "If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits.",
+    "payment": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed.",
+    "refund_window_days": 30,
+    "timing_correction_live": false,
+    "scope": "Draft copy aligned with the canonical Crown-rejection condition; no publication or refund execution is recorded here"
+  },
   "counts_scope": "Prepared draft assets, not live provider inventory",
   "counts": {
     "campaigns": 1,
@@ -12,22 +21,22 @@
     "meta_variants": 3
   },
   "max_rsa_headline_length": 28,
-  "max_rsa_description_length": 90,
+  "max_rsa_description_length": 88,
   "checks": [
     "All draft entities with a status are paused",
     "No assigned or authorized advertising spend; total_budget_cad is the ad-spend test cap",
     "Account identity and exact Photo Radar destination/label match archived provider metadata; an optional private record must match its archived SHA-256 and contents",
     "Historical provider inventory retains two Secondary purchase actions, zero Primary actions and zero campaigns; activation did not change paid-action optimization or campaigns",
     "Dynamic CAD fallback 0, Every, 90/3/1-day windows and Data-driven Google paid channels preserved",
-    "Historical no-tag/deployment-pending observations are preserved; the separate activation summary supplies current measurement evidence",
+    "Historical no-tag/deployment-pending observations are preserved; the separate activation summary preserves historical measurement evidence",
     "Activation summary SHA-256, publication commits/deployment and three successful CI runs checked",
     "Isolated pre-release real-Google 11/11 capture is distinguished from independent live Tag Assistant Page View/DOM evidence",
     "Google explicit-consent defaults/opt-in, private-intake exclusion and completed withdrawal/Tag Assistant cleanup preserved",
-    "Actual paid receipt, attribution, fee-refund publication and advertising approvals remain open",
+    "Actual paid receipt, attribution, Crown-rejection timing-correction publication and advertising approvals remain open",
     "Authorized test-mode/synthetic/debug checks are distinguished from actual paid-customer evidence; no live charge required",
     "Canonical CAD 79 / GST 3.95 / total 82.95",
     "RSA copy limits and mandatory refund/price/condition pins",
-    "Upfront fee and original-fine Crown-offer refund within 30 days of Fabsy receiving the offer; no legal outcome promise",
+    "Canonical Crown-rejection condition and neither original-fine reduction nor withdrawal obtained; 30 days from Fabsy receiving rejection, never payment or an initial unchanged offer",
     "Exact/Phrase pairs and all four camera-notice families",
     "No blanket holdout negatives or literal positive-negative conflicts",
     "Alberta presence and restricted network settings",
@@ -43,7 +52,7 @@
     "Literal negative matching does not model every Google close variant",
     "This validator intentionally validates a paused draft, not authorization to launch"
   ],
-  "historical_evidence_scope": "provider_configuration_receipt, release_owner_report and destination-audit.json preserve their earlier observations. The activation summary supersedes no-tag/deployment-pending status only; it is not paid-purchase evidence.",
+  "historical_evidence_scope": "provider_configuration_receipt, release_owner_report, destination-audit.json and measurement_activation_receipt preserve their earlier observations. The activation summary superseded no-tag/deployment-pending status for that release; its product-release and capture-guard observations are historical, not publication evidence for this Crown-rejection timing correction or actual paid-purchase evidence.",
   "provider_record_validation": {
     "mode": "archived_metadata_only",
     "private_record_supplied": false,
@@ -245,8 +254,8 @@
   },
   "launch_blockers": [
     "No concrete approved daily advertising budget, total ad-spend test cap, dates, stop-loss or campaign activation; campaign CSV Budget is intentionally blank.",
-    "The fee-refund website publication is pending; capture-guard validation has passed per the release owner. The matching Photo Radar destination, terms and checkout still require publication review.",
-    "Google measurement activation and a live Page View are verified in the recorded evidence. Actual paid Photo Radar receipt, CAD 79 excluding-GST value, deduplication and attribution remain unverified.",
+    "This Crown-rejection refund-timing correction is not live. Matching Photo Radar destination, terms and checkout publication remain unverified; earlier capture-guard/product-release observations do not establish publication of this revision.",
+    "Historical Google measurement activation and a Page View are recorded. Actual paid Photo Radar receipt, CAD 79 excluding-GST value, deduplication and attribution remain unverified.",
     "Targeting, inherited negatives, assets, claims, policy, privacy and evaluation settings need account review.",
     "Both saved purchase actions remain Secondary. Receipt validation and explicit campaign-goal approval are required before promotion or activation."
   ],
@@ -254,16 +263,16 @@
     "01-campaigns.csv": "a4a5291dc3b08fe5dcd7b0bae9f0e3315eece1027c9040495a69b5985f2cb81f",
     "02-ad-groups.csv": "41fa7520f0f31c4478216a4f56372772c3bb4d6292a12d30b383e81777e596c8",
     "03-keywords.csv": "f3e7a084485ec56477280b732f5d86dd1fbeb14026ac4ae0d5d4ce269a130688",
-    "04-responsive-search-ads.csv": "9db49c8a46eabd61d396f9c9a6b3e38e2ce5670633127665d2f65aabd6a28cc1",
+    "04-responsive-search-ads.csv": "ded3c3bcec9f1075f99c05fea38e5b7cfe421ea885611dfc06d7a31f14f562a3",
     "05-negative-keywords.csv": "f5c9ff66f4517967113a57b1fbfa21a162faf48d46e3567825799e761498da8a",
-    "README.md": "91e824ef6680b100b700d8648da2e5dc138ad1bc364623827ed77061b1496a35",
+    "README.md": "887e3e5849f7c3a79642c801d3d40e0092910e88fa17c50aff4b352229aa5af4",
     "destination-audit.json": "a17ab0c03f439fc9a6d5c6606143cdece09dcde62c0a841d8f23beb8e6b2a08d",
-    "launch-checklist.md": "cccdcc946e416f8ced5e2ba2d2cfa116a75f1633a6c4a5b7583b7efd579efc93",
+    "launch-checklist.md": "f2d6e9e9385535f1f9ed2eb3e25a0b48b8316dfa87641c7520779d4c70e4e00b",
     "launch-settings.json": "4b2e04876874b1baecada46f51f52defd229bd8ed6415d0c2628514bfe9c48d6",
     "measurement-activation-receipt.json": "762387c5e7ef006221c75827f8260496dee1e963e49d85f6c00fa41c1682a13b",
-    "measurement-plan.md": "571c1d4cbd47b0a3c393fb477964b7608d85657b842ae7efe7ee0dd61d043add",
-    "meta-copy.json": "c6b47672c6628c088d10143ba49f3061f7ae327dbb651f473511690e96ce49b4",
-    "meta-creative-brief.md": "bf207f8734da79a2840fd3b860db2d68d2bb300072ca3fbf72229b0f23c7c184",
-    "validate.py": "8daa232d6471603c4030f17a46b3280e2b3c64d6fe082f9a0869d452d223e38b"
+    "measurement-plan.md": "c90391af14819e0b046350a6a7c3c45009d346bc6104efd155aa479fb8caff7e",
+    "meta-copy.json": "dfad0f9d624d84e002fa31f816310c8c23c89d736c0c01bf6f2a2dba3407ab5f",
+    "meta-creative-brief.md": "01abf2d9752f17f478adcf1e6e21f57535b0236e74260db0275023a44c68ed85",
+    "validate.py": "fbe05520c00159021c6aaf33260d96dc0d679580c2dbe8dc0449949bbf390693"
   }
 }

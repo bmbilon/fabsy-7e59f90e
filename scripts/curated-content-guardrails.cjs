@@ -11,8 +11,8 @@ const PHOTO_RADAR_CONTENT = require('../src/config/photoRadarContent.json');
 const PHOTO_RADAR_CONTENT_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
 const FEE_REFUND = require('../src/config/feeRefund.json');
 const REVIEWED_REFUND_SOURCE_HASHES = Object.freeze({
-  'src/config/feeRefund.json': '7e8280729a197d3e36426a174ddac8580dbba498a6a82b20fcac146a70a4bd19',
-  'src/config/photoRadarContent.json': 'e6f022d9ad7dea736876e5018cbd85a2a4764a0f956278b189f01523f69414a3',
+  'src/config/feeRefund.json': 'd61d1fe2d10ef5c58f69ebcf4ef4caf277f15b7121cd09d40f64b062819b2767',
+  'src/config/photoRadarContent.json': '90796ae2642f9fc405c80dc6ab459b1118ad5cdd6dd114668151b75a428754af',
 });
 // These are reviewed business-policy passages, not a licence for arbitrary
 // future config values to become legal facts. A copy change requires review.
@@ -29,7 +29,7 @@ const PHOTO_RADAR_COMPLETE_PRICE = `${PHOTO_RADAR.name} costs $${PHOTO_RADAR.pri
 const PHOTO_REFUND_GUIDE_FAQ = `${PHOTO_RADAR_COMPLETE_PRICE} ${FEE_REFUND.payment} The fee covers the authorized not-guilty plea, disclosure request and review, pursuit of a Crown reduction or withdrawal and client approval of any deal. ${FEE_REFUND.photoCondition} No trial or success surcharge. Government fines are separate. See the fee refund guarantee in our Terms of Service for details.`;
 const PHOTO_REFUND_GUIDE_NOTICE = `<h3>${FEE_REFUND.photoHeadline}</h3><p>${FEE_REFUND.photoCondition}</p><p>${FEE_REFUND.payment}</p><p><a href="${FEE_REFUND.termsPath}">${FEE_REFUND.details}</a>.</p>`;
 const PHOTO_REFUND_GUIDE_CLAUSES = [FEE_REFUND.photoHeadline, FEE_REFUND.photoCondition, FEE_REFUND.payment, PHOTO_REFUND_GUIDE_FAQ];
-const REVIEWED_RAPID_REFUND_DISCLAIMER = `Outcomes depend on the charge, evidence, procedure and prosecutor. A withdrawal, reduction, lower fine, fewer demerits or insurance result is not promised. ${FEE_REFUND.condition}`;
+const REVIEWED_RAPID_REFUND_DISCLAIMER = `Outcomes depend on the charge, evidence, procedure and prosecutor. A withdrawal, reduction, lower fine, fewer demerits or insurance result is not promised. ${FEE_REFUND.condition} Payment does not start the 30-day refund clock.`;
 
 function redactReviewedFeeRefund(value, slug) {
   const photoGuide = PHOTO_RADAR_CONTENT_SLUGS.has(slug);

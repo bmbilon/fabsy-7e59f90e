@@ -19,7 +19,7 @@
     "description": "For eligible Alberta photo radar and red-light camera notices mailed to a registered owner under Traffic Safety Act s.160(1). Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal.",
     "actionCommitment": "Within 48 hours after complete, readable disclosure is received and matched to your file, Fabsy reviews it and prepares or takes the next authorized Crown step.",
     "speedDisclaimer": "The 48-hour commitment covers Fabsy's action after complete disclosure, not the Crown's response time or a final outcome.",
-    "outcomeDisclaimer": "No legal outcome is guaranteed. If a Crown offer does not reduce the original fine, Fabsy refunds the service fee paid within 30 days of receiving that offer. No trial. No success fee. Government fines are separate.",
+    "outcomeDisclaimer": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed. If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits. No trial. No success fee. Government fines are separate.",
     "insuranceDisclaimer": "Registered-owner photo radar and red-light camera notices carry no demerits and have no insurance impact. Only the fine is on the table. An Insurance Impact Report is not included or needed."
   },
   "rapidResolution": {
@@ -53,7 +53,7 @@
       "Matters outside Fabsy's permitted or accepted agent scope"
     ],
     "speedDisclaimer": "The 48-hour clock begins only after complete, readable disclosure is received and matched to the file. It covers Fabsy's review and next authorized action, not Crown response time or the date of a final outcome.",
-    "outcomeDisclaimer": "Outcomes depend on the charge, evidence, procedure and prosecutor. A withdrawal, reduction, lower fine, fewer demerits or insurance result is not promised. If a Crown offer reduces neither your original fine nor your original demerits, Fabsy refunds the service fee you paid within 30 days of receiving that offer."
+    "outcomeDisclaimer": "Outcomes depend on the charge, evidence, procedure and prosecutor. A withdrawal, reduction, lower fine, fewer demerits or insurance result is not promised. If the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. Payment does not start the 30-day refund clock."
   },
   "insuranceReport": {
     "name": "Insurance Impact & Renewal Planning Report",

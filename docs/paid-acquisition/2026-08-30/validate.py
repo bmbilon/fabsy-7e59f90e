@@ -49,6 +49,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--write", action="store_true", help="Refresh validation.json after local checks")
     parser.add_argument("--check-zip", action="store_true", help="Verify the original 15 entry names and exact bytes")
+    parser.add_argument("--require-launch-ready", action="store_true", help="Fail closed while publication, measurement and spend gates remain open")
     args = parser.parse_args()
     assert not (args.write and args.check_zip), "Write the record, rebuild the ZIP, then check the ZIP separately"
 
@@ -70,12 +71,26 @@ def main():
 
     policy = settings["fee_refund_policy"]
     assert policy["fee_paid_upfront"] is True and policy["refund_deadline_days"] == 30
-    assert policy["trigger"] == "A Crown offer that reduces neither the original fine nor the original demerits"
-    assert policy["refund_clock_starts"] == "When Fabsy receives that Crown offer"
-    assert policy["refund_amount"] == "Full service fee actually paid, including the full bundled fee after any Pro discount"
+    assert policy["trigger"] == "The Crown rejects Fabsy's efforts to reduce the original fine or demerits or obtain withdrawal, and none of those improvements is obtained"
+    assert policy["refund_clock_starts"] == "When Fabsy receives the Crown's rejection of those negotiation efforts"
+    assert policy["refund_amount"] == "Full service fee and GST actually paid, including the full bundled fee and GST after any Pro discount"
+    assert policy["crown_negotiation_rejection_required"] is True and policy["no_improvement_obtained_required"] is True
+    assert policy["payment_starts_refund_clock"] is False and policy["initial_or_unchanged_offer_starts_refund_clock"] is False
+    assert policy["gst_paid_is_refunded"] is True
     for key in ["standalone_report_covered", "legal_outcome_guaranteed", "final_offer_required", "minimum_reduction_required", "client_must_accept_offer", "government_fines_covered"]:
         assert policy[key] is False, key
     assert policy["customer_claim_deadline"] is None and policy["publication_requires_matching_site_terms"] is True
+
+    canonical_path = PACK.parents[2] / "src/config/feeRefund.json"
+    canonical = json.loads(canonical_path.read_text(encoding="utf-8"))
+    for token in ["Crown rejects Fabsy's efforts", "original fine or demerits", "withdraw your ticket", "none of those improvements is obtained", "within 30 days of receiving the rejection"]:
+        assert token in canonical["condition"], token
+    assert "Payment does not start the 30-day refund clock" in canonical["payment"]
+    assert canonical["refundWindowDays"] == 30
+    assert settings["copy_revision"] == "crown_negotiation_rejection_refund_20260831"
+    correction = settings["timing_correction"]
+    assert correction["state"] == "prepared_not_live" and correction["website_publication_verified"] is False
+    assert correction["campaign_activation_authorized"] is False
 
     campaigns, groups, keywords, ads, negatives, assets = [rows(name) for name in ENTRIES[:6]]
     counts = dict(zip(
@@ -123,9 +138,9 @@ def main():
         assert row["Headline 1 position"] == "1" and row["Headline 2 position"] == "2" and row["Description 1 position"] == "1"
         assert row["Headline 1"] == "Ticket Reduced Or Fee Refunded"
         assert row["Headline 2"] == "Rapid Resolution: $198 + GST"
-        for token in ["Pre-trial", "Crown offer", "neither original fine nor demerits", "Fee refund", "See terms"]:
+        for token in ["Crown rejects Fabsy's efforts", "no fine/demerit cut or withdrawal", "fee refund", "See terms"]:
             assert token in row["Description 1"], token
-        for token in ["Pay upfront", "within 30 days of Fabsy receiving the offer", "No legal outcome promise"]:
+        for token in ["Pay upfront", "within 30 days of Fabsy receiving the rejection", "No outcome promise"]:
             assert token in row["Description 2"], token
         headlines = [row[f"Headline {i}"] for i in range(1, 16)]
         descriptions = [row[f"Description {i}"] for i in range(1, 5)]
@@ -150,7 +165,7 @@ def main():
         if row["Asset type"] == "Sitelink":
             assert urlsplit(row["Final URL"]).hostname == "fabsy.ca" and row["Final URL"].startswith("https://")
     refund_link = next(row for row in assets if row["Text"] == "Service Fee Refund Terms")
-    assert "Pay upfront" in refund_link["Description 1"] and "Within 30 days of Fabsy's receipt" in refund_link["Description 2"]
+    assert "Crown rejects our negotiations" in refund_link["Description 1"] and "Within 30 days of Fabsy's receipt" in refund_link["Description 2"]
     assert refund_link["Final URL"] == "https://fabsy.ca/terms-of-service"
 
     social = (PACK / "social-copy-drafts.md").read_text(encoding="utf-8")
@@ -158,10 +173,11 @@ def main():
     assert len(bodies) == 5 and social.count("**Primary text:**") == 4 and social.count("**Body:**") == 1
     for body in bodies:
         assert body.startswith("Fine or demerits reduced—or your ") and "fee refunded" in body[:100]
-        for token in ["upfront", "Crown offer reduces neither your original fine nor your original demerits", "within 30 days of receiving that", "No legal outcome is guaranteed", "See website for details"]:
+        for token in ["upfront", "Crown rejects Fabsy's efforts", "original fine or demerits or withdraw your ticket", "none of those improvements is obtained", "within 30 days of receiving the Crown's rejection", "Payment does not start this clock", "initial or unchanged offer before that rejection does not trigger it", "No legal outcome is guaranteed", "See website for details"]:
             assert token in body, token
         safe_ad_copy(body)
-    assert "full bundled service fee actually paid" in bodies[2]
+        assert not re.search(r"within 30 days of (?:Fabsy )?receiving (?:that |the )?(?:Crown )?offer|if a Crown offer reduces|30 days (?:after|from) payment", body, re.I), "Stale offer/payment trigger"
+    assert "full bundled service fee and GST actually paid" in bodies[2]
     assert "full bundled fee after any Pro discount" in bodies[3]
     for price in ["$198", "$229", "$158.40", "$183.20"]:
         assert price in social, price
@@ -190,22 +206,25 @@ def main():
             "Search-only, English, exact/phrase and Alberta-presence controls retained",
             "No duplicate keyword/ad-group rows, opposite-metro keywords or literal negative conflicts",
             "15 unique headlines and 4 unique descriptions per RSA; 30/90/15 character limits",
-            "Refund H1, price/GST H2 and original-penalty Crown-offer condition D1 pinned",
-            "Upfront payment, 30 days from Fabsy receiving the offer, and no legal outcome promise",
-            "Full actual fee including full bundle after Pro discount; standalone report and fines excluded",
+            "Refund H1, price/GST H2 and Crown-rejected efforts with no reduction/withdrawal D1 pinned",
+            "Upfront payment; 30 days from Fabsy receiving Crown rejection; payment and initial/unchanged offers do not start the clock",
+            "Full actual service fee and GST, including full bundle after Pro discount; standalone report and fines excluded",
             "No extra final-offer, minimum-reduction, claim-deadline or plea-acceptance condition",
             "All four older Meta concepts and one Reddit draft lead with conditional fee refund",
             "Sitelink/callout 25 and description 35 character limits; supported static/ValueTrack suffixes",
             "UTF-8 CSV/JSON parse, exact row counts and pilot holdout negative checks",
         ],
         "copy_revision": {"id": settings["copy_revision"], "updated_on": "2026-08-31", "lead_message": "Ticket Reduced Or Fee Refunded", "fee_refund_policy": policy},
+        "canonical_policy_source": {"file": "../../../src/config/feeRefund.json", "sha256": hashlib.sha256(canonical_path.read_bytes()).hexdigest()},
+        "timing_correction": correction,
+        "launch_blockers": ["Crown-rejection timing correction has not been published and verified on the website", "Actual paid-purchase ingestion and attribution remain unverified", "Advertising budget, test cap, campaign-goal approval and activation are not authorized"],
         "measurement_follow_up": {
             "recorded_on": "2026-08-31",
             "status": "production_google_activation_verified_paid_receipt_unverified",
             "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
             "receipt": "../2026-08-31-photo-radar/measurement-activation-receipt.json",
             "receipt_sha256": "762387c5e7ef006221c75827f8260496dee1e963e49d85f6c00fa41c1682a13b",
-            "evidence_scope": "Dated owner release records, isolated real-Google request matrix and independent live Tag Assistant Page View/consent/boundary checks; not a new check by this validator",
+            "evidence_scope": "Historical owner release records, isolated real-Google request matrix and independent live Tag Assistant Page View/consent/boundary checks; not a new check or verification of this timing correction",
             "actual_paid_purchase_verified": False,
             "actual_paid_attribution_verified": False,
             "paid_actions": "Secondary, unchanged",
@@ -213,7 +232,7 @@ def main():
             "budget_and_test_cap_approved": False,
         },
         "not_verified": [
-            "New fee-refund offer, terms, service authorization and checkout publication; actual refund processing",
+            "Crown-rejection timing correction in offer, terms, service authorization and checkout publication; actual refund processing",
             "Authenticated Editor import, pin mapping, rendered placements or ad-policy approval",
             "Actual paid purchase ingestion, matching and attribution; Page View/consent evidence does not prove these",
             "Current campaign policy, goal approval, approved budget and total advertising test cap",
@@ -234,7 +253,7 @@ def main():
     print(json.dumps({key: report[key] for key in ["status", "launch_ready", "counts", "social_counts", "max_rsa_headline_length", "max_rsa_description_length"]}, indent=2))
     if args.check_zip:
         print("ZIP: exact original 15 entries; CRC and all payload bytes match.")
-    return 0
+    return 1 if args.require_launch_ready else 0
 
 
 if __name__ == "__main__":

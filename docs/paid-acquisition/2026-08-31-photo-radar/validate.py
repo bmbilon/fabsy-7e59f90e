@@ -143,7 +143,7 @@ def check_provider_receipt(settings, record_path=None):
 
 
 def check_measurement_activation(settings):
-    """Check the shareable activation summary, without replaying private evidence."""
+    """Check the historical activation summary, not this timing correction's release."""
     receipt_path = ASSETS / "measurement-activation-receipt.json"
     receipt_bytes = receipt_path.read_bytes()
     assert hashlib.sha256(receipt_bytes).hexdigest() == ACTIVATION_RECEIPT_SHA256, "Measurement activation summary SHA-256 mismatch"
@@ -204,6 +204,14 @@ def main():
     meta = read_json("meta-copy.json")
     audit = read_json("destination-audit.json")
     offer = json.loads((REPO / "src/config/offers.json").read_text())["photoRadar"]
+    fee_refund_bytes = (REPO / "src/config/feeRefund.json").read_bytes()
+    fee_refund = json.loads(fee_refund_bytes)
+    assert fee_refund["refundWindowDays"] == 30
+    assert "Payment does not start the 30-day refund clock." in fee_refund["payment"]
+    for token in ["Crown rejects Fabsy's efforts", "reduce the original fine", "obtain a withdrawal", "neither improvement is obtained", "within 30 days of receiving the rejection", "These notices have no demerits"]:
+        assert token in fee_refund["photoCondition"], f"Canonical Photo Radar refund condition: {token}"
+    assert "Photo Radar" in fee_refund["scope"]
+    assert fee_refund["termsPath"] == "/terms-of-service#fee-refund-guarantee"
     assert offer["priceCad"] == 79 and offer["gstCad"] == 3.95 and offer["totalCad"] == 82.95
     assert offer["orderType"] == "photo_radar" and offer["reviewPath"] == "ate"
     assert settings["spend_authorized"] is False and settings["import_authorized"] is False
@@ -279,9 +287,9 @@ def main():
         assert row["Description 1 position"] == "1"
         assert row["Headline 1"] == "Fine Reduced Or Fee Refunded"
         assert row["Headline 2"] == "$79 + GST. No Hidden Fees"
-        for token in ["Alberta owner camera notices", "Crown offer", "no cut to original fine", "Fee refund", "See terms"]:
+        for token in ["Crown rejects Fabsy's efforts", "no fine cut or withdrawal", "fee refund", "See terms"]:
             assert token in row["Description 1"], (context, token)
-        for token in ["Pay upfront", "within 30 days of Fabsy receiving the offer", "No legal outcome promise"]:
+        for token in ["Pay upfront", "within 30 days of Fabsy receiving the rejection", "No outcome promise"]:
             assert token in row["Description 2"], (context, token)
         headlines = [row[f"Headline {i}"] for i in range(1, 16)]
         descriptions = [row[f"Description {i}"] for i in range(1, 5)]
@@ -291,7 +299,7 @@ def main():
         for text in headlines + descriptions:
             check_copy(text, context)
         combined = " ".join(descriptions).lower()
-        for token in ["owner camera notices", "no demerits", "insurance impact", "no trial", "fines separate", "not-guilty plea", "request disclosure", "you approve any deal"]:
+        for token in ["alberta owner camera notices", "no demerits", "insurance impact", "no trial", "fines separate", "not-guilty plea", "request disclosure", "you approve any deal"]:
             assert token in combined, (context, token)
         suffix = row["Final URL suffix"]
         assert not suffix.startswith("?")
@@ -323,10 +331,15 @@ def main():
             check_copy(variant[field], variant["id"])
         assert "$79" in variant["primary_text"][:125] and "GST" in variant["primary_text"][:125]
         body = variant["primary_text"].lower()
+        assert "refund covers the actual photo radar service fee and gst paid" in body, variant["id"]
+        assert fee_refund["photoHeadline"].lower() in body, variant["id"]
+        assert fee_refund["photoCondition"].lower() in body, variant["id"]
         for token in ["alberta", "owner", "$82.95 total", "no demerits", "insurance impact", "no trial", "no outcome is promised", "you approve any deal"]:
             assert token in body, (variant["id"], token)
-        for token in ["fine reduced—or your fee refunded", "upfront", "no hidden fees", "if fabsy receives a crown offer that does not reduce your original fine", "refunds the actual service fee within 30 days of receiving that offer", "see terms", "not-guilty plea", "request disclosure", "government fines are separate"]:
+        for token in ["upfront", "no hidden fees", "actual photo radar service fee and gst paid", "payment does not start the 30-day refund clock", "an initial or unchanged offer alone does not trigger a refund", "see terms", "not-guilty plea", "request disclosure", "government fines are separate"]:
             assert token in body, (variant["id"], token)
+        for stale_trigger in ["if fabsy receives a crown offer that does not reduce", "within 30 days of receiving that offer", "within 30 days of payment"]:
+            assert stale_trigger not in body, (variant["id"], stale_trigger)
         assert parse_qs(variant["url_parameters"])["utm_source"] == ["meta"]
         assert "{" not in variant["url_parameters"] and "}" not in variant["url_parameters"]
 
@@ -335,22 +348,31 @@ def main():
     assert audit["browser_checkout_verified"] is False
     blockers = [
         "No concrete approved daily advertising budget, total ad-spend test cap, dates, stop-loss or campaign activation; campaign CSV Budget is intentionally blank.",
-        "The fee-refund website publication is pending; capture-guard validation has passed per the release owner. The matching Photo Radar destination, terms and checkout still require publication review.",
-        "Google measurement activation and a live Page View are verified in the recorded evidence. Actual paid Photo Radar receipt, CAD 79 excluding-GST value, deduplication and attribution remain unverified.",
+        "This Crown-rejection refund-timing correction is not live. Matching Photo Radar destination, terms and checkout publication remain unverified; earlier capture-guard/product-release observations do not establish publication of this revision.",
+        "Historical Google measurement activation and a Page View are recorded. Actual paid Photo Radar receipt, CAD 79 excluding-GST value, deduplication and attribution remain unverified.",
         "Targeting, inherited negatives, assets, claims, policy, privacy and evaluation settings need account review.",
         "Both saved purchase actions remain Secondary. Receipt validation and explicit campaign-goal approval are required before promotion or activation.",
     ]
     report = {
         "status": "draft_valid_not_launch_ready",
         "launch_ready": False,
-        "current_measurement_status": activation["status"],
+        "recorded_measurement_status": activation["status"],
+        "fee_refund_policy": {
+            "source": "src/config/feeRefund.json",
+            "source_sha256": hashlib.sha256(fee_refund_bytes).hexdigest(),
+            "photo_condition": fee_refund["photoCondition"],
+            "payment": fee_refund["payment"],
+            "refund_window_days": fee_refund["refundWindowDays"],
+            "timing_correction_live": False,
+            "scope": "Draft copy aligned with the canonical Crown-rejection condition; no publication or refund execution is recorded here",
+        },
         "counts_scope": "Prepared draft assets, not live provider inventory",
         "counts": {"campaigns": len(campaigns), "ad_groups": len(groups), "keywords": len(keywords), "rsa": len(ads), "negative_keywords": len(negatives), "meta_variants": len(meta["variants"])},
         "max_rsa_headline_length": max(len(row[f"Headline {i}"]) for row in ads for i in range(1, 16)),
         "max_rsa_description_length": max(len(row[f"Description {i}"]) for row in ads for i in range(1, 5)),
-        "checks": ["All draft entities with a status are paused", "No assigned or authorized advertising spend; total_budget_cad is the ad-spend test cap", "Account identity and exact Photo Radar destination/label match archived provider metadata; an optional private record must match its archived SHA-256 and contents", "Historical provider inventory retains two Secondary purchase actions, zero Primary actions and zero campaigns; activation did not change paid-action optimization or campaigns", "Dynamic CAD fallback 0, Every, 90/3/1-day windows and Data-driven Google paid channels preserved", "Historical no-tag/deployment-pending observations are preserved; the separate activation summary supplies current measurement evidence", "Activation summary SHA-256, publication commits/deployment and three successful CI runs checked", "Isolated pre-release real-Google 11/11 capture is distinguished from independent live Tag Assistant Page View/DOM evidence", "Google explicit-consent defaults/opt-in, private-intake exclusion and completed withdrawal/Tag Assistant cleanup preserved", "Actual paid receipt, attribution, fee-refund publication and advertising approvals remain open", "Authorized test-mode/synthetic/debug checks are distinguished from actual paid-customer evidence; no live charge required", "Canonical CAD 79 / GST 3.95 / total 82.95", "RSA copy limits and mandatory refund/price/condition pins", "Upfront fee and original-fine Crown-offer refund within 30 days of Fabsy receiving the offer; no legal outcome promise", "Exact/Phrase pairs and all four camera-notice families", "No blanket holdout negatives or literal positive-negative conflicts", "Alberta presence and restricted network settings", "Meta tax/scope/approval/outcome qualifications", "Paid purchase value and CAC/reduction threshold contract"],
+        "checks": ["All draft entities with a status are paused", "No assigned or authorized advertising spend; total_budget_cad is the ad-spend test cap", "Account identity and exact Photo Radar destination/label match archived provider metadata; an optional private record must match its archived SHA-256 and contents", "Historical provider inventory retains two Secondary purchase actions, zero Primary actions and zero campaigns; activation did not change paid-action optimization or campaigns", "Dynamic CAD fallback 0, Every, 90/3/1-day windows and Data-driven Google paid channels preserved", "Historical no-tag/deployment-pending observations are preserved; the separate activation summary preserves historical measurement evidence", "Activation summary SHA-256, publication commits/deployment and three successful CI runs checked", "Isolated pre-release real-Google 11/11 capture is distinguished from independent live Tag Assistant Page View/DOM evidence", "Google explicit-consent defaults/opt-in, private-intake exclusion and completed withdrawal/Tag Assistant cleanup preserved", "Actual paid receipt, attribution, Crown-rejection timing-correction publication and advertising approvals remain open", "Authorized test-mode/synthetic/debug checks are distinguished from actual paid-customer evidence; no live charge required", "Canonical CAD 79 / GST 3.95 / total 82.95", "RSA copy limits and mandatory refund/price/condition pins", "Canonical Crown-rejection condition and neither original-fine reduction nor withdrawal obtained; 30 days from Fabsy receiving rejection, never payment or an initial unchanged offer", "Exact/Phrase pairs and all four camera-notice families", "No blanket holdout negatives or literal positive-negative conflicts", "Alberta presence and restricted network settings", "Meta tax/scope/approval/outcome qualifications", "Paid purchase value and CAC/reduction threshold contract"],
         "limitations": ["Without --provider-record, archived provider metadata is checked but the private/local source file is neither required nor read; its recorded SHA-256 is retained as historical evidence", "The activation summary and its hash are checked offline; this validator does not replay the local release records, browser checks or live provider observations", "Production Tag Assistant observed a Page View, not a Purchase; the 11/11 network capture was an isolated pre-release harness, not production-browser request capture", "The existing Cloudflare beacon is unchanged; the Google consent checks do not establish behavior of every analytics service", "Offline content checks do not validate Ads Editor import, account policy approval, actual matching or current production behavior", "Literal negative matching does not model every Google close variant", "This validator intentionally validates a paused draft, not authorization to launch"],
-        "historical_evidence_scope": "provider_configuration_receipt, release_owner_report and destination-audit.json preserve their earlier observations. The activation summary supersedes no-tag/deployment-pending status only; it is not paid-purchase evidence.",
+        "historical_evidence_scope": "provider_configuration_receipt, release_owner_report, destination-audit.json and measurement_activation_receipt preserve their earlier observations. The activation summary superseded no-tag/deployment-pending status for that release; its product-release and capture-guard observations are historical, not publication evidence for this Crown-rejection timing correction or actual paid-purchase evidence.",
         "provider_record_validation": {
             "mode": "private_source_verified_against_archive" if args.provider_record is not None else "archived_metadata_only",
             "private_record_supplied": args.provider_record is not None,
@@ -373,7 +395,7 @@ def main():
         "asset_sha256": {file.name: hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(ASSETS.iterdir()) if file.is_file() and file.name != "validation.json"},
     }
     (ASSETS / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps({key: report[key] for key in ["status", "current_measurement_status", "provider_record_validation", "counts", "max_rsa_headline_length", "max_rsa_description_length", "launch_blockers"]}, indent=2))
+    print(json.dumps({key: report[key] for key in ["status", "recorded_measurement_status", "fee_refund_policy", "provider_record_validation", "counts", "max_rsa_headline_length", "max_rsa_description_length", "launch_blockers"]}, indent=2))
     return 1 if args.require_launch_ready else 0
 
 

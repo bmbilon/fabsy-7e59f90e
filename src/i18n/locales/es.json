@@ -32,9 +32,9 @@
   "feeRefund": {
     "headline": "Menos multa o puntos de penalización, o te devolvemos la tarifa",
     "photoHeadline": "Multa reducida o infracción desestimada, o te devolvemos la tarifa",
-    "payment": "La tarifa del servicio se paga por adelantado. No se garantiza ningún resultado legal.",
-    "condition": "Si una oferta de la fiscalía (Crown) no reduce ni tu multa original ni tus puntos de penalización originales, Fabsy te devuelve la tarifa del servicio que pagaste dentro de los 30 días siguientes a la recepción de esa oferta por Fabsy.",
-    "photoCondition": "Si una oferta de la fiscalía (Crown) no reduce la multa original de tu aviso de foto radar o cámara de semáforo en rojo, Fabsy te devuelve la tarifa del servicio que pagaste dentro de los 30 días siguientes a la recepción de esa oferta por Fabsy. Estos avisos no conllevan puntos de penalización.",
+    "payment": "La tarifa del servicio se paga por adelantado. El pago no inicia el plazo de 30 días para el reembolso. No se garantiza ningún resultado legal.",
+    "condition": "Si la fiscalía (Crown) rechaza las gestiones de Fabsy para reducir tu multa o tus puntos de penalización originales, o retirar tu infracción, y no se obtiene ninguna de esas mejoras, Fabsy te devuelve la tarifa del servicio dentro de los 30 días siguientes a la recepción de ese rechazo por Fabsy.",
+    "photoCondition": "Si la fiscalía (Crown) rechaza las gestiones de Fabsy para reducir la multa original o conseguir la retirada de tu aviso de foto radar o cámara de semáforo en rojo, y no se obtiene ninguna de esas mejoras, Fabsy te devuelve la tarifa del servicio dentro de los 30 días siguientes a la recepción de ese rechazo por Fabsy. Estos avisos no conllevan puntos de penalización.",
     "details": "Condiciones de devolución de la tarifa",
     "scope": "Para servicios de representación por infracciones, incluidos Rapid Resolution, Photo Radar y el paquete Rapid Resolution. Las multas gubernamentales son aparte."
   },
@@ -148,7 +148,7 @@
       },
       "outcome": {
         "question": "¿Se garantiza un resultado? ¿Cómo funciona la devolución de la tarifa?",
-        "answer": "No se garantiza ningún resultado legal. El resultado depende del cargo, las pruebas, el procedimiento, la fiscalía y el tribunal. En los servicios de representación por infracciones, la tarifa se paga por adelantado. Si una oferta de la fiscalía (Crown) no reduce ni tu multa original ni tus puntos de penalización originales, Fabsy te devuelve la tarifa del servicio que pagaste dentro de los 30 días siguientes a la recepción de esa oferta por Fabsy. En los avisos de foto radar y cámara de semáforo en rojo, solo se compara la multa porque estos avisos no conllevan puntos de penalización. Las multas gubernamentales son aparte."
+        "answer": "La tarifa del servicio se paga por adelantado. El pago no inicia el plazo de 30 días para el reembolso. No se garantiza ningún resultado legal. Si la fiscalía (Crown) rechaza las gestiones de Fabsy para reducir tu multa o tus puntos de penalización originales, o retirar tu infracción, y no se obtiene ninguna de esas mejoras, Fabsy te devuelve la tarifa del servicio dentro de los 30 días siguientes a la recepción de ese rechazo por Fabsy. Una oferta inicial de la fiscalía que deje las sanciones sin cambios no inicia por sí sola el plazo de 30 días para el reembolso. En los avisos de foto radar y cámara de semáforo en rojo, las mejoras son una reducción de la multa original o la retirada del aviso; estos avisos no conllevan puntos de penalización. Para servicios de representación por infracciones, incluidos Rapid Resolution, Photo Radar y el paquete Rapid Resolution. Las multas gubernamentales son aparte."
       },
       "language": {
         "question": "¿Puedo escribir en mi idioma?",

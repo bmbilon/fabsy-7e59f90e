@@ -1,9 +1,9 @@
 {
   "headline": "Fine or demerits reduced—or your fee refunded",
   "photoHeadline": "Fine reduced or ticket dismissed—or your fee refunded",
-  "payment": "The service fee is paid upfront. No legal outcome is guaranteed.",
-  "condition": "If a Crown offer reduces neither your original fine nor your original demerits, Fabsy refunds the service fee you paid within 30 days of receiving that offer.",
-  "photoCondition": "If a Crown offer does not reduce the original fine on your photo radar or red-light camera notice, Fabsy refunds the service fee you paid within 30 days of receiving that offer. These notices have no demerits.",
+  "payment": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed.",
+  "condition": "If the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection.",
+  "photoCondition": "If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits.",
   "details": "Fee-refund terms",
   "scope": "For ticket-representation services, including Rapid Resolution, Photo Radar and the Rapid Resolution bundle. Government fines are separate.",
   "termsPath": "/terms-of-service#fee-refund-guarantee",

@@ -26,7 +26,7 @@ const REFUND_NOTICE_SOURCES = {
   '/faq': 'src/pages/FAQ.tsx', '/terms-of-service': 'src/pages/TermsOfService.tsx',
   '/terms-of-purchase': 'src/pages/TermsOfPurchase.tsx',
 };
-const REVIEWED_PHOTO_OUTCOME_COPY = 'No legal outcome is guaranteed. If a Crown offer does not reduce the original fine, Fabsy refunds the service fee paid within 30 days of receiving that offer. No trial. No success fee. Government fines are separate.';
+const REVIEWED_PHOTO_OUTCOME_COPY = `${feeRefund.payment} ${feeRefund.photoCondition} No trial. No success fee. Government fines are separate.`;
 const REVIEWED_RAPID_OUTCOME_COPY = REVIEWED_RAPID_REFUND_DISCLAIMER;
 // The owners froze these public copy files for this release. A changed source
 // must receive a new explicit review of the admission contract and fixtures.
@@ -471,7 +471,8 @@ function redactTermsAdditions(document) {
       'Photo radar and red-light camera owner notices have no demerits, so the comparison is to the original fine only.',
       'The guarantee covers the service fee actually paid for Rapid Resolution, Rapid Resolution: Photo Radar, or the Rapid Resolution and insurance-planning bundle, including a discounted Pro Driver order. A standalone insurance report is not a ticket-representation service and is not covered by this outcome-based guarantee.',
       'The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. Work performed and payment-processing costs do not reduce a refund due under this guarantee.',
-      'The 30-calendar-day period starts when Fabsy receives the Crown offer that provides no reduction in either penalty. It does not start at checkout and is not a promise that the Crown will respond or the case will finish within 30 days.',
+      "The 30-calendar-day period starts when Fabsy receives the Crown's rejection of Fabsy's efforts to obtain a lower original fine, fewer original demerits or withdrawal, and none of those improvements has been obtained. Payment or checkout does not start this clock. An opening or unchanged Crown offer before Fabsy's negotiation efforts have been rejected does not start it either.",
+      'This is not a promise that the Crown will respond or the case will finish within 30 days. Once a qualifying rejection has been received, further negotiation or waiting for your instructions does not postpone the refund deadline.',
       'You do not have to accept a Crown offer or plead guilty to receive a refund due under this guarantee. Your case-specific instructions are still required for any resolution; ticket and court deadlines continue to apply.',
       "This is a promise about Fabsy's service fee, not a guarantee of a legal result. Government fines, court charges and third-party costs remain separate. The ordinary cancellation provisions below do not limit a refund due under this guarantee or any statutory rights.",
     ]],
@@ -519,7 +520,7 @@ function redactTermsAdditions(document) {
 
 function redactRefundSourceClauses(document, route) {
   const photoPriceNote = 'Government fines are separate. The service fee is paid upfront and covered by our fee refund guarantee. See refund details.';
-  const purchaseRefund = 'The fee-refund guarantee applies if a Crown offer reduces neither your original fine nor your original demerits. Fabsy refunds the service fee you actually paid, together with the corresponding GST, within 30 calendar days of receiving that offer. Photo radar and red-light owner notices are assessed on the fine only. The guarantee covers Rapid Resolution, Photo Radar and the Rapid Resolution bundle, including discounted Pro Driver orders; it does not cover a standalone insurance report. Work already performed and payment-processing costs do not reduce a refund due under this guarantee. Amounts already refunded are not paid twice. Read the complete fee-refund terms.';
+  const purchaseRefund = "The fee-refund guarantee applies when the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or obtain a withdrawal, and none of those improvements has been obtained. Fabsy refunds the service fee you actually paid, together with the corresponding GST, within 30 calendar days of Fabsy receiving that rejection. Payment does not start the clock; an opening or unchanged offer before Fabsy's negotiation efforts have been rejected does not start it either. Photo radar and red-light owner notices are assessed on the original fine or withdrawal only. The guarantee covers Rapid Resolution, Photo Radar and the Rapid Resolution bundle, including discounted Pro Driver orders; it does not cover a standalone insurance report. Work already performed and payment-processing costs do not reduce a refund due under this guarantee. Amounts already refunded are not paid twice. Read the complete fee-refund terms.";
   const purchaseLimit = "Fabsy does not promise a withdrawal, reduced fine, fewer demerits, a particular court result, insurance savings, or any premium outcome. Courts, prosecutors, registries, and insurers make their own decisions. The fee-refund guarantee is a commitment to refund Fabsy's fee when its stated conditions are met, not a promise of a particular legal outcome.";
   const rules = route === '/photo-radar' ? [
     [photoPriceNote, 'p', 0, 'See refund details'],

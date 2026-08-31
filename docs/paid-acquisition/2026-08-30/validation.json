@@ -23,25 +23,25 @@
     "Search-only, English, exact/phrase and Alberta-presence controls retained",
     "No duplicate keyword/ad-group rows, opposite-metro keywords or literal negative conflicts",
     "15 unique headlines and 4 unique descriptions per RSA; 30/90/15 character limits",
-    "Refund H1, price/GST H2 and original-penalty Crown-offer condition D1 pinned",
-    "Upfront payment, 30 days from Fabsy receiving the offer, and no legal outcome promise",
-    "Full actual fee including full bundle after Pro discount; standalone report and fines excluded",
+    "Refund H1, price/GST H2 and Crown-rejected efforts with no reduction/withdrawal D1 pinned",
+    "Upfront payment; 30 days from Fabsy receiving Crown rejection; payment and initial/unchanged offers do not start the clock",
+    "Full actual service fee and GST, including full bundle after Pro discount; standalone report and fines excluded",
     "No extra final-offer, minimum-reduction, claim-deadline or plea-acceptance condition",
     "All four older Meta concepts and one Reddit draft lead with conditional fee refund",
     "Sitelink/callout 25 and description 35 character limits; supported static/ValueTrack suffixes",
     "UTF-8 CSV/JSON parse, exact row counts and pilot holdout negative checks"
   ],
   "copy_revision": {
-    "id": "service_fee_refund_offer_20260831",
+    "id": "crown_negotiation_rejection_refund_20260831",
     "updated_on": "2026-08-31",
     "lead_message": "Ticket Reduced Or Fee Refunded",
     "fee_refund_policy": {
       "authorized_on": "2026-08-31",
       "fee_paid_upfront": true,
-      "trigger": "A Crown offer that reduces neither the original fine nor the original demerits",
-      "refund_amount": "Full service fee actually paid, including the full bundled fee after any Pro discount",
+      "trigger": "The Crown rejects Fabsy's efforts to reduce the original fine or demerits or obtain withdrawal, and none of those improvements is obtained",
+      "refund_amount": "Full service fee and GST actually paid, including the full bundled fee and GST after any Pro discount",
       "refund_deadline_days": 30,
-      "refund_clock_starts": "When Fabsy receives that Crown offer",
+      "refund_clock_starts": "When Fabsy receives the Crown's rejection of those negotiation efforts",
       "standalone_report_covered": false,
       "legal_outcome_guaranteed": false,
       "final_offer_required": false,
@@ -49,16 +49,38 @@
       "customer_claim_deadline": null,
       "client_must_accept_offer": false,
       "government_fines_covered": false,
-      "publication_requires_matching_site_terms": true
+      "publication_requires_matching_site_terms": true,
+      "payment_starts_refund_clock": false,
+      "initial_or_unchanged_offer_starts_refund_clock": false,
+      "crown_negotiation_rejection_required": true,
+      "no_improvement_obtained_required": true,
+      "gst_paid_is_refunded": true,
+      "canonical_policy_source": "../../../src/config/feeRefund.json"
     }
   },
+  "canonical_policy_source": {
+    "file": "../../../src/config/feeRefund.json",
+    "sha256": "d61d1fe2d10ef5c58f69ebcf4ef4caf277f15b7121cd09d40f64b062819b2767"
+  },
+  "timing_correction": {
+    "prepared_on": "2026-08-31",
+    "state": "prepared_not_live",
+    "website_publication_verified": false,
+    "campaign_activation_authorized": false,
+    "earlier_release_evidence_is_not_this_correction": true
+  },
+  "launch_blockers": [
+    "Crown-rejection timing correction has not been published and verified on the website",
+    "Actual paid-purchase ingestion and attribution remain unverified",
+    "Advertising budget, test cap, campaign-goal approval and activation are not authorized"
+  ],
   "measurement_follow_up": {
     "recorded_on": "2026-08-31",
     "status": "production_google_activation_verified_paid_receipt_unverified",
     "source_commit": "3a187b2d6f5fa72e9bb28a4fab55d45279bfce0e",
     "receipt": "../2026-08-31-photo-radar/measurement-activation-receipt.json",
     "receipt_sha256": "762387c5e7ef006221c75827f8260496dee1e963e49d85f6c00fa41c1682a13b",
-    "evidence_scope": "Dated owner release records, isolated real-Google request matrix and independent live Tag Assistant Page View/consent/boundary checks; not a new check by this validator",
+    "evidence_scope": "Historical owner release records, isolated real-Google request matrix and independent live Tag Assistant Page View/consent/boundary checks; not a new check or verification of this timing correction",
     "actual_paid_purchase_verified": false,
     "actual_paid_attribution_verified": false,
     "paid_actions": "Secondary, unchanged",
@@ -66,7 +88,7 @@
     "budget_and_test_cap_approved": false
   },
   "not_verified": [
-    "New fee-refund offer, terms, service authorization and checkout publication; actual refund processing",
+    "Crown-rejection timing correction in offer, terms, service authorization and checkout publication; actual refund processing",
     "Authenticated Editor import, pin mapping, rendered placements or ad-policy approval",
     "Actual paid purchase ingestion, matching and attribution; Page View/consent evidence does not prove these",
     "Current campaign policy, goal approval, approved budget and total advertising test cap",
@@ -140,17 +162,17 @@
     "01-campaigns.csv": "c88074b77e14356e0381a2a64bd4ea7279561a96b290fd4a986b62d6ac988bda",
     "02-ad-groups.csv": "9cdb2639f178a828d93aa4e3567675fcbaf80294b18c370b9f32adcacf123f2a",
     "03-keywords.csv": "95d74d0b820a3f30d8842292b3ff2e8f590c1f77551b923b4dae0853896a0674",
-    "04-responsive-search-ads.csv": "b454cbd15d2bd2e8413b184e9b572a6c51efed5af2a1d61d65dc04b396420345",
+    "04-responsive-search-ads.csv": "3af54b79b8ff31d57551d5d4642180902b04839dbfd9307d1350f1aaa9dcafeb",
     "05-negative-keywords.csv": "c35cb37db6d62b60299af969776fca5b8bdc74b1e13ed051d68145f148920327",
-    "06-assets.csv": "3abd77b432faa31ad626f880096b735365102f946e4708fc5063f7d8a067be60",
-    "README.md": "1995ad3bcb3c7fe9cfbf41ce26ef2d6c8d79fa5599fcca2e3b6b164a2f30f39c",
-    "campaign-review.md": "8098a715be1a3d19bcd9860318f20df9be742f1ee4311ca414d35fb890001e7c",
-    "launch-settings.json": "da4876c676b8acef795d10cff9c405abdea3d697436a1b117d1fca6700dd36ba",
+    "06-assets.csv": "9ee630fe86fbb1ce8408aa924e14c788193cccdb509b2d2ed9b45f6bbdea257b",
+    "README.md": "6f1dead7ca8221bdba132510f8478b8d238ca630d18048f2500fb5ab28c3d574",
+    "campaign-review.md": "a027c5adf0909a2929642c8f89eba8916886fab2168d5e4717259d9b61eaf530",
+    "launch-settings.json": "02383d83cd902610c5a3938c4d36b525ec934722c69e73eb408865fb4ee49c0f",
     "live-http-audit.json": "3aaaf4c99cde6978fd2cfca43cc0beeb5b6f99b3f180b4928250381ca13fecd7",
-    "measurement-readiness.md": "7d97ef402bb1aa7c090f0d0cbc369aedea76e8b7a468c608e3b4df837ccfecb4",
-    "site-readiness.md": "c4b874de073ba5dcb1e6f6afcdb825f0c5454c0afe5812421c181c48c6e1caba",
-    "social-copy-drafts.md": "d2085c022d24f876d70531316b4eacf78ec51be5aa36f4f713b66218af7d70b4",
-    "messaging-direction.md": "e229d5ea2f82890c7724530d740b84f693249554966959ecda7bbf2361421815",
-    "validate.py": "818eb54243365825675bfe195e04fb20e1ac75d9980e6eb7c8322d55e63794e4"
+    "measurement-readiness.md": "3652ae4078417e373097c4139a3145d675b7963b294757524bf40f6671eea5d7",
+    "site-readiness.md": "27c016e0320a121ed52acc950fa9eda6ecafde8aa2de18c9c7a8644ff412e580",
+    "social-copy-drafts.md": "c5dc25424cbed76069a72d1983816f2a5767337f3f58654f73299a2144f274d2",
+    "messaging-direction.md": "bd1e55a65deb5a100dd670389cdb47dc63ff7aff62408691d1da1b54c9928651",
+    "validate.py": "19e3b5308d9291836bd3a4cf9441696b609dd5aeaf71e22e52fd0049e3015816"
   }
 }
