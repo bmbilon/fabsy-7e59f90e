@@ -48,6 +48,8 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const errors = [];
 const fail = (message) => errors.push(message);
 let localeCatalogForms = new Map();
+let englishTermsSourceClauses = new Set();
+let englishTermsHasUpdateLabel = false;
 
 function redactVerifiedClientTestimonials(value) {
   return VERIFIED_CLIENT_TESTIMONIALS.reduce(
@@ -621,6 +623,22 @@ async function admitExactLocaleCatalogs() {
   // This also checks noindex, exact locale routes, reciprocal equivalents and
   // the current source/bundle fingerprints and approval/service gates.
   verifyLocaleSnapshotCoverage(path.dirname(SNAPSHOT_DIR), context);
+  const termsSource = fs.readFileSync(path.join(
+    process.env.LOCALE_SOURCE_ROOT || ROOT, 'src/pages/TermsOfService.tsx'
+  ), 'utf8').replace(/\s+/g, ' ');
+  const hours = OFFER_DATA.rapidResolution.actionCommitmentHours;
+  const termsClauses = [
+    ['The standalone report is ${INSURANCE_IMPACT_REPORT.priceCad} CAD plus applicable GST',
+      `The standalone report is $${OFFER_DATA.insuranceReport.priceCad} CAD plus applicable GST`],
+    ['The bundle is ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD plus applicable GST',
+      `The bundle is $${OFFER_DATA.bundle.priceCad} CAD plus applicable GST`],
+    [`The ${hours}-hour commitment begins when complete, readable disclosure is received and matched to your file`],
+    [`Outcomes depend on the charge, evidence, procedure, prosecutor and court. Fabsy does not promise a withdrawal, reduced charge, lower fine, fewer demerits, premium saving, insurer eligibility or any other result. The ${hours}-hour service commitment is not an outcome promise.`],
+  ];
+  englishTermsSourceClauses = new Set(termsClauses
+    .filter(([source]) => termsSource.includes(source))
+    .map(([source, rendered]) => rendered || source));
+  englishTermsHasUpdateLabel = termsSource.includes('Last updated: {new Date().toLocaleDateString()}');
   const keysUnder = (value, prefix = '') => Object.entries(value).flatMap(([key, child]) => {
     const keyPath = prefix ? `${prefix}.${key}` : key;
     return typeof child === 'string' ? [keyPath] : child && typeof child === 'object' ? keysUnder(child, keyPath) : [];
@@ -629,8 +647,14 @@ async function admitExactLocaleCatalogs() {
     const t = snapshotTranslator(context, locale.code);
     const forms = new Set();
     for (const key of keysUnder(context.bundles[locale.code])) {
+      // The English browser agreement is authoritative source, not a copy of
+      // every translated UI label. Only complete terms paragraphs qualify.
+      if (locale.code === 'en' && !/^terms\.sections\.[^.]+\.body$/.test(key)) continue;
       let phrase;
       try { phrase = t(key); } catch (_) { continue; } // Not a snapshot string (for example a personal email template).
+      // Preserve the context needed by the existing product/amount and tax
+      // checks. Removing a bare brand made a valid named price look unbound.
+      if (APPROVED_OFFER_PRICES.has(phrase.trim()) || /^(?:All prices are )?CAD\s*(?:\+|plus)\s*(?:applicable\s+)?GST\.?$/.test(phrase.trim())) continue;
       // Admit complete catalog strings, never bare amounts/tokens. The short
       // Chinese preview label is a complete phrase despite its character
       // count. Exact source prose also prevents false English regex matches
@@ -653,6 +677,29 @@ function redactExactLocaleStrings(value, code) {
     (text, phrase) => text.split(phrase).join('[catalog source string]'),
     String(value)
   );
+}
+
+function redactVerifiedEnglishTerms(html) {
+  let candidate = String(html).replace(/<(li|p)\b[^>]*>([\s\S]*?)<\/\1>/gi, (block, tag, inner) => {
+    // Match whole plain-text source elements, never a substring that could
+    // turn an extra legal fine/savings claim into an admitted service fee.
+    if (/<[^>]+>/.test(inner)) return block;
+    const text = decodeHtml(inner).replace(/\s+/g, ' ').trim();
+    return englishTermsSourceClauses.has(text) ? `<${tag}>[verified English terms clause]</${tag}>` : block;
+  });
+  if (englishTermsHasUpdateLabel) {
+    const firstHeading = /<h1\b[^>]*>[\s\S]*?<\/h1>/i.exec(candidate);
+    const start = firstHeading?.index ?? candidate.length;
+    candidate = candidate.slice(0, start) + candidate.slice(start).replace(
+      /^(<h1\b[^>]*>\s*Terms of Service\s*<\/h1>\s*<p\b[^>]*>\s*Last updated:\s*)(\d{1,2})\/(\d{1,2})\/(\d{4})(\s*<\/p>)/i,
+      (block, prefix, month, day, year, suffix) => {
+        const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+        if (date.getUTCFullYear() !== Number(year) || date.getUTCMonth() !== Number(month) - 1 || date.getUTCDate() !== Number(day)) return block;
+        return `${prefix}[source update date]${suffix}`;
+      }
+    );
+  }
+  return candidate;
 }
 
 function validateAllPrerendered() {
@@ -680,7 +727,8 @@ function validateAllPrerendered() {
     // Catalog admission is limited to complete strings from the current,
     // fingerprint-verified locale source. All remaining text still receives
     // the existing product-specific commercial and legal-claim checks.
-    const candidate = redactExactLocaleStrings(html, catalogCode);
+    const sourceCheckedHtml = catalogCode === 'en' ? redactVerifiedEnglishTerms(html) : html;
+    const candidate = redactExactLocaleStrings(sourceCheckedHtml, catalogCode);
     for (const issue of browserTextGuardrailIssues(candidate, pageSlug, { numeric: !isBlogSnapshot })) {
       fail(`${label}: ${issue}`);
     }

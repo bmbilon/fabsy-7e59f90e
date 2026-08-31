@@ -283,6 +283,100 @@ try {
     assert.equal(fs.readFileSync(snapshotFile(outDir, '/pa/'), 'utf8'), before);
   });
 
+  // Use the real catalogs here: the prefixed synthetic translations above do
+  // not reproduce a shared, untranslated product name in a browser price card.
+  // The captured fragments exercise the CLI, manifest and legal-source gates,
+  // not a helper with artificially admitted strings.
+  const browserFixture = readJson(path.join(ROOT, 'scripts/fixtures/locale-browser-fragments.json'));
+  const browserOptions = { ...options, bundlesDir: path.join(ROOT, 'src/i18n/locales') };
+  const browserContext = loadLocaleSeoContext(browserOptions);
+  const browserDir = path.join(temp, 'browser/prerendered');
+  fs.cpSync(outDir, browserDir, { recursive: true });
+  generateLocalizedSnapshots({ context: browserContext, outDir: browserDir });
+  const browserEnv = {
+    LOCALE_BUNDLES_DIR: browserOptions.bundlesDir,
+    LOCALE_SNAPSHOT_OUT_DIR: browserDir,
+    SNAPSHOT_OUT_DIR: path.join(browserDir, 'content'),
+    SNAPSHOT_MANIFEST: path.join(browserDir, 'content-manifest.json'),
+    VALIDATE_ALL_PRERENDERED: '1',
+  };
+  for (const locale of registry.locales.filter(item => item.wave === 1)) {
+    for (const base of ['/', '/rapid-resolution']) {
+      const filename = snapshotFile(browserDir, `/${locale.code}${base}`);
+      const original = fs.readFileSync(filename, 'utf8');
+      fs.writeFileSync(filename, original.replace('</main>', `${browserFixture.priceCard}</main>`));
+    }
+  }
+  const termsFilename = snapshotFile(browserDir, '/terms-of-service');
+  const termsOriginal = fs.readFileSync(termsFilename, 'utf8');
+  const termsBody = `${browserFixture.termsHeadingAndDate}${browserFixture.termsClauses.join('')}`;
+  const capturedTerms = termsOriginal.replace(/<main\b[^>]*>[\s\S]*?<\/main>/, `<main>${termsBody}</main>`);
+  assert.notEqual(capturedTerms, termsOriginal);
+  fs.writeFileSync(termsFilename, capturedTerms);
+  check('real browser price cards and authoritative English terms pass together', () => {
+    run('scripts/validate-snapshot-guardrails.cjs', browserEnv);
+  });
+  const rejectBrowserMutation = (name, route, mutate, issue) => {
+    const filename = snapshotFile(browserDir, route);
+    const original = fs.readFileSync(filename, 'utf8');
+    const changed = mutate(original);
+    assert.notEqual(changed, original, `fixture mutation did not apply: ${name}`);
+    try {
+      fs.writeFileSync(filename, changed);
+      const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts/validate-snapshot-guardrails.cjs')], {
+        cwd: ROOT, env: { ...env, ...browserEnv }, encoding: 'utf8', timeout: 30000,
+      });
+      assert.notEqual(result.status, 0, `${name} must fail the full-tree guardrail`);
+      assert.match(result.stderr, issue, name);
+    } finally {
+      fs.writeFileSync(filename, original);
+    }
+  };
+  check('preserving product identity does not admit unknown or different product prices', () => {
+    for (const [name, amount] of [['unknown amount', '$999'], ['report amount on rapid card', '$49']]) {
+      rejectBrowserMutation(name, '/pa/', html => html.replace(browserFixture.priceCard, browserFixture.priceCard.replace('$198', amount)), /unsupported monetary legal claim/);
+    }
+  });
+  check('English source admissions require the complete unaltered visible clause', () => {
+    const cases = [
+      ['wrong report amount', '$49 CAD', '$198 CAD'],
+      ['wrong report cents', '$49 CAD', '$49.01 CAD'],
+      ['wrong report product', 'The standalone report is', 'The court fine is'],
+      ['wrong currency', '$49 CAD', '$49 USD'],
+      ['missing currency', '$49 CAD', '$49'],
+      ['missing GST', '$49 CAD plus applicable GST', '$49 CAD'],
+      ['inclusive GST', '$49 CAD plus applicable GST', '$49 CAD including GST'],
+      ['fine appended to report', '$49 CAD plus applicable GST</li>', '$49 CAD plus applicable GST, the statutory fine for speeding</li>'],
+      ['savings appended to bundle', '$229 CAD plus applicable GST</li>', '$229 CAD plus applicable GST in annual insurance savings</li>'],
+      ['inline alteration', '$49 CAD', '<span>$49</span> CAD'],
+      ['different service clock', 'The 48-hour commitment begins', 'The 24-hour commitment begins'],
+      ['payment starts clock', 'complete, readable disclosure is received and matched to your file', 'payment is received'],
+      ['Crown timing appended', 'received and matched to your file</li>', 'received and matched to your file, including Crown response time</li>'],
+      ['outcome promise substituted', 'The 48-hour service commitment is not an outcome promise.', 'The 48-hour service commitment is an outcome promise.'],
+    ];
+    for (const [name, original, changed] of cases) {
+      rejectBrowserMutation(name, '/terms-of-service', html => html.replace(original, changed), /unsupported monetary legal claim|duration or deadline claim/);
+    }
+  });
+  check('only a valid date immediately after the first terms heading is metadata', () => {
+    const dateNode = /<p\b[^>]*>Last updated: 8\/30\/2026<\/p>/;
+    const cases = [
+      ['invalid calendar date', html => html.replace('Last updated: 8/30/2026', 'Last updated: 2/30/2026')],
+      ['deadline label', html => html.replace('Last updated: 8/30/2026', 'Response deadline: 8/30/2026')],
+      ['extra text in date', html => html.replace('Last updated: 8/30/2026', 'Last updated: 8/30/2026. Effective on this date.')],
+      ['same date in a deadline', html => html.replace('</main>', '<p>Your court deadline is 8/30/2026.</p></main>')],
+      ['date moved to body', html => html.replace(dateNode, '').replace('</main>', '<p>Last updated: 8/30/2026</p></main>')],
+      ['second heading cannot qualify', html => html.replace(/<main\b[^>]*>/, '<main><h1>Terms of Service</h1><p>Agreement introduction.</p>')],
+    ];
+    for (const [name, mutate] of cases) rejectBrowserMutation(name, '/terms-of-service', mutate, /numeric date claim/);
+    for (const [name, fragment, issue] of [
+      ['terms clause on another route', browserFixture.termsClauses[0], /unsupported monetary legal claim/],
+      ['terms metadata on another route', browserFixture.termsHeadingAndDate, /numeric date claim/],
+    ]) {
+      rejectBrowserMutation(name, '/contact', html => html.replace('</body>', `${fragment}</body>`), issue);
+    }
+  });
+
   async function importFunction(relative) {
     const compiled = await build({ entryPoints: [path.join(ROOT, relative)], bundle: true, write: false, format: 'esm', platform: 'neutral', logLevel: 'silent' });
     return import(`data:text/javascript;base64,${Buffer.from(compiled.outputFiles[0].text).toString('base64')}`);
