@@ -1,0 +1,14 @@
+{
+  "sourceVersion": "rapid-resolution-2026-08-30",
+  "locales": {
+    "en": { "status": "source" },
+    "pa": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
+    "tl": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
+    "zh-hans": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
+    "zh-hant": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
+    "ar": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
+    "hi": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false },
+    "es": { "status": "draft", "reviewedBy": null, "reviewedAt": null, "sourceFingerprint": null, "bundleFingerprint": null, "serviceReady": false }
+  },
+  "contact": { "whatsappNumber": null }
+}

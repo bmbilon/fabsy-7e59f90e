@@ -16,6 +16,8 @@ import path from 'path';
 import { chromium } from 'playwright';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import { assertSnapshotHead, loadLocaleSeoContext, localeSnapshotRecords, normalizeSnapshotHead, splitSnapshotRoute } from './locale-seo.mjs';
+import { assertLocalizedMainContent, generateLocalizedSnapshots } from './generate-localized-snapshots.mjs';
 
 dotenv.config();
 
@@ -25,6 +27,7 @@ const PAGES_SITEMAP = process.env.PRERENDER_PAGES_SITEMAP || 'public/sitemaps/si
 const TIMEOUT = Number(process.env.PRERENDER_TIMEOUT_MS || 30000);
 const MAX_ATTEMPTS = Number(process.env.PRERENDER_MAX_ATTEMPTS || 2);
 const INCLUDE_CONTENT_ROUTES = process.env.PRERENDER_CONTENT_ROUTES === '1';
+const LOCALE_CONTEXT = loadLocaleSeoContext();
 const STATIC_ROUTES = [
   '/',
   '/faq',
@@ -33,11 +36,11 @@ const STATIC_ROUTES = [
   '/services',
   '/testimonials',
   '/contact',
+  '/terms-of-service',
   '/blog',
   '/ai-info',
   '/founder',
   '/about/comparison',
-  '/submit-ticket',
   '/terms-of-purchase',
   '/rapid-resolution',
   '/insurance-damage-report',
@@ -96,6 +99,7 @@ async function removeEmptyParents(file, root) {
 async function pruneStaleBrowserSnapshots(routes) {
   const root = path.resolve(OUT_DIR);
   const contentRoot = path.join(root, 'content');
+  const localeRoots = LOCALE_CONTEXT.locales.filter(locale => locale.code !== 'en').map(locale => path.join(root, locale.code));
   const expected = new Set(routes.map((route) => path.resolve(toOutPath(route))));
   const files = await htmlFilesUnder(root);
   let removed = 0;
@@ -105,6 +109,9 @@ async function pruneStaleBrowserSnapshots(routes) {
     // page_content snapshots are replaced atomically by the deterministic
     // generator and are never owned by this browser-rendering pass.
     if (resolved.startsWith(`${contentRoot}${path.sep}`)) continue;
+    // Translated trees have their own exact route inventory and manifest.
+    // Never prune them by an English blog/browser inventory.
+    if (localeRoots.some(localeRoot => resolved.startsWith(`${localeRoot}${path.sep}`))) continue;
     if (expected.has(resolved)) continue;
     await fs.rm(resolved, { force: true });
     await removeEmptyParents(resolved, root);
@@ -134,7 +141,11 @@ async function prerenderRoute(browser, route) {
 
       await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(500);
-      const html = (await page.content()).replace(/[ \t]+$/gm, '');
+      const original = (await page.content()).replace(/[ \t]+$/gm, '');
+      const { code, basePath } = splitSnapshotRoute(route, LOCALE_CONTEXT);
+      if (code !== 'en') assertLocalizedMainContent(original, LOCALE_CONTEXT, code, basePath);
+      const html = normalizeSnapshotHead(original, route, LOCALE_CONTEXT);
+      assertSnapshotHead(html, route, LOCALE_CONTEXT);
       const outPath = toOutPath(route);
       await fs.mkdir(path.dirname(outPath), { recursive: true });
       await fs.writeFile(outPath, html, 'utf8');
@@ -150,7 +161,7 @@ async function prerenderRoute(browser, route) {
 }
 
 async function fetchDynamicRoutes() {
-  const routes = new Set(STATIC_ROUTES);
+  const routes = new Set([...STATIC_ROUTES, ...localeSnapshotRecords(LOCALE_CONTEXT).map(record => record.route)]);
 
   // The generated sitemap is the release source of truth for published blog
   // URLs. Reading it locally keeps prerender coverage deterministic when an
@@ -226,6 +237,11 @@ async function fetchDynamicRoutes() {
   console.log('🧱 Prerender-all starting...');
   console.log('   Base URL:', BASE);
   console.log('   Out dir :', OUT_DIR);
+
+  // Materialize a complete draft/review manifest before browser enhancement.
+  // Browser captures must then prove that their main heading is translated;
+  // a production server that still serves English cannot overwrite them.
+  generateLocalizedSnapshots({ context: LOCALE_CONTEXT, outDir: OUT_DIR });
 
   const { routes, routeInventoryComplete } = await fetchDynamicRoutes();
   console.log(`📋 Total routes to render: ${routes.length}`);

@@ -1,0 +1,21 @@
+{
+  "sourceVersion": "rapid-resolution-2026-08-30",
+  "locales": [
+    { "code": "en", "languageTag": "en", "nativeName": "English", "englishName": "English", "dir": "ltr", "wave": 0 },
+    { "code": "pa", "languageTag": "pa", "nativeName": "ਪੰਜਾਬੀ", "englishName": "Punjabi", "dir": "ltr", "wave": 1 },
+    { "code": "tl", "languageTag": "tl", "nativeName": "Tagalog", "englishName": "Tagalog", "dir": "ltr", "wave": 1 },
+    { "code": "zh-hans", "languageTag": "zh-Hans", "nativeName": "简体中文", "englishName": "Simplified Chinese", "dir": "ltr", "wave": 1 },
+    { "code": "zh-hant", "languageTag": "zh-Hant", "nativeName": "繁體中文", "englishName": "Traditional Chinese", "dir": "ltr", "wave": 1 },
+    { "code": "ar", "languageTag": "ar", "nativeName": "العربية", "englishName": "Arabic", "dir": "rtl", "wave": 1 },
+    { "code": "hi", "languageTag": "hi", "nativeName": "हिन्दी", "englishName": "Hindi", "dir": "ltr", "wave": 1 },
+    { "code": "es", "languageTag": "es", "nativeName": "Español", "englishName": "Spanish", "dir": "ltr", "wave": 1 },
+    { "code": "ur", "languageTag": "ur", "nativeName": "اردو", "englishName": "Urdu", "dir": "rtl", "wave": 2 },
+    { "code": "vi", "languageTag": "vi", "nativeName": "Tiếng Việt", "englishName": "Vietnamese", "dir": "ltr", "wave": 2 },
+    { "code": "fr", "languageTag": "fr", "nativeName": "Français", "englishName": "French", "dir": "ltr", "wave": 2 },
+    { "code": "uk", "languageTag": "uk", "nativeName": "Українська", "englishName": "Ukrainian", "dir": "ltr", "wave": 2 },
+    { "code": "ko", "languageTag": "ko", "nativeName": "한국어", "englishName": "Korean", "dir": "ltr", "wave": 2 },
+    { "code": "fa", "languageTag": "fa", "nativeName": "فارسی", "englishName": "Persian", "dir": "rtl", "wave": 2 }
+  ],
+  "phase1Routes": ["/", "/rapid-resolution", "/how-it-works", "/faq", "/contact", "/terms-of-service", "/terms-of-purchase", "/submit-ticket", "/ticket-form", "/payment-canceled", "/thank-you"],
+  "indexableRoutes": ["/", "/rapid-resolution", "/how-it-works", "/faq", "/contact", "/terms-of-service"]
+}

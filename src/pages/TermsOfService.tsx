@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import useSafeHead from "@/hooks/useSafeHead";
 import {
   CANONICAL_OFFER_PRICING,
   INSURANCE_IMPACT_REPORT,
@@ -8,6 +9,13 @@ import {
 } from "@/config/offers";
 
 const TermsOfService = () => {
+  useSafeHead({
+    title: "Terms of Service | Fabsy Traffic Ticket Services",
+    description: "Service terms for Fabsy's Alberta traffic ticket agent services, including service scope, fees, client responsibilities and limitations.",
+    canonical: "https://fabsy.ca/terms-of-service",
+    robots: "index, follow",
+  });
+
   return (
     <main className="min-h-screen bg-gradient-hero">
       <Header />

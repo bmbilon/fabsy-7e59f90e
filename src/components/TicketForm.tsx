@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useTicketCache } from "@/hooks/useTicketCache";
 import { Link } from "react-router-dom";
 import { RAPID_RESOLUTION } from "@/config/offers";
+import { useLocale } from "@/i18n/locale-context";
+import LocalizedTicketJourney from "./LocalizedTicketJourney";
 
 export interface FormData {
   // Unified intake handoff
@@ -149,6 +151,7 @@ const TicketForm = ({
   initialStep?: number;
   sourceAssessment?: { submissionId: string; accessToken: string } | null;
 }) => {
+  const { locale, setIntakeHandoff } = useLocale();
   const [currentStep, setCurrentStep] = useState<number>(() => {
     const s = typeof initialStep === 'number' ? initialStep : 1;
     const clamped = Math.max(1, Math.min(s, steps.length));
@@ -182,11 +185,22 @@ const TicketForm = ({
     } as FormData;
   });
   const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
+  // Preserve an active draft when the route changes between English and a
+  // locale. Keep identity documents in memory, never a new browser cache.
+  // A language handoff always requires fresh consent in the destination.
+  useEffect(() => {
+    setIntakeHandoff({
+      prefillTicketData: { ...formData, consentGiven: false, digitalSignature: '' },
+      startAtStep: Math.min(currentStep, 4),
+      ticketImage: formData.ticketImage,
+    });
+  }, [formData, currentStep, setIntakeHandoff]);
   const { toast } = useToast();
   const { getCachedTicketData, isCacheKeyValid } = useTicketCache();
 
   // Check for ticket data from eligibility checker on mount
   useEffect(() => {
+    if (locale !== "en" || initialPrefill) return;
     const loadTicketData = async () => {
       console.log('[TicketForm] Starting ticket data loading process...');
       
@@ -303,10 +317,10 @@ const TicketForm = ({
     };
     
     loadTicketData();
-  }, [getCachedTicketData, isCacheKeyValid, toast]);
+  }, [getCachedTicketData, isCacheKeyValid, toast, locale, initialPrefill]);
 
-  const updateFormData = (updates: Partial<FormData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+  const updateFormData = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => {
+    setFormData(prev => ({ ...prev, ...(typeof updates === 'function' ? updates(prev) : updates) }));
   };
 
   const scrollToForm = () => {
@@ -434,6 +448,8 @@ const TicketForm = ({
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
+
+  if (locale !== "en") return <LocalizedTicketJourney formData={formData} updateFormData={updateFormData} currentStep={currentStep} nextStep={nextStep} prevStep={prevStep} />;
 
   return (
     <section className="py-20 bg-gradient-soft min-h-screen">

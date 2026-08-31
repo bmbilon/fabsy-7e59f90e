@@ -1,5 +1,9 @@
 // Cloudflare Pages middleware: serve prerendered HTML to crawlers, SPA to humans.
 // Replaces functions/faq.ts and cloudflare-worker.js. Runs on every request.
+import { localizePath, splitLocalePath } from '../src/i18n/locale-policy.mjs';
+import localeRegistry from '../src/i18n/locales.json';
+
+const LOCALIZED_SNAPSHOT_PATHS = new Set(localeRegistry.phase1Routes.filter(path => !['/terms-of-purchase', '/ticket-form', '/thank-you'].includes(path)));
 
 const BOT = /(bot|crawler|spider|googlebot|bingbot|duckduckbot|yandex|baiduspider|facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|gptbot|chatgpt-user|oai-searchbot|ccbot|anthropic|claudebot|claude-web|perplexitybot|google-extended|applebot|amazonbot|bytespider|meta-externalagent)/i;
 
@@ -35,13 +39,23 @@ const LEGACY_CONTENT_PATHS = new Set([
 ]);
 
 function canonicalFor(pathname: string): string {
-  const clean = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
-  return `https://fabsy.ca${clean}`;
+  const { locale, path } = splitLocalePath(pathname);
+  return `https://fabsy.ca${localizePath(path, locale)}`;
 }
 
 function canonicalFromHtml(html: string): string | null {
   const tag = html.match(/<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/i)?.[0];
   return tag?.match(/\bhref=["']([^"']+)["']/i)?.[1] || null;
+}
+
+function robotsFromHtml(html: string): string | null {
+  const tag = html.match(/<meta\b(?=[^>]*\bname=["']robots["'])[^>]*>/i)?.[0];
+  return tag?.match(/\bcontent=["']([^"']+)["']/i)?.[1] || null;
+}
+
+function htmlAttribute(html: string, name: 'lang' | 'dir'): string | null {
+  const tag = html.match(/<html\b[^>]*>/i)?.[0];
+  return tag?.match(new RegExp(`\\b${name}=["']([^"']+)["']`, 'i'))?.[1] || null;
 }
 
 function snapshotPath(pathname: string): string | null {
@@ -59,6 +73,13 @@ export const onRequest: PagesFunction = async (context) => {
   const { request, env, next } = context;
   const requestUrl = new URL(request.url);
   const pathname = requestUrl.pathname === "/" ? "/" : requestUrl.pathname.replace(/\/+$/, "");
+
+  const localeRoute = splitLocalePath(pathname);
+  if (localeRoute.hasLocalePrefix && localeRoute.path === '/ticket-form') {
+    const destination = new URL(request.url);
+    destination.pathname = localizePath('/submit-ticket', localeRoute.locale);
+    return Response.redirect(destination, 301);
+  }
 
   // `_redirects` rules do not run for routes handled by Pages Functions, so
   // these redirects must happen in middleware for every user agent.
@@ -96,6 +117,10 @@ export const onRequest: PagesFunction = async (context) => {
     });
   };
 
+  if (localeRoute.hasLocalePrefix && !LOCALIZED_SNAPSHOT_PATHS.has(localeRoute.path)) {
+    return noindexFallback();
+  }
+
   try {
     // env.ASSETS serves files from the deployed static output (dist/).
     const res = await env.ASSETS.fetch(new URL(target, request.url));
@@ -108,12 +133,22 @@ export const onRequest: PagesFunction = async (context) => {
       if (canonicalFromHtml(html) !== canonicalFor(pathname)) {
         return noindexFallback();
       }
+      if (localeRoute.hasLocalePrefix) {
+        const locale = localeRegistry.locales.find(item => item.code === localeRoute.locale);
+        if (!locale || htmlAttribute(html, 'lang') !== locale.languageTag || htmlAttribute(html, 'dir') !== locale.dir) {
+          return noindexFallback();
+        }
+      }
       const h = new Headers(res.headers);
-      // Direct /prerendered/* asset URLs are noindex via public/_headers. Do
-      // not forward that internal-path directive when serving the same HTML at
-      // its public canonical URL; the document's own robots meta remains the
-      // source of truth for indexability.
-      h.delete("X-Robots-Tag");
+      // Direct /prerendered/* assets are noindex via public/_headers. Only an
+      // explicitly indexable document can remove that internal-path header.
+      // Draft translations and private intake pages keep their own noindex
+      // directive at the public URL, including for crawlers that use headers.
+      const robots = robotsFromHtml(html);
+      if (robots) h.set("X-Robots-Tag", robots);
+      else h.set("X-Robots-Tag", "noindex, nofollow");
+      const language = htmlAttribute(html, 'lang');
+      if (language) h.set('Content-Language', language);
       h.set("X-Prerendered", "true");
       return new Response(res.body, { status: 200, headers: h });
     }

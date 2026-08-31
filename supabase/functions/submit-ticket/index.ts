@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { LocaleRequestError, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -27,6 +28,7 @@ const corsHeaders = {
 };
 
 interface SubmissionData {
+  preferred_locale?: unknown;
   // Client info
   driversLicense: string;
   firstName: string;
@@ -119,6 +121,8 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const formData: SubmissionData = await req.json();
+    const preferredLocale = parsePreferredLocale(formData.preferred_locale);
+    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
     
     console.log("[Submit Ticket] Processing submission");
 
@@ -291,6 +295,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const submissionPayload = {
       client_id: clientId,
+      preferred_locale: preferredLocale,
       first_name: formData.firstName,
       last_name: formData.lastName,
       email: normalizedEmail,
@@ -394,6 +399,7 @@ const handler = async (req: Request): Promise<Response> => {
         submissionId: existingSubmission.id,
         clientId,
         reused: true,
+        preferred_locale: preferredLocale,
         accessToken: representationAccessToken,
         upload,
       }), {
@@ -438,6 +444,7 @@ const handler = async (req: Request): Promise<Response> => {
       success: true,
       submissionId: submissionData.id,
       clientId: clientId,
+      preferred_locale: preferredLocale,
       accessToken: representationAccessToken,
       upload,
     }), {
@@ -449,10 +456,11 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: unknown) {
     console.error("[Submit Ticket] Error:", error);
-    const status = error instanceof RequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof LocaleRequestError ? error.status : 500;
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Submission failed",
+        ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
       }),
       {
         status,

@@ -5,6 +5,10 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Scale, Phone } from "lucide-react";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 import { RAPID_RESOLUTION } from "@/config/offers";
+import { useLocale } from "@/i18n/locale-context";
+import LanguageSelector from "./LanguageSelector";
+import LanguageMessages from "./LanguageMessages";
+import { LocalizedHeader } from "./LocalizedNavigation";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_HREF = "tel:+18257932279";
@@ -22,6 +26,9 @@ const NAV_ITEMS = [
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { locale } = useLocale();
+
+  if (locale !== "en") return <LocalizedHeader />;
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -40,7 +47,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-4 xl:space-x-5">
+          <nav className="hidden xl:flex items-center gap-3 2xl:gap-5">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.name}
@@ -66,7 +73,7 @@ const Header = () => {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3">
             <a className="hidden 2xl:block" href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
               <Button variant="outline" className="gap-2 border-primary text-primary hover:bg-primary/10 transition-smooth">
                 <Phone className="h-4 w-4" />
@@ -79,8 +86,9 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu */}
+          <LanguageSelector />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="lg:hidden">
+            <SheetTrigger asChild className="xl:hidden">
               <Button variant="ghost" size="icon" aria-label="Open navigation">
                 <Menu className="h-6 w-6" aria-hidden="true" />
               </Button>
@@ -146,6 +154,7 @@ const Header = () => {
           </div>
         </div>
       </header>
+      <LanguageMessages />
     </>
   );
 };

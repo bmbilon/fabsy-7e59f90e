@@ -1,7 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
+import { renderTicketAdminEmailHtml, renderTicketClientEmailHtml, type TicketNotification } from "../_shared/ticket-notification-html.ts";
+import { parsePreferredLocale } from "../_shared/locale-policy.ts";
+import { notificationLocale, prepareClientEmail, prepareClientSms } from "../_shared/notification-locale.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -39,18 +41,6 @@ interface NotificationRequest {
   accessToken: string;
 }
 
-interface TicketNotification {
-  submissionId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  ticketNumber: string;
-  violation: string;
-  fineAmount: string;
-  submittedAt: string;
-  smsOptIn?: boolean;
-}
 
 class RequestError extends Error {
   constructor(message: string, public status = 400) {
@@ -86,7 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
     const accessTokenHash = await sha256(accessToken);
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
-      .select("id,first_name,last_name,email,phone,ticket_number,violation,fine_amount,created_at,sms_opt_in,status,service_type,consent_form_path,representation_access_token_hash")
+      .select("id,first_name,last_name,email,phone,ticket_number,violation,fine_amount,created_at,sms_opt_in,status,service_type,consent_form_path,representation_access_token_hash,preferred_locale")
       .eq("id", submissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
@@ -102,6 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new RequestError("Submission authorization or stored consent is invalid.", 403);
     }
     const ticketData: TicketNotification = {
+      preferredLocale: parsePreferredLocale(submission.preferred_locale),
       submissionId: submission.id,
       firstName: String(submission.first_name || ""),
       lastName: String(submission.last_name || ""),
@@ -113,6 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
       submittedAt: submission.created_at ? String(submission.created_at) : new Date().toISOString(),
       smsOptIn: submission.sms_opt_in === true,
     };
+    const localeContext = { preferredLocale: ticketData.preferredLocale, template: "ticket_received" as const };
     const configuredSiteUrl = Deno.env.get("SITE_URL") || "https://fabsy.ca";
     const siteOrigin = new URL(configuredSiteUrl).origin;
     
@@ -155,43 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
       reply_to: "brett@execom.ca",
       to: adminEmails,
       subject: `Payment Pending - ${ticketData.firstName} ${ticketData.lastName}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
-            🎫 Payment-Pending Ticket Submission
-          </h1>
-          
-          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <h2 style="color: #4CAF50; margin-top: 0;">Client Information</h2>
-            <p><strong>Name:</strong> ${ticketData.firstName} ${ticketData.lastName}</p>
-            <p><strong>Email:</strong> ${ticketData.email}</p>
-            <p><strong>Phone:</strong> ${ticketData.phone}</p>
-          </div>
-          
-          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <h2 style="color: #4CAF50; margin-top: 0;">Quick Details</h2>
-            <p><strong>Ticket Number:</strong> ${ticketData.ticketNumber}</p>
-            <p><strong>Violation:</strong> ${ticketData.violation}</p>
-            <p><strong>Fine Amount:</strong> ${ticketData.fineAmount}</p>
-          </div>
-          
-      <div style="background-color: #e8f5e9; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
-        <p style="margin: 0 0 15px 0; font-weight: bold;">View Full Case Details</p>
-        <a href="${ticketData.submissionId ? `${siteOrigin}/admin/submissions/${ticketData.submissionId}` : `${siteOrigin}/admin/dashboard`}" 
-           style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; 
-                  text-decoration: none; border-radius: 5px; font-weight: bold;">
-          Open Admin Portal
-        </a>
-      </div>
-          
-          <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px;">
-            <strong>Submitted:</strong> ${ticketData.submittedAt}<br>
-            This is an automated notification from your Fabsy case management system.
-          </p>
-          
-          ${getFabsyEmailSignature()}
-        </div>
-      `,
+      html: renderTicketAdminEmailHtml(ticketData, siteOrigin),
     });
 
     console.log("Admin email sent successfully:", emailResponse);
@@ -249,66 +205,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     // SECURITY: Send CLIENT confirmation email - contains ONLY this client's own data
     // Client should NEVER receive other clients' information or admin-only data
-    const clientEmailResponse = await resend.emails.send({
+    const clientEmailResponse = await resend.emails.send(prepareClientEmail({
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "brett@execom.ca",
       to: [ticketData.email],
       subject: "Your Ticket Submission Confirmation",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
-            Thank You for Your Submission!
-          </h1>
-          
-          <p style="font-size: 16px; color: #333;">
-            Hi ${ticketData.firstName},
-          </p>
-          
-          <p style="font-size: 14px; color: #555; line-height: 1.6;">
-            We've received your ticket submission. Complete Stripe Checkout before Fabsy begins
-            service on the matter. Below is a summary of your submission, and attached you'll find
-            a copy of the written consent form.
-          </p>
-          
-          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
-            <h2 style="color: #4CAF50; margin-top: 0;">Your Ticket Information</h2>
-            <p><strong>Ticket Number:</strong> ${ticketData.ticketNumber}</p>
-            <p><strong>Violation:</strong> ${ticketData.violation}</p>
-            <p><strong>Fine Amount:</strong> ${ticketData.fineAmount}</p>
-          </div>
-          
-          <div style="background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3 style="color: #333; margin-top: 0;">What Happens Next?</h3>
-            <ul style="color: #555; line-height: 1.8;">
-              <li>Complete the Stripe Checkout payment opened after submission</li>
-              <li>After payment is confirmed, Fabsy's agent service will review your ticket information and court location</li>
-              <li>We'll confirm whether Fabsy can assist with the matter</li>
-              <li>You'll receive updates via email${ticketData.smsOptIn ? ' and SMS' : ''}</li>
-              <li>Case outcomes depend on the facts and process in each matter</li>
-            </ul>
-          </div>
-          
-          <p style="font-size: 14px; color: #555; line-height: 1.6;">
-            If you have any questions, feel free to reach out to us at any time.
-          </p>
-          
-          <p style="font-size: 14px; color: #333;">
-            Best regards,<br>
-            <strong>The Fabsy Team</strong>
-          </p>
-          
-          <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px;">
-            Submitted on ${ticketData.submittedAt}
-          </p>
-          
-          ${getFabsyEmailSignature()}
-        </div>
-      `,
+      html: renderTicketClientEmailHtml(ticketData),
       attachments: pdfBuffer ? [{
         filename: 'Written-Consent-Form.pdf',
         content: arrayBufferToBase64(pdfBuffer),
       }] : [],
-    });
+    }, localeContext));
 
     console.log("Client confirmation email sent successfully:", clientEmailResponse);
 
@@ -351,7 +258,7 @@ const handler = async (req: Request): Promise<Response> => {
     let clientSmsResponse = null;
     if (ticketData.smsOptIn) {
       try {
-        const clientSmsMessage = `Hi ${ticketData.firstName}! Your ticket submission has been received. Complete Stripe Checkout before service begins. We've emailed copies of your forms and consent agreement. - Fabsy`;
+        const clientSmsMessage = prepareClientSms(`Hi ${ticketData.firstName}! Your ticket submission has been received. Complete Stripe Checkout before service begins. We've emailed copies of your forms and consent agreement. - Fabsy`, localeContext);
         
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
         const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
@@ -386,6 +293,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({ 
       success: true, 
+      localization: notificationLocale(localeContext),
       adminEmail: emailResponse, 
       clientEmail: clientEmailResponse,
       adminSms: adminSmsResponse,

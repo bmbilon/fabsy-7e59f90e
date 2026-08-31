@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { LocaleRequestError, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
 
 class RequestError extends Error {
   constructor(message: string, public status = 400) {
@@ -203,6 +204,8 @@ serve(async (req) => {
     });
 
     const body = await req.json() as Record<string, unknown>;
+    const preferredLocale = parsePreferredLocale(body.preferred_locale);
+    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
     if (typeof body.company === "string" && body.company.trim()) {
       return json(origin, { success: true }, 200);
     }
@@ -337,6 +340,7 @@ serve(async (req) => {
 
     const submissionPayload = {
       client_id: clientId,
+      preferred_locale: preferredLocale,
       first_name: firstName,
       last_name: lastName,
       email,
@@ -415,13 +419,17 @@ serve(async (req) => {
 
     return json(origin, {
       submissionId: orderId,
+      preferred_locale: preferredLocale,
       accessToken,
       upload: { path: storagePath, token: signedUpload.token },
       policyUploads,
     });
   } catch (error) {
-    const status = error instanceof RequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof LocaleRequestError ? error.status : 500;
     if (status >= 500) console.error("submit-assessment-intake failed");
-    return json(origin, { error: status >= 500 ? "The assessment intake could not be saved." : (error as Error).message }, status);
+    return json(origin, {
+      error: status >= 500 ? "The assessment intake could not be saved." : (error as Error).message,
+      ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
+    }, status);
   }
 });

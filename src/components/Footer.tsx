@@ -1,6 +1,8 @@
 import { Separator } from "@/components/ui/separator";
 import { Scale, Mail, MapPin, Phone, Facebook, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLocale } from "@/i18n/locale-context";
+import { LocalizedFooter } from "./LocalizedNavigation";
 import {
   INSURANCE_IMPACT_REPORT,
   RAPID_RESOLUTION,
@@ -8,7 +10,9 @@ import {
 } from "@/config/offers";
 
 const Footer = () => {
+  const { locale } = useLocale();
   const currentYear = new Date().getFullYear();
+  if (locale !== "en") return <LocalizedFooter />;
 
   const footerLinks = {
     company: [

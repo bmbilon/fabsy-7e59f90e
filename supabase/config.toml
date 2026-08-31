@@ -44,6 +44,11 @@ verify_jwt = false
 
 [functions.generate-consent-form]
 verify_jwt = false
+static_files = [
+  "./functions/_shared/consent-fonts/*.ttf",
+  "./functions/_shared/consent-fonts/*.gz",
+  "./functions/_shared/consent-harfbuzz/*.wasm"
+]
 
 [functions.representation-consent]
 verify_jwt = false

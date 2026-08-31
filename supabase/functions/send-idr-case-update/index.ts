@@ -119,7 +119,7 @@ serve(async (req) => {
 
     const { data: submission, error: submissionError } = await admin
       .from("ticket_submissions")
-      .select("id,ticket_number,violation,status,verdict,case_outcome,client_id,clients(first_name,email)")
+      .select("id,ticket_number,violation,status,verdict,case_outcome,client_id,preferred_locale,clients(first_name,email)")
       .eq("id", submissionId)
       .single();
     if (submissionError || !submission) throw new Error("Ticket submission not found");
@@ -208,6 +208,7 @@ serve(async (req) => {
     let providerAccepted = false;
     try {
       await sendResendEmail(resendApiKey, {
+        localization: { preferredLocale: submission.preferred_locale, template: "case_update" },
         from: "Fabsy <hello@fabsy.ca>",
         reply_to: "hello@fabsy.ca",
         to: [client.email],

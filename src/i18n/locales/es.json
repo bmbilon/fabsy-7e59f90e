@@ -1,0 +1,355 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "rapid": "Rapid Resolution",
+    "howItWorks": "Cómo funciona",
+    "faq": "Preguntas frecuentes",
+    "contact": "Contacto",
+    "terms": "Condiciones del servicio",
+    "start": "Empieza con tu infracción",
+    "menu": "Abrir navegación"
+  },
+  "common": {
+    "brand": "Fabsy",
+    "serviceName": "Rapid Resolution",
+    "back": "Atrás",
+    "next": "Continuar",
+    "close": "Cerrar",
+    "loading": "Cargando…",
+    "yes": "Sí",
+    "no": "No",
+    "optional": "Opcional",
+    "required": "Obligatorio",
+    "english": "Inglés",
+    "priceLine": "{{price}} CAD más el GST aplicable",
+    "notLawFirm": "Fabsy ofrece representación mediante agentes para infracciones de tránsito; no es un despacho de abogados. No brindamos asesoría jurídica.",
+    "noOutcomePromise": "No se promete retirar o reducir el cargo, bajar la multa, disminuir los puntos de penalización ni obtener ningún resultado en el seguro.",
+    "noSuccessFee": "Una tarifa fija por el servicio. Sin honorarios de éxito calculados como porcentaje.",
+    "clientDecision": "Tú indicas si se acepta alguna resolución propuesta. Nada se acepta automáticamente.",
+    "notFound": "Esta página no está disponible en este idioma.",
+    "returnHome": "Volver al inicio"
+  },
+  "language": {
+    "selector": "Elige tu idioma",
+    "offer": "¿Prefieres leer esta página en {{language}}?",
+    "switch": "Leer en {{language}}",
+    "dismiss": "Mantener mi idioma actual",
+    "draftTitle": "Vista previa de traducción — pendiente de revisión",
+    "draftBody": "Esta traducción es un borrador y aún no ha sido aprobada por una persona revisora nativa. Antes de comprar o dar tu consentimiento, lee las condiciones en inglés o contacta a Fabsy para aclarar tus dudas.",
+    "englishControls": "Si hay diferencias en la traducción, prevalecen las condiciones en inglés. Este borrador no modifica el acuerdo en inglés ni limita los derechos conforme a la legislación aplicable.",
+    "readEnglish": "Leer la versión en inglés",
+    "paymentBlocked": "La compra y la autorización en este idioma no estarán disponibles hasta confirmar la revisión de la traducción y el soporte en el idioma. Puedes continuar en inglés.",
+    "continueEnglish": "Continuar en inglés"
+  },
+  "home": {
+    "metaTitle": "Ayuda con infracciones de tránsito en Alberta | Fabsy",
+    "metaDescription": "Conoce el servicio de Fabsy previo al juicio en Alberta: tarifa fija, revisión de pruebas y decisiones bajo instrucciones del cliente.",
+    "eyebrow": "Ayuda con infracciones de tránsito en Alberta",
+    "title": "Entiende tu infracción. Elige tu siguiente paso.",
+    "description": "Rapid Resolution reúne la recepción de datos de la infracción, el acceso a pruebas, su revisión y las actualizaciones para asuntos elegibles previos al juicio en Alberta.",
+    "primaryCta": "Empieza con tu infracción",
+    "secondaryCta": "Conoce cómo funciona",
+    "educationTitle": "¿Recibiste una infracción? Puede haber opciones.",
+    "educationBody": "Una infracción de tránsito en Alberta puede impugnarse. La posibilidad de recibir ayuda de un agente depende del cargo, el procedimiento, el plazo y los requisitos del tribunal. Es posible que debas comparecer personalmente si se exige.",
+    "scope": "Solo para asuntos elegibles previos al juicio. La representación en juicio, las multas gubernamentales y el trabajo fuera del alcance aceptado son independientes."
+  },
+  "rapid": {
+    "metaTitle": "Rapid Resolution | Ayuda con infracciones en Alberta | Fabsy",
+    "metaDescription": "Recepción segura, solicitud de pruebas, revisión calificada y solicitudes ante la fiscalía para asuntos elegibles antes del juicio en Alberta.",
+    "eyebrow": "Gestión de infracciones en Alberta antes del juicio",
+    "title": "El siguiente paso para tu infracción.",
+    "description": "Un proceso seguro en línea para recibir datos, obtener autorización, solicitar pruebas, revisarlas y recoger tu decisión sobre cualquier respuesta disponible de la fiscalía.",
+    "priceLabel": "Tarifa fija del servicio previo al juicio",
+    "includedTitle": "Qué incluye",
+    "excludedTitle": "Qué es independiente o queda excluido",
+    "included": {
+      "intake": "Recepción digital segura de la infracción",
+      "eligibility": "Revisión de elegibilidad y plazos",
+      "authorization": "Consentimiento y autorización digitales",
+      "disclosure": "Solicitud de acceso a las pruebas de la fiscalía y seguimiento de documentos",
+      "analysis": "Análisis de pruebas asistido por tecnología con revisión calificada",
+      "submission": "Solicitud de revisión ante la fiscalía basada en los hechos del caso",
+      "updates": "Avisos de cambios en el expediente",
+      "explanation": "Comparación clara de la infracción original y cualquier respuesta de la fiscalía",
+      "decision": "Aceptación de una resolución previa al juicio disponible, según instrucciones del cliente"
+    },
+    "excluded": {
+      "trial": "Representación en juicio",
+      "appeals": "Apelaciones, reaperturas y solicitudes extraordinarias",
+      "sanctions": "Immediate Roadside Sanctions y Notices of Administrative Penalty",
+      "fines": "Multas gubernamentales, tasas judiciales y cargos de terceros",
+      "scope": "Asuntos fuera del alcance de representación permitido o aceptado por Fabsy"
+    },
+    "speedTitle": "Pruebas completas recibidas. Siguiente actuación autorizada en 48 horas.",
+    "speedBody": "La documentación probatoria completa y legible se revisa, y el siguiente paso autorizado ante la fiscalía se prepara o presenta en un plazo de 48 horas desde su recepción y vinculación con tu expediente.",
+    "speedDisclaimer": "El plazo comienza solo al recibir la documentación probatoria completa y legible y vincularla con tu expediente. No incluye el tiempo de respuesta de la fiscalía ni la fecha del resultado final."
+  },
+  "process": {
+    "metaTitle": "Cómo funciona Rapid Resolution | Fabsy",
+    "title": "De tu infracción a tu decisión",
+    "description": "Tu infracción, autorización, pruebas y actualizaciones permanecen vinculadas al mismo expediente.",
+    "steps": {
+      "intake": {
+        "title": "Comparte tu infracción",
+        "body": "Sube una imagen legible de la infracción y proporciona tus datos. Fabsy revisa la elegibilidad y los plazos; el servicio comienza tras completar los datos, la autorización y el pago, y aceptar el asunto."
+      },
+      "disclosure": {
+        "title": "Se solicitan las pruebas",
+        "body": "Cuando está autorizado y disponible, Fabsy solicita las pruebas de la fiscalía y hace seguimiento de los documentos. La solicitud no amplía ningún plazo."
+      },
+      "review": {
+        "title": "Se revisan las pruebas",
+        "body": "El análisis asistido por tecnología y la revisión calificada examinan las pruebas, el procedimiento y las opciones disponibles antes del juicio."
+      },
+      "action": {
+        "title": "Se prepara el siguiente paso",
+        "body": "En las 48 horas posteriores a recibir la documentación probatoria completa y legible y vincularla con el expediente, Fabsy la revisa y prepara o presenta el siguiente paso autorizado ante la fiscalía."
+      },
+      "decision": {
+        "title": "Tú das las instrucciones",
+        "body": "Fabsy explica cualquier respuesta de la fiscalía. Solo tú indicas si debe aceptarse una resolución disponible; el trabajo de juicio requiere otro acuerdo."
+      }
+    }
+  },
+  "faq": {
+    "metaTitle": "Preguntas sobre infracciones en Alberta | Fabsy",
+    "title": "Preguntas antes de empezar",
+    "items": {
+      "fee": {
+        "question": "¿Qué cubre la tarifa de {{price}}?",
+        "answer": "La recepción de datos de un asunto elegible previo al juicio, revisión de plazos, autorización, solicitud y seguimiento de pruebas, revisión calificada, solicitud de revisión ante la fiscalía basada en los hechos, actualizaciones y explicación de una respuesta de la fiscalía. El GST aplicable es adicional; las multas y el trabajo de juicio son independientes."
+      },
+      "speed": {
+        "question": "¿Mi infracción se resolverá en 48 horas?",
+        "answer": "No se promete un plazo para el resultado final. El compromiso de 48 horas comienza solo al recibir las pruebas completas y legibles y vincularlas con tu expediente. Cubre la revisión de Fabsy y su siguiente actuación autorizada, no el tiempo de respuesta de la fiscalía."
+      },
+      "deadline": {
+        "question": "¿Solicitar las pruebas amplía mi plazo?",
+        "answer": "No. Sigue controlando las fechas indicadas en la infracción, la notificación judicial y el portal. Solicitar pruebas no amplía por sí solo la fecha de respuesta, la del juicio ni ningún otro plazo."
+      },
+      "trial": {
+        "question": "¿Se incluye el juicio?",
+        "answer": "No. La representación en juicio requiere otra revisión de elegibilidad, otro acuerdo y otra cotización. Las apelaciones, reaperturas, tasas gubernamentales y el trabajo fuera del alcance también son independientes."
+      },
+      "approval": {
+        "question": "¿Fabsy puede aceptar una propuesta por mí?",
+        "answer": "Solo después de tus instrucciones específicas para el caso. Fabsy no aceptará automáticamente una propuesta de la fiscalía, presentará una declaración de culpabilidad ni formalizará una resolución propuesta."
+      },
+      "outcome": {
+        "question": "¿Se promete retirar o reducir el cargo?",
+        "answer": "No. El resultado depende del cargo, las pruebas, el procedimiento, la fiscalía y el tribunal. No se promete retirar o reducir el cargo, bajar la multa, disminuir los puntos de penalización ni ningún resultado en el seguro."
+      },
+      "language": {
+        "question": "¿Puedo escribir en mi idioma?",
+        "answer": "Puedes escribir tu relato en el idioma que prefieras. Antes de depender de la asistencia lingüística, pide a Fabsy que confirme su disponibilidad. Un sitio traducido no significa que haya una persona que hable ese idioma disponible por teléfono."
+      }
+    }
+  },
+  "contact": {
+    "metaTitle": "Contacta a Fabsy | Ayuda con infracciones en Alberta",
+    "title": "Empieza con una pregunta por escrito",
+    "description": "Puedes enviar una pregunta por correo electrónico en el idioma que prefieras. Incluye tu plazo y pregunta qué asistencia lingüística está disponible.",
+    "messageLabel": "Tu mensaje",
+    "messageHint": "Escribe en tu idioma preferido. No envíes datos de tarjetas ni documentos de identidad innecesarios.",
+    "submit": "Enviar mensaje",
+    "availability": "Deben confirmarse la asistencia lingüística y los tiempos de respuesta. Actualmente no se promete atención por WhatsApp ni por teléfono en este idioma.",
+    "emailCta": "Escribir a {{email}}",
+    "whatsappCta": "Escríbenos en tu idioma por WhatsApp",
+    "staffAvailability": "Antes de llamar, pregunta qué asistencia lingüística está disponible.",
+    "whatsappHint": "Envía un mensaje escrito en tu idioma preferido. No envíes datos de tarjetas de pago."
+  },
+  "intake": {
+    "title": "Comenzar Rapid Resolution",
+    "description": "Introduce los datos exactamente como aparecen en tu infracción. Puedes escribir tu relato en el idioma que prefieras.",
+    "steps": {
+      "ticket": "Datos de la infracción",
+      "personal": "Información personal",
+      "account": "Tu relato",
+      "consent": "Autorización",
+      "review": "Revisión",
+      "payment": "Pago"
+    },
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "phone": "Número de teléfono",
+      "smsOptIn": "Acepto recibir actualizaciones por mensaje de texto sobre mi expediente.",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "province": "Provincia",
+      "postalCode": "Código postal",
+      "dateOfBirth": "Fecha de nacimiento",
+      "driversLicense": "Número de licencia de conducir",
+      "driversLicenseImage": "Imagen de la licencia de conducir",
+      "addressDifferent": "Mi dirección actual es distinta de la que figura en mi licencia.",
+      "ticketNumber": "Número de infracción",
+      "issueDate": "Fecha de emisión",
+      "location": "Lugar",
+      "officer": "Agente o autoridad emisora",
+      "officerBadge": "Número de placa del agente",
+      "offenceSection": "Artículo",
+      "offenceSubSection": "Apartado",
+      "offenceDescription": "Descripción de la infracción",
+      "fineAmount": "Importe de la multa",
+      "courtDate": "Fecha judicial, si está programada",
+      "courtJurisdiction": "Ubicación del tribunal",
+      "ticketImage": "Sube tu infracción",
+      "vehicleSeized": "¿Se incautó tu vehículo?",
+      "pleaType": "Tu postura sobre la infracción",
+      "explanation": "Tu relato de lo ocurrido",
+      "circumstances": "Otras circunstancias relevantes",
+      "witnesses": "¿Hay testigos?",
+      "witnessDetails": "Datos de los testigos",
+      "evidence": "¿Tienes pruebas adicionales?",
+      "evidenceDetails": "Detalles de las pruebas",
+      "priorTickets": "Infracciones anteriores",
+      "insuranceCompany": "Compañía de seguros",
+      "vehicleDetails": "Datos del vehículo",
+      "additionalNotes": "Notas adicionales",
+      "preferredLanguage": "Idioma preferido para la comunicación escrita",
+      "digitalSignature": "Firma digital: escribe tu nombre legal completo"
+    },
+    "validation": {
+      "required": "Completa este campo obligatorio.",
+      "email": "Introduce un correo electrónico válido.",
+      "phone": "Introduce un número de teléfono válido.",
+      "date": "Introduce una fecha válida.",
+      "amount": "Introduce un importe de multa válido.",
+      "ticketImage": "Sube una imagen legible de tu infracción.",
+      "signature": "Escribe tu nombre legal completo para firmar.",
+      "consent": "Lee y acepta la autorización antes de continuar.",
+      "terms": "Acepta las Condiciones del Servicio y la Política de Privacidad antes de pagar.",
+      "submit": "No pudimos enviar tus datos. Inténtalo de nuevo.",
+      "scanReview": "Comprueba los datos extraídos y corrige cualquier error.",
+      "scanFailed": "No pudimos leer este documento. Introduce los datos manualmente.",
+      "fileFormat": "Elige un archivo PDF, JPG, PNG, WebP, HEIC o HEIF de hasta 10 MB.",
+      "consentCharacter": "No pudimos crear un documento de consentimiento legible debido a uno o más caracteres. Contacta a Fabsy antes de pagar y conserva tu nombre y tus datos originales sin modificarlos.",
+      "length": "Este texto es demasiado largo para este formulario. Contacta a Fabsy si necesitas conservar el texto completo."
+    },
+    "consent": {
+      "title": "Autorización digital para Rapid Resolution",
+      "scope": "Autorizo a Fabsy y a sus agentes, cuando esté permitido, a solicitar, recibir y revisar las pruebas; utilizar Traffic Tickets Digital Service; comunicarse con el tribunal, la fiscalía y las oficinas gubernamentales pertinentes; preparar y presentar una solicitud de revisión ante la fiscalía basada en los hechos, mis instrucciones y el expediente; y explicar cualquier respuesta de la fiscalía, el cargo, la multa y las consecuencias en puntos de penalización.",
+      "approval": "Fabsy solo puede dar el paso final de resolución después de recibir mis instrucciones expresas y específicas para el caso. Esta autorización no permite aceptar automáticamente una propuesta de la fiscalía ni presentar una declaración de culpabilidad.",
+      "exclusions": "Se excluyen los juicios controvertidos, apelaciones, reaperturas, Immediate Roadside Sanctions y Notices of Administrative Penalty. El trabajo de juicio requiere otro acuerdo y otra tarifa. También puede exigirse el formulario de consentimiento prescrito por el Gobierno de Alberta.",
+      "fee": "Contrato voluntariamente a Fabsy para el servicio limitado previo al juicio por {{price}} CAD más el GST aplicable. Las multas gubernamentales y los trabajos excluidos son independientes. Entiendo el alcance, la condición de las 48 horas y que no se promete ningún resultado.",
+      "data": "Consiento la recopilación y el tratamiento de mis datos para prestar el servicio, la extracción y el análisis de documentos asistidos por tecnología con revisión calificada, el almacenamiento seguro de registros, las comunicaciones sobre mi caso por correo electrónico, teléfono y mensajes de texto y el intercambio necesario con tribunales y autoridades. Proporcionaré información precisa y completa. Puedo solicitar acceso o retirar el consentimiento sobre mis datos escribiendo a privacy@fabsy.ca.",
+      "withdrawal": "Puedo retirar esta autorización mediante aviso escrito. De lo contrario, seguirá vigente hasta que el asunto se resuelva o se retire. La retirada no cancela automáticamente los honorarios por el trabajo ya realizado.",
+      "confirm": "Soy la persona cuyo nombre figura arriba y tengo facultad para celebrar este acuerdo. He leído y entendido esta autorización y acepto el servicio limitado. Mi firma digital tiene el mismo efecto jurídico que una firma manuscrita."
+    },
+    "review": {
+      "title": "Revisa tus datos",
+      "description": "Comprueba la infracción, los datos de contacto y la autorización antes de continuar al pago seguro.",
+      "edit": "Editar datos",
+      "languageNote": "Tu relato escrito original debe conservarse junto con cualquier traducción al inglés para su revisión. No cambies nombres, fechas ni números de infracción al traducir."
+    },
+    "scanTicket": "Leer los datos de la infracción"
+  },
+  "checkout": {
+    "title": "Pago de Rapid Resolution",
+    "service": "Servicio",
+    "subtotal": "Subtotal",
+    "gst": "GST aplicable",
+    "total": "Total",
+    "pay": "Continuar al pago seguro",
+    "processing": "Abriendo el pago seguro…",
+    "paymentFailed": "El pago seguro no está disponible. Inténtalo de nuevo.",
+    "scope": "{{price}} CAD más el GST aplicable para asuntos elegibles previos al juicio. Stripe muestra el subtotal y los impuestos completos antes del pago. Las multas, la representación en juicio y los servicios excluidos son independientes.",
+    "termsAcceptance": "He leído y acepto las Condiciones de Compra, las Condiciones del Servicio y la Política de Privacidad en inglés. Prevalecen las condiciones en inglés. El pago no autoriza la aceptación automática de ninguna propuesta."
+  },
+  "terms": {
+    "metaTitle": "Condiciones del servicio | Fabsy",
+    "title": "Condiciones del servicio",
+    "intro": "Lee estas condiciones junto con las Condiciones del Servicio en inglés antes de autorizar o comprar un servicio. Esta versión localizada sigue las condiciones vigentes en inglés; no crea un acuerdo de servicio diferente.",
+    "englishControls": "Si la traducción difiere, prevalecen las Condiciones del Servicio en inglés. No se limitan los derechos establecidos por ley. Pide aclaraciones antes de consentir si no entiendes alguna condición.",
+    "sections": {
+      "service": {
+        "title": "1. Descripción del servicio",
+        "body": "Fabsy Traffic Ticket Services presta servicios de representación mediante agentes para infracciones de tránsito en Alberta; no es un despacho de abogados. Los servicios de pago son Rapid Resolution para asuntos elegibles previos al juicio y el Insurance Impact & Renewal Planning Report. El trabajo puede incluir recepción segura de datos, revisión de elegibilidad y plazos, autorización digital, solicitud y seguimiento de pruebas, análisis asistido por tecnología con revisión calificada, solicitudes autorizadas de revisión ante la fiscalía basadas en los hechos, avisos del expediente, explicación de respuestas y decisiones según instrucciones del cliente. Los informes opcionales utilizan registros del cliente y fuentes públicas aprobadas. Rapid Resolution excluye los juicios controvertidos, apelaciones, reaperturas, Immediate Roadside Sanctions, Notices of Administrative Penalty, multas gubernamentales y trabajo fuera del alcance permitido."
+      },
+      "practice": {
+        "title": "2. Límites de la representación mediante agentes",
+        "body": "Los representantes de Fabsy no brindan asesoría jurídica ni ejercen la abogacía, no se identifican como abogados ni presentan a Fabsy como despacho de abogados, no aceptan asuntos fuera del alcance permitido para agentes y no prometen resultados concretos."
+      },
+      "eligibility": {
+        "title": "3. Disponibilidad del servicio",
+        "body": "La disponibilidad depende del cargo, el procedimiento, el plazo, la ubicación del tribunal, los requisitos del portal y de que los servicios remunerados de agentes estén permitidos y sean aceptados por Fabsy. Los asuntos fuera del alcance pueden rechazarse o remitirse a otro proveedor."
+      },
+      "pricing": {
+        "title": "4. Precios",
+        "body": "Rapid Resolution cuesta {{price}} CAD más el GST aplicable para asuntos elegibles previos al juicio en Alberta. El Insurance Impact & Renewal Planning Report por separado cuesta {{reportPrice}} CAD más el GST aplicable. Ambos juntos cuestan {{bundlePrice}} CAD más el GST aplicable. La representación en juicio, las multas gubernamentales y los asuntos fuera del alcance son independientes."
+      },
+      "payment": {
+        "title": "5. Honorarios y pago",
+        "body": "Todas las tarifas se expresan en dólares canadienses. Los costos judiciales, multas y otros cargos fuera del control de Fabsy siguen siendo tu responsabilidad. El subtotal y los impuestos completos se muestran antes de pagar mediante Stripe."
+      },
+      "rapid": {
+        "title": "5A. Rapid Resolution",
+        "body": "El servicio comienza solo cuando los datos, la autorización y el pago están completos y Fabsy acepta el asunto. Cuando está autorizado y es operativamente posible, Fabsy solicita y revisa las pruebas. Una solicitud de pruebas no amplía la fecha de respuesta, la del juicio ni ningún otro plazo. Debes controlar todos los plazos y comparecer personalmente si se exige. El compromiso de 48 horas comienza solo cuando la documentación probatoria completa y legible se recibe y se vincula a tu expediente; cubre la revisión de Fabsy y la preparación o presentación de su siguiente actuación autorizada, no el tiempo de respuesta de la fiscalía ni el del resultado final. Fabsy no aceptará una propuesta de la fiscalía, presentará una declaración de culpabilidad ni formalizará una resolución sin tus instrucciones específicas para el caso. El trabajo de juicio requiere otra revisión de elegibilidad, otro acuerdo y otra cotización."
+      },
+      "report": {
+        "title": "5B. Informe de planificación del seguro",
+        "body": "Es un producto único de investigación y planificación para consumidores. Los registros de conducción, servicios de corredor, cotizaciones de aseguradoras y otros documentos de terceros tienen costos independientes. Debes proporcionar información precisa sobre la infracción, historial de conducción, póliza, renovación y datos de tarificación. Los escenarios e intervalos se basan en información pública aprobada y registros proporcionados; no son cotizaciones de aseguradoras. Las fuentes y preguntas son ayudas de planificación, no recomendaciones para comprar, cancelar, renovar o cambiar la cobertura. Fabsy no es agente ni corredor de seguros y no vende, cotiza ni coloca seguros, contacta aseguradoras, presenta solicitudes ni negocia renovaciones. No se promete elegibilidad, ahorro ni un resultado en las primas. La asesoría y las cotizaciones específicas de una aseguradora deben proceder de un corredor autorizado o de la aseguradora."
+      },
+      "responsibilities": {
+        "title": "6. Tus responsabilidades",
+        "body": "Proporciona información precisa y completa sobre la infracción, responde con prontitud a las solicitudes, revisa cada respuesta de la fiscalía y da instrucciones claras antes de que venza una propuesta, comparece ante el tribunal cuando se exija y paga las tarifas y los costos judiciales aplicables. Fabsy presta servicios de representación mediante agentes, no asesoría jurídica."
+      },
+      "outcomes": {
+        "title": "7. No se promete ningún resultado",
+        "body": "Los resultados dependen del cargo, las pruebas, el procedimiento, la fiscalía y el tribunal. No se promete retirar o reducir el cargo, bajar la multa, disminuir los puntos de penalización, ahorrar en primas, obtener elegibilidad para un seguro ni ningún otro resultado. El compromiso de 48 horas no es una promesa de resultado."
+      },
+      "privacy": {
+        "title": "8. Confidencialidad",
+        "body": "Fabsy protege la información del cliente mediante prácticas internas de privacidad y las obligaciones de privacidad aplicables. La información puede divulgarse según sea necesario para los procedimientos judiciales o cuando lo exija la ley."
+      },
+      "liability": {
+        "title": "9. Limitación de responsabilidad",
+        "body": "La responsabilidad de Fabsy se limita a los honorarios pagados por el servicio. Fabsy no responde por daños indirectos, consecuenciales ni punitivos derivados de sus servicios de representación."
+      },
+      "cancellation": {
+        "title": "10. Cancelación, reembolsos y terminación",
+        "body": "Cualquiera de las partes puede terminar el acuerdo por consentimiento mutuo, falta de pago, falta de información o cooperación, o si la representación se vuelve imposible o impracticable. Contacta a Fabsy con prontitud para solicitar la cancelación. La elegibilidad para reembolso depende del trabajo realizado, los cargos de terceros, la información revelada al pagar y la legislación aplicable. Si Fabsy rechaza un asunto pagado y completo en los demás aspectos antes de comenzar el trabajo sustancial, reembolsará la tarifa de servicio correspondiente. No se limitan los derechos legales de cancelación."
+      },
+      "website": {
+        "title": "11. Uso del sitio web",
+        "body": "El uso del sitio constituye aceptación de las condiciones. No lo uses con fines ilícitos, intentes accesos no autorizados, interfieras con su funcionamiento ni transmitas código dañino o malicioso."
+      },
+      "law": {
+        "title": "12. Legislación aplicable",
+        "body": "Las condiciones se rigen por las leyes de Alberta, Canadá. Los conflictos quedan sujetos a la jurisdicción de los tribunales de Alberta."
+      },
+      "changes": {
+        "title": "13. Cambios en las condiciones",
+        "body": "Fabsy puede modificar las condiciones. Los cambios se publican en la página de condiciones en inglés con una fecha de revisión actualizada. Seguir utilizando los servicios después de los cambios constituye aceptación de las condiciones modificadas."
+      },
+      "contact": {
+        "title": "14. Contacto",
+        "body": "Para consultas, contacta a Fabsy Traffic Ticket Services en {{email}} o al (825) 793-2279. Área de servicio: Alberta."
+      }
+    }
+  },
+  "notifications": {
+    "received": {
+      "subject": "Fabsy: recibimos los datos de tu infracción",
+      "body": "Hola {{name}}, recibimos los datos del expediente {{reference}}. La recepción no significa que se haya aceptado el asunto ni ampliado ningún plazo. Consulta tu expediente: {{url}}"
+    },
+    "disclosure": {
+      "subject": "Fabsy: recibimos las pruebas",
+      "body": "Hola {{name}}, llegaron las pruebas del expediente {{reference}}. El compromiso de revisión y actuación de 48 horas comienza solo tras confirmar que la documentación está completa, es legible y corresponde a tu expediente. Consulta la actualización: {{url}}"
+    },
+    "update": {
+      "subject": "Fabsy: actualización de tu expediente",
+      "body": "Hola {{name}}, hay una actualización del expediente {{reference}}. Lee los detalles y los plazos en tu expediente seguro: {{url}}"
+    },
+    "decision": {
+      "subject": "Fabsy: necesitamos tus instrucciones",
+      "body": "Hola {{name}}, hay una respuesta para el expediente {{reference}}. Revisa la propuesta y su fecha de vencimiento, y luego da tus instrucciones específicas para el caso. Fabsy no aceptará una propuesta automáticamente. Revísala aquí: {{url}}"
+    },
+    "payment": {
+      "subject": "Fabsy: pago recibido",
+      "body": "Hola {{name}}, recibimos el pago de {{total}} CAD para el expediente {{reference}}. El pago no promete un resultado ni amplía ningún plazo. Consulta el recibo y los siguientes pasos: {{url}}"
+    },
+    "disclaimer": "Fabsy ofrece representación mediante agentes para infracciones de tránsito; no es un despacho de abogados. Prevalecen las condiciones del servicio en inglés. No envíes datos de tarjetas de pago por correo ni por mensaje de texto."
+  }
+}

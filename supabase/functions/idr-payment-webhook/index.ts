@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { sendResendEmail } from "../_shared/resend-email.ts";
+import { parsePreferredLocale } from "../_shared/locale-policy.ts";
 
 type IdrOrderType = "standalone" | "addon";
 type CheckoutIntentType = IdrOrderType | "ticket" | "assessment";
@@ -440,7 +441,7 @@ async function sendTicketAssessmentConfirmation(
   const { data: submission, error: submissionError } = await supabase
     .from("ticket_submissions")
     .select(
-      "id,assessment_payment_source,assessment_confirmation_claimed_at,assessment_confirmation_sent_at,clients(first_name,email)",
+      "id,assessment_payment_source,assessment_confirmation_claimed_at,assessment_confirmation_sent_at,preferred_locale,clients(first_name,email)",
     )
     .eq("id", submissionId)
     .single();
@@ -479,6 +480,7 @@ async function sendTicketAssessmentConfirmation(
     const paymentSummary = included ? isRapidResolution ? "Your priority ticket and insurance-impact review is included with the $198 Rapid Resolution service. Applicable tax and any separately disclosed fees are governed by your service terms." : "Your priority ticket and insurance-impact review is included with the $488 base representation service. Applicable tax and any separately disclosed contingent fee are governed by your representation terms." : "$149 CAD total, one-time; applicable GST included";
     const upgradeNote = included ? "<p>Your representation intake is connected to this review, so you do not need to buy the $149 review separately.</p>" : '<div style="background:#f5f3ff;border:1px solid #c4b5fd;border-radius:10px;padding:18px;margin:24px 0"><p style="margin:0 0 8px"><strong>If Rapid Resolution is worthwhile:</strong> the $149 Ticket Triage payment can be applied to Fabsy\'s $198 service fee for the same eligible matter, leaving a $49 service-fee balance plus applicable tax.</p><p style="margin:0">Eligible Ticket Triage clients also receive priority placement. Any additional service is optional and subject to its own terms.</p></div>';
     await sendResendEmail(apiKey, {
+      localization: { preferredLocale: submission.preferred_locale, template: "assessment_paid" },
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "hello@fabsy.ca",
       to: [client.email],
@@ -899,6 +901,7 @@ async function persistPaidOrder(
 
   const { error: insertError } = await supabase.from("idr_orders").insert({
     id: orderId,
+    preferred_locale: parsePreferredLocale(metadata.preferred_locale),
     client_id: clientId,
     ticket_submission_id: ticketSubmissionId,
     type,
@@ -945,7 +948,7 @@ async function sendAccessEmail(
   const { data: order, error: orderError } = await supabase
     .from("idr_orders")
     .select(
-      "id,access_email_sent_at,access_email_claimed_at,clients(first_name,email)",
+      "id,access_email_sent_at,access_email_claimed_at,preferred_locale,clients(first_name,email)",
     )
     .eq("id", orderId)
     .single();
@@ -990,6 +993,7 @@ async function sendAccessEmail(
       reply_to: "hello@fabsy.ca",
       to: [client.email],
       subject: "Your Fabsy insurance planning report upload instructions",
+      localization: { preferredLocale: order.preferred_locale, template: "report_access" },
       html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;color:#1f2937"><h1>Your Insurance Impact &amp; Renewal Planning Report is ready for your abstract</h1><p>Hi ${escapeHtml(client.first_name)},</p><p>Sign in with your purchase email to order and upload your commercial 5-year Alberta driver abstract.</p><p style="margin:28px 0"><a href="${siteUrl}/insurance-damage-report/intake" style="background:#7c3aed;color:white;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:700">Open your private report intake</a></p><p style="font-size:13px;color:#6b7280;line-height:1.5">${DISCLAIMER}</p>${getFabsyEmailSignature()}</div>`,
     }, `idr-access/${orderId}`);
     emailAccepted = true;

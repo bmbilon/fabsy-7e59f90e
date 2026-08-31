@@ -389,6 +389,7 @@ async function sendReportDeliveryEmail(
   reportId: string,
   orderId: string,
   client: { first_name: string; email: string },
+  preferredLocale: unknown,
 ) {
   const eventKey = `report:${reportId}:delivered`;
   const { error: seedEmailError } = await admin.from("idr_email_events").upsert({
@@ -416,6 +417,7 @@ async function sendReportDeliveryEmail(
   let providerAccepted = false;
   try {
     await sendResendEmail(resendApiKey, {
+      localization: { preferredLocale, template: "report_ready" },
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "hello@fabsy.ca",
       to: [client.email],
@@ -468,7 +470,7 @@ serve(async (req) => {
 
     const { data: order, error: orderError } = await admin
       .from("idr_orders")
-      .select("id,client_id,ticket_submission_id,status")
+      .select("id,client_id,ticket_submission_id,status,preferred_locale")
       .eq("id", orderId)
       .single();
     if (orderError || !order) throw new Error("IDR order was not found.");
@@ -492,7 +494,7 @@ serve(async (req) => {
       if (!storedReport.pdf_url || !storedReport.html_url) {
         throw new Error("The delivered report is missing its generated files.");
       }
-      const emailStatus = await sendReportDeliveryEmail(storedReport.id, orderId, client);
+      const emailStatus = await sendReportDeliveryEmail(storedReport.id, orderId, client, order.preferred_locale);
       return json(req, {
         success: true,
         reportId: storedReport.id,
@@ -578,7 +580,7 @@ serve(async (req) => {
     activeDeliveryClaim = null;
     pendingArtifactPaths = [];
 
-    const emailStatus = await sendReportDeliveryEmail(storedReport.id, orderId, client);
+    const emailStatus = await sendReportDeliveryEmail(storedReport.id, orderId, client, order.preferred_locale);
     return json(req, { success: true, reportId: storedReport.id, pdfPath, htmlPath, emailStatus });
   } catch (error) {
     let claimReleased = false;

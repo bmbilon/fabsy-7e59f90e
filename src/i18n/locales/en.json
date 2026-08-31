@@ -1,0 +1,355 @@
+{
+  "nav": {
+    "home": "Home",
+    "rapid": "Rapid Resolution",
+    "howItWorks": "How it works",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "terms": "Terms of Service",
+    "start": "Start with your ticket",
+    "menu": "Open navigation"
+  },
+  "common": {
+    "brand": "Fabsy",
+    "serviceName": "Rapid Resolution",
+    "back": "Back",
+    "next": "Continue",
+    "close": "Close",
+    "loading": "Loading…",
+    "yes": "Yes",
+    "no": "No",
+    "optional": "Optional",
+    "required": "Required",
+    "english": "English",
+    "priceLine": "{{price}} CAD plus applicable GST",
+    "notLawFirm": "Fabsy is a traffic ticket agent service, not a law firm. We do not provide legal advice.",
+    "noOutcomePromise": "No withdrawal, reduction, lower fine, fewer demerits or insurance result is promised.",
+    "noSuccessFee": "One flat service fee. No percentage-based success fee.",
+    "clientDecision": "You direct whether to accept any proposed resolution. Nothing is accepted automatically.",
+    "notFound": "This page is not available in this language.",
+    "returnHome": "Return to home"
+  },
+  "language": {
+    "selector": "Choose your language",
+    "offer": "Prefer to read this page in {{language}}?",
+    "switch": "Read in {{language}}",
+    "dismiss": "Keep my current language",
+    "draftTitle": "Translation preview — review pending",
+    "draftBody": "This translation is a draft and has not been approved by a native reviewer. Before purchasing or giving consent, read the English terms or contact Fabsy for clarification.",
+    "englishControls": "The English terms control if the translation differs. This draft does not change the English agreement or limit rights under applicable law.",
+    "readEnglish": "Read the English version",
+    "paymentBlocked": "Purchasing and authorization in this language are not available until translation review and language support are confirmed. You may continue in English.",
+    "continueEnglish": "Continue in English"
+  },
+  "home": {
+    "metaTitle": "Alberta traffic ticket help | Fabsy",
+    "metaDescription": "Understand Fabsy's Alberta pre-trial ticket service, flat fee, disclosure review and client-directed decisions in your language.",
+    "eyebrow": "Alberta traffic ticket help",
+    "title": "Understand your ticket. Choose your next step.",
+    "description": "Rapid Resolution brings ticket intake, disclosure, review and updates together for eligible Alberta pre-trial matters.",
+    "primaryCta": "Start with your ticket",
+    "secondaryCta": "See how it works",
+    "educationTitle": "Received a ticket? You may have options.",
+    "educationBody": "An Alberta traffic ticket may be disputed. Whether an agent can help depends on the charge, procedure, deadline and court requirements. You may still have to attend personally if required.",
+    "scope": "Eligible pre-trial matters only. Trial representation, government fines and work outside the accepted scope are separate."
+  },
+  "rapid": {
+    "metaTitle": "Rapid Resolution | Alberta ticket help | Fabsy",
+    "metaDescription": "Secure ticket intake, disclosure requests, qualified review and prosecutor-review submissions for eligible Alberta pre-trial tickets.",
+    "eyebrow": "Alberta pre-trial ticket resolution",
+    "title": "Your ticket, moving forward.",
+    "description": "One secure online process for intake, authorization, disclosure, review and your decision about any available Crown response.",
+    "priceLabel": "Flat pre-trial service fee",
+    "includedTitle": "What is included",
+    "excludedTitle": "What is separate or excluded",
+    "included": {
+      "intake": "Secure digital ticket intake",
+      "eligibility": "Eligibility and deadline review",
+      "authorization": "Digital consent and authorization",
+      "disclosure": "Disclosure request and document tracking",
+      "analysis": "Technology-assisted disclosure analysis with qualified review",
+      "submission": "Fact-specific prosecutor-review submission",
+      "updates": "File-change notifications",
+      "explanation": "Plain-language comparison of the original ticket and any Crown response",
+      "decision": "Client-directed acceptance of an available pre-trial resolution"
+    },
+    "excluded": {
+      "trial": "Trial representation",
+      "appeals": "Appeals, reopenings and extraordinary applications",
+      "sanctions": "Immediate Roadside Sanctions and Notices of Administrative Penalty",
+      "fines": "Government fines, court charges and third-party fees",
+      "scope": "Matters outside Fabsy's permitted or accepted agent scope"
+    },
+    "speedTitle": "Complete disclosure received. Next authorized action within 48 hours.",
+    "speedBody": "Complete, readable disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours after it is received and matched to your file.",
+    "speedDisclaimer": "The clock starts only after complete, readable disclosure is received and matched to your file. It does not cover Crown response time or the date of a final outcome."
+  },
+  "process": {
+    "metaTitle": "How Rapid Resolution works | Fabsy",
+    "title": "From your ticket to your decision",
+    "description": "Your ticket, authorization, evidence and updates stay connected to the same file.",
+    "steps": {
+      "intake": {
+        "title": "Share your ticket",
+        "body": "Upload a readable ticket and provide your details. Fabsy reviews eligibility and deadlines; service starts after intake, authorization, payment and acceptance."
+      },
+      "disclosure": {
+        "title": "Disclosure is requested",
+        "body": "Where authorized and available, Fabsy requests the prosecution's evidence and tracks documents. A request does not extend any deadline."
+      },
+      "review": {
+        "title": "Evidence is reviewed",
+        "body": "Technology-assisted analysis and qualified review examine the evidence, procedure and available pre-trial options."
+      },
+      "action": {
+        "title": "The next step is prepared",
+        "body": "Within 48 hours of complete, readable disclosure being received and matched to the file, Fabsy reviews it and prepares or submits the next authorized prosecutor step."
+      },
+      "decision": {
+        "title": "You give the instruction",
+        "body": "Fabsy explains any Crown response. Only you direct whether an available resolution should be accepted; trial work requires a separate agreement."
+      }
+    }
+  },
+  "faq": {
+    "metaTitle": "Alberta ticket service questions | Fabsy",
+    "title": "Questions before you start",
+    "items": {
+      "fee": {
+        "question": "What does the {{price}} fee cover?",
+        "answer": "Eligible pre-trial intake, deadline review, authorization, disclosure requests and tracking, qualified review, a fact-specific prosecutor-review submission, file updates and explanation of a Crown response. Applicable GST is extra; fines and trial work are separate."
+      },
+      "speed": {
+        "question": "Will my ticket be resolved in 48 hours?",
+        "answer": "No final-outcome timing is promised. The 48-hour commitment begins only when complete, readable disclosure arrives and is matched to your file. It covers Fabsy's review and next authorized action, not the prosecutor's response time."
+      },
+      "deadline": {
+        "question": "Does a disclosure request extend my deadline?",
+        "answer": "No. Continue monitoring the dates on your ticket, court notice and portal. A disclosure request does not itself extend a response date, trial date or other deadline."
+      },
+      "trial": {
+        "question": "Is a trial included?",
+        "answer": "No. Trial representation requires separate eligibility review, an agreement and a quote. Appeals, reopenings, government charges and out-of-scope work are also separate."
+      },
+      "approval": {
+        "question": "Can Fabsy accept an offer for me?",
+        "answer": "Only after your case-specific instruction. Fabsy will not accept a Crown offer, enter a guilty plea or finalize a proposed resolution automatically."
+      },
+      "outcome": {
+        "question": "Is a withdrawal or reduction promised?",
+        "answer": "No. The result depends on the charge, evidence, procedure, prosecutor and court. There is no promise of a withdrawal, reduction, lower fine, fewer demerits or insurance result."
+      },
+      "language": {
+        "question": "Can I write in my language?",
+        "answer": "You may write your account in your preferred language. Ask Fabsy to confirm available language assistance before relying on it. A translated website does not mean a speaker of that language is available by phone."
+      }
+    }
+  },
+  "contact": {
+    "metaTitle": "Contact Fabsy | Alberta ticket help",
+    "title": "Start with a written question",
+    "description": "You can email a question in your preferred language. Include your deadline and ask what language assistance is available.",
+    "messageLabel": "Your message",
+    "messageHint": "Write in your preferred language. Do not send card details or unnecessary identity documents.",
+    "submit": "Send message",
+    "availability": "Language support and response times must be confirmed. WhatsApp and phone service in this language are not currently promised.",
+    "emailCta": "Email {{email}}",
+    "whatsappCta": "Text us in your language on WhatsApp",
+    "staffAvailability": "Ask which language support is available before calling.",
+    "whatsappHint": "Send a written message in your preferred language. Do not send payment-card details."
+  },
+  "intake": {
+    "title": "Start Rapid Resolution",
+    "description": "Enter the details exactly as they appear on your ticket. You may write your account in your preferred language.",
+    "steps": {
+      "ticket": "Ticket details",
+      "personal": "Personal information",
+      "account": "Your account",
+      "consent": "Authorization",
+      "review": "Review",
+      "payment": "Payment"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "smsOptIn": "I agree to receive text updates about my file.",
+      "address": "Street address",
+      "city": "City",
+      "province": "Province",
+      "postalCode": "Postal code",
+      "dateOfBirth": "Date of birth",
+      "driversLicense": "Driver's licence number",
+      "driversLicenseImage": "Driver's licence image",
+      "addressDifferent": "My current address differs from my licence.",
+      "ticketNumber": "Ticket number",
+      "issueDate": "Issue date",
+      "location": "Location",
+      "officer": "Officer or enforcement agency",
+      "officerBadge": "Badge number",
+      "offenceSection": "Section",
+      "offenceSubSection": "Subsection",
+      "offenceDescription": "Offence description",
+      "fineAmount": "Fine amount",
+      "courtDate": "Court date, if scheduled",
+      "courtJurisdiction": "Court location",
+      "ticketImage": "Upload your ticket",
+      "vehicleSeized": "Was your vehicle seized?",
+      "pleaType": "Your position on the ticket",
+      "explanation": "Your account of what happened",
+      "circumstances": "Other relevant circumstances",
+      "witnesses": "Are there witnesses?",
+      "witnessDetails": "Witness details",
+      "evidence": "Do you have additional evidence?",
+      "evidenceDetails": "Evidence details",
+      "priorTickets": "Previous tickets",
+      "insuranceCompany": "Insurance company",
+      "vehicleDetails": "Vehicle details",
+      "additionalNotes": "Additional notes",
+      "preferredLanguage": "Preferred written language",
+      "digitalSignature": "Digital signature: type your full legal name"
+    },
+    "validation": {
+      "required": "Complete this required field.",
+      "email": "Enter a valid email address.",
+      "phone": "Enter a valid phone number.",
+      "date": "Enter a valid date.",
+      "amount": "Enter a valid fine amount.",
+      "ticketImage": "Upload a readable image of your ticket.",
+      "signature": "Type your full legal name to sign.",
+      "consent": "Read and accept the authorization before continuing.",
+      "terms": "Accept the Terms of Service and Privacy Policy before payment.",
+      "submit": "We could not submit your details. Please try again.",
+      "scanReview": "Check the extracted details and correct any mistakes.",
+      "scanFailed": "We could not read this document. Enter the details manually.",
+      "fileFormat": "Choose a PDF, JPG, PNG, WebP, HEIC or HEIF file no larger than 10 MB.",
+      "consentCharacter": "We could not create a readable consent document from one or more characters. Contact Fabsy before paying, and keep your original name and details unchanged.",
+      "length": "This entry is too long for this form. Contact Fabsy if you need to keep the full text."
+    },
+    "consent": {
+      "title": "Digital authorization for Rapid Resolution",
+      "scope": "I authorize Fabsy and its agents, where permitted, to request, receive and review disclosure; use the Traffic Tickets Digital Service; communicate with the court, prosecutor and relevant government offices; prepare and submit a fact-specific prosecutor-review request based on my instructions and record; and explain any Crown response, charge, fine and demerit consequences.",
+      "approval": "Fabsy may take a final resolution step only after my express case-specific instruction. This authorization does not permit automatic acceptance of a Crown offer or a guilty plea.",
+      "exclusions": "Contested trials, appeals, reopenings, Immediate Roadside Sanctions and Notices of Administrative Penalty are excluded. Trial work requires a separate agreement and fee. A prescribed Government of Alberta consent form may also be required.",
+      "fee": "I voluntarily retain Fabsy for the limited pre-trial service at {{price}} CAD plus applicable GST. Government fines and excluded work are separate. I understand the scope, the 48-hour condition and that no result is promised.",
+      "data": "I consent to collection and processing of my information to deliver the service, technology-assisted document extraction and analysis with qualified review, secure record storage, communications about my case by email, phone and text and necessary sharing with courts and authorities. I will provide accurate, complete information. I may request access or withdraw data consent by contacting privacy@fabsy.ca.",
+      "withdrawal": "I may withdraw this authorization by written notice. Otherwise it remains valid until the matter is resolved or withdrawn. Withdrawal does not automatically cancel fees for work already performed.",
+      "confirm": "I am the person named above and am authorized to enter this agreement. I have read and understood this authorization and agree to the limited service. My digital signature has the same legal effect as a handwritten signature."
+    },
+    "review": {
+      "title": "Review your details",
+      "description": "Check your ticket, contact information and authorization before continuing to secure payment.",
+      "edit": "Edit details",
+      "languageNote": "Your original written account must be kept with any English translation for review. Do not change names, dates or ticket numbers when translating."
+    },
+    "scanTicket": "Read details from the ticket"
+  },
+  "checkout": {
+    "title": "Rapid Resolution checkout",
+    "service": "Service",
+    "subtotal": "Subtotal",
+    "gst": "Applicable GST",
+    "total": "Total",
+    "pay": "Continue to secure payment",
+    "processing": "Opening secure checkout…",
+    "paymentFailed": "Secure checkout is unavailable. Please try again.",
+    "scope": "{{price}} CAD plus applicable GST for eligible pre-trial matters. The full subtotal and tax are shown by Stripe before payment. Fines, trial representation and excluded services are separate.",
+    "termsAcceptance": "I have read and agree to the English Terms of Purchase, Terms of Service and Privacy Policy. The English terms control. Payment does not authorize automatic acceptance of an offer."
+  },
+  "terms": {
+    "metaTitle": "Terms of Service | Fabsy",
+    "title": "Terms of Service",
+    "intro": "Read these terms with the English Terms of Service before authorizing or purchasing a service. This localized presentation follows the current English service terms; it does not create a different service agreement.",
+    "englishControls": "The English Terms of Service control if a translation differs. Statutory rights are not limited. Ask for clarification before consenting if you do not understand a term.",
+    "sections": {
+      "service": {
+        "title": "1. Service description",
+        "body": "Fabsy Traffic Ticket Services is an Alberta traffic ticket agent service, not a law firm. Paid services are Rapid Resolution for eligible pre-trial matters and the Insurance Impact & Renewal Planning Report. Work may include secure intake, eligibility and deadline review, digital authorization, disclosure requests and tracking, technology-assisted analysis with qualified review, authorized fact-specific prosecutor-review submissions, file notifications, Crown-response explanations and client-directed decisions. Optional reports use client records and approved public sources. Contested trials, appeals, reopenings, Immediate Roadside Sanctions, Notices of Administrative Penalty, government fines and work outside the permitted scope are excluded from Rapid Resolution."
+      },
+      "practice": {
+        "title": "2. Limits on agent practice",
+        "body": "Fabsy representatives do not provide legal advice or practise law, identify themselves as lawyers or Fabsy as a law firm, accept matters outside the permitted agent scope, or promise particular results."
+      },
+      "eligibility": {
+        "title": "3. Service availability",
+        "body": "Availability depends on the charge, procedure, deadline, court location, portal requirements and whether paid agent services are permitted and accepted by Fabsy. Matters outside the scope may be declined or referred elsewhere."
+      },
+      "pricing": {
+        "title": "4. Pricing",
+        "body": "Rapid Resolution costs {{price}} CAD plus applicable GST for eligible Alberta pre-trial matters. The standalone Insurance Impact & Renewal Planning Report costs {{reportPrice}} CAD plus applicable GST. Both together cost {{bundlePrice}} CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate."
+      },
+      "payment": {
+        "title": "5. Fees and payment",
+        "body": "All fees are in Canadian dollars. Court costs, fines and other charges beyond Fabsy's control remain your responsibility. The complete subtotal and tax are displayed before payment through Stripe."
+      },
+      "rapid": {
+        "title": "5A. Rapid Resolution",
+        "body": "Service starts only after intake, authorization and payment are complete and Fabsy accepts the matter. Where authorized and operationally available, Fabsy requests and reviews disclosure. A disclosure request does not extend a response date, trial date or other deadline. You must monitor every deadline and attend personally if required. The 48-hour commitment begins only when complete, readable disclosure is received and matched to your file; it covers Fabsy's review and preparation or submission of the next authorized action, not Crown response time or final-outcome timing. Fabsy will not accept a Crown offer, enter a guilty plea or finalize a resolution without your case-specific instruction. Trial work requires separate eligibility review, an agreement and a quote."
+      },
+      "report": {
+        "title": "5B. Insurance planning report",
+        "body": "This is a one-time consumer research and planning product. Driver abstracts, broker services, insurer quotes and other third-party records cost extra. You must provide accurate ticket, driving-record, policy, renewal and rating information. Scenarios and ranges use approved public information and supplied records; they are not insurer quotes. Sources and questions are planning aids, not recommendations to buy, cancel, renew or change coverage. Fabsy is not an insurance agent or broker and does not sell, quote or place insurance, contact insurers, submit applications or negotiate renewals. No eligibility, savings or premium result is promised. Insurer-specific advice and quotes must come from a licensed broker or insurer."
+      },
+      "responsibilities": {
+        "title": "6. Your responsibilities",
+        "body": "Provide accurate and complete ticket information, respond promptly to requests, review every Crown response and give clear instructions before an offer expires, attend court if required, and pay applicable fees and court costs. Fabsy provides agent representation services, not legal advice."
+      },
+      "outcomes": {
+        "title": "7. No promised result",
+        "body": "Results depend on the charge, evidence, procedure, prosecutor and court. No withdrawal, charge reduction, lower fine, fewer demerits, premium savings, insurer eligibility or other result is promised. The 48-hour commitment is not a promise of an outcome."
+      },
+      "privacy": {
+        "title": "8. Confidentiality",
+        "body": "Fabsy protects client information through internal privacy practices and applicable privacy obligations. Information may be disclosed as needed for court proceedings or as required by law."
+      },
+      "liability": {
+        "title": "9. Limitation of liability",
+        "body": "Fabsy's liability is limited to the service fees paid. Fabsy is not liable for indirect, consequential or punitive damages arising from its representation services."
+      },
+      "cancellation": {
+        "title": "10. Cancellation, refunds and termination",
+        "body": "Either party may terminate by mutual agreement, for non-payment, failure to provide information or cooperation, or if representation becomes impossible or impractical. Contact Fabsy promptly to request cancellation. Refund eligibility depends on work already performed, third-party charges, checkout disclosures and applicable law. If Fabsy declines an otherwise complete paid matter before substantive work begins, the applicable service fee will be refunded. Statutory cancellation rights are not limited."
+      },
+      "website": {
+        "title": "11. Website use",
+        "body": "Using the website constitutes acceptance of the terms. Do not use it unlawfully, attempt unauthorized access, interfere with functionality or transmit harmful or malicious code."
+      },
+      "law": {
+        "title": "12. Governing law",
+        "body": "The terms are governed by the laws of Alberta, Canada. Disputes are subject to the jurisdiction of Alberta courts."
+      },
+      "changes": {
+        "title": "13. Changes to terms",
+        "body": "Fabsy may modify the terms. Changes are posted on the English terms page with an updated revision date. Continued use of services after changes constitutes acceptance of the modified terms."
+      },
+      "contact": {
+        "title": "14. Contact",
+        "body": "For questions, contact Fabsy Traffic Ticket Services at {{email}} or (825) 793-2279. Service area: Alberta."
+      }
+    }
+  },
+  "notifications": {
+    "received": {
+      "subject": "Fabsy: ticket details received",
+      "body": "Hello {{name}}, we received the details for file {{reference}}. Receipt does not mean your matter has been accepted or a deadline extended. View your file: {{url}}"
+    },
+    "disclosure": {
+      "subject": "Fabsy: disclosure received",
+      "body": "Hello {{name}}, disclosure has arrived for file {{reference}}. The 48-hour review and action commitment starts only after the disclosure is confirmed complete, readable and matched to your file. View the update: {{url}}"
+    },
+    "update": {
+      "subject": "Fabsy: an update to your file",
+      "body": "Hello {{name}}, there is an update to file {{reference}}. Read the details and any deadlines in your secure file: {{url}}"
+    },
+    "decision": {
+      "subject": "Fabsy: your instruction is needed",
+      "body": "Hello {{name}}, a response is available for file {{reference}}. Review the proposal and any expiry date, then give your case-specific instruction. Fabsy will not accept an offer automatically. Review: {{url}}"
+    },
+    "payment": {
+      "subject": "Fabsy: payment received",
+      "body": "Hello {{name}}, payment of {{total}} CAD was received for file {{reference}}. Payment does not promise an outcome or extend a deadline. View your receipt and next steps: {{url}}"
+    },
+    "disclaimer": "Fabsy is a traffic ticket agent service, not a law firm. The English service terms control. Do not send payment-card details by email or text."
+  }
+}

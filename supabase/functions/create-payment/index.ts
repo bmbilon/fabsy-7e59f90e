@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { LocaleRequestError, localizedPublicPath, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
 
 const TICKET_BASE_CENTS = 19800;
 const IDR_ADDON_CENTS = 3100;
@@ -446,7 +447,7 @@ serve(async (req) => {
     const { data: submission, error: submissionError } = await admin
       .from("ticket_submissions")
       .select(
-        "id,client_id,ticket_number,status,ticket_document_path,consent_form_path,representation_access_token_hash,source_assessment_id,representation_includes_assessment,clients(email)",
+        "id,client_id,ticket_number,status,ticket_document_path,consent_form_path,representation_access_token_hash,source_assessment_id,representation_includes_assessment,preferred_locale,clients(email)",
       )
       .eq("id", submissionId)
       .maybeSingle();
@@ -466,6 +467,9 @@ serve(async (req) => {
       );
     }
 
+    // Use the authorized stored preference, never a payment-request override.
+    const preferredLocale = parsePreferredLocale(submission.preferred_locale);
+    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
     const ticketDocumentPath = String(submission.ticket_document_path || "");
     const ticketOwnerId = submission.source_assessment_id || submissionId;
     await requireStoredObject(
@@ -627,6 +631,7 @@ serve(async (req) => {
     }
 
     const metadata: Record<string, string> = {
+      preferred_locale: preferredLocale,
       ticket_number: ticketNumber,
       customer_name: customerName,
       submission_id: submissionId,
@@ -653,7 +658,9 @@ serve(async (req) => {
       });
     }
 
-    const successUrl = includeIdrAddon ? `${siteUrl}/insurance-damage-report/intake?checkout=success&order_id=${idrOrderId}&session_id={CHECKOUT_SESSION_ID}` : `${siteUrl}/thank-you?session_id={CHECKOUT_SESSION_ID}`;
+    // The report portal is still English. Only translated public return pages
+    // receive a prefix; inventing a localized portal URL would break checkout.
+    const successUrl = includeIdrAddon ? `${siteUrl}/insurance-damage-report/intake?checkout=success&order_id=${idrOrderId}&session_id={CHECKOUT_SESSION_ID}` : `${siteUrl}${localizedPublicPath(preferredLocale, "/thank-you")}?session_id={CHECKOUT_SESSION_ID}`;
     const params: Stripe.Checkout.SessionCreateParams = {
       customer_email: customerEmail,
       client_reference_id: submissionId,
@@ -664,8 +671,9 @@ serve(async (req) => {
       automatic_tax: { enabled: true },
       tax_id_collection: { enabled: false },
       success_url: successUrl,
-      cancel_url: `${siteUrl}/payment-canceled`,
+      cancel_url: `${siteUrl}${localizedPublicPath(preferredLocale, "/payment-canceled")}`,
       metadata,
+      payment_intent_data: { metadata },
     };
     const session = await stripe.checkout.sessions.create(params, {
       idempotencyKey: `ticket-checkout:${checkoutIntentId}:${reservation.attempt}`,
@@ -735,10 +743,11 @@ serve(async (req) => {
         createdStripeSessionId || cleanupClaim.sessionId,
       );
     }
-    const status = error instanceof RequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof LocaleRequestError ? error.status : 500;
     if (status >= 500) console.error("create-payment failed");
     return json(req, {
       error: status >= 500 ? "Unable to create secure checkout." : (error as Error).message,
+      ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
     }, status);
   }
 });

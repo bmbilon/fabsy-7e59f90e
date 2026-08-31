@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
+import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
+import { prepareClientEmail } from "../_shared/notification-locale.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -10,6 +12,7 @@ const corsHeaders = {
 };
 
 interface LeadCaptureRequest {
+  preferred_locale?: unknown;
   name: string;
   email: string;
   ticketType: string;
@@ -23,12 +26,13 @@ serve(async (req) => {
   }
 
   try {
-    const { name, email, ticketType, aiAnswer, hasTicketUpload }: LeadCaptureRequest = await req.json();
+    const { name, email, ticketType, aiAnswer, hasTicketUpload, preferred_locale }: LeadCaptureRequest = await req.json();
+    const preferredLocale = parsePreferredLocale(preferred_locale);
 
     console.log("Processing lead capture:", { name, email, ticketType, hasTicketUpload });
 
     // Send confirmation email to user
-    const userEmailResponse = await resend.emails.send({
+    const userEmailResponse = await resend.emails.send(prepareClientEmail({
       from: "Fabsy <onboarding@resend.dev>",
       to: [email],
       subject: "Your Free Eligibility Check is Being Reviewed",
@@ -70,7 +74,7 @@ serve(async (req) => {
           ${getFabsyEmailSignature()}
         </div>
       `,
-    });
+    }, { preferredLocale, template: "lead_received" }));
 
     console.log("User confirmation email sent:", userEmailResponse);
 
@@ -90,6 +94,7 @@ serve(async (req) => {
             <li><strong>Email:</strong> ${email}</li>
             <li><strong>Ticket Type:</strong> ${ticketType}</li>
             <li><strong>Ticket Upload:</strong> ${hasTicketUpload ? "Yes" : "No"}</li>
+            <li><strong>Preferred language:</strong> ${preferredLocale}</li>
           </ul>
 
           ${aiAnswer ? `
@@ -123,9 +128,12 @@ serve(async (req) => {
   } catch (error) {
     console.error("Error in send-lead-capture:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({
+        error: error instanceof Error ? error.message : "Unknown error",
+        ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
+      }),
       {
-        status: 500,
+        status: error instanceof LocaleRequestError ? error.status : 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );

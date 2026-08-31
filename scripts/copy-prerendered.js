@@ -5,6 +5,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { loadLocaleSeoContext, normalizeStagedEnglishSnapshots, snapshotFile, verifyLocaleSnapshotCoverage } from './locale-seo.mjs';
+import { assertLocalizedMainContent } from './generate-localized-snapshots.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = path.resolve(process.env.PRERENDER_SRC_DIR || path.join(ROOT, 'public/prerendered'));
@@ -165,7 +167,16 @@ function removeLegacyAnalyticsTags(root) {
   return cleaned;
 }
 
-function copyAtomically(manifest) {
+function verifyLocales(root, localeContext) {
+  const localeManifest = verifyLocaleSnapshotCoverage(root, localeContext);
+  for (const record of localeManifest.records) {
+    const html = fs.readFileSync(snapshotFile(root, record.route), 'utf8');
+    assertLocalizedMainContent(html, localeContext, record.code, record.basePath);
+  }
+  return localeManifest;
+}
+
+function copyAtomically(manifest, localeContext) {
   if (src === distDir) throw new Error('prerendered source and destination must differ');
   const parent = path.dirname(distDir);
   const tempDir = path.join(parent, `.prerendered-copy-${process.pid}`);
@@ -175,6 +186,9 @@ function copyAtomically(manifest) {
   fs.rmSync(backupDir, { recursive: true, force: true });
   fs.cpSync(src, tempDir, { recursive: true, force: true });
   const cleanedLegacyTags = removeLegacyAnalyticsTags(tempDir);
+  // Existing English bodies remain intact; metadata is refreshed only in the
+  // build output so alternates become reciprocal when a locale is approved.
+  normalizeStagedEnglishSnapshots(tempDir, localeContext);
 
   const copiedManifestPath = path.join(tempDir, 'content-manifest.json');
   if (path.resolve(manifestPath) !== path.resolve(path.join(src, 'content-manifest.json'))) {
@@ -182,6 +196,7 @@ function copyAtomically(manifest) {
   }
   validateManifest(JSON.parse(fs.readFileSync(copiedManifestPath, 'utf8')));
   verifyCoverage(tempDir, manifest, 'staged dist');
+  verifyLocales(tempDir, localeContext);
 
   let movedExisting = false;
   try {
@@ -209,10 +224,13 @@ try {
   }
 
   const manifest = readManifest();
+  const localeContext = loadLocaleSeoContext();
   verifyCoverage(src, manifest, 'source');
-  copyAtomically(manifest);
+  const localeManifest = verifyLocales(src, localeContext);
+  copyAtomically(manifest, localeContext);
   verifyCoverage(distDir, manifest, 'dist');
-  console.log(`Prerendered copy complete: ${manifest.generatedCount} content snapshot(s) verified.`);
+  verifyLocales(distDir, localeContext);
+  console.log(`Prerendered copy complete: ${manifest.generatedCount} English content and ${localeManifest.generatedCount} localized snapshot(s) verified.`);
 } catch (error) {
   const message = error && typeof error.message === 'string' ? error.message : 'unknown error';
   console.error(`Prerendered copy failed: ${message}`);

@@ -45,7 +45,11 @@ function formatDate(value: unknown) {
   }).format(new Date(`${text}T12:00:00Z`));
 }
 
-async function isAuthorized(req: Request, admin: ReturnType<typeof createClient>, anonKey: string) {
+// deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseAdmin = ReturnType<typeof createClient<any>>;
+
+async function isAuthorized(req: Request, admin: SupabaseAdmin, anonKey: string) {
   const expectedSecret = Deno.env.get("IDR_CRON_SECRET");
   const suppliedSecret = req.headers.get("x-cron-secret");
   if (expectedSecret && suppliedSecret && suppliedSecret === expectedSecret) return true;
@@ -126,7 +130,7 @@ serve(async (req) => {
       if (reportError || !report) throw reportError || new Error("Reminder report was not found.");
       const { data: order, error: orderError } = await admin
         .from("idr_orders")
-        .select("id,status,client_id")
+        .select("id,status,client_id,preferred_locale")
         .eq("id", report.idr_order_id)
         .single();
       if (orderError || !order || order.status !== "delivered") {
@@ -152,6 +156,7 @@ serve(async (req) => {
       }
 
       await sendResendEmail(resendKey, {
+        localization: { preferredLocale: order.preferred_locale, template: "renewal_reminder" },
         from: "Fabsy <hello@fabsy.ca>",
         reply_to: "hello@fabsy.ca",
         to: [client.email],

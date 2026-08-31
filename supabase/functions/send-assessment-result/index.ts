@@ -97,7 +97,7 @@ serve(async (req) => {
     if (!UUID_PATTERN.test(submissionId)) return json({ error: "submissionId is invalid." }, 400);
     const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: submission, error: submissionError } = await admin.from("ticket_submissions")
-      .select("id,status,service_type,assessment_paid_at,assessment_result,assessment_delivered_at,assessment_delivery_claimed_at,assessment_delivery_sent_at,representation_credit_eligible,clients(first_name,email)")
+      .select("id,status,service_type,assessment_paid_at,assessment_result,assessment_delivered_at,assessment_delivery_claimed_at,assessment_delivery_sent_at,representation_credit_eligible,preferred_locale,clients(first_name,email)")
       .eq("id", submissionId).single();
     if (submissionError || !submission) return json({ error: "Assessment submission was not found." }, 404);
     if (submission.service_type !== "ticket_insurance_assessment" || !submission.assessment_paid_at || !submission.representation_credit_eligible) {
@@ -131,6 +131,7 @@ serve(async (req) => {
         : `<div style="margin-top:24px;padding:18px;border:1px solid #bbf7d0;border-radius:10px;background:#f0fdf4"><h2 style="margin-top:0">Fabsy action path</h2><p>${escapeHtml(result.next_step)}</p><p style="font-size:13px;color:#4b5563">No further paid Fabsy service is being recommended in this assessment.</p></div>`;
       const section = (heading: string, content: string) => `<h2 style="margin:28px 0 8px;color:#4c1d95">${heading}</h2><p style="margin:0;line-height:1.6">${escapeHtml(content)}</p>`;
       await sendResendEmail(resendApiKey, {
+        localization: { preferredLocale: submission.preferred_locale, template: "assessment_result" },
         from: "Fabsy <hello@fabsy.ca>",
         reply_to: "hello@fabsy.ca",
         to: [client.email],

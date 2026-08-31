@@ -4,6 +4,8 @@ import Footer from "@/components/Footer";
 import { useLocation } from "react-router-dom";
 import type { FormData } from "@/components/TicketForm";
 import useSafeHead from "@/hooks/useSafeHead";
+import { useLocale } from "@/i18n/locale-context";
+import { useTranslation } from "react-i18next";
 
 type LocationState = {
   state?: {
@@ -15,10 +17,13 @@ type LocationState = {
 };
 
 const TicketFormPage = () => {
+  const { locale, href } = useLocale();
+  const { t } = useTranslation();
   useSafeHead({
-    title: "Submit an Alberta Traffic Ticket | Fabsy",
-    description: "Submit an Alberta traffic ticket for review by Fabsy Traffic Ticket Services. Fabsy is an agent service, not a law firm.",
-    canonical: "https://fabsy.ca/submit-ticket",
+    title: locale === "en" ? "Submit an Alberta Traffic Ticket | Fabsy" : `${t('intake.title')} | Fabsy`,
+    description: locale === "en" ? "Submit an Alberta traffic ticket for review by Fabsy Traffic Ticket Services. Fabsy is an agent service, not a law firm." : t('intake.description'),
+    canonical: `https://fabsy.ca${href('/submit-ticket')}`,
+    robots: "noindex, follow",
   });
   const location = useLocation() as unknown as LocationState;
   const initialTicketImage = location?.state?.ticketImage ?? null;
@@ -28,14 +33,15 @@ const TicketFormPage = () => {
   return (
     <div className="min-h-screen bg-gradient-hero">
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8">
         <TicketForm
+          key={locale}
           initialTicketImage={initialTicketImage}
           initialPrefill={prefillTicketData}
           initialStep={startAtStep ?? undefined}
           sourceAssessment={sourceAssessment}
         />
-      </div>
+      </main>
       <Footer />
     </div>
   );

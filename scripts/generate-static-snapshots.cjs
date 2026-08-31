@@ -398,6 +398,7 @@ ${page.sources.map((source) => `          <li><a href="${esc(source.url)}" rel="
   <title>${esc(page.meta_title)}</title>
   <meta name="description" content="${esc(page.meta_description)}">
   <link rel="canonical" href="${url}">
+${robots === 'index, follow' ? `  <link rel="alternate" hreflang="en" href="${url}">\n  <link rel="alternate" hreflang="x-default" href="${url}">\n` : ''}  <!-- Content pages remain English until their own translations are reviewed. -->
   <meta name="robots" content="${robots}">
   <meta name="geo.region" content="CA-AB">
   <meta property="og:title" content="${esc(page.meta_title)}">

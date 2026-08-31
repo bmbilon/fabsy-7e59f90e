@@ -1,0 +1,355 @@
+{
+  "nav": {
+    "home": "Home",
+    "rapid": "Rapid Resolution",
+    "howItWorks": "Paano ito gumagana",
+    "faq": "Mga karaniwang tanong",
+    "contact": "Makipag-ugnayan",
+    "terms": "Mga kondisyon ng serbisyo",
+    "start": "Magsimula sa iyong ticket",
+    "menu": "Buksan ang menu"
+  },
+  "common": {
+    "brand": "Fabsy",
+    "serviceName": "Rapid Resolution",
+    "back": "Bumalik",
+    "next": "Magpatuloy",
+    "close": "Isara",
+    "loading": "Naglo-load…",
+    "yes": "Oo",
+    "no": "Hindi",
+    "optional": "Opsyonal",
+    "required": "Kinakailangan",
+    "english": "Ingles",
+    "priceLine": "{{price}} CAD at karagdagang naaangkop na GST",
+    "notLawFirm": "Ang Fabsy ay serbisyo ng kinatawan para sa mga traffic ticket, hindi isang law firm. Hindi kami nagbibigay ng legal na payo.",
+    "noOutcomePromise": "Walang ipinapangakong pagbawi o pagbawas ng kaso, mas mababang multa, mas kaunting demerit point, o resulta sa insurance.",
+    "noSuccessFee": "Isang nakapirming bayad sa serbisyo. Walang success fee na nakabatay sa porsiyento.",
+    "clientDecision": "Ikaw ang magbibigay ng tagubilin kung tatanggapin ang anumang mungkahing pag-aayos. Walang awtomatikong tinatanggap.",
+    "notFound": "Hindi available ang pahinang ito sa wikang ito.",
+    "returnHome": "Bumalik sa home"
+  },
+  "language": {
+    "selector": "Piliin ang iyong wika",
+    "offer": "Mas gusto mo bang basahin ang pahinang ito sa {{language}}?",
+    "switch": "Basahin sa {{language}}",
+    "dismiss": "Panatilihin ang kasalukuyang wika",
+    "draftTitle": "Preview ng salin — hindi pa nasusuri",
+    "draftBody": "Burador ang saling ito at hindi pa ito naaprubahan ng tagasuring katutubong nagsasalita ng wika. Bago bumili o pumayag, basahin ang mga kondisyon sa Ingles o makipag-ugnayan sa Fabsy para sa paglilinaw.",
+    "englishControls": "Ang mga kondisyon sa Ingles ang mananaig kung may pagkakaiba sa salin. Hindi binabago ng burador na ito ang kasunduan sa Ingles o nililimitahan ang mga karapatan sa ilalim ng naaangkop na batas.",
+    "readEnglish": "Basahin ang bersiyon sa Ingles",
+    "paymentBlocked": "Hindi pa available ang pagbili at pagbibigay ng awtorisasyon sa wikang ito hangga't hindi nasusuri ang salin at nakukumpirma ang tulong sa wika. Maaari kang magpatuloy sa Ingles.",
+    "continueEnglish": "Magpatuloy sa Ingles"
+  },
+  "home": {
+    "metaTitle": "Tulong sa traffic ticket sa Alberta | Fabsy",
+    "metaDescription": "Unawain ang serbisyo ng Fabsy bago ang paglilitis sa Alberta, nakapirming bayad, pagsusuri ng ebidensiya at mga desisyong ayon sa iyong tagubilin.",
+    "eyebrow": "Tulong sa traffic ticket sa Alberta",
+    "title": "Unawain ang iyong ticket. Piliin ang susunod mong hakbang.",
+    "description": "Pinagsasama ng Rapid Resolution ang pagkuha ng detalye ng ticket, disclosure, pagsusuri at mga update para sa mga kwalipikadong kaso sa Alberta bago ang paglilitis.",
+    "primaryCta": "Magsimula sa iyong ticket",
+    "secondaryCta": "Alamin kung paano ito gumagana",
+    "educationTitle": "Nakatanggap ng ticket? Maaaring may mga opsyon ka.",
+    "educationBody": "Maaaring kuwestiyunin ang isang traffic ticket sa Alberta. Kung makatutulong ang isang kinatawan ay nakadepende sa kaso, proseso, deadline at mga tuntunin ng hukuman. Maaaring kailangan mo pa ring personal na humarap kung iyon ang hinihingi.",
+    "scope": "Para lamang sa mga kwalipikadong kaso bago ang paglilitis. Hiwalay ang representasyon sa paglilitis, mga multa ng pamahalaan at gawaing labas sa tinanggap na saklaw."
+  },
+  "rapid": {
+    "metaTitle": "Rapid Resolution | Tulong sa ticket sa Alberta | Fabsy",
+    "metaDescription": "Ligtas na pagkuha ng ticket, paghingi ng ebidensiya, kwalipikadong pagsusuri at kahilingan sa piskal bago ang paglilitis sa Alberta.",
+    "eyebrow": "Pag-aayos ng ticket sa Alberta bago ang paglilitis",
+    "title": "Susunod na hakbang para sa iyong ticket.",
+    "description": "Isang ligtas na online na proseso para sa pagkuha ng detalye, awtorisasyon, disclosure, pagsusuri at iyong desisyon sa anumang tugon ng prosekusyon.",
+    "priceLabel": "Nakapirming bayad sa serbisyo bago ang paglilitis",
+    "includedTitle": "Ano ang kasama",
+    "excludedTitle": "Ano ang hiwalay o hindi kasama",
+    "included": {
+      "intake": "Ligtas na digital na pagkuha ng detalye ng ticket",
+      "eligibility": "Pagsusuri ng pagiging kwalipikado at mga deadline",
+      "authorization": "Digital na pahintulot at awtorisasyon",
+      "disclosure": "Paghingi ng disclosure o mga ebidensiya ng prosekusyon at pagsubaybay sa mga dokumento",
+      "analysis": "Pagsusuri ng disclosure gamit ang teknolohiya, na may kwalipikadong pagrepaso",
+      "submission": "Pagsusumite para sa pagrepaso ng piskal batay sa mga detalye ng kaso",
+      "updates": "Mga abiso kapag may pagbabago sa file",
+      "explanation": "Malinaw na paghahambing ng orihinal na ticket at anumang tugon ng prosekusyon",
+      "decision": "Pagtanggap ng available na pag-aayos bago ang paglilitis, ayon sa tagubilin ng kliyente"
+    },
+    "excluded": {
+      "trial": "Representasyon sa paglilitis",
+      "appeals": "Mga apela, muling pagbubukas ng kaso at mga espesyal na aplikasyon",
+      "sanctions": "Immediate Roadside Sanctions at Notices of Administrative Penalty",
+      "fines": "Mga multa ng pamahalaan, singil ng hukuman at bayarin sa third party",
+      "scope": "Mga kasong labas sa pinapayagan o tinatanggap na saklaw ng Fabsy bilang kinatawan"
+    },
+    "speedTitle": "Kumpletong disclosure na natanggap. Susunod na awtorisadong hakbang sa loob ng 48 oras.",
+    "speedBody": "Sinusuri ang kumpleto at nababasang disclosure at inihahanda o isinusumite ang susunod na awtorisadong hakbang sa piskal sa loob ng 48 oras matapos itong matanggap at maitugma sa iyong file.",
+    "speedDisclaimer": "Magsisimula lamang ang oras kapag natanggap at naitugma sa iyong file ang kumpleto at nababasang disclosure. Hindi kasama ang oras ng pagtugon ng prosekusyon o ang petsa ng pinal na resulta."
+  },
+  "process": {
+    "metaTitle": "Paano gumagana ang Rapid Resolution | Fabsy",
+    "title": "Mula sa iyong ticket hanggang sa iyong desisyon",
+    "description": "Mananatiling magkakaugnay sa iisang file ang iyong ticket, awtorisasyon, ebidensiya at mga update.",
+    "steps": {
+      "intake": {
+        "title": "Ibahagi ang iyong ticket",
+        "body": "Mag-upload ng nababasang ticket at ibigay ang iyong detalye. Susuriin ng Fabsy ang pagiging kwalipikado at mga deadline; magsisimula ang serbisyo pagkatapos ng kumpletong detalye, awtorisasyon, bayad at pagtanggap sa kaso."
+      },
+      "disclosure": {
+        "title": "Hihingi ng disclosure",
+        "body": "Kung awtorisado at available, hihingin ng Fabsy ang ebidensiya ng prosekusyon at susubaybayan ang mga dokumento. Hindi pinahahaba ng kahilingang ito ang anumang deadline."
+      },
+      "review": {
+        "title": "Susuriin ang ebidensiya",
+        "body": "Titingnan ang ebidensiya, proseso at available na opsyon bago ang paglilitis sa pamamagitan ng pagsusuring may tulong ng teknolohiya at kwalipikadong pagrepaso."
+      },
+      "action": {
+        "title": "Ihahanda ang susunod na hakbang",
+        "body": "Sa loob ng 48 oras matapos matanggap at maitugma sa file ang kumpleto at nababasang disclosure, susuriin ito ng Fabsy at ihahanda o isusumite ang susunod na awtorisadong hakbang sa piskal."
+      },
+      "decision": {
+        "title": "Ikaw ang magbibigay ng tagubilin",
+        "body": "Ipapaliwanag ng Fabsy ang anumang tugon ng prosekusyon. Ikaw lamang ang mag-uutos kung tatanggapin ang available na pag-aayos; kailangan ng hiwalay na kasunduan para sa paglilitis."
+      }
+    }
+  },
+  "faq": {
+    "metaTitle": "Mga tanong sa serbisyo para sa ticket sa Alberta | Fabsy",
+    "title": "Mga tanong bago ka magsimula",
+    "items": {
+      "fee": {
+        "question": "Ano ang sakop ng bayad na {{price}}?",
+        "answer": "Pagkuha ng detalye ng kwalipikadong kaso bago ang paglilitis, pagsusuri ng deadline, awtorisasyon, paghingi at pagsubaybay sa disclosure, kwalipikadong pagrepaso, pagsusumite para sa pagrepaso ng piskal batay sa kaso, mga update at paliwanag ng tugon ng prosekusyon. Dagdag ang naaangkop na GST; hiwalay ang mga multa at paglilitis."
+      },
+      "speed": {
+        "question": "Maaayos ba ang aking ticket sa loob ng 48 oras?",
+        "answer": "Walang ipinapangakong oras para sa pinal na resulta. Nagsisimula lamang ang 48-oras na pangako kapag dumating at naitugma sa iyong file ang kumpleto at nababasang disclosure. Sakop nito ang pagsusuri ng Fabsy at susunod na awtorisadong hakbang, hindi ang oras ng pagtugon ng piskal."
+      },
+      "deadline": {
+        "question": "Pinahahaba ba ng paghingi ng disclosure ang aking deadline?",
+        "answer": "Hindi. Patuloy na subaybayan ang mga petsa sa iyong ticket, abiso ng hukuman at portal. Ang paghingi ng disclosure lamang ay hindi nagpapahaba sa petsa ng pagtugon, paglilitis o anumang ibang deadline."
+      },
+      "trial": {
+        "question": "Kasama ba ang paglilitis?",
+        "answer": "Hindi. Kailangan ng hiwalay na pagsusuri ng pagiging kwalipikado, kasunduan at quotation para sa representasyon sa paglilitis. Hiwalay din ang mga apela, muling pagbubukas ng kaso, singil ng pamahalaan at gawaing labas sa saklaw."
+      },
+      "approval": {
+        "question": "Maaari bang tumanggap ng alok ang Fabsy para sa akin?",
+        "answer": "Pagkatapos lamang ng iyong tiyak na tagubilin para sa kaso. Hindi awtomatikong tatanggap ng alok ng prosekusyon, maghahain ng guilty plea o magtatapos ng mungkahing pag-aayos ang Fabsy."
+      },
+      "outcome": {
+        "question": "Ipinapangako ba ang pagbawi o pagbawas ng kaso?",
+        "answer": "Hindi. Nakadepende ang resulta sa kaso, ebidensiya, proseso, piskal at hukuman. Walang pangako ng pagbawi o pagbawas ng kaso, mas mababang multa, mas kaunting demerit point o resulta sa insurance."
+      },
+      "language": {
+        "question": "Maaari ba akong sumulat sa sarili kong wika?",
+        "answer": "Maaari mong isulat ang iyong salaysay sa wikang gusto mo. Kumpirmahin muna sa Fabsy kung anong tulong sa wika ang available bago umasa rito. Hindi ibig sabihin ng isang isinaling website na may nagsasalita ng wikang iyon na available sa telepono."
+      }
+    }
+  },
+  "contact": {
+    "metaTitle": "Makipag-ugnayan sa Fabsy | Tulong sa ticket sa Alberta",
+    "title": "Magsimula sa isang nakasulat na tanong",
+    "description": "Maaari kang mag-email ng tanong sa wikang gusto mo. Isama ang iyong deadline at itanong kung anong tulong sa wika ang available.",
+    "messageLabel": "Iyong mensahe",
+    "messageHint": "Sumulat sa wikang gusto mo. Huwag magpadala ng detalye ng card o hindi kailangang dokumento ng pagkakakilanlan.",
+    "submit": "Ipadala ang mensahe",
+    "availability": "Kailangang kumpirmahin ang tulong sa wika at oras ng pagtugon. Sa ngayon, walang pangakong serbisyo sa WhatsApp o telepono sa wikang ito.",
+    "emailCta": "Mag-email sa {{email}}",
+    "whatsappCta": "Mag-text sa amin sa iyong wika sa WhatsApp",
+    "staffAvailability": "Itanong muna kung anong tulong sa wika ang available bago tumawag.",
+    "whatsappHint": "Magpadala ng nakasulat na mensahe sa wikang gusto mo. Huwag magpadala ng detalye ng payment card."
+  },
+  "intake": {
+    "title": "Simulan ang Rapid Resolution",
+    "description": "Ilagay ang mga detalye nang eksakto ayon sa iyong ticket. Maaari mong isulat ang iyong salaysay sa wikang gusto mo.",
+    "steps": {
+      "ticket": "Detalye ng ticket",
+      "personal": "Personal na impormasyon",
+      "account": "Iyong salaysay",
+      "consent": "Awtorisasyon",
+      "review": "Repasuhin",
+      "payment": "Pagbabayad"
+    },
+    "fields": {
+      "firstName": "Pangalan",
+      "lastName": "Apelyido",
+      "email": "Email address",
+      "phone": "Numero ng telepono",
+      "smsOptIn": "Pumapayag akong makatanggap ng mga text update tungkol sa aking file.",
+      "address": "Address sa kalye",
+      "city": "Lungsod",
+      "province": "Probinsiya",
+      "postalCode": "Postal code",
+      "dateOfBirth": "Petsa ng kapanganakan",
+      "driversLicense": "Numero ng lisensiya sa pagmamaneho",
+      "driversLicenseImage": "Larawan ng lisensiya sa pagmamaneho",
+      "addressDifferent": "Iba ang kasalukuyan kong address sa nakasaad sa lisensiya.",
+      "ticketNumber": "Numero ng ticket",
+      "issueDate": "Petsa ng pagkakaisyu",
+      "location": "Lokasyon",
+      "officer": "Opisyal o ahensiyang nagpapatupad",
+      "officerBadge": "Badge number",
+      "offenceSection": "Seksyon",
+      "offenceSubSection": "Subseksyon",
+      "offenceDescription": "Paglalarawan ng paglabag",
+      "fineAmount": "Halaga ng multa",
+      "courtDate": "Petsa ng pagharap sa hukuman, kung nakatakda",
+      "courtJurisdiction": "Lokasyon ng hukuman",
+      "ticketImage": "I-upload ang iyong ticket",
+      "vehicleSeized": "Na-impound ba ang iyong sasakyan?",
+      "pleaType": "Iyong paninindigan tungkol sa ticket",
+      "explanation": "Iyong salaysay ng nangyari",
+      "circumstances": "Iba pang kaugnay na pangyayari",
+      "witnesses": "May mga saksi ba?",
+      "witnessDetails": "Detalye ng mga saksi",
+      "evidence": "May karagdagang ebidensiya ka ba?",
+      "evidenceDetails": "Detalye ng ebidensiya",
+      "priorTickets": "Mga nakaraang ticket",
+      "insuranceCompany": "Kompanya ng insurance",
+      "vehicleDetails": "Detalye ng sasakyan",
+      "additionalNotes": "Karagdagang tala",
+      "preferredLanguage": "Gustong wika sa nakasulat na komunikasyon",
+      "digitalSignature": "Digital na lagda: i-type ang iyong buong legal na pangalan"
+    },
+    "validation": {
+      "required": "Kumpletuhin ang kinakailangang field na ito.",
+      "email": "Maglagay ng wastong email address.",
+      "phone": "Maglagay ng wastong numero ng telepono.",
+      "date": "Maglagay ng wastong petsa.",
+      "amount": "Maglagay ng wastong halaga ng multa.",
+      "ticketImage": "Mag-upload ng nababasang larawan ng iyong ticket.",
+      "signature": "I-type ang iyong buong legal na pangalan para lumagda.",
+      "consent": "Basahin at tanggapin ang awtorisasyon bago magpatuloy.",
+      "terms": "Tanggapin ang Mga Kondisyon ng Serbisyo at Patakaran sa Privacy bago magbayad.",
+      "submit": "Hindi namin maisumite ang iyong detalye. Subukan muli.",
+      "scanReview": "Tingnan ang nabasang detalye at itama ang anumang mali.",
+      "scanFailed": "Hindi namin mabasa ang dokumentong ito. Mano-manong ilagay ang mga detalye.",
+      "fileFormat": "Pumili ng PDF, JPG, PNG, WebP, HEIC o HEIF file na hindi lalampas sa 10 MB.",
+      "consentCharacter": "Hindi kami makagawa ng nababasang dokumento ng pahintulot dahil sa isa o higit pang karakter. Makipag-ugnayan sa Fabsy bago magbayad, at huwag baguhin ang orihinal mong pangalan at mga detalye.",
+      "length": "Masyadong mahaba ang inilagay mo para sa form na ito. Makipag-ugnayan sa Fabsy kung kailangan mong panatilihin ang buong teksto."
+    },
+    "consent": {
+      "title": "Digital na awtorisasyon para sa Rapid Resolution",
+      "scope": "Pinapahintulutan ko ang Fabsy at mga kinatawan nito, kung pinapayagan, na humingi, tumanggap at sumuri ng disclosure; gumamit ng Traffic Tickets Digital Service; makipag-ugnayan sa hukuman, piskal at kaugnay na tanggapan ng pamahalaan; maghanda at magsumite ng kahilingan para sa pagrepaso ng piskal batay sa aking tagubilin at rekord; at ipaliwanag ang tugon ng prosekusyon, kaso, multa at epekto sa demerit point.",
+      "approval": "Maaari lamang gumawa ng pinal na hakbang sa pag-aayos ang Fabsy pagkatapos ng aking malinaw at tiyak na tagubilin para sa kaso. Hindi pinapahintulutan ng awtorisasyong ito ang awtomatikong pagtanggap ng alok ng prosekusyon o paghahain ng guilty plea.",
+      "exclusions": "Hindi kasama ang pinagtatalunang paglilitis, mga apela, muling pagbubukas ng kaso, Immediate Roadside Sanctions at Notices of Administrative Penalty. Kailangan ng hiwalay na kasunduan at bayad para sa paglilitis. Maaaring kailanganin din ang itinakdang consent form ng Pamahalaan ng Alberta.",
+      "fee": "Kusang-loob kong kinukuha ang Fabsy para sa limitadong serbisyo bago ang paglilitis sa halagang {{price}} CAD at karagdagang naaangkop na GST. Hiwalay ang mga multa ng pamahalaan at gawaing hindi kasama. Nauunawaan ko ang saklaw, kondisyon ng 48 oras at na walang ipinapangakong resulta.",
+      "data": "Pumapayag ako sa pagkuha at pagproseso ng aking impormasyon para sa serbisyo, pagbasa at pagsusuri ng dokumento gamit ang teknolohiya na may kwalipikadong pagrepaso, ligtas na pag-iimbak ng rekord, komunikasyon tungkol sa aking kaso sa pamamagitan ng email, telepono at text at kinakailangang pagbabahagi sa mga hukuman at awtoridad. Magbibigay ako ng tumpak at kumpletong impormasyon. Maaari akong humiling ng access o bawiin ang pahintulot sa data sa privacy@fabsy.ca.",
+      "withdrawal": "Maaari kong bawiin ang awtorisasyong ito sa pamamagitan ng nakasulat na abiso. Kung hindi, mananatili ito hanggang maayos o bawiin ang kaso. Hindi awtomatikong kinakansela ng pagbawi ang bayad para sa gawaing natapos na.",
+      "confirm": "Ako ang taong nakapangalan sa itaas at awtorisado akong pumasok sa kasunduang ito. Nabasa at naunawaan ko ang awtorisasyon at pumapayag ako sa limitadong serbisyo. Ang digital kong lagda ay may kaparehong legal na epekto ng sulat-kamay na lagda."
+    },
+    "review": {
+      "title": "Repasuhin ang iyong detalye",
+      "description": "Tingnan ang iyong ticket, contact information at awtorisasyon bago magpatuloy sa ligtas na pagbabayad.",
+      "edit": "Baguhin ang detalye",
+      "languageNote": "Dapat itago ang iyong orihinal na nakasulat na salaysay kasama ng anumang salin sa Ingles para sa pagsusuri. Huwag baguhin ang mga pangalan, petsa o numero ng ticket sa pagsasalin."
+    },
+    "scanTicket": "Basahin ang detalye mula sa ticket"
+  },
+  "checkout": {
+    "title": "Pagbabayad para sa Rapid Resolution",
+    "service": "Serbisyo",
+    "subtotal": "Subtotal",
+    "gst": "Naaangkop na GST",
+    "total": "Kabuuan",
+    "pay": "Magpatuloy sa ligtas na pagbabayad",
+    "processing": "Binubuksan ang ligtas na checkout…",
+    "paymentFailed": "Hindi available ang ligtas na checkout. Subukan muli.",
+    "scope": "{{price}} CAD at karagdagang naaangkop na GST para sa mga kwalipikadong kaso bago ang paglilitis. Ipapakita ng Stripe ang buong subtotal at buwis bago magbayad. Hiwalay ang mga multa, representasyon sa paglilitis at mga serbisyong hindi kasama.",
+    "termsAcceptance": "Nabasa ko at tinatanggap ang Mga Kondisyon sa Pagbili, Mga Kondisyon ng Serbisyo at Patakaran sa Privacy sa Ingles. Ang mga kondisyon sa Ingles ang mananaig. Hindi nagbibigay ng awtorisasyon ang bayad para sa awtomatikong pagtanggap ng alok."
+  },
+  "terms": {
+    "metaTitle": "Mga kondisyon ng serbisyo | Fabsy",
+    "title": "Mga kondisyon ng serbisyo",
+    "intro": "Basahin ito kasama ng Mga Kondisyon ng Serbisyo sa Ingles bago magbigay ng awtorisasyon o bumili. Sinusunod ng isinaling bersiyong ito ang kasalukuyang kondisyon sa Ingles; hindi ito lumilikha ng ibang kasunduan sa serbisyo.",
+    "englishControls": "Ang Mga Kondisyon ng Serbisyo sa Ingles ang mananaig kung may pagkakaiba sa salin. Hindi nililimitahan ang mga karapatang itinakda ng batas. Humingi ng paglilinaw bago pumayag kung may hindi nauunawaang kondisyon.",
+    "sections": {
+      "service": {
+        "title": "1. Paglalarawan ng serbisyo",
+        "body": "Ang Fabsy Traffic Ticket Services ay serbisyo ng kinatawan para sa traffic ticket sa Alberta, hindi law firm. Ang mga bayad na serbisyo ay Rapid Resolution para sa kwalipikadong kaso bago ang paglilitis at ang Insurance Impact & Renewal Planning Report. Maaaring kasama ang ligtas na pagkuha ng detalye, pagsusuri ng pagiging kwalipikado at deadline, digital na awtorisasyon, paghingi at pagsubaybay sa disclosure, pagsusuri gamit ang teknolohiya na may kwalipikadong pagrepaso, awtorisadong pagsusumite sa piskal ayon sa detalye ng kaso, mga abiso sa file, paliwanag ng tugon ng prosekusyon at desisyong ayon sa kliyente. Gumagamit ang opsyonal na mga ulat ng rekord ng kliyente at aprubadong pampublikong sanggunian. Hindi kasama sa Rapid Resolution ang pinagtatalunang paglilitis, mga apela, muling pagbubukas, Immediate Roadside Sanctions, Notices of Administrative Penalty, multa ng pamahalaan at gawaing labas sa pinapayagang saklaw."
+      },
+      "practice": {
+        "title": "2. Limitasyon ng kinatawan",
+        "body": "Hindi nagbibigay ng legal na payo o nagsasagawa ng praktis ng batas ang mga kinatawan ng Fabsy, hindi nila ipinapakilala ang sarili bilang mga abogado o ang Fabsy bilang law firm, hindi sila tumatanggap ng kasong labas sa pinapayagang saklaw ng kinatawan, at hindi nangangako ng partikular na resulta."
+      },
+      "eligibility": {
+        "title": "3. Availability ng serbisyo",
+        "body": "Nakadepende ang availability sa kaso, proseso, deadline, lokasyon ng hukuman, mga tuntunin ng portal at kung pinapayagan at tinatanggap ng Fabsy ang bayad na serbisyo ng kinatawan. Maaaring tanggihan o i-refer sa iba ang mga kasong labas sa saklaw."
+      },
+      "pricing": {
+        "title": "4. Presyo",
+        "body": "Ang Rapid Resolution ay {{price}} CAD at karagdagang naaangkop na GST para sa kwalipikadong kaso sa Alberta bago ang paglilitis. Ang hiwalay na Insurance Impact & Renewal Planning Report ay {{reportPrice}} CAD at karagdagang naaangkop na GST. Ang dalawa nang magkasama ay {{bundlePrice}} CAD at karagdagang naaangkop na GST. Hiwalay ang representasyon sa paglilitis, multa ng pamahalaan at mga kasong labas sa saklaw."
+      },
+      "payment": {
+        "title": "5. Mga bayad at pagbabayad",
+        "body": "Lahat ng bayad ay nasa Canadian dollar. Responsibilidad mo ang mga gastos sa hukuman, multa at iba pang singil na wala sa kontrol ng Fabsy. Ipapakita ang buong subtotal at buwis bago ang pagbabayad sa Stripe."
+      },
+      "rapid": {
+        "title": "5A. Rapid Resolution",
+        "body": "Magsisimula lamang ang serbisyo kapag kumpleto na ang detalye, awtorisasyon at bayad, at tinanggap ng Fabsy ang kaso. Kung awtorisado at posible sa operasyon, hihingi at susuri ng disclosure ang Fabsy. Hindi pinahahaba ng paghingi ng disclosure ang petsa ng pagtugon, paglilitis o ibang deadline. Dapat mong subaybayan ang bawat deadline at personal na humarap kung kinakailangan. Magsisimula lamang ang 48-oras na pangako kapag natanggap at naitugma sa iyong file ang kumpleto at nababasang disclosure; sakop nito ang pagsusuri ng Fabsy at paghahanda o pagsusumite ng susunod na awtorisadong hakbang, hindi ang oras ng tugon ng prosekusyon o pinal na resulta. Hindi tatanggap ng alok ng prosekusyon, maghahain ng guilty plea o magtatapos ng pag-aayos ang Fabsy nang walang tiyak mong tagubilin sa kaso. Kailangan ng hiwalay na pagsusuri ng pagiging kwalipikado, kasunduan at quotation para sa paglilitis."
+      },
+      "report": {
+        "title": "5B. Ulat sa pagpaplano ng insurance",
+        "body": "Ito ay isang beses na produkto para sa pananaliksik at pagpaplano ng mamimili. May hiwalay na bayad para sa driver abstract, serbisyo ng broker, quotation ng insurer at iba pang rekord mula sa third party. Dapat kang magbigay ng tumpak na impormasyon sa ticket, driving record, polisiya, renewal at rating. Nakabatay ang mga senaryo at saklaw ng halaga sa aprubadong pampublikong impormasyon at ibinigay na rekord; hindi ito mga quotation ng insurer. Ang mga sanggunian at tanong ay pantulong sa pagpaplano, hindi rekomendasyong bumili, magkansela, mag-renew o magbago ng coverage. Ang Fabsy ay hindi insurance agent o broker at hindi nagbebenta, nagbibigay ng quotation o nag-aayos ng insurance, nakikipag-ugnayan sa insurer, nagsusumite ng aplikasyon o nakikipagnegosasyon sa renewal. Walang pangako ng pagiging kwalipikado, pagtitipid o resulta sa premium. Dapat manggaling sa lisensiyadong broker o insurer ang payo at quotation para sa isang partikular na insurer."
+      },
+      "responsibilities": {
+        "title": "6. Iyong mga responsibilidad",
+        "body": "Magbigay ng tumpak at kumpletong detalye ng ticket, tumugon agad sa mga kahilingan, repasuhin ang bawat tugon ng prosekusyon at magbigay ng malinaw na tagubilin bago mapaso ang alok, humarap sa hukuman kung kailangan, at bayaran ang naaangkop na bayad at gastos sa hukuman. Nagbibigay ang Fabsy ng representasyon bilang ahente, hindi legal na payo."
+      },
+      "outcomes": {
+        "title": "7. Walang ipinapangakong resulta",
+        "body": "Nakadepende ang resulta sa kaso, ebidensiya, proseso, piskal at hukuman. Walang pangako ng pagbawi o pagbawas ng kaso, mas mababang multa, mas kaunting demerit point, pagtitipid sa premium, pagiging kwalipikado sa insurance o ibang resulta. Ang 48-oras na pangako ay hindi pangako ng resulta."
+      },
+      "privacy": {
+        "title": "8. Pagiging kumpidensiyal",
+        "body": "Pinoprotektahan ng Fabsy ang impormasyon ng kliyente sa pamamagitan ng panloob na mga gawain sa privacy at naaangkop na obligasyon sa privacy. Maaaring ibahagi ang impormasyon kung kailangan sa proseso ng hukuman o hinihingi ng batas."
+      },
+      "liability": {
+        "title": "9. Limitasyon ng pananagutan",
+        "body": "Limitado ang pananagutan ng Fabsy sa ibinayad na halaga ng serbisyo. Hindi mananagot ang Fabsy para sa di-tuwiran, kasunod o pamparusang danyos na dulot ng serbisyo nitong representasyon."
+      },
+      "cancellation": {
+        "title": "10. Pagkansela, refund at pagwawakas",
+        "body": "Maaaring wakasan ng alinmang panig ang kasunduan sa pamamagitan ng parehong pagsang-ayon, dahil sa hindi pagbabayad, hindi pagbibigay ng impormasyon o pakikipagtulungan, o kung imposible o hindi praktikal ang representasyon. Makipag-ugnayan agad sa Fabsy upang humiling ng pagkansela. Nakadepende ang refund sa gawaing natapos na, singil ng third party, ipinahayag sa checkout at naaangkop na batas. Kung tatanggihan ng Fabsy ang isang bayad at kumpletong kaso bago magsimula ang makabuluhang gawain, ibabalik ang naaangkop na bayad sa serbisyo. Hindi nililimitahan ang karapatang magkansela na itinakda ng batas."
+      },
+      "website": {
+        "title": "11. Paggamit ng website",
+        "body": "Ang paggamit ng website ay nangangahulugan ng pagtanggap sa mga kondisyon. Huwag itong gamitin nang labag sa batas, magtangkang mag-access nang walang pahintulot, manggambala sa paggana nito o magpadala ng mapaminsalang code."
+      },
+      "law": {
+        "title": "12. Naaangkop na batas",
+        "body": "Saklaw ang mga kondisyon ng mga batas ng Alberta, Canada. Ang mga alitan ay sasailalim sa hurisdiksiyon ng mga hukuman ng Alberta."
+      },
+      "changes": {
+        "title": "13. Pagbabago sa mga kondisyon",
+        "body": "Maaaring baguhin ng Fabsy ang mga kondisyon. Ilalathala ang mga pagbabago sa pahina ng kondisyon sa Ingles na may bagong petsa ng rebisyon. Ang patuloy na paggamit ng serbisyo pagkatapos ng pagbabago ay nangangahulugan ng pagtanggap sa binagong mga kondisyon."
+      },
+      "contact": {
+        "title": "14. Makipag-ugnayan",
+        "body": "Para sa mga tanong, makipag-ugnayan sa Fabsy Traffic Ticket Services sa {{email}} o (825) 793-2279. Lugar ng serbisyo: Alberta."
+      }
+    }
+  },
+  "notifications": {
+    "received": {
+      "subject": "Fabsy: natanggap ang detalye ng ticket",
+      "body": "Kumusta {{name}}, natanggap namin ang detalye para sa file {{reference}}. Hindi nangangahulugan ang pagtanggap nito na tinanggap na ang kaso o napahaba ang deadline. Tingnan ang iyong file: {{url}}"
+    },
+    "disclosure": {
+      "subject": "Fabsy: natanggap ang disclosure",
+      "body": "Kumusta {{name}}, dumating na ang disclosure para sa file {{reference}}. Magsisimula lamang ang 48-oras na pangako sa pagsusuri at pagkilos kapag nakumpirmang kumpleto, nababasa at naitugma sa iyong file ang disclosure. Tingnan ang update: {{url}}"
+    },
+    "update": {
+      "subject": "Fabsy: may update sa iyong file",
+      "body": "Kumusta {{name}}, may update sa file {{reference}}. Basahin ang detalye at anumang deadline sa iyong ligtas na file: {{url}}"
+    },
+    "decision": {
+      "subject": "Fabsy: kailangan ang iyong tagubilin",
+      "body": "Kumusta {{name}}, may tugon para sa file {{reference}}. Repasuhin ang mungkahi at anumang petsa ng pag-expire, saka ibigay ang tiyak mong tagubilin sa kaso. Hindi awtomatikong tatanggap ng alok ang Fabsy. Repasuhin: {{url}}"
+    },
+    "payment": {
+      "subject": "Fabsy: natanggap ang bayad",
+      "body": "Kumusta {{name}}, natanggap ang bayad na {{total}} CAD para sa file {{reference}}. Hindi nangangako ng resulta o nagpapahaba ng deadline ang pagbabayad. Tingnan ang resibo at susunod na hakbang: {{url}}"
+    },
+    "disclaimer": "Ang Fabsy ay serbisyo ng kinatawan para sa traffic ticket, hindi law firm. Ang mga kondisyon ng serbisyo sa Ingles ang mananaig. Huwag magpadala ng detalye ng payment card sa email o text."
+  }
+}

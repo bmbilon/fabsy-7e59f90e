@@ -55,6 +55,11 @@ import TicketAssessmentConfirmation from "./pages/TicketAssessmentConfirmation";
 import AdminAssessmentReview from "./pages/AdminAssessmentReview";
 import RepresentationConsent from "./pages/RepresentationConsent";
 import RapidResolution from "./pages/RapidResolution";
+import { lazy, Suspense } from "react";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
+import LocaleAlternates from "@/i18n/LocaleAlternates";
+
+const LocalizedPage = lazy(() => import("./pages/LocalizedPage"));
 
 const queryClient = new QueryClient();
 
@@ -77,6 +82,8 @@ const App = () => (
         <Sonner />
         <GlobalSchema />
         <BrowserRouter>
+        <LocaleProvider>
+        <LocaleAlternates />
         {/* Analytics must be inside the router; secure bearer-token routes are excluded. */}
         <RouteAnalytics />
         <ScrollToTop />
@@ -143,9 +150,11 @@ const App = () => (
           <Route path="/hubs/court-options-and-deadlines" element={<CourtOptionsDeadlines />} />
           <Route path="/hubs/city-specific-quirks" element={<CityQuirks />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/:locale/*" element={<Suspense fallback={<div className="min-h-screen" aria-busy="true" />}><LocalizedPage /></Suspense>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <CallBar />
+        </LocaleProvider>
         </BrowserRouter>
       </TooltipProvider>
     </HelmetProvider>

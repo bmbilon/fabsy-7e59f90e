@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
+import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
+import { prepareClientEmail } from "../_shared/notification-locale.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -11,6 +13,7 @@ const corsHeaders = {
 };
 
 interface ContactFormData {
+  preferred_locale?: unknown;
   name: string;
   email: string;
   phone?: string;
@@ -25,12 +28,13 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, phone, subject, message }: ContactFormData = await req.json();
+    const { name, email, phone, subject, message, preferred_locale }: ContactFormData = await req.json();
+    const preferredLocale = parsePreferredLocale(preferred_locale);
 
     console.log("Processing contact form submission from:", email);
 
     // Send confirmation email to the user
-    const userEmailResponse = await resend.emails.send({
+    const userEmailResponse = await resend.emails.send(prepareClientEmail({
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "brett@execom.ca",
       to: [email],
@@ -102,7 +106,7 @@ const handler = async (req: Request): Promise<Response> => {
           </body>
         </html>
       `,
-    });
+    }, { preferredLocale, template: "contact_received" }));
 
     console.log("User confirmation email sent:", userEmailResponse);
 
@@ -153,6 +157,7 @@ const handler = async (req: Request): Promise<Response> => {
                 ` : ''}
                 
                 <div class="field">
+                  <span class="label">Preferred language:</span> ${preferredLocale}<br>
                   <span class="label">Message:</span><br>
                   <div style="margin-top: 10px; white-space: pre-wrap;">${message}</div>
                 </div>
@@ -188,10 +193,11 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Unknown error occurred',
+        ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
         success: false 
       }),
       {
-        status: 500,
+        status: error instanceof LocaleRequestError ? error.status : 500,
         headers: { 
           "Content-Type": "application/json", 
           ...corsHeaders 

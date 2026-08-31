@@ -2,7 +2,9 @@
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { SITE, alternateLinks, loadLocaleSeoContext, localePath, splitSnapshotRoute } from './locale-seo.mjs';
 dotenv.config();
 
 const SUPABASE_URL =
@@ -20,6 +22,7 @@ const PAGE_CONTENT_DIR = path.resolve(
   process.env.PAGE_CONTENT_DIR || path.join(process.cwd(), 'src/content/pages')
 );
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const PUBLIC_DIR = path.resolve(process.env.SITEMAP_PUBLIC_DIR || path.join(process.cwd(), 'public'));
 
 async function fetchAllRows(table, columns, configure = query => query) {
   const rows = [];
@@ -81,24 +84,47 @@ function escapeXml(value) {
     .replaceAll("'", '&apos;');
 }
 
-function urlset(urls) {
+function urlset(urls, localeContext) {
   const entries = urls.map(u => {
     const fields = [`<loc>${escapeXml(`https://fabsy.ca${u.loc}`)}</loc>`];
     if (u.changefreq) fields.push(`<changefreq>${escapeXml(u.changefreq)}</changefreq>`);
     if (u.priority) fields.push(`<priority>${escapeXml(u.priority)}</priority>`);
     if (u.lastmod) fields.push(`<lastmod>${escapeXml(u.lastmod)}</lastmod>`);
+    const { code, basePath } = splitSnapshotRoute(u.loc, localeContext);
+    for (const alternate of alternateLinks(localeContext, code, basePath)) {
+      fields.push(`<xhtml:link rel="alternate" hreflang="${escapeXml(alternate.languageTag)}" href="${escapeXml(alternate.href)}" />`);
+    }
     return `  <url>\n${fields.map(field => `    ${field}`).join('\n')}\n  </url>`;
   });
 
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${entries.join('\n')}\n</urlset>\n`;
 }
 
 function sitemapIndex(entries) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.map(loc => `  <sitemap><loc>${escapeXml(loc)}</loc></sitemap>`).join('\n')}\n</sitemapindex>\n`;
 }
 
-async function generateSitemap() {
+async function loadBlogPosts() {
+  // An explicit fixture/cache makes offline and isolated release checks
+  // deterministic; normal builds still use the published database inventory.
+  if (process.env.SITEMAP_BLOG_CACHE) {
+    const posts = JSON.parse(fs.readFileSync(process.env.SITEMAP_BLOG_CACHE, 'utf8'));
+    const seen = new Set();
+    if (!Array.isArray(posts)) throw new Error('SITEMAP_BLOG_CACHE must contain a blog-post array');
+    for (const post of posts) {
+      if (!SLUG_RE.test(post?.slug) || seen.has(post.slug) || (post.status && post.status !== 'published')) {
+        throw new Error('SITEMAP_BLOG_CACHE contains an invalid, duplicate or unpublished post');
+      }
+      seen.add(post.slug);
+    }
+    return posts;
+  }
+  return fetchAllRows('blog_posts', 'slug, published_at, status', query => query.eq('status', 'published'));
+}
+
+export async function generateSitemap() {
   console.log('📊 Loading cached pages and fetching published blog posts...');
+  const localeContext = loadLocaleSeoContext();
 
   // sync-pages-from-db.js runs immediately before this script when credentials
   // are available. Using that same cache keeps sitemap and snapshot coverage
@@ -106,11 +132,7 @@ async function generateSitemap() {
   const pages = loadCachedPages();
 
   // Blog posts
-  const posts = await fetchAllRows(
-    'blog_posts',
-    'slug, published_at, status',
-    query => query.eq('status', 'published')
-  );
+  const posts = await loadBlogPosts();
 
   console.log(`✅ Found ${pages.length} content page(s), ${posts.length} blog post(s)`);
 
@@ -124,11 +146,11 @@ async function generateSitemap() {
     { loc: '/insurance-damage-report', priority: '0.8', changefreq: 'weekly' },
     { loc: '/testimonials', priority: '0.7', changefreq: 'weekly' },
     { loc: '/contact', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/terms-of-service', priority: '0.4', changefreq: 'monthly' },
     { loc: '/blog', priority: '0.8', changefreq: 'daily' },
     { loc: '/ai-info', priority: '0.8', changefreq: 'monthly' },
     { loc: '/founder', priority: '0.5', changefreq: 'monthly' },
     { loc: '/about/comparison', priority: '0.7', changefreq: 'monthly' },
-    { loc: '/submit-ticket', priority: '0.9', changefreq: 'monthly' },
     { loc: '/terms-of-purchase', priority: '0.4', changefreq: 'monthly' },
     { loc: '/hubs/alberta-tickets-101', priority: '0.8', changefreq: 'monthly' },
     { loc: '/hubs/photo-radar-vs-officer-issued', priority: '0.8', changefreq: 'monthly' },
@@ -159,15 +181,15 @@ async function generateSitemap() {
   ];
 
   // Write segmented sitemaps
-  const pagesXmlPath = 'public/sitemaps/sitemap-pages.xml';
-  const contentXmlPath = 'public/sitemaps/sitemap-content.xml';
-  const faqXmlPath = 'public/sitemaps/sitemap-faq.xml';
+  const pagesXmlPath = path.join(PUBLIC_DIR, 'sitemaps/sitemap-pages.xml');
+  const contentXmlPath = path.join(PUBLIC_DIR, 'sitemaps/sitemap-content.xml');
+  const faqXmlPath = path.join(PUBLIC_DIR, 'sitemaps/sitemap-faq.xml');
 
   ensureDir(pagesXmlPath);
   ensureDir(contentXmlPath);
   ensureDir(faqXmlPath);
 
-  fs.writeFileSync(pagesXmlPath, urlset([...staticPages, ...blogPostUrls]));
+  fs.writeFileSync(pagesXmlPath, urlset([...staticPages, ...blogPostUrls], localeContext));
 
   // Chunk content URLs: Google caps sitemaps at 50,000 URLs, but we chunk at 1,000
   // to keep files small and diffable. First chunk keeps the legacy filename.
@@ -178,7 +200,7 @@ async function generateSitemap() {
   }
   if (contentChunks.length === 0) contentChunks.push([]);
   const contentPaths = contentChunks.map((_, i) =>
-    i === 0 ? 'public/sitemaps/sitemap-content.xml' : `public/sitemaps/sitemap-content-${i + 1}.xml`
+    path.join(PUBLIC_DIR, i === 0 ? 'sitemaps/sitemap-content.xml' : `sitemaps/sitemap-content-${i + 1}.xml`)
   );
   const expectedContentFiles = new Set(contentPaths.map(contentPath => path.basename(contentPath)));
   for (const filename of fs.readdirSync(path.dirname(contentXmlPath))) {
@@ -186,16 +208,37 @@ async function generateSitemap() {
       fs.unlinkSync(path.join(path.dirname(contentXmlPath), filename));
     }
   }
-  contentChunks.forEach((chunk, i) => fs.writeFileSync(contentPaths[i], urlset(chunk)));
+  contentChunks.forEach((chunk, i) => fs.writeFileSync(contentPaths[i], urlset(chunk, localeContext)));
 
-  fs.writeFileSync(faqXmlPath, urlset(faqUrls));
+  fs.writeFileSync(faqXmlPath, urlset(faqUrls, localeContext));
+
+  // Keep the existing segmented English inventory. Each released translation
+  // gets only its real, reviewed Phase 1 equivalents, never English content
+  // duplicates or intake/checkout/receipt URLs.
+  const localePaths = [];
+  for (const locale of localeContext.registry.locales.filter(item => item.code !== 'en')) {
+    const filename = path.join(PUBLIC_DIR, 'sitemaps', `sitemap-${locale.code}.xml`);
+    if (!localeContext.released(locale.code)) {
+      fs.rmSync(filename, { force: true });
+      continue;
+    }
+    const urls = [...localeContext.indexableRoutes].map(basePath => ({
+      loc: localePath(locale.code, basePath),
+      changefreq: 'monthly',
+      priority: basePath === '/' ? '0.9' : '0.7',
+    }));
+    fs.writeFileSync(filename, urlset(urls, localeContext));
+    localePaths.push(filename);
+  }
 
   // Write sitemap index at root
-  const indexXmlPath = 'public/sitemap.xml';
+  const indexXmlPath = path.join(PUBLIC_DIR, 'sitemap.xml');
+  const publicUrl = filename => `${SITE}/${path.relative(PUBLIC_DIR, filename).split(path.sep).join('/')}`;
   const index = sitemapIndex([
-    'https://fabsy.ca/sitemaps/sitemap-pages.xml',
-    ...contentPaths.map(p => 'https://fabsy.ca' + p.replace('public', '')),
-    'https://fabsy.ca/sitemaps/sitemap-faq.xml',
+    publicUrl(pagesXmlPath),
+    ...contentPaths.map(publicUrl),
+    publicUrl(faqXmlPath),
+    ...localePaths.map(publicUrl),
   ]);
   fs.writeFileSync(indexXmlPath, index);
 
@@ -204,9 +247,12 @@ async function generateSitemap() {
   console.log('   -', pagesXmlPath);
   contentPaths.forEach(contentPath => console.log('   -', contentPath));
   console.log('   -', faqXmlPath);
+  localePaths.forEach(filename => console.log('   -', filename));
 }
 
-generateSitemap().catch(err => {
-  console.error('Fatal error:', err);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  generateSitemap().catch(err => {
+    console.error('Fatal error:', err);
+    process.exitCode = 1;
+  });
+}

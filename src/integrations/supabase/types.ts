@@ -260,6 +260,74 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_intake_translations: {
+        Row: {
+          id: string
+          ticket_submission_id: string
+          preferred_locale: string
+          target_locale: string
+          source_fields: Json
+          english_fields: Json | null
+          detected_language: string | null
+          status: string
+          is_current: boolean
+          attempts: number
+          claim_token: string | null
+          claimed_at: string | null
+          last_error_code: string | null
+          translated_at: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          ticket_submission_id: string
+          preferred_locale: string
+          target_locale?: string
+          source_fields: Json
+          english_fields?: Json | null
+          detected_language?: string | null
+          status?: string
+          is_current?: boolean
+          attempts?: number
+          claim_token?: string | null
+          claimed_at?: string | null
+          last_error_code?: string | null
+          translated_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          ticket_submission_id?: string
+          preferred_locale?: string
+          target_locale?: string
+          source_fields?: Json
+          english_fields?: Json | null
+          detected_language?: string | null
+          status?: string
+          is_current?: boolean
+          attempts?: number
+          claim_token?: string | null
+          claimed_at?: string | null
+          last_error_code?: string | null
+          translated_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_intake_translations_ticket_submission_id_fkey"
+            columns: ["ticket_submission_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_submissions: {
         Row: {
           additional_notes: string | null
@@ -298,6 +366,7 @@ export type Database = {
           last_name: string
           phone: string
           postal_code: string | null
+          preferred_locale: string
           representation_access_token_hash: string | null
           representation_credit_eligible: boolean
           representation_includes_assessment: boolean
@@ -351,6 +420,7 @@ export type Database = {
           last_name: string
           phone: string
           postal_code?: string | null
+          preferred_locale?: string
           representation_access_token_hash?: string | null
           representation_credit_eligible?: boolean
           representation_includes_assessment?: boolean
@@ -404,6 +474,7 @@ export type Database = {
           last_name?: string
           phone?: string
           postal_code?: string | null
+          preferred_locale?: string
           representation_access_token_hash?: string | null
           representation_credit_eligible?: boolean
           representation_includes_assessment?: boolean
@@ -472,6 +543,22 @@ export type Database = {
       }
     }
     Functions: {
+      claim_ticket_intake_translations: {
+        Args: { p_limit?: number }
+        Returns: Database["public"]["Tables"]["ticket_intake_translations"]["Row"][]
+      }
+      complete_ticket_intake_translation: {
+        Args: { p_id: string; p_claim_token: string; p_english_fields: Json; p_detected_language: string }
+        Returns: boolean
+      }
+      fail_ticket_intake_translation: {
+        Args: { p_id: string; p_claim_token: string; p_error_code: string }
+        Returns: boolean
+      }
+      review_ticket_intake_translation: {
+        Args: { p_id: string; p_english_fields: Json }
+        Returns: boolean
+      }
       get_aeo_kpi_summary: {
         Args: Record<PropertyKey, never>
         Returns: {

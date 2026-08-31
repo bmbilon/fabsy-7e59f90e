@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { LocaleRequestError, parsePreferredLocale, requireReleasedServiceLocale, type PreferredLocale } from "../_shared/locale-policy.ts";
 
 type IdrOrderType = "standalone" | "addon";
 // This Edge Function intentionally uses the dynamic service-role client without generated DB types.
@@ -9,6 +10,7 @@ type IdrOrderType = "standalone" | "addon";
 type SupabaseAdmin = ReturnType<typeof createClient<any>>;
 
 interface CheckoutRequest {
+  preferred_locale?: unknown;
   orderId?: unknown;
   type?: unknown;
   product?: unknown;
@@ -20,6 +22,7 @@ interface CheckoutRequest {
 }
 
 interface Purchaser {
+  preferredLocale: PreferredLocale;
   clientId: string | null;
   ticketSubmissionId: string | null;
   firstName: string;
@@ -194,7 +197,7 @@ async function resolveCasePurchaser(
   const { data: submission, error: submissionError } = await admin
     .from("ticket_submissions")
     .select(
-      "id,client_id,status,verdict,case_outcome,clients(first_name,last_name,email,phone,auth_user_id)",
+      "id,client_id,status,verdict,case_outcome,preferred_locale,clients(first_name,last_name,email,phone,auth_user_id)",
     )
     .eq("id", ticketSubmissionId)
     .maybeSingle();
@@ -252,6 +255,7 @@ async function resolveCasePurchaser(
   }
 
   return {
+    preferredLocale: parsePreferredLocale(submission.preferred_locale),
     clientId: submission.client_id,
     ticketSubmissionId,
     firstName: client.first_name,
@@ -510,6 +514,7 @@ serve(async (req) => {
     }
 
     const body = await req.json() as CheckoutRequest;
+    const requestedLocale = parsePreferredLocale(body.preferred_locale);
     const type = orderType(body.type ?? body.product);
     const orderId = body.orderId === undefined ? crypto.randomUUID() : uuid(body.orderId, "orderId");
     const admin = createClient(supabaseUrl, serviceRoleKey, {
@@ -530,6 +535,7 @@ serve(async (req) => {
     }
 
     const purchaser = body.ticketSubmissionId ? await resolveCasePurchaser(req, admin, supabaseUrl, anonKey, body, type) : {
+      preferredLocale: requestedLocale,
       clientId: null,
       ticketSubmissionId: null,
       firstName: text(body.firstName, "firstName", 100),
@@ -537,6 +543,7 @@ serve(async (req) => {
       email: email(body.email),
       phone: phone(body.phone),
     };
+    requireReleasedServiceLocale(purchaser.preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
     if (type === "addon" && !purchaser.ticketSubmissionId) {
       throw new RequestError(
         "The $31 add-on requires an active ticket case.",
@@ -574,6 +581,7 @@ serve(async (req) => {
     const reservedOrderId = reservation.orderId;
     const amountCents = PRICE_CENTS[type];
     const metadata: Record<string, string> = {
+      preferred_locale: purchaser.preferredLocale,
       idr_order_id: reservedOrderId,
       idr_type: type,
       idr_checkout_kind: "idr_only",
@@ -615,6 +623,7 @@ serve(async (req) => {
         },
       }],
       metadata,
+      payment_intent_data: { metadata },
       success_url: `${siteOrigin()}/insurance-damage-report/intake?checkout=success&order_id=${reservedOrderId}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteOrigin()}/insurance-damage-report?checkout=cancelled`,
     }, {
@@ -657,11 +666,12 @@ serve(async (req) => {
       origin,
     );
   } catch (error) {
-    const status = error instanceof RequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof LocaleRequestError ? error.status : 500;
     if (status >= 500) console.error("create-idr-payment failed");
     return json(
       {
         error: status >= 500 ? "Unable to create the insurance report checkout." : (error as Error).message,
+        ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
       },
       status,
       origin,

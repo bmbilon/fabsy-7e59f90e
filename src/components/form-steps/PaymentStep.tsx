@@ -8,6 +8,10 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "@/i18n/locale-context";
+import { buildIntakeAdditionalNotes, buildIntakeDefenseStrategy, validateLocalizedIntakeStep } from "@/i18n/intake-validation";
 import {
   ABSTRACT_SELF_ORDER,
   IDR_DISCLAIMER,
@@ -25,24 +29,33 @@ interface PaymentStepProps {
   updateFormData: (updates: Partial<FormData>) => void;
 }
 
-async function functionErrorMessage(error: unknown, fallback: string) {
+class CheckoutFailure extends Error {
+  constructor(message: string, readonly translationKey?: 'intake.validation.consentCharacter') { super(message); }
+}
+
+async function functionErrorDetails(error: unknown, fallback: string): Promise<{ message: string; code?: string }> {
   if (error && typeof error === "object" && "context" in error) {
     const context = (error as { context?: Response }).context;
     if (context instanceof Response) {
       try {
-        const body = await context.clone().json() as { error?: unknown };
-        if (typeof body.error === "string" && body.error.trim()) return body.error;
+        const body = await context.clone().json() as { error?: unknown; code?: unknown };
+        if (typeof body.error === "string" && body.error.trim()) return { message: body.error, code: typeof body.code === 'string' ? body.code : undefined };
       } catch {
         // Use the provider error below when the response body is unavailable.
       }
     }
   }
-  return error instanceof Error && error.message ? error.message : fallback;
+  return { message: error instanceof Error && error.message ? error.message : fallback };
 }
 
 export default function PaymentStep({ formData, updateFormData }: PaymentStepProps) {
+  const { t } = useTranslation();
+  const { locale, isReleased, href } = useLocale();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [includeIdrAddon, setIncludeIdrAddon] = useState(false);
+  const [selectedIdrAddon, setIncludeIdrAddon] = useState(false);
+  // The report intake is still English. Offer the reviewed RR service alone on
+  // localized checkout instead of silently handing off an untranslated add-on.
+  const includeIdrAddon = locale === "en" && selectedIdrAddon;
   const [isProcessing, setIsProcessing] = useState(false);
   const [idrOrderId] = useState(() => crypto.randomUUID());
   const { toast } = useToast();
@@ -51,10 +64,21 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
   const checkoutSubtotal = RAPID_RESOLUTION.priceCad + (includeIdrAddon ? IDR_PRICE_ADDON : 0);
 
   const handleStripeCheckout = async () => {
+    if (!isReleased) {
+      toast({ title: t('language.draftTitle'), description: t('language.paymentBlocked'), variant: "destructive" });
+      return;
+    }
+    if (locale !== "en") {
+      const invalid = [1, 2, 3, 4].flatMap(step => Object.values(validateLocalizedIntakeStep(step, formData)));
+      if (invalid.length) {
+        toast({ title: t('intake.review.title'), description: t(invalid[0]), variant: "destructive" });
+        return;
+      }
+    }
     if (!agreedToTerms) {
       toast({
-        title: "Agreement required",
-        description: "Agree to the Terms of Service and Privacy Policy before continuing.",
+        title: locale === "en" ? "Agreement required" : t('intake.validation.consent'),
+        description: locale === "en" ? "Agree to the Terms of Purchase, Terms of Service and Privacy Policy before continuing." : t('intake.validation.terms'),
         variant: "destructive",
       });
       return;
@@ -81,6 +105,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
 
       const { data: submission, error: submissionError } = await supabase.functions.invoke("submit-ticket", {
         body: {
+          preferred_locale: locale,
           driversLicense: formData.driversLicense,
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -93,18 +118,13 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           dateOfBirth: formData.dateOfBirth?.toISOString().split("T")[0],
           smsOptIn: formData.smsOptIn,
           ticketNumber: formData.ticketNumber,
-          violation: formData.violation || formData.offenceDescription,
+          violation: formData.offenceDescription || formData.violation,
           fineAmount: formData.fineAmount,
           violationDate: formData.issueDate?.toISOString().split("T")[0],
           courtLocation: formData.courtJurisdiction || formData.location,
           courtDate: formData.courtDate?.toISOString().split("T")[0],
-          defenseStrategy: `${formData.pleaType}\n\nExplanation: ${formData.explanation}\n\nCircumstances: ${formData.circumstances}`,
-          additionalNotes: [
-            formData.additionalNotes,
-            formData.offenceSection ? `Section: ${formData.offenceSection}${formData.offenceSubSection ? `(${formData.offenceSubSection})` : ""}` : "",
-            formData.officer ? `Officer: ${formData.officer}${formData.officerBadge ? ` (${formData.officerBadge})` : ""}` : "",
-            formData.location ? `Offence location: ${formData.location}` : "",
-          ].filter(Boolean).join("\n"),
+          defenseStrategy: buildIntakeDefenseStrategy(formData),
+          additionalNotes: buildIntakeAdditionalNotes(formData),
           insuranceCompany: formData.insuranceCompany,
           ...(sourceAssessment ? { sourceAssessment } : {
             file: { contentType: ticketMimeType!, size: ticketFile!.size },
@@ -116,7 +136,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
         throw new Error(
           typeof submission?.error === "string"
             ? submission.error
-            : await functionErrorMessage(submissionError, "Ticket submission could not be created."),
+            : (await functionErrorDetails(submissionError, "Ticket submission could not be created.")).message,
         );
       }
 
@@ -141,7 +161,8 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
         },
       });
       if (consentError || !consent?.success || !consent?.consentFormPath) {
-        throw new Error(await functionErrorMessage(consentError, "Your signed consent form could not be stored. Please try again."));
+        const detail = await functionErrorDetails(consentError, "Your signed consent form could not be stored. Please try again.");
+        throw new CheckoutFailure(detail.message, detail.code === 'consent_character_not_supported' ? 'intake.validation.consentCharacter' : undefined);
       }
 
       const { error: notificationError } = await supabase.functions.invoke("send-notification", {
@@ -166,13 +187,39 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
     } catch (error) {
       console.error("Ticket checkout failed", error);
       toast({
-        title: "Checkout unavailable",
-        description: error instanceof Error ? error.message : "We could not start secure checkout. Please try again.",
+        title: locale === "en" ? "Checkout unavailable" : t('checkout.paymentFailed'),
+        description: locale === "en" ? (error instanceof Error ? error.message : "We could not start secure checkout. Please try again.") : t(error instanceof CheckoutFailure && error.translationKey ? error.translationKey : 'intake.validation.submit'),
         variant: "destructive",
       });
       setIsProcessing(false);
     }
   };
+
+  if (locale !== "en") return <div className="space-y-6">
+    <section className="space-y-4 rounded-xl border bg-slate-50 p-5">
+      <h3 className="text-xl font-bold">{t('checkout.title')}</h3>
+      <div className="flex flex-wrap justify-between gap-3 font-semibold"><span>{t('common.serviceName')}</span><span dir="ltr">${checkoutSubtotal} CAD + GST</span></div>
+      <p className="text-sm leading-relaxed text-slate-600">{t('checkout.scope')}</p>
+      <p className="text-sm leading-relaxed text-slate-600">{t('common.noSuccessFee')}</p>
+      <p className="text-sm leading-relaxed text-slate-600">{t('rapid.speedDisclaimer')}</p>
+      <p className="text-sm leading-relaxed text-slate-600">{t('common.noOutcomePromise')}</p>
+      <div className="flex justify-between border-t pt-4 font-semibold"><span>{t('checkout.subtotal')}</span><span dir="ltr">${checkoutSubtotal} CAD</span></div>
+    </section>
+    {!isReleased && <aside className="space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
+      <p>{t('language.paymentBlocked')}</p><Link to="/submit-ticket" state={{ prefillTicketData: { ...formData, consentGiven: false, digitalSignature: '' }, startAtStep: 4, ticketImage: formData.ticketImage }} className="font-semibold underline">{t('language.continueEnglish')}</Link>
+    </aside>}
+    <div className="space-y-3">
+      <label htmlFor="localized-payment-terms" className="flex items-start gap-3 text-sm leading-relaxed">
+        <input id="localized-payment-terms" type="checkbox" checked={agreedToTerms} disabled={!isReleased || isProcessing} onChange={event => setAgreedToTerms(event.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-emerald-700" />
+        <span>{t('checkout.termsAcceptance')}</span>
+      </label>
+      <div className="flex flex-wrap gap-4 text-sm"><Link to={href('/terms-of-service')} target="_blank" rel="noopener noreferrer" className="text-primary underline">{t('nav.terms')}</Link><Link to="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-primary underline">{t('language.readEnglish')}</Link><Link to="/terms-of-purchase" target="_blank" rel="noopener noreferrer" className="text-primary underline" lang="en">Terms of Purchase (English)</Link><Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline" lang="en">Privacy Policy (English)</Link></div>
+    </div>
+    <Button className="h-auto min-h-12 w-full whitespace-normal py-3" disabled={!isReleased || !agreedToTerms || isProcessing} onClick={handleStripeCheckout}>
+      <CreditCard className="me-2 h-5 w-5 shrink-0" aria-hidden="true" />{t(isProcessing ? 'checkout.processing' : 'checkout.pay')}
+    </Button>
+    <p className="text-sm leading-relaxed text-slate-600">{t('common.notLawFirm')} {t('common.clientDecision')}</p>
+  </div>;
 
   return (
     <div className="space-y-8">

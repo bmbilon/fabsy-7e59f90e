@@ -2,6 +2,7 @@ import { ArrowRight, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { RAPID_RESOLUTION } from "@/config/offers";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
+import { useLocale } from "@/i18n/locale-context";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_HREF = "tel:+18257932279";
@@ -12,6 +13,9 @@ const PHONE_HREF = "tel:+18257932279";
  */
 const CallBar = () => {
   const location = useLocation();
+  const { locale } = useLocale();
+  // A translated page does not imply phone staffing in that language.
+  if (locale !== "en") return null;
   if (location.pathname === RAPID_RESOLUTION.intakePath || location.pathname === "/traffic-ticket-assessment/confirmation") {
     return null;
   }

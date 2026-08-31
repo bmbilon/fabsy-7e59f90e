@@ -25,6 +25,11 @@ const MANIFEST_PATH = path.resolve(
   process.env.SNAPSHOT_MANIFEST || path.join(path.dirname(SNAPSHOT_DIR), 'content-manifest.json')
 );
 const SITE = 'https://fabsy.ca';
+const SITEMAP_DIR = path.resolve(
+  process.env.SNAPSHOT_SITEMAP_DIR || path.join(process.env.SITEMAP_PUBLIC_DIR || path.join(ROOT, 'public'), 'sitemaps')
+);
+const LOCALE_REGISTRY = require(path.resolve(process.env.LOCALE_REGISTRY_PATH || path.join(ROOT, 'src/i18n/locales.json')));
+const LOCALE_ROOTS = new Set(LOCALE_REGISTRY.locales.filter((locale) => locale.code !== 'en' && locale.wave <= 1).map((locale) => `/${locale.code}`));
 const PRICING_TEXT = EXACT_FABSY_PRICING;
 const OFFER_DATA = require('../src/config/offers.json');
 const APPROVED_OFFER_PRICES = new Map([
@@ -42,6 +47,7 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const errors = [];
 const fail = (message) => errors.push(message);
+let localeCatalogForms = new Map();
 
 function redactVerifiedClientTestimonials(value) {
   return VERIFIED_CLIENT_TESTIMONIALS.reduce(
@@ -607,6 +613,48 @@ function htmlFilesUnder(root) {
   return files.sort();
 }
 
+async function admitExactLocaleCatalogs() {
+  const { loadLocaleSeoContext, verifyLocaleSnapshotCoverage, escapeHtml } = await import('./locale-seo.mjs');
+  const { snapshotTranslator } = await import('./generate-localized-snapshots.mjs');
+  const context = loadLocaleSeoContext();
+  // An edited, incomplete or stale artifact never gets catalog admission.
+  // This also checks noindex, exact locale routes, reciprocal equivalents and
+  // the current source/bundle fingerprints and approval/service gates.
+  verifyLocaleSnapshotCoverage(path.dirname(SNAPSHOT_DIR), context);
+  const keysUnder = (value, prefix = '') => Object.entries(value).flatMap(([key, child]) => {
+    const keyPath = prefix ? `${prefix}.${key}` : key;
+    return typeof child === 'string' ? [keyPath] : child && typeof child === 'object' ? keysUnder(child, keyPath) : [];
+  });
+  localeCatalogForms = new Map(context.locales.map(locale => {
+    const t = snapshotTranslator(context, locale.code);
+    const forms = new Set();
+    for (const key of keysUnder(context.bundles[locale.code])) {
+      let phrase;
+      try { phrase = t(key); } catch (_) { continue; } // Not a snapshot string (for example a personal email template).
+      // Admit complete catalog strings, never bare amounts/tokens. The short
+      // Chinese preview label is a complete phrase despite its character
+      // count. Exact source prose also prevents false English regex matches
+      // across adjacent translated paragraphs (for example the English proper
+      // name "Administrative Penalty" followed by a numbered heading).
+      if (phrase.length < 12 && !(phrase.length >= 4 && phrase.includes('—'))) continue;
+      for (const value of [phrase, phrase.replace(/\s+/g, ' ').trim()]) {
+        forms.add(value);
+        forms.add(escapeHtml(value));
+        forms.add(JSON.stringify(value).slice(1, -1));
+      }
+    }
+    return [locale.code, [...forms].sort((a, b) => b.length - a.length)];
+  }));
+}
+
+function redactExactLocaleStrings(value, code) {
+  if (!code) return value;
+  return (localeCatalogForms.get(code) || []).reduce(
+    (text, phrase) => text.split(phrase).join('[catalog source string]'),
+    String(value)
+  );
+}
+
 function validateAllPrerendered() {
   if (process.env.VALIDATE_ALL_PRERENDERED !== '1') return 0;
   const prerenderRoot = path.dirname(SNAPSHOT_DIR);
@@ -616,6 +664,7 @@ function validateAllPrerendered() {
     return 0;
   }
 
+  const snapshotPolicies = new Map();
   for (const file of files) {
     const relative = path.relative(prerenderRoot, file);
     const label = `prerendered ${relative}`;
@@ -623,10 +672,16 @@ function validateAllPrerendered() {
     const relativeParts = relative.split(path.sep);
     const contentSlug = relativeParts[0] === 'content' ? relativeParts[1] : undefined;
     const isBlogSnapshot = relativeParts[0] === 'blog';
+    const catalogCode = LOCALE_ROOTS.has(`/${relativeParts[0]}`) ? relativeParts[0]
+      : relative === `terms-of-service${path.sep}index.html` ? 'en' : null;
     // Shared marketing claims are checked in raw HTML so JSON-LD and other
     // machine-readable blocks cannot bypass the same publication rules.
     const pageSlug = contentSlug || (relativeParts[0] === 'index.html' ? 'index' : relativeParts[0]);
-    for (const issue of browserTextGuardrailIssues(html, pageSlug, { numeric: !isBlogSnapshot })) {
+    // Catalog admission is limited to complete strings from the current,
+    // fingerprint-verified locale source. All remaining text still receives
+    // the existing product-specific commercial and legal-claim checks.
+    const candidate = redactExactLocaleStrings(html, catalogCode);
+    for (const issue of browserTextGuardrailIssues(candidate, pageSlug, { numeric: !isBlogSnapshot })) {
       fail(`${label}: ${issue}`);
     }
     // Blog numeric claims are validated against rendered article fields by
@@ -664,6 +719,10 @@ function validateAllPrerendered() {
     }
     const robotsTags = [...html.matchAll(/<meta\b[^>]*name=["']robots["'][^>]*>/gi)];
     if (robotsTags.length !== 1) fail(`${label}: must contain exactly one robots directive`);
+    snapshotPolicies.set(file, {
+      robots: metaContent(html, 'robots').toLowerCase(),
+      canonical: decodeHtml(/href=["']([^"']+)["']/i.exec(canonicalTags[0]?.[0] || '')?.[1] || ''),
+    });
 
     const text = renderedPageText(html);
     if (/\$(?:149|339|488)\b|\b30%\b/.test(text)) {
@@ -671,7 +730,7 @@ function validateAllPrerendered() {
     }
   }
 
-  const sitemapDir = path.join(ROOT, 'public/sitemaps');
+  const sitemapDir = SITEMAP_DIR;
   const sitemapFiles = fs.existsSync(sitemapDir)
     ? fs.readdirSync(sitemapDir).filter((file) => file.endsWith('.xml')).sort()
     : [];
@@ -723,8 +782,19 @@ function validateAllPrerendered() {
       fail(`browser snapshot has an unexpected file layout: ${relative}`);
       continue;
     }
-    const publicUrl = `${SITE}${pathname}`;
-    if (!seenUrls.has(publicUrl)) {
+    // Locale home canonicals end in '/', matching the React routes and the
+    // localized sitemap. Deeper routes retain the site's no-trailing-slash
+    // convention.
+    const publicUrl = `${SITE}${pathname}${LOCALE_ROOTS.has(pathname) ? '/' : ''}`;
+    const policy = snapshotPolicies.get(file);
+    if (policy?.canonical && policy.canonical !== publicUrl) {
+      fail(`browser snapshot canonical does not match its route: ${publicUrl}`);
+    }
+    if (/\bnoindex\b/.test(policy?.robots || '')) {
+      // Translation previews and private intake/checkout snapshots are real
+      // documents, but must never be promoted through an indexable sitemap.
+      if (seenUrls.has(publicUrl)) fail(`noindex snapshot is represented in a sitemap: ${publicUrl}`);
+    } else if (!seenUrls.has(publicUrl)) {
       fail(`browser snapshot is not represented in a sitemap: ${publicUrl}`);
     }
   }
@@ -736,7 +806,8 @@ function validateAllPrerendered() {
   return files.length;
 }
 
-function run() {
+async function run() {
+  if (process.env.VALIDATE_ALL_PRERENDERED === '1') await admitExactLocaleCatalogs();
   const dbInventory = readSourceInventory(DB_DIR, 'page_content');
   const curatedInventory = readSourceInventory(CURATED_DIR, 'curated');
   if (dbInventory.slugs.length === 0) fail('page_content source contains zero usable rows');
@@ -756,7 +827,12 @@ function run() {
   );
 }
 
-if (require.main === module) run();
+if (require.main === module) {
+  run().catch((error) => {
+    console.error(`Snapshot guardrail validation failed: ${error.message}`);
+    process.exitCode = 1;
+  });
+}
 
 module.exports = {
   browserTextGuardrailIssues,

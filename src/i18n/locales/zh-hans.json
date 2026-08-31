@@ -1,0 +1,355 @@
+{
+  "nav": {
+    "home": "首页",
+    "rapid": "Rapid Resolution",
+    "howItWorks": "服务流程",
+    "faq": "常见问题",
+    "contact": "联系我们",
+    "terms": "服务条款",
+    "start": "从提交罚单开始",
+    "menu": "打开导航菜单"
+  },
+  "common": {
+    "brand": "Fabsy",
+    "serviceName": "Rapid Resolution",
+    "back": "返回",
+    "next": "继续",
+    "close": "关闭",
+    "loading": "正在加载…",
+    "yes": "是",
+    "no": "否",
+    "optional": "选填",
+    "required": "必填",
+    "english": "英语",
+    "priceLine": "{{price}} 加元，另加适用的 GST",
+    "notLawFirm": "Fabsy 提供交通罚单代理服务，并非律师事务所。我们不提供法律意见。",
+    "noOutcomePromise": "我们不承诺撤销或减轻指控、降低罚款、减少扣分或任何保险结果。",
+    "noSuccessFee": "固定服务费，不收取按比例计算的成功酬金。",
+    "clientDecision": "是否接受任何拟议的处理方案，由您作出指示。我们不会自动接受任何方案。",
+    "notFound": "此页面暂不提供该语言版本。",
+    "returnHome": "返回首页"
+  },
+  "language": {
+    "selector": "选择语言",
+    "offer": "您希望以{{language}}阅读此页面吗？",
+    "switch": "以{{language}}阅读",
+    "dismiss": "保留当前语言",
+    "draftTitle": "翻译预览 — 待审核",
+    "draftBody": "本译文为草稿，尚未经母语审校人员批准。购买服务或给予授权前，请阅读英文条款，或联系 Fabsy 澄清疑问。",
+    "englishControls": "如译文与英文有差异，以英文条款为准。本草稿不修改英文协议，也不限制适用法律规定的权利。",
+    "readEnglish": "阅读英文版本",
+    "paymentBlocked": "在翻译审核及语言支持得到确认之前，暂不开放此语言的购买与授权流程。您可以继续使用英文。",
+    "continueEnglish": "继续使用英文"
+  },
+  "home": {
+    "metaTitle": "阿尔伯塔交通罚单协助 | Fabsy",
+    "metaDescription": "以您熟悉的语言了解 Fabsy 在阿尔伯塔提供的审前罚单服务、固定费用、证据披露审查，以及由客户指示作出的决定。",
+    "eyebrow": "阿尔伯塔交通罚单协助",
+    "title": "了解您的罚单，选择下一步。",
+    "description": "Rapid Resolution 为符合条件的阿尔伯塔审前案件提供统一流程，涵盖罚单资料收集、证据披露、审查与进度通知。",
+    "primaryCta": "从提交罚单开始",
+    "secondaryCta": "了解服务流程",
+    "educationTitle": "收到罚单？您可能有其他选择。",
+    "educationBody": "阿尔伯塔的交通罚单可以提出异议。代理人能否协助，取决于指控、程序、截止日期及法院要求。如有要求，您仍可能需要亲自出庭。",
+    "scope": "仅适用于符合条件的审前案件。庭审代理、政府罚款及超出已接受服务范围的工作另计。"
+  },
+  "rapid": {
+    "metaTitle": "Rapid Resolution | 阿尔伯塔罚单协助 | Fabsy",
+    "metaDescription": "为符合条件的阿尔伯塔审前交通罚单提供安全资料提交、证据披露申请、合资格人员审查及向检察官提交审查申请的服务。",
+    "eyebrow": "阿尔伯塔交通罚单审前处理",
+    "title": "推动您的罚单处理进程。",
+    "description": "一个安全的在线流程，涵盖资料收集、授权、证据披露、审查，以及您对检方答复作出的决定。",
+    "priceLabel": "固定审前服务费",
+    "includedTitle": "服务包含",
+    "excludedTitle": "另计或不包含的项目",
+    "included": {
+      "intake": "安全的线上罚单资料收集",
+      "eligibility": "服务资格及截止日期审查",
+      "authorization": "电子同意与授权",
+      "disclosure": "申请证据披露并跟踪文件",
+      "analysis": "技术辅助的证据披露分析，并由合资格人员审查",
+      "submission": "根据案件具体事实向检察官提交审查申请",
+      "updates": "档案变更通知",
+      "explanation": "以清晰易懂的语言比较原罚单与检方的任何答复",
+      "decision": "按照客户指示接受可用的审前处理方案"
+    },
+    "excluded": {
+      "trial": "庭审代理",
+      "appeals": "上诉、案件重开及特别申请",
+      "sanctions": "即时路边制裁（Immediate Roadside Sanctions）及行政处罚通知（Notices of Administrative Penalty）",
+      "fines": "政府罚款、法院收费及第三方费用",
+      "scope": "超出 Fabsy 获准或接受的代理范围的案件"
+    },
+    "speedTitle": "收到完整披露材料后，48 小时内采取下一项获授权行动。",
+    "speedBody": "完整、可读的披露材料收到并与您的档案匹配后，Fabsy 将在 48 小时内完成审查，并准备或提交下一项获授权的检察官审查步骤。",
+    "speedDisclaimer": "只有在完整、可读的披露材料收到并与您的档案匹配后才开始计时。不包括检方答复所需时间或最终结果的日期。"
+  },
+  "process": {
+    "metaTitle": "Rapid Resolution 服务流程 | Fabsy",
+    "title": "从提交罚单到作出决定",
+    "description": "您的罚单、授权、证据与进度通知均关联至同一档案。",
+    "steps": {
+      "intake": {
+        "title": "提交您的罚单",
+        "body": "上传清晰可读的罚单并填写资料。Fabsy 审查服务资格和截止日期；资料、授权及付款完成且案件被接受后，服务才会开始。"
+      },
+      "disclosure": {
+        "title": "申请证据披露",
+        "body": "在获得授权且相关服务可用时，Fabsy 向检方申请证据材料并跟踪文件。此申请不会延长任何截止日期。"
+      },
+      "review": {
+        "title": "审查证据",
+        "body": "通过技术辅助分析及合资格人员审查，评估证据、程序和可用的审前处理选项。"
+      },
+      "action": {
+        "title": "准备下一步",
+        "body": "完整、可读的披露材料收到并与档案匹配后，Fabsy 将在 48 小时内审查材料，并准备或提交下一项获授权的检察官审查步骤。"
+      },
+      "decision": {
+        "title": "由您作出指示",
+        "body": "Fabsy 会解释检方的任何答复。是否接受可用的处理方案，只能由您指示；庭审工作需要另行签订协议。"
+      }
+    }
+  },
+  "faq": {
+    "metaTitle": "阿尔伯塔罚单服务常见问题 | Fabsy",
+    "title": "开始前的常见问题",
+    "items": {
+      "fee": {
+        "question": "{{price}} 的费用包括哪些服务？",
+        "answer": "包括符合条件的审前案件资料收集、截止日期审查、授权、证据披露申请与跟踪、合资格人员审查、根据案件事实提交检察官审查申请、进度通知及检方答复说明。适用的 GST 另计；罚款和庭审工作另计。"
+      },
+      "speed": {
+        "question": "我的罚单会在 48 小时内处理完毕吗？",
+        "answer": "我们不承诺最终结果的时间。48 小时服务承诺仅在完整、可读的披露材料收到并与您的档案匹配后开始。该承诺涵盖 Fabsy 的审查和下一项获授权行动，不涵盖检察官的答复时间。"
+      },
+      "deadline": {
+        "question": "申请证据披露会延长我的截止日期吗？",
+        "answer": "不会。请持续查看罚单、法院通知及门户网站上的日期。申请披露本身不会延长答复日期、庭审日期或其他截止日期。"
+      },
+      "trial": {
+        "question": "服务包括庭审吗？",
+        "answer": "不包括。庭审代理需要另行进行资格审查、签订协议并报价。上诉、案件重开、政府收费及范围外的工作亦另计。"
+      },
+      "approval": {
+        "question": "Fabsy 可以代我接受方案吗？",
+        "answer": "只有在您针对该案件作出具体指示后才可以。Fabsy 不会自动接受检方方案、作出认罪答辩或敲定拟议的处理方案。"
+      },
+      "outcome": {
+        "question": "是否保证撤销或减轻指控？",
+        "answer": "不保证。结果取决于指控、证据、程序、检察官及法院。我们不承诺撤销或减轻指控、降低罚款、减少扣分或任何保险结果。"
+      },
+      "language": {
+        "question": "我可以用自己的语言填写吗？",
+        "answer": "您可以用偏好的语言描述事件。在依赖语言协助前，请先向 Fabsy 确认是否提供该项支持。网站有译文，不代表电话服务中有会说该语言的人员。"
+      }
+    }
+  },
+  "contact": {
+    "metaTitle": "联系 Fabsy | 阿尔伯塔罚单协助",
+    "title": "先通过文字提出问题",
+    "description": "您可以用偏好的语言发送电子邮件提问。请写明截止日期，并询问可提供哪些语言支持。",
+    "messageLabel": "您的留言",
+    "messageHint": "请用您偏好的语言填写。不要发送银行卡资料或不必要的身份证明文件。",
+    "submit": "发送留言",
+    "availability": "语言支持及回复时间须另行确认。目前不承诺提供此语言的 WhatsApp 或电话服务。",
+    "emailCta": "发送邮件至 {{email}}",
+    "whatsappCta": "通过 WhatsApp 用您的语言给我们发文字消息",
+    "staffAvailability": "致电前，请先询问可提供哪些语言支持。",
+    "whatsappHint": "请用您偏好的语言发送文字消息。不要发送支付卡资料。"
+  },
+  "intake": {
+    "title": "开始 Rapid Resolution",
+    "description": "请严格按照罚单上的内容填写资料。您可以用偏好的语言描述事件。",
+    "steps": {
+      "ticket": "罚单资料",
+      "personal": "个人资料",
+      "account": "事件陈述",
+      "consent": "授权",
+      "review": "核对",
+      "payment": "付款"
+    },
+    "fields": {
+      "firstName": "名字",
+      "lastName": "姓氏",
+      "email": "电子邮箱",
+      "phone": "电话号码",
+      "smsOptIn": "我同意通过短信接收档案进度通知。",
+      "address": "街道地址",
+      "city": "城市",
+      "province": "省份",
+      "postalCode": "邮政编码",
+      "dateOfBirth": "出生日期",
+      "driversLicense": "驾驶证号码",
+      "driversLicenseImage": "驾驶证照片",
+      "addressDifferent": "我的现住址与驾驶证上的地址不同。",
+      "ticketNumber": "罚单号码",
+      "issueDate": "开具日期",
+      "location": "地点",
+      "officer": "执法人员或执法机构",
+      "officerBadge": "警员编号",
+      "offenceSection": "条文",
+      "offenceSubSection": "款项",
+      "offenceDescription": "违规事项说明",
+      "fineAmount": "罚款金额",
+      "courtDate": "出庭日期（如已安排）",
+      "courtJurisdiction": "法院地点",
+      "ticketImage": "上传罚单",
+      "vehicleSeized": "您的车辆是否被扣押？",
+      "pleaType": "您对罚单的立场",
+      "explanation": "您对事件经过的陈述",
+      "circumstances": "其他相关情况",
+      "witnesses": "是否有证人？",
+      "witnessDetails": "证人资料",
+      "evidence": "您是否有其他证据？",
+      "evidenceDetails": "证据说明",
+      "priorTickets": "以往罚单",
+      "insuranceCompany": "保险公司",
+      "vehicleDetails": "车辆资料",
+      "additionalNotes": "补充说明",
+      "preferredLanguage": "偏好的书面沟通语言",
+      "digitalSignature": "电子签名：请输入您的完整法定姓名"
+    },
+    "validation": {
+      "required": "请填写此必填项。",
+      "email": "请输入有效的电子邮箱。",
+      "phone": "请输入有效的电话号码。",
+      "date": "请输入有效日期。",
+      "amount": "请输入有效的罚款金额。",
+      "ticketImage": "请上传清晰可读的罚单照片。",
+      "signature": "请输入完整法定姓名以签名。",
+      "consent": "继续前，请阅读并接受授权条款。",
+      "terms": "付款前，请接受服务条款及隐私政策。",
+      "submit": "无法提交您的资料，请重试。",
+      "scanReview": "请核对提取的资料并纠正错误。",
+      "scanFailed": "无法读取此文件，请手动填写资料。",
+      "fileFormat": "请选择不超过 10 MB 的 PDF、JPG、PNG、WebP、HEIC 或 HEIF 文件。",
+      "consentCharacter": "由于一个或多个字符，我们无法生成清晰可读的同意书。付款前请联系 Fabsy，并保留您原来的姓名和资料，不要修改。",
+      "length": "此输入内容超出表单长度限制。如需保留完整文本，请联系 Fabsy。"
+    },
+    "consent": {
+      "title": "Rapid Resolution 电子授权",
+      "scope": "在获准的范围内，我授权 Fabsy 及其代理人申请、接收和审查披露材料；使用 Traffic Tickets Digital Service；与法院、检察官及有关政府部门沟通；根据我的指示和记录，准备并提交基于案件事实的检察官审查申请；以及解释检方答复、指控、罚款和扣分后果。",
+      "approval": "只有在收到我针对该案件的明确指示后，Fabsy 才可采取最终处理步骤。本授权不允许自动接受检方方案或作出认罪答辩。",
+      "exclusions": "不包括争议庭审、上诉、案件重开、Immediate Roadside Sanctions 及 Notices of Administrative Penalty。庭审工作须另行签订协议并付费，也可能需要填写阿尔伯塔政府规定的同意书。",
+      "fee": "我自愿聘请 Fabsy 提供有限的审前服务，费用为 {{price}} 加元，另加适用的 GST。政府罚款及不包含的工作另计。我了解服务范围、48 小时承诺的条件，以及没有任何结果保证。",
+      "data": "我同意为提供服务而收集和处理个人资料、由技术辅助并经合资格人员审查的文件提取和分析、安全保存记录、通过电子邮件、电话和短信与我沟通案件，以及向法院和有关机构提供必要资料。我将提供准确、完整的信息。我可以联系 privacy@fabsy.ca 请求查阅资料或撤回资料处理同意。",
+      "withdrawal": "我可以通过书面通知撤回此授权。否则，此授权持续有效，直至案件处理完毕或撤回。撤回授权不会自动取消已完成工作所产生的费用。",
+      "confirm": "我就是上述姓名所指的人，并有权订立此协议。我已阅读并理解本授权，并同意所述的有限服务。我的电子签名与手写签名具有相同法律效力。"
+    },
+    "review": {
+      "title": "核对您的资料",
+      "description": "继续安全付款前，请检查罚单、联系方式及授权内容。",
+      "edit": "修改资料",
+      "languageNote": "原始事件陈述必须与任何英文译文一并保留，以供审查。翻译时不要更改姓名、日期或罚单号码。"
+    },
+    "scanTicket": "读取罚单资料"
+  },
+  "checkout": {
+    "title": "Rapid Resolution 付款",
+    "service": "服务",
+    "subtotal": "小计",
+    "gst": "适用的 GST",
+    "total": "合计",
+    "pay": "继续安全付款",
+    "processing": "正在打开安全付款页面…",
+    "paymentFailed": "安全付款暂不可用，请重试。",
+    "scope": "符合条件的审前案件费用为 {{price}} 加元，另加适用的 GST。Stripe 会在付款前显示完整小计和税费。罚款、庭审代理及不包含的服务另计。",
+    "termsAcceptance": "我已阅读并同意英文购买条款、服务条款及隐私政策。以英文条款为准。付款不构成自动接受任何方案的授权。"
+  },
+  "terms": {
+    "metaTitle": "服务条款 | Fabsy",
+    "title": "服务条款",
+    "intro": "授权或购买服务前，请将本条款与英文服务条款一并阅读。本地化版本遵循现行英文服务条款，不构成另一份服务协议。",
+    "englishControls": "如译文有差异，以英文服务条款为准。法定权利不受限制。如您不理解任何条款，请在同意前要求澄清。",
+    "sections": {
+      "service": {
+        "title": "1. 服务说明",
+        "body": "Fabsy Traffic Ticket Services 是阿尔伯塔交通罚单代理服务机构，并非律师事务所。付费服务包括为符合条件的审前案件提供 Rapid Resolution，以及 Insurance Impact & Renewal Planning Report。服务可能包括安全资料收集、资格和截止日期审查、电子授权、证据披露申请与跟踪、技术辅助分析并由合资格人员审查、获授权的基于事实的检察官审查申请、档案通知、检方答复说明及按客户指示作出的决定。可选报告使用客户记录及获准的公开来源。Rapid Resolution 不包括争议庭审、上诉、案件重开、即时路边制裁（Immediate Roadside Sanctions）、行政处罚通知（Notices of Administrative Penalty）、政府罚款及超出获准范围的工作。"
+      },
+      "practice": {
+        "title": "2. 代理服务限制",
+        "body": "Fabsy 代表不提供法律意见或从事律师执业，不自称律师或将 Fabsy 称为律师事务所，不接受超出获准代理范围的案件，也不承诺特定结果。"
+      },
+      "eligibility": {
+        "title": "3. 服务可用性",
+        "body": "是否提供服务取决于指控、程序、截止日期、法院地点、门户要求，以及付费代理服务是否获准并被 Fabsy 接受。范围外的案件可能被拒绝或转介至其他机构。"
+      },
+      "pricing": {
+        "title": "4. 价格",
+        "body": "符合条件的阿尔伯塔审前案件，Rapid Resolution 费用为 {{price}} 加元，另加适用的 GST。单独的 Insurance Impact & Renewal Planning Report 费用为 {{reportPrice}} 加元，另加适用的 GST。两项合购为 {{bundlePrice}} 加元，另加适用的 GST。庭审代理、政府罚款及范围外的案件另计。"
+      },
+      "payment": {
+        "title": "5. 费用与付款",
+        "body": "所有费用均以加元计价。法院费用、罚款及其他不由 Fabsy 控制的收费仍由您承担。通过 Stripe 付款前，会显示完整小计及税费。"
+      },
+      "rapid": {
+        "title": "5A. Rapid Resolution",
+        "body": "只有在资料、授权和付款完成且 Fabsy 接受案件后，服务才开始。在获得授权且实际可行时，Fabsy 会申请并审查披露材料。披露申请不会延长答复日期、庭审日期或其他截止日期。您必须自行关注所有截止日期，并在有要求时亲自出庭。48 小时承诺只在完整、可读的披露材料收到并与档案匹配后开始；它涵盖 Fabsy 的审查及准备或提交下一项获授权行动，不涵盖检方答复时间或最终结果时间。未经您针对该案件的具体指示，Fabsy 不会接受检方方案、作出认罪答辩或敲定处理结果。庭审工作需要另行进行资格审查、签订协议并报价。"
+      },
+      "report": {
+        "title": "5B. 保险规划报告",
+        "body": "这是一次性的消费者研究与规划产品。驾驶记录摘要、经纪服务、保险公司报价及其他第三方记录的费用另计。您须提供准确的罚单、驾驶记录、保单、续保和评级资料。情景分析及范围估计依据获准的公开信息和您提供的记录，不属于保险公司报价。资料来源和问题仅供规划参考，不构成购买、取消、续保或更改保障的建议。Fabsy 并非保险代理人或经纪，不销售保险、报价或安排承保，不联系保险公司、提交申请或协商续保。我们不承诺投保资格、节省费用或保费结果。针对具体保险公司的意见及报价必须由持牌保险经纪或保险公司提供。"
+      },
+      "responsibilities": {
+        "title": "6. 您的责任",
+        "body": "您须提供准确、完整的罚单资料，及时回应资料要求，审阅检方的每次答复，并在方案失效前给予明确指示；有要求时出庭，支付适用费用和法院费用。Fabsy 提供代理服务，不提供法律意见。"
+      },
+      "outcomes": {
+        "title": "7. 不承诺结果",
+        "body": "结果取决于指控、证据、程序、检察官及法院。我们不承诺撤销或减轻指控、降低罚款、减少扣分、节省保费、投保资格或任何其他结果。48 小时服务承诺不是结果保证。"
+      },
+      "privacy": {
+        "title": "8. 保密",
+        "body": "Fabsy 通过内部隐私措施及适用的隐私义务保护客户资料。法院程序所需或法律要求时，资料可能被披露。"
+      },
+      "liability": {
+        "title": "9. 责任限制",
+        "body": "Fabsy 的责任以已支付的服务费用为限。对于代理服务引起的间接、后果性或惩罚性损害赔偿，Fabsy 不承担责任。"
+      },
+      "cancellation": {
+        "title": "10. 取消、退款与终止",
+        "body": "任何一方可因双方同意、未付款、未提供资料或合作，或代理工作变得不可能或不可行而终止协议。如需取消，请及时联系 Fabsy。退款资格取决于已完成的工作、第三方收费、结账时披露的信息及适用法律。如果 Fabsy 在实质性工作开始前拒绝接受一个其余手续完整且已付款的案件，将退还适用的服务费。法定取消权不受限制。"
+      },
+      "website": {
+        "title": "11. 网站使用",
+        "body": "使用本网站即表示接受条款。不得用于非法目的、尝试未经授权的访问、干扰网站功能或传输有害或恶意代码。"
+      },
+      "law": {
+        "title": "12. 适用法律",
+        "body": "本条款受加拿大阿尔伯塔省法律管辖。任何争议受阿尔伯塔法院管辖。"
+      },
+      "changes": {
+        "title": "13. 条款变更",
+        "body": "Fabsy 可修改条款。变更会刊载于英文条款页面，并更新修订日期。变更后继续使用服务，即表示接受修改后的条款。"
+      },
+      "contact": {
+        "title": "14. 联系方式",
+        "body": "如有疑问，请通过 {{email}} 或 (825) 793-2279 联系 Fabsy Traffic Ticket Services。服务地区：阿尔伯塔。"
+      }
+    }
+  },
+  "notifications": {
+    "received": {
+      "subject": "Fabsy：已收到罚单资料",
+      "body": "{{name}}，您好。我们已收到档案 {{reference}} 的资料。收到资料不代表案件已被接受，也不代表任何截止日期已延长。查看档案：{{url}}"
+    },
+    "disclosure": {
+      "subject": "Fabsy：已收到披露材料",
+      "body": "{{name}}，您好。档案 {{reference}} 的披露材料已收到。只有在确认材料完整、可读且与您的档案匹配后，48 小时审查及行动承诺才开始。查看更新：{{url}}"
+    },
+    "update": {
+      "subject": "Fabsy：您的档案有更新",
+      "body": "{{name}}，您好。档案 {{reference}} 有新进展。请在安全档案中阅读详情及任何截止日期：{{url}}"
+    },
+    "decision": {
+      "subject": "Fabsy：需要您的指示",
+      "body": "{{name}}，您好。档案 {{reference}} 已有答复。请审阅方案及有效期限，然后就该案件作出具体指示。Fabsy 不会自动接受任何方案。查看详情：{{url}}"
+    },
+    "payment": {
+      "subject": "Fabsy：已收到付款",
+      "body": "{{name}}，您好。档案 {{reference}} 的 {{total}} 加元付款已收到。付款不保证任何结果，也不会延长截止日期。查看收据及后续步骤：{{url}}"
+    },
+    "disclaimer": "Fabsy 提供交通罚单代理服务，并非律师事务所。以英文服务条款为准。请勿通过电子邮件或短信发送支付卡资料。"
+  }
+}

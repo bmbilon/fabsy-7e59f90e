@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { LocaleRequestError, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
 
 class RequestError extends Error {
   constructor(message: string, public status = 400) {
@@ -57,7 +58,10 @@ function siteOrigin() {
   return parsed.origin;
 }
 
-type SupabaseAdmin = ReturnType<typeof createClient>;
+// Match the dynamic service-role clients used by the other payment functions.
+// deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseAdmin = ReturnType<typeof createClient<any>>;
 
 function claimRequestError(error: unknown): RequestError | null {
   const message = String((error as { message?: string } | null)?.message || "");
@@ -138,7 +142,7 @@ serve(async (req) => {
 
     const { data: submission, error: submissionError } = await admin
       .from("ticket_submissions")
-      .select("id,client_id,status,service_type,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_access_token_hash,assessment_paid_at,assessment_price_cad,clients(first_name,last_name,email)")
+      .select("id,client_id,status,service_type,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_access_token_hash,assessment_paid_at,assessment_price_cad,preferred_locale,clients(first_name,last_name,email)")
       .eq("id", submissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
@@ -150,6 +154,8 @@ serve(async (req) => {
     if (await sha256(accessToken) !== submission.assessment_access_token_hash) {
       throw new RequestError("Assessment checkout could not be verified.", 403);
     }
+    const preferredLocale = parsePreferredLocale(submission.preferred_locale);
+    requireReleasedServiceLocale(preferredLocale, Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"));
     const storagePath = String(submission.assessment_ticket_path || "");
     if (!storagePath.startsWith(`${submissionId}/`) || storagePath.includes("..")) {
       throw new RequestError("Assessment ticket upload is missing.");
@@ -293,6 +299,7 @@ serve(async (req) => {
         },
       }],
       metadata: {
+        preferred_locale: preferredLocale,
         fabsy_checkout_kind: "ticket_assessment",
         checkout_intent_id: intentId,
         assessment_submission_id: submissionId,
@@ -305,6 +312,7 @@ serve(async (req) => {
         representation_upgrade_base_balance_cents: "33900",
         checkout_attempt: String(attempt),
       },
+      payment_intent_data: { metadata: { preferred_locale: preferredLocale, assessment_submission_id: submissionId } },
       success_url: `${siteOrigin()}/traffic-ticket-assessment/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteOrigin()}/traffic-ticket-assessment/start?checkout=cancelled`,
     }, { idempotencyKey: `ticket-assessment:${submissionId}:${attempt}` });
@@ -393,12 +401,13 @@ serve(async (req) => {
       }
     }
 
-    const status = responseError instanceof RequestError ? responseError.status : 500;
+    const status = responseError instanceof RequestError || responseError instanceof LocaleRequestError ? responseError.status : 500;
     if (status >= 500) {
       console.error("create-assessment-payment failed");
     }
     return json(origin, {
       error: status >= 500 ? "Secure checkout is temporarily unavailable." : (responseError as Error).message,
+      ...(responseError instanceof LocaleRequestError ? { error_code: responseError.code } : {}),
     }, status);
   }
 });

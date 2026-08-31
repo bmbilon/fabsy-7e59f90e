@@ -1,0 +1,355 @@
+{
+  "nav": {
+    "home": "首頁",
+    "rapid": "Rapid Resolution",
+    "howItWorks": "服務流程",
+    "faq": "常見問題",
+    "contact": "聯繫我們",
+    "terms": "服務條款",
+    "start": "從提交告票開始",
+    "menu": "開啟導覽選單"
+  },
+  "common": {
+    "brand": "Fabsy",
+    "serviceName": "Rapid Resolution",
+    "back": "返回",
+    "next": "繼續",
+    "close": "關閉",
+    "loading": "正在載入…",
+    "yes": "是",
+    "no": "否",
+    "optional": "選填",
+    "required": "必填",
+    "english": "英語",
+    "priceLine": "{{price}} 加元，另加適用的 GST",
+    "notLawFirm": "Fabsy 提供交通告票代理服務，並非律師事務所。我們不提供法律意見。",
+    "noOutcomePromise": "我們不承諾撤銷或減輕指控、降低罰款、減少扣分或任何保險結果。",
+    "noSuccessFee": "固定服務費，不收取按比例計算的成功酬金。",
+    "clientDecision": "是否接受任何擬議的處理方案，由您作出指示。我們不會自動接受任何方案。",
+    "notFound": "此頁面暫不提供該語言版本。",
+    "returnHome": "返回首頁"
+  },
+  "language": {
+    "selector": "選擇語言",
+    "offer": "您希望以{{language}}閱讀此頁面嗎？",
+    "switch": "以{{language}}閱讀",
+    "dismiss": "保留當前語言",
+    "draftTitle": "翻譯預覽 — 待審核",
+    "draftBody": "本譯文為草稿，尚未經母語審校人員批准。購買服務或給予授權前，請閱讀英文條款，或聯繫 Fabsy 澄清疑問。",
+    "englishControls": "如譯文與英文有差異，以英文條款為準。本草稿不修改英文協議，也不限制適用法律規定的權利。",
+    "readEnglish": "閱讀英文版本",
+    "paymentBlocked": "在翻譯審核及語言支持得到確認之前，暫不開放此語言的購買與授權流程。您可以繼續使用英文。",
+    "continueEnglish": "繼續使用英文"
+  },
+  "home": {
+    "metaTitle": "阿爾伯塔交通告票協助 | Fabsy",
+    "metaDescription": "以您熟悉的語言瞭解 Fabsy 在阿爾伯塔提供的審前告票服務、固定費用、證據披露審查，以及由客戶指示作出的決定。",
+    "eyebrow": "阿爾伯塔交通告票協助",
+    "title": "瞭解您的告票，選擇下一步。",
+    "description": "Rapid Resolution 為符合條件的阿爾伯塔審前案件提供統一流程，涵蓋告票資料收集、證據披露、審查與進度通知。",
+    "primaryCta": "從提交告票開始",
+    "secondaryCta": "瞭解服務流程",
+    "educationTitle": "收到告票？您可能有其他選擇。",
+    "educationBody": "阿爾伯塔的交通告票可以提出異議。代理人能否協助，取決於指控、程序、截止日期及法院要求。如有要求，您仍可能需要親自出庭。",
+    "scope": "僅適用於符合條件的審前案件。庭審代理、政府罰款及超出已接受服務範圍的工作另計。"
+  },
+  "rapid": {
+    "metaTitle": "Rapid Resolution | 阿爾伯塔告票協助 | Fabsy",
+    "metaDescription": "為符合條件的阿爾伯塔審前交通告票提供安全資料提交、證據披露申請、合資格人員審查及向檢察官提交審查申請的服務。",
+    "eyebrow": "阿爾伯塔交通告票審前處理",
+    "title": "推動您的告票處理進程。",
+    "description": "一個安全的線上流程，涵蓋資料收集、授權、證據披露、審查，以及您對檢方答覆作出的決定。",
+    "priceLabel": "固定審前服務費",
+    "includedTitle": "服務包含",
+    "excludedTitle": "另計或不包含的項目",
+    "included": {
+      "intake": "安全的線上告票資料收集",
+      "eligibility": "服務資格及截止日期審查",
+      "authorization": "電子同意與授權",
+      "disclosure": "申請證據披露並跟蹤文件",
+      "analysis": "技術輔助的證據披露分析，並由合資格人員審查",
+      "submission": "根據案件具體事實向檢察官提交審查申請",
+      "updates": "檔案變更通知",
+      "explanation": "以清晰易懂的語言比較原本的告票與檢方的任何答覆",
+      "decision": "按照客戶指示接受可用的審前處理方案"
+    },
+    "excluded": {
+      "trial": "庭審代理",
+      "appeals": "上訴、案件重開及特別申請",
+      "sanctions": "即時路邊制裁（Immediate Roadside Sanctions）及行政處罰通知（Notices of Administrative Penalty）",
+      "fines": "政府罰款、法院收費及第三方費用",
+      "scope": "超出 Fabsy 獲准或接受的代理範圍的案件"
+    },
+    "speedTitle": "收到完整披露材料後，48 小時內採取下一項獲授權行動。",
+    "speedBody": "完整、可讀的披露材料收到並與您的檔案匹配後，Fabsy 將在 48 小時內完成審查，並準備或提交下一項獲授權的檢察官審查步驟。",
+    "speedDisclaimer": "只有在完整、可讀的披露材料收到並與您的檔案匹配後才開始計時。不包括檢方答覆所需時間或最終結果的日期。"
+  },
+  "process": {
+    "metaTitle": "Rapid Resolution 服務流程 | Fabsy",
+    "title": "從提交告票到作出決定",
+    "description": "您的告票、授權、證據與進度通知均關聯至同一檔案。",
+    "steps": {
+      "intake": {
+        "title": "提交您的告票",
+        "body": "上傳清晰可讀的告票並填寫資料。Fabsy 審查服務資格和截止日期；資料、授權及付款完成且案件被接受後，服務才會開始。"
+      },
+      "disclosure": {
+        "title": "申請證據披露",
+        "body": "在獲得授權且相關服務可用時，Fabsy 向檢方申請證據材料並跟蹤文件。此申請不會延長任何截止日期。"
+      },
+      "review": {
+        "title": "審查證據",
+        "body": "通過技術輔助分析及合資格人員審查，評估證據、程序和可用的審前處理選項。"
+      },
+      "action": {
+        "title": "準備下一步",
+        "body": "完整、可讀的披露材料收到並與檔案匹配後，Fabsy 將在 48 小時內審查材料，並準備或提交下一項獲授權的檢察官審查步驟。"
+      },
+      "decision": {
+        "title": "由您作出指示",
+        "body": "Fabsy 會解釋檢方的任何答覆。是否接受可用的處理方案，只能由您指示；庭審工作需要另行簽訂協議。"
+      }
+    }
+  },
+  "faq": {
+    "metaTitle": "阿爾伯塔告票服務常見問題 | Fabsy",
+    "title": "開始前的常見問題",
+    "items": {
+      "fee": {
+        "question": "{{price}} 的費用包括哪些服務？",
+        "answer": "包括符合條件的審前案件資料收集、截止日期審查、授權、證據披露申請與跟蹤、合資格人員審查、根據案件事實提交檢察官審查申請、進度通知及檢方答覆說明。適用的 GST 另計；罰款和庭審工作另計。"
+      },
+      "speed": {
+        "question": "我的告票會在 48 小時內處理完畢嗎？",
+        "answer": "我們不承諾最終結果的時間。48 小時服務承諾僅在完整、可讀的披露材料收到並與您的檔案匹配後開始。該承諾涵蓋 Fabsy 的審查和下一項獲授權行動，不涵蓋檢察官的答覆時間。"
+      },
+      "deadline": {
+        "question": "申請證據披露會延長我的截止日期嗎？",
+        "answer": "不會。請持續查看告票、法院通知及服務平台上的日期。申請披露本身不會延長答覆日期、庭審日期或其他截止日期。"
+      },
+      "trial": {
+        "question": "服務包括庭審嗎？",
+        "answer": "不包括。庭審代理需要另行進行資格審查、簽訂協議並報價。上訴、案件重開、政府收費及範圍外的工作亦另計。"
+      },
+      "approval": {
+        "question": "Fabsy 可以代我接受方案嗎？",
+        "answer": "只有在您針對該案件作出具體指示後才可以。Fabsy 不會自動接受檢方方案、作出認罪答辯或敲定擬議的處理方案。"
+      },
+      "outcome": {
+        "question": "是否保證撤銷或減輕指控？",
+        "answer": "不保證。結果取決於指控、證據、程序、檢察官及法院。我們不承諾撤銷或減輕指控、降低罰款、減少扣分或任何保險結果。"
+      },
+      "language": {
+        "question": "我可以用自己的語言填寫嗎？",
+        "answer": "您可以用偏好的語言描述事件。在依賴語言協助前，請先向 Fabsy 確認是否提供該項支持。網站有譯文，不代表電話服務中有會說該語言的人員。"
+      }
+    }
+  },
+  "contact": {
+    "metaTitle": "聯繫 Fabsy | 阿爾伯塔告票協助",
+    "title": "先通過文字提出問題",
+    "description": "您可以用偏好的語言發送電子郵件提問。請寫明截止日期，並詢問可提供哪些語言支持。",
+    "messageLabel": "您的留言",
+    "messageHint": "請用您偏好的語言填寫。不要發送銀行卡資料或不必要的身份證明文件。",
+    "submit": "發送留言",
+    "availability": "語言支持及回覆時間須另行確認。目前不承諾提供此語言的 WhatsApp 或電話服務。",
+    "emailCta": "發送郵件至 {{email}}",
+    "whatsappCta": "通過 WhatsApp 用您的語言給我們發文字消息",
+    "staffAvailability": "致電前，請先詢問可提供哪些語言支持。",
+    "whatsappHint": "請用您偏好的語言發送文字消息。不要發送支付卡資料。"
+  },
+  "intake": {
+    "title": "開始 Rapid Resolution",
+    "description": "請嚴格按照告票上的內容填寫資料。您可以用偏好的語言描述事件。",
+    "steps": {
+      "ticket": "告票資料",
+      "personal": "個人資料",
+      "account": "事件陳述",
+      "consent": "授權",
+      "review": "核對",
+      "payment": "付款"
+    },
+    "fields": {
+      "firstName": "名字",
+      "lastName": "姓氏",
+      "email": "電子郵箱",
+      "phone": "電話號碼",
+      "smsOptIn": "我同意通過短訊接收檔案進度通知。",
+      "address": "街道地址",
+      "city": "城市",
+      "province": "省份",
+      "postalCode": "郵政編碼",
+      "dateOfBirth": "出生日期",
+      "driversLicense": "駕駛執照號碼",
+      "driversLicenseImage": "駕駛執照照片",
+      "addressDifferent": "我的現住址與駕駛執照上的地址不同。",
+      "ticketNumber": "告票號碼",
+      "issueDate": "開具日期",
+      "location": "地點",
+      "officer": "執法人員或執法機構",
+      "officerBadge": "警員編號",
+      "offenceSection": "條文",
+      "offenceSubSection": "款項",
+      "offenceDescription": "違規事項說明",
+      "fineAmount": "罰款金額",
+      "courtDate": "出庭日期（如已安排）",
+      "courtJurisdiction": "法院地點",
+      "ticketImage": "上傳告票",
+      "vehicleSeized": "您的車輛是否被扣押？",
+      "pleaType": "您對告票的立場",
+      "explanation": "您對事件經過的陳述",
+      "circumstances": "其他相關情況",
+      "witnesses": "是否有證人？",
+      "witnessDetails": "證人資料",
+      "evidence": "您是否有其他證據？",
+      "evidenceDetails": "證據說明",
+      "priorTickets": "以往告票",
+      "insuranceCompany": "保險公司",
+      "vehicleDetails": "車輛資料",
+      "additionalNotes": "補充說明",
+      "preferredLanguage": "偏好的書面溝通語言",
+      "digitalSignature": "電子簽名：請輸入您的完整法定姓名"
+    },
+    "validation": {
+      "required": "請填寫此必填項。",
+      "email": "請輸入有效的電子郵箱。",
+      "phone": "請輸入有效的電話號碼。",
+      "date": "請輸入有效日期。",
+      "amount": "請輸入有效的罰款金額。",
+      "ticketImage": "請上傳清晰可讀的告票照片。",
+      "signature": "請輸入完整法定姓名以簽名。",
+      "consent": "繼續前，請閱讀並接受授權條款。",
+      "terms": "付款前，請接受服務條款及私隱政策。",
+      "submit": "無法提交您的資料，請重試。",
+      "scanReview": "請核對提取的資料並糾正錯誤。",
+      "scanFailed": "無法讀取此文件，請手動填寫資料。",
+      "fileFormat": "請選擇不超過 10 MB 的 PDF、JPG、PNG、WebP、HEIC 或 HEIF 檔案。",
+      "consentCharacter": "由於一個或多個字元，我們無法製作可讀的同意書。付款前請聯繫 Fabsy，並保留您原來的姓名和資料，不要修改。",
+      "length": "此輸入內容超出表單長度限制。如需保留完整文字，請聯繫 Fabsy。"
+    },
+    "consent": {
+      "title": "Rapid Resolution 電子授權",
+      "scope": "在獲准的範圍內，我授權 Fabsy 及其代理人申請、接收和審查披露材料；使用 Traffic Tickets Digital Service；與法院、檢察官及有關政府部門溝通；根據我的指示和記錄，準備並提交基於案件事實的檢察官審查申請；以及解釋檢方答覆、指控、罰款和扣分後果。",
+      "approval": "只有在收到我針對該案件的明確指示後，Fabsy 才可採取最終處理步驟。本授權不允許自動接受檢方方案或作出認罪答辯。",
+      "exclusions": "不包括爭議庭審、上訴、案件重開、Immediate Roadside Sanctions 及 Notices of Administrative Penalty。庭審工作須另行簽訂協議並付費，也可能需要填寫阿爾伯塔政府規定的同意書。",
+      "fee": "我自願聘請 Fabsy 提供有限的審前服務，費用為 {{price}} 加元，另加適用的 GST。政府罰款及不包含的工作另計。我瞭解服務範圍、48 小時承諾的條件，以及沒有任何結果保證。",
+      "data": "我同意為提供服務而收集和處理個人資料、由技術輔助並經合資格人員審查的文件提取和分析、安全保存記錄、透過電子郵件、電話和短訊與我溝通案件，以及向法院和有關機構提供必要資料。我將提供準確、完整的資訊。我可以聯繫 privacy@fabsy.ca 請求查閱資料或撤回資料處理同意。",
+      "withdrawal": "我可以通過書面通知撤回此授權。否則，此授權持續有效，直至案件處理完畢或撤回。撤回授權不會自動取消已完成工作所產生的費用。",
+      "confirm": "我就是上述姓名所指的人，並有權訂立此協議。我已閱讀並理解本授權，並同意所述的有限服務。我的電子簽名與手寫簽名具有相同法律效力。"
+    },
+    "review": {
+      "title": "核對您的資料",
+      "description": "繼續安全付款前，請檢查告票、聯繫方式及授權內容。",
+      "edit": "修改資料",
+      "languageNote": "原始事件陳述必須與任何英文譯文一並保留，以供審查。翻譯時不要更改姓名、日期或告票號碼。"
+    },
+    "scanTicket": "讀取告票資料"
+  },
+  "checkout": {
+    "title": "Rapid Resolution 付款",
+    "service": "服務",
+    "subtotal": "小計",
+    "gst": "適用的 GST",
+    "total": "合計",
+    "pay": "繼續安全付款",
+    "processing": "正在打開安全付款頁面…",
+    "paymentFailed": "安全付款暫不可用，請重試。",
+    "scope": "符合條件的審前案件費用為 {{price}} 加元，另加適用的 GST。Stripe 會在付款前顯示完整小計和稅費。罰款、庭審代理及不包含的服務另計。",
+    "termsAcceptance": "我已閱讀並同意英文購買條款、服務條款及私隱政策。以英文條款為準。付款不構成自動接受任何方案的授權。"
+  },
+  "terms": {
+    "metaTitle": "服務條款 | Fabsy",
+    "title": "服務條款",
+    "intro": "授權或購買服務前，請將本條款與英文服務條款一並閱讀。本地化版本遵循現行英文服務條款，不構成另一份服務協議。",
+    "englishControls": "如譯文有差異，以英文服務條款為準。法定權利不受限制。如您不理解任何條款，請在同意前要求澄清。",
+    "sections": {
+      "service": {
+        "title": "1. 服務說明",
+        "body": "Fabsy Traffic Ticket Services 是阿爾伯塔交通告票代理服務機構，並非律師事務所。付費服務包括為符合條件的審前案件提供 Rapid Resolution，以及 Insurance Impact & Renewal Planning Report。服務可能包括安全資料收集、資格和截止日期審查、電子授權、證據披露申請與跟蹤、技術輔助分析並由合資格人員審查、獲授權的基於事實的檢察官審查申請、檔案通知、檢方答覆說明及按客戶指示作出的決定。可選報告使用客戶記錄及獲准的公開來源。Rapid Resolution 不包括爭議庭審、上訴、案件重開、即時路邊制裁（Immediate Roadside Sanctions）、行政處罰通知（Notices of Administrative Penalty）、政府罰款及超出獲准範圍的工作。"
+      },
+      "practice": {
+        "title": "2. 代理服務限制",
+        "body": "Fabsy 代表不提供法律意見或從事律師執業，不自稱律師或將 Fabsy 稱為律師事務所，不接受超出獲准代理範圍的案件，也不承諾特定結果。"
+      },
+      "eligibility": {
+        "title": "3. 服務可用性",
+        "body": "是否提供服務取決於指控、程序、截止日期、法院地點、服務平台要求，以及付費代理服務是否獲准並被 Fabsy 接受。範圍外的案件可能被拒絕或轉介至其他機構。"
+      },
+      "pricing": {
+        "title": "4. 價格",
+        "body": "符合條件的阿爾伯塔審前案件，Rapid Resolution 費用為 {{price}} 加元，另加適用的 GST。單獨的 Insurance Impact & Renewal Planning Report 費用為 {{reportPrice}} 加元，另加適用的 GST。兩項合購為 {{bundlePrice}} 加元，另加適用的 GST。庭審代理、政府罰款及範圍外的案件另計。"
+      },
+      "payment": {
+        "title": "5. 費用與付款",
+        "body": "所有費用均以加元計價。法院費用、罰款及其他不由 Fabsy 控制的收費仍由您承擔。通過 Stripe 付款前，會顯示完整小計及稅費。"
+      },
+      "rapid": {
+        "title": "5A. Rapid Resolution",
+        "body": "只有在資料、授權和付款完成且 Fabsy 接受案件後，服務才開始。在獲得授權且實際可行時，Fabsy 會申請並審查披露材料。披露申請不會延長答覆日期、庭審日期或其他截止日期。您必須自行關注所有截止日期，並在有要求時親自出庭。48 小時承諾只在完整、可讀的披露材料收到並與檔案匹配後開始；它涵蓋 Fabsy 的審查及準備或提交下一項獲授權行動，不涵蓋檢方答覆時間或最終結果時間。未經您針對該案件的具體指示，Fabsy 不會接受檢方方案、作出認罪答辯或敲定處理結果。庭審工作需要另行進行資格審查、簽訂協議並報價。"
+      },
+      "report": {
+        "title": "5B. 保險規劃報告",
+        "body": "這是一次性的消費者研究與規劃產品。駕駛記錄摘要、經紀服務、保險公司報價及其他第三方記錄的費用另計。您須提供準確的告票、駕駛記錄、保單、續保和評級資料。情景分析及範圍估計依據獲准的公開資訊和您提供的記錄，不屬於保險公司報價。資料來源和問題僅供規劃參考，不構成購買、取消、續保或更改保障的建議。Fabsy 並非保險代理人或經紀，不銷售保險、報價或安排承保，不聯繫保險公司、提交申請或協商續保。我們不承諾投保資格、節省費用或保費結果。針對具體保險公司的意見及報價必須由持牌保險經紀或保險公司提供。"
+      },
+      "responsibilities": {
+        "title": "6. 您的責任",
+        "body": "您須提供準確、完整的告票資料，及時回應資料要求，審閱檢方的每次答覆，並在方案失效前給予明確指示；有要求時出庭，支付適用費用和法院費用。Fabsy 提供代理服務，不提供法律意見。"
+      },
+      "outcomes": {
+        "title": "7. 不承諾結果",
+        "body": "結果取決於指控、證據、程序、檢察官及法院。我們不承諾撤銷或減輕指控、降低罰款、減少扣分、節省保費、投保資格或任何其他結果。48 小時服務承諾不是結果保證。"
+      },
+      "privacy": {
+        "title": "8. 保密",
+        "body": "Fabsy 通過內部私隱措施及適用的私隱義務保護客戶資料。法院程序所需或法律要求時，資料可能被披露。"
+      },
+      "liability": {
+        "title": "9. 責任限制",
+        "body": "Fabsy 的責任以已支付的服務費用為限。對於代理服務引起的間接、後果性或懲罰性損害賠償，Fabsy 不承擔責任。"
+      },
+      "cancellation": {
+        "title": "10. 取消、退款與終止",
+        "body": "任何一方可因雙方同意、未付款、未提供資料或合作，或代理工作變得不可能或不可行而終止協議。如需取消，請及時聯繫 Fabsy。退款資格取決於已完成的工作、第三方收費、結賬時披露的資訊及適用法律。如果 Fabsy 在實質性工作開始前拒絕接受一個其餘手續完整且已付款的案件，將退還適用的服務費。法定取消權不受限制。"
+      },
+      "website": {
+        "title": "11. 網站使用",
+        "body": "使用本網站即表示接受條款。不得用於非法目的、嘗試未經授權的訪問、干擾網站功能或傳輸有害或惡意代碼。"
+      },
+      "law": {
+        "title": "12. 適用法律",
+        "body": "本條款受加拿大阿爾伯塔省法律管轄。任何爭議受阿爾伯塔法院管轄。"
+      },
+      "changes": {
+        "title": "13. 條款變更",
+        "body": "Fabsy 可修改條款。變更會刊載於英文條款頁面，並更新修訂日期。變更後繼續使用服務，即表示接受修改後的條款。"
+      },
+      "contact": {
+        "title": "14. 聯繫方式",
+        "body": "如有疑問，請通過 {{email}} 或 (825) 793-2279 聯繫 Fabsy Traffic Ticket Services。服務地區：阿爾伯塔。"
+      }
+    }
+  },
+  "notifications": {
+    "received": {
+      "subject": "Fabsy：已收到告票資料",
+      "body": "{{name}}，您好。我們已收到檔案 {{reference}} 的資料。收到資料不代表案件已被接受，也不代表任何截止日期已延長。查看檔案：{{url}}"
+    },
+    "disclosure": {
+      "subject": "Fabsy：已收到披露材料",
+      "body": "{{name}}，您好。檔案 {{reference}} 的披露材料已收到。只有在確認材料完整、可讀且與您的檔案匹配後，48 小時審查及行動承諾才開始。查看更新：{{url}}"
+    },
+    "update": {
+      "subject": "Fabsy：您的檔案有更新",
+      "body": "{{name}}，您好。檔案 {{reference}} 有新進展。請在安全檔案中閱讀詳情及任何截止日期：{{url}}"
+    },
+    "decision": {
+      "subject": "Fabsy：需要您的指示",
+      "body": "{{name}}，您好。檔案 {{reference}} 已有答覆。請審閱方案及有效期限，然後就該案件作出具體指示。Fabsy 不會自動接受任何方案。查看詳情：{{url}}"
+    },
+    "payment": {
+      "subject": "Fabsy：已收到付款",
+      "body": "{{name}}，您好。檔案 {{reference}} 的 {{total}} 加元付款已收到。付款不保證任何結果，也不會延長截止日期。查看收據及後續步驟：{{url}}"
+    },
+    "disclaimer": "Fabsy 提供交通告票代理服務，並非律師事務所。以英文服務條款為準。請勿通過電子郵件或短訊發送支付卡資料。"
+  }
+}

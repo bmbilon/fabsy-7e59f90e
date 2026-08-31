@@ -1,9 +1,12 @@
+import { prepareClientEmail, type NotificationLocaleContext } from "./notification-locale.ts";
+
 interface ResendEmailPayload {
   from: string;
   to: string[];
   subject: string;
   html: string;
   reply_to?: string;
+  localization?: NotificationLocaleContext;
 }
 
 export async function sendResendEmail(
@@ -16,6 +19,8 @@ export async function sendResendEmail(
     throw new Error("The email idempotency key is invalid.");
   }
 
+  const { localization, ...englishPayload } = payload;
+  const outgoing = localization ? prepareClientEmail(englishPayload, localization) : englishPayload;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -23,7 +28,7 @@ export async function sendResendEmail(
       "Content-Type": "application/json",
       "Idempotency-Key": idempotencyKey,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(outgoing),
   });
   const result = await response.json().catch(() => ({})) as {
     id?: string;
