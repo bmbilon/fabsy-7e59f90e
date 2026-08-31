@@ -1,0 +1,245 @@
+{
+  "version": 1,
+  "createdAt": "2026-08-31T09:40:46.369Z",
+  "status": "frozen",
+  "owner": "/root/photo_radar_content",
+  "scope": "Photo Radar content, exact scoped pricing/claim guards, focused regression tests and paused acquisition assets. No deployment or live advertising.",
+  "sources": [
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/01-campaigns.csv",
+      "sha256": "a4a5291dc3b08fe5dcd7b0bae9f0e3315eece1027c9040495a69b5985f2cb81f",
+      "bytes": 169
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/02-ad-groups.csv",
+      "sha256": "41fa7520f0f31c4478216a4f56372772c3bb4d6292a12d30b383e81777e596c8",
+      "bytes": 236
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/03-keywords.csv",
+      "sha256": "f3e7a084485ec56477280b732f5d86dd1fbeb14026ac4ae0d5d4ce269a130688",
+      "bytes": 8393
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/04-responsive-search-ads.csv",
+      "sha256": "55fb6c78e5284e2aec7b1328acc8e18d3c9dab87bd533f68a65d07ebaedb55a6",
+      "bytes": 3451
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/05-negative-keywords.csv",
+      "sha256": "f5c9ff66f4517967113a57b1fbfa21a162faf48d46e3567825799e761498da8a",
+      "bytes": 1604
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/README.md",
+      "sha256": "1134366149fb27db214ba33c81f8f9be1f1ae059a441f9e821aa5378fdf47ab4",
+      "bytes": 8255
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/destination-audit.json",
+      "sha256": "a17ab0c03f439fc9a6d5c6606143cdece09dcde62c0a841d8f23beb8e6b2a08d",
+      "bytes": 1197
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/launch-checklist.md",
+      "sha256": "d77f94cb5c407b2794ed8c1c632b8ca9e444d7470be2c9f31aac1c016e57e78c",
+      "bytes": 5483
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/launch-settings.json",
+      "sha256": "7adc7012eefead8b0cdca509566ebe0361e75fed739afd32eb7e877f3a9be16a",
+      "bytes": 4947
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/measurement-plan.md",
+      "sha256": "f72a996c6278b91297ae0312ada000458d3231e62304732274e602303c8dffb4",
+      "bytes": 6285
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/meta-copy.json",
+      "sha256": "cae0014364be3dcf1f36bbe28d80432b5819fc12645c9b8d34c7cf5e22c87531",
+      "bytes": 2638
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/meta-creative-brief.md",
+      "sha256": "a484b35d35ad111b2cabf1f7e0ae213489751b5fc627b93e4f8281d0af4c644b",
+      "bytes": 3101
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/validate.py",
+      "sha256": "3fbddd1c59219b41f36efd3853c75edf500bd1db239787a07d92ee16f9a39dba",
+      "bytes": 12058
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-31-photo-radar/validation.json",
+      "sha256": "b89c53cccd54e2ee12a2bbef5ab256531047fea0efa43cee0e5ff7d3858ebbb9",
+      "bytes": 2829
+    },
+    {
+      "path": "docs/photo-radar/legal-sources.md",
+      "sha256": "3a1dda96a78a30e0fd8bf9eb8cb56691b5f703c98c27993e7b29f03769f876c2",
+      "bytes": 9197
+    },
+    {
+      "path": "scripts/curated-content-guardrails.cjs",
+      "sha256": "5f4b631d31aa07ccab6848f25e4793d17a6e6afde915380a9e7bc05619176dc1",
+      "bytes": 24711
+    },
+    {
+      "path": "scripts/generate-photo-radar-snapshots.cjs",
+      "sha256": "c61ca1b89971ad13b059c63de7677eeeca466b32a8b132db1c980956f65783c8",
+      "bytes": 9995
+    },
+    {
+      "path": "scripts/normalize-rapid-resolution-content.cjs",
+      "sha256": "dad0958c13280bca8bab1e97bb0828ae01512e77fa5b2da23ede82b361b5ab4e",
+      "bytes": 13570
+    },
+    {
+      "path": "scripts/test-new-offer-snapshot-guardrails.cjs",
+      "sha256": "92aa1a17aef2e6691c7f32123d79b399a346b305fc9bb52dfce6d595c655b33d",
+      "bytes": 4555
+    },
+    {
+      "path": "scripts/test-photo-radar-content.cjs",
+      "sha256": "4c867e0f88c41b50e4f8eaadcf31c34929ca80b237e3d088759693f98eb844e4",
+      "bytes": 2950
+    },
+    {
+      "path": "scripts/test-photo-radar-pricing-compatibility.cjs",
+      "sha256": "d35f73b5f8767effeb41f2b1a1ba194dd1f12df5ef241650f341c44837377b27",
+      "bytes": 4407
+    },
+    {
+      "path": "scripts/test-rapid-resolution-content-normalizer.cjs",
+      "sha256": "d283e14dc4da78ebf43803261d6ef83bb9d642b41be8381b36f6246091981fd7",
+      "bytes": 3089
+    },
+    {
+      "path": "scripts/validate-snapshot-guardrails.cjs",
+      "sha256": "6d8bca5c774693ae1ce17f2b37e4a18e3af0df9eeb4b2c846510c0d72baeb57d",
+      "bytes": 32629
+    },
+    {
+      "path": "src/config/photoRadarContent.json",
+      "sha256": "974b4c31f0dc4881e5b7d737ae5b3dbb1df6c6dbfaaf8c7c9f50aa48b360b01c",
+      "bytes": 5068
+    },
+    {
+      "path": "src/content/pages/fight-photo-radar-ticket-calgary.json",
+      "sha256": "59084252e0f2e46c2cabfbf790eeb3da7bd8d62a5b32173054e25a86210eb2be",
+      "bytes": 12391
+    },
+    {
+      "path": "src/content/pages/photo-radar-ticket-alberta.json",
+      "sha256": "391e0fb73eb37df68367fcfb8cc982d93f59e4c6c2781c8366e5d240b37ae160",
+      "bytes": 12108
+    },
+    {
+      "path": "src/content/pages/photo-radar-ticket-edmonton.json",
+      "sha256": "82a7c668788451fc7f022fd32be8cd87c8f9a5d02c6fe68b775e087e7c3b3087",
+      "bytes": 12092
+    },
+    {
+      "path": "src/pages/PhotoRadar.tsx",
+      "sha256": "1e4dbeb5bde3449de13fa00e10e2042488edb3b565f1f5a8192180ba7ce82add",
+      "bytes": 13137
+    },
+    {
+      "path": "ssg-pages/fight-photo-radar-ticket-calgary.json",
+      "sha256": "3c04116836d293991ceb181b71ab05e4f20c34f3915df6d432c5be2776ba5464",
+      "bytes": 12339
+    },
+    {
+      "path": "ssg-pages/photo-radar-ticket-alberta.json",
+      "sha256": "738fc78af233aa19354bde4b83090289f9e52b96ef22ceced2d3591dec4c6613",
+      "bytes": 12056
+    },
+    {
+      "path": "ssg-pages/photo-radar-ticket-edmonton.json",
+      "sha256": "dd191c065658b92db710f9987989dae81692871558f949b5ff9f00217156593a",
+      "bytes": 12041
+    }
+  ],
+  "referenceOutputs": [
+    {
+      "path": "public/prerendered/content-manifest.json",
+      "sha256": "d1714d2834ecd26c32fa240462389ac790ddb58c18c0a81281f2b570ea63fe71",
+      "bytes": 112183
+    },
+    {
+      "path": "public/prerendered/content/fight-photo-radar-ticket-calgary/index.html",
+      "sha256": "202658109ab5118b78f79c4687db87ef4c292e1be17a861fa5af569036394a19",
+      "bytes": 19047
+    },
+    {
+      "path": "public/prerendered/content/photo-radar-ticket-alberta/index.html",
+      "sha256": "8f67d1a5d59ece6282a97e1b36c232ec0931cb0cf205e05acc515f6aa5dca254",
+      "bytes": 18943
+    },
+    {
+      "path": "public/prerendered/content/photo-radar-ticket-edmonton/index.html",
+      "sha256": "6ba6d37c280cddb7af5dc56b4be173592594a617ac7b943cf87d6ec7372930ea",
+      "bytes": 18898
+    },
+    {
+      "path": "public/prerendered/fleet/index.html",
+      "sha256": "450b3fe56e2b38f1182982d5809e503de1638be6074c3dd61ebd08ae012aa7fc",
+      "bytes": 5387
+    },
+    {
+      "path": "public/prerendered/free-ticket-check/index.html",
+      "sha256": "a49b3420c61988c0cadbf3f8934fa1e35eb84ac101a6e6679bd5fa86a1763bee",
+      "bytes": 2888
+    },
+    {
+      "path": "public/prerendered/photo-radar/index.html",
+      "sha256": "ba4dd928696f2ef28869737e213a0a56fcb6dee0ac739b9cefa911c874e0a4d2",
+      "bytes": 12122
+    },
+    {
+      "path": "public/prerendered/pro-drivers/index.html",
+      "sha256": "112431674a45db1bb071f4ae5ef8c89d64fd516642c6ebb9ff64b918fba82e19",
+      "bytes": 11439
+    },
+    {
+      "path": "public/prerendered/refer/index.html",
+      "sha256": "957d13b0eadf7514160ac7f396a571219d0cd1f07986cbd2e5170131197b8119",
+      "bytes": 10962
+    }
+  ],
+  "referenceOutputsAreReleaseInputs": false,
+  "referenceOutputNote": "These snapshots prove local rendering and source parity only. The release owner will regenerate from current main; do not copy the old prerendered tree wholesale.",
+  "verification": {
+    "auditDirectory": "/tmp/fabsy-combined-snapshot-release-gwq4ahdb",
+    "passed": [
+      "node scripts/generate-static-snapshots.cjs",
+      "node scripts/generate-pro-referral-snapshots.cjs pro-drivers refer",
+      "node scripts/validate-snapshot-guardrails.cjs",
+      "node scripts/test-photo-radar-content.cjs",
+      "node scripts/test-rapid-resolution-content-normalizer.cjs",
+      "node scripts/test-new-offer-snapshot-guardrails.cjs",
+      "node scripts/test-pro-referral-snapshots.mjs",
+      "node scripts/update-static-sitemap-offline.mjs --check"
+    ],
+    "prebuildRegressionWired": true,
+    "contentSnapshots": 1122,
+    "curatedAdmitted": 38,
+    "curatedQuarantined": 0,
+    "sitemapPageUrls": 100,
+    "sitemapBlogUrls": 77,
+    "fullTree": {
+      "status": "blocked-before-validation",
+      "command": "VALIDATE_ALL_PRERENDERED=1 node scripts/validate-snapshot-guardrails.cjs",
+      "reason": "public/prerendered/locale-manifest.json is absent; release owner must generate under current locale gates. No gate bypass or fake manifest.",
+      "diagnostic": "/tmp/fabsy-combined-snapshot-release-gwq4ahdb/english-diagnostic.json",
+      "diagnosticNote": "Supplementary English diagnostic does not admit reviewed Terms locale document. Its Terms flags are provisional. Fresh core catalog Photo79 schema and legacy blog standalone198 schema need latest-main compatibility review; not changed here."
+    }
+  },
+  "protectedRootCoreOutputsUnchanged": true,
+  "restrictions": [
+    "No source edits after this manifest without owner notification.",
+    "No live ads, budget invention, spend, email, commit or deployment performed.",
+    "Dedicated Photo79/Pro158.40/183.20 schema allowances stay route-specific; unrelated legal amounts and marketing claims remain rejected."
+  ]
+}

@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, CheckCircle, Shield } from 'lucide-react';
-import { RAPID_RESOLUTION } from '@/config/offers';
+import { PHOTO_RADAR, RAPID_RESOLUTION } from '@/config/offers';
 
 type Props = {
   offence: string;
   city: string;
   ctaHref?: string;
   className?: string;
+  photoRadar?: boolean;
 };
 
 /**
@@ -18,7 +19,8 @@ const AnswerBox: React.FC<Props> = ({
   offence, 
   city, 
   ctaHref = RAPID_RESOLUTION.slug,
-  className = "" 
+  className = "",
+  photoRadar = false,
 }) => {
   // Format offence for display (handle various cases)
   const displayOffence = offence.toLowerCase().replace(/[-_]/g, ' ');
@@ -41,11 +43,12 @@ const AnswerBox: React.FC<Props> = ({
       {/* Main question and answer */}
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-slate-900 mb-2">
-          Can I dispute a {displayOffence} ticket in {city}?
+          {photoRadar ? `Can I dispute a photo radar or red-light camera notice in ${city}?` : `Can I dispute a ${displayOffence} ticket in ${city}?`}
         </h2>
         <p className="text-slate-700 font-medium">
           <span className="text-green-600 font-semibold">Yes.</span> Follow the instructions on your ticket and act by the deadline printed on it.
         </p>
+        {photoRadar && <p className="mt-2 text-slate-700">{PHOTO_RADAR.insuranceDisclaimer}</p>}
       </div>
 
       {/* Process steps */}
@@ -59,11 +62,11 @@ const AnswerBox: React.FC<Props> = ({
           </li>
           <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold mt-0.5 flex-shrink-0">2</span>
-            <div><span className="font-semibold">Context:</span> The practical choice depends on the charge, record, evidence, and what a conviction could mean for you.</div>
+            <div>{photoRadar ? <><span className="font-semibold">Disclosure:</span> For an eligible Alberta registered-owner notice under TSA s.160(1), Fabsy enters the not-guilty plea and requests disclosure.</> : <><span className="font-semibold">Context:</span> The practical choice depends on the charge, record, evidence, and what a conviction could mean for you.</>}</div>
           </li>
           <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-700 text-xs font-semibold mt-0.5 flex-shrink-0">3</span>
-            <div><span className="font-semibold">Rapid Resolution:</span> Secure intake, disclosure review, prosecutor review, immediate updates and your final decision for an eligible pre-trial matter.</div>
+            <div>{photoRadar ? <><span className="font-semibold">Your decision:</span> Fabsy pursues a Crown fine reduction or withdrawal. You approve any deal. No trial. No success fee. No outcome is promised.</> : <><span className="font-semibold">Rapid Resolution:</span> Secure intake, disclosure review, prosecutor review, immediate updates and your final decision for an eligible pre-trial matter.</>}</div>
           </li>
         </ol>
       </div>
@@ -71,20 +74,20 @@ const AnswerBox: React.FC<Props> = ({
       {/* CTA section */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <Link 
-          to={ctaHref}
+          to={photoRadar ? PHOTO_RADAR.slug : ctaHref}
           className="inline-flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
         >
           <Shield className="w-4 h-4" />
-          Rapid Resolution - ${RAPID_RESOLUTION.priceCad} →
+          {photoRadar ? `Photo Radar - $${PHOTO_RADAR.priceCad} + GST` : `Rapid Resolution - $${RAPID_RESOLUTION.priceCad}`} →
         </Link>
         <div className="text-xs text-slate-600">
-          Plus GST · Complete disclosure advanced within 48 hours · Crown timing separate
+          {photoRadar ? `$${PHOTO_RADAR.totalCad.toFixed(2)} total · Fabsy action within 48 hours after complete disclosure · Crown timing separate` : 'Plus GST · Complete disclosure advanced within 48 hours · Crown timing separate'}
         </div>
       </div>
 
       {/* Local indicator */}
       <div className="mt-4 pt-3 border-t border-sky-200 text-xs text-slate-500">
-        Serving {city}, Alberta • {capitalizedOffence} ticket information • Eligible pre-trial agent service
+        {photoRadar ? `Serving ${city === 'Alberta' ? city : `${city}, Alberta`} • Registered-owner notice review • Government fines are separate` : `Serving ${city}, Alberta • ${capitalizedOffence} ticket information • Eligible pre-trial agent service`}
       </div>
     </section>
   );

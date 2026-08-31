@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { detectOwnerNotice } from "../_shared/photo-radar.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -50,6 +51,7 @@ serve(async (req) => {
                 text: `Extract information from this traffic ticket image. Return the data in JSON format with these fields:
 - ticketNumber: the ticket or violation number
 - issueDate: date in YYYY-MM-DD format
+- offenceDate: the explicitly labelled offence/violation date in YYYY-MM-DD format; never substitute the issue date, certificate date, mailing date or payment deadline (return null when not visible)
 - location: location where violation occurred
 - officer: officer name
 - officerBadge: officer badge number (if visible)
@@ -59,6 +61,11 @@ serve(async (req) => {
 - violation: type of violation (e.g., "Speeding (16-30 km/h over)", "Red Light Violation", etc.)
 - fineAmount: fine amount as number without currency symbol
 - courtDate: court date in YYYY-MM-DD format if present, otherwise null
+- ownerNoticeWording: exact visible words identifying registered-owner liability (for example "Owner of Motor Vehicle Involved in..." or "160(1)"), otherwise null
+- mailedNoticeFormat: true only when the document visibly has the mailed registered-owner notice format, otherwise null
+- automatedEnforcementNotice: true only when the document visibly identifies automated enforcement/photo radar/an intersection safety camera, otherwise null
+
+Do not classify an officer-issued red-light or speeding ticket as an owner notice just because of the offence name. Copy document evidence; do not invent ownership, mailing dates or legal eligibility.
 
 If any field is not clearly visible, set it to null. Be as accurate as possible.`,
               },
@@ -82,6 +89,7 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
                 properties: {
                   ticketNumber: { type: "string", nullable: true },
                   issueDate: { type: "string", nullable: true },
+                  offenceDate: { type: "string", nullable: true },
                   location: { type: "string", nullable: true },
                   officer: { type: "string", nullable: true },
                   officerBadge: { type: "string", nullable: true },
@@ -91,6 +99,9 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
                   violation: { type: "string", nullable: true },
                   fineAmount: { type: "string", nullable: true },
                   courtDate: { type: "string", nullable: true },
+                  ownerNoticeWording: { type: "string", nullable: true },
+                  mailedNoticeFormat: { type: "boolean", nullable: true },
+                  automatedEnforcementNotice: { type: "boolean", nullable: true },
                 },
                 required: [],
                 additionalProperties: false,
@@ -124,7 +135,7 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
     }
 
     const data = await response.json();
-    console.log("AI response:", JSON.stringify(data));
+    console.log("Ticket OCR response received");
 
     // Extract the structured data from tool call
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
@@ -142,9 +153,13 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
     const payload = {
       success: true,
       data: {
+        ...detectOwnerNotice(extractedData),
+        owner_notice_wording: extractedData.ownerNoticeWording ?? null,
+        mailed_notice_format: extractedData.mailedNoticeFormat === true,
         // Canonical fields used by the form
         ticketNumber: extractedData.ticketNumber ?? null,
         issueDate: extractedData.issueDate ?? null,
+        offenceDate: extractedData.offenceDate ?? null,
         location: extractedData.location ?? null,
         officer: extractedData.officer ?? null,
         officerBadge: extractedData.officerBadge ?? null,

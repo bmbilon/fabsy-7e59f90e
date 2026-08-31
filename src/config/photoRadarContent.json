@@ -1,0 +1,80 @@
+{
+  "heroFacts": [
+    {
+      "title": "No demerits",
+      "description": "A registered-owner camera notice does not add points to your licence."
+    },
+    {
+      "title": "No insurance impact",
+      "description": "These notices do not affect your driving record or insurance."
+    },
+    {
+      "title": "Only the fine is on the table",
+      "description": "We pursue a reduction or withdrawal. Any government fine remains separate from our fee."
+    }
+  ],
+  "processSteps": [
+    {
+      "title": "Upload your notice and authorize us",
+      "description": "Upload the complete notice, confirm whether the vehicle was registered to you on the offence date, and sign the authorization. We check the ticket type and response deadline."
+    },
+    {
+      "title": "We plead not guilty and review the evidence",
+      "description": "Fabsy enters the not-guilty plea, requests disclosure, and reviews the images, location, timing, ownership and device records. We prepare or take the next authorized Crown step within 48 hours after complete, readable disclosure is received and matched to your file."
+    },
+    {
+      "title": "You approve any deal",
+      "description": "We pursue a Crown reduction or withdrawal, keep you updated and explain any offer. You decide whether to accept. No trial or success fee is included, and no outcome is promised."
+    }
+  ],
+  "faqs": [
+    {
+      "question": "Which tickets qualify for Rapid Resolution: Photo Radar?",
+      "answer": "This product is for Alberta automated enforcement notices mailed to a registered owner under Traffic Safety Act s.160(1), including photo radar speeding and red-light camera notices. We confirm the notice, ownership and response deadline during intake. Tell us if the vehicle was sold before the offence or stolen; those facts need review and supporting records. A ticket issued to you as the driver uses a different service."
+    },
+    {
+      "question": "Does photo radar affect insurance in Alberta?",
+      "answer": "No. A photo radar or red-light camera notice issued to the registered owner has no insurance impact and carries no demerits. Only the fine is on the table. An Insurance Impact Report is not included or needed. This does not describe a separate ticket issued to an identified driver."
+    },
+    {
+      "question": "What does the $79 fee cover?",
+      "answer": "Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total). It covers the authorized not-guilty plea, disclosure request and review, pursuit of a Crown reduction or withdrawal, file updates and explanation of any offer for your approval. Government fines are separate."
+    },
+    {
+      "question": "Is a trial, success fee or outcome-based refund part of this service?",
+      "answer": "No. This is a pre-trial service with no success fee. Trial representation is not included and would need a separate quote. No reduction or withdrawal is promised, and the service fee is not refunded based on outcome."
+    },
+    {
+      "question": "When does the 48-hour commitment start?",
+      "answer": "Only after complete, readable disclosure is received and matched to your file. Within 48 hours, Fabsy reviews it and prepares or takes the next authorized Crown step. This is not a promise of a Crown reply or a completed outcome within 48 hours. Uploading a ticket or requesting disclosure does not itself extend a response or court deadline."
+    },
+    {
+      "question": "Can Fabsy accept a Crown offer without asking me?",
+      "answer": "No. We explain the offer and you approve any deal through the client reply and offer flow. Nothing is accepted automatically. If there is no acceptable offer, we explain your remaining options and deadlines; continuing to trial is outside this service."
+    }
+  ],
+  "reviewChecks": [
+    "The vehicle and plate in the images match the notice.",
+    "The site was permitted, or had an approved exception, for the offence and date. Speed and red-light rules are checked separately.",
+    "The posted zone hours and any special signs applied at the recorded time.",
+    "The evidence supports workers being present if a doubled construction fine was applied.",
+    "Related notices are checked against the municipality's applicable duplicate-notice policy.",
+    "The certificate's mailing date and the applicable service requirements are checked.",
+    "Ownership on the offence date is checked against any sale or theft records.",
+    "Available operator logs and device testing or calibration records support the allegation."
+  ],
+  "sourceLinks": [
+    {
+      "title": "Alberta photo radar rules and exemptions",
+      "url": "https://www.alberta.ca/photo-radar-alberta"
+    },
+    {
+      "title": "Calgary Police: camera tickets and insurance",
+      "url": "https://www.calgarypolice.ca/public-safety/traffic-and-road-safety/automated-traffic-enforcement.html"
+    },
+    {
+      "title": "Edmonton: registered-owner notices",
+      "url": "https://www.edmonton.ca/transportation/traffic_safety/automated-enforcement"
+    }
+  ]
+}

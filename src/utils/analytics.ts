@@ -1,5 +1,6 @@
 // Google Analytics 4 utility functions
 // GA4 is loaded by src/components/Analytics.tsx before these helpers are used.
+import { PHOTO_RADAR, RAPID_RESOLUTION } from '@/config/offers';
 
 declare global {
   interface Window {
@@ -51,10 +52,8 @@ export const trackButtonClick = (buttonName: string, buttonLocation?: string): v
 
 // Track conversions (when someone completes the contact form)
 export const trackConversion = (conversionType: 'contact_form' | 'phone_call' | 'email'): void => {
-  trackEvent('conversion', {
+  trackEvent('generate_lead', {
     conversion_type: conversionType,
-    value: 488, // Your service price
-    currency: 'CAD',
   });
 };
 
@@ -91,18 +90,16 @@ export const trackOutboundLink = (url: string, linkText: string): void => {
 
 // Enhanced ecommerce tracking for service purchases
 export const trackPurchaseIntent = (serviceType: string, estimatedSavings?: number): void => {
+  const offer = serviceType === 'photo_radar' ? PHOTO_RADAR : RAPID_RESOLUTION;
   trackEvent('begin_checkout', {
     currency: 'CAD',
-    value: 488,
+    value: offer.priceCad,
     items: [
       {
-        item_id: 'traffic_ticket_defense',
-        item_name: 'Traffic Ticket Defense Service',
-        category: 'Legal Services',
-        price: 488,
+        item_id: serviceType === 'photo_radar' ? 'photo_radar' : 'rapid_resolution',
+        item_name: offer.name,
+        price: offer.priceCad,
         quantity: 1,
-        custom_parameter_1: serviceType,
-        custom_parameter_2: estimatedSavings?.toString() || '',
       },
     ],
   });
@@ -110,20 +107,8 @@ export const trackPurchaseIntent = (serviceType: string, estimatedSavings?: numb
 
 // Track successful case completion (for thank you page)
 export const trackServiceCompletion = (): void => {
-  trackEvent('purchase', {
-    transaction_id: `fabsy_${Date.now()}`,
-    currency: 'CAD',
-    value: 488,
-    items: [
-      {
-        item_id: 'traffic_ticket_defense',
-        item_name: 'Traffic Ticket Defense Service',
-        category: 'Legal Services',
-        price: 488,
-        quantity: 1,
-      },
-    ],
-  });
+  // Only the server-confirmed receipt flow may emit a paid purchase.
+  trackEvent('service_completed');
 };
 
 export default {

@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import useSafeHead from '@/hooks/useSafeHead';
 import { readMarketingAttribution } from '@/lib/marketingAttribution';
-import { RAPID_RESOLUTION } from '@/config/offers';
+import { PHOTO_RADAR, RAPID_RESOLUTION } from '@/config/offers';
+import { paidCheckoutSummary, purchaseAdsDestination, type CheckoutReceipt } from '@/lib/checkoutReceipt';
 
 type Gtag = (...args: unknown[]) => void;
 
@@ -14,29 +15,19 @@ interface AnalyticsWindow extends Window {
   gtag?: Gtag;
 }
 
-interface CheckoutLineItem {
-  description?: string;
-  quantity?: number;
-  amount_total?: number;
-  currency?: string;
-}
-
-interface CheckoutSession {
-  amount_total?: number;
-  currency?: string;
-  id?: string;
-  payment_status?: string;
-  total_details?: {
-    amount_tax?: number;
-  };
-  line_items?: CheckoutLineItem[];
-}
+const reportedPurchases = new Set<string>();
 
 const ThankYou: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  const [receipt, setReceipt] = useState<CheckoutReceipt | null>(null);
+  const [checking, setChecking] = useState(false);
+  const summary = paidCheckoutSummary(receipt);
+  const offer = summary?.photoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const url = 'https://fabsy.ca/thank-you';
   useSafeHead({
-    title: 'Submission Received | Fabsy',
-    description: 'Fabsy received your submission and will follow up with the next steps.',
+    title: 'Payment Confirmation | Fabsy',
+    description: 'Check your Fabsy payment confirmation and the next steps for your ticket.',
     robots: 'noindex, nofollow',
   });
   const published = new Date().toISOString().split('T')[0];
@@ -47,108 +38,104 @@ const ThankYou: React.FC = () => {
     name: 'Thank You, Fabsy Traffic Ticket Services',
     url,
     description:
-      'Thank you for contacting Fabsy Traffic Ticket Services. We received your submission and will follow up with the next steps.',
+      'Check your Fabsy payment confirmation and the next steps for your ticket.',
     datePublished: published,
     dateModified: published,
   } as const;
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get('session_id');
-    const gtag = (window as AnalyticsWindow).gtag;
-
-    // Always record a generate_lead for GA4 (you can mark as conversion in GA)
-    if (typeof gtag === 'function') {
-      try {
-        gtag('event', 'generate_lead', { page_path: '/thank-you' });
-      } catch {
-        // Analytics failures must not interrupt the confirmation page.
-      }
-    }
-
-    // If Stripe session exists, fetch details and fire purchase
-    (async () => {
-      if (sessionId) {
+    let cancelled = false;
+    setReceipt(null);
+    setChecking(false);
+    if (!sessionId || !/^cs_(?:test_|live_)[A-Za-z0-9]+$/.test(sessionId)) return;
+    setChecking(true);
+    void (async () => {
         try {
-          const { data, error } = await supabase.functions.invoke<CheckoutSession>('get-checkout-session', {
+          const { data, error } = await supabase.functions.invoke<CheckoutReceipt>('get-checkout-session', {
             body: { sessionId },
           });
-          if (error) throw error;
-          if (data?.payment_status !== 'paid' || typeof gtag !== 'function') return;
-          const value = (data?.amount_total ?? 0) / 100;
-          const currency = (data?.currency || 'cad').toUpperCase();
-          const transaction_id = data?.id || sessionId;
-
-          // Attach stored acquisition parameters if present
+          if (cancelled || error || data?.id !== sessionId) return;
+          const paid = paidCheckoutSummary(data);
+          if (!paid) return;
+          setReceipt(data);
+          const gtag = (window as AnalyticsWindow).gtag;
+          const transaction_id = paid.transactionId;
+          const purchaseKey = `fabsy-paid-purchase:${transaction_id}`;
+          if (typeof gtag !== 'function' || reportedPurchases.has(transaction_id)) return;
+          try { if (window.sessionStorage.getItem(purchaseKey)) return; } catch { /* Storage is optional. */ }
+          const value = paid.serviceValue;
+          const currency = 'CAD';
           const acq = readMarketingAttribution();
-
-          // GA4 purchase event
           gtag('event', 'purchase', {
+            ...acq,
             transaction_id,
             value,
             currency,
-            tax: (data?.total_details?.amount_tax ?? 0) / 100,
-            items: (data?.line_items || []).map((li) => ({
-              item_name: li.description,
-              quantity: li.quantity,
-              price: (li.amount_total ?? 0) / 100,
-              currency: (li.currency || currency).toUpperCase(),
-            })),
-            ...acq,
+            tax: paid.tax,
+            order_type: paid.orderType,
+            items: [{ item_id: paid.orderType, item_name: paid.name, quantity: 1, price: value }],
           });
 
-          // Google Ads conversion (purchase) if configured
-          const gadsId = import.meta.env.VITE_GADS_ID;
-          const gadsPurchaseLabel = import.meta.env.VITE_GADS_PURCHASE_LABEL;
-          if (gadsId && gadsPurchaseLabel) {
+          // A missing Photo label must never fall back to the officer goal.
+          const adsDestination = purchaseAdsDestination(paid.orderType, {
+            destinationId: import.meta.env.VITE_GADS_ID,
+            officerPurchaseLabel: import.meta.env.VITE_GADS_PURCHASE_LABEL,
+            photoRadarPurchaseLabel: import.meta.env.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL,
+          });
+          if (adsDestination) {
             gtag('event', 'conversion', {
-              send_to: `${gadsId}/${gadsPurchaseLabel}`,
+              send_to: adsDestination,
               value,
               currency,
               transaction_id,
             });
           }
+          reportedPurchases.add(transaction_id);
+          try { window.sessionStorage.setItem(purchaseKey, '1'); } catch { /* Storage is optional. */ }
         } catch {
           // Analytics failures must not interrupt the confirmation page.
+        } finally {
+          if (!cancelled) setChecking(false);
         }
-      }
     })();
-  }, []);
+    return () => { cancelled = true; };
+  }, [sessionId]);
 
   return (
     <main className="min-h-screen bg-background">
       <StaticJsonLd schema={webPageSchema} dataAttr="webpage" />
       <Header />
       <div className="container mx-auto px-4 py-16 max-w-3xl text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Thank You!</h1>
-        <p className="text-lg text-muted-foreground mb-8">
-          We received your Rapid Resolution intake and emailed a confirmation. We will validate the
-          authorization and deadlines, request disclosure where authorized, and notify you as the file advances.
-          If it’s urgent, call us at{' '}
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">{summary ? 'Payment confirmed' : 'Payment confirmation'}</h1>
+        <p role="status" className="text-lg text-muted-foreground mb-8">
+          {checking ? 'Checking your payment… ' : summary ? `Your ${summary.name} payment of $${summary.total.toFixed(2)} CAD is confirmed. Fabsy will validate your authorization and deadlines before the next step. ` : 'We could not confirm a paid order from this page. Check your Stripe receipt or contact Fabsy before paying again. '}
+          If it’s urgent, call{' '}
           <a href="tel:+18257932279" className="underline decoration-dashed underline-offset-4 text-primary hover:text-primary/80">(825) 793-2279</a>.
         </p>
 
-        <div className="grid gap-4 sm:grid-cols-3 text-left">
+        {summary ? <div className="grid gap-4 sm:grid-cols-3 text-left">
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">What happens next</h2>
-            <p className="text-sm text-muted-foreground">We confirm the intake and authorization, then request and track disclosure where available.</p>
+            <p className="text-sm text-muted-foreground">{summary.photoRadar ? 'After accepting the file and confirming authorization, Fabsy enters the not-guilty plea and requests disclosure. You approve any Crown deal.' : 'We confirm the intake and authorization, then request and track disclosure where available.'}</p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">How our pricing works</h2>
             <p className="text-sm text-muted-foreground">
-              Rapid Resolution is ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST. Trial and government fines are separate.
+              ${summary.serviceValue.toFixed(2)} service fee + ${summary.tax.toFixed(2)} GST (${summary.total.toFixed(2)} total). {summary.photoRadar ? 'No trial. No success fee. No insurance impact.' : 'Trial representation is separate.'} Government fines are separate.
             </p>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">Outcome standard</h2>
             <p className="text-sm text-muted-foreground">
-              {RAPID_RESOLUTION.speedDisclaimer} {RAPID_RESOLUTION.outcomeDisclaimer}
+              {offer.speedDisclaimer} {offer.outcomeDisclaimer}
             </p>
           </div>
-        </div>
+        </div> : null}
+
+        {summary && !summary.photoRadar && !summary.proDiscountApplied ? <div className="mt-6 rounded-lg border bg-card p-5 text-left"><p>Alberta Class 1, 2 or 4 licence? Send a photo of your licence for 20% off. Once verified, we refund the difference.</p><Link to="/portal/pro-discount" className="mt-3 inline-block font-semibold text-primary underline">Verify your licence privately</Link></div> : null}
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link to="/submit-ticket" className="inline-block">
+          <Link to={summary?.photoRadar ? PHOTO_RADAR.intakePath : RAPID_RESOLUTION.intakePath} className="inline-block">
             <span className="inline-flex items-center rounded-md bg-primary px-6 py-3 font-semibold text-white hover:opacity-90 transition">Submit another ticket</span>
           </Link>
           <Link to="/how-it-works" className="inline-block">

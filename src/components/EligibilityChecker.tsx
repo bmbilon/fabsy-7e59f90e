@@ -11,7 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RAPID_RESOLUTION } from "@/config/offers";
+import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
+import TicketTypeFields from "./TicketTypeFields";
+import { applyTicketType, detectTicketType, ticketDateFromExtraction, type TicketTypeState } from "@/lib/ticket/ticketType";
+import { TICKET_CAPTURE_BROWSE_ACCEPT, TICKET_CAPTURE_PHOTO_ACCEPT, validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
 import { supabase } from "@/integrations/supabase/client";
 import { useTicketCache } from "@/hooks/useTicketCache";
 import { toast } from "sonner";
@@ -21,12 +24,13 @@ interface EligibilityCheckerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-interface TicketData {
+interface TicketData extends TicketTypeState {
   violation?: string;
   fine?: string;
   fineAmount?: string;
   ticketNumber?: string;
   issueDate?: string;
+  offenceDate?: string;
   location?: string;
   officer?: string;
   officerBadge?: string;
@@ -70,10 +74,15 @@ function textValue(value: unknown) {
 function normalizedTicketData(response: OcrResponse | null): TicketData {
   const extracted = response?.data && typeof response.data === "object" ? response.data : response;
   const source = extracted && typeof extracted === "object" ? extracted : {};
+  const detected = detectTicketType(source);
 
   return {
+    ticketType: detected ?? "officer_issued",
+    ticketTypeSource: detected ? "upload" : "default",
+    registeredOwnerOnOffenceDate: "",
     ticketNumber: textValue(source.ticketNumber),
-    issueDate: textValue(source.issueDate),
+    issueDate: ticketDateFromExtraction(source, "officer_issued"),
+    offenceDate: ticketDateFromExtraction(source, "photo_radar"),
     location: textValue(source.location),
     officer: textValue(source.officer),
     officerBadge: textValue(source.officerBadge),
@@ -95,11 +104,17 @@ function numericFine(value: string) {
 function rapidResolutionPrefill(ticketData: TicketData) {
   const fineAmount = ticketData.fineAmount || ticketData.fine || "";
   const offence = ticketData.offenceDescription || ticketData.violation || "";
+  const ticketDate = ticketDateFromExtraction(ticketData, ticketData.ticketType);
 
   return {
+    ticketType: ticketData.ticketType,
+    ticketTypeSource: ticketData.ticketTypeSource,
+    registeredOwnerOnOffenceDate: ticketData.registeredOwnerOnOffenceDate,
     ticketNumber: ticketData.ticketNumber || "",
-    issueDate: ticketData.issueDate || "",
-    ticketDate: ticketData.issueDate || "",
+    // issueDate is the representation form's legacy name for its displayed date.
+    issueDate: ticketDate,
+    offenceDate: ticketData.offenceDate || "",
+    ticketDate,
     location: ticketData.location || "",
     officer: ticketData.officer || "",
     officerBadge: ticketData.officerBadge || "",
@@ -134,6 +149,8 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
   const [showSummary, setShowSummary] = useState(false);
   const [cacheKey, setCacheKey] = useState<string | null>(null);
   const { cacheTicketData } = useTicketCache();
+  const isPhotoRadar = ticketData?.ticketType === "photo_radar";
+  const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
 
   useEffect(() => {
     if (showSummary && dialogScrollRef.current) {
@@ -162,14 +179,10 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!isSupportedImage(file)) {
+    const fileValidation = validateTicketCaptureFile(file);
+    if ("error" in fileValidation) {
       event.target.value = "";
-      toast.error("Choose a JPG, PNG, WebP, HEIC or HEIF ticket image.");
-      return;
-    }
-    if (file.size <= 0 || file.size > MAX_IMAGE_BYTES) {
-      event.target.value = "";
-      toast.error("The ticket image must be between 1 byte and 10 MB.");
+      toast.error(fileValidation.error);
       return;
     }
 
@@ -180,6 +193,14 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
     setShowSummary(false);
     setCacheKey(null);
     setSelectedFile(file);
+
+    if (fileValidation.kind === "pdf") {
+      setImagePreview(null);
+      setTicketData(normalizedTicketData(null));
+      setIsProcessing(false);
+      toast.info("PDF attached for manual review. Enter the readable details and select the ticket type below.");
+      return;
+    }
 
     try {
       const imageBase64 = await new Promise<string>((resolve, reject) => {
@@ -248,7 +269,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
     resetReview();
     onOpenChange(false);
-    navigate(RAPID_RESOLUTION.intakePath, { state: navigationState });
+    navigate(offer.intakePath, { state: navigationState });
   };
 
   return (
@@ -257,7 +278,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
         <DialogHeader>
           <DialogTitle className="text-2xl">Free Ticket Review</DialogTitle>
           <DialogDescription>
-            Upload a clear image or take a photo. The tool captures ticket details for you to verify; no payment is required.
+            Upload a PDF, clear image or take a photo. Images are scanned; PDFs are attached for manual review. No payment is required.
           </DialogDescription>
         </DialogHeader>
 
@@ -268,7 +289,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                 ref={fileInputRef}
                 id={inputId}
                 type="file"
-                accept="image/*,.heic,.heif"
+                accept={TICKET_CAPTURE_BROWSE_ACCEPT}
                 className="sr-only"
                 disabled={isProcessing}
                 onChange={handleFileUpload}
@@ -277,7 +298,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                 ref={cameraInputRef}
                 id={cameraInputId}
                 type="file"
-                accept="image/*,.heic,.heif"
+                accept={TICKET_CAPTURE_PHOTO_ACCEPT}
                 capture="environment"
                 className="sr-only"
                 disabled={isProcessing}
@@ -294,7 +315,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   <p className="text-lg font-semibold">
                     {isProcessing ? "Reading your ticket..." : "Add your ticket image"}
                   </p>
-                  <p className="mt-1 text-sm text-muted-foreground">JPG, PNG, WebP, HEIC or HEIF · maximum 10 MB</p>
+                  <p className="mt-1 text-sm text-muted-foreground">PDF, JPG, PNG, WebP, HEIC or HEIF · maximum 10 MB</p>
                 </div>
 
                 {!isProcessing ? (
@@ -320,6 +341,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
             {ticketData ? (
               <div className="space-y-5">
+                <TicketTypeFields ticketType={ticketData.ticketType} ticketTypeSource={ticketData.ticketTypeSource} registeredOwnerOnOffenceDate={ticketData.registeredOwnerOnOffenceDate} onTicketTypeChange={value => setTicketData(current => current ? applyTicketType(current, value, "manual") : current)} onOwnerChange={registeredOwnerOnOffenceDate => setTicketData(current => current ? { ...current, registeredOwnerOnOffenceDate } : current)} />
                 <div className="rounded-xl border bg-muted/30 p-4 sm:p-5">
                   <div className="flex items-start gap-3">
                     <FileSearch className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
@@ -330,7 +352,10 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                   </div>
 
                   <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    {ticketFields.map(({ key, label, placeholder }) => {
+                    {ticketFields.map((field) => {
+                      const { placeholder } = field;
+                      const key = isPhotoRadar && field.key === "issueDate" ? "offenceDate" : field.key;
+                      const label = key === "offenceDate" ? "Offence date" : field.label;
                       const value = ticketData[key] || "";
                       const present = value.trim().length > 0;
                       return (
@@ -348,10 +373,11 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                             value={value}
                             placeholder={placeholder}
                             onChange={(event) => setTicketData((current) => ({
-                              ...(current || {}),
+                              ...(current || normalizedTicketData(null)),
                               [key]: event.target.value,
                             }))}
                           />
+                          {key === "offenceDate" && <p className="text-xs text-muted-foreground">Use the offence date on the notice, not its issue or mailing date. Enter it if the scan left this blank.</p>}
                         </div>
                       );
                     })}
@@ -390,7 +416,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
                 <div><dt className="text-muted-foreground">Ticket #</dt><dd className="font-medium">{ticketData?.ticketNumber || "Not captured"}</dd></div>
                 <div><dt className="text-muted-foreground">Offence</dt><dd className="font-medium">{ticketData?.offenceDescription || ticketData?.violation || "Not captured"}</dd></div>
                 <div><dt className="text-muted-foreground">Fine</dt><dd className="font-medium">{ticketData?.fineAmount || ticketData?.fine || "Not captured"}</dd></div>
-                <div><dt className="text-muted-foreground">Date</dt><dd className="font-medium">{ticketData?.issueDate || "Not captured"}</dd></div>
+                <div><dt className="text-muted-foreground">{isPhotoRadar ? "Offence date" : "Issue date"}</dt><dd className="font-medium">{ticketData ? ticketDateFromExtraction(ticketData, ticketData.ticketType) || "Not captured — enter it on the intake" : "Not captured"}</dd></div>
               </dl>
             </div>
 
@@ -398,12 +424,13 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Handle the ticket online</p>
               <div className="mt-2 flex flex-wrap items-end justify-between gap-2">
                 <div>
-                  <h4 className="text-lg font-bold">{RAPID_RESOLUTION.name} · ${RAPID_RESOLUTION.priceCad}</h4>
-                  <p className="text-sm text-muted-foreground">Eligible pre-trial service from intake through your decision on any Crown response.</p>
+                  <h4 className="text-lg font-bold">{offer.name} · ${offer.priceCad}</h4>
+                  <p className="text-sm text-muted-foreground">{isPhotoRadar ? "No demerits. No insurance impact. Only the fine is on the table." : "Eligible pre-trial service from intake through your decision on any Crown response."}</p>
                 </div>
                 <p className="text-sm font-semibold">CAD · plus GST</p>
               </div>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                {isPhotoRadar && <li className="font-semibold">{PHOTO_RADAR_PRICE_LABEL}. No trial. No success fee.</li>}
                 <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Digital authorization, disclosure request and tracking</li>
                 <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Disclosure analysis and fact-specific prosecutor review</li>
                 <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Immediate updates and your final instruction on any Crown response</li>
@@ -414,8 +441,8 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
               <div className="flex items-start gap-3">
                 <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
                 <p className="text-xs leading-relaxed text-slate-600">
-                  {RAPID_RESOLUTION.actionCommitment} Trial representation and government fines are separate.
-                  {" "}{RAPID_RESOLUTION.outcomeDisclaimer}
+                  {offer.actionCommitment} Government fines are separate.
+                  {" "}{offer.outcomeDisclaimer}
                 </p>
               </div>
             </div>
@@ -423,7 +450,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
             <div className="grid gap-3 sm:grid-cols-[0.8fr_1.2fr]">
               <Button type="button" variant="outline" onClick={resetReview}>Review Another Ticket</Button>
               <Button type="button" size="lg" onClick={continueToRapidResolution}>
-                Continue to Rapid Resolution
+                {isPhotoRadar ? "Continue to Photo Radar intake" : "Continue to Rapid Resolution"}
               </Button>
             </div>
 

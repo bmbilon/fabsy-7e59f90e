@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "frozen_at": "2026-08-31T09:29:16.913293+00:00",
+  "source_workspace": "/Users/brettbilon/fabsy",
+  "source_head": "03621fc2eb5c7ea4efb5183efb8fdee2aef031f7",
+  "release_coordinator_suggested_merge_ancestor": "bb03f4bcb70de0c8b06606768206c880165f75d6",
+  "warning": "Extensive pre-existing/delegated dirty changes. Shared files are scoped merge references, NOT whole-file replacements over origin/main. Retain FABSY_LIVE_SERVICE_LOCALES and latest exact publication/browser/legal guardrails. This task made no commit/deployment.",
+  "freeze_scope": "Listed frontend/backend implementation frozen. Docs/tests/delegatedSEO output may add final receipts; any implementation change will be notified.",
+  "new_program_sources": [
+    {
+      "path": "src/config/pro-drivers.ts",
+      "category": "new_program_source",
+      "sha256": "539f8d283e8fab49e01cde4d06b073314461914fcba5b7510cb4290ac3999d5e"
+    },
+    {
+      "path": "src/config/pro-referral-public.ts",
+      "category": "new_program_source",
+      "sha256": "de2d51e57c1d084e174ed894edc4164123a95d386a91a0288dce8068eeaa9cf3"
+    },
+    {
+      "path": "src/config/proReferralContent.json",
+      "category": "new_program_source",
+      "sha256": "44c9aca3a399fa5cef0d5d04eca14655ff271dfcf32f371487d95ed066c48449"
+    },
+    {
+      "path": "src/components/ReferralAttribution.tsx",
+      "category": "new_program_source",
+      "sha256": "168598719a392a85e513b627338aec0a56bb0931bb504c2970311cd737263393"
+    },
+    {
+      "path": "src/components/ResolutionEmailAction.tsx",
+      "category": "new_program_source",
+      "sha256": "1cba7ae95ef85cc34ce131f07ab1a9c2e86ce742469633548be9fc9fd0e5f70c"
+    },
+    {
+      "path": "src/hooks/useHashScroll.ts",
+      "category": "new_program_source",
+      "sha256": "137fef0af760bdef72de0a90cc50489bd02999a194f8339d385a0471c50b1471"
+    },
+    {
+      "path": "src/lib/pro-drivers/intake.ts",
+      "category": "new_program_source",
+      "sha256": "d8061bc6b40681eb66c77768bf4e3c2474afaba9c36ecc64ff3db6ae8861b347"
+    },
+    {
+      "path": "src/lib/referrals/attribution.ts",
+      "category": "new_program_source",
+      "sha256": "962db77d670ea46894a639999c820d2b8d82c0bbfb4747c0bc0fd95c13b8fa69"
+    },
+    {
+      "path": "src/lib/referrals/capture.ts",
+      "category": "new_program_source",
+      "sha256": "ef1812f6a40ae42be3307977b7178d952ab9002ad9822896dc756c3eb0746ff8"
+    },
+    {
+      "path": "src/lib/referral-program.ts",
+      "category": "new_program_source",
+      "sha256": "78b75b8a4610d3f6b2cf94d0d9439c6d42d49bf1d413acbfeda585cad0ab4963"
+    },
+    {
+      "path": "src/pages/ProDrivers.tsx",
+      "category": "new_program_source",
+      "sha256": "1797c0f027200ad0172d948a4749e44fb9c15700f233166b86b558c7139d123d"
+    },
+    {
+      "path": "src/pages/Refer.tsx",
+      "category": "new_program_source",
+      "sha256": "d10bc0916af14877f636ddb7ef62f020184e56e62b2e524b06f9290cf88bb26c"
+    },
+    {
+      "path": "src/pages/ReferralPortal.tsx",
+      "category": "new_program_source",
+      "sha256": "31dd66ff3c4576f5813ddf19106ddd927c6bc1f1d512f330a7918211d2ebd35b"
+    },
+    {
+      "path": "src/pages/AdminReferrals.tsx",
+      "category": "new_program_source",
+      "sha256": "42a6f3e55300da6129d38422d6b9a7035dcab98f2b519d4ac352e6770f8e1e46"
+    },
+    {
+      "path": "src/pages/ProDiscountPortal.tsx",
+      "category": "new_program_source",
+      "sha256": "41e76ff6708ebb9452614bd656e30d0ec178de5477c9d86615359d7fd480358c"
+    },
+    {
+      "path": "supabase/functions/_shared/pro-pricing.ts",
+      "category": "new_program_source",
+      "sha256": "9088af743282adfbf9a2190dfb85ae8e87fd998e5df63ecd80567f923254d6b6"
+    },
+    {
+      "path": "supabase/functions/_shared/pro-licence.ts",
+      "category": "new_program_source",
+      "sha256": "8703a89c9da5969c433f5466fa046904eb6b803455aacc4432330aef1ad3267f"
+    },
+    {
+      "path": "supabase/functions/_shared/pro-refund.ts",
+      "category": "new_program_source",
+      "sha256": "4a0d5b55835138bb2cc6a8b38315b8225ae84281763b81133da6a24fcb4532bb"
+    },
+    {
+      "path": "supabase/functions/_shared/referrals.ts",
+      "category": "new_program_source",
+      "sha256": "77589d69b18945f453a7a95eb6406f61c5dbdbb2de6aa8d63343f4a6a934de88"
+    },
+    {
+      "path": "supabase/functions/_shared/resolution-email.ts",
+      "category": "new_program_source",
+      "sha256": "d7aa2aea768c32ffba3352fcd7de72bf558c30b54a59238aa84f77c89e158678"
+    },
+    {
+      "path": "supabase/functions/verify-pro-licence/index.ts",
+      "category": "new_program_source",
+      "sha256": "120e52978027cb3fd0df2603ac4d560c4396591ac979241d23699a7e220e16e4"
+    },
+    {
+      "path": "supabase/functions/referral-program/index.ts",
+      "category": "new_program_source",
+      "sha256": "19810132d9b81acdae3dc3e430f128bea054bce47a54a53eef130beaf6676e93"
+    },
+    {
+      "path": "supabase/migrations/20260831120000_pro_driver_discount.sql",
+      "category": "new_program_source",
+      "sha256": "f2d52def1ec731d81efc8ed8a1ecc4bf6f149cec6fe86a93ebb3937d3724e733"
+    },
+    {
+      "path": "supabase/migrations/20260831121000_referral_program.sql",
+      "category": "new_program_source",
+      "sha256": "674f8db32184ca608532f0242edafd7250eea49c21b3537162b28d30c1c4cbe8"
+    },
+    {
+      "path": "supabase/migrations/20260831122000_resolution_referral_email.sql",
+      "category": "new_program_source",
+      "sha256": "5b9e1cd9d8dc43598a8fede3bb28cd8b38c2711cccfd92d2c4cb75ead981bd6d"
+    },
+    {
+      "path": "scripts/provision-pro-driver-stripe.mjs",
+      "category": "new_program_source",
+      "sha256": "f366f93ec50400942f5bd0d4ed8b93dd18bbf4af18dc4a02de9ec4863e9e3190"
+    },
+    {
+      "path": "scripts/generate-pro-referral-snapshots.cjs",
+      "category": "new_program_source",
+      "sha256": "ff218b51bb32b3b64f029f098f2289aed55c95e642df7be6c311e912be513be9"
+    },
+    {
+      "path": "scripts/update-static-sitemap-offline.mjs",
+      "category": "new_program_source",
+      "sha256": "b7cd4b75a88f32d7b9d579fb2b214897dd1753ae372d1704ec2fd0a2eb3fed03"
+    }
+  ],
+  "shared_sources": [
+    {
+      "path": "src/App.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "22b00d80fce041351bc9787e34f8716049fd08c6b42cd54cf193816eff5ade4a",
+      "merge_boundary": "Only program lazy imports/RouteSuspense/ReferralAttribution and pro/refer/r/portal/admin routes; preserve live locale and Photo routes."
+    },
+    {
+      "path": "src/components/TicketForm.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "9736a1e819fd81c84e6652068542a36d5e702f0652a2ac52fa8a72b07af26bd6",
+      "merge_boundary": "LicenceClass/referral/manual-date fields; officer step1 declaration, step3 signed capture, minimal draft, explicit initialTicketType cache bypass, offence-date mapping. Preserve live locale gates and Photo controls."
+    },
+    {
+      "path": "src/components/form-steps/PersonalInfoStep.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "bafab85cbf407255e712cc2ffae22566b5ac8bd1bb75725d9fc6a109bcf2fa14",
+      "merge_boundary": "Memory-only licence upload checks and pro notice/class consistency; preserve live localization/PII/consent."
+    },
+    {
+      "path": "src/components/form-steps/ReviewStep.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "a454b3feea71ca1e9813ed4ac8d2678c549ba4335ad52fb85f0d6b2fc95d2176",
+      "merge_boundary": "Pro pending and referral disclosure; preserve Photo price/scope."
+    },
+    {
+      "path": "src/components/form-steps/PaymentStep.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "29cc3e922c1f3a4339fe1a357031709f71c906169790beec6a9b24f0b7e7778d",
+      "merge_boundary": "Server verification before Stripe, strict response and identity/photo-bound quote, signed ref/class submit payload, minimal payment request. Preserve LIVE locale/legal checks and Photo branch."
+    },
+    {
+      "path": "src/components/PricingLadder.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "08d670acfca3bd032a16edbe78458400da9bd6ec1466e5911c04c33177f637bf",
+      "merge_boundary": "Officer pro20% line only; preserve Photo79/Free/RR198/Bundle229/Trial."
+    },
+    {
+      "path": "src/components/ProductLadder.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "2a7f3c5a7c7d3f922c7afa43ad7b6469b0c681479ded7dca3f48d68011fce619",
+      "merge_boundary": "Pro20% line only; check import usage before consolidation."
+    },
+    {
+      "path": "src/components/idr/IdrAccessGate.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "2c72385bc3a8967a67e56f753cc35d4c159214a8d1cb2409357c2009a52929a3",
+      "merge_boundary": "Optional emailLabel for registered referrers; preserve purchase sign-in."
+    },
+    {
+      "path": "src/pages/ClientCasesPage.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "eacb2691e4b668ae35285aa5b0d1d6d3a19d0e2063febe89b48bb47ae2fcfb05",
+      "merge_boundary": "Refer-a-driver navigation only."
+    },
+    {
+      "path": "src/pages/IdrPortal.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "9c66b218a519aa975fc9793521046c01104b320268b0e9c63ecda891af33d7c3",
+      "merge_boundary": "Refer-a-driver navigation only."
+    },
+    {
+      "path": "src/pages/AdminDashboard.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "e8270f4e99a109ba70d349f5e9dc73d1aa67c1876a80ab3d51dea630d508c44b",
+      "merge_boundary": "One Referrals tile only."
+    },
+    {
+      "path": "src/pages/TermsOfService.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "b25338b59575ef8340c536bb83c09e19ea7f6dc468c6c77ca9ee3a4a87e338fc",
+      "merge_boundary": "Program imports/5D/pro-driver-terms/5E/referral-terms and hash scroll. Preserve Photo5C/latest legal text; consciously refresh final exact publication fingerprints."
+    },
+    {
+      "path": "src/pages/PrivacyPolicy.tsx",
+      "category": "shared_scoped_merge",
+      "sha256": "08cb8a82272f84699aa6f24527c7b61810c82440639659d994cd5a1e9647ffc8",
+      "merge_boundary": "Licence evidence/referral attribution/identity/tax/payout disclosure; preserve latest privacy text."
+    },
+    {
+      "path": "src/integrations/supabase/types.ts",
+      "category": "shared_scoped_merge",
+      "sha256": "581356955f007b23fdabd9a0c6f4ad6bbfd52754e82581ab2ba9021e951fb17c",
+      "merge_boundary": "Only21 new pro/referral ticket_submissions fields across Row/Insert/Update; preserve ATE/main types."
+    },
+    {
+      "path": "supabase/config.toml",
+      "category": "shared_scoped_merge",
+      "sha256": "6912189ac25db89261663e7a12a0b9ac33b49ece0133fc451351f2d4e2330962",
+      "merge_boundary": "Only verify-pro-licence/referral-program verify_jwt=false sections; handlers enforce ownership/staff/capabilities."
+    },
+    {
+      "path": "supabase/functions/create-payment/index.ts",
+      "category": "shared_scoped_merge",
+      "sha256": "2fb05d9d56bcbd8ca642725f3edfa15d7b8b44eaf18c40a92825b3eb25f3c63d",
+      "merge_boundary": "verifiedProEvidence/proPricing, validatedPRO20 officer-only, immutable reservation+metadata, no new genericpromo; preserve LIVE locale and Photo resolver/SKU/GST."
+    },
+    {
+      "path": "supabase/functions/submit-ticket/index.ts",
+      "category": "shared_scoped_merge",
+      "sha256": "8e27d4cd1309c4aa8395ce1e0f49b0965ee6d1dbb02b36c23ffa3e85ddfa6ac3",
+      "merge_boundary": "Normalized officer class, signed referral attach and append-only plate denial hash for reused/new intake; preserve LIVE locale/consent/Photo mapping."
+    },
+    {
+      "path": "supabase/functions/idr-payment-webhook/index.ts",
+      "category": "shared_scoped_merge",
+      "sha256": "6f5936b5412c78fae4aab6efeebb7030fd72f40f6e01cbb4c23eb9be3383cc17",
+      "merge_boundary": "Pro price/proof validation and24.80+PRO20 report allocation, ALL representation payment identities, referral refund/dispute holds and actual pro refund reconciliation; preserve LIVE locale/Photo activation."
+    },
+    {
+      "path": "supabase/functions/send-idr-case-update/index.ts",
+      "category": "shared_scoped_merge",
+      "sha256": "20892767bb7967f5fed4ab298a1d832355e897c1d819033ba3675cd16ae50a26",
+      "merge_boundary": "New staff case_resolved preview/send, paid saved outcome/fingerprint/explicit invite consent+config/immutable retry+crash guard; requires122000. Preserve live locale dispatch and old events."
+    },
+    {
+      "path": "docs/paid-acquisition/2026-08-30/social-copy-drafts.md",
+      "category": "shared_scoped_merge",
+      "sha256": "785f2b8aef2dd5c3ba3528544467e1f723d71fee4b819be9a694cc0502c38604",
+      "merge_boundary": "Commercial driver Meta draft only; no campaign or referral ads."
+    }
+  ],
+  "verification_sources": [
+    {
+      "path": "supabase/functions/_shared/pro-pricing.test.ts",
+      "category": "offline_test",
+      "sha256": "bb759ecb7b1b3572ac026daa5884f33df0c855fb0ba435eb6e0bb96e528c038c"
+    },
+    {
+      "path": "supabase/functions/_shared/referrals.test.ts",
+      "category": "offline_test",
+      "sha256": "2222ce66e07bc9b974a5393a10e3e0b8dd199212d0955a8ecc739a648af3ab72"
+    },
+    {
+      "path": "supabase/functions/_shared/resolution-email.test.ts",
+      "category": "offline_test",
+      "sha256": "4181459ef108e64724150e870cd0c1c2fb63bc3f2d3651d8fe2c1943e593dcaf"
+    },
+    {
+      "path": "supabase/tests/test_referral_program.py",
+      "category": "offline_test",
+      "sha256": "1f65cc0e89519f04301dbb81c8486cd41dfec4073c33dfd5d60d609847915bac"
+    },
+    {
+      "path": "supabase/tests/referral-program.test.sql",
+      "category": "offline_test",
+      "sha256": "ed167bdc9c66eb7f8513d933d46c8c8fd214efd42cf8fe190139db2dea2be4e0"
+    },
+    {
+      "path": "supabase/tests/test_pro_referral_migrations.py",
+      "category": "offline_test",
+      "sha256": "e19c48fef8aa70fa6b2bed750d227e4bfe6c1f75813148ed9d368f2f03bb4906"
+    },
+    {
+      "path": "supabase/tests/pro-referral-migrations.test.sql",
+      "category": "offline_test",
+      "sha256": "cbf0705a9a0b51ae4851f5952ca02e12bdf7ce66bc2b2ed9d75e44cef5ef28df"
+    },
+    {
+      "path": "supabase/tests/resolution-referral-email.test.sql",
+      "category": "offline_test",
+      "sha256": "1db23ef5bcf27c1f40c51ab02e9246a110a682c8943150c0dc1bcdf7a33831d8"
+    },
+    {
+      "path": "src/lib/pro-drivers/checkout.test.mjs",
+      "category": "offline_test",
+      "sha256": "c9eb7f227a251dfd534ec5c3456fe4d4a0e745d9e71c05f68d9002b4e06656dd"
+    },
+    {
+      "path": "src/lib/referrals/attribution.test.mjs",
+      "category": "offline_test",
+      "sha256": "d9018f4cac74bfa80ece54f0b9c5491598a538071b721a9ae307075be77597f8"
+    },
+    {
+      "path": "src/lib/referrals/resolution-email-action.test.mjs",
+      "category": "offline_test",
+      "sha256": "fa8dbb9c87a90d6cd1db6456c13566c30ff53dc9f1d9f138dfe0e435a20c14d6"
+    },
+    {
+      "path": "src/lib/ticket/intake-date-handoff.test.mjs",
+      "category": "offline_test",
+      "sha256": "709311c9929d603c27bc186fc5e2b85c5474bc0396307632dea0f70af5dab4a5"
+    },
+    {
+      "path": "scripts/test-provision-pro-driver-stripe.mjs",
+      "category": "offline_test",
+      "sha256": "298756756b1f448ae3d82556bd952b7a85d867a01c0ee0f3a31dce906b9c80c2"
+    },
+    {
+      "path": "scripts/test-pro-referral-snapshots.mjs",
+      "category": "offline_test",
+      "sha256": "8d9915c9458760e0116aa3add1d07a653d32e5d50dc4660c833f1fa5c1a7a05a"
+    },
+    {
+      "path": "scripts/test-resolution-email-endpoint.mjs",
+      "category": "offline_test",
+      "sha256": "fb3cdae1d385bae5e90f0dc71cfe22d2197cf6a650504e1ca4afcea08c10e1a8"
+    }
+  ],
+  "schema_order": [
+    "existing main prerequisites",
+    "20260831115000_photo_radar_product.sql",
+    "20260831120000_pro_driver_discount.sql",
+    "20260831121000_referral_program.sql",
+    "20260831122000_resolution_referral_email.sql"
+  ],
+  "function_deployments": [
+    "submit-ticket",
+    "verify-pro-licence",
+    "create-payment",
+    "idr-payment-webhook",
+    "referral-program",
+    "send-idr-case-update"
+  ],
+  "dependent_photo_owner_files": [
+    "src/config/offers.json",
+    "src/config/offers.ts",
+    "src/lib/ticket/ticketType.ts",
+    "src/components/form-steps/TicketDetailsStep.tsx",
+    "src/components/TicketTypeFields.tsx",
+    "src/pages/ThankYou.tsx",
+    "src/lib/checkoutReceipt.ts",
+    "supabase/functions/_shared/photo-radar.ts",
+    "supabase/functions/get-checkout-session/index.ts",
+    "supabase/migrations/20260831115000_photo_radar_product.sql",
+    "src/components/AteCaseReview.tsx",
+    "src/pages/AdminSubmissionDetail.tsx"
+  ],
+  "delegated_seo_merge_files": [
+    "scripts/generate-sitemap-from-db.js",
+    "scripts/generate-static-snapshots.cjs",
+    "scripts/prerender-all.js",
+    "scripts/curated-content-guardrails.cjs",
+    "scripts/validate-snapshot-guardrails.cjs",
+    "scripts/normalize-rapid-resolution-content.cjs",
+    "public/sitemaps/sitemap-pages.xml",
+    "public/prerendered/pro-drivers/index.html",
+    "public/prerendered/refer/index.html",
+    "public/llms.txt"
+  ],
+  "seo_status": "Program generator/React parity passes before final exact text admission. Route-scoped commercial/Offer guards are owned separately in shared Photo and release worktrees; must pass in release; never replace latest validators wholesale.",
+  "confirmed_local_checks": [
+    "9 pro-pricing/image Deno tests",
+    "7 referral HMAC/settlement/refund Deno tests",
+    "4 resolution Deno tests",
+    "actual disposablePG migrations115000/120000/121000/122000,RLS,concurrentpayout/refunds",
+    "7mountedcheckout scenarios and attribution/datehandoff suites",
+    "realbundledendpoint+mountedresolution offline tests",
+    "TypeScript/directViteproduction compile",
+    "public/private unauthenticated browserchecks"
+  ],
+  "not_run_by_this_task": [
+    "live Stripe apply",
+    "live Supabase migrations/edge deploy",
+    "real AI upload/payment/refund",
+    "real email/Interac",
+    "campaignpublication"
+  ],
+  "runtime_flags": {
+    "REFERRAL_EMAIL_ENABLED": "unset/false until real mailing details, consent and unsubscribe operations ready",
+    "FABSY_BUSINESS_MAILING_ADDRESS": "unset; never invent",
+    "REFERRAL_ATTRIBUTION_SECRET": "optional>=24 chars; service-key HMACfallback",
+    "PRO20": "exact private20%once/unrestricted; coordinatedStripeownerprovisions"
+  },
+  "runbooks": [
+    "supabase/PRO_DRIVER_OPERATIONS.md",
+    "supabase/REFERRAL_OPERATIONS.md",
+    "docs/pro-drivers-referrals/stripe-provisioning.md",
+    "docs/pro-drivers-referrals/seo-snapshots.md"
+  ],
+  "optional_email_omission": "If excluded from firstrelease, omit endpointchanges+migration122000+ResolutionEmailAction+bothATE/Adminmounts together. Do not expose controls against older endpoint. Keepinviteflagoff."
+}

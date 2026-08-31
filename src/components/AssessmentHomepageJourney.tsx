@@ -21,6 +21,8 @@ import {
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
+import PhotoRadarOfferStrip from "./PhotoRadarOfferStrip";
+import PricingLadder from "./PricingLadder";
 
 const process = [
   {
@@ -148,6 +150,7 @@ export default function AssessmentHomepageJourney() {
               Ticket resolution, insurance planning, or both
             </h2>
             <p className="mt-4 text-muted-foreground">Prices are CAD plus applicable GST.</p>
+            <div className="mt-4"><PricingLadder /></div>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             <Card className="flex flex-col border-primary/20 p-7 shadow-fab">
@@ -178,10 +181,11 @@ export default function AssessmentHomepageJourney() {
               <p className="mt-3 text-4xl font-bold text-primary">${RAPID_RESOLUTION_BUNDLE.priceCad}</p>
               <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">{RAPID_RESOLUTION_BUNDLE.description}</p>
               <Button asChild className="mt-6">
-                <Link to={RAPID_RESOLUTION.intakePath}>Choose the bundle</Link>
+                <Link to={`${RAPID_RESOLUTION.intakePath}?bundle=1`}>Choose the bundle</Link>
               </Button>
             </Card>
           </div>
+          <PhotoRadarOfferStrip />
         </div>
       </section>
 

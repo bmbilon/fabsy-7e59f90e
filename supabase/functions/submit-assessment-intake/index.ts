@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { LocaleRequestError, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
+import { parseTicketClassification, ProductRequestError } from "../_shared/photo-radar.ts";
+import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
 
 class RequestError extends Error {
   constructor(message: string, public status = 400) {
@@ -204,12 +206,15 @@ serve(async (req) => {
     });
 
     const body = await req.json() as Record<string, unknown>;
+    const classification = parseTicketClassification(body);
+    const isPhotoRadar = classification.ticket_type === "photo_radar";
     const preferredLocale = parsePreferredLocale(body.preferred_locale);
     requireReleasedServiceLocale(
       preferredLocale,
       Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
       Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
     );
+    if (isPhotoRadar) requireEnglishProductLocale(preferredLocale, "photo_radar");
     if (typeof body.company === "string" && body.company.trim()) {
       return json(origin, { success: true }, 200);
     }
@@ -219,8 +224,8 @@ serve(async (req) => {
 
     const contact = body.contact as Record<string, unknown> | undefined;
     const ticket = body.ticket as Record<string, unknown> | undefined;
-    const driving = body.driving as Record<string, unknown> | undefined;
-    const insurance = body.insurance as Record<string, unknown> | undefined;
+    const driving = (isPhotoRadar ? { licensedInCanada: "unknown", licenceClass: "unknown", relevantConvictions: "unknown", currentDemerits: "unknown", drivingUse: "unknown" } : body.driving) as Record<string, unknown> | undefined;
+    const insurance = (isPhotoRadar ? { premiumFrequency: "unknown", renewalMonth: "unknown" } : body.insurance) as Record<string, unknown> | undefined;
     const file = body.file as Record<string, unknown> | undefined;
     if (!contact || !ticket || !driving || !insurance || !file) throw new RequestError("Assessment intake is incomplete.");
 
@@ -230,7 +235,7 @@ serve(async (req) => {
     if (!EMAIL_PATTERN.test(email)) throw new RequestError("Email is invalid.");
     const phone = optionalText(contact.phone, "Phone", 30) || "";
     if (!PHONE_PATTERN.test(phone) || phone.replace(/\D/g, "").length > 15) throw new RequestError("Phone is invalid.");
-    const reviewConsent = signedReviewConsent(body.reviewConsent);
+    const reviewConsent = isPhotoRadar ? null : signedReviewConsent(body.reviewConsent);
 
     const province = requiredText(ticket.province, "Province", 80);
     if (province !== "Alberta") throw new RequestError("This assessment currently accepts Alberta traffic tickets only.", 422);
@@ -239,8 +244,8 @@ serve(async (req) => {
     const ticketDate = optionalIsoDate(ticket.ticketDate, "Ticket date");
     const responseDeadline = optionalIsoDate(ticket.responseDeadline, "Response deadline");
     const fineAmountCad = optionalMoney(ticket.fineAmountCad, "Fine amount");
-    const whatHappened = requiredText(ticket.whatHappened, "What happened", 2500);
-    if (whatHappened.length < 10) throw new RequestError("What happened must be at least 10 characters.");
+    const whatHappened = isPhotoRadar ? optionalText(ticket.whatHappened, "What happened", 2500) || "Registered-owner automated notice; ownership answer recorded for review." : requiredText(ticket.whatHappened, "What happened", 2500);
+    if (!isPhotoRadar && whatHappened.length < 10) throw new RequestError("What happened must be at least 10 characters.");
 
     const licensedInCanada = enumValue(driving.licensedInCanada, "Canadian licence duration", ["less_than_1_year", "1_to_3_years", "4_to_9_years", "10_plus_years", "unknown"]);
     const licenceClass = enumValue(driving.licenceClass, "Licence class", ["class_7", "class_5_gdl", "class_5", "commercial", "other", "unknown"]);
@@ -259,7 +264,7 @@ serve(async (req) => {
     if (typeof file.size !== "number" || !Number.isInteger(file.size) || file.size <= 0 || file.size > MAX_FILE_BYTES) {
       throw new RequestError("Ticket file size is invalid.");
     }
-    const policyFiles = policyFileMetadata(body.policyFiles);
+    const policyFiles = isPhotoRadar ? [] : policyFileMetadata(body.policyFiles);
 
     const fingerprint = await sha256(`${serviceRoleKey}:${requestIp(req)}`);
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -281,6 +286,7 @@ serve(async (req) => {
     const intake = {
       schema_version: 1,
       ticket: {
+        ...classification,
         province,
         ticket_number: ticketNumber,
         offence,
@@ -343,6 +349,7 @@ serve(async (req) => {
     }
 
     const submissionPayload = {
+      ...classification,
       client_id: clientId,
       preferred_locale: preferredLocale,
       first_name: firstName,
@@ -367,7 +374,7 @@ serve(async (req) => {
       review_consent: reviewConsent,
       assessment_access_token_hash: accessTokenHash,
       assessment_price_cad: 149,
-      representation_credit_eligible: true,
+      representation_credit_eligible: !isPhotoRadar,
       updated_at: new Date().toISOString(),
     };
 
@@ -429,7 +436,7 @@ serve(async (req) => {
       policyUploads,
     });
   } catch (error) {
-    const status = error instanceof RequestError || error instanceof LocaleRequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof LocaleRequestError || error instanceof ProductRequestError ? error.status : 500;
     if (status >= 500) console.error("submit-assessment-intake failed");
     return json(origin, {
       error: status >= 500 ? "The assessment intake could not be saved." : (error as Error).message,

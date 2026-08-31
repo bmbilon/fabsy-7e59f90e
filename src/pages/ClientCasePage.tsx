@@ -12,9 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import useSafeHead from "@/hooks/useSafeHead";
 import { idrDb } from "@/lib/idr/supabase";
-import { INSURANCE_IMPACT_REPORT, RAPID_RESOLUTION } from "@/config/offers";
+import { INSURANCE_IMPACT_REPORT, PHOTO_RADAR, RAPID_RESOLUTION } from "@/config/offers";
+import { AteClientOffers } from "@/components/AteCaseReview";
 
 interface CaseRecord {
+  ticket_type: "photo_radar" | "officer_issued";
   id: string;
   ticket_number: string;
   violation: string;
@@ -39,7 +41,7 @@ function CaseContent({ caseId }: { caseId: string }) {
     const load = async () => {
       const { data, error: caseError } = await idrDb
         .from("ticket_submissions")
-        .select("id,ticket_number,violation,fine_amount,status,verdict,case_outcome,clients(email)")
+        .select("id,ticket_number,violation,fine_amount,status,verdict,case_outcome,ticket_type,clients(email)")
         .eq("id", caseId)
         .single();
       if (caseError) {
@@ -60,7 +62,7 @@ function CaseContent({ caseId }: { caseId: string }) {
   }, [caseId]);
 
   const startAddonCheckout = async () => {
-    if (!caseRecord) return;
+    if (!caseRecord || caseRecord.ticket_type === "photo_radar") return;
     setIsCheckingOut(true);
     setError(null);
     const client = caseRecord.clients;
@@ -81,7 +83,7 @@ function CaseContent({ caseId }: { caseId: string }) {
   };
 
   const startDamageControlCheckout = async () => {
-    if (!caseRecord) return;
+    if (!caseRecord || caseRecord.ticket_type === "photo_radar") return;
     setIsCheckingOut(true);
     setError(null);
     const client = caseRecord.clients;
@@ -120,9 +122,14 @@ function CaseContent({ caseId }: { caseId: string }) {
               <ShieldCheck className="h-4 w-4" />
               <AlertTitle>Payment has not been confirmed</AlertTitle>
               <AlertDescription>
-                This submission is not an active Rapid Resolution matter. Return to the ticket form to start the secure ${RAPID_RESOLUTION.priceCad} CAD plus GST checkout.
+                This submission is not an active Rapid Resolution matter. Return to the ticket form to start the secure ${caseRecord.ticket_type === "photo_radar" ? PHOTO_RADAR.priceCad : RAPID_RESOLUTION.priceCad} CAD plus GST checkout.
               </AlertDescription>
             </Alert>
+          ) : caseRecord.ticket_type === "photo_radar" ? (
+            <div className="space-y-6">
+              <div><Badge>Rapid Resolution: Photo Radar</Badge><h2 className="mt-4 text-2xl font-bold">Only the fine is on the table</h2><p className="mt-3 text-muted-foreground">No demerits. No insurance impact. Your service is $79 + 5% GST ($82.95 total), with no trial or success fee. No reduction is promised and the fee is not refunded based on outcome.</p><p className="mt-3 text-sm text-muted-foreground">{PHOTO_RADAR.actionCommitment} {PHOTO_RADAR.speedDisclaimer}</p></div>
+              {caseRecord.case_outcome ? <p className="rounded-lg border p-4">Recorded outcome: {caseRecord.case_outcome.replace(/_/g, " ")}. No Insurance Impact Report is needed for this registered-owner notice.</p> : <AteClientOffers key={caseRecord.id} submissionId={caseRecord.id} />}
+            </div>
           ) : !caseRecord.verdict ? (
             <Alert>
               <ShieldCheck className="h-4 w-4" />
@@ -177,7 +184,7 @@ function CaseContent({ caseId }: { caseId: string }) {
           {error && <p className="mt-5 text-sm text-destructive">{error}</p>}
         </CardContent>
       </Card>
-      {(caseRecord.verdict === "unwinnable" || caseRecord.case_outcome === "conviction_stands") && <p className="mt-6 rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">{IDR_DISCLAIMER}</p>}
+      {caseRecord.ticket_type !== "photo_radar" && (caseRecord.verdict === "unwinnable" || caseRecord.case_outcome === "conviction_stands") && <p className="mt-6 rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">{IDR_DISCLAIMER}</p>}
     </main>
   );
 }
@@ -185,5 +192,5 @@ function CaseContent({ caseId }: { caseId: string }) {
 export default function ClientCasePage() {
   const { caseId = "" } = useParams();
   useSafeHead({ title: "Your Fabsy Case", robots: "noindex, nofollow" });
-  return <div className="min-h-screen bg-background"><Header /><IdrAccessGate redirectPath={`/portal/cases/${caseId}`}>{caseId ? <CaseContent caseId={caseId} /> : <p className="p-8">Missing case.</p>}</IdrAccessGate><Footer /></div>;
+  return <div className="min-h-screen bg-background"><Header /><IdrAccessGate redirectPath={`/portal/cases/${caseId}`}>{caseId ? <CaseContent key={caseId} caseId={caseId} /> : <p className="p-8">Missing case.</p>}</IdrAccessGate><Footer /></div>;
 }

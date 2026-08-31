@@ -6,8 +6,10 @@ import type { FormData } from "@/components/TicketForm";
 import useSafeHead from "@/hooks/useSafeHead";
 import { useLocale } from "@/i18n/locale-context";
 import { useTranslation } from "react-i18next";
+import { ticketTypeFromSearch } from "@/lib/ticket/ticketType";
 
 type LocationState = {
+  search: string;
   state?: {
     ticketImage?: File | null;
     prefillTicketData?: Partial<FormData> | null;
@@ -26,6 +28,7 @@ const TicketFormPage = () => {
     robots: "noindex, follow",
   });
   const location = useLocation() as unknown as LocationState;
+  const initialTicketType = ticketTypeFromSearch(location.search);
   const initialTicketImage = location?.state?.ticketImage ?? null;
   const prefillTicketData = location?.state?.prefillTicketData ?? null;
   const startAtStep = location?.state?.startAtStep ?? null;
@@ -35,7 +38,8 @@ const TicketFormPage = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <TicketForm
-          key={locale}
+          key={`${locale}:${initialTicketType ?? 'default'}`}
+          initialTicketType={initialTicketType}
           initialTicketImage={initialTicketImage}
           initialPrefill={prefillTicketData}
           initialStep={startAtStep ?? undefined}

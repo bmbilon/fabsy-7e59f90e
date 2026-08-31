@@ -1,0 +1,506 @@
+{
+  "version": 1,
+  "frozen_at": "2026-08-31T09:40:44.956422+00:00",
+  "source_workspace": "/Users/brettbilon/fabsy",
+  "source_head": "03621fc2eb5c7ea4efb5183efb8fdee2aef031f7",
+  "branch": "feature/insurance-damage-report",
+  "commit_created_by_this_task": false,
+  "warning": "Extensive pre-existing/delegated dirty changes. Shared files are merge references, NOT whole-file replacements over newer main. Preserve FABSY_LIVE_SERVICE_LOCALES and current legal/locale/publication gates; integrate with Pro and multilingual manifests. Never copy this old generated snapshot tree over the release worktree.",
+  "freeze_scope": "All listed Photo runtime/frontend/backend/content and shared guard/test reference files are now frozen. Documentation and read-only diagnostics may follow. Notify release owner before any implementation change.",
+  "migration_order": [
+    "20260830160000_multilingual_intake.sql",
+    "20260831115000_photo_radar_product.sql",
+    "20260831120000_pro_driver_discount.sql",
+    "20260831121000_referral_program.sql",
+    "20260831122000_resolution_referral_email.sql"
+  ],
+  "required_external_source_handoffs": [
+    "docs/pro-drivers-referrals/source-handoff.json",
+    "multilingual/Allstate release source owned by thread01a054fc-7b1d-7dc2-a369-7dff289fd87a"
+  ],
+  "known_release_requirements": [
+    "Keep Photo/pro English-only frontend and stored-order backend language gates",
+    "Rebuild generated pages and locale manifest in reconciled release worktree",
+    "Include ResolutionEmailAction and other Pro sources from their frozen manifest",
+    "Optional VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL must use a distinct Photo purchase action; camera does not fall back to RRlabel",
+    "Connect disclosure/notification worker or operate staff draft/copy/offer flow; no worker deployed here",
+    "Run signed test checkout/webhook/replay in authorized test environment before paid acquisition"
+  ],
+  "stripe": {
+    "verified_on": "2026-08-31",
+    "mode": "live",
+    "verification_method": "Authenticated Stripe Dashboard; no API credentials extracted",
+    "account_id": "acct_1PG64qAt6NWmIwaS",
+    "account_label": "execom",
+    "product": {
+      "id": "prod_VAmmGDIMzF4Njl",
+      "name": "Rapid Resolution: Photo Radar",
+      "metadata": {
+        "fabsy_product": "photo_radar",
+        "review_path": "ate"
+      },
+      "dashboard_url": "https://dashboard.stripe.com/acct_1PG64qAt6NWmIwaS/products/prod_VAmmGDIMzF4Njl"
+    },
+    "price": {
+      "id": "price_1UARCWAt6NWmIwaSdmboYoZP",
+      "currency": "cad",
+      "unit_amount": 7900,
+      "type": "one_time",
+      "tax_behavior": "exclusive",
+      "lookup_key": "fabsy_photo_radar_cad_79_v1",
+      "dashboard_url": "https://dashboard.stripe.com/acct_1PG64qAt6NWmIwaS/prices/price_1UARCWAt6NWmIwaSdmboYoZP"
+    },
+    "gst": {
+      "id": "txr_1UARPtAt6NWmIwaSKJip9xAE",
+      "display_name": "GST",
+      "percentage": 5,
+      "inclusive": false,
+      "active": true,
+      "country": "CA",
+      "state": "AB",
+      "jurisdiction": "Alberta, Canada",
+      "metadata": {
+        "fabsy_tax": "fabsy_alberta_gst_5_v1"
+      },
+      "note": "The Dashboard's separate Tax Type field is unset. The reviewed manual GST rate is identified by its exact display name, jurisdiction, percentage, exclusive calculation and metadata marker.",
+      "dashboard_url": "https://dashboard.stripe.com/acct_1PG64qAt6NWmIwaS/tax-rates/txr_1UARPtAt6NWmIwaSKJip9xAE"
+    },
+    "supabase_configuration": {
+      "project_ref": "gcasbisxfrssonllpqrw",
+      "STRIPE_PHOTO_RADAR_PRICE_ID": "price_1UARCWAt6NWmIwaSdmboYoZP",
+      "STRIPE_GST_TAX_RATE_ID": "txr_1UARPtAt6NWmIwaSKJip9xAE",
+      "both_expected_id_digests_verified": true,
+      "existing_secret_values_changed": false
+    },
+    "customer_or_payment_objects_created": false,
+    "signed_checkout_and_webhook_test_completed": false,
+    "deployment_completed_by_this_task": false
+  },
+  "files": {
+    "new_photo_sources": [
+      {
+        "path": "src/config/offers.json",
+        "sha256": "d670c0eb7c738fae71fa1ba0c86a53f17049a92e71d87b2f46e4580b6e7ec9a1"
+      },
+      {
+        "path": "src/config/offers.ts",
+        "sha256": "8d05109c1f855d17482d5bfd690a32072c9e8bc1eef42445aea3395e9adebf92"
+      },
+      {
+        "path": "src/config/photoRadarContent.json",
+        "sha256": "974b4c31f0dc4881e5b7d737ae5b3dbb1df6c6dbfaaf8c7c9f50aa48b360b01c"
+      },
+      {
+        "path": "src/config/photoRadarPages.json",
+        "sha256": "fefdefef911b906d3e42e871af6392a5d928a0ab66becdfaac23e3e832aa48f8"
+      },
+      {
+        "path": "src/config/fleetContent.json",
+        "sha256": "5652afcc1a158a70446dfdf2850ac289280ab4ad4d72c5c8be3fdb89853d2720"
+      },
+      {
+        "path": "src/components/TicketTypeFields.tsx",
+        "sha256": "08c317e8bfd75410928d17d0fa3f6261f4e0c9a8d36c85bdb1a57c32fe988f2a"
+      },
+      {
+        "path": "src/components/PhotoRadarOfferStrip.tsx",
+        "sha256": "c08b46b03dfb13358359978193937c4bb9febceb2f5b5ba069ca6705b0416c3a"
+      },
+      {
+        "path": "src/components/AteCaseReview.tsx",
+        "sha256": "cc618a1216a70434982eac10be460b0899b557baaee45537991f040f3cdded07"
+      },
+      {
+        "path": "src/components/PricingLadder.tsx",
+        "sha256": "08d670acfca3bd032a16edbe78458400da9bd6ec1466e5911c04c33177f637bf"
+      },
+      {
+        "path": "src/lib/ticket/ticketType.ts",
+        "sha256": "4c536feeb43a4ed22211c1e99752be22a5fb4834b57b031456e80de84745af46"
+      },
+      {
+        "path": "src/lib/ate-review.ts",
+        "sha256": "0c6fed257d24e3f13503d95feb4b1ba4d1201711ed1b0291f252db1abd73db36"
+      },
+      {
+        "path": "src/lib/ate-notifications.ts",
+        "sha256": "e2349dac0d8f61c04e542c9be0c999e369031fe1784ed979d182530f78fbd33b"
+      },
+      {
+        "path": "src/lib/photo-radar-pages.ts",
+        "sha256": "7e532c53cee873cac22d25dbf0f8ca1ec7d0a6a0499d7042a5cad5d0c3ebcba8"
+      },
+      {
+        "path": "src/lib/checkoutReceipt.ts",
+        "sha256": "e1b8fadeab07db42aa69058bc8ce730013a603cc85e2f20cc0d380c046b454f3"
+      },
+      {
+        "path": "src/pages/PhotoRadar.tsx",
+        "sha256": "1e4dbeb5bde3449de13fa00e10e2042488edb3b565f1f5a8192180ba7ce82add"
+      },
+      {
+        "path": "src/pages/Fleet.tsx",
+        "sha256": "c0db0683735a2d94ca112c6cc89661bff0871a78d5a7704d7d0eaff362f3dd4a"
+      },
+      {
+        "path": "src/pages/FreeTicketCheck.tsx",
+        "sha256": "7313b55567c38dc2d69d135848a149fc37c91fa004c744debb02b23827acae6e"
+      },
+      {
+        "path": "supabase/functions/_shared/photo-radar.ts",
+        "sha256": "4d38410313eaaf6bc39d91fdac4b3c4bffa636835d2d4af4e0a59288748d32fe"
+      },
+      {
+        "path": "supabase/functions/_shared/contact-request.ts",
+        "sha256": "5dbf5cd68d35f4a170905239e57a9fd49de8da1110d9cdd200e163d4d80663df"
+      },
+      {
+        "path": "supabase/migrations/20260831115000_photo_radar_product.sql",
+        "sha256": "c06e464ba6a5031cd5ae3858491ddb60bc7be01cacd97f784539b4cdad929948"
+      }
+    ],
+    "shared_frontend_merge_references": [
+      {
+        "path": "index.html",
+        "sha256": "6987cb9e30ce3595af9f03fb5b4bc8ed5b2846d33737132d1ec56127aa8be32e"
+      },
+      {
+        "path": "src/App.tsx",
+        "sha256": "22b00d80fce041351bc9787e34f8716049fd08c6b42cd54cf193816eff5ade4a"
+      },
+      {
+        "path": "src/components/TicketForm.tsx",
+        "sha256": "9736a1e819fd81c84e6652068542a36d5e702f0652a2ac52fa8a72b07af26bd6"
+      },
+      {
+        "path": "src/components/TicketCapture.tsx",
+        "sha256": "008cc12f6344bbb4d65e28a746c88c23ffb5fd3e633774cd71fd618657b41a05"
+      },
+      {
+        "path": "src/components/EligibilityChecker.tsx",
+        "sha256": "2d9a755dc6b7ae96e20ca6905f2606b467fc879324a0e9f1ef55077eb324dca5"
+      },
+      {
+        "path": "src/components/form-steps/PersonalInfoStep.tsx",
+        "sha256": "bafab85cbf407255e712cc2ffae22566b5ac8bd1bb75725d9fc6a109bcf2fa14"
+      },
+      {
+        "path": "src/components/form-steps/TicketDetailsStep.tsx",
+        "sha256": "876037c962289a7d3a564bd632cec439c1eed2710e16459fb695d38f9b154ca3"
+      },
+      {
+        "path": "src/components/form-steps/DefenseStep.tsx",
+        "sha256": "66a2eed5441a9f00220569170b664b97bfba64832987538f34621d10758a118e"
+      },
+      {
+        "path": "src/components/form-steps/ReviewStep.tsx",
+        "sha256": "a454b3feea71ca1e9813ed4ac8d2678c549ba4335ad52fb85f0d6b2fc95d2176"
+      },
+      {
+        "path": "src/components/form-steps/PaymentStep.tsx",
+        "sha256": "29cc3e922c1f3a4339fe1a357031709f71c906169790beec6a9b24f0b7e7778d"
+      },
+      {
+        "path": "src/components/form-steps/ConsentStep.tsx",
+        "sha256": "c59e1764b647f04d0323b77a1568eefc7c4905104628694de54b1b31d90ed173"
+      },
+      {
+        "path": "src/components/AssessmentHomepageJourney.tsx",
+        "sha256": "9c9ff9d0e996411926d96a919b1df9d1d3f84a0674f0d85472edb09e7fd2015d"
+      },
+      {
+        "path": "src/components/AnswerBox.tsx",
+        "sha256": "96e4a222ac03973b280c144ee265c20533dfda65832fbc1dcc13a0b2944f5924"
+      },
+      {
+        "path": "src/components/Footer.tsx",
+        "sha256": "ff28226b2f85d9e2f28b9abb1ba596babcfc6e75155d31fa7fd2da7857449235"
+      },
+      {
+        "path": "src/components/Header.tsx",
+        "sha256": "609844975199ce80a821b2edf87aa55a165d3b4d72ddea6bf06103ecaecf4864"
+      },
+      {
+        "path": "src/components/CallBar.tsx",
+        "sha256": "f0bb5ea46441c27943306f48b040722a14b57a82c87814341ee35cf35c79a9c6"
+      },
+      {
+        "path": "src/components/ProductLadder.tsx",
+        "sha256": "2a7f3c5a7c7d3f922c7afa43ad7b6469b0c681479ded7dca3f48d68011fce619"
+      },
+      {
+        "path": "src/components/LocalBusinessSchema.tsx",
+        "sha256": "b4f2627365df7a00695d5b47d893967b3ca4746139acf6d686c1be2d3c7e8a18"
+      },
+      {
+        "path": "src/components/ServiceSchema.tsx",
+        "sha256": "c4cdcd75da475677510939fec8cc9ab8e8cf468bfe649d1b83fabda1c41f0f62"
+      },
+      {
+        "path": "src/pages/TicketAssessmentIntake.tsx",
+        "sha256": "62232708c090836845d6360766233038a5223163b2f37c25943f5a90efa9d12b"
+      },
+      {
+        "path": "src/pages/WorkingContentPage.tsx",
+        "sha256": "e08a7109f8fded201634b9897b2cfa1ac6cc50bb8e38a90de0e79ac811969926"
+      },
+      {
+        "path": "src/pages/ContentPage.tsx",
+        "sha256": "3ec1677b811a4c6ce4759884c0d99e77d60b177adb901c433343b47d4783a0e8"
+      },
+      {
+        "path": "src/pages/Services.tsx",
+        "sha256": "79bc0dae086f5924f3bf1119ebab3f2fce703408e73c4e46e97643e3ae3ec3e5"
+      },
+      {
+        "path": "src/pages/AIInfo.tsx",
+        "sha256": "e8b819419eb415b7f1d4e7d386de42f7f76f2f4c37c335ad3ea61a05dc323282"
+      },
+      {
+        "path": "src/pages/TermsOfService.tsx",
+        "sha256": "b25338b59575ef8340c536bb83c09e19ea7f6dc468c6c77ca9ee3a4a87e338fc"
+      },
+      {
+        "path": "src/pages/ThankYou.tsx",
+        "sha256": "b9c662900209738b971140bab088dcac32d1eb615164640e820ccf826adafbf0"
+      },
+      {
+        "path": "src/pages/AdminCaseManagement.tsx",
+        "sha256": "4c8436704132b0f7212b3ca08c4d4a66d86f5df7a86e9bc7ecf3910f1f62f2f4"
+      },
+      {
+        "path": "src/pages/AdminSubmissionDetail.tsx",
+        "sha256": "f12c9d29db9a5c885e70ed5cb6d87580f11f450400df3c4ed29aaaee2ae43b91"
+      },
+      {
+        "path": "src/pages/ClientCasePage.tsx",
+        "sha256": "1c0a639ee825c640c591ae971663c7292c90cdd2ff6decc97fb0797385aa6d66"
+      },
+      {
+        "path": "src/integrations/supabase/types.ts",
+        "sha256": "581356955f007b23fdabd9a0c6f4ad6bbfd52754e82581ab2ba9021e951fb17c"
+      },
+      {
+        "path": "src/utils/analytics.ts",
+        "sha256": "09d9d23d626f7da2a1b9e3a40a1314f4ffc41cc6e5633bbb5e7898c86747358a"
+      },
+      {
+        "path": "src/utils/generate-json-ld.ts",
+        "sha256": "e8dee8bff949074f6ba5e876a6b953594ca979a92598fb81eff57ca86a001ee9"
+      }
+    ],
+    "shared_backend_merge_references": [
+      {
+        "path": "supabase/functions/submit-ticket/index.ts",
+        "sha256": "8e27d4cd1309c4aa8395ce1e0f49b0965ee6d1dbb02b36c23ffa3e85ddfa6ac3"
+      },
+      {
+        "path": "supabase/functions/submit-assessment-intake/index.ts",
+        "sha256": "2eec3eaea202b00daec4cac2dd70971eecb1e9952a1aa5d5a4facc5d4d1a0d19"
+      },
+      {
+        "path": "supabase/functions/create-payment/index.ts",
+        "sha256": "2fb05d9d56bcbd8ca642725f3edfa15d7b8b44eaf18c40a92825b3eb25f3c63d"
+      },
+      {
+        "path": "supabase/functions/create-idr-payment/index.ts",
+        "sha256": "1dfa57111c315093fe0546331b3f07d27e139ef726f778c455bdecefa3a2ac90"
+      },
+      {
+        "path": "supabase/functions/create-assessment-payment/index.ts",
+        "sha256": "2948fb8d95c2702caceae810c187e6684324ed360a268f0a83bc80c7dc19eaf5"
+      },
+      {
+        "path": "supabase/functions/idr-payment-webhook/index.ts",
+        "sha256": "6f5936b5412c78fae4aab6efeebb7030fd72f40f6e01cbb4c23eb9be3383cc17"
+      },
+      {
+        "path": "supabase/functions/ocr-ticket/index.ts",
+        "sha256": "17304ff5643368b097123db8fa9d09a0abaca610118139b044a8cd262413921e"
+      },
+      {
+        "path": "supabase/functions/analyze-ticket-ai/index.ts",
+        "sha256": "60baee12ae9c34d49aa1b4d87b50adc6022684cd00c370908ca2b86ce4ac9f6c"
+      },
+      {
+        "path": "supabase/functions/generate-consent-form/index.ts",
+        "sha256": "2c65f3cd2716a57771e4067f4a99c865089f1a1b1c73a3d79896ceb4fa4a0adf"
+      },
+      {
+        "path": "supabase/functions/get-checkout-session/index.ts",
+        "sha256": "6a941f8162e4f3ffbaec2c6839cde92fbec06714de82faabe3c4a141fe55e0bf"
+      },
+      {
+        "path": "supabase/functions/send-contact-email/index.ts",
+        "sha256": "20453d7959211506150c0efc5b736ad4b663299aa408cfdd9c7f658e16ace31f"
+      },
+      {
+        "path": "supabase/functions/send-idr-case-update/index.ts",
+        "sha256": "20892767bb7967f5fed4ab298a1d832355e897c1d819033ba3675cd16ae50a26"
+      },
+      {
+        "path": "supabase/functions/generate-json-ld/index.ts",
+        "sha256": "0fd3e256b10ffed2cc41fc3dbf8eec1685f24004efa5054af0c3f786f595b8b0"
+      },
+      {
+        "path": "supabase/functions/_shared/consent-pdf.ts",
+        "sha256": "096ec58881e68481c07d170fe8e74b9c934cba5783530b8ff26fa8df4866aff0"
+      },
+      {
+        "path": "supabase/functions/_shared/consent-unicode.ts",
+        "sha256": "34267e894524e63c79fc3507bd9b7cf9e074c0de0a73f9b879a0f51566c6be80"
+      },
+      {
+        "path": "supabase/functions/_shared/ticket-notification-html.ts",
+        "sha256": "31f78f8c04069ce4ee7da4cc09d4ec23f5a3dbfeb2de83aedefb3466f0ed1ae0"
+      }
+    ],
+    "photo_content_sources": [
+      {
+        "path": "src/content/pages/photo-radar-ticket-alberta.json",
+        "sha256": "391e0fb73eb37df68367fcfb8cc982d93f59e4c6c2781c8366e5d240b37ae160"
+      },
+      {
+        "path": "src/content/pages/photo-radar-ticket-edmonton.json",
+        "sha256": "82a7c668788451fc7f022fd32be8cd87c8f9a5d02c6fe68b775e087e7c3b3087"
+      },
+      {
+        "path": "src/content/pages/fight-photo-radar-ticket-calgary.json",
+        "sha256": "59084252e0f2e46c2cabfbf790eeb3da7bd8d62a5b32173054e25a86210eb2be"
+      },
+      {
+        "path": "ssg-pages/photo-radar-ticket-alberta.json",
+        "sha256": "738fc78af233aa19354bde4b83090289f9e52b96ef22ceced2d3591dec4c6613"
+      },
+      {
+        "path": "ssg-pages/photo-radar-ticket-edmonton.json",
+        "sha256": "dd191c065658b92db710f9987989dae81692871558f949b5ff9f00217156593a"
+      },
+      {
+        "path": "ssg-pages/fight-photo-radar-ticket-calgary.json",
+        "sha256": "3c04116836d293991ceb181b71ab05e4f20c34f3915df6d432c5be2776ba5464"
+      }
+    ],
+    "seo_merge_references": [
+      {
+        "path": "scripts/generate-photo-radar-snapshots.cjs",
+        "sha256": "c61ca1b89971ad13b059c63de7677eeeca466b32a8b132db1c980956f65783c8"
+      },
+      {
+        "path": "scripts/generate-static-snapshots.cjs",
+        "sha256": "3da3dae6dfaf7f1d264ecbd9f54dc9ab1654d62be21de7371628175a4255a205"
+      },
+      {
+        "path": "scripts/generate-sitemap-from-db.js",
+        "sha256": "759d6e1ee25cc26daf9bd97e1cfa3bff33c35b399e8ef5bfc12a1d8326f299ae"
+      },
+      {
+        "path": "scripts/prerender-all.js",
+        "sha256": "26af64f25463ba2b8bab4bed2d048b79253631ad610d53af251874bb08451c6a"
+      },
+      {
+        "path": "scripts/normalize-rapid-resolution-content.cjs",
+        "sha256": "dad0958c13280bca8bab1e97bb0828ae01512e77fa5b2da23ede82b361b5ab4e"
+      },
+      {
+        "path": "scripts/curated-content-guardrails.cjs",
+        "sha256": "5f4b631d31aa07ccab6848f25e4793d17a6e6afde915380a9e7bc05619176dc1"
+      },
+      {
+        "path": "scripts/validate-snapshot-guardrails.cjs",
+        "sha256": "6d8bca5c774693ae1ce17f2b37e4a18e3af0df9eeb4b2c846510c0d72baeb57d"
+      },
+      {
+        "path": "src/lib/published-content-guardrails-core.js",
+        "sha256": "d6d2ffccb9c1cd67cfb79887b6c534d46dd95e1f4b29845ad922934429695f1c"
+      },
+      {
+        "path": "supabase/functions/_shared/generated-content-guardrails.ts",
+        "sha256": "4e6bb29275e87866a2a48bda460205bc99b4653c5b216fcfd417539a13f6bed8"
+      },
+      {
+        "path": "public/llms.txt",
+        "sha256": "a4701f6806d238b4439f4ba6da567bda18a20759019e8bd7d97a70a7b7d4a235"
+      }
+    ],
+    "photo_tests_and_operations": [
+      {
+        "path": "scripts/provision-photo-radar-stripe.mjs",
+        "sha256": "d6b5839672e8663307e8c1e931de7cb9cfaf721fedca3c2163c164960a4f574b"
+      },
+      {
+        "path": "scripts/test-photo-radar-intake.mjs",
+        "sha256": "434178083285d5bde911832a7bf4c19e1485480e04e93ddb3573779166400d6c"
+      },
+      {
+        "path": "scripts/test-photo-radar-answer-box.mjs",
+        "sha256": "8eee0b0f3fd455f13dfbb569ba778df2195730ed67256e62d9c1e426f3f41614"
+      },
+      {
+        "path": "scripts/test-photo-radar-content.cjs",
+        "sha256": "4c867e0f88c41b50e4f8eaadcf31c34929ca80b237e3d088759693f98eb844e4"
+      },
+      {
+        "path": "scripts/test-photo-radar-pricing-compatibility.cjs",
+        "sha256": "d35f73b5f8767effeb41f2b1a1ba194dd1f12df5ef241650f341c44837377b27"
+      },
+      {
+        "path": "scripts/test-new-offer-snapshot-guardrails.cjs",
+        "sha256": "92aa1a17aef2e6691c7f32123d79b399a346b305fc9bb52dfce6d595c655b33d"
+      },
+      {
+        "path": "scripts/test-rapid-resolution-content-normalizer.cjs",
+        "sha256": "d283e14dc4da78ebf43803261d6ef83bb9d642b41be8381b36f6246091981fd7"
+      },
+      {
+        "path": "src/lib/checkoutReceipt.test.ts",
+        "sha256": "c81ec0249bc8c0f7c887d4ca7bbdf8e079b1fb69e1d1fdd1063f61ed7e146ed1"
+      },
+      {
+        "path": "src/lib/ticket/ticketType.test.ts",
+        "sha256": "3edd78ee674443cd7710e14e90a494a6ff34c18d1de0e00a42287a6dd791964c"
+      },
+      {
+        "path": "src/lib/ticket/intake-date-handoff.test.mjs",
+        "sha256": "709311c9929d603c27bc186fc5e2b85c5474bc0396307632dea0f70af5dab4a5"
+      },
+      {
+        "path": "supabase/functions/_shared/photo-radar.test.ts",
+        "sha256": "74d277c67406a12aaa9c5450597d164f3a2844b594576d817339a9517d9ec999"
+      },
+      {
+        "path": "supabase/functions/_shared/contact-request.test.ts",
+        "sha256": "049b561be7222fab9022544f06cb384db3cb0da4c3397814d36e023eb9da0ae7"
+      },
+      {
+        "path": "supabase/functions/_shared/consent-pdf.test.ts",
+        "sha256": "797f20e1eeec723f9a09d5f4c59d1a39f109f3388e32517f23905c82dfc5da70"
+      },
+      {
+        "path": "supabase/tests/test_photo_radar_migration.py",
+        "sha256": "add9f3a4dabaa4f922405f4beb36dd24b063bd0a0f7e490aa0786f7756bcdbc1"
+      },
+      {
+        "path": "supabase/tests/photo-radar.test.sql",
+        "sha256": "7a2101db0b75405dfb98feee2b994ecbd80b5d410ecc60392cd406112daf7368"
+      },
+      {
+        "path": "supabase/PHOTO_RADAR_OPERATIONS.md",
+        "sha256": "cbfe592d9556e2af14dd37f9e6c3f7e4e5a0dd009bcd9344b4e543d8a8da9360"
+      },
+      {
+        "path": "specs/009-photo-radar/spec.md",
+        "sha256": "da9ff48d9105a2a7f3e60b099bb3ddc4b77a1ea83669ddec1b6eb617f50de0de"
+      },
+      {
+        "path": "docs/photo-radar/legal-sources.md",
+        "sha256": "3a1dda96a78a30e0fd8bf9eb8cb56691b5f703c98c27993e7b29f03769f876c2"
+      },
+      {
+        "path": "docs/photo-radar/stripe-provisioning.json",
+        "sha256": "9143a27c2c09a875e0b892e90ad9495605382dcd54a59ffed5bca5fcf633e5c5"
+      }
+    ]
+  },
+  "content_guard_handoff": "docs/photo-radar/content-snapshot-handoff.json"
+}

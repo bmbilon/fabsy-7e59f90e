@@ -3,6 +3,7 @@ import { Resend } from "npm:resend@2.0.0";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
 import { prepareClientEmail } from "../_shared/notification-locale.ts";
+import { ContactRequestError, escapeContactHtml, parseContactRequest } from "../_shared/contact-request.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -12,33 +13,30 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface ContactFormData {
-  preferred_locale?: unknown;
-  name: string;
-  email: string;
-  phone?: string;
-  subject?: string;
-  message: string;
-}
-
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+  if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: corsHeaders });
 
   try {
-    const { name, email, phone, subject, message, preferred_locale }: ContactFormData = await req.json();
-    const preferredLocale = parsePreferredLocale(preferred_locale);
-
-    console.log("Processing contact form submission from:", email);
+    const request = parseContactRequest(await req.json());
+    const preferredLocale = parsePreferredLocale(request.preferredLocale);
+    const { email, inquiryType } = request;
+    const name = escapeContactHtml(request.name);
+    const phone = escapeContactHtml(request.phone);
+    const subject = escapeContactHtml(request.subject);
+    const message = escapeContactHtml(request.message);
+    const emailHtml = escapeContactHtml(email);
+    const isFleet = inquiryType === "fleet";
 
     // Send confirmation email to the user
     const userEmailResponse = await resend.emails.send(prepareClientEmail({
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "brett@execom.ca",
       to: [email],
-      subject: "We've Received Your Message - Fabsy",
+      subject: isFleet ? "We've Received Your Fleet Enquiry - Fabsy" : "We've Received Your Message - Fabsy",
       html: `
         <!DOCTYPE html>
         <html>
@@ -68,7 +66,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <div class="highlight">
                   <strong>Your Message Summary:</strong><br>
                   ${subject ? `<strong>Subject:</strong> ${subject}<br>` : ''}
-                  <strong>Email:</strong> ${email}<br>
+                  <strong>Email:</strong> ${emailHtml}<br>
                   ${phone ? `<strong>Phone:</strong> ${phone}<br>` : ''}
                 </div>
                 
@@ -81,12 +79,12 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>If you have an Alberta traffic ticket, you can submit it online for assessment. Fabsy will review the ticket and confirm whether agent representation is permitted for the matter and court location.</p>
                 
                 <center>
-                  <a href="https://fabsy.ca/ticket-form" class="button">Submit Your Ticket Now</a>
+                  <a href="https://fabsy.ca/${isFleet ? "fleet" : "submit-ticket"}" class="button">${isFleet ? "Review Fleet Service" : "Submit Your Ticket Now"}</a>
                 </center>
                 
                 <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 15px; border-radius: 5px; margin: 20px 0;">
                   <strong style="color: #92400e;">Pricing</strong><br>
-                  <span style="color: #92400e;">Rapid Resolution costs $198 CAD plus GST for eligible Alberta pre-trial matters. Trial and government fines are separate.</span>
+                  <span style="color: #92400e;">${isFleet ? "Photo radar and red-light owner notices cost $79 + 5% GST ($82.95 total) per ticket. Account pricing at 5+ tickets per month and monthly QuickBooks invoicing are confirmed before work begins. No trial and no success fee. You approve every deal. This enquiry does not retain Fabsy or pause a deadline." : "Rapid Resolution costs $198 CAD plus GST for eligible Alberta pre-trial matters. Photo radar and red-light owner notices cost $79 + 5% GST ($82.95 total). Trial and government fines are separate."}</span>
                 </div>
                 
                 <p style="margin-top: 30px;">Have questions? Simply reply to this email or call us during business hours.</p>
@@ -108,14 +106,14 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     }, { preferredLocale, template: "contact_received" }));
 
-    console.log("User confirmation email sent:", userEmailResponse);
+    if (userEmailResponse.error) throw new Error("Contact confirmation delivery failed.");
 
     // Send notification email to admin
     const adminEmailResponse = await resend.emails.send({
       from: "Fabsy Notifications <hello@fabsy.ca>",
       reply_to: email, // Set reply-to as the user's email so admin can reply directly
       to: ["brett@execom.ca"],
-      subject: `New Contact Form Submission from ${name}`,
+      subject: `${isFleet ? "Fleet Account Enquiry" : "New Contact Form Submission"} from ${request.name}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -141,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
                 
                 <div class="field">
-                  <span class="label">Email:</span> ${email}
+                  <span class="label">Email:</span> ${emailHtml}
                 </div>
                 
                 ${phone ? `
@@ -173,7 +171,7 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Admin notification email sent:", adminEmailResponse);
+    if (adminEmailResponse.error) throw new Error("Contact notification delivery failed.");
 
     return new Response(
       JSON.stringify({ 
@@ -189,15 +187,15 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error: unknown) {
-    console.error("Error in send-contact-email function:", error);
+    console.error("Contact request failed", error instanceof ContactRequestError ? "invalid_request" : "delivery_or_locale_error");
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: error instanceof ContactRequestError || error instanceof LocaleRequestError ? error.message : 'Unable to confirm receipt. Please try again or call Fabsy.',
         ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
         success: false 
       }),
       {
-        status: error instanceof LocaleRequestError ? error.status : 500,
+        status: error instanceof LocaleRequestError ? error.status : error instanceof ContactRequestError ? 400 : 500,
         headers: { 
           "Content-Type": "application/json", 
           ...corsHeaders 

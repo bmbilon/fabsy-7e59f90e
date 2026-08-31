@@ -8,8 +8,8 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-7872c929",
-      "bundleFingerprint": "fnv1a-2708a3cc",
+      "sourceFingerprint": "fnv1a-c22d9df5",
+      "bundleFingerprint": "fnv1a-484ffceb",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -17,17 +17,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+        "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+        "src/config/offers.ts": "fnv1a-4b290fd6",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
       }
     },
     "tl": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-7872c929",
-      "bundleFingerprint": "fnv1a-b5435b0b",
+      "sourceFingerprint": "fnv1a-c22d9df5",
+      "bundleFingerprint": "fnv1a-80ce3e56",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -35,17 +39,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+        "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+        "src/config/offers.ts": "fnv1a-4b290fd6",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
       }
     },
     "zh-hans": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-7872c929",
-      "bundleFingerprint": "fnv1a-ce1a528c",
+      "sourceFingerprint": "fnv1a-c22d9df5",
+      "bundleFingerprint": "fnv1a-a5665426",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -53,17 +61,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+        "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+        "src/config/offers.ts": "fnv1a-4b290fd6",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
       }
     },
     "zh-hant": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-7872c929",
-      "bundleFingerprint": "fnv1a-c65ab668",
+      "sourceFingerprint": "fnv1a-c22d9df5",
+      "bundleFingerprint": "fnv1a-670580d3",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -71,17 +83,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+        "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+        "src/config/offers.ts": "fnv1a-4b290fd6",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
       }
     },
     "ar": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-7872c929",
-      "bundleFingerprint": "fnv1a-5cda625d",
+      "sourceFingerprint": "fnv1a-c22d9df5",
+      "bundleFingerprint": "fnv1a-ca38fbf4",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -89,17 +105,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+        "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+        "src/config/offers.ts": "fnv1a-4b290fd6",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
       }
     },
     "hi": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-7872c929",
-      "bundleFingerprint": "fnv1a-06acf68f",
+      "sourceFingerprint": "fnv1a-c22d9df5",
+      "bundleFingerprint": "fnv1a-adce9837",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -107,17 +127,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+        "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+        "src/config/offers.ts": "fnv1a-4b290fd6",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
       }
     },
     "es": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-7872c929",
-      "bundleFingerprint": "fnv1a-d6244c2b",
+      "sourceFingerprint": "fnv1a-c22d9df5",
+      "bundleFingerprint": "fnv1a-ca778501",
       "serviceReady": false,
       "publication": {
         "basis": "owner_authorized_machine_translation",
@@ -125,9 +149,13 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-cbac9802",
+        "src/pages/TermsOfService.tsx": "fnv1a-6c9a7f22",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-a5235508",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-f5d746e8"
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-185a53c3",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-dbb821ad",
+        "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+        "src/config/offers.ts": "fnv1a-4b290fd6",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-6d52a883"
       }
     }
   },

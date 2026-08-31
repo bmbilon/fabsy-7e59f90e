@@ -19,9 +19,11 @@ import {
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
+import PhotoRadarOfferStrip from "@/components/PhotoRadarOfferStrip";
+import PricingLadder from "@/components/PricingLadder";
 
-const REVIEWED_ISO = "2026-08-27";
-const REVIEWED_LABEL = "August 27, 2026";
+const REVIEWED_ISO = "2026-08-31";
+const REVIEWED_LABEL = "August 31, 2026";
 
 const products = [
   {
@@ -106,7 +108,7 @@ const factPageSchema = {
 export default function AIInfo() {
   useSafeHead({
     title: "Fabsy Rapid Resolution Facts, Pricing & Alberta Sources",
-    description: "Canonical facts about Fabsy's $198 Rapid Resolution service, $49 insurance-planning report, scope, 48-hour action commitment and official Alberta sources.",
+    description: "Fabsy pricing: Photo Radar $79 + GST, Rapid Resolution $198, bundle $229. Scope, client approval, 48-hour action commitment and official Alberta sources.",
     canonical: "https://fabsy.ca/ai-info",
   });
 
@@ -172,6 +174,8 @@ export default function AIInfo() {
                 </Card>
               ))}
             </div>
+            <PhotoRadarOfferStrip />
+            <div className="mt-6"><PricingLadder /></div>
           </div>
         </section>
 

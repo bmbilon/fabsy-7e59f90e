@@ -14,6 +14,8 @@ import { FormData } from "../TicketForm";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { isProLicenceClass, licenceClassHint, licencePhotoAsDataUrl, validateProLicenceFile, type LicenceClass } from "@/lib/pro-drivers/intake";
+import { TICKET_CAPTURE_PHOTO_ACCEPT, validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -38,10 +40,12 @@ interface PersonalInfoStepProps {
 }
 
 const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) => {
-  const [dlImage, setDlImage] = useState<File | null>(formData.driversLicenseImage);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [showAddressFields, setShowAddressFields] = useState(formData.addressDifferentFromLicense);
   const [isProcessingOCR, setIsProcessingOCR] = useState(false);
+  const [ocrSucceeded, setOcrSucceeded] = useState(false);
+  const [classHint, setClassHint] = useState<LicenceClass>("unknown");
+  const scanId = useRef(0);
   const [hasProcessedInitialImage, setHasProcessedInitialImage] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [dobYear, setDobYear] = useState<string>(formData.dateOfBirth ? formData.dateOfBirth.getFullYear().toString() : "");
@@ -50,6 +54,8 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const declaredProClass = formData.ticketType !== "photo_radar" && isProLicenceClass(formData.licenceClass);
+  const proPhotoUsable = formData.driversLicenseImage ? validateProLicenceFile(formData.driversLicenseImage).valid : false;
 
   const {
     register,
@@ -75,13 +81,18 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
 
   const dateOfBirth = watch("dateOfBirth");
 
+  useEffect(() => {
+    if (!formData.driversLicenseImage) { setImagePreview(""); return; }
+    const preview = URL.createObjectURL(formData.driversLicenseImage);
+    setImagePreview(preview);
+    return () => URL.revokeObjectURL(preview);
+  }, [formData.driversLicenseImage]);
+  useEffect(() => () => { scanId.current += 1; }, []);
+
   // Process DL image on mount if it was uploaded from elsewhere
   useEffect(() => {
     if (formData.driversLicenseImage && !hasProcessedInitialImage && !formData.firstName) {
-      console.log('[Mount] Processing initial DL image');
       setHasProcessedInitialImage(true);
-      setDlImage(formData.driversLicenseImage);
-      setImagePreview(URL.createObjectURL(formData.driversLicenseImage));
       processDLOCR(formData.driversLicenseImage);
     }
   }, [formData.driversLicenseImage]);
@@ -136,42 +147,24 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
   };
 
   const processDLOCR = async (file: File) => {
-    console.log('[DL OCR] Starting driver license OCR process with file:', file.name, file.type);
+    const requestId = ++scanId.current;
     setIsProcessingOCR(true);
+    setOcrSucceeded(false);
+    setClassHint("unknown");
     try {
-      // Convert file to base64
-      console.log('[DL OCR] Converting file to base64...');
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          console.log('[DL OCR] File converted to base64, length:', result.length);
-          resolve(result);
-        };
-        reader.onerror = (error) => {
-          console.error('[DL OCR] FileReader error:', error);
-          reject(error);
-        };
-      });
-      reader.readAsDataURL(file);
-      const imageBase64 = await base64Promise;
-
-      // Call OCR edge function
-      console.log('[DL OCR] Calling ocr-drivers-license edge function...');
+      const imageBase64 = await licencePhotoAsDataUrl(file);
       const { data, error } = await supabase.functions.invoke('ocr-drivers-license', {
         body: { imageBase64 }
       });
-
-      console.log('[DL OCR] Edge function response:', { data, error });
-
-      if (error) {
-        console.error('[DL OCR] Edge function error:', error);
-        throw error;
-      }
+      if (requestId !== scanId.current) return;
+      if (error) throw error;
 
       if (data?.success && data?.data) {
         const extracted = data.data;
-        console.log('[DL OCR] Extracted data:', extracted);
+        // Autofill is a convenience only. Preserve the driver's declaration;
+        // a separate server-bound read controls the discount at checkout.
+        setClassHint(licenceClassHint(extracted.licenceClass ?? extracted.licenseClass ?? extracted.licence_class));
+        setOcrSucceeded(true);
         
         // Auto-fill fields with extracted data
         if (extracted.firstName) {
@@ -194,11 +187,12 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
         }
         if (extracted.dateOfBirth) {
           const date = new Date(extracted.dateOfBirth);
-          handleFieldUpdate('dateOfBirth', date);
-          // Update the individual date component states
-          setDobYear(date.getFullYear().toString());
-          setDobMonth((date.getMonth() + 1).toString());
-          setDobDay(date.getDate().toString());
+          if (Number.isFinite(date.getTime())) {
+            handleFieldUpdate('dateOfBirth', date);
+            setDobYear(date.getFullYear().toString());
+            setDobMonth((date.getMonth() + 1).toString());
+            setDobDay(date.getDate().toString());
+          }
         }
         if (extracted.driversLicense) {
           handleFieldUpdate('driversLicense', extracted.driversLicense);
@@ -209,37 +203,39 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           description: "Form fields have been auto-filled. Please review and correct any errors.",
         });
       } else {
-        console.warn('[DL OCR] No data returned from OCR function');
         toast({
           title: "Could not extract data",
           description: "Please fill in the form manually.",
           variant: "destructive",
         });
       }
-    } catch (error) {
-      console.error('[DL OCR] Error during OCR process:', error);
+    } catch {
+      if (requestId !== scanId.current) return;
       toast({
         title: "Could not read driver's license",
         description: "Please fill in the form manually.",
         variant: "destructive",
       });
     } finally {
-      setIsProcessingOCR(false);
-      console.log('[DL OCR] OCR process completed');
+      if (requestId === scanId.current) setIsProcessingOCR(false);
     }
+  };
+
+  const acceptLicenceImage = (file: File) => {
+    const descriptor = validateTicketCaptureFile(file);
+    if (!descriptor.valid || descriptor.kind !== "image") {
+      toast({ title: "Choose a licence photo", description: "Upload a JPG, PNG, WebP, HEIC or HEIF image, 10 MB or smaller.", variant: "destructive" });
+      return;
+    }
+    setHasProcessedInitialImage(true);
+    updateFormData({ driversLicenseImage: file });
+    void processDLOCR(file);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log('[DL Upload] File selected:', file?.name, file?.type, file?.size);
-    if (file) {
-      setDlImage(file);
-      setImagePreview(URL.createObjectURL(file));
-      updateFormData({ driversLicenseImage: file });
-      // Trigger OCR processing
-      console.log('[DL Upload] Triggering OCR...');
-      processDLOCR(file);
-    }
+    if (file) acceptLicenceImage(file);
+    event.target.value = "";
   };
 
   const handleAddressDifferent = (checked: boolean) => {
@@ -263,18 +259,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      console.log('[DL Upload] File dropped:', file.name, file.type, file.size);
-      const isImageMime = file.type?.startsWith('image/');
-      const name = file.name.toLowerCase();
-      const isHeic = name.endsWith('.heic') || name.endsWith('.heif');
-      
-      if (isImageMime || isHeic) {
-        setDlImage(file);
-        setImagePreview(URL.createObjectURL(file));
-        updateFormData({ driversLicenseImage: file });
-        processDLOCR(file);
-      }
+      acceptLicenceImage(e.dataTransfer.files[0]);
     }
   };
 
@@ -284,8 +269,15 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
       <div className="space-y-3">
         <div className="text-center space-y-1">
           <h3 className="text-lg font-semibold text-primary">Auto-Fill: Scan Your Driver's License</h3>
-          <p className="text-sm text-muted-foreground">Skip typing - upload your license to fill all fields instantly</p>
+          <p className="text-sm text-muted-foreground">Upload your licence to help fill in your details, then review them for accuracy.</p>
         </div>
+        {declaredProClass && <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm" role="status">
+          <p className="font-semibold">Class {formData.licenceClass} declared — 20% pro driver discount pending verification</p>
+          <p className="mt-2 text-muted-foreground">Upload a clear photo showing the class, name and licence number. At checkout we verify that it is your Alberta licence and the class matches your declaration. Autofill alone does not apply the discount.</p>
+          <p className="mt-2 text-muted-foreground">No verified photo means full price at checkout. You can securely provide one afterward for the 20% partial refund if eligible.</p>
+          {formData.driversLicenseImage && !proPhotoUsable && <p className="mt-2 font-medium">For discount verification, choose a JPG, PNG or WebP photo, 10 MB or smaller.</p>}
+        </div>}
+        {classHint !== "unknown" && formData.ticketType !== "photo_radar" && <p className="text-sm text-muted-foreground" role="status">The autofill scan suggests Class {classHint}. Your declared class has not changed. Correct it in Ticket Details if needed.</p>}
         
         <Card 
           className={cn(
@@ -316,7 +308,7 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                   />
                   <div className="absolute top-2 right-2 bg-primary text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                     <Check className="h-3 w-3" />
-                    Scanned
+                    Photo attached
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-primary/20">
@@ -341,11 +333,18 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                     </Button>
                   </div>
                   <p className="text-sm font-medium text-foreground">
-                    Driver's license scanned successfully!
+                    {ocrSucceeded ? "Autofill complete — please review your details." : "Licence photo attached. Complete or review your details below."}
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Form fields have been auto-filled. Please review for accuracy and correct any errors.
-                  </p>
+                  {formData.ticketType !== "photo_radar" && <p className="text-sm text-muted-foreground mt-1">
+                    Attaching a photo does not confirm eligibility for the pro driver discount.
+                  </p>}
+                  <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => {
+                    scanId.current += 1;
+                    setIsProcessingOCR(false);
+                    setOcrSucceeded(false);
+                    setClassHint("unknown");
+                    updateFormData({ driversLicenseImage: null });
+                  }}>Remove photo</Button>
                 </div>
               </div>
             ) : (
@@ -381,14 +380,14 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Supports JPG, PNG, HEIC • Your data is encrypted and secure
+                  Supports JPG, PNG, WebP, HEIC and HEIF, up to 10 MB. {formData.ticketType !== "photo_radar" && "Discount verification requires JPG, PNG or WebP."}
                 </p>
               </div>
             )}
             <input
               ref={cameraInputRef}
               type="file"
-              accept="image/*,.heic,.heif"
+              accept={TICKET_CAPTURE_PHOTO_ACCEPT}
               capture="environment"
               onChange={handleImageUpload}
               className="hidden"
@@ -396,12 +395,13 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,.heic,.heif"
+              accept={TICKET_CAPTURE_PHOTO_ACCEPT}
               onChange={handleImageUpload}
               className="hidden"
             />
           </div>
         </Card>
+        <p className="text-xs text-muted-foreground">Your licence photo stays out of browser storage. {formData.ticketType === "photo_radar" ? "It is used to help fill in your details." : "It is used for autofill and, where requested, secure discount verification."}</p>
       </div>
 
       {/* Divider */}

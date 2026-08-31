@@ -24,12 +24,14 @@ import {
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
+import PhotoRadarOfferStrip from "@/components/PhotoRadarOfferStrip";
+import PricingLadder from "@/components/PricingLadder";
 
 const ticketTypes = [
   { icon: Zap, title: "Speeding tickets", description: "Officer-issued speeding allegations and eligible related provincial ticket matters." },
   { icon: AlertTriangle, title: "Excessive speeding", description: "Ticket review and service-scope confirmation based on the allegation and available process." },
   { icon: Phone, title: "Distracted driving", description: "Pre-trial review of the allegation, disclosure, and available prosecutor-review path." },
-  { icon: Camera, title: "Automated enforcement", description: "Review of eligible photo-enforcement and red-light ticket information." },
+  { icon: Camera, title: "Photo radar and red-light cameras", description: "$79 + GST for Alberta notices mailed to a registered owner. No demerits, no insurance impact, no success fee." },
   { icon: Car, title: "Careless driving", description: "Eligibility assessment and review of disclosure and circumstances for an accepted matter." },
   { icon: Clock3, title: "Other traffic violations", description: "Selected Alberta provincial traffic tickets where agent services are permitted and accepted." },
 ] as const;
@@ -100,10 +102,12 @@ const Services = () => {
               </div>
               <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">{RAPID_RESOLUTION_BUNDLE.description}</p>
               <Button asChild className="mt-7">
-                <Link to={RAPID_RESOLUTION.intakePath}>Choose the bundle</Link>
+                <Link to={`${RAPID_RESOLUTION.intakePath}?bundle=1`}>Choose the bundle</Link>
               </Button>
             </Card>
           </div>
+          <PhotoRadarOfferStrip />
+          <div className="mt-6 text-white"><PricingLadder /></div>
         </section>
 
         <section className="bg-background px-4 py-16 sm:py-20" aria-labelledby="ticket-types-heading">

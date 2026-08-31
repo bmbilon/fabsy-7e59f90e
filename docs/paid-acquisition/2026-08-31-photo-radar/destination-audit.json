@@ -1,0 +1,27 @@
+{
+  "recorded_at": "2026-08-31T08:56:47.770036+00:00",
+  "url": "https://fabsy.ca/photo-radar",
+  "method": "Read-only public curl GET with redirects; HTML parser; JavaScript not executed",
+  "http_status": 200,
+  "effective_url": "https://fabsy.ca/photo-radar",
+  "content_type": "text/html; charset=utf-8",
+  "body_bytes": 6616,
+  "body_sha256": "f26e866a6411f7e6bd8dd3385780accffbcd02aa561777d69b66008dde59e5a4",
+  "raw_html": {
+    "titles": [
+      "Rapid Resolution | Alberta Traffic Ticket Service | $198"
+    ],
+    "h1": [],
+    "canonical_urls": [],
+    "contains_expected_photo_radar_h1": false,
+    "contains_total_82_95": false
+  },
+  "production_destination_verified": false,
+  "browser_checkout_verified": false,
+  "limitations": [
+    "HTTP 200 does not prove the intended rendered page or purchase flow works.",
+    "This raw response contains the generic $198 Rapid Resolution title; it did not verify Photo Radar copy or snapshot.",
+    "No JavaScript/browser rendering, client form submission, checkout, payment, ad account or deployment was performed.",
+    "Repeat after the authorized release; this observation does not establish a 404 or permanent production state."
+  ]
+}

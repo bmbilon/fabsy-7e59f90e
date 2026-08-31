@@ -1,4 +1,27 @@
 {
+  "photoRadar": {
+    "name": "Rapid Resolution: Photo Radar",
+    "shortName": "Photo Radar",
+    "slug": "/photo-radar",
+    "intakePath": "/submit-ticket?ticket_type=photo_radar",
+    "priceCad": 79,
+    "priceCents": 7900,
+    "gstRate": 0.05,
+    "gstCad": 3.95,
+    "gstCents": 395,
+    "totalCad": 82.95,
+    "totalCents": 8295,
+    "currency": "CAD",
+    "taxTreatment": "+ GST",
+    "orderType": "photo_radar",
+    "reviewPath": "ate",
+    "actionCommitmentHours": 48,
+    "description": "For eligible Alberta photo radar and red-light camera notices mailed to a registered owner under Traffic Safety Act s.160(1). Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal.",
+    "actionCommitment": "Within 48 hours after complete, readable disclosure is received and matched to your file, Fabsy reviews it and prepares or takes the next authorized Crown step.",
+    "speedDisclaimer": "The 48-hour commitment covers Fabsy's action after complete disclosure, not the Crown's response time or a final outcome.",
+    "outcomeDisclaimer": "No reduction or withdrawal is promised. No trial. No success fee. Government fines are separate. The fee is not refunded based on outcome.",
+    "insuranceDisclaimer": "Registered-owner photo radar and red-light camera notices carry no demerits and have no insurance impact. Only the fine is on the table. An Insurance Impact Report is not included or needed."
+  },
   "rapidResolution": {
     "name": "Rapid Resolution",
     "shortName": "Rapid Resolution",
@@ -66,5 +89,5 @@
     "combinable": false,
     "detailsPath": "/pro-drivers"
   },
-  "canonicalPricingCopy": "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate."
+  "canonicalPricingCopy": "Free Ticket Check; Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total) for eligible Alberta registered-owner automated enforcement notices, with no success fee. Rapid Resolution costs $198 CAD plus applicable GST for other eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or Rapid Resolution and the report cost $229 CAD plus applicable GST. Trial representation is quoted separately; government fines and out-of-scope matters are separate."
 }

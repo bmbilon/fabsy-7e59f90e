@@ -1,6 +1,7 @@
 import offerData from '../config/offers.json' with { type: 'json' };
 
 export const EXACT_FABSY_PRICING = offerData.canonicalPricingCopy;
+export const EXACT_FABSY_OFFICER_PRICING = `${offerData.rapidResolution.name} costs $${offerData.rapidResolution.priceCad} CAD plus applicable GST for eligible Alberta pre-trial matters. The ${offerData.insuranceReport.name} costs $${offerData.insuranceReport.priceCad} CAD plus applicable GST, or both products cost $${offerData.bundle.priceCad} CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate.`;
 export const EXACT_FABSY_ONE_LINE = offerData.rapidResolution.oneLineDescription;
 export const EXACT_FABSY_ACTION_COMMITMENT = offerData.rapidResolution.actionCommitment;
 export const EXACT_FABSY_SPEED_DISCLAIMER = offerData.rapidResolution.speedDisclaimer;
@@ -177,7 +178,7 @@ const NUMERIC_LEGAL_PATTERNS = [
 ];
 
 function withoutExactPricing(value) {
-  return String(value || '').split(EXACT_FABSY_PRICING).join('');
+  return String(value || '').split(EXACT_FABSY_PRICING).join('').split(EXACT_FABSY_OFFICER_PRICING).join('');
 }
 
 function withoutExactCommercialFacts(value) {
@@ -193,7 +194,7 @@ export function hasInexactFabsyPricingClaim(value) {
 }
 
 export function hasFabsyPricingClaim(value) {
-  return String(value || '').includes(EXACT_FABSY_PRICING) || hasInexactFabsyPricingClaim(value);
+  return [EXACT_FABSY_PRICING, EXACT_FABSY_OFFICER_PRICING].some(copy => String(value || '').includes(copy)) || hasInexactFabsyPricingClaim(value);
 }
 
 function stripPricingClaimsForLegalScan(value) {

@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
 
 interface ConsentStepProps {
   formData: FormData;
@@ -13,17 +13,17 @@ interface ConsentStepProps {
 }
 
 const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
-  const [agreedToConsent, setAgreedToConsent] = useState(false);
-  const [digitalSignature, setDigitalSignature] = useState("");
+  const isPhotoRadar = formData.ticketType === "photo_radar";
+  const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
+  const agreedToConsent = formData.consentGiven;
+  const digitalSignature = formData.digitalSignature;
   const currentDate = new Date().toLocaleDateString('en-CA');
 
   const handleSignatureChange = (value: string) => {
-    setDigitalSignature(value);
     updateFormData({ digitalSignature: value });
   };
 
   const handleConsentChange = (checked: boolean) => {
-    setAgreedToConsent(checked);
     updateFormData({ consentGiven: checked });
   };
 
@@ -31,7 +31,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
     <div className="space-y-6">
       <Card className="p-6 bg-muted/30">
         <h3 className="text-lg font-semibold mb-4 text-center">
-          Digital Authorization for Rapid Resolution
+          Digital Authorization for {offer.name}
         </h3>
         <p className="text-center text-sm text-muted-foreground mb-4">
           Fabsy.ca Traffic Defense Services
@@ -92,10 +92,11 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
                 I, <span className="font-semibold">{formData.firstName} {formData.lastName}</span>, hereby consent to and authorize Fabsy.ca and its agents to:
               </p>
               <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
+                {isPhotoRadar && <li>Enter a not-guilty plea for the registered-owner automated enforcement notice identified above</li>}
                 <li>Request, receive and review disclosure for the traffic ticket identified above</li>
                 <li>Use the Traffic Tickets Digital Service and communicate with the court, prosecutor and relevant government offices as my authorized agent where permitted</li>
                 <li>Prepare and submit a fact-specific prosecutor-review request based on my instructions and the available record</li>
-                <li>Receive a prosecutor response or proposed resolution and explain the stated charge, fine and demerit consequences to me</li>
+                <li>{isPhotoRadar ? "Pursue a Crown reduction or withdrawal and explain any proposed fine resolution to me" : "Receive a prosecutor response or proposed resolution and explain the stated charge, fine and demerit consequences to me"}</li>
                 <li>Take only the final resolution step that I expressly authorize after receiving the Crown response</li>
               </ul>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
@@ -110,13 +111,14 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
               <h4 className="font-semibold mb-3 text-primary">Terms of Service Agreement</h4>
               <p className="text-sm leading-relaxed mb-2">By signing below, I acknowledge and agree that:</p>
               <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
-                <li>I have voluntarily retained Fabsy.ca for the Rapid Resolution pre-trial service</li>
+                <li>I have voluntarily retained Fabsy.ca for {offer.name}</li>
                 <li>I understand the included work and exclusions outlined above</li>
                 <li>I will provide accurate and complete information regarding my case</li>
                 <li>I authorize digital communication via email and text regarding my case</li>
-                <li>The service fee is $198 CAD plus applicable GST; government fines, trial work and other excluded services are separate</li>
+                <li>{isPhotoRadar ? `The service fee is ${PHOTO_RADAR_PRICE_LABEL}, one-time, charged at checkout. No trial and no success fee. Government fines are separate.` : `The service fee is $${RAPID_RESOLUTION.priceCad} CAD plus applicable GST; government fines, trial work and other excluded services are separate`}</li>
                 <li>The 48-hour commitment covers Fabsy's review and next authorized action after complete, readable disclosure is received and matched to my file—not Crown response time or final outcome timing</li>
-                <li>Fabsy.ca does not promise a withdrawal, reduction, lower fine, fewer demerits or insurance result</li>
+                <li>{isPhotoRadar ? "Fabsy pursues a resolution with the Crown; no outcome is promised and the fee is not refunded based on outcome." : "Fabsy.ca does not promise a withdrawal, reduction, lower fine, fewer demerits or insurance result"}</li>
+                {isPhotoRadar && <li>This registered-owner notice carries no demerits and has no insurance impact. Only the fine is on the table; no insurance report is included or needed.</li>}
                 <li>I may withdraw this consent at any time by providing written notice</li>
                 <li>This consent remains valid until the matter is resolved or withdrawn</li>
               </ul>
@@ -129,7 +131,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
               <h4 className="font-semibold mb-3 text-primary">Data Processing Consent</h4>
               <p className="text-sm leading-relaxed mb-2">I consent to Fabsy.ca:</p>
               <ul className="text-sm space-y-2 list-disc list-inside text-muted-foreground">
-                <li>Collecting and processing my personal information to deliver Rapid Resolution</li>
+                <li>Collecting and processing my personal information to deliver {offer.name}</li>
                 <li>Using technology-assisted document extraction and analysis, subject to qualified review, for my ticket and disclosure</li>
                 <li>Storing my case files securely for record-keeping requirements</li>
                 <li>Communicating with me via email, phone, and text regarding my case</li>
@@ -201,7 +203,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
         </div>
 
         <div className="mt-6 pt-4 border-t text-xs text-muted-foreground space-y-1">
-          <p>Form Version: 2026-08-27</p>
+          <p>Form Version: {isPhotoRadar ? "2026-08-31-photo-radar" : "2026-08-27"}</p>
           <p>Contact: support@fabsy.ca</p>
           <p className="mt-2 italic">
             This digital authorization records your consent to Fabsy's service. Any prescribed government consent form remains separately required.

@@ -31,8 +31,16 @@ assert.equal(preferredLocale(['en-CA', 'pa']), 'en', 'Do not offer a secondary l
 assert.equal(preferredLocale('pa;q=0,tl;q=0.7'), 'tl');
 assert.equal(preferredLocale('pa, en;q=0.8', ['en']), 'en');
 assert.equal(fingerprint({ b: 2, a: 1 }), fingerprint({ a: 1, b: 2 }));
-const sourceDocuments = { 'src/pages/TermsOfService.tsx': 'terms-fixture', 'src/pages/TermsOfPurchase.tsx': 'purchase-fixture', 'src/components/form-steps/ConsentStep.tsx': 'consent-fixture' };
-assert.deepEqual(new Set(LEGAL_SOURCE_DOCUMENT_PATHS), new Set(Object.keys(sourceDocuments)), 'Both legal agreements and the consent document must participate in approval');
+const sourceDocuments = {
+  'src/pages/TermsOfService.tsx': 'terms-fixture',
+  'src/pages/TermsOfPurchase.tsx': 'purchase-fixture',
+  'src/components/form-steps/ConsentStep.tsx': 'consent-fixture',
+  'src/pages/PrivacyPolicy.tsx': 'privacy-fixture',
+  'src/config/pro-drivers.ts': 'pro-pricing-fixture',
+  'src/config/offers.ts': 'offer-contract-fixture',
+  'supabase/functions/_shared/consent-pdf.ts': 'consent-pdf-fixture',
+};
+assert.deepEqual(new Set(LEGAL_SOURCE_DOCUMENT_PATHS), new Set(Object.keys(sourceDocuments)), 'All seven legal, pricing and consent documents must participate in publication');
 const expected = { sourceVersion: 'v1', sourceFingerprint: 'source', bundleFingerprint: 'bundle', sourceDocuments };
 const approval = { sourceVersion: 'v1', locales: { pa: { status: 'approved', reviewedBy: 'Test reviewer', reviewedAt: '2026-08-30', sourceFingerprint: 'source', bundleFingerprint: 'bundle', serviceReady: true, sourceDocuments } } };
 assert.equal(isLocaleReleased('en', {}, expected), true);

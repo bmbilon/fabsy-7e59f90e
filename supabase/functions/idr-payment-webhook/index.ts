@@ -4,9 +4,13 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { sendResendEmail } from "../_shared/resend-email.ts";
 import { parsePreferredLocale } from "../_shared/locale-policy.ts";
+import { validatePhotoRadarPaidSession } from "../_shared/photo-radar.ts";
+import { PRO_COUPON, validateProPayment } from "../_shared/pro-pricing.ts";
+import { recordReferralCheckoutPayment, recordReferralRefund } from "../_shared/referrals.ts";
+import { reconcileProRefund } from "../_shared/pro-refund.ts";
 
 type IdrOrderType = "standalone" | "addon";
-type CheckoutIntentType = IdrOrderType | "ticket" | "assessment";
+type CheckoutIntentType = IdrOrderType | "ticket" | "assessment" | "photo_radar";
 // This Edge Function intentionally uses the dynamic service-role client without generated DB types.
 // deno-lint-ignore no-explicit-any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,11 +26,13 @@ interface CheckoutSessionData {
   payment_status: string;
   status?: string | null;
   customer_email?: string | null;
+  customer?: string | { id?: string } | null;
   customer_details?: { email?: string | null } | null;
   payment_intent?: string | { id?: string } | null;
   total_details?: {
     amount_discount?: number | null;
     amount_tax?: number | null;
+    amount_shipping?: number | null;
   } | null;
   metadata: Record<string, string> | null;
 }
@@ -115,7 +121,7 @@ async function validateCheckoutIntent(
   const { data: intent, error: intentError } = await supabase
     .from("idr_checkout_intents")
     .select(
-      "id,client_id,ticket_submission_id,type,checkout_kind,expected_amount_cents,purchaser_email,stripe_checkout_session_id,status,attempts",
+      "id,client_id,ticket_submission_id,type,checkout_kind,expected_amount_cents,purchaser_email,stripe_checkout_session_id,status,attempts,pro_coupon,pro_discount_cents,pro_subtotal_cents,pro_verification_id",
     )
     .eq("id", intentId)
     .maybeSingle();
@@ -155,6 +161,36 @@ async function validateCheckoutIntent(
     if (sessionLinkError) throw sessionLinkError;
   }
   return intent;
+}
+
+async function persistProPayment(
+  supabase: SupabaseAdmin,
+  submissionId: string,
+  intent: { pro_verification_id?: string | null; pro_discount_cents?: number },
+  discounted: boolean,
+) {
+  if (!discounted) return;
+  const { data: evidence, error: evidenceError } = await supabase.from("pro_licence_verifications")
+    .select("id,ticket_submission_id,status,declared_class,read_class,jurisdiction,identity_matches")
+    .eq("id", intent.pro_verification_id).maybeSingle();
+  if (evidenceError) throw evidenceError;
+  if (!evidence || evidence.ticket_submission_id !== submissionId || evidence.status !== "verified" ||
+    evidence.read_class !== evidence.declared_class || evidence.jurisdiction !== "AB" ||
+    evidence.identity_matches !== true) throw new Error("Paid pro discount has no matching licence evidence.");
+  const { data: order, error: orderError } = await supabase.from("ticket_submissions")
+    .update({ discount_applied: PRO_COUPON, pro_discount_cents: intent.pro_discount_cents })
+    .eq("id", submissionId).eq("pro_verified", true).eq("pro_verification_id", evidence.id)
+    .eq("ticket_type", "officer_issued").select("id").maybeSingle();
+  if (orderError) throw orderError;
+  if (!order) throw new Error("Paid pro discount does not match the verified officer order.");
+}
+
+async function recordRepresentationPayment(supabase: SupabaseAdmin, session: CheckoutSessionData) {
+  const orderId = session.metadata?.ticket_submission_id || session.metadata?.submission_id;
+  const paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id;
+  if (!isUuid(orderId) || !paymentIntentId) throw new Error("Representation payment identity is missing.");
+  const stripeCustomerId = typeof session.customer === "string" ? session.customer : session.customer?.id;
+  await recordReferralCheckoutPayment(supabase, { orderId, paymentIntentId, stripeCustomerId });
 }
 
 async function activateIncludedAssessment(
@@ -257,9 +293,8 @@ async function persistPaidTicketCheckout(
     );
   }
 
-  // Stripe's amount_subtotal is before promotion discounts. Core-only checkout
-  // deliberately permits configured promotion codes, so no zero-discount check
-  // belongs here. The signed subtotal still proves a supported product price was selected.
+  // Legacy sessions retain their old validation; new sessions must match the
+  // immutable PRO20/no-discount reservation as well as the Stripe subtotal.
   const intent = await validateCheckoutIntent(
     supabase,
     session,
@@ -274,16 +309,18 @@ async function persistPaidTicketCheckout(
       "Paid ticket checkout client does not match its reservation.",
     );
   }
+  const proPayment = validateProPayment(session, intent, false);
+  await persistProPayment(supabase, submissionId, intent, proPayment.verified);
 
   const { data: submission, error: submissionError } = await supabase
     .from("ticket_submissions")
     .select(
-      "id,client_id,status,source_assessment_id,representation_includes_assessment",
+      "id,client_id,status,source_assessment_id,representation_includes_assessment,ticket_type",
     )
     .eq("id", submissionId)
     .maybeSingle();
   if (submissionError) throw submissionError;
-  if (!submission || submission.client_id !== clientId) {
+  if (!submission || submission.client_id !== clientId || submission.ticket_type === "photo_radar") {
     throw new Error(
       "Paid ticket checkout does not belong to its reserved client.",
     );
@@ -327,6 +364,30 @@ async function persistPaidTicketCheckout(
     );
   }
   return result;
+}
+
+async function persistPaidPhotoRadarCheckout(supabase: SupabaseAdmin, session: CheckoutSessionData) {
+  validatePhotoRadarPaidSession(session);
+  const metadata = session.metadata!;
+  const intentId = metadata.checkout_intent_id;
+  const submissionId = metadata.ticket_submission_id;
+  const clientId = metadata.client_id;
+  const attempt = Number(metadata.checkout_attempt);
+  if (!isUuid(intentId) || !isUuid(submissionId) || !isUuid(clientId) ||
+      session.client_reference_id !== submissionId || !Number.isSafeInteger(attempt) || attempt < 1) {
+    throw new Error("Photo Radar checkout has invalid reservation metadata.");
+  }
+  const intent = await validateCheckoutIntent(supabase, session, intentId, "photo_radar", "photo_radar", submissionId, 7900);
+  if (intent.client_id !== clientId) throw new Error("Photo Radar client does not match its reservation.");
+  const paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id || null;
+  // One transaction locks the stored product, marks payment and creates exactly
+  // one ATE review. Stripe retries cannot duplicate a file or restart its clock.
+  const { data, error } = await supabase.rpc("activate_photo_radar_checkout", {
+    p_intent_id: intentId, p_submission_id: submissionId, p_client_id: clientId,
+    p_session_id: session.id, p_attempt: attempt, p_payment_intent_id: paymentIntentId,
+  });
+  if (error) throw error;
+  return data;
 }
 
 async function persistPaidTicketAssessment(
@@ -384,7 +445,7 @@ async function persistPaidTicketAssessment(
   const { data: submission, error: submissionError } = await supabase
     .from("ticket_submissions")
     .select(
-      "id,client_id,status,service_type,assessment_price_cad,assessment_paid_at,assessment_checkout_session_id",
+      "id,client_id,status,service_type,assessment_price_cad,assessment_paid_at,assessment_checkout_session_id,ticket_type",
     )
     .eq("id", submissionId)
     .maybeSingle();
@@ -393,6 +454,7 @@ async function persistPaidTicketAssessment(
     !submission ||
     submission.client_id !== clientId ||
     submission.service_type !== "ticket_insurance_assessment" ||
+    submission.ticket_type === "photo_radar" ||
     Number(submission.assessment_price_cad) !== 149 ||
     (submission.assessment_checkout_session_id &&
       submission.assessment_checkout_session_id !== session.id)
@@ -696,6 +758,7 @@ function orderMatches(
     type: IdrOrderType;
     pricePaid: number;
     checkoutSessionId: string;
+    discountApplied: string | null;
   },
 ): boolean {
   return order.id === expected.id &&
@@ -703,6 +766,7 @@ function orderMatches(
     (order.ticket_submission_id || null) === expected.ticketSubmissionId &&
     order.type === expected.type &&
     Number(order.price_paid) === expected.pricePaid &&
+    (order.discount_applied || null) === expected.discountApplied &&
     (!order.stripe_checkout_session_id ||
       order.stripe_checkout_session_id === expected.checkoutSessionId);
 }
@@ -767,14 +831,6 @@ async function persistPaidOrder(
   if (checkoutKind === "ticket_with_addon" && type !== "addon") {
     throw new Error("Combined checkout has an invalid IDR type.");
   }
-  if (
-    checkoutKind === "ticket_with_addon" &&
-    Number(session.total_details?.amount_discount || 0) !== 0
-  ) {
-    throw new Error(
-      "Combined IDR checkout cannot include a promotion discount.",
-    );
-  }
   const intent = await validateCheckoutIntent(
     supabase,
     session,
@@ -784,6 +840,16 @@ async function persistPaidOrder(
     ticketSubmissionId,
     idrPriceCents,
   );
+  const proPayment = checkoutKind === "ticket_with_addon"
+    ? validateProPayment(session, intent, true) : null;
+  if (checkoutKind === "ticket_with_addon" && !proPayment?.verified &&
+    Number(session.total_details?.amount_discount || 0) !== 0) {
+    throw new Error("Combined checkout requires verified pro pricing for a discount.");
+  }
+  if (proPayment?.verified && ticketSubmissionId) {
+    await persistProPayment(supabase, ticketSubmissionId, intent, true);
+  }
+  const chargedIdrCents = proPayment?.verified ? proPayment.netAddonCents : idrPriceCents;
   clientId = await resolveClientId(
     supabase,
     session,
@@ -804,12 +870,12 @@ async function persistPaidOrder(
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
       .select(
-        "id,client_id,source_assessment_id,representation_includes_assessment",
+        "id,client_id,source_assessment_id,representation_includes_assessment,ticket_type",
       )
       .eq("id", ticketSubmissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
-    if (!submission || submission.client_id !== clientId) {
+    if (!submission || submission.client_id !== clientId || submission.ticket_type === "photo_radar") {
       throw new Error("Ticket submission does not belong to the IDR client.");
     }
     combinedRepresentation = submission;
@@ -832,8 +898,9 @@ async function persistPaidOrder(
     clientId,
     ticketSubmissionId,
     type,
-    pricePaid: idrPriceCents / 100,
+    pricePaid: chargedIdrCents / 100,
     checkoutSessionId: session.id,
+    discountApplied: proPayment?.verified ? PRO_COUPON : null,
   };
   const paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id || null;
   const activateCombinedTicket = async () => {
@@ -852,7 +919,7 @@ async function persistPaidOrder(
       );
     }
   };
-  const selectFields = "id,client_id,ticket_submission_id,type,price_paid,status,stripe_checkout_session_id,stripe_payment_intent_id";
+  const selectFields = "id,client_id,ticket_submission_id,type,price_paid,status,stripe_checkout_session_id,stripe_payment_intent_id,discount_applied";
   const { data: existing, error: existingError } = await supabase
     .from("idr_orders")
     .select(selectFields)
@@ -905,7 +972,8 @@ async function persistPaidOrder(
     client_id: clientId,
     ticket_submission_id: ticketSubmissionId,
     type,
-    price_paid: idrPriceCents / 100,
+    price_paid: chargedIdrCents / 100,
+    discount_applied: proPayment?.verified ? PRO_COUPON : null,
     status: "awaiting_abstract",
     stripe_checkout_session_id: session.id,
     stripe_payment_intent_id: paymentIntentId,
@@ -1037,11 +1105,9 @@ serve(async (req: Request): Promise<Response> => {
     return json({ error: "Webhook configuration is incomplete." }, 500);
   }
 
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2025-08-27.basil" });
   let event: StripeEventData;
   try {
-    const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: "2025-08-27.basil",
-    });
     const payload = await req.text();
     const cryptoProvider = Stripe.createSubtleCryptoProvider();
     event = await stripe.webhooks.constructEventAsync(
@@ -1061,6 +1127,11 @@ serve(async (req: Request): Promise<Response> => {
       "checkout.session.async_payment_succeeded",
       "checkout.session.async_payment_failed",
       "checkout.session.expired",
+      "charge.refunded",
+      "charge.dispute.created",
+      "refund.created",
+      "refund.updated",
+      "refund.failed",
     ].includes(event.type)
   ) {
     return json({ received: true, handled: false });
@@ -1071,6 +1142,41 @@ serve(async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+    if (event.type.startsWith("refund.")) {
+      // Fetch current state so a delayed pending event cannot overwrite success.
+      const refund = await stripe.refunds.retrieve(session.id);
+      const paymentIntentId = typeof refund.payment_intent === "string"
+        ? refund.payment_intent : refund.payment_intent?.id;
+      if (paymentIntentId && refund.status !== "failed" && refund.status !== "canceled") {
+        await recordReferralRefund(supabase, {
+          paymentIntentId, refundedAt: new Date(refund.created * 1000).toISOString(), eventId: event.id,
+        });
+      }
+      await reconcileProRefund(supabase, refund);
+      return json({ received: true, handled: true });
+    }
+    if (event.type === "charge.refunded") {
+      const charge = session as unknown as Stripe.Charge;
+      const paymentIntentId = typeof charge.payment_intent === "string"
+        ? charge.payment_intent : charge.payment_intent?.id;
+      if (paymentIntentId && charge.amount_refunded > 0) {
+        await recordReferralRefund(supabase, { paymentIntentId, eventId: event.id });
+      }
+      return json({ received: true, handled: true });
+    }
+    if (event.type === "charge.dispute.created") {
+      const dispute = session as unknown as Stripe.Dispute;
+      let paymentIntentId = typeof dispute.payment_intent === "string"
+        ? dispute.payment_intent : dispute.payment_intent?.id;
+      if (!paymentIntentId && dispute.charge) {
+        const charge = typeof dispute.charge === "string" ? await stripe.charges.retrieve(dispute.charge) : dispute.charge;
+        paymentIntentId = typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
+      }
+      if (paymentIntentId) await recordReferralRefund(supabase, {
+        paymentIntentId, disputedAt: new Date(dispute.created * 1000).toISOString(), eventId: event.id,
+      });
+      return json({ received: true, handled: true });
+    }
     if (
       event.type === "checkout.session.async_payment_failed" ||
       event.type === "checkout.session.expired"
@@ -1086,6 +1192,11 @@ serve(async (req: Request): Promise<Response> => {
       return json({ received: true, handled: false });
     }
 
+    if (session.metadata?.fabsy_checkout_kind === "photo_radar") {
+      const result = await persistPaidPhotoRadarCheckout(supabase, session);
+      await recordRepresentationPayment(supabase, session);
+      return json({ received: true, handled: true, result, review_path: "ate" });
+    }
     if (session.metadata?.fabsy_checkout_kind === "ticket_assessment") {
       const result = await persistPaidTicketAssessment(supabase, session);
       await sendTicketAssessmentConfirmation(
@@ -1097,6 +1208,7 @@ serve(async (req: Request): Promise<Response> => {
 
     if (session.metadata?.fabsy_checkout_kind === "ticket_only") {
       const result = await persistPaidTicketCheckout(supabase, session);
+      await recordRepresentationPayment(supabase, session);
       if (isUuid(session.metadata.source_assessment_id)) {
         const ticketBaseCents = metadataPriceCents(
           session.metadata.ticket_base_cents,
@@ -1115,6 +1227,9 @@ serve(async (req: Request): Promise<Response> => {
       return json({ received: true, handled: false });
     }
     const result = await persistPaidOrder(supabase, session);
+    if (session.metadata?.fabsy_checkout_kind === "ticket_with_addon") {
+      await recordRepresentationPayment(supabase, session);
+    }
     await sendAccessEmail(supabase, session.metadata!.idr_order_id);
     if (isUuid(session.metadata?.source_assessment_id)) {
       const ticketBaseCents = metadataPriceCents(

@@ -20,11 +20,17 @@ import useSafeHead from "@/hooks/useSafeHead";
 import { supabase } from "@/integrations/supabase/client";
 import { assessmentAttribution, trackAssessmentEvent } from "@/lib/assessment/analytics";
 import { validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
+import TicketTypeFields from "@/components/TicketTypeFields";
+import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
+import { applyDetectedTicketType, applyTicketType, assessmentStepsForTicket, detectTicketType, resetTicketTypeForUpload, ticketDateAsLocalDate, ticketDateFromExtraction, ticketTypeFromSearch, type RegisteredOwnerAnswer, type TicketType, type TicketTypeSource } from "@/lib/ticket/ticketType";
 
 type PremiumFrequency = "monthly" | "annual" | "unknown";
-type ServiceChoice = "priority_review" | "full_representation";
+type ServiceChoice = "priority_review" | "full_representation" | "photo_radar";
 
 interface AssessmentDraft {
+  ticketType: TicketType;
+  ticketTypeSource: TicketTypeSource;
+  registeredOwnerOnOffenceDate: RegisteredOwnerAnswer;
   province: string;
   ticketNumber: string;
   offence: string;
@@ -67,6 +73,7 @@ const ORDER_KEY = "fabsy-ticket-assessment-order-v1";
 const MAX_POLICY_FILES = 5;
 const POLICY_ACCEPT = "application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif";
 const initialDraft: AssessmentDraft = {
+  ticketType: "officer_issued", ticketTypeSource: "default", registeredOwnerOnOffenceDate: "",
   province: "Alberta", ticketNumber: "", offence: "", ticketDate: "", responseDeadline: "", fineAmount: "", whatHappened: "",
   licensedInCanada: "unknown", licenceClass: "unknown", relevantConvictions: "unknown", currentDemerits: "unknown", drivingUse: "personal",
   premiumAmount: "", premiumFrequency: "unknown", renewalMonth: "unknown", insurer: "", firstName: "", lastName: "", email: "", phone: "",
@@ -137,33 +144,48 @@ export default function TicketAssessmentIntake() {
   const [searchParams] = useSearchParams();
   const checkoutCancelled = searchParams.get("checkout") === "cancelled";
   const [step, setStep] = useState(1);
-  const [draft, setDraft] = useState<AssessmentDraft>(loadDraft);
+  const [draft, setDraft] = useState<AssessmentDraft>(() => {
+    const saved = loadDraft();
+    const requested = ticketTypeFromSearch(location.search);
+    return requested ? { ...applyTicketType(saved, requested, "entry"), ticketDate: requested === saved.ticketType ? saved.ticketDate : "" } : saved;
+  });
   const [orderId] = useState(assessmentOrderId);
   const [ticketFile, setTicketFile] = useState<File | null>(() => state.ticketImage || null);
   const [ticketPrefill, setTicketPrefill] = useState<Record<string, unknown>>(() => state.prefillTicketData || {});
+  const manuallyEditedTicketDate = useRef<string | undefined>(state.prefillTicketData
+    ? ticketDateFromExtraction(state.prefillTicketData, detectTicketType(state.prefillTicketData) ?? draft.ticketType) || undefined
+    : draft.ticketDate || undefined);
   const [policyFiles, setPolicyFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const policyBrowseRef = useRef<HTMLInputElement>(null);
   const policyCameraRef = useRef<HTMLInputElement>(null);
+  const isPhotoRadar = draft.ticketType === "photo_radar";
 
   useSafeHead({
     title: "Free Ticket Review | Fabsy",
-    description: "Upload or photograph an Alberta ticket, review the extracted details, and choose a $149 priority report or $488 full representation.",
+    description: "Upload or photograph an Alberta ticket, check its type and continue to the appropriate Fabsy service. Photo radar costs $79 plus GST; Rapid Resolution costs $198 plus GST.",
     canonical: `https://fabsy.ca${TICKET_ASSESSMENT.intakePath}`,
     robots: "noindex, nofollow",
   });
 
   const applyPrefill = (data: Record<string, unknown> | null | undefined) => {
     if (!data) return;
-    setDraft((current) => ({
-      ...current,
+    setDraft((current) => {
+      const typed = data.ticketTypeSource === "manual" && (data.ticketType === "photo_radar" || data.ticketType === "officer_issued")
+        ? applyTicketType(current, data.ticketType, "manual")
+        : applyDetectedTicketType(current, data);
+      const ticketDate = ticketDateFromExtraction(data, typed.ticketType, typed.ticketType === current.ticketType ? manuallyEditedTicketDate.current : undefined);
+      return {
+      ...typed,
+      ...(["yes", "sold_before", "stolen"].includes(String(data.registeredOwnerOnOffenceDate)) ? { registeredOwnerOnOffenceDate: data.registeredOwnerOnOffenceDate as RegisteredOwnerAnswer } : {}),
       ticketNumber: stringValue(data.ticketNumber) || current.ticketNumber,
       offence: stringValue(data.offenceDescription) || stringValue(data.violation) || stringValue(data.offence) || current.offence,
-      ticketDate: dateValue(data.ticketDate) || dateValue(data.issueDate) || current.ticketDate,
+      ticketDate: ticketDate || (typed.ticketType === "officer_issued" ? current.ticketDate : ""),
       responseDeadline: dateValue(data.responseDeadline) || dateValue(data.courtDate) || current.responseDeadline,
       fineAmount: stringValue(data.fineAmount) || current.fineAmount,
-    }));
+      };
+    });
   };
 
   useEffect(() => {
@@ -188,18 +210,31 @@ export default function TicketAssessmentIntake() {
   }, [draft]);
 
   const unsupportedProvince = draft.province !== "Alberta";
-  const progress = (step / 4) * 100;
-  const ticketStepValid = Boolean(ticketFile && draft.province && !unsupportedProvince && draft.whatHappened.trim().length >= 10);
-  const drivingStepValid = Boolean(draft.licensedInCanada && draft.licenceClass && draft.relevantConvictions && draft.currentDemerits && draft.drivingUse && policyFiles.length >= 1);
+  const activeSteps = assessmentStepsForTicket(draft.ticketType);
+  const displayStep = Math.max(1, activeSteps.indexOf(step) + 1);
+  const progress = (displayStep / activeSteps.length) * 100;
+  const ticketStepValid = Boolean(ticketFile && draft.province && !unsupportedProvince && (isPhotoRadar ? draft.registeredOwnerOnOffenceDate : draft.whatHappened.trim().length >= 10));
+  const drivingStepValid = isPhotoRadar || Boolean(draft.licensedInCanada && draft.licenceClass && draft.relevantConvictions && draft.currentDemerits && draft.drivingUse && policyFiles.length >= 1);
   const contactStepValid = Boolean(draft.firstName.trim() && draft.lastName.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email.trim()) && draft.termsAccepted && draft.reviewConsentAccepted && draft.reviewSignature.trim());
 
   const update = <K extends keyof AssessmentDraft>(field: K, value: AssessmentDraft[K]) => {
-    setDraft((current) => ({ ...current, [field]: value }));
+    if (field === "ticketDate") manuallyEditedTicketDate.current = String(value);
+    if (field === "ticketType" && value !== draft.ticketType) manuallyEditedTicketDate.current = undefined;
+    setDraft((current) => field === "ticketType"
+      ? { ...applyTicketType(current, value as TicketType, "manual"), ticketDate: value === current.ticketType ? current.ticketDate : ticketDateFromExtraction(ticketPrefill, value as TicketType), insurer: "", premiumAmount: "", premiumFrequency: "unknown", renewalMonth: "unknown", termsAccepted: false, reviewConsentAccepted: false, reviewSignature: "" }
+      : { ...current, [field]: value });
+    if (field === "ticketType") setPolicyFiles([]);
     setError(null);
   };
   const onTicketOcr = (data: TicketOcrData | null) => {
     if (data) setTicketPrefill(data);
     applyPrefill(data);
+  };
+  const changeTicketFile = (file: File | null) => {
+    manuallyEditedTicketDate.current = undefined;
+    setTicketFile(file);
+    setTicketPrefill({});
+    setDraft(current => ({ ...resetTicketTypeForUpload(current), ticketDate: "", termsAccepted: false, reviewConsentAccepted: false, reviewSignature: "" }));
   };
   const addPolicyFiles = (selected: FileList | null, input: HTMLInputElement) => {
     const incoming = selected ? Array.from(selected) : [];
@@ -215,20 +250,21 @@ export default function TicketAssessmentIntake() {
   };
 
   const next = () => {
-    if (step === 1 && !ticketStepValid) { setError(unsupportedProvince ? "This service currently accepts Alberta traffic tickets only." : "Attach the ticket and briefly tell us what happened before continuing."); return; }
+    if (step === 1 && !ticketStepValid) { setError(unsupportedProvince ? "This service currently accepts Alberta traffic tickets only." : isPhotoRadar ? "Attach the notice and answer the registered-owner question before continuing." : "Attach the ticket and briefly tell us what happened before continuing."); return; }
     if (step === 2 && !drivingStepValid) { setError("Complete the driving context and attach at least one current policy document."); return; }
     if (step === 3 && !contactStepValid) { setError("Enter your contact information, sign the review consent and accept the terms."); return; }
     setError(null);
-    setStep((current) => Math.min(4, current + 1));
+    setStep((current) => activeSteps[Math.min(activeSteps.length - 1, activeSteps.indexOf(current) + 1)]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const back = () => { setError(null); setStep((current) => Math.max(1, current - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const back = () => { setError(null); setStep((current) => activeSteps[Math.max(0, activeSteps.indexOf(current) - 1)]); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   const saveIntake = async () => {
     if (!ticketFile || !ticketStepValid || !drivingStepValid || !contactStepValid) throw new Error("Review each step and complete the required fields before continuing.");
     const ticketDescriptor = validateTicketCaptureFile(ticketFile);
     if ("error" in ticketDescriptor) throw new Error(ticketDescriptor.error);
-    const policyDescriptors = policyFiles.map((file) => {
+    const includedPolicyFiles = isPhotoRadar ? [] : policyFiles;
+    const policyDescriptors = includedPolicyFiles.map((file) => {
       const descriptor = validateTicketCaptureFile(file);
       if ("error" in descriptor) throw new Error(`Policy document “${file.name}”: ${descriptor.error}`);
       return descriptor;
@@ -236,26 +272,29 @@ export default function TicketAssessmentIntake() {
     const { data: intake, error: intakeError } = await supabase.functions.invoke<IntakeResponse>("submit-assessment-intake", {
       body: {
         orderId,
+        ticket_type: draft.ticketType,
+        ticket_type_source: draft.ticketTypeSource === "default" ? "entry" : draft.ticketTypeSource,
+        registered_owner_on_offence_date: isPhotoRadar ? draft.registeredOwnerOnOffenceDate : null,
         file: { contentType: ticketDescriptor.mimeType, size: ticketFile.size },
-        policyFiles: policyFiles.map((file, index) => ({ contentType: policyDescriptors[index].mimeType, size: file.size })),
+        policyFiles: includedPolicyFiles.map((file, index) => ({ contentType: policyDescriptors[index].mimeType, size: file.size })),
         reviewConsent: { schemaVersion: 1, consentVersion: "ticket-triage-review-v1", accepted: true, digitalSignature: draft.reviewSignature.trim(), signedAt: new Date().toISOString() },
         contact: { firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), email: draft.email.trim().toLowerCase(), phone: draft.phone.trim() || null },
         ticket: { province: draft.province, ticketNumber: draft.ticketNumber.trim() || null, offence: draft.offence.trim() || null, ticketDate: draft.ticketDate || null, responseDeadline: draft.responseDeadline || null, fineAmountCad: moneyValue(draft.fineAmount), whatHappened: draft.whatHappened.trim() },
-        driving: { licensedInCanada: draft.licensedInCanada, licenceClass: draft.licenceClass, relevantConvictions: draft.relevantConvictions, currentDemerits: draft.currentDemerits, drivingUse: draft.drivingUse },
-        insurance: { premiumAmountCad: moneyValue(draft.premiumAmount), premiumFrequency: draft.premiumFrequency, renewalMonth: draft.renewalMonth, insurer: draft.insurer.trim() || null },
+        driving: isPhotoRadar ? null : { licensedInCanada: draft.licensedInCanada, licenceClass: draft.licenceClass, relevantConvictions: draft.relevantConvictions, currentDemerits: draft.currentDemerits, drivingUse: draft.drivingUse },
+        insurance: isPhotoRadar ? null : { premiumAmountCad: moneyValue(draft.premiumAmount), premiumFrequency: draft.premiumFrequency, renewalMonth: draft.renewalMonth, insurer: draft.insurer.trim() || null },
         termsAccepted: draft.termsAccepted,
         company: draft.company,
         attribution: assessmentAttribution(),
       },
     });
-    if (intakeError || intake?.error || !intake?.submissionId || !intake.accessToken || !intake.upload?.path || !intake.upload.token || !Array.isArray(intake.policyUploads) || intake.policyUploads.length !== policyFiles.length) {
+    if (intakeError || intake?.error || !intake?.submissionId || !intake.accessToken || !intake.upload?.path || !intake.upload.token || !Array.isArray(intake.policyUploads) || intake.policyUploads.length !== includedPolicyFiles.length) {
       throw new Error(intake?.error || await functionErrorMessage(intakeError, "The private intake could not be saved."));
     }
     const { error: ticketUploadError } = await supabase.storage.from("assessment-tickets").uploadToSignedUrl(intake.upload.path, intake.upload.token, ticketFile, { contentType: ticketDescriptor.mimeType, upsert: true });
     if (ticketUploadError) throw new Error("The ticket upload did not finish. Please try again.");
     await Promise.all(intake.policyUploads.map(async (upload) => {
       const index = Number(upload.index);
-      const file = policyFiles[index];
+      const file = includedPolicyFiles[index];
       if (!file || !upload.path || !upload.token) throw new Error("A policy upload could not be prepared.");
       const { error: policyUploadError } = await supabase.storage.from("assessment-policy-documents").uploadToSignedUrl(upload.path, upload.token, file, { contentType: policyDescriptors[index].mimeType, upsert: true });
       if (policyUploadError) throw new Error(`The policy document “${file.name}” did not finish uploading.`);
@@ -269,13 +308,16 @@ export default function TicketAssessmentIntake() {
     setIsSubmitting(true);
     setError(null);
     try {
+      if (isPhotoRadar && choice !== "photo_radar") throw new Error("Choose Photo Radar for this registered-owner notice. An insurance report is not needed.");
       const saved = await saveIntake();
-      if (choice === "full_representation") {
-        const prefillTicketData: Partial<RepresentationFormData> = {
+      if (choice === "full_representation" || choice === "photo_radar") {
+        const prefillTicketData: Partial<RepresentationFormData> & { offenceDate?: string } = {
+          ticketType: draft.ticketType, ticketTypeSource: draft.ticketTypeSource, registeredOwnerOnOffenceDate: draft.registeredOwnerOnOffenceDate,
           ticketNumber: draft.ticketNumber, violation: draft.offence, offenceDescription: draft.offence, fineAmount: draft.fineAmount,
-          issueDate: draft.ticketDate ? new Date(`${draft.ticketDate}T12:00:00`) : undefined,
+          issueDate: ticketDateAsLocalDate(draft.ticketDate),
+          ...(isPhotoRadar ? { offenceDate: draft.ticketDate } : {}),
           courtDate: draft.responseDeadline ? new Date(`${draft.responseDeadline}T12:00:00`) : undefined,
-          explanation: draft.whatHappened, insuranceCompany: draft.insurer,
+          explanation: draft.whatHappened, insuranceCompany: isPhotoRadar ? "" : draft.insurer,
           firstName: draft.firstName, lastName: draft.lastName, email: draft.email, phone: draft.phone,
           location: stringValue(ticketPrefill.location),
           officer: stringValue(ticketPrefill.officer),
@@ -284,8 +326,8 @@ export default function TicketAssessmentIntake() {
           offenceSubSection: stringValue(ticketPrefill.offenceSubSection),
           courtJurisdiction: stringValue(ticketPrefill.courtJurisdiction),
         };
-        trackAssessmentEvent("representation_selected", { value: 488 }, orderId);
-        navigate("/submit-ticket", { state: { ticketImage: ticketFile, prefillTicketData, startAtStep: 1, sourceAssessment: saved } });
+        trackAssessmentEvent("representation_selected", { value: isPhotoRadar ? PHOTO_RADAR.priceCad : RAPID_RESOLUTION.priceCad }, orderId);
+        navigate(isPhotoRadar ? PHOTO_RADAR.intakePath : RAPID_RESOLUTION.intakePath, { state: { ticketImage: ticketFile, prefillTicketData, startAtStep: 1, sourceAssessment: saved } });
         return;
       }
       const checkoutUrl = await createAssessmentPayment(saved);
@@ -293,7 +335,7 @@ export default function TicketAssessmentIntake() {
       window.location.assign(checkoutUrl);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "We could not continue. Please try again."); setIsSubmitting(false); }
   };
-  const submitPriorityReview = (event: FormEvent) => { event.preventDefault(); if (step === 4) void chooseService("priority_review"); };
+  const submitPriorityReview = (event: FormEvent) => { event.preventDefault(); if (step === 4) void chooseService(isPhotoRadar ? "photo_radar" : "priority_review"); };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -305,22 +347,22 @@ export default function TicketAssessmentIntake() {
             <div className="border-b bg-white p-6 sm:p-8">
               <Badge className="mb-4">Free Ticket Review · upload or take a photo</Badge>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">One secure intake. Choose the help you need.</h1>
-              <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">We scan your ticket, keep the source documents private, and carry the same information into a priority report or full representation—no re-uploading.</p>
-              <div className="mt-6"><div className="mb-2 flex items-center justify-between text-sm font-medium"><span>Step {step} of 4</span><span>{Math.round(progress)}% complete</span></div><Progress value={progress} className="h-2" /></div>
+              <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{isPhotoRadar ? "No demerits. No insurance impact. Only the fine is on the table. Your notice and ownership details carry into the $79 Photo Radar service." : "We scan your ticket, keep the source documents private, and carry the same information into your selected service."}</p>
+              <div className="mt-6"><div className="mb-2 flex items-center justify-between text-sm font-medium"><span>Step {displayStep} of {activeSteps.length}</span><span>{Math.round(progress)}% complete</span></div><Progress value={progress} className="h-2" /></div>
             </div>
             <form onSubmit={submitPriorityReview} className="bg-white p-6 sm:p-8">
-              {step === 1 && <TicketStep draft={draft} update={update} ticketFile={ticketFile} setTicketFile={setTicketFile} onTicketOcr={onTicketOcr} unsupportedProvince={unsupportedProvince} isSubmitting={isSubmitting} />}
-              {step === 2 && <DrivingStep draft={draft} update={update} policyFiles={policyFiles} setPolicyFiles={setPolicyFiles} policyBrowseRef={policyBrowseRef} policyCameraRef={policyCameraRef} addPolicyFiles={addPolicyFiles} />}
-              {step === 3 && <ContactStep draft={draft} update={update} />}
-              {step === 4 && <ServiceStep isSubmitting={isSubmitting} chooseRepresentation={() => void chooseService("full_representation")} />}
+              {step === 1 && <TicketStep draft={draft} update={update} ticketFile={ticketFile} setTicketFile={changeTicketFile} onTicketOcr={onTicketOcr} unsupportedProvince={unsupportedProvince} isSubmitting={isSubmitting} />}
+              {step === 2 && !isPhotoRadar && <DrivingStep draft={draft} update={update} policyFiles={policyFiles} setPolicyFiles={setPolicyFiles} policyBrowseRef={policyBrowseRef} policyCameraRef={policyCameraRef} addPolicyFiles={addPolicyFiles} />}
+              {step === 3 && <ContactStep draft={draft} update={update} displayStep={displayStep} />}
+              {step === 4 && <ServiceStep isSubmitting={isSubmitting} isPhotoRadar={isPhotoRadar} displayStep={displayStep} chooseRepresentation={() => void chooseService(isPhotoRadar ? "photo_radar" : "full_representation")} />}
               {error && <Alert className="mt-6 border-destructive/30" variant="destructive"><AlertTitle>Check this step</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
               <div className="mt-8 flex items-center justify-between border-t pt-6"><Button type="button" variant="outline" onClick={back} disabled={step === 1 || isSubmitting}><ArrowLeft className="mr-2 h-4 w-4" />Back</Button>{step < 4 && <Button type="button" onClick={next} disabled={isSubmitting}>Continue<ArrowRight className="ml-2 h-4 w-4" /></Button>}</div>
             </form>
           </Card>
           <aside className="space-y-5 lg:sticky lg:top-24">
-            <Card className="p-6 shadow-fab"><p className="text-sm font-semibold text-primary">One connected intake</p><ol className="mt-5 space-y-4 text-sm">{["Free ticket photo/PDF scan", "Driving and policy context", "Signed limited review consent", "Choose $149 review or $488 representation"].map((item, index) => <li key={item} className="flex items-start gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">{index + 1}</span>{item}</li>)}</ol></Card>
-            <Card className="p-5"><div className="flex items-start gap-3"><LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><div><p className="font-bold">Private source documents</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Ticket and policy files use signed uploads into non-public storage and remain linked to the matter Fabsy reviews.</p></div></div></Card>
-            <Card className="p-5"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><p className="text-sm leading-relaxed text-muted-foreground">Insurance outcomes vary by insurer, history and renewal timing. Scenarios are estimates, not binding quotes or guarantees.</p></div></Card>
+            <Card className="p-6 shadow-fab"><p className="text-sm font-semibold text-primary">One connected intake</p><ol className="mt-5 space-y-4 text-sm">{(isPhotoRadar ? ["Ticket and ownership check", "Contact and limited review consent", PHOTO_RADAR_PRICE_LABEL] : ["Free ticket capture", "Driving and policy context", "Signed limited review consent", "Choose a priority report or Rapid Resolution"]).map((item, index) => <li key={item} className="flex items-start gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">{index + 1}</span>{item}</li>)}</ol></Card>
+            <Card className="p-5"><div className="flex items-start gap-3"><LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><div><p className="font-bold">Private source documents</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{isPhotoRadar ? "Your ticket uses a signed upload into non-public storage and remains linked to the matter Fabsy reviews. No policy documents are requested." : "Ticket and policy files use signed uploads into non-public storage and remain linked to the matter Fabsy reviews."}</p></div></div></Card>
+            <Card className="p-5"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><p className="text-sm leading-relaxed text-muted-foreground">{isPhotoRadar ? "This registered-owner notice has no demerits or insurance impact. Fabsy pursues a Crown reduction or withdrawal; you approve any deal. No trial. No success fee." : "Insurance outcomes vary by insurer, history and renewal timing. Scenarios are estimates, not binding quotes or guarantees."}</p></div></Card>
           </aside>
         </div>
       </main>
@@ -334,6 +376,7 @@ type UpdateDraft = <K extends keyof AssessmentDraft>(field: K, value: Assessment
 function TicketStep({ draft, update, ticketFile, setTicketFile, onTicketOcr, unsupportedProvince, isSubmitting }: { draft: AssessmentDraft; update: UpdateDraft; ticketFile: File | null; setTicketFile: (file: File | null) => void; onTicketOcr: (data: TicketOcrData | null) => void; unsupportedProvince: boolean; isSubmitting: boolean }) {
   return <div className="space-y-6">
     <div><h2 className="text-2xl font-bold">1. Ticket capture and free review</h2><p className="mt-1 text-sm text-muted-foreground">Take a clear photo or choose the original PDF. OCR helps fill the fields; you can correct them.</p></div>
+    <TicketTypeFields ticketType={draft.ticketType} ticketTypeSource={draft.ticketTypeSource} registeredOwnerOnOffenceDate={draft.registeredOwnerOnOffenceDate} onTicketTypeChange={value => update("ticketType", value)} onOwnerChange={value => update("registeredOwnerOnOffenceDate", value)} disabled={isSubmitting} />
     <TicketCapture file={ticketFile} onFileChange={setTicketFile} onOcrData={onTicketOcr} required disabled={isSubmitting} />
     <div className="space-y-2"><Label htmlFor="assessment-province">Province or territory on the ticket *</Label><Select value={draft.province} onValueChange={(value) => update("province", value)}><SelectTrigger id="assessment-province"><SelectValue /></SelectTrigger><SelectContent>{provinces.map((province) => <SelectItem key={province} value={province}>{province}</SelectItem>)}</SelectContent></Select></div>
     {unsupportedProvince && <Alert className="border-amber-300 bg-amber-50"><AlertTitle>Fabsy currently serves Alberta tickets only</AlertTitle><AlertDescription>We cannot sell these services for a ticket issued elsewhere. <Link to="/contact" className="font-semibold underline">Contact us</Link> with questions.</AlertDescription></Alert>}
@@ -341,10 +384,10 @@ function TicketStep({ draft, update, ticketFile, setTicketFile, onTicketOcr, uns
       <TextInput id="assessment-ticket-number" label="Ticket number, if readable" value={draft.ticketNumber} onChange={(value) => update("ticketNumber", value)} maxLength={50} />
       <TextInput id="assessment-offence" label="Offence, if known" value={draft.offence} onChange={(value) => update("offence", value)} maxLength={200} placeholder="e.g. speeding" />
       <div className="space-y-2"><Label htmlFor="assessment-fine">Fine amount, if shown</Label><Input id="assessment-fine" type="number" min="0" max="100000" step="0.01" value={draft.fineAmount} onChange={(event) => update("fineAmount", event.target.value)} placeholder="CAD" /></div>
-      <div className="space-y-2"><Label htmlFor="assessment-ticket-date">Ticket date, if known</Label><Input id="assessment-ticket-date" type="date" value={draft.ticketDate} onChange={(event) => update("ticketDate", event.target.value)} /></div>
+      <div className="space-y-2"><Label htmlFor="assessment-ticket-date">{draft.ticketType === "photo_radar" ? "Offence date, if readable" : "Ticket date, if known"}</Label><Input id="assessment-ticket-date" type="date" value={draft.ticketDate} onChange={(event) => update("ticketDate", event.target.value)} />{draft.ticketType === "photo_radar" && <p className="text-xs text-muted-foreground">Use the offence date printed on the notice, not its issue or mailing date.</p>}</div>
       <div className="space-y-2 sm:col-span-2"><Label htmlFor="assessment-deadline">Response or court deadline, if shown</Label><Input id="assessment-deadline" type="date" value={draft.responseDeadline} onChange={(event) => update("responseDeadline", event.target.value)} /></div>
     </div>
-    <div className="space-y-2"><Label htmlFor="assessment-happened">What happened? *</Label><Textarea id="assessment-happened" value={draft.whatHappened} onChange={(event) => update("whatHappened", event.target.value)} placeholder="A short description in your own words is enough." maxLength={2500} rows={5} /><p className="text-xs text-muted-foreground">This free scan is information only and does not retain Fabsy or pause a deadline.</p></div>
+    <div className="space-y-2"><Label htmlFor="assessment-happened">{draft.ticketType === "photo_radar" ? "Anything else we should know? (optional)" : "What happened? *"}</Label><Textarea id="assessment-happened" value={draft.whatHappened} onChange={(event) => update("whatHappened", event.target.value)} placeholder="A short description in your own words is enough." maxLength={2500} rows={5} /><p className="text-xs text-muted-foreground">This free scan is information only and does not retain Fabsy or pause a deadline.</p></div>
   </div>;
 }
 
@@ -368,20 +411,31 @@ function DrivingStep({ draft, update, policyFiles, setPolicyFiles, policyBrowseR
   </div>;
 }
 
-function ContactStep({ draft, update }: { draft: AssessmentDraft; update: UpdateDraft }) {
+function ContactStep({ draft, update, displayStep }: { draft: AssessmentDraft; update: UpdateDraft; displayStep: number }) {
   return <div className="space-y-6">
-    <div><h2 className="text-2xl font-bold">3. Contact and signed review consent</h2><p className="mt-1 text-sm text-muted-foreground">This consent covers document review and the report only. Full representation has a separate authorization step.</p></div>
+    <div><h2 className="text-2xl font-bold">{displayStep}. Contact and signed review consent</h2><p className="mt-1 text-sm text-muted-foreground">This consent covers document review only. Rapid Resolution has a separate authorization step before payment.</p></div>
     <div className="grid gap-5 sm:grid-cols-2"><TextInput id="assessment-first-name" label="First name *" value={draft.firstName} onChange={(value) => update("firstName", value)} maxLength={100} autoComplete="given-name" /><TextInput id="assessment-last-name" label="Last name *" value={draft.lastName} onChange={(value) => update("lastName", value)} maxLength={100} autoComplete="family-name" /><div className="space-y-2"><Label htmlFor="assessment-email">Email *</Label><Input id="assessment-email" type="email" autoComplete="email" value={draft.email} onChange={(event) => update("email", event.target.value)} maxLength={255} /></div><div className="space-y-2"><Label htmlFor="assessment-phone">Phone, optional</Label><Input id="assessment-phone" type="tel" autoComplete="tel" value={draft.phone} onChange={(event) => update("phone", event.target.value)} maxLength={30} /></div></div>
     <div className="sr-only" aria-hidden="true"><Label htmlFor="assessment-company">Company</Label><Input id="assessment-company" tabIndex={-1} autoComplete="off" value={draft.company} onChange={(event) => update("company", event.target.value)} /></div>
-    <Card className="space-y-4 border-primary/20 bg-primary/5 p-5"><div><p className="font-bold">Consent to review supplied documents</p><p className="mt-2 text-sm leading-relaxed text-muted-foreground">I authorize Fabsy to securely receive and review the ticket, policy documents and information I supplied, contact me about this matter, and prepare the service I select. This does not authorize a plea, court appearance, negotiation or other representation. It does not pause any deadline.</p></div><div className="flex items-start gap-3"><Checkbox id="review-consent" checked={draft.reviewConsentAccepted} onCheckedChange={(value) => update("reviewConsentAccepted", value === true)} className="mt-0.5" /><Label htmlFor="review-consent" className="cursor-pointer text-sm leading-relaxed">I have read and agree to this limited review consent.</Label></div><TextInput id="review-signature" label="Type your full legal name to sign *" value={draft.reviewSignature} onChange={(value) => update("reviewSignature", value)} maxLength={200} placeholder="Digital signature" /></Card>
-    <div className="flex items-start gap-3 rounded-xl border bg-slate-50 p-4"><Checkbox id="assessment-terms" checked={draft.termsAccepted} onCheckedChange={(value) => update("termsAccepted", value === true)} className="mt-0.5" /><Label htmlFor="assessment-terms" className="cursor-pointer text-sm leading-relaxed">I confirm the information is accurate to the best of my knowledge and agree to Fabsy's <Link to="/terms-of-purchase" className="font-semibold text-primary underline">Terms of Purchase</Link>, <Link to="/terms-of-service" className="font-semibold text-primary underline">Terms of Service</Link>, and <Link to="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>. I understand no court or insurance result is promised.</Label></div>
+    <Card className="space-y-4 border-primary/20 bg-primary/5 p-5"><div><p className="font-bold">Consent to review supplied documents</p><p className="mt-2 text-sm leading-relaxed text-muted-foreground">I authorize Fabsy to securely receive and review the ticket and any other documents and information I supplied, contact me about this matter, and prepare the service I select. This does not authorize a plea, court appearance, negotiation or other representation. It does not pause any deadline.</p></div><div className="flex items-start gap-3"><Checkbox id="review-consent" checked={draft.reviewConsentAccepted} onCheckedChange={(value) => update("reviewConsentAccepted", value === true)} className="mt-0.5" /><Label htmlFor="review-consent" className="cursor-pointer text-sm leading-relaxed">I have read and agree to this limited review consent.</Label></div><TextInput id="review-signature" label="Type your full legal name to sign *" value={draft.reviewSignature} onChange={(value) => update("reviewSignature", value)} maxLength={200} placeholder="Digital signature" /></Card>
+    <div className="flex items-start gap-3 rounded-xl border bg-slate-50 p-4"><Checkbox id="assessment-terms" checked={draft.termsAccepted} onCheckedChange={(value) => update("termsAccepted", value === true)} className="mt-0.5" /><Label htmlFor="assessment-terms" className="cursor-pointer text-sm leading-relaxed">I confirm the information is accurate to the best of my knowledge and agree to Fabsy's <Link to="/terms-of-purchase" className="font-semibold text-primary underline">Terms of Purchase</Link>, <Link to="/terms-of-service" className="font-semibold text-primary underline">Terms of Service</Link>, and <Link to="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>. {draft.ticketType === "photo_radar" ? "I understand no reduction or withdrawal is promised." : "I understand no court or insurance result is promised."}</Label></div>
   </div>;
 }
 
-function ServiceStep({ isSubmitting, chooseRepresentation }: { isSubmitting: boolean; chooseRepresentation: () => void }) {
-  return <div className="space-y-6"><div><h2 className="text-2xl font-bold">4. Choose your service</h2><p className="mt-1 text-sm text-muted-foreground">Your ticket, policy documents and consent will carry into either option.</p></div><div className="grid gap-5 md:grid-cols-2">
+function ServiceStep({ isSubmitting, isPhotoRadar, displayStep, chooseRepresentation }: { isSubmitting: boolean; isPhotoRadar: boolean; displayStep: number; chooseRepresentation: () => void }) {
+  if (isPhotoRadar) return <div className="space-y-6">
+    <div><h2 className="text-2xl font-bold">{displayStep}. Your Photo Radar service</h2><p className="mt-1 text-sm text-muted-foreground">Your source ticket and ownership answer carry into the signed authorization and checkout.</p></div>
+    <Card className="space-y-4 border-primary/30 bg-primary/5 p-6">
+      <h3 className="text-2xl font-bold">{PHOTO_RADAR.name}</h3>
+      <p className="text-xl font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>
+      <p className="text-sm leading-relaxed">No demerits. No insurance impact. Only the fine is on the table.</p>
+      <ServiceList items={["Fabsy enters the not-guilty plea and requests disclosure", "Disclosure review and a Crown reduction or withdrawal request", "You approve any proposed deal", "No trial. No success fee."]} color="text-primary" />
+      <p className="text-sm text-muted-foreground">{PHOTO_RADAR.actionCommitment} {PHOTO_RADAR.outcomeDisclaimer}</p>
+      <Button type="button" size="lg" disabled={isSubmitting} onClick={chooseRepresentation}>{isSubmitting ? "Saving securely..." : "Continue to Photo Radar authorization"}</Button>
+    </Card>
+  </div>;
+  return <div className="space-y-6"><div><h2 className="text-2xl font-bold">{displayStep}. Choose your service</h2><p className="mt-1 text-sm text-muted-foreground">Your ticket, policy documents and consent will stay linked to this matter.</p></div><div className="grid gap-5 md:grid-cols-2">
     <Card className="flex flex-col border-primary/30 p-5"><Zap className="h-7 w-7 text-primary" /><p className="mt-4 text-sm font-semibold text-primary">PRIORITY REVIEW</p><h3 className="mt-1 text-xl font-bold">Fast report and initial dispute plan</h3><p className="mt-3 text-3xl font-bold">$149 <span className="text-sm font-normal text-muted-foreground">CAD total</span></p><ServiceList items={["Priority human ticket review", "Insurance-impact and cost scenarios", "Policy-document context", "Initial dispute plan", "$149 credit on eligible same-matter representation"]} color="text-primary" /><Button type="submit" size="lg" disabled={isSubmitting}><CreditCard className="mr-2 h-5 w-5" />{isSubmitting ? "Saving securely..." : "Choose $149 review"}</Button><p className="mt-2 text-center text-xs text-muted-foreground">Applicable GST included.</p></Card>
-    <Card className="flex flex-col border-secondary/40 bg-secondary/5 p-5"><BriefcaseBusiness className="h-7 w-7 text-secondary" /><p className="mt-4 text-sm font-semibold text-secondary">FULL REPRESENTATION</p><h3 className="mt-1 text-xl font-bold">Everything above, handled end-to-end</h3><p className="mt-3 text-3xl font-bold">$488 <span className="text-sm font-normal text-muted-foreground">base fee</span></p><ServiceList items={["Everything in the $149 review", "Separate representation consent", "Disclosure review and Crown discussions", "Agent representation through resolution or trial", "Private documents stay linked to one matter"]} color="text-secondary" /><Button type="button" size="lg" variant="secondary" disabled={isSubmitting} onClick={chooseRepresentation}><BriefcaseBusiness className="mr-2 h-5 w-5" />{isSubmitting ? "Saving securely..." : "Choose $488 representation"}</Button><p className="mt-2 text-center text-xs text-muted-foreground">Applicable tax added. A 30% fee applies only to a fine reduction achieved.</p></Card>
+    <Card className="flex flex-col border-secondary/40 bg-secondary/5 p-5"><BriefcaseBusiness className="h-7 w-7 text-secondary" /><p className="mt-4 text-sm font-semibold text-secondary">RAPID RESOLUTION</p><h3 className="mt-1 text-xl font-bold">Eligible pre-trial resolution</h3><p className="mt-3 text-3xl font-bold">${RAPID_RESOLUTION.priceCad} <span className="text-sm font-normal text-muted-foreground">CAD plus GST</span></p><ServiceList items={["Separate signed authorization", "Disclosure request and review", "Fact-specific Crown discussions", "You approve any deal", "No trial. No success fee."]} color="text-secondary" /><Button type="button" size="lg" variant="secondary" disabled={isSubmitting} onClick={chooseRepresentation}><BriefcaseBusiness className="mr-2 h-5 w-5" />{isSubmitting ? "Saving securely..." : "Choose Rapid Resolution"}</Button><p className="mt-2 text-center text-xs text-muted-foreground">Government fines and trial representation are separate. No outcome is promised.</p></Card>
   </div></div>;
 }
 

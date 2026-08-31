@@ -1,0 +1,52 @@
+{
+  "status": "draft_valid_not_launch_ready",
+  "launch_ready": false,
+  "counts": {
+    "campaigns": 1,
+    "ad_groups": 3,
+    "keywords": 78,
+    "rsa": 3,
+    "negative_keywords": 44,
+    "meta_variants": 3
+  },
+  "max_rsa_headline_length": 30,
+  "max_rsa_description_length": 89,
+  "checks": [
+    "All entities with a status are paused",
+    "No assigned or authorized spend",
+    "Canonical CAD 79 / GST 3.95 / total 82.95",
+    "RSA copy limits and mandatory pins",
+    "Exact/Phrase pairs and all four camera-notice families",
+    "No blanket holdout negatives or literal positive-negative conflicts",
+    "Alberta presence and restricted network settings",
+    "Meta tax/scope/approval/outcome qualifications",
+    "Paid purchase value and CAC/reduction threshold contract"
+  ],
+  "limitations": [
+    "Offline content checks do not validate Ads Editor import, account policy approval, actual matching or production behavior",
+    "Literal negative matching does not model every Google close variant",
+    "This validator intentionally validates a paused draft, not authorization to launch"
+  ],
+  "launch_blockers": [
+    "No budget or activation authorization; campaign CSV Budget is intentionally blank.",
+    "Billing/account identity and advertiser status need an authorized account check.",
+    "Production Photo Radar destination and checkout are not verified.",
+    "A single paid Photo Radar conversion with CAD 79 value and deduplication is not verified.",
+    "Targeting, inherited negatives, assets, privacy and evaluation settings need account review."
+  ],
+  "asset_sha256": {
+    "01-campaigns.csv": "a4a5291dc3b08fe5dcd7b0bae9f0e3315eece1027c9040495a69b5985f2cb81f",
+    "02-ad-groups.csv": "41fa7520f0f31c4478216a4f56372772c3bb4d6292a12d30b383e81777e596c8",
+    "03-keywords.csv": "f3e7a084485ec56477280b732f5d86dd1fbeb14026ac4ae0d5d4ce269a130688",
+    "04-responsive-search-ads.csv": "55fb6c78e5284e2aec7b1328acc8e18d3c9dab87bd533f68a65d07ebaedb55a6",
+    "05-negative-keywords.csv": "f5c9ff66f4517967113a57b1fbfa21a162faf48d46e3567825799e761498da8a",
+    "README.md": "1134366149fb27db214ba33c81f8f9be1f1ae059a441f9e821aa5378fdf47ab4",
+    "destination-audit.json": "a17ab0c03f439fc9a6d5c6606143cdece09dcde62c0a841d8f23beb8e6b2a08d",
+    "launch-checklist.md": "d77f94cb5c407b2794ed8c1c632b8ca9e444d7470be2c9f31aac1c016e57e78c",
+    "launch-settings.json": "7adc7012eefead8b0cdca509566ebe0361e75fed739afd32eb7e877f3a9be16a",
+    "measurement-plan.md": "f72a996c6278b91297ae0312ada000458d3231e62304732274e602303c8dffb4",
+    "meta-copy.json": "cae0014364be3dcf1f36bbe28d80432b5819fc12645c9b8d34c7cf5e22c87531",
+    "meta-creative-brief.md": "a484b35d35ad111b2cabf1f7e0ae213489751b5fc627b93e4f8281d0af4c644b",
+    "validate.py": "3fbddd1c59219b41f36efd3853c75edf500bd1db239787a07d92ee16f9a39dba"
+  }
+}

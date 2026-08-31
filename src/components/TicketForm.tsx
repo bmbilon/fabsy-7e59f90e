@@ -3,6 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import PersonalInfoStep from "./form-steps/PersonalInfoStep";
 import TicketDetailsStep from "./form-steps/TicketDetailsStep";
@@ -13,9 +16,13 @@ import ReviewStep from "./form-steps/ReviewStep";
 import { useToast } from "@/hooks/use-toast";
 import { useTicketCache } from "@/hooks/useTicketCache";
 import { Link } from "react-router-dom";
-import { RAPID_RESOLUTION } from "@/config/offers";
+import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
 import { useLocale } from "@/i18n/locale-context";
 import LocalizedTicketJourney from "./LocalizedTicketJourney";
+import { applyDetectedTicketType, applyTicketType, ticketDateAsLocalDate, ticketDateFromExtraction, type RegisteredOwnerAnswer, type TicketType, type TicketTypeSource } from "@/lib/ticket/ticketType";
+import { isProLicenceClass, LICENCE_CLASS_OPTIONS, normalizeLicenceClass, type LicenceClass } from "@/lib/pro-drivers/intake";
+import { latestReferralAttribution, normalizeReferralCode, ReferralCaptureError, type ReferralAttribution } from "@/lib/referrals/attribution";
+import { captureReferralCode, captureReferralFromLocation, clearReferralAttribution, readActiveReferral, REFERRAL_ATTRIBUTION_EVENT } from "@/lib/referrals/capture";
 
 export interface FormData {
   // Unified intake handoff
@@ -35,11 +42,18 @@ export interface FormData {
   dateOfBirth: Date | undefined;
   driversLicense: string;
   driversLicenseImage: File | null;
+  licenceClass: LicenceClass;
   addressDifferentFromLicense: boolean;
+  referral: ReferralAttribution | null;
   
   // Ticket Details
+  ticketType: TicketType;
+  ticketTypeSource: TicketTypeSource;
+  registeredOwnerOnOffenceDate: RegisteredOwnerAnswer;
   ticketNumber: string;
+  plateNumber: string;
   issueDate: Date | undefined;
+  ticketDateManuallyEdited?: boolean;
   location: string;
   officer: string;
   officerBadge: string;
@@ -92,11 +106,18 @@ const initialFormData: FormData = {
   dateOfBirth: undefined,
   driversLicense: "",
   driversLicenseImage: null,
+  licenceClass: "unknown",
   addressDifferentFromLicense: false,
+  referral: null,
   
   // Ticket Details
+  ticketType: "officer_issued",
+  ticketTypeSource: "default",
+  registeredOwnerOnOffenceDate: "",
   ticketNumber: "",
+  plateNumber: "",
   issueDate: undefined,
+  ticketDateManuallyEdited: false,
   location: "",
   officer: "",
   officerBadge: "",
@@ -140,15 +161,85 @@ const steps = [
   { id: 6, title: "Payment", description: "Secure payment processing" }
 ];
 
+function mergeCachedTicketData(current: FormData, raw: Record<string, unknown>): FormData {
+  const merged = applyDetectedTicketType({
+    ...current,
+    ...raw,
+    ticketType: current.ticketType,
+    ticketTypeSource: current.ticketTypeSource,
+    referral: current.referral,
+    licenceClass: current.licenceClass,
+    driversLicenseImage: current.driversLicenseImage,
+    courtDate: ticketDateAsLocalDate(raw.courtDate),
+  }, raw);
+  const preserveManualDate = current.ticketDateManuallyEdited && merged.ticketType === current.ticketType;
+  return {
+    ...merged,
+    issueDate: ticketDateAsLocalDate(ticketDateFromExtraction(raw, merged.ticketType,
+      preserveManualDate ? current.issueDate ?? "" : undefined)),
+    ticketDateManuallyEdited: Boolean(preserveManualDate),
+  };
+}
+
+function ReferralCodeField({ referral, onChange }: {
+  referral: ReferralAttribution | null;
+  onChange: (referral: ReferralAttribution | null) => void;
+}) {
+  const [code, setCode] = useState(referral?.code ?? "");
+  const [isApplying, setIsApplying] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => { setCode(referral?.code ?? ""); }, [referral?.code]);
+
+  const applyCode = async () => {
+    if (isApplying || !code.trim()) return;
+    if (!normalizeReferralCode(code)) {
+      setError("Enter a code with 3–32 letters, numbers, hyphens or underscores.");
+      return;
+    }
+    setIsApplying(true);
+    setError("");
+    try {
+      const applied = await captureReferralCode(code, true);
+      onChange(applied);
+      setCode(applied?.code ?? "");
+    } catch (failure) {
+      setError(failure instanceof ReferralCaptureError && failure.reason === "invalid"
+        ? "That referral code could not be verified. Check it or continue without changing your referral."
+        : "We could not verify the code right now. Try again; your ticket checkout is still available.");
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  return <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
+    <Label htmlFor="referral-code" className="text-base font-semibold">Referral code, optional</Label>
+    <p id="referral-code-help" className="text-sm text-muted-foreground">Did someone refer you? Apply their code here. They may earn a referral payment; your price stays the same.</p>
+    <div className="flex flex-wrap gap-3">
+      <Input id="referral-code" value={code} maxLength={32} autoComplete="off" autoCapitalize="characters" spellCheck={false}
+        placeholder="Enter code" className="min-w-0 flex-1 uppercase" aria-invalid={Boolean(error)} aria-describedby={`referral-code-help${error ? " referral-code-error" : ""}`}
+        disabled={isApplying} onChange={event => { setCode(event.target.value); setError(""); }}
+        onBlur={() => { if (code.trim() && normalizeReferralCode(code) !== referral?.code) void applyCode(); }} />
+      <Button type="button" variant="outline" disabled={isApplying || !code.trim()} onClick={() => void applyCode()}>{isApplying ? "Checking…" : "Apply code"}</Button>
+    </div>
+    {error && <p id="referral-code-error" role="alert" className="text-sm text-destructive">{error}</p>}
+    {referral && <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+      <p role="status">Referral code <strong>{referral.code}</strong> applied. <Link to="/refer" className="text-primary underline">Referral terms</Link></p>
+      <Button type="button" variant="ghost" size="sm" disabled={isApplying} onClick={() => { clearReferralAttribution(); onChange(null); setCode(""); setError(""); }}>Remove code</Button>
+    </div>}
+  </div>;
+}
+
 const TicketForm = ({
   initialTicketImage = null,
   initialPrefill = null,
   initialStep,
+  initialTicketType,
   sourceAssessment = null,
 }: {
   initialTicketImage?: File | null;
   initialPrefill?: Partial<FormData> | null;
   initialStep?: number;
+  initialTicketType?: TicketType | null;
   sourceAssessment?: { submissionId: string; accessToken: string } | null;
 }) => {
   const { locale, setIntakeHandoff } = useLocale();
@@ -169,28 +260,54 @@ const TicketForm = ({
     };
 
     const pre = initialPrefill ?? null;
-    const preIssue = pre?.issueDate as unknown;
     const preCourt = pre?.courtDate as unknown;
 
-    return {
+    const draft = {
       ...initialFormData,
       ticketImage: initialTicketImage ?? null,
       sourceAssessmentId: sourceAssessment?.submissionId ?? "",
       sourceAssessmentAccessToken: sourceAssessment?.accessToken ?? "",
       ...(pre ? {
         ...pre,
-        issueDate: coerceDate(preIssue),
         courtDate: coerceDate(preCourt),
       } : {}),
+      licenceClass: normalizeLicenceClass(pre?.licenceClass),
+      driversLicenseImage: typeof File !== "undefined" && pre?.driversLicenseImage instanceof File ? pre.driversLicenseImage : null,
+      referral: latestReferralAttribution([pre?.referral, readActiveReferral()]),
     } as FormData;
+    const typed = initialTicketType && draft.ticketTypeSource !== "manual"
+      ? applyTicketType(draft, initialTicketType, "entry")
+      : applyDetectedTicketType(draft, pre);
+    const preserveManualDate = pre?.ticketDateManuallyEdited === true && pre?.ticketType === typed.ticketType;
+    return {
+      ...typed,
+      issueDate: ticketDateAsLocalDate(ticketDateFromExtraction(pre, typed.ticketType,
+        preserveManualDate ? pre?.issueDate ?? "" : undefined)),
+      ticketDateManuallyEdited: preserveManualDate,
+    };
   });
+  const isPhotoRadar = formData.ticketType === "photo_radar";
+  const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
+  useEffect(() => {
+    const syncReferral = () => setFormData(current => ({ ...current, referral: readActiveReferral() }));
+    window.addEventListener(REFERRAL_ATTRIBUTION_EVENT, syncReferral);
+    void captureReferralFromLocation(window.location);
+    return () => window.removeEventListener(REFERRAL_ATTRIBUTION_EVENT, syncReferral);
+  }, []);
   // Preserve an active draft when the route changes between English and a
   // locale. Keep identity documents in memory, never a new browser cache.
   // A language handoff always requires fresh consent in the destination.
   useEffect(() => {
     setIntakeHandoff({
-      prefillTicketData: { ...formData, consentGiven: false, digitalSignature: '' },
+      prefillTicketData: {
+        ...formData,
+        ...(formData.ticketType === "photo_radar"
+          ? { offenceDate: ticketDateFromExtraction(null, "photo_radar", formData.issueDate ?? "") }
+          : {}),
+        consentGiven: false,
+        digitalSignature: '',
+      },
       startAtStep: Math.min(currentStep, 4),
       ticketImage: formData.ticketImage,
     });
@@ -200,7 +317,7 @@ const TicketForm = ({
 
   // Check for ticket data from eligibility checker on mount
   useEffect(() => {
-    if (locale !== "en" || initialPrefill) return;
+    if (locale !== "en" || initialPrefill || initialTicketType) return;
     const loadTicketData = async () => {
       console.log('[TicketForm] Starting ticket data loading process...');
       
@@ -218,14 +335,8 @@ const TicketForm = ({
           if (cachedData?.ticketData && Object.keys(cachedData.ticketData).length > 0) {
             console.log('[TicketForm] Supabase cache data available, updating form...');
             
-            const parsedData: Partial<FormData> = {
-              ...cachedData.ticketData,
-              issueDate: cachedData.ticketData.issueDate ? new Date(cachedData.ticketData.issueDate) : undefined,
-              courtDate: cachedData.ticketData.courtDate ? new Date(cachedData.ticketData.courtDate) : undefined,
-            };
-            
             // Update form with cached data (may override localStorage)
-            setFormData(prev => ({ ...prev, ...parsedData }));
+            setFormData(prev => mergeCachedTicketData(prev, cachedData.ticketData));
             localStorage.removeItem('ticket-cache-key');
             
             console.log('[TicketForm] Form updated with Supabase cache data');
@@ -252,19 +363,9 @@ const TicketForm = ({
       if (primaryData) {
         try {
           const ocrData = JSON.parse(primaryData);
-          console.log('[TicketForm] Loading primary OCR data:', JSON.stringify(ocrData, null, 2));
-          
-          // Parse dates if they exist
-          const parsedData: Partial<FormData> = {
-            ...ocrData,
-            issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
-            courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
-          };
-          
-          console.log('[TicketForm] Parsed primary data:', JSON.stringify(parsedData, null, 2));
           
           // Update form with primary data
-          setFormData(prev => ({ ...prev, ...parsedData }));
+          setFormData(prev => mergeCachedTicketData(prev, ocrData));
           
           // Clean up primary localStorage
           localStorage.removeItem('eligibility-ocr-data');
@@ -284,19 +385,9 @@ const TicketForm = ({
       if (backupData) {
         try {
           const ocrData = JSON.parse(backupData);
-          console.log('[TicketForm] Loading backup OCR data:', JSON.stringify(ocrData, null, 2));
-          
-          // Parse dates if they exist
-          const parsedData: Partial<FormData> = {
-            ...ocrData,
-            issueDate: ocrData.issueDate ? new Date(ocrData.issueDate) : undefined,
-            courtDate: ocrData.courtDate ? new Date(ocrData.courtDate) : undefined,
-          };
-          
-          console.log('[TicketForm] Parsed backup data:', JSON.stringify(parsedData, null, 2));
           
           // Update form with backup data
-          setFormData(prev => ({ ...prev, ...parsedData }));
+          setFormData(prev => mergeCachedTicketData(prev, ocrData));
           
           // Clean up backup localStorage
           localStorage.removeItem('eligibility-ocr-data-backup');
@@ -317,10 +408,26 @@ const TicketForm = ({
     };
     
     loadTicketData();
-  }, [getCachedTicketData, isCacheKeyValid, toast, locale, initialPrefill]);
+  }, [getCachedTicketData, isCacheKeyValid, toast, locale, initialPrefill, initialTicketType]);
 
   const updateFormData = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => {
-    setFormData(prev => ({ ...prev, ...(typeof updates === 'function' ? updates(prev) : updates) }));
+    setFormData(prev => {
+      const update = typeof updates === 'function' ? updates(prev) : updates;
+      const next = { ...prev, ...update };
+      const typed = update.ticketType
+        ? applyTicketType({ ...next, ticketType: prev.ticketType, ticketTypeSource: prev.ticketTypeSource }, update.ticketType, update.ticketTypeSource ?? "manual")
+        : next;
+      const isNewTicket = typed.ticketType !== prev.ticketType || typed.ticketImage !== prev.ticketImage;
+      if (typeof updates !== 'function' && Object.prototype.hasOwnProperty.call(update, "issueDate")) {
+        return { ...typed, ticketDateManuallyEdited: true };
+      }
+      if (!isNewTicket && prev.ticketDateManuallyEdited) {
+        // Parent hydration and child OCR can both finish after a manual edit,
+        // including an explicit clear or an edit before leaving this step.
+        return { ...typed, issueDate: prev.issueDate, ticketDateManuallyEdited: true };
+      }
+      return { ...typed, ticketDateManuallyEdited: isNewTicket ? false : typed.ticketDateManuallyEdited };
+    });
   };
 
   const scrollToForm = () => {
@@ -347,11 +454,25 @@ const TicketForm = ({
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <TicketDetailsStep formData={formData} updateFormData={updateFormData} />;
+        return <>
+          <TicketDetailsStep formData={formData} updateFormData={updateFormData} />
+          {!isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
+            <Label htmlFor="pro-licence-class" className="text-base font-semibold">Alberta licence class</Label>
+            <Select value={formData.licenceClass} onValueChange={value => updateFormData({ licenceClass: normalizeLicenceClass(value) })}>
+              <SelectTrigger id="pro-licence-class" aria-describedby="pro-licence-class-help"><SelectValue /></SelectTrigger>
+              <SelectContent>{LICENCE_CLASS_OPTIONS.map(option => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+            </Select>
+            <p id="pro-licence-class-help" className="text-sm text-muted-foreground">Class 1, 2 or 4 licence? Get 20% off Rapid Resolution and the bundle after we verify that your Alberta licence photo matches this class. Upload the photo in the next step.</p>
+            <p className="text-xs text-muted-foreground">Officer tickets only. Class 5, including gig couriers, and photo radar are excluded. <Link to="/pro-drivers" className="text-primary underline">See pro driver eligibility.</Link></p>
+          </div>}
+        </>;
       case 2:
         return <PersonalInfoStep formData={formData} updateFormData={updateFormData} />;
       case 3:
-        return <DefenseStep formData={formData} updateFormData={updateFormData} />;
+        return <>
+          <DefenseStep formData={formData} updateFormData={updateFormData} />
+          <ReferralCodeField referral={formData.referral} onChange={referral => updateFormData({ referral })} />
+        </>;
       case 4:
         return <ConsentStep formData={formData} updateFormData={updateFormData} />;
       case 5:
@@ -373,6 +494,7 @@ const TicketForm = ({
           formData.issueDate &&
           formData.location &&
           formData.fineAmount &&
+          (!isPhotoRadar || formData.registeredOwnerOnOffenceDate) &&
           !formData.vehicleSeized
         );
       case 2: // Personal Info
@@ -389,6 +511,7 @@ const TicketForm = ({
           formData.postalCode
         );
       case 3: // Defense
+        if (isPhotoRadar) return true;
         return !!(
           formData.pleaType &&
           formData.explanation
@@ -414,9 +537,10 @@ const TicketForm = ({
       case 1:
         if (!formData.ticketImage && !formData.sourceAssessmentId) m.push("Ticket PDF or photo");
         if (!formData.ticketNumber) m.push("Ticket number");
-        if (!formData.issueDate) m.push("Issue date");
+        if (!formData.issueDate) m.push(isPhotoRadar ? "Offence date" : "Issue date");
         if (!formData.location) m.push("Location");
         if (!formData.fineAmount) m.push("Fine amount");
+        if (isPhotoRadar && !formData.registeredOwnerOnOffenceDate) m.push("Registered owner on the offence date");
         if (formData.vehicleSeized) m.push("A separate review is required for a vehicle-seizure matter");
         break;
       case 2:
@@ -432,6 +556,7 @@ const TicketForm = ({
         if (!formData.phone) m.push("Phone number");
         break;
       case 3:
+        if (isPhotoRadar) break;
         if (!formData.pleaType) m.push("Plea selection");
         if (!formData.explanation) m.push("Case explanation");
         break;
@@ -449,6 +574,13 @@ const TicketForm = ({
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
 
+  if (locale !== "en" && (isPhotoRadar || isProLicenceClass(formData.licenceClass))) return (
+    <section lang="en" className="mx-auto max-w-2xl space-y-5 rounded-xl border bg-white p-8">
+      <h1 className="text-2xl font-bold">{isPhotoRadar ? "Photo Radar" : "Pro Driver Discount"} intake is available in English</h1>
+      <p>The pricing and authorization for this new {isPhotoRadar ? "service" : "discount"} have not been released in this language. Your ticket and completed fields will stay with you when you continue in English.</p>
+      <Button asChild><Link to={isPhotoRadar ? PHOTO_RADAR.intakePath : "/submit-ticket?ticket_type=officer_issued"} state={{ prefillTicketData: { ...formData, ...(isPhotoRadar ? { offenceDate: ticketDateFromExtraction(null, "photo_radar", formData.issueDate ?? "") } : {}), consentGiven: false, digitalSignature: "" }, startAtStep: Math.min(currentStep, 4), ticketImage: formData.ticketImage }}>Continue in English</Link></Button>
+    </section>
+  );
   if (locale !== "en") return <LocalizedTicketJourney formData={formData} updateFormData={updateFormData} currentStep={currentStep} nextStep={nextStep} prevStep={prevStep} />;
 
   return (
@@ -457,17 +589,17 @@ const TicketForm = ({
         {/* Header */}
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            {RAPID_RESOLUTION.name}
+            {offer.name}
           </Badge>
           <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-foreground">
-            Start your <span className="text-gradient-primary">pre-trial resolution</span>
+            Start your <span className="text-gradient-primary">{isPhotoRadar ? "photo radar resolution" : "pre-trial resolution"}</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
+            {isPhotoRadar ? <>Upload your Alberta registered-owner notice, confirm ownership and sign the authorization. {PHOTO_RADAR_PRICE_LABEL}. No demerits, no insurance impact. Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee.</> : <>Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
             and continue to the transparent ${RAPID_RESOLUTION.priceCad} CAD plus GST checkout. Want the insurance report by itself?{" "}
             <Link to="/insurance-damage-report" className="font-semibold text-primary underline underline-offset-4">
               See the Insurance Impact &amp; Renewal Planning Report.
-            </Link>
+            </Link></>}
           </p>
         </div>
 

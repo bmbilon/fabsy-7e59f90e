@@ -33,6 +33,11 @@ const SITE = 'https://fabsy.ca';
 const BUSINESS_NAME = 'Fabsy Traffic Ticket Services';
 const TELEPHONE = '(825) 793-2279';
 const EMAIL = 'hello@fabsy.ca';
+const OFFERS = require('../src/config/offers.json');
+const PHOTO_RADAR_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
+const { PHOTO_RADAR_PRICING_COPY } = require('./normalize-rapid-resolution-content.cjs');
+const { generatePhotoRadarSnapshots, ROUTES: OFFER_ROUTES } = require('./generate-photo-radar-snapshots.cjs');
+const { generateProReferralSnapshots, ROUTES: PROGRAM_ROUTES } = require('./generate-pro-referral-snapshots.cjs');
 const PRICING_TEXT = EXACT_FABSY_PRICING;
 const DB_DIR = path.resolve(process.env.PAGE_CONTENT_DIR || path.join(ROOT, 'src/content/pages'));
 const CURATED_DIR = path.resolve(process.env.SNAPSHOT_CURATED_DIR || path.join(ROOT, 'ssg-pages'));
@@ -47,7 +52,10 @@ const SYNC_MANIFEST_PATH = path.resolve(
 );
 const REQUIRE_SYNC_MANIFEST = process.env.REQUIRE_PAGE_SYNC_MANIFEST === '1';
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const args = process.argv.slice(2);
+const originalArgs = process.argv.slice(2).map(slug => slug.replace(/^\//, ''));
+const offerArgs = originalArgs.filter(slug => OFFER_ROUTES.includes(slug));
+const programArgs = originalArgs.filter(slug => PROGRAM_ROUTES.includes(slug));
+const args = originalArgs.filter(slug => !OFFER_ROUTES.includes(slug) && !PROGRAM_ROUTES.includes(slug));
 
 const present = (value) => typeof value === 'string' && value.trim().length > 0;
 const esc = (value) =>
@@ -365,6 +373,7 @@ function fallbackSections(page) {
 }
 
 function render(page) {
+  const photoRadar = PHOTO_RADAR_SLUGS.has(page.slug);
   const url = `${SITE}/content/${page.slug}`;
   const robots = /^(?:test(?:-|$)|verify-smoke(?:-|$))/.test(page.slug)
     ? 'noindex, nofollow'
@@ -389,6 +398,9 @@ ${page.sources.map((source) => `          <li><a href="${esc(source.url)}" rel="
         <p>Rules and procedures can change. Use the current official source and the instructions printed on the individual ticket.</p>
       </aside>`
     : '';
+  const offerHtml = photoRadar
+    ? `<section class="triage" aria-labelledby="photo-radar-heading"><h2 id="photo-radar-heading">Photo radar or red-light camera notice?</h2><p>${esc(PHOTO_RADAR_PRICING_COPY)}</p><p>No demerits. No insurance impact. The only thing on the table is the fine. You approve any deal.</p><p>${esc(OFFERS.photoRadar.speedDisclaimer)}</p><p><a class="cta" href="/photo-radar">Review Rapid Resolution: Photo Radar</a></p></section>`
+    : `<section class="triage" aria-labelledby="rapid-resolution-heading"><h2 id="rapid-resolution-heading">Start ${RAPID_RESOLUTION_NAME}</h2><p>Rapid Resolution is Fabsy's end-to-end agent service for eligible Alberta pre-trial traffic matters.</p><ul><li>Secure digital intake and authorization</li><li>Disclosure request, tracking and qualified analysis</li><li>A fact-specific prosecutor-review submission</li><li>Immediate client updates and a plain-language Crown-response comparison</li></ul><p>${RAPID_RESOLUTION_ACTION_COMMITMENT}</p><p>${RAPID_RESOLUTION_SPEED_DISCLAIMER}</p><p>${PRICING_TEXT}</p><p>The ${INSURANCE_REPORT_NAME} provides consumer research and planning information, not an insurer quote or licensed broker recommendation.</p><p><a class="cta" href="/submit-ticket">Start Rapid Resolution</a></p></section>`;
 
   const html = `<!DOCTYPE html>
 <html lang="en-CA">
@@ -441,21 +453,7 @@ ${articleSchema ? `  <script type="application/ld+json">${safeJsonLd(articleSche
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}
       </ul>
 ${sections}
-${sourcesHtml ? `${sourcesHtml}\n` : ''}      <section class="triage" aria-labelledby="rapid-resolution-heading">
-        <h2 id="rapid-resolution-heading">Start ${RAPID_RESOLUTION_NAME}</h2>
-        <p>Rapid Resolution is Fabsy's end-to-end agent service for eligible Alberta pre-trial traffic matters.</p>
-        <ul>
-          <li>Secure digital intake and authorization</li>
-          <li>Disclosure request, tracking and qualified analysis</li>
-          <li>A fact-specific prosecutor-review submission</li>
-          <li>Immediate client updates and a plain-language Crown-response comparison</li>
-        </ul>
-        <p>${RAPID_RESOLUTION_ACTION_COMMITMENT}</p>
-        <p>${RAPID_RESOLUTION_SPEED_DISCLAIMER}</p>
-        <p>${PRICING_TEXT}</p>
-        <p>The ${INSURANCE_REPORT_NAME} provides consumer research and planning information, not an insurer quote or licensed broker recommendation.</p>
-        <p><a class="cta" href="/submit-ticket">Start Rapid Resolution</a></p>
-      </section>
+${sourcesHtml ? `${sourcesHtml}\n` : ''}      ${offerHtml}
       <section>
         <h2>Frequently Asked Questions</h2>
 ${faqsHtml}
@@ -463,7 +461,7 @@ ${faqsHtml}
     </article>
   </main>
   <footer>
-    <p>${BUSINESS_NAME}. ${PRICING_TEXT} Fabsy is an agent service for Alberta traffic matters and is not a law firm.</p>
+    <p>${BUSINESS_NAME}. ${photoRadar ? PHOTO_RADAR_PRICING_COPY : PRICING_TEXT} Fabsy is an agent service for Alberta traffic matters and is not a law firm.</p>
     <p><a href="tel:+18257932279">${TELEPHONE}</a> · <a href="mailto:${EMAIL}">${EMAIL}</a></p>
     <p><a href="/content/fight-traffic-ticket-alberta">Fight a ticket in Alberta</a> · <a href="/content/speeding-ticket-alberta">Speeding tickets</a> · <a href="/content/photo-radar-ticket-alberta">Photo radar</a> · <a href="/content/fight-traffic-ticket-calgary">Calgary</a> · <a href="/content/fight-traffic-ticket-edmonton">Edmonton</a></p>
   </footer>
@@ -523,6 +521,16 @@ function writeManifest(manifest) {
 }
 
 try {
+  if (!originalArgs.length || offerArgs.length) {
+    generatePhotoRadarSnapshots(path.dirname(OUT_DIR), offerArgs.length ? offerArgs : OFFER_ROUTES);
+  }
+  if (!originalArgs.length || programArgs.length) {
+    generateProReferralSnapshots(path.dirname(OUT_DIR), programArgs.length ? programArgs : PROGRAM_ROUTES);
+  }
+  if (originalArgs.length && !args.length) {
+    console.log(`Snapshot generation complete: ${offerArgs.length + programArgs.length} selected public offer/program page(s).`);
+    process.exit(0);
+  }
   const dbPages = readPages(DB_DIR, 'page_content');
   const curatedPages = readPages(CURATED_DIR, 'curated');
   if (dbPages.size === 0) {

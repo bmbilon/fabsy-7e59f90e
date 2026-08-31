@@ -142,7 +142,7 @@ serve(async (req) => {
 
     const { data: submission, error: submissionError } = await admin
       .from("ticket_submissions")
-      .select("id,client_id,status,service_type,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_access_token_hash,assessment_paid_at,assessment_price_cad,preferred_locale,clients(first_name,last_name,email)")
+      .select("id,client_id,status,service_type,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_access_token_hash,assessment_paid_at,assessment_price_cad,preferred_locale,ticket_type,clients(first_name,last_name,email)")
       .eq("id", submissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
@@ -154,6 +154,7 @@ serve(async (req) => {
     if (await sha256(accessToken) !== submission.assessment_access_token_hash) {
       throw new RequestError("Assessment checkout could not be verified.", 403);
     }
+    if (submission.ticket_type === "photo_radar") throw new RequestError("Use the $79 Photo Radar intake for a registered-owner camera notice; an insurance assessment is not applicable.", 409);
     const preferredLocale = parsePreferredLocale(submission.preferred_locale);
     requireReleasedServiceLocale(
       preferredLocale,

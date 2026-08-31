@@ -1,14 +1,18 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import useSafeHead from "@/hooks/useSafeHead";
+import useHashScroll from "@/hooks/useHashScroll";
 import {
   CANONICAL_OFFER_PRICING,
   INSURANCE_IMPACT_REPORT,
+  PHOTO_RADAR,
   RAPID_RESOLUTION,
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
+import { PRO_DRIVER_BUNDLE_CENTS, PRO_DRIVER_DISCOUNT_PERCENT, PRO_DRIVER_RAPID_CENTS } from "@/config/pro-drivers";
 
 const TermsOfService = () => {
+  useHashScroll();
   useSafeHead({
     title: "Terms of Service | Fabsy Traffic Ticket Services",
     description: "Service terms for Fabsy's Alberta traffic ticket agent services, including service scope, fees, client responsibilities and limitations.",
@@ -22,7 +26,7 @@ const TermsOfService = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Terms of Service</h1>
         <p className="text-white/70 mb-8">
-          Last updated: {new Date().toLocaleDateString()}
+          Last updated: August 31, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -30,7 +34,7 @@ const TermsOfService = () => {
             <h2 className="text-2xl font-semibold mb-4">1. Service Description</h2>
             <p className="mb-4">
               Fabsy Traffic Ticket Services is an Alberta traffic ticket agent service. Our current
-              paid services are Rapid Resolution for eligible pre-trial matters and the Insurance
+              paid services are Rapid Resolution for eligible pre-trial matters, Rapid Resolution: Photo Radar for eligible owner notices, and the Insurance
               Impact &amp; Renewal Planning Report. Fabsy is not a law firm.
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -78,6 +82,7 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">5. Fees and Payment</h2>
             <ul className="list-disc pl-6 space-y-2">
+              <li>Rapid Resolution: Photo Radar is ${PHOTO_RADAR.priceCad} CAD plus 5% GST (${PHOTO_RADAR.totalCad.toFixed(2)} total)</li>
               <li>Rapid Resolution is ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST</li>
               <li>The standalone report is ${INSURANCE_IMPACT_REPORT.priceCad} CAD plus applicable GST</li>
               <li>The bundle is ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD plus applicable GST</li>
@@ -118,6 +123,62 @@ const TermsOfService = () => {
               <li>A licensed insurance broker or insurer must provide insurer-specific advice and quotes</li>
             </ul>
             <p className="mt-4">{INSURANCE_IMPACT_REPORT.disclaimer}</p>
+          </section>
+
+          <section id="photo-radar-terms" className="scroll-mt-24">
+            <h2 className="text-2xl font-semibold mb-4">5C. Rapid Resolution: Photo Radar Terms</h2>
+            <p className="mb-4">Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown; no outcome is promised and the fee is not refunded based on outcome.</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>The service applies to Alberta automated enforcement notices mailed to the registered owner under Traffic Safety Act section 160(1), including photo radar speeding and red-light camera notices.</li>
+              <li>Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal after accepting the file and receiving your authorization.</li>
+              <li>You approve any deal. Fabsy will not accept a Crown offer or enter a guilty plea without your case-specific instruction.</li>
+              <li>No trial representation and no success fee are included or charged under this product. Government fines remain your responsibility.</li>
+              <li>These owner notices carry no demerits and have no insurance impact. No Insurance Impact Report is included or offered for this ticket.</li>
+              <li>{PHOTO_RADAR.speedDisclaimer}</li>
+              <li>Section 10 and any applicable statutory cancellation or refund rights continue to apply.</li>
+            </ul>
+          </section>
+
+          <section id="pro-driver-terms" className="scroll-mt-24">
+            <h2 className="text-2xl font-semibold mb-4">5D. Pro Driver Discount</h2>
+            <p className="mb-4">
+              Holders of a verified Alberta Class 1, 2 or 4 driver's licence receive {PRO_DRIVER_DISCOUNT_PERCENT}% off
+              Rapid Resolution for an eligible officer-issued ticket: ${(PRO_DRIVER_RAPID_CENTS / 100).toFixed(2)} CAD,
+              or ${(PRO_DRIVER_BUNDLE_CENTS / 100).toFixed(2)} CAD for the Rapid Resolution and insurance-planning bundle,
+              in each case plus applicable GST.
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Eligibility is based on the class shown on your Alberta licence. Class 3 and Class 5 licences, including Class 5 delivery and gig couriers, do not qualify.</li>
+              <li>The offer applies only to officer-issued tickets. Photo radar, red-light camera owner notices, standalone insurance reports, trial representation, government fines and other separate charges are excluded.</li>
+              <li>You declare your licence class in intake. Fabsy must verify that the class read from your uploaded licence matches that declaration and is Class 1, 2 or 4 before applying the discount at checkout.</li>
+              <li>If verification is unavailable or inconclusive at checkout, the full price is charged. Use the secure post-checkout licence-upload process to request verification. If eligibility is confirmed, Fabsy refunds the 20% service discount and corresponding GST to the original payment method.</li>
+              <li>A declaration, referral code or customer-entered coupon is not proof of eligibility. Altered documents or false information do not qualify.</li>
+              <li>The service scope and outcome limitations in sections 5A, 5B and 7 remain unchanged. A non-moving amendment may be requested where the facts and procedure support it; no abstract, employer, demerit or insurance result is promised.</li>
+            </ul>
+          </section>
+
+          <section id="referral-terms" className="scroll-mt-24">
+            <h2 className="text-2xl font-semibold mb-4">5E. Refer a Driver Program</h2>
+            <p className="mb-4">
+              A past Fabsy client or registered portal user with a valid referral code may receive $50 CAD for an eligible
+              officer-ticket referral or $20 CAD for an eligible camera-ticket referral. The reward is paid only to the referrer;
+              the referred driver receives no referral discount. There is no cap on eligible referrals or rewards.
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>A valid referral link or code must be recorded before payment. Attribution lasts 30 days. The most recent valid referral takes precedence; a code may also be entered at step 3 of intake.</li>
+              <li>The referred driver's Stripe payment must settle and Fabsy must accept the Alberta matter into its service pipeline. The payout is due seven days after both conditions are met, subject to the eligibility, fraud, refund and payout-information checks below.</li>
+              <li>Approved rewards are paid manually by Interac e-transfer. A portal status of pending or eligible is not confirmation that money has been sent; completed payouts appear in payout history.</li>
+              <li>Referred fleet accounts are excluded because their account pricing is separate. An otherwise eligible individual referral remains eligible if the driver independently qualifies for the pro driver discount.</li>
+              <li>Self-referrals and referrals with a matching email, phone, address, plate or Stripe customer between referrer and referred driver are blocked. False, duplicated or fabricated referrals do not qualify.</li>
+              <li>Refunds, disputes and chargebacks place an unpaid reward on hold for review. Fabsy may void an ineligible referral or a referral for which no qualifying paid order remains. Refunds after a completed payout are separately reviewed.</li>
+              <li>Your verified portal email is the default Interac delivery address unless a different payout email is saved. You must provide your legal name and address in the portal before the second payout.</li>
+              <li>Fabsy collects information needed for applicable tax reporting and issues required slips, including a T4A where applicable. The CRA's general annual threshold is more than $500 for reportable payments, subject to its rules and exceptions. Additional identifiers, if required, are requested through an appropriate secure process; do not send a SIN through referral messages or this profile form. You are responsible for reporting your income.</li>
+              <li>Share only truthful personal experiences and disclose that you may receive a referral reward. Do not make outcome promises, impersonate Fabsy or send unsolicited bulk messages.</li>
+              <li>Referrers see referral and payout status, not the referred driver's private case details. See the Privacy Policy for information handling.</li>
+            </ul>
+            <p className="mt-4 text-sm">
+              Tax reporting reference: <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/completing-filing-information-returns/t4a-information-payers/t4a-slip.html" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">CRA guidance for T4A payers</a>.
+            </p>
           </section>
 
           <section>

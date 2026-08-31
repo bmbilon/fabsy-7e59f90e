@@ -65,6 +65,23 @@
         "itemListElement": [
           {
             "@type": "Offer",
+            "price": "79",
+            "priceCurrency": "CAD",
+            "url": "https://fabsy.ca/photo-radar",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "price": "79",
+              "priceCurrency": "CAD",
+              "valueAddedTaxIncluded": false
+            },
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Rapid Resolution: Photo Radar",
+              "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+            }
+          },
+          {
+            "@type": "Offer",
             "price": "198.00",
             "priceCurrency": "CAD",
             "url": "https://fabsy.ca/submit-ticket",
@@ -107,39 +124,7 @@
     }
     </script>
     
-    <!-- Structured Data - Service -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      "name": "Rapid Resolution",
-      "serviceType": "Rapid Resolution pre-trial traffic ticket agent service",
-      "provider": {
-        "@type": "ProfessionalService",
-        "@id": "https://fabsy.ca/#business",
-        "name": "Fabsy Traffic Ticket Services",
-        "url": "https://fabsy.ca",
-        "telephone": "(825) 793-2279",
-        "email": "hello@fabsy.ca"
-      },
-      "areaServed": {
-        "@type": "State",
-        "name": "Alberta",
-        "addressCountry": "CA"
-      },
-      "audience": {
-        "@type": "Audience",
-        "audienceType": "Alberta Drivers"
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": "198.00",
-        "priceCurrency": "CAD",
-        "url": "https://fabsy.ca/submit-ticket",
-        "description": "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. Trial representation, government fines and out-of-scope matters are separate."
-      }
-    }
-    </script>
+    <!-- Each route emits its own Service schema and price. -->
   </head>
 
   <body>

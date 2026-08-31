@@ -197,7 +197,7 @@ async function resolveCasePurchaser(
   const { data: submission, error: submissionError } = await admin
     .from("ticket_submissions")
     .select(
-      "id,client_id,status,verdict,case_outcome,preferred_locale,clients(first_name,last_name,email,phone,auth_user_id)",
+      "id,client_id,status,verdict,case_outcome,preferred_locale,ticket_type,clients(first_name,last_name,email,phone,auth_user_id)",
     )
     .eq("id", ticketSubmissionId)
     .maybeSingle();
@@ -216,6 +216,9 @@ async function resolveCasePurchaser(
       "The Rapid Resolution checkout has not been completed.",
       403,
     );
+  }
+  if (submission.ticket_type === "photo_radar") {
+    throw new RequestError("Registered-owner camera notices have no insurance impact and are not eligible for an insurance report.", 409);
   }
   if (
     type === "addon" &&

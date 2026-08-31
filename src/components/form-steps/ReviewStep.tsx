@@ -15,7 +15,10 @@ import {
   Calendar,
   DollarSign
 } from "lucide-react";
-import { RAPID_RESOLUTION } from "@/config/offers";
+import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
+import { REGISTERED_OWNER_LABELS } from "@/lib/ticket/ticketType";
+import { isProLicenceClass } from "@/lib/pro-drivers/intake";
+import { parseReferralAttribution } from "@/lib/referrals/attribution";
 
 interface ReviewStepProps {
   formData: FormData;
@@ -23,6 +26,10 @@ interface ReviewStepProps {
 }
 
 const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
+  const isPhotoRadar = formData.ticketType === "photo_radar";
+  const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
+  const hasProDeclaration = !isPhotoRadar && isProLicenceClass(formData.licenceClass);
+  const referral = parseReferralAttribution(formData.referral);
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -46,6 +53,9 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
         </div>
         <div className="grid md:grid-cols-2 gap-4 text-sm">
           <div className="space-y-2">
+            <div><span className="font-medium">Ticket type:</span> {isPhotoRadar ? "Photo radar / red-light camera notice" : "Officer-issued ticket"}</div>
+            {isPhotoRadar && <div><span className="font-medium">Registered owner on the offence date:</span> {REGISTERED_OWNER_LABELS[formData.registeredOwnerOnOffenceDate] || "Not answered"}</div>}
+            {!isPhotoRadar && formData.licenceClass !== "unknown" && <div><span className="font-medium">Declared Alberta licence class:</span> Class {formData.licenceClass}</div>}
             <div className="flex items-center gap-2">
               <span className="font-medium">Name:</span>
               <span>{formData.firstName} {formData.lastName}</span>
@@ -172,21 +182,29 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
         </div>
         <div className="space-y-3">
           <div className="flex justify-between">
-            <span>{RAPID_RESOLUTION.name}</span>
-            <span>${RAPID_RESOLUTION.priceCad}.00 CAD</span>
+            <span>{offer.name}</span>
+            <span>${offer.priceCad}.00 CAD</span>
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Applicable tax</span>
-            <span>Calculated at checkout</span>
+            <span>{isPhotoRadar ? "5% GST" : "Applicable tax"}</span>
+            <span>{isPhotoRadar ? `$${PHOTO_RADAR.gstCad.toFixed(2)}` : "Calculated at checkout"}</span>
           </div>
-          {formData.insuranceCompany && (
+          {isPhotoRadar && <p className="border-t pt-3 font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>}
+          {hasProDeclaration && <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
+            <p className="font-medium">20% pro driver discount pending verification</p>
+            <p className="mt-2 text-muted-foreground">{formData.driversLicenseImage
+              ? "Your licence photo is attached. Before checkout we will verify your identity, Alberta licence and declared class. The price stays unchanged until verification succeeds."
+              : "No licence photo is attached, so checkout will be full price. You can go back to Personal Info to upload one, or provide it securely after payment for a 20% partial refund if eligible."}</p>
+          </div>}
+          {referral && <p className="text-sm text-muted-foreground"><span className="font-medium">Referral code:</span> {referral.code}. Your referrer may receive a referral payment; your price stays the same.</p>}
+          {!isPhotoRadar && formData.insuranceCompany && (
             <div className="text-sm text-muted-foreground">
               <span className="font-medium">Insurance:</span> {formData.insuranceCompany}
             </div>
           )}
           <p className="border-t pt-3 text-sm text-muted-foreground">
-            This fee covers the eligible pre-trial service described above. Trial representation,
-            government fines and out-of-scope work are separate. {RAPID_RESOLUTION.outcomeDisclaimer}
+            {isPhotoRadar ? <>No demerits. No insurance impact. Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. {PHOTO_RADAR.outcomeDisclaimer}</> : <>This fee covers the eligible pre-trial service described above. Trial representation,
+            government fines and out-of-scope work are separate. {RAPID_RESOLUTION.outcomeDisclaimer}</>}
           </p>
         </div>
       </Card>
@@ -202,7 +220,7 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
             <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
             <div>
               <div className="font-medium">Secure Checkout</div>
-              <div className="text-muted-foreground">Review the final subtotal, tax, and any optional insurance-report add-on in the next step</div>
+              <div className="text-muted-foreground">{isPhotoRadar ? `Pay ${PHOTO_RADAR_PRICE_LABEL}. No insurance report is needed.` : "Review the final subtotal, tax, and any optional insurance-report add-on in the next step"}</div>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -240,7 +258,7 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
         </Button>
         
         <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-          By continuing, you confirm the information above and proceed to the ${RAPID_RESOLUTION.priceCad} CAD plus GST Rapid Resolution checkout. Fabsy is an agent service, not a law firm.
+          By continuing, you confirm the information above and proceed to the ${offer.priceCad} CAD plus GST {offer.name} checkout. Fabsy is an agent service, not a law firm.
         </p>
       </div>
     </div>

@@ -330,6 +330,35 @@ export type Database = {
       }
       ticket_submissions: {
         Row: {
+          ticket_type: "photo_radar" | "officer_issued"
+          ticket_type_source: "upload" | "manual" | "entry" | "default"
+          registered_owner_on_offence_date: "yes" | "sold_before" | "stolen" | null
+          order_type: "photo_radar" | "rapid_resolution"
+          review_path: "ate" | "standard"
+          representation_paid_at: string | null
+          representation_checkout_session_id: string | null
+          representation_payment_intent_id: string | null
+          declared_licence_class: string
+          pro_verified: boolean
+          pro_verification_id: string | null
+          discount_applied: string | null
+          pro_discount_cents: number
+          ref_code: string | null
+          referral_attributed_at: string | null
+          referral_payment_intent_id: string | null
+          referral_stripe_customer_id: string | null
+          referral_payment_settled_at: string | null
+          referral_payment_checked_at: string | null
+          referral_refunded_at: string | null
+          referral_disputed_at: string | null
+          referral_accepted_at: string | null
+          referral_rejected_at: string | null
+          referral_scope_confirmed: boolean | null
+          referral_fleet_account: boolean | null
+          referral_identity_checked_at: string | null
+          referral_plate: string | null
+          referral_reviewed_by: string | null
+          referral_review_notes: string | null
           additional_notes: string | null
           address: string | null
           assessment_access_token_hash: string | null
@@ -384,6 +413,35 @@ export type Database = {
           violation_time: string | null
         }
         Insert: {
+          ticket_type?: "photo_radar" | "officer_issued"
+          ticket_type_source?: "upload" | "manual" | "entry" | "default"
+          registered_owner_on_offence_date?: "yes" | "sold_before" | "stolen" | null
+          order_type?: "photo_radar" | "rapid_resolution"
+          review_path?: "ate" | "standard"
+          representation_paid_at?: string | null
+          representation_checkout_session_id?: string | null
+          representation_payment_intent_id?: string | null
+          declared_licence_class?: string
+          pro_verified?: boolean
+          pro_verification_id?: string | null
+          discount_applied?: string | null
+          pro_discount_cents?: number
+          ref_code?: string | null
+          referral_attributed_at?: string | null
+          referral_payment_intent_id?: string | null
+          referral_stripe_customer_id?: string | null
+          referral_payment_settled_at?: string | null
+          referral_payment_checked_at?: string | null
+          referral_refunded_at?: string | null
+          referral_disputed_at?: string | null
+          referral_accepted_at?: string | null
+          referral_rejected_at?: string | null
+          referral_scope_confirmed?: boolean | null
+          referral_fleet_account?: boolean | null
+          referral_identity_checked_at?: string | null
+          referral_plate?: string | null
+          referral_reviewed_by?: string | null
+          referral_review_notes?: string | null
           additional_notes?: string | null
           address?: string | null
           assessment_access_token_hash?: string | null
@@ -438,6 +496,35 @@ export type Database = {
           violation_time?: string | null
         }
         Update: {
+          ticket_type?: "photo_radar" | "officer_issued"
+          ticket_type_source?: "upload" | "manual" | "entry" | "default"
+          registered_owner_on_offence_date?: "yes" | "sold_before" | "stolen" | null
+          order_type?: "photo_radar" | "rapid_resolution"
+          review_path?: "ate" | "standard"
+          representation_paid_at?: string | null
+          representation_checkout_session_id?: string | null
+          representation_payment_intent_id?: string | null
+          declared_licence_class?: string
+          pro_verified?: boolean
+          pro_verification_id?: string | null
+          discount_applied?: string | null
+          pro_discount_cents?: number
+          ref_code?: string | null
+          referral_attributed_at?: string | null
+          referral_payment_intent_id?: string | null
+          referral_stripe_customer_id?: string | null
+          referral_payment_settled_at?: string | null
+          referral_payment_checked_at?: string | null
+          referral_refunded_at?: string | null
+          referral_disputed_at?: string | null
+          referral_accepted_at?: string | null
+          referral_rejected_at?: string | null
+          referral_scope_confirmed?: boolean | null
+          referral_fleet_account?: boolean | null
+          referral_identity_checked_at?: string | null
+          referral_plate?: string | null
+          referral_reviewed_by?: string | null
+          referral_review_notes?: string | null
           additional_notes?: string | null
           address?: string | null
           assessment_access_token_hash?: string | null

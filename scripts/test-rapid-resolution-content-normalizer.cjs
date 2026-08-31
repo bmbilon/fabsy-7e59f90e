@@ -57,4 +57,6 @@ assert.equal(
 );
 assert.deepEqual(curatedPageIssues(normalizedCurated), []);
 
+require('./test-photo-radar-pricing-compatibility.cjs');
+
 console.log('Rapid Resolution content normalizer tests passed.');

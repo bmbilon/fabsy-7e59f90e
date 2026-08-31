@@ -56,6 +56,12 @@ verify_jwt = false
 [functions.submit-ticket]
 verify_jwt = false
 
+[functions.verify-pro-licence]
+verify_jwt = false
+
+[functions.referral-program]
+verify_jwt = false
+
 [functions.generate-city-content]
 verify_jwt = false
 

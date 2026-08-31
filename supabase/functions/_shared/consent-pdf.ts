@@ -1,8 +1,11 @@
 import { PDFDocument, PDFName, PDFPage, PDFString, rgb, StandardFonts } from "https://esm.sh/pdf-lib@1.17.1";
 import { ConsentUnicodeWriter, wrapConsentText } from "./consent-unicode.ts";
 import type { PreferredLocale } from "./locale-policy.ts";
+import { requireEnglishProductLocale } from "./product-locale.ts";
 
 export interface ConsentFormData {
+  ticketType?: "photo_radar" | "officer_issued";
+  registeredOwnerOnOffenceDate?: string | null;
   submissionId: string;
   firstName: string;
   lastName: string;
@@ -43,6 +46,29 @@ export const CONSENT_AUTHORIZATION_LINES = [
   "• The 48-hour commitment excludes Crown response and final-outcome timing",
 ] as const;
 
+export const PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES = [
+  "I authorize Fabsy Traffic Ticket Services and its designated agents to deliver",
+  "Rapid Resolution: Photo Radar for the registered-owner notice above, if accepted.",
+  "This service covers Alberta automated enforcement notices under TSA s.160(1).",
+  "",
+  "Within permitted agent scope, I specifically instruct and authorize Fabsy to:",
+  "• Enter a not-guilty plea for this notice and request and review disclosure",
+  "• Review the owner notice, images, site, timing and device records available",
+  "• Pursue a Crown reduction or withdrawal based on the evidence",
+  "• Explain each Crown response and obtain my decision on any proposed deal",
+  "• Finalize a proposed resolution only after my case-specific approval",
+  "",
+  "I understand that:",
+  "• Fabsy is an agent service, not a law firm, and does not provide legal advice",
+  "• Owner-liability camera notices have no demerits or insurance impact",
+  "• Only the fine is at issue; no Insurance Impact Report is included or needed",
+  "• The one-time service fee is $79 CAD plus 5% GST ($82.95 total) at checkout",
+  "• No outcome is promised and the fee is not refunded based on outcome",
+  "• There is no success fee and no trial representation; government fines are separate",
+  "• Fabsy takes its next authorized step within 48 hours after complete disclosure",
+  "• The 48-hour commitment excludes Crown response and final-outcome timing",
+] as const;
+
 export const CONSENT_PRIVACY_LINES = [
   "By signing this form, I consent to the processing of my personal information",
   "for this ticket matter, including controlled technology-assisted document analysis,",
@@ -59,6 +85,8 @@ export async function createConsentPdf(
   locale: PreferredLocale = "en",
   generatedAt = new Date(),
 ): Promise<Uint8Array> {
+  if (formData.ticketType === "photo_radar") requireEnglishProductLocale(locale, "photo_radar");
+  const authorizationLines = formData.ticketType === "photo_radar" ? PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES : CONSENT_AUTHORIZATION_LINES;
   const doc = await PDFDocument.create();
   doc.setTitle("Client consent for traffic ticket agent services");
   doc.setAuthor("Fabsy Traffic Ticket Services");
@@ -148,9 +176,10 @@ export async function createConsentPdf(
   section("TICKET INFORMATION");
   await field("Ticket number", formData.ticketNumber);
   await field("Violation", formData.violation);
-  await field("Issue date", formData.issueDate);
-  section("RAPID RESOLUTION AUTHORIZATION");
-  for (const line of CONSENT_AUTHORIZATION_LINES) english(line);
+  await field(formData.ticketType === "photo_radar" ? "Offence date" : "Issue date", formData.issueDate);
+  if (formData.ticketType === "photo_radar") await field("Offence-date ownership", formData.registeredOwnerOnOffenceDate?.replaceAll("_", " ") || "Not supplied");
+  section(formData.ticketType === "photo_radar" ? "PHOTO RADAR AUTHORIZATION" : "RAPID RESOLUTION AUTHORIZATION");
+  for (const line of authorizationLines) english(line);
   const signatureLines = await wrapConsentText(formData.digitalSignature || "Not supplied", locale, 11, printableWidth - 108);
   ensureRoom(signatureLines.length * 23 + 136);
   section("CLIENT SIGNATURE");
@@ -176,7 +205,7 @@ export async function createConsentPdf(
     preferredLocale: locale,
     generatedAt: generatedAt.toISOString(),
     fields: formData,
-    authorizationLines: CONSENT_AUTHORIZATION_LINES,
+    authorizationLines,
     privacyLines: CONSENT_PRIVACY_LINES,
   };
   await doc.attach(new TextEncoder().encode(JSON.stringify(sourceRecord, null, 2)), CONSENT_SOURCE_ATTACHMENT, {

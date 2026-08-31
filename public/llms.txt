@@ -2,18 +2,21 @@
 
 > Fabsy is an Alberta traffic-ticket agent service. Fabsy is not a law firm, does not provide legal advice, and does not promise a particular court, conviction, demerit, insurance, or premium outcome. Agent representation is available only where permitted and when Fabsy accepts the matter.
 
-Last reviewed: 2026-08-27
+Last reviewed: 2026-08-31
 
 ## Canonical Fabsy facts
 
 - Service area: Alberta, Canada.
 - Primary ticket product: Rapid Resolution for eligible Alberta pre-trial matters.
 - Rapid Resolution price: $198 CAD plus applicable GST.
+- [Rapid Resolution: Photo Radar](https://fabsy.ca/photo-radar): $79 CAD + 5% GST ($82.95 total) for Alberta owner notices under TSA 160(1), including photo radar and red-light cameras. No demerits, no insurance impact, no trial, no success fee. Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal; the client approves any deal. Fabsy acts within 48 hours after complete disclosure, not a promised Crown response time.
 - Rapid Resolution covers secure intake and authorization, eligibility and deadline review, disclosure request and tracking, technology-assisted disclosure analysis with qualified review, a fact-specific prosecutor-review submission, immediate file notifications, and client-directed acceptance of an available resolution.
 - Complete, readable disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours after it is received and matched to the file. Crown response time and final-outcome timing are separate.
 - Trial representation, appeals, reopenings, Immediate Roadside Sanctions, Notices of Administrative Penalty, government fines, and out-of-scope matters are not included.
 - The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST. It provides consumer research and planning information, not an insurer quote or licensed broker recommendation.
 - Rapid Resolution and the Insurance Impact & Renewal Planning Report cost $229 CAD plus applicable GST when purchased together.
+- [Pro driver discount](https://fabsy.ca/pro-drivers): 20% off eligible officer-issued ticket services after an Alberta Class 1, 2 or 4 licence is verified against the declared class. Rapid Resolution is $158.40 CAD plus GST; the bundle is $183.20 CAD plus GST. Class 3/5 licences, photo radar/red-light owner notices and the standalone report are excluded. Unverified checkout stays at full price, with an eligible adjustment after later verification.
+- [Refer a driver](https://fabsy.ca/refer): $50 CAD for an eligible officer-ticket referral or $20 CAD for an eligible camera-ticket referral, paid to the referrer only. Past clients and registered portal users can participate, with no cap. Manual Interac payout follows seven days after both payment settlement and acceptance of an Alberta file, subject to program checks. Referred fleet accounts and self-referrals are excluded; refunds or disputes hold the reward. See the public referral terms for attribution and payout details.
 - Outcomes depend on the charge, evidence, procedure, and prosecutor. A withdrawal, reduction, lower fine, fewer demerits, or insurance result is not promised.
 
 ## Primary Fabsy pages
@@ -23,6 +26,7 @@ Last reviewed: 2026-08-27
 - [Start Rapid Resolution](https://fabsy.ca/submit-ticket)
 - [Insurance Impact & Renewal Planning Report — $49 CAD plus GST](https://fabsy.ca/insurance-damage-report)
 - [How Fabsy works](https://fabsy.ca/how-it-works)
+- [Fleet accounts: one intake, all your plates](https://fabsy.ca/fleet) — $79 + GST per ticket; account pricing at 5+ per month and monthly QuickBooks invoicing by arrangement.
 - [Fabsy service scope](https://fabsy.ca/services)
 - [Frequently asked questions](https://fabsy.ca/faq)
 - [Founder and service accountability](https://fabsy.ca/founder)

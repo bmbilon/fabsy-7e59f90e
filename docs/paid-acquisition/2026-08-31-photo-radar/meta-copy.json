@@ -1,0 +1,35 @@
+{
+  "prepared_on": "2026-08-31",
+  "state": "copy_only_not_uploaded",
+  "spend_authorized": false,
+  "budget_cad": null,
+  "destination": "https://fabsy.ca/photo-radar",
+  "cta": "Learn More",
+  "suggested_scope": "Alberta adult audience; verify current audience controls and appropriate campaign classification before any launch",
+  "objective": "Website Sales only after paid Photo Radar Purchase delivery is verified",
+  "conversion_value_cad_excluding_gst": 79,
+  "prohibited_data": "No ticket images, plates, offence details, names, case IDs or client lists sent to Meta. No retargeting or sensitive audience creation.",
+  "variants": [
+    {
+      "id": "eligibility",
+      "headline": "Photo Radar: $79 + GST",
+      "description": "Check Notice Eligibility",
+      "primary_text": "Photo radar notice? $79 flat + GST. We ask the Crown to cut it. You approve any deal.\n\nFor eligible Alberta camera notices mailed to a registered owner. $82.95 total. No demerits. No insurance impact. Only the fine is on the table. No trial. No success fee. No outcome is promised. Government fines are separate.",
+      "url_parameters": "utm_source=meta&utm_medium=paid_social&utm_campaign=ate-photo-radar-alberta-20260831&utm_content=eligibility"
+    },
+    {
+      "id": "red-light",
+      "headline": "Red-Light Notice: $79 + GST",
+      "description": "You Approve Any Deal",
+      "primary_text": "Red-light camera notice in the mail? Check eligibility for $79 + GST ($82.95 total). Fabsy asks the Crown for a reduction or withdrawal. You approve any deal.\n\nFor eligible Alberta registered-owner camera notices: no demerits and no insurance impact. Only the fine is on the table. No trial. No success fee. No outcome is promised. Government fines are separate.",
+      "url_parameters": "utm_source=meta&utm_medium=paid_social&utm_campaign=ate-photo-radar-alberta-20260831&utm_content=red-light"
+    },
+    {
+      "id": "owner-notice",
+      "headline": "Owner Camera Notice? $79 + GST",
+      "description": "Check The Notice First",
+      "primary_text": "An Alberta camera ticket addressed to the registered owner? $79 + GST ($82.95 total). Check notice eligibility before deciding.\n\nFabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. These owner camera notices have no demerits or insurance impact; only the fine is on the table. No trial. No success fee. No outcome is promised. Government fines are separate.",
+      "url_parameters": "utm_source=meta&utm_medium=paid_social&utm_campaign=ate-photo-radar-alberta-20260831&utm_content=owner-notice"
+    }
+  ]
+}

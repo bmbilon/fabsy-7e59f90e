@@ -18,6 +18,7 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { assertSnapshotHead, loadLocaleSeoContext, localeSnapshotRecords, normalizeSnapshotHead, splitSnapshotRoute } from './locale-seo.mjs';
 import { assertLocalizedMainContent, generateLocalizedSnapshots } from './generate-localized-snapshots.mjs';
+import { stripCapturedTrackingScripts } from './snapshot-runtime-hygiene.mjs';
 
 dotenv.config();
 
@@ -43,6 +44,11 @@ const STATIC_ROUTES = [
   '/about/comparison',
   '/terms-of-purchase',
   '/rapid-resolution',
+  '/photo-radar',
+  '/fleet',
+  '/free-ticket-check',
+  '/pro-drivers',
+  '/refer',
   '/insurance-damage-report',
   '/hubs/alberta-tickets-101',
   '/hubs/photo-radar-vs-officer-issued',
@@ -141,10 +147,10 @@ async function prerenderRoute(browser, route) {
 
       await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(500);
-      const original = (await page.content()).replace(/[ \t]+$/gm, '');
+      const original = stripCapturedTrackingScripts(await page.content()).replace(/[ \t]+$/gm, '');
       const { code, basePath } = splitSnapshotRoute(route, LOCALE_CONTEXT);
       if (code !== 'en') assertLocalizedMainContent(original, LOCALE_CONTEXT, code, basePath);
-      const html = normalizeSnapshotHead(original, route, LOCALE_CONTEXT);
+      const html = normalizeSnapshotHead(original, route, LOCALE_CONTEXT).replace(/[ \t]+$/gm, '');
       assertSnapshotHead(html, route, LOCALE_CONTEXT);
       const outPath = toOutPath(route);
       await fs.mkdir(path.dirname(outPath), { recursive: true });

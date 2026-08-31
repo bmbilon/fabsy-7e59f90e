@@ -11,6 +11,7 @@ const {
   EXACT_FABSY_PRICING,
   canonicalFaq,
   curatedPageIssues,
+  hasCompleteFabsyPricing,
   present,
   textGuardrailIssues,
 } = require('./curated-content-guardrails.cjs');
@@ -33,6 +34,9 @@ const LOCALE_ROOTS = new Set(LOCALE_REGISTRY.locales.filter((locale) => locale.c
 const PRICING_TEXT = EXACT_FABSY_PRICING;
 const OFFER_DATA = require('../src/config/offers.json');
 const { redactProDriverPromotion } = require('./pro-driver-promotion-guardrail.cjs');
+const { redactPublicOfferSnapshot, isExactPublicServiceSchema, withoutExactPhotoCatalogOffer } = require('./public-offer-snapshot-guardrail.cjs');
+const PHOTO_RADAR_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
+const { PHOTO_RADAR_PRICING_COPY, OFFICER_PRICING_COPY } = require('./normalize-rapid-resolution-content.cjs');
 const APPROVED_OFFER_PRICES = new Map([
   [OFFER_DATA.rapidResolution.name, OFFER_DATA.rapidResolution.priceCad],
   [OFFER_DATA.rapidResolution.shortName, OFFER_DATA.rapidResolution.priceCad],
@@ -269,8 +273,12 @@ function browserTextGuardrailIssues(html, slug, { numeric = true } = {}) {
   const issues = textGuardrailIssues(raw, slug, { numeric: false })
     .filter((issue) => issue !== 'partial or inexact Fabsy pricing');
   const rendered = renderedPageText(raw);
-  const candidate = redactBrowserCommercialFacts(rendered, slug);
-  if (/\$\s*\d/.test(rendered) && !/(?:\bplus|\+)\s+(?:applicable\s+)?GST\b/i.test(rendered)) {
+  // The complete current ladder also names the $79 SKU and its exact GST.
+  // Admit that whole source paragraph before short-card normalization can
+  // erase the other product amounts and break its exact match.
+  const candidate = redactBrowserCommercialFacts(rendered.split(PRICING_TEXT).join('[complete current offer pricing]'), slug);
+  const exactPhotoTax = PHOTO_RADAR_SLUGS.has(slug) && rendered.includes(PHOTO_RADAR_PRICING_COPY);
+  if (/\$\s*\d/.test(rendered) && !exactPhotoTax && !/(?:\bplus|\+)\s+(?:applicable\s+)?GST\b/i.test(rendered)) {
     issues.push('Fabsy pricing must disclose applicable GST separately');
   }
   if (numeric) {
@@ -311,7 +319,7 @@ function isApprovedFabsyOffer(value, inheritedItemName) {
   const specifiedPrice = specification?.price === undefined ? offeredPrice : Number(specification.price);
   const isCanonicalRapidResolutionOffer =
     offeredPrice === OFFER_DATA.rapidResolution.priceCad &&
-    value?.description === PRICING_TEXT &&
+    (value?.description === PRICING_TEXT || value?.description === OFFICER_PRICING_COPY) &&
     value?.url === `${SITE}${OFFER_DATA.rapidResolution.intakePath}`;
   const expectedPrice = isCanonicalRapidResolutionOffer
     ? OFFER_DATA.rapidResolution.priceCad
@@ -346,12 +354,16 @@ function containsDisallowedOfferPricing(value, inheritedItemName) {
   return Object.values(value).some((item) => containsDisallowedOfferPricing(item, itemName));
 }
 
-function hasDisallowedOfferPricing(html) {
+function hasDisallowedOfferPricing(html, route) {
   for (const match of html.matchAll(
     /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
   )) {
     try {
-      if (containsDisallowedOfferPricing(JSON.parse(match[1].trim()))) return true;
+      const schema = JSON.parse(match[1].trim());
+      // Discounted/new-SKU Offers require the entire exact public Service
+      // object on its own route; no new amount enters the global price map.
+      if (isExactPublicServiceSchema(schema, route)) continue;
+      if (containsDisallowedOfferPricing(withoutExactPhotoCatalogOffer(schema))) return true;
     } catch (_) {
       // Invalid JSON-LD is reported by the schema-specific checks.
     }
@@ -537,11 +549,23 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     if (hasDisallowedOfferPricing(html)) {
       fail(`${label}: Fabsy Offer schema contains an unapproved fixed price`);
     }
-    if (!html.includes(PRICING_TEXT)) fail(`${label}: exact pricing language missing`);
+    const photoRadar = PHOTO_RADAR_SLUGS.has(slug);
+    const renderedText = renderedPageText(html);
+    const hasExpectedPricing = photoRadar
+      ? renderedText.includes(PHOTO_RADAR_PRICING_COPY)
+      : hasCompleteFabsyPricing(renderedText, slug);
+    if (!hasExpectedPricing) fail(`${label}: exact pricing language missing`);
+    if (photoRadar && hasCompleteFabsyPricing(renderedText)) {
+      fail(`${label}: Photo Radar guide contains general product pricing`);
+    }
     if (!html.includes('Fabsy is an agent service') || !html.includes('not a law firm')) {
       fail(`${label}: agent-service disclaimer missing`);
     }
-    const discoverySignals = [
+    const discoverySignals = photoRadar ? [
+      'Rapid Resolution: Photo Radar', 'not-guilty plea', 'disclosure',
+      'complete, readable disclosure', 'No demerits', 'No insurance impact',
+      'No trial', 'No success fee', 'approve any deal', 'href="/photo-radar"',
+    ] : [
       'Rapid Resolution',
       'secure digital intake',
       'technology-assisted',
@@ -552,7 +576,7 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     ];
     for (const signal of discoverySignals) {
       if (!html.toLowerCase().includes(signal.toLowerCase())) {
-        fail(`${label}: Rapid Resolution discovery signal missing: ${signal}`);
+        fail(`${label}: ${photoRadar ? 'Photo Radar' : 'Rapid Resolution'} discovery signal missing: ${signal}`);
       }
     }
     if (!html.includes(`<link rel="canonical" href="${SITE}/content/${slug}">`)) {
@@ -583,6 +607,7 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     const visible = visibleFaqs(html);
     const schema = extractFaqSchema(html, label);
     if (!visible.length) fail(`${label}: visible FAQs missing`);
+    if (photoRadar && visible.length !== 6) fail(`${label}: Photo Radar must have six visible FAQs`);
     if (schema && JSON.stringify(schema) !== JSON.stringify(canonicalFaq(visible))) {
       fail(`${label}: visible FAQs and FAQPage JSON-LD differ`);
     }
@@ -744,7 +769,9 @@ function validateAllPrerendered() {
     });
     for (const issue of promotion.issues) fail(`${label}: ${issue}`);
     const sourceCheckedHtml = catalogCode === 'en' ? redactVerifiedEnglishTerms(promotion.html) : promotion.html;
-    const candidate = redactExactLocaleStrings(sourceCheckedHtml, catalogCode);
+    const publicOffer = redactPublicOfferSnapshot(sourceCheckedHtml, { route: promotionRoute });
+    for (const issue of publicOffer.issues) fail(`${label}: ${issue}`);
+    const candidate = redactExactLocaleStrings(publicOffer.html, catalogCode);
     for (const issue of browserTextGuardrailIssues(candidate, pageSlug, { numeric: !isBlogSnapshot })) {
       fail(`${label}: ${issue}`);
     }
@@ -754,7 +781,7 @@ function validateAllPrerendered() {
     if (/"@type"\s*:\s*"LegalService"/.test(html)) {
       fail(`${label}: Fabsy must not be represented as a LegalService`);
     }
-    if (hasDisallowedOfferPricing(html)) {
+    if (hasDisallowedOfferPricing(html, promotionRoute)) {
       fail(`${label}: Fabsy Offer schema contains an unapproved fixed price`);
     }
     if (/\b(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]?555[ .-]?\d{4}\b/.test(html)) {
@@ -898,8 +925,17 @@ if (require.main === module) {
   });
 }
 
+function publicSnapshotGuardrailIssues(html, route) {
+  const admitted = redactPublicOfferSnapshot(html, { route });
+  const slug = route.replace(/^\//, '') || 'index';
+  const issues = [...admitted.issues, ...browserTextGuardrailIssues(admitted.html, slug)];
+  if (hasDisallowedOfferPricing(html, route)) issues.push('Fabsy Offer schema contains an unapproved fixed price');
+  return [...new Set(issues)];
+}
+
 module.exports = {
   browserTextGuardrailIssues,
   containsDisallowedOfferPricing,
   redactBrowserCommercialFacts,
+  publicSnapshotGuardrailIssues,
 };

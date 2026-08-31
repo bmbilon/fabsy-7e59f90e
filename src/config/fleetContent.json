@@ -1,0 +1,11 @@
+{
+  "headline": "One intake, all your plates.",
+  "description": "Photo radar and red-light camera notices for Alberta fleets. One account contact, a clear decision on each ticket, and less administration for your team.",
+  "segments": ["Delivery", "Rental", "Trades", "Dealers"],
+  "steps": [
+    {"title": "Introduce your fleet", "description": "Complete one account intake with your business, plates and expected ticket volume. Fabsy confirms the account and secure notice-upload arrangements."},
+    {"title": "We review each notice", "description": "For each accepted owner notice, Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. No trial and no success fee."},
+    {"title": "You approve; we invoice", "description": "Your authorized account contact approves any deal for each ticket. Arrange a monthly QuickBooks invoice for an approved fleet account."}
+  ],
+  "accountPricing": "Account pricing is available at 5+ tickets per month. Fabsy confirms the rate and monthly invoicing terms before work begins; no volume discount is applied automatically."
+}

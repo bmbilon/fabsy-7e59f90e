@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
+import { EXACT_FABSY_OFFICER_PRICING as OFFICER_PRICING_COPY } from '../src/lib/published-content-guardrails-core.js';
 
 const offerData = JSON.parse(
   fs.readFileSync(new URL('../src/config/offers.json', import.meta.url), 'utf8')
@@ -30,6 +31,7 @@ const guardrails = await import(
 const {
   EXACT_FABSY_ACTION_COMMITMENT,
   EXACT_FABSY_ONE_LINE,
+  EXACT_FABSY_OFFICER_PRICING,
   EXACT_FABSY_PRICING,
   EXACT_FABSY_SPEED_DISCLAIMER,
   assertGeneratedContentSafe,
@@ -37,6 +39,7 @@ const {
 } = guardrails;
 
 assert.equal(EXACT_FABSY_PRICING, offerData.canonicalPricingCopy);
+assert.equal(EXACT_FABSY_OFFICER_PRICING, OFFICER_PRICING_COPY);
 assert.equal(EXACT_FABSY_ONE_LINE, offerData.rapidResolution.oneLineDescription);
 assert.equal(EXACT_FABSY_ACTION_COMMITMENT, offerData.rapidResolution.actionCommitment);
 assert.equal(EXACT_FABSY_SPEED_DISCLAIMER, offerData.rapidResolution.speedDisclaimer);
@@ -45,6 +48,7 @@ for (const safe of [
   { hook: 'Check the deadline printed on your ticket and review the available options.' },
   { captions: '00:00.000 --> 00:03.000\nReview the ticket carefully.' },
   { next: EXACT_FABSY_PRICING },
+  { next: EXACT_FABSY_OFFICER_PRICING },
   { next: EXACT_FABSY_ONE_LINE },
   { next: EXACT_FABSY_ACTION_COMMITMENT },
   { next: EXACT_FABSY_SPEED_DISCLAIMER },
@@ -63,6 +67,17 @@ for (const unsafe of [
   { text: 'Rapid Resolution costs $198.' },
   { text: 'The insurance report costs $49.' },
   { text: 'The bundle costs $229.' },
+  { text: 'Photo Radar costs $79.' },
+  { text: 'The statutory fine is $79 CAD.' },
+  { text: 'The Pro Driver price is $158.40 CAD plus GST.' },
+  { text: EXACT_FABSY_PRICING.replace('$79 CAD', '$198 CAD') },
+  { text: EXACT_FABSY_PRICING.replace('$82.95 total', '$79 total') },
+  { text: EXACT_FABSY_PRICING.replace('plus 5% GST', 'including 5% GST') },
+  { text: EXACT_FABSY_PRICING.replaceAll('CAD', 'USD') },
+  { text: EXACT_FABSY_OFFICER_PRICING.replace('$198', '$79') },
+  { text: EXACT_FABSY_OFFICER_PRICING.replace('plus applicable GST', 'including GST') },
+  { text: `${EXACT_FABSY_PRICING} The statutory fine is $79.` },
+  { text: `${EXACT_FABSY_OFFICER_PRICING} Fabsy resolves your ticket within 24 hours.` },
   { text: 'Fabsy completes every disclosure review within 24 hours.' },
   { text: 'The fine is $390 and adds 3 demerit points.' },
   { text: 'You must respond within 30 days.' },

@@ -83,6 +83,10 @@ export default function ProductLadder({ compact = false, className }: ProductLad
         <p className="mx-auto mt-4 max-w-4xl text-center text-sm font-medium leading-relaxed text-foreground/80">
           {PRODUCT_LADDER_BRIDGE}
         </p>
+        <p className="mt-4 text-center text-sm">
+          <Link to="/pro-drivers" className="font-semibold text-primary underline underline-offset-4">Class 1, 2 or 4 licence? 20% off</Link>
+          <span className="mt-1 block text-xs text-muted-foreground">Verified Alberta licence. Officer-issued tickets only.</span>
+        </p>
         <div className={cn("grid gap-6 md:grid-cols-3", compact ? "mt-7" : "mt-10")}>
           {tiers.map((tier) => (
             <article

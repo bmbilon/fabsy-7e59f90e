@@ -450,12 +450,21 @@ try {
   // The captured fragments exercise the CLI, manifest and legal-source gates,
   // not a helper with artificially admitted strings.
   const browserFixture = readJson(path.join(ROOT, 'scripts/fixtures/locale-browser-fragments.json'));
-  const browserOptions = { ...options, bundlesDir: path.join(ROOT, 'src/i18n/locales') };
+  // Keep the historical browser fragment paired with its original dynamic
+  // date source. The new fixed source date and added terms have independent
+  // actual-React and mutation coverage in test-public-offer-snapshot-guardrails.
+  const browserSourceRoot = path.join(temp, 'captured-browser-legal-source');
+  fs.cpSync(options.sourceRoot, browserSourceRoot, { recursive: true });
+  const browserTermsSource = path.join(browserSourceRoot, 'src/pages/TermsOfService.tsx');
+  const currentTermsSource = fs.readFileSync(browserTermsSource, 'utf8');
+  fs.writeFileSync(browserTermsSource, currentTermsSource.replace('Last updated: August 31, 2026', 'Last updated: {new Date().toLocaleDateString()}'));
+  const browserOptions = { ...options, sourceRoot: browserSourceRoot, bundlesDir: path.join(ROOT, 'src/i18n/locales') };
   const browserContext = loadLocaleSeoContext(browserOptions);
   const browserDir = path.join(temp, 'browser/prerendered');
   fs.cpSync(outDir, browserDir, { recursive: true });
   generateLocalizedSnapshots({ context: browserContext, outDir: browserDir });
   const browserEnv = {
+    LOCALE_SOURCE_ROOT: browserSourceRoot,
     LOCALE_BUNDLES_DIR: browserOptions.bundlesDir,
     LOCALE_SNAPSHOT_OUT_DIR: browserDir,
     SNAPSHOT_OUT_DIR: path.join(browserDir, 'content'),

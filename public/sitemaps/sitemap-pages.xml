@@ -57,6 +57,41 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/rapid-resolution" />
   </url>
   <url>
+    <loc>https://fabsy.ca/photo-radar</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/photo-radar" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/photo-radar" />
+  </url>
+  <url>
+    <loc>https://fabsy.ca/fleet</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/fleet" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/fleet" />
+  </url>
+  <url>
+    <loc>https://fabsy.ca/free-ticket-check</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/free-ticket-check" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/free-ticket-check" />
+  </url>
+  <url>
+    <loc>https://fabsy.ca/pro-drivers</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/pro-drivers" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/pro-drivers" />
+  </url>
+  <url>
+    <loc>https://fabsy.ca/refer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/refer" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/refer" />
+  </url>
+  <url>
     <loc>https://fabsy.ca/insurance-damage-report</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

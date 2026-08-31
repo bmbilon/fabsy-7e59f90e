@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { AlertTriangle, CalendarIcon, Upload, FileImage, Loader2, Check, ChevronsUpDown, X } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,10 +15,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { albertaCourts } from "@/data/albertaCourts";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
+import TicketCapture, { type TicketOcrData } from "../TicketCapture";
+import TicketTypeFields from "../TicketTypeFields";
+import { detectTicketType, resetTicketTypeForUpload, ticketDateAsLocalDate, ticketDateFromExtraction } from "@/lib/ticket/ticketType";
 import { FormData } from "../TicketForm";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { albertaTrafficActSections, TrafficActSection } from "@/data/albertaTrafficAct";
 
 const ticketDetailsSchema = z.object({
@@ -40,16 +42,14 @@ type TicketDetailsSchema = z.infer<typeof ticketDetailsSchema>;
 
 interface TicketDetailsStepProps {
   formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
+  updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void;
 }
 
 const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps) => {
-  const [dragActive, setDragActive] = useState(false);
-  const [isProcessingOCR, setIsProcessingOCR] = useState(false);
-  const [hasProcessedInitialImage, setHasProcessedInitialImage] = useState(false);
   const [openOffenceCombobox, setOpenOffenceCombobox] = useState(false);
   const [offenceSearchValue, setOffenceSearchValue] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const manuallyEditedDate = useRef<Date | string | undefined>(formData.issueDate);
+  const lastExtraction = useRef<TicketOcrData | null>(null);
   const { toast } = useToast();
   
   const {
@@ -94,217 +94,43 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
   const issueDate = watch("issueDate");
   const courtDate = watch("courtDate");
 
-  // Determine if OCR data has already populated the form
-  const hasOCRData = Boolean(
-    formData.ticketNumber ||
-    formData.fineAmount ||
-    formData.offenceDescription ||
-    formData.officer ||
-    formData.officerBadge ||
-    formData.offenceSection ||
-    formData.offenceSubSection ||
-    formData.location ||
-    formData.issueDate ||
-    formData.courtDate
-  );
-
-  // Process ticket image on mount if it was uploaded from Hero page
-  useEffect(() => {
-    if (formData.ticketImage && !hasProcessedInitialImage && !formData.ticketNumber) {
-      console.log('[Mount] Processing initial ticket image from Hero page');
-      setHasProcessedInitialImage(true);
-      processTicketOCR(formData.ticketImage);
-    }
-  }, [formData.ticketImage]);
-
   const handleFieldUpdate = (field: keyof TicketDetailsSchema | keyof FormData, value: unknown) => {
+    if (field === "issueDate") manuallyEditedDate.current = value instanceof Date ? value : "";
     if (field in formData) {
       setValue(field as keyof TicketDetailsSchema, value as TicketDetailsSchema[keyof TicketDetailsSchema]);
     }
     updateFormData({ [field]: value } as Partial<FormData>);
   };
 
-  const processTicketOCR = async (file: File) => {
-    console.log('[OCR] Starting ticket OCR process with file:', file.name, file.type);
-    setIsProcessingOCR(true);
-    try {
-      // Convert file to base64
-      console.log('[OCR] Converting file to base64...');
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          console.log('[OCR] File converted to base64, length:', result.length);
-          resolve(result);
-        };
-        reader.onerror = (error) => {
-          console.error('[OCR] FileReader error:', error);
-          reject(error);
-        };
-      });
-      reader.readAsDataURL(file);
-      const imageBase64 = await base64Promise;
-
-      // Call OCR edge function
-      console.log('[OCR] Calling ocr-ticket edge function...');
-      const { data, error } = await supabase.functions.invoke('ocr-ticket', {
-        body: { imageBase64 }
-      });
-
-      console.log('[OCR] Edge function response:', { data, error });
-
-      if (error) {
-        console.error('[OCR] Edge function error:', error);
-        throw error;
+  const applyTicketOCR = (extracted: TicketOcrData | null) => {
+    if (!extracted) return;
+    lastExtraction.current = extracted;
+    const updates: Partial<FormData> = {};
+    const textFields = ["ticketNumber", "location", "officer", "officerBadge", "offenceSection", "offenceSubSection", "offenceDescription", "violation", "courtJurisdiction"] as const;
+    for (const key of textFields) {
+      if (typeof extracted[key] === "string" && extracted[key].trim()) updates[key] = extracted[key].trim();
+    }
+    for (const key of ["courtDate"] as const) {
+      if (typeof extracted[key] === "string") {
+        const date = new Date(extracted[key]);
+        if (Number.isFinite(date.getTime())) updates[key] = date;
       }
-
-      // Support both shapes:
-      // 1) { success: true, data: {...} }
-      // 2) { ...extractedFields }
-      const rawUnknown: unknown = data;
-      let extracted: Record<string, unknown> | null = null;
-      if (rawUnknown && typeof rawUnknown === 'object') {
-        const rawObj = rawUnknown as Record<string, unknown>;
-        const success = (rawObj as { success?: boolean }).success === true;
-        if (success && 'data' in rawObj && typeof rawObj.data === 'object' && rawObj.data !== null) {
-          extracted = rawObj.data as Record<string, unknown>;
-        } else {
-          extracted = rawObj;
-        }
-      }
-
-      if (extracted) {
-        // Helpers
-        const getStr = (k: string): string | null => {
-          const v = extracted![k];
-          return typeof v === 'string' && v.trim() ? v : null;
-        };
-        const getNumStr = (k: string): string | null => {
-          const v = extracted![k];
-          if (typeof v === 'number') return String(v);
-          if (typeof v === 'string' && v.trim()) return v.trim();
-          return null;
-        };
-
-        // Normalize keys from edge fn -> form schema
-        const norm = {
-          ticketNumber: getStr('ticketNumber'),
-          issueDate: getStr('issueDate'),
-          location: getStr('location'),
-          officer: getStr('officer'),
-          officerBadge: getStr('officerBadge'),
-          offenceSection: getStr('offenceSection') ?? getStr('section'),
-          offenceSubSection: getStr('offenceSubSection') ?? getStr('subsection'),
-          offenceDescription: getStr('offenceDescription') ?? getStr('offenseDescription'),
-          violation: getStr('violation'),
-          fineAmount: (() => {
-            const fa = getNumStr('fineAmount');
-            const f = getNumStr('fine');
-            const val = fa ?? f;
-            if (!val) return null;
-            return val.startsWith('$') ? val : `$${val}`;
-          })(),
-          courtDate: getStr('courtDate'),
-        } as Record<string, string | null>;
-
-        console.log('[OCR] Extracted normalized data:', norm);
-        
-        // Auto-fill fields with extracted data if present
-        if (norm.ticketNumber) {
-          handleFieldUpdate('ticketNumber', norm.ticketNumber);
-        }
-        if (norm.issueDate) {
-          const d = new Date(norm.issueDate);
-          if (!isNaN(d.getTime())) handleFieldUpdate('issueDate', d);
-        }
-        if (norm.location) {
-          handleFieldUpdate('location', norm.location);
-        }
-        if (norm.officer) {
-          handleFieldUpdate('officer', norm.officer);
-        }
-        if (norm.officerBadge) {
-          handleFieldUpdate('officerBadge', norm.officerBadge);
-        }
-        if (norm.offenceSection) {
-          handleFieldUpdate('offenceSection', norm.offenceSection);
-        }
-        if (norm.offenceSubSection) {
-          handleFieldUpdate('offenceSubSection', norm.offenceSubSection);
-        }
-        if (norm.offenceDescription) {
-          handleFieldUpdate('offenceDescription', norm.offenceDescription);
-        }
-        if (norm.violation) {
-          handleFieldUpdate('violation', norm.violation);
-        }
-        if (norm.fineAmount) {
-          handleFieldUpdate('fineAmount', norm.fineAmount);
-        }
-        if (norm.courtDate) {
-          const cd = new Date(norm.courtDate);
-          if (!isNaN(cd.getTime())) handleFieldUpdate('courtDate', cd);
-        }
-
-        toast({
-          title: "Ticket scanned successfully!",
-          description: "Form fields have been auto-filled. Please review and correct any errors.",
-        });
-      } else {
-        console.warn('[OCR] No data returned from OCR function');
-        toast({
-          title: "Could not extract data",
-          description: "Please fill in the form manually.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('[OCR] Error during OCR process:', error);
-      toast({
-        title: "Could not read ticket",
-        description: "Please fill in the form manually.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessingOCR(false);
-      console.log('[OCR] OCR process completed');
     }
-  };
-
-  const handleFileUpload = (file: File) => {
-    console.log('[Upload] File selected:', file.name, file.type, file.size);
-    const isImageMime = file.type?.startsWith('image/');
-    const name = file.name.toLowerCase();
-    const isHeic = name.endsWith('.heic') || name.endsWith('.heif');
-    console.log('[Upload] File check - isImageMime:', isImageMime, 'isHeic:', isHeic);
-    if (isImageMime || isHeic) {
-      console.log('[Upload] Valid image file, updating formData and triggering OCR');
-      updateFormData({ ticketImage: file });
-      // Trigger OCR processing
-      processTicketOCR(file);
-    } else {
-      console.warn('[Upload] Invalid file type, skipping');
-    }
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileUpload(e.dataTransfer.files[0]);
-    }
+    const fine = extracted.fineAmount ?? extracted.fine;
+    if (typeof fine === "string" || typeof fine === "number") updates.fineAmount = String(fine).replace(/[$,\s]/g, "");
+    if (!updates.offenceSection && typeof extracted.section === "string") updates.offenceSection = extracted.section;
+    if (!updates.offenceSubSection && typeof extracted.subsection === "string") updates.offenceSubSection = extracted.subsection;
+    if (!updates.offenceDescription && typeof extracted.offenseDescription === "string") updates.offenceDescription = extracted.offenseDescription;
+    const detected = detectTicketType(extracted);
+    updateFormData(current => {
+      const ticketType = current.ticketTypeSource === "manual" ? current.ticketType : detected ?? current.ticketType;
+      const date = ticketDateFromExtraction(extracted, ticketType, ticketType === current.ticketType ? manuallyEditedDate.current : undefined);
+      return {
+        ...updates,
+        ...(detected ? { ticketType: detected, ticketTypeSource: "upload" as const } : {}),
+        issueDate: ticketDateAsLocalDate(date),
+      };
+    });
   };
 
   const violationTypes = [
@@ -367,127 +193,42 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
         .map(s => s.description)
     : [];
 
-  const openFileDialog = () => {
-    const input = fileInputRef.current;
-    if (!input) return;
-    try {
-      // Allow re-selecting the same file name
-      (input as HTMLInputElement).value = "";
-    } catch {
-      // noop
-    }
-    const anyInput = input as HTMLInputElement & { showPicker?: () => void };
-    if (typeof anyInput.showPicker === "function") {
-      try {
-        anyInput.showPicker();
-        return;
-      } catch {
-        // noop
-      }
-    }
-    input.click();
-  };
-
   return (
     <>
-      {/* OCR Processing Modal */}
-      {isProcessingOCR && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-card rounded-lg p-8 max-w-md mx-4 shadow-elevated">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <Loader2 className="h-12 w-12 text-primary animate-spin" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-foreground">
-                Processing Your Ticket
-              </h3>
-              <p className="text-gray-700 dark:text-muted-foreground">
-                Reading ticket details using OCR technology. This will only take a moment...
-              </p>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div className="h-full bg-gradient-primary animate-pulse" style={{ width: '60%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <form className="space-y-8">
+      <form className="space-y-8" onSubmit={event => event.preventDefault()}>
       {/* Basic Ticket Information */}
       <Card className="p-6 bg-gradient-card border-2 border-primary/10">
         <h3 className="text-lg font-semibold mb-4 text-primary">Ticket Information</h3>
         
-        {/* Ticket Upload - Show only when no prior OCR data or image is present */}
-        {!(formData.ticketImage || hasOCRData) && (
-          <div className="mb-6 p-4 bg-gradient-soft border border-primary/30 rounded-lg">
-            <div className="mb-3">
-              <Label className="font-medium text-primary">Upload Your Ticket</Label>
-              <p className="text-sm text-muted-foreground mt-1">Upload a photo to auto-fill the form fields below</p>
-            </div>
-            <div
-              className={cn(
-                "border-2 border-dashed rounded-lg p-6 text-center transition-smooth cursor-pointer hover:border-primary/50",
-                dragActive ? "border-primary bg-primary/5" : "border-primary/30"
-              )}
-              onClick={openFileDialog}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFileDialog(); } }}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-              role="button"
-              tabIndex={0}
-              aria-label="Upload ticket image"
-            >
-              <input
-                id="ticketUploadTop"
-                ref={fileInputRef}
-                type="file"
-                className="sr-only"
-                accept="image/*,.heic,.heif,application/pdf"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    handleFileUpload(e.target.files[0]);
-                  }
-                }}
-              />
-              
-              <div className="space-y-2">
-                <Upload className="h-8 w-8 text-primary/70 mx-auto" />
-                <p className="text-sm font-medium text-primary">
-                  Drag & drop your ticket or click to browse
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  JPG, PNG, HEIC, PDF • Max 10MB
-                </p>
-                <p className="text-xs text-primary font-medium">
-                  We'll automatically fill in the details!
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Show uploaded ticket status if already uploaded */}
-        {formData.ticketImage && (
-          <div className="mb-6 p-3 bg-white/50 dark:bg-white/10 rounded-lg border border-primary/30">
-            <div className="flex items-center gap-3">
-              <FileImage className="h-4 w-4 text-primary" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-primary">Ticket Uploaded</p>
-                <p className="text-xs text-muted-foreground">{formData.ticketImage.name}</p>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={openFileDialog}
-                className="text-xs h-8"
-              >
-                Change
-              </Button>
-            </div>
-          </div>
-        )}
-        
+        <div className="mb-6 space-y-5">
+          <TicketTypeFields
+            ticketType={formData.ticketType}
+            ticketTypeSource={formData.ticketTypeSource}
+            registeredOwnerOnOffenceDate={formData.registeredOwnerOnOffenceDate}
+            onTicketTypeChange={ticketType => {
+              if (ticketType !== formData.ticketType) manuallyEditedDate.current = undefined;
+              updateFormData(current => ({
+                ticketType,
+                ticketTypeSource: "manual",
+                ...(ticketType !== current.ticketType ? { issueDate: ticketDateAsLocalDate(ticketDateFromExtraction(lastExtraction.current, ticketType)) } : {}),
+              }));
+            }}
+            onOwnerChange={registeredOwnerOnOffenceDate => updateFormData({ registeredOwnerOnOffenceDate })}
+          />
+          <TicketCapture
+            file={formData.ticketImage}
+            onFileChange={ticketImage => {
+              manuallyEditedDate.current = undefined;
+              lastExtraction.current = null;
+              updateFormData(current => ({ ...resetTicketTypeForUpload(current), ticketImage, issueDate: undefined, sourceAssessmentId: "", sourceAssessmentAccessToken: "" }));
+            }}
+            onOcrData={applyTicketOCR}
+            required={!formData.sourceAssessmentId}
+            skipInitialScan={Boolean(formData.ticketNumber)}
+          />
+          {formData.sourceAssessmentId && !formData.ticketImage ? <p className="text-sm text-muted-foreground">The ticket from your earlier intake is already linked to this matter.</p> : null}
+        </div>
+
         <div className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -505,10 +246,11 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             </div>
 
             <div className="space-y-2">
-              <Label className="font-medium">Issue Date *</Label>
+              <Label htmlFor="ticket-issue-date" className="font-medium">{formData.ticketType === "photo_radar" ? "Offence Date *" : "Issue Date *"}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="ticket-issue-date"
                     variant="outline"
                     className={cn(
                       "w-full h-11 justify-start text-left font-normal",
@@ -530,8 +272,9 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
                   />
                 </PopoverContent>
               </Popover>
+              {formData.ticketType === "photo_radar" && <p className="text-xs text-muted-foreground">Use the offence date printed on the notice, not its issue or mailing date. Enter it manually if the scan could not read it.</p>}
               {errors.issueDate && (
-                <p className="text-sm text-destructive">{errors.issueDate.message}</p>
+                <p className="text-sm text-destructive">{formData.ticketType === "photo_radar" ? "Offence date is required" : errors.issueDate.message}</p>
               )}
             </div>
           </div>
@@ -598,7 +341,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
       {/* Officer Information */}
       <Card className="p-6 bg-gradient-card border-2 border-primary/10">
-        <h3 className="text-lg font-semibold mb-4 text-primary">Officer Details</h3>
+        <h3 className="text-lg font-semibold mb-4 text-primary">{formData.ticketType === "photo_radar" ? "Notice details" : "Officer Details"}</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
               <Label htmlFor="officer" className="font-medium">Officer or enforcement agency</Label>
@@ -907,7 +650,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
 
 
       {/* Vehicle Seizure Checkbox */}
-      <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+      {formData.ticketType !== "photo_radar" && <div className="space-y-4 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
         <div className="flex items-start space-x-3">
           <Checkbox
             id="vehicleSeized"
@@ -938,7 +681,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
             </p>
           </div>
         )}
-      </div>
+      </div>}
 
 
 
@@ -950,7 +693,7 @@ const TicketDetailsStep = ({ formData, updateFormData }: TicketDetailsStepProps)
       </div>
 
       {/* Instant Ticket Analyzer - Shows AI analysis when ticket details are provided */}
-      {formData.ticketImage && formData.fineAmount && formData.offenceDescription && (
+      {formData.ticketType !== "photo_radar" && formData.ticketImage && formData.fineAmount && formData.offenceDescription && (
         <InstantTicketAnalyzer 
           ticketImage={formData.ticketImage}
           fineAmount={formData.fineAmount}

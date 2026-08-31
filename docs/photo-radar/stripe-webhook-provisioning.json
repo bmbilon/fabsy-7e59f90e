@@ -1,0 +1,56 @@
+{
+  "verified_on": "2026-08-31",
+  "environment": "live",
+  "provider": "Stripe",
+  "verification_method": "Authenticated Stripe Dashboard; saved destination and reloaded the page before verifying all nine subscriptions.",
+  "requested_by_release_thread": "01a054fc-7b1d-7dc2-a369-7dff289fd87a",
+  "account_id": "acct_1PG64qAt6NWmIwaS",
+  "endpoint_id": "we_1U02lSAt6NWmIwaSNP26qckC",
+  "name": "fabsy-idr-payments-live",
+  "status": "active",
+  "url": "https://gcasbisxfrssonllpqrw.supabase.co/functions/v1/idr-payment-webhook",
+  "dashboard_url": "https://dashboard.stripe.com/acct_1PG64qAt6NWmIwaS/workbench/webhooks/we_1U02lSAt6NWmIwaSNP26qckC",
+  "description": "Fabsy ticket and Insurance Damage Report payment fulfillment",
+  "api_version": "2024-04-10",
+  "event_scope": "Your account",
+  "payload_style": "Snapshot",
+  "preserved_events": [
+    "checkout.session.async_payment_failed",
+    "checkout.session.async_payment_succeeded",
+    "checkout.session.completed",
+    "checkout.session.expired"
+  ],
+  "added_events": [
+    "charge.refunded",
+    "charge.dispute.created",
+    "refund.created",
+    "refund.updated",
+    "refund.failed"
+  ],
+  "saved_events": [
+    "charge.dispute.created",
+    "charge.refunded",
+    "checkout.session.async_payment_failed",
+    "checkout.session.async_payment_succeeded",
+    "checkout.session.completed",
+    "checkout.session.expired",
+    "refund.created",
+    "refund.failed",
+    "refund.updated"
+  ],
+  "saved_event_count": 9,
+  "unchanged": [
+    "Endpoint ID, URL, active status, name and description",
+    "API version, event scope and payload style",
+    "Signing secret; not revealed, rolled or changed",
+    "All other destinations and settings"
+  ],
+  "events_resent": false,
+  "payments_created": false,
+  "refunds_created": false,
+  "customers_created": false,
+  "emails_sent": false,
+  "application_or_migration_deployed_by_this_check": false,
+  "delivery_test_performed": false,
+  "limitation": "This verifies live event subscriptions only. It does not establish deployment, signature validation, fulfillment, refund behavior, replay safety or end-to-end delivery. The coordinated release owner retains those checks."
+}

@@ -46,6 +46,13 @@ export default function AdminDashboard() {
       color: "from-cyan-500 to-teal-600"
     },
     {
+      title: "Referrals",
+      description: "Review file eligibility, settlement and completed Interac transfers",
+      icon: Users,
+      path: "/admin/referrals",
+      color: "from-violet-600 to-purple-700"
+    },
+    {
       title: "Blog Management",
       description: "Create, edit and publish blog posts and content",
       icon: FileText,

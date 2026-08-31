@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { createConsentPdf } from "../_shared/consent-pdf.ts";
 import { ConsentTextError } from "../_shared/consent-unicode.ts";
-import { parsePreferredLocale } from "../_shared/locale-policy.ts";
+import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -60,7 +60,7 @@ const handler = async (req: Request): Promise<Response> => {
     const accessTokenHash = await sha256(accessToken);
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
-      .select("id,first_name,last_name,email,phone,address,city,postal_code,drivers_license,ticket_number,violation,violation_date,status,service_type,preferred_locale,representation_access_token_hash")
+      .select("id,first_name,last_name,email,phone,address,city,postal_code,drivers_license,ticket_number,violation,violation_date,status,service_type,preferred_locale,representation_access_token_hash,ticket_type,registered_owner_on_offence_date")
       .eq("id", submissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
@@ -74,6 +74,8 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const formData = {
+      ticketType: submission.ticket_type === "photo_radar" ? "photo_radar" as const : "officer_issued" as const,
+      registeredOwnerOnOffenceDate: submission.registered_owner_on_offence_date,
       submissionId: submission.id,
       firstName: String(submission.first_name || ""),
       lastName: String(submission.last_name || ""),
@@ -150,9 +152,9 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: unknown) {
     console.error("Error in generate-consent-form function:", error);
     const errorMessage = error instanceof Error ? error.message : "Consent form generation failed";
-    const status = error instanceof RequestError || error instanceof ConsentTextError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof ConsentTextError || error instanceof LocaleRequestError ? error.status : 500;
     return new Response(
-      JSON.stringify({ error: errorMessage, ...(error instanceof ConsentTextError ? { code: error.code } : {}) }),
+      JSON.stringify({ error: errorMessage, ...(error instanceof ConsentTextError || error instanceof LocaleRequestError ? { code: error.code } : {}) }),
       {
         status,
         headers: { "Content-Type": "application/json", ...corsHeaders },

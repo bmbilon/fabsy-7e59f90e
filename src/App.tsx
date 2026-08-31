@@ -55,11 +55,24 @@ import TicketAssessmentConfirmation from "./pages/TicketAssessmentConfirmation";
 import AdminAssessmentReview from "./pages/AdminAssessmentReview";
 import RepresentationConsent from "./pages/RepresentationConsent";
 import RapidResolution from "./pages/RapidResolution";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type PropsWithChildren } from "react";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import LocaleAlternates from "@/i18n/LocaleAlternates";
+import { ReferralAttribution, ReferralRedirect } from "@/components/ReferralAttribution";
 
 const LocalizedPage = lazy(() => import("./pages/LocalizedPage"));
+const PhotoRadar = lazy(() => import("./pages/PhotoRadar"));
+const Fleet = lazy(() => import("./pages/Fleet"));
+const FreeTicketCheck = lazy(() => import("./pages/FreeTicketCheck"));
+const ProDrivers = lazy(() => import("./pages/ProDrivers"));
+const Refer = lazy(() => import("./pages/Refer"));
+const ReferralPortal = lazy(() => import("./pages/ReferralPortal"));
+const ProDiscountPortal = lazy(() => import("./pages/ProDiscountPortal"));
+const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
+
+function RouteSuspense({ children }: PropsWithChildren) {
+  return <Suspense fallback={<div className="min-h-screen" aria-busy="true" />}>{children}</Suspense>;
+}
 
 const queryClient = new QueryClient();
 
@@ -69,6 +82,7 @@ const RouteAnalytics = () => {
   return (
     <>
       <AcquisitionTracker />
+      <ReferralAttribution />
       <Analytics />
     </>
   );
@@ -89,6 +103,13 @@ const App = () => (
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/pro-drivers" element={<RouteSuspense><ProDrivers /></RouteSuspense>} />
+          <Route path="/refer" element={<RouteSuspense><Refer /></RouteSuspense>} />
+          <Route path="/r/:code" element={<ReferralRedirect />} />
+          <Route path="/portal/referrals" element={<RouteSuspense><ReferralPortal /></RouteSuspense>} />
+          <Route path="/portal/pro-discount" element={<RouteSuspense><ProDiscountPortal /></RouteSuspense>} />
+          <Route path="/portal/pro-discount/:submissionId" element={<RouteSuspense><ProDiscountPortal /></RouteSuspense>} />
+          <Route path="/admin/referrals" element={<RouteSuspense><AdminReferrals /></RouteSuspense>} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />
           <Route path="/ticket-form" element={<TicketFormPage />} />
           <Route path="/representation-consent" element={<RepresentationConsent />} />
@@ -111,6 +132,9 @@ const App = () => (
           <Route path="/insurance-damage-report/checkout" element={<IdrCheckout />} />
           <Route path="/insurance-damage-report/intake" element={<IdrIntake />} />
           <Route path="/rapid-resolution" element={<RapidResolution />} />
+          <Route path="/photo-radar" element={<RouteSuspense><PhotoRadar /></RouteSuspense>} />
+          <Route path="/fleet" element={<RouteSuspense><Fleet /></RouteSuspense>} />
+          <Route path="/free-ticket-check" element={<RouteSuspense><FreeTicketCheck /></RouteSuspense>} />
           <Route path="/traffic-ticket-assessment" element={<Navigate to="/rapid-resolution" replace />} />
           <Route path="/traffic-ticket-assessment/examples" element={<Navigate to="/rapid-resolution" replace />} />
           <Route path="/traffic-ticket-assessment/start" element={<Navigate to="/submit-ticket" replace />} />

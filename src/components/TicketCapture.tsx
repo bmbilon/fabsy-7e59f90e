@@ -19,6 +19,7 @@ export interface TicketCaptureProps {
   disabled?: boolean;
   label?: string;
   required?: boolean;
+  skipInitialScan?: boolean;
 }
 
 type CaptureStatus =
@@ -62,6 +63,7 @@ export default function TicketCapture({
   disabled = false,
   label = "Ticket PDF or clear image",
   required = false,
+  skipInitialScan = false,
 }: TicketCaptureProps) {
   const reactId = useId();
   const inputId = reactId.replace(/:/g, "");
@@ -69,6 +71,7 @@ export default function TicketCapture({
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const latestOcrHandler = useRef(onOcrData);
   const requestId = useRef(0);
+  const alreadyCapturedFile = useRef(skipInitialScan ? file : null);
   const [status, setStatus] = useState<CaptureStatus>({ kind: "idle" });
 
   useEffect(() => {
@@ -96,6 +99,12 @@ export default function TicketCapture({
     }
 
     latestOcrHandler.current(null);
+
+    if (alreadyCapturedFile.current === file) {
+      setStatus({ kind: "success", title: "Ticket attached", message: "Your captured details are ready below. Review them before continuing." });
+      return;
+    }
+    alreadyCapturedFile.current = null;
 
     if (validation.kind === "pdf") {
       setStatus({

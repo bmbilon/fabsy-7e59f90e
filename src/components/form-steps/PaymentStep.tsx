@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreditCard, DollarSign, FileSearch, Shield } from "lucide-react";
 import { FormData } from "../TicketForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,8 +18,14 @@ import {
   IDR_PRICE_ADDON,
 } from "@/config/idr";
 import { validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
+import { ticketCheckoutSelection } from "@/lib/ticket/ticketType";
+import { isProLicenceClass, licencePhotoAsDataUrl, normalizeLicenceClass, proCheckoutSubtotalCents, validateProLicenceFile, verifiedProResponse, type ProVerificationResponse } from "@/lib/pro-drivers/intake";
+import { latestReferralAttribution } from "@/lib/referrals/attribution";
+import { referralForCheckout } from "@/lib/referrals/capture";
 import {
   INSURANCE_IMPACT_REPORT,
+  PHOTO_RADAR,
+  PHOTO_RADAR_PRICE_LABEL,
   RAPID_RESOLUTION,
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
@@ -55,17 +61,39 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
   const [selectedIdrAddon, setIncludeIdrAddon] = useState(false);
   // The report intake is still English. Offer the released RR service alone on
   // localized checkout instead of silently handing off an untranslated add-on.
-  const includeIdrAddon = locale === "en" && selectedIdrAddon;
+  const isPhotoRadar = formData.ticketType === "photo_radar";
+  const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
+  const { includeIdrAddon } = ticketCheckoutSelection(formData.ticketType, selectedIdrAddon, locale);
+  useEffect(() => { setIncludeIdrAddon(false); setAgreedToTerms(false); }, [formData.ticketType, locale]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isVerifyingPro, setIsVerifyingPro] = useState(false);
+  const [proVerification, setProVerification] = useState<{ response: ProVerificationResponse; identity: string; image: File } | null>(null);
+  const [proCheckFailed, setProCheckFailed] = useState(false);
   const [idrOrderId] = useState(() => crypto.randomUUID());
   const { toast } = useToast();
   const hasLegacyAssessment = Boolean(formData.sourceAssessmentId && formData.sourceAssessmentAccessToken);
 
-  const checkoutSubtotal = RAPID_RESOLUTION.priceCad + (includeIdrAddon ? IDR_PRICE_ADDON : 0);
+  const requestsProDiscount = !isPhotoRadar && isProLicenceClass(formData.licenceClass);
+  const requiresEnglish = locale !== "en" && (isPhotoRadar || requestsProDiscount);
+  const hasProDeclaration = locale === "en" && requestsProDiscount;
+  const proIdentity = JSON.stringify([locale, formData.ticketType, formData.ticketNumber, formData.sourceAssessmentId, formData.licenceClass, formData.firstName, formData.lastName, formData.email, formData.driversLicense, formData.dateOfBirth]);
+  const currentProVerification = proVerification?.identity === proIdentity && proVerification.image === formData.driversLicenseImage
+    ? proVerification.response : null;
+  const baseSubtotalCents = offer.priceCents + (includeIdrAddon ? IDR_PRICE_ADDON * 100 : 0);
+  const checkoutSubtotalCents = proCheckoutSubtotalCents(baseSubtotalCents, formData, currentProVerification);
+  const checkoutSubtotal = (checkoutSubtotalCents / 100).toFixed(2);
+  const proDiscountApplied = checkoutSubtotalCents < baseSubtotalCents;
+  const hasUsableProPhoto = hasProDeclaration && formData.driversLicenseImage && validateProLicenceFile(formData.driversLicenseImage).valid;
+  const fullPriceNotice = `Your licence discount is not verified. Stripe checkout will be $${(baseSubtotalCents / 100).toFixed(2)} CAD plus GST. After payment, securely send a licence photo for the 20% partial refund if eligible.`;
 
   const handleStripeCheckout = async () => {
-    if (!isReleased) {
+    if (isProcessing) return;
+    if (!isReleased || requiresEnglish) {
       toast({ title: t('language.draftTitle'), description: t('language.paymentBlocked'), variant: "destructive" });
+      return;
+    }
+    if (isPhotoRadar && !formData.registeredOwnerOnOffenceDate) {
+      toast({ title: "Ownership answer required", description: "Return to Ticket Details and confirm whether the vehicle was registered to you on the offence date.", variant: "destructive" });
       return;
     }
     if (locale !== "en") {
@@ -85,6 +113,8 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
     }
 
     setIsProcessing(true);
+    setProCheckFailed(false);
+    setProVerification(null);
     try {
       const sourceAssessment = formData.sourceAssessmentId && formData.sourceAssessmentAccessToken
         ? {
@@ -103,9 +133,16 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
         ticketMimeType = ticketDescriptor.mimeType;
       }
 
+      const referral = latestReferralAttribution([formData.referral, await referralForCheckout()]);
       const { data: submission, error: submissionError } = await supabase.functions.invoke("submit-ticket", {
         body: {
           preferred_locale: locale,
+          ticket_type: formData.ticketType,
+          ticket_type_source: formData.ticketTypeSource === "default" ? "entry" : formData.ticketTypeSource,
+          registered_owner_on_offence_date: isPhotoRadar ? formData.registeredOwnerOnOffenceDate : null,
+          declaredLicenceClass: locale !== "en" || isPhotoRadar ? "unknown" : normalizeLicenceClass(formData.licenceClass),
+          ...(referral ? { refCode: referral.code, refAttributionToken: referral.attributionToken } : {}),
+          ...(formData.plateNumber?.trim() ? { plateNumber: formData.plateNumber.trim() } : {}),
           driversLicense: formData.driversLicense,
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -125,7 +162,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           courtDate: formData.courtDate?.toISOString().split("T")[0],
           defenseStrategy: buildIntakeDefenseStrategy(formData),
           additionalNotes: buildIntakeAdditionalNotes(formData),
-          insuranceCompany: formData.insuranceCompany,
+          insuranceCompany: isPhotoRadar ? "" : formData.insuranceCompany,
           ...(sourceAssessment ? { sourceAssessment } : {
             file: { contentType: ticketMimeType!, size: ticketFile!.size },
           }),
@@ -153,6 +190,33 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           });
         if (uploadError) throw new Error("Your ticket was saved, but the private file upload did not finish. Please try again.");
       }
+
+      // Only a direct response for this stored submission can change the UI
+      // price. The checkout endpoint independently rechecks the stored result.
+      if (hasProDeclaration) {
+        const licencePhoto = formData.driversLicenseImage;
+        const descriptor = licencePhoto ? validateProLicenceFile(licencePhoto) : null;
+        let verified: ProVerificationResponse | null = null;
+        if (licencePhoto && descriptor?.valid) {
+          setIsVerifyingPro(true);
+          try {
+            const imageBase64 = await licencePhotoAsDataUrl(licencePhoto);
+            const { data: verification, error: verificationError } = await supabase.functions.invoke("verify-pro-licence", {
+              body: { submissionId, accessToken: representationAccessToken, licenceClass: formData.licenceClass, imageBase64, mimeType: descriptor.mimeType },
+            });
+            if (!verificationError) verified = verifiedProResponse(verification);
+            if (verified) setProVerification({ response: verified, identity: proIdentity, image: licencePhoto });
+          } catch {
+            // An unavailable or unreadable licence never blocks base checkout.
+          } finally {
+            setIsVerifyingPro(false);
+          }
+        }
+        if (!verified) {
+          setProCheckFailed(true);
+          if (licencePhoto) toast({ title: "Continuing at full price", description: fullPriceNotice });
+        }
+      }
       const { data: consent, error: consentError } = await supabase.functions.invoke("generate-consent-form", {
         body: {
           submissionId,
@@ -172,7 +236,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
 
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("create-payment", {
         body: {
-          formData,
+          formData: { email: formData.email, firstName: formData.firstName, lastName: formData.lastName, ticketNumber: formData.ticketNumber },
           submissionId,
           clientId,
           accessToken: representationAccessToken,
@@ -192,8 +256,17 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
         variant: "destructive",
       });
       setIsProcessing(false);
+      setIsVerifyingPro(false);
     }
   };
+
+  if (requiresEnglish) return <section className="space-y-4 rounded-xl border border-amber-300 bg-amber-50 p-5">
+    <p>{t('language.paymentBlocked')}</p>
+    <p lang="en">{isPhotoRadar ? "Photo Radar" : "Pro Driver Discount"} pricing and authorization are available in English.</p>
+    <Link to={isPhotoRadar ? PHOTO_RADAR.intakePath : "/submit-ticket?ticket_type=officer_issued"}
+      state={{ prefillTicketData: { ...formData, consentGiven: false, digitalSignature: '' }, startAtStep: 4, ticketImage: formData.ticketImage }}
+      className="font-semibold underline">{t('language.continueEnglish')}</Link>
+  </section>;
 
   if (locale !== "en") return <div className="space-y-6">
     <section className="space-y-4 rounded-xl border bg-slate-50 p-5">
@@ -226,37 +299,49 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
       <Card className="border-primary/10 bg-gradient-card p-6 shadow-fab">
         <div className="mb-5 flex items-center gap-3">
           <DollarSign className="h-6 w-6 text-primary" />
-          <h3 className="text-xl font-bold">Rapid Resolution checkout</h3>
+          <h3 className="text-xl font-bold">{offer.name} checkout</h3>
         </div>
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-semibold">Rapid Resolution</p>
+              <p className="font-semibold">{offer.name}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Eligible Alberta pre-trial service through disclosure, prosecutor review, Crown-response explanation and your decision. Trial representation is separate.
+                {isPhotoRadar ? "Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee. No demerits or insurance impact." : "Eligible Alberta pre-trial service through disclosure, prosecutor review, Crown-response explanation and your decision. Trial representation is separate."}
               </p>
             </div>
-            <p className="shrink-0 font-bold">${RAPID_RESOLUTION.priceCad} CAD</p>
+            <p className="shrink-0 font-bold">${offer.priceCad} CAD</p>
           </div>
           <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-4 text-sm">
-            {RAPID_RESOLUTION.actionCommitment} {RAPID_RESOLUTION.speedDisclaimer}
+            {offer.actionCommitment} {offer.speedDisclaimer}
           </div>
-          {hasLegacyAssessment && (
+          {hasLegacyAssessment && !isPhotoRadar && (
             <div className="rounded-lg border border-primary/25 bg-primary/5 p-4 text-sm">
               A previous assessment is linked to this matter. Any credit available under its original terms is validated securely before payment.
             </div>
           )}
+          {hasProDeclaration && <div className="rounded-lg border border-primary/25 bg-primary/5 p-4 text-sm" aria-live="polite">
+            <p className="font-semibold">{proDiscountApplied ? "20% pro driver discount verified" : isVerifyingPro ? "Verifying your Alberta licence…" : "Pro driver discount: verification required"}</p>
+            <p className="mt-2 text-muted-foreground">{proDiscountApplied
+              ? `Your licence matched your Class ${formData.licenceClass} declaration. The 20% discount applies to this officer-ticket service${includeIdrAddon ? " and its report add-on" : ""}.`
+              : hasUsableProPhoto
+                ? `You declared Class ${formData.licenceClass}. We will securely check the licence photo against your declaration and identity before creating checkout. Until verified, the subtotal shown is full price.`
+                : `You declared Class ${formData.licenceClass}, but no usable verification photo is attached. Checkout is full price. Go back to Personal Info to attach a clear JPG, PNG or WebP licence photo, or submit it securely after payment for the 20% partial refund if eligible.`}</p>
+            {proCheckFailed && <p className="mt-2 font-medium">{fullPriceNotice}</p>}
+          </div>}
           <div className="border-t pt-4">
+            {includeIdrAddon && <div className="mb-3 flex items-center justify-between gap-3 text-sm"><span>{INSURANCE_IMPACT_REPORT.shortName} add-on</span><span>${IDR_PRICE_ADDON.toFixed(2)} CAD</span></div>}
+            {proDiscountApplied && <div className="mb-3 flex items-center justify-between gap-3 text-sm text-primary"><span>Verified pro driver discount (20%)</span><span>−${((baseSubtotalCents - checkoutSubtotalCents) / 100).toFixed(2)} CAD</span></div>}
             <div className="flex items-center justify-between text-lg font-bold">
               <span>Checkout subtotal</span>
               <span className="text-primary">${checkoutSubtotal} CAD</span>
             </div>
+            {isPhotoRadar && <p className="mt-3 text-sm font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>}
             <p className="mt-2 text-xs text-muted-foreground">
-              Applicable GST is calculated at Stripe checkout. Government fines, trial representation and out-of-scope work are separate.
+              {isPhotoRadar ? `GST is $${PHOTO_RADAR.gstCad.toFixed(2)}. The total charged is $${PHOTO_RADAR.totalCad.toFixed(2)} CAD. Government fines are separate. No outcome is promised and the fee is not refunded based on outcome.` : "Applicable GST is calculated at Stripe checkout. Government fines, trial representation and out-of-scope work are separate."}
             </p>
             {includeIdrAddon && (
               <p className="mt-2 text-xs text-muted-foreground">
-                Promotion codes cannot be combined with the ${IDR_PRICE_ADDON} report add-on in the same checkout.
+                The verified pro driver discount applies to the full bundle. Other promotion codes cannot be combined with this checkout.
               </p>
             )}
           </div>
@@ -270,21 +355,23 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
             <h3 className="text-xl font-bold">Payment options</h3>
           </div>
 
-          <div className="space-y-2">
+          {!isPhotoRadar && <div className="space-y-2">
             <Label htmlFor="insurance-company">Insurance company, optional</Label>
             <Input
               id="insurance-company"
               value={formData.insuranceCompany}
+              disabled={isProcessing}
               onChange={(event) => updateFormData({ insuranceCompany: event.target.value })}
               placeholder="Current insurance company"
             />
-          </div>
+          </div>}
 
-          {!hasLegacyAssessment && <div className="rounded-lg border border-primary/25 bg-primary/5 p-4">
+          {!isPhotoRadar && !hasLegacyAssessment && <div className="rounded-lg border border-primary/25 bg-primary/5 p-4">
             <div className="flex items-start gap-3">
               <Checkbox
                 id="idr-addon"
                 checked={includeIdrAddon}
+                disabled={isProcessing}
                 onCheckedChange={(value) => setIncludeIdrAddon(value === true)}
                 className="mt-0.5"
               />
@@ -315,6 +402,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
               <Checkbox
                 id="payment-terms"
                 checked={agreedToTerms}
+                disabled={isProcessing}
                 onCheckedChange={(value) => setAgreedToTerms(value === true)}
                 className="mt-0.5"
               />
@@ -323,7 +411,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
                   I agree to the <a href="/terms-of-purchase" className="text-primary underline">Terms of Purchase</a>, <a href="/terms-of-service" className="text-primary underline">Terms of Service</a>, and <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a>.
                 </Label>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Payment activates Rapid Resolution under the signed consent. Fabsy is a traffic ticket agent service, not a law firm, and no outcome is promised.
+                  Payment activates {offer.name} under the signed consent. Fabsy is a traffic ticket agent service, not a law firm, and no outcome is promised.
                 </p>
               </div>
             </div>
@@ -335,9 +423,9 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
             className="min-h-12 h-auto w-full whitespace-normal py-3 text-base font-semibold sm:text-lg"
             size="lg"
           >
-            {isProcessing ? "Starting secure checkout..." : (
+            {isProcessing ? (isVerifyingPro ? "Verifying licence before checkout…" : "Starting secure checkout...") : (
               <span className="flex flex-wrap items-center justify-center gap-2">
-                <CreditCard className="h-5 w-5" /> Continue to Stripe for ${checkoutSubtotal} CAD plus tax
+                <CreditCard className="h-5 w-5" /> {isPhotoRadar ? `$${PHOTO_RADAR.priceCad} + GST` : hasUsableProPhoto && !proDiscountApplied ? "Verify licence and continue to Stripe" : `Continue to Stripe for $${checkoutSubtotal} CAD plus GST`}
               </span>
             )}
           </Button>

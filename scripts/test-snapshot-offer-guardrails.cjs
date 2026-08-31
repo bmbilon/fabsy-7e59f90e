@@ -6,6 +6,7 @@ const path = require('node:path');
 const offers = require('../src/config/offers.json');
 const { textGuardrailIssues } = require('./curated-content-guardrails.cjs');
 const { proDriverPromotionValues, renderProDriverSnapshot, redactProDriverPromotion } = require('./pro-driver-promotion-guardrail.cjs');
+const { withoutExactPhotoCatalogOffer } = require('./public-offer-snapshot-guardrail.cjs');
 const {
   browserTextGuardrailIssues,
   containsDisallowedOfferPricing,
@@ -189,7 +190,8 @@ assert.equal(containsDisallowedOfferPricing(service('Rapid Resolution Bundle', 1
 
 const shell = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
 for (const match of shell.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
-  assert.equal(containsDisallowedOfferPricing(JSON.parse(match[1])), false, 'base-shell offer schemas must be named and correctly priced');
+  assert.equal(containsDisallowedOfferPricing(withoutExactPhotoCatalogOffer(JSON.parse(match[1]))), false,
+    'base-shell offers must use the original named prices or the exact source-bound Photo Radar catalog entry');
 }
 const description = /<meta name="description" content="([^"]*)"/.exec(shell)?.[1];
 assert.ok(description && description.length <= 155, 'base-shell description must fit the production gate');

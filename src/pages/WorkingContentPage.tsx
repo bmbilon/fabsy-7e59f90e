@@ -12,7 +12,9 @@ import useSafeHead from '@/hooks/useSafeHead';
 import { MapPin, AlertTriangle, Shield, ExternalLink, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnswerBox from '@/components/AnswerBox';
-import { CANONICAL_OFFER_PRICING, RAPID_RESOLUTION } from '@/config/offers';
+import { CANONICAL_OFFER_PRICING, OFFICER_OFFER_PRICING, PHOTO_RADAR, PHOTO_RADAR_OFFER_PRICING, RAPID_RESOLUTION } from '@/config/offers';
+import PhotoRadarOfferStrip from '@/components/PhotoRadarOfferStrip';
+import { isPhotoRadarContentSlug, loadPhotoRadarContent } from '@/lib/photo-radar-pages';
 import type { FAQItem } from '@/components/FAQSchema';
 
 type PageRecord = Record<string, unknown>;
@@ -106,8 +108,9 @@ const hasOverCapPercentage = (value: string): boolean => {
 const hasFabsyPricingSignal = (value: string): boolean =>
   /\$\s*(?:49|198|229|488)\b|\bflat\s+\$\s*\d|\b(?:admin|base|contingency|representation|service)\s+fee\b|\bFabsy\b[^.!?\n]{0,100}(?:\$\s*\d|\b(?:charges?|costs?|fees?|pricing)\b)|\b(?:pricing|fee\s+structure|only\s+pay)\b|\b30\s*(?:%|percent)\b[^.!?\n]{0,100}\bfine\s+reduction\b/i.test(value);
 
-const hasCompleteFabsyPricing = (value: string): boolean =>
-  value.includes(CANONICAL_OFFER_PRICING);
+const hasCompleteFabsyPricing = (value: string, photoRadar: boolean): boolean =>
+  photoRadar ? value.includes(PHOTO_RADAR_OFFER_PRICING) :
+    value.includes(CANONICAL_OFFER_PRICING) || value.includes(OFFICER_OFFER_PRICING);
 
 const pricingClaimsAreComplete = (page: PageRecord): boolean => {
   const fields: string[] = [
@@ -128,7 +131,8 @@ const pricingClaimsAreComplete = (page: PageRecord): boolean => {
       : []),
   ].filter(Boolean);
 
-  return fields.every((field) => !hasFabsyPricingSignal(field) || hasCompleteFabsyPricing(field));
+  const photoRadar = isPhotoRadarContentSlug(text(page.slug));
+  return fields.every((field) => !hasFabsyPricingSignal(field) || hasCompleteFabsyPricing(field, photoRadar));
 };
 
 const loadCuratedSlugs = async (): Promise<Set<string>> => {
@@ -314,6 +318,11 @@ const WorkingContentPage = () => {
       setError(null);
 
       try {
+        const reviewedPhotoRadarPage = await loadPhotoRadarContent(slug);
+        if (reviewedPhotoRadarPage) {
+          setPageData(displayPage(reviewedPhotoRadarPage, parseFaqItems(reviewedPhotoRadarPage.faqs).items));
+          return;
+        }
         const [pageResult, curatedSlugs] = await Promise.all([
           supabase
             .from('page_content')
@@ -369,6 +378,7 @@ const WorkingContentPage = () => {
   }
 
   const currentUrl = canonicalUrl || `https://fabsy.ca/content/${String(pageData.slug)}`;
+  const photoRadar = isPhotoRadarContentSlug(String(pageData.slug));
 
   // Derive Service schema fields with enhanced city detection
   const detectCityFromSlug = (slug: string): string | null => {
@@ -432,7 +442,8 @@ const WorkingContentPage = () => {
         serviceType={serviceType}
         url={currentUrl}
         cityName={cityName}
-        offerDescription={CANONICAL_OFFER_PRICING}
+        offerDescription={photoRadar ? PHOTO_RADAR_OFFER_PRICING : CANONICAL_OFFER_PRICING}
+        photoRadar={photoRadar}
       />
       {/* Enhanced LocalBusiness schema for Alberta city pages */}
       {cityName && (
@@ -485,7 +496,8 @@ const WorkingContentPage = () => {
             <AnswerBox 
               offence={offence}
               city={cityName}
-              ctaHref="/submit-ticket"
+              ctaHref={photoRadar ? PHOTO_RADAR.slug : '/submit-ticket'}
+              photoRadar={photoRadar}
             />
           )}
 
@@ -494,19 +506,19 @@ const WorkingContentPage = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-lg font-semibold text-foreground mb-2">Can I dispute it?</h2>
-                <p className="text-foreground">You can dispute a {offence.toLowerCase()} {cityName ? `in ${cityName}` : 'in Alberta'}. Follow the instructions on the ticket and act by the deadline printed on it.</p>
+                <p className="text-foreground">{photoRadar ? 'You can dispute an Alberta registered-owner photo radar or red-light camera notice under TSA s.160(1). No demerits. No insurance impact. Only the fine is on the table. Follow the deadline printed on the notice.' : `You can dispute a ${offence.toLowerCase()} ${cityName ? `in ${cityName}` : 'in Alberta'}. Follow the instructions on the ticket and act by the deadline printed on it.`}</p>
                 <h3 className="mt-4 text-sm font-semibold text-foreground">What to do now (3 steps)</h3>
                 <ol className="mt-2 list-decimal ml-5 space-y-1 text-foreground">
-                  <li>Upload your ticket</li>
-                  <li>We check the court file and disclosure</li>
-                  <li>Review the Crown response and give your instruction</li>
+                  <li>{photoRadar ? 'Upload the notice and confirm ownership on the offence date' : 'Upload your ticket'}</li>
+                  <li>{photoRadar ? 'Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown fine reduction or withdrawal' : 'We check the court file and disclosure'}</li>
+                  <li>{photoRadar ? 'You approve any deal. No trial. No success fee.' : 'Review the Crown response and give your instruction'}</li>
                 </ol>
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-foreground">What happens next</h3>
-                <p className="text-foreground">Rapid Resolution requests and reviews disclosure, advances the next authorized prosecutor step, and keeps you informed.</p>
+                <p className="text-foreground">{photoRadar ? `${PHOTO_RADAR.actionCommitment} No reduction or withdrawal is promised. An Insurance Impact Report is not needed.` : 'Rapid Resolution requests and reviews disclosure, advances the next authorized prosecutor step, and keeps you informed.'}</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Pricing</h3>
-                <p className="text-foreground">{CANONICAL_OFFER_PRICING}</p>
+                <p className="text-foreground">{photoRadar ? PHOTO_RADAR_OFFER_PRICING : CANONICAL_OFFER_PRICING}</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>
                 <p className="text-foreground">{cityName || 'Alberta'} • {offence.charAt(0).toUpperCase() + offence.slice(1)}</p>
               </div>
@@ -581,6 +593,8 @@ const WorkingContentPage = () => {
               </div>
             </div>
 
+            {photoRadar ? <PhotoRadarOfferStrip /> : null}
+
             {/* FAQs Section */}
             {pageData.faqs && pageData.faqs.length > 0 && (
               <div className="bg-card rounded-xl p-8 md:p-10 shadow-sm border">
@@ -645,21 +659,21 @@ const WorkingContentPage = () => {
                 <div className="w-12 h-12 rounded-lg bg-primary-foreground/20 flex items-center justify-center mb-4">
                   <Shield className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Start Rapid Resolution</h3>
+                <h3 className="text-xl font-bold mb-2">{photoRadar ? PHOTO_RADAR.name : 'Start Rapid Resolution'}</h3>
                 <p className="text-sm mb-5 opacity-95">
                   Upload, authorize and pay online. Fabsy requests disclosure, reviews the file and advances the next authorized pre-trial step.
                 </p>
                 <Link
-                  to="/submit-ticket"
+                  to={photoRadar ? PHOTO_RADAR.slug : RAPID_RESOLUTION.intakePath}
                 >
                   <Button 
                     size="lg"
                     className="w-full bg-background text-foreground hover:shadow-lg transition-shadow"
                   >
-                    Start Rapid Resolution →
+                    {photoRadar ? 'View Photo Radar · $79 + GST' : 'Start Rapid Resolution'} →
                   </Button>
                 </Link>
-                <p className="text-xs mt-3 opacity-80 text-center">$198 CAD plus GST · Eligible pre-trial matters · Trial separately quoted</p>
+                <p className="text-xs mt-3 opacity-80 text-center">{photoRadar ? '$79 + GST ($82.95 total) · No trial · No success fee' : '$198 CAD plus GST · Eligible pre-trial matters · Trial separately quoted'}</p>
                 <p className="mt-3 text-center text-xs opacity-80">
                   {RAPID_RESOLUTION.speedDisclaimer}
                 </p>

@@ -12,8 +12,12 @@ import { ArrowLeft, Calendar, MapPin, Shield, FileText, Phone, Mail, User as Use
 import { format } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
 import { RAPID_RESOLUTION } from "@/config/offers";
+import { AteCaseReview } from "@/components/AteCaseReview";
+import { ResolutionEmailAction } from "@/components/ResolutionEmailAction";
 
 interface TicketSubmission {
+  ticket_type: "photo_radar" | "officer_issued";
+  registered_owner_on_offence_date: "yes" | "sold_before" | "stolen" | null;
   id: string;
   first_name: string;
   last_name: string;
@@ -164,6 +168,10 @@ export default function AdminSubmissionDetail() {
 
   const updateStatus = async (newStatus: string) => {
     if (!submission) return;
+    if (submission.ticket_type === "photo_radar" && newStatus === "completed") {
+      toast({ title: "Record the actual ATE outcome", description: "Use the Photo Radar outcome form so the final fine, client approval and reduction metric stay consistent.", variant: "destructive" });
+      return;
+    }
 
     setIsUpdating(true);
     try {
@@ -193,6 +201,7 @@ export default function AdminSubmissionDetail() {
 
   const updateAssessment = async (field: "verdict" | "case_outcome", value: string) => {
     if (!submission || !user) return;
+    if (submission.ticket_type === "photo_radar") return;
     if (submission.status === "awaiting_payment") {
       toast({
         title: "Payment not confirmed",
@@ -360,7 +369,7 @@ export default function AdminSubmissionDetail() {
                 <SelectContent>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="completed" disabled={submission.ticket_type === "photo_radar"}>Completed{submission.ticket_type === "photo_radar" ? " — use ATE outcome form" : ""}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -507,7 +516,9 @@ export default function AdminSubmissionDetail() {
               </CardContent>
             </Card>
 
-            <Card>
+            {submission.ticket_type === "photo_radar" ? (
+              <AteCaseReview key={submission.id} submissionId={submission.id} offenceDate={submission.violation_date} ownership={submission.registered_owner_on_offence_date} onOutcomeRecorded={checkAuthAndFetchSubmission} />
+            ) : <Card>
               <CardHeader>
                 <CardTitle>Case Assessment</CardTitle>
                 <CardDescription>
@@ -553,8 +564,9 @@ export default function AdminSubmissionDetail() {
                     IDR offer email sent {format(new Date(submission.idr_offer_sent_at), "PPP p")}.
                   </p>
                 )}
+                {submission.case_outcome && <ResolutionEmailAction submissionId={submission.id} outcomeSaved={Boolean(submission.case_outcome)} className="sm:col-span-2" />}
               </CardContent>
-            </Card>
+            </Card>}
 
             {/* Defense Strategy */}
             {(submission.defense_strategy || submission.additional_notes) && (

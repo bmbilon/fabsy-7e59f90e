@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
         <p className="text-white/70 mb-8">
-          Last updated: {new Date().toLocaleDateString()}
+          Last updated: August 31, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -20,12 +20,14 @@ const PrivacyPolicy = () => {
             <ul className="list-disc pl-6 space-y-2">
               <li>Personal identification information (name, address, phone number, email)</li>
               <li>Driver's license information</li>
+              <li>Licence photos, declared and verified licence class, identity-match and expiry checks, and discount/refund records when you request the pro driver offer</li>
               <li>Driver abstracts and conviction records you upload for an Insurance Impact &amp; Renewal Planning Report</li>
               <li>Traffic ticket documents, details, violation information, deadlines, and your description of what happened</li>
               <li>Driving-history context you provide, including years licensed, recent tickets, demerit context, licence class, and commercial-driving status</li>
               <li>Policy renewal dates and rating inputs you provide, such as territory, liability limit, prior claims, and current premium</li>
               <li>Optional outcome survey responses, including carrier and premium information</li>
               <li>Payment and billing information</li>
+              <li>Referral codes and attribution dates, referral eligibility and payout history, Interac delivery email, and the referrer's legal name and address for payout administration and applicable tax reporting</li>
               <li>Communication records between you and our representatives</li>
             </ul>
           </section>
@@ -42,6 +44,9 @@ const PrivacyPolicy = () => {
               <li>Send requested renewal, conviction-aging, delivery, and outcome survey reminders</li>
               <li>Send immediate case-status and decision-needed notifications by the communication channels you authorize</li>
               <li>Process payments and billing</li>
+              <li>Verify pro driver eligibility from private licence evidence and administer the discount or corresponding payment adjustment</li>
+              <li>Attribute referrals, check Alberta scope and fleet-account exclusions, and compare referrer and referred-driver email, phone, address, plate and payment-customer records to detect self-referrals and fraud</li>
+              <li>Administer referral payouts, resolve refund or payment disputes and meet applicable tax-reporting obligations</li>
               <li>Comply with legal obligations and court requirements</li>
               <li>Improve our services and website functionality</li>
             </ul>
@@ -67,6 +72,14 @@ const PrivacyPolicy = () => {
               only with authorized Fabsy personnel, the government participants needed for the service,
               and service providers needed to store files, process payments, authenticate access,
               perform controlled document processing, deliver reports and send requested messages.
+            </p>
+            <p className="mt-4">
+              Licence photos used for the pro driver discount are kept in private storage and processed by authorized
+              personnel and document-verification providers for eligibility and related records. Referrers can see their
+              own referral status and payouts, but not a referred driver's identity, uploaded documents or case details.
+              Payout details are available only to the account holder and authorized staff. The referral profile does not
+              collect a Social Insurance Number; if additional tax identifiers are legally required, we request them
+              through an appropriate secure process.
             </p>
             <p className="mt-4">
               Some technology providers may process information outside Canada. Fabsy uses contractual,
@@ -138,6 +151,14 @@ const PrivacyPolicy = () => {
               fields. Fabsy does not intentionally send names, email addresses, phone numbers,
               ticket numbers, uploaded documents, free-text answers, or assessment results to its
               website analytics service.
+            </p>
+            <p className="mt-4">
+              Referral links and manually entered codes are stored with an attribution date in the browser's intake
+              draft and written to the order for a 30-day, last-touch attribution window. The most recent valid referral
+              replaces an earlier one. Clearing browser storage or changing devices can remove the saved attribution;
+              a code can be entered again before checkout. Licence photos for verification are not stored in the browser's
+              intake draft or local storage. Opening a WhatsApp or SMS share link is your choice and is subject to that
+              messaging provider's practices; Fabsy does not send that message for you.
             </p>
           </section>
 

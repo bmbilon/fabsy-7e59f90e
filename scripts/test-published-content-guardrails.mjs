@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   EXACT_FABSY_ACTION_COMMITMENT,
   EXACT_FABSY_ONE_LINE,
+  EXACT_FABSY_OFFICER_PRICING,
   EXACT_FABSY_PRICING,
   EXACT_FABSY_SPEED_DISCLAIMER,
   SAFE_BLOG_FALLBACK_TITLE,
@@ -26,6 +27,12 @@ function guard(overrides) {
   assert.deepEqual(articleViolations(guarded), [], 'guarded output must pass the publication audit');
   return guarded;
 }
+
+assert.deepEqual(articleViolations(post({ content: EXACT_FABSY_OFFICER_PRICING })), []);
+assert.equal(guard({ content: EXACT_FABSY_OFFICER_PRICING }).content, EXACT_FABSY_OFFICER_PRICING,
+  'Accurate complete officer-ticket pricing remains valid without inserting a Photo Radar offer');
+assert.equal(guard({ content: EXACT_FABSY_PRICING }).content, EXACT_FABSY_PRICING,
+  'Explicit full-catalog content retains the current precise ladder');
 
 for (const claim of [
   'Fabsy reports more than 95% success rate.',
@@ -75,6 +82,7 @@ for (const unsupportedClaim of [
   'The conviction can affect insurance for three years.',
   'Fabsy completes its review within 24 hours.',
   `${EXACT_FABSY_PRICING} The fine is $500.`,
+  `${EXACT_FABSY_OFFICER_PRICING} The fine is $500.`,
 ]) {
   const guarded = guard({ content: unsupportedClaim });
   assert.equal(guarded.title, 'Alberta Traffic Ticket Guide');

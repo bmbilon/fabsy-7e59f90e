@@ -12,6 +12,7 @@ interface IdrAccessGateProps {
   redirectPath: string;
   title?: string;
   description?: string;
+  emailLabel?: string;
 }
 
 export default function IdrAccessGate({
@@ -19,6 +20,7 @@ export default function IdrAccessGate({
   redirectPath,
   title = "Access your private IDR portal",
   description = "Use the email address from your purchase. We will send a secure sign-in link.",
+  emailLabel = "Purchase email",
 }: IdrAccessGateProps) {
   const { session, isLoading, accessError, sendMagicLink, signOut } = useIdrAuth();
   const [email, setEmail] = useState("");
@@ -86,7 +88,7 @@ export default function IdrAccessGate({
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="idr-access-email">Purchase email</Label>
+                <Label htmlFor="idr-access-email">{emailLabel}</Label>
                 <Input
                   id="idr-access-email"
                   type="email"

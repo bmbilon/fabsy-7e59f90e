@@ -51,7 +51,10 @@ function PortalContent() {
           <h1 className="text-3xl font-bold sm:text-4xl">Your Insurance Impact &amp; Renewal Planning Reports</h1>
           <p className="mt-2 text-muted-foreground">Signed in as {session?.user.email}</p>
         </div>
-        <Button variant="outline" onClick={() => signOut()}><LogOut className="mr-2 h-4 w-4" /> Sign out</Button>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Button asChild variant="outline"><Link to="/portal/referrals">Refer a driver</Link></Button>
+          <Button variant="outline" onClick={() => signOut()}><LogOut className="mr-2 h-4 w-4" /> Sign out</Button>
+        </div>
       </div>
 
       {isLoading ? (

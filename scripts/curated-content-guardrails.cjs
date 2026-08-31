@@ -1,10 +1,65 @@
 const {
   CANONICAL_PRICE_RANGE_COPY,
   CANONICAL_PRICING_COPY: EXACT_FABSY_PRICING,
+  OFFICER_PRICING_COPY,
   RAPID_RESOLUTION_ACTION_COMMITMENT,
   RAPID_RESOLUTION_ONE_LINE,
   RAPID_RESOLUTION_SPEED_DISCLAIMER,
 } = require('./normalize-rapid-resolution-content.cjs');
+const PHOTO_RADAR = require('../src/config/offers.json').photoRadar;
+const PHOTO_RADAR_CONTENT = require('../src/config/photoRadarContent.json');
+const PHOTO_RADAR_CONTENT_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
+// Public offer pages use their separate whole-element/source contract.
+// These article passages apply only to the three frozen owner-notice guides.
+const PHOTO_RADAR_OFFER_SLUGS = new Set(PHOTO_RADAR_CONTENT_SLUGS);
+const PHOTO_RADAR_COMPLETE_PRICE = `${PHOTO_RADAR.name} costs $${PHOTO_RADAR.priceCad} CAD plus 5% GST ($${PHOTO_RADAR.totalCad.toFixed(2)} total).`;
+const PHOTO_RADAR_COMMERCIAL_CLAIMS = [
+  PHOTO_RADAR_COMPLETE_PRICE,
+  PHOTO_RADAR.actionCommitment,
+  PHOTO_RADAR.speedDisclaimer,
+  ...PHOTO_RADAR_CONTENT.processSteps.map((step) => step.description),
+  ...PHOTO_RADAR_CONTENT.faqs.flatMap((faq) => [faq.question, faq.answer]),
+];
+
+// Exact, reviewed passages only. Evidence and qualifications are recorded in
+// docs/photo-radar/legal-sources.md. Do not approve an arbitrary amount, date,
+// duration, or speed merely because it appears on a photo-radar page.
+const PHOTO_RADAR_VERIFIED_COMMON_FACTS = [
+  'March 2026 fine schedule',
+  'Selected Alberta traffic fine increases took effect on March 13, 2026. The offence date determines which schedule applies.',
+  "Alberta's current standard speeding table lists $228 for 20 km/h over and $324 for 30 km/h over, including the 20% victim surcharge.",
+];
+const PHOTO_RADAR_VERIFIED_EDMONTON_FACTS = [
+  "Edmonton's posted playground zones are normally 30 km/h from 7:30 a.m. to 9 p.m. every day. Check the signs and any special flashing-beacon schedule at the actual location.",
+  'Edmonton says multiple notices must not be issued to the same vehicle within five minutes in the same municipality.',
+];
+const PHOTO_RADAR_VERIFIED_CALGARY_FACTS = [
+  "Calgary's playground zones are 30 km/h from 7:30 a.m. to 9 p.m. every day of the year.",
+  'The March 2026 police report confirms that five Calgary intersection sites had approval to resume speed-on-green enforcement.',
+  'Can I challenge two camera notices within five minutes?',
+  'Upload both notices if they concern the same vehicle within five minutes. Fabsy checks the policy that applied in Calgary on the offence date before asking for duplicate-notice review.',
+];
+
+function redactReviewedPhotoRadarClaims(value, slug) {
+  if (!PHOTO_RADAR_OFFER_SLUGS.has(slug)) return value;
+  let text = value;
+  const approved = [...PHOTO_RADAR_COMMERCIAL_CLAIMS];
+  if (PHOTO_RADAR_CONTENT_SLUGS.has(slug)) {
+    approved.push(...PHOTO_RADAR_VERIFIED_COMMON_FACTS);
+    if (slug === 'photo-radar-ticket-alberta' || slug === 'photo-radar-ticket-edmonton') {
+      approved.push(...PHOTO_RADAR_VERIFIED_EDMONTON_FACTS);
+    }
+    if (slug === 'fight-photo-radar-ticket-calgary') {
+      approved.push(...PHOTO_RADAR_VERIFIED_CALGARY_FACTS);
+    }
+  }
+  // Longest first avoids removing the price prefix before its complete,
+  // approved FAQ passage has been recognized.
+  for (const claim of approved.sort((left, right) => right.length - left.length)) {
+    text = text.split(claim).join('[reviewed photo radar fact]');
+  }
+  return text;
+}
 
 const BANNED_PHRASE_RE =
   /(?:no\s+win\s+no\s+fee|risk[\s-]*free|money\s+back|guarantee|zero[\s-]*risk)/i;
@@ -48,9 +103,10 @@ function visibleText(value) {
     .trim();
 }
 
-function hasCompleteFabsyPricing(value) {
+function hasCompleteFabsyPricing(value, slug) {
   const text = visibleText(value);
-  return text.includes(EXACT_FABSY_PRICING);
+  return text.includes(EXACT_FABSY_PRICING) ||
+    (!PHOTO_RADAR_CONTENT_SLUGS.has(slug) && text.includes(OFFICER_PRICING_COPY));
 }
 
 function hasFabsyPricingMarker(value) {
@@ -158,7 +214,14 @@ function redactSlugVerifiedFacts(value, slug) {
 }
 
 function redactVerifiedNumericClaims(value, slug) {
-  let text = visibleText(value);
+  let text = redactReviewedPhotoRadarClaims(visibleText(value), slug);
+
+  // Retain reviewed officer-page content when a new SKU extends the sitewide
+  // ladder. Only the exact current-price statement qualifies, and it cannot
+  // validate pricing on one of the three owner-notice guides.
+  if (!PHOTO_RADAR_CONTENT_SLUGS.has(slug)) {
+    text = text.split(OFFICER_PRICING_COPY).join('[verified officer offer pricing]');
+  }
 
   // These are narrowly approved commercial facts from src/config/offers.json.
   // Remove only the exact complete statements before scanning for unsupported
@@ -250,7 +313,12 @@ function textGuardrailIssues(value, slug, options = {}) {
     if (BANNED_PHRASE_RE.test(marketingText)) issues.push('banned phrase');
     if (text.includes('—')) issues.push('em dash');
 
-    if (hasFabsyPricingMarker(text) && !hasCompleteFabsyPricing(text)) {
+    const pricingCandidate = redactReviewedPhotoRadarClaims(text, slug);
+    if (
+      hasFabsyPricingMarker(pricingCandidate) &&
+      !hasCompleteFabsyPricing(text, slug) &&
+      !(PHOTO_RADAR_OFFER_SLUGS.has(slug) && text.includes(PHOTO_RADAR_COMPLETE_PRICE))
+    ) {
       issues.push('partial or inexact Fabsy pricing');
     }
 
@@ -321,7 +389,10 @@ function curatedPageIssues(page) {
     } else {
       page.sources.forEach((source, index) => {
         if (!present(source?.title)) issues.push(`source ${index + 1}: missing title`);
-        if (!/^https:\/\/(?:www\.)?(?:alberta\.ca|open\.alberta\.ca|traffictickets\.alberta\.ca)\//i.test(source?.url || '')) {
+        const provincialSource = /^https:\/\/(?:www\.)?(?:alberta\.ca|open\.alberta\.ca|traffictickets\.alberta\.ca)\//i.test(source?.url || '');
+        const reviewedPhotoRadarSource = PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) &&
+          /^https:\/\/(?:www\.)?(?:edmonton\.ca|calgary\.ca|calgarypolice\.ca|calgarypolicecommission\.ca|newsroom\.calgary\.ca|kings-printer\.alberta\.ca|secure\.reddeer\.ca)\//i.test(source?.url || '');
+        if (!provincialSource && !reviewedPhotoRadarSource) {
           issues.push(`source ${index + 1}: URL must be an official Alberta source`);
         }
       });
@@ -346,7 +417,14 @@ function curatedPageIssues(page) {
     ['how', page?.how],
     ['next', page?.next],
   ];
+  if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) &&
+      !visibleText(page?.next).includes(PHOTO_RADAR_COMPLETE_PRICE)) {
+    issues.push('next: complete Photo Radar pricing is required');
+  }
   for (const [field, value] of textFields) {
+    if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) && hasCompleteFabsyPricing(value)) {
+      issues.push(`${field}: Photo Radar guides must use their own offer, not general product pricing`);
+    }
     for (const issue of textGuardrailIssues(value, page?.slug)) issues.push(`${field}: ${issue}`);
   }
 
@@ -372,6 +450,7 @@ function curatedPageIssues(page) {
 module.exports = {
   BANNED_PHRASE_RE,
   EXACT_FABSY_PRICING,
+  PHOTO_RADAR_COMPLETE_PRICE,
   UNSAFE_HTML_RE,
   canonicalFaq,
   curatedPageIssues,

@@ -11,6 +11,7 @@ import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle, Mail, Ph
 import { formatDistanceToNow } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
+import { AtePilotMetrics } from "@/components/AteCaseReview";
 
 interface TicketSubmission {
   id: string;
@@ -23,6 +24,7 @@ interface TicketSubmission {
   fine_amount: string;
   status: string;
   service_type: "representation" | "ticket_insurance_assessment";
+  ticket_type: "photo_radar" | "officer_issued";
   created_at: string;
 }
 
@@ -129,6 +131,7 @@ export default function AdminCaseManagement() {
         violation: sub.violation,
         fine_amount: sub.fine_amount,
         status: sub.status,
+        ticket_type: sub.ticket_type,
         service_type: sub.service_type === 'ticket_insurance_assessment'
           ? 'ticket_insurance_assessment'
           : 'representation',
@@ -200,6 +203,7 @@ export default function AdminCaseManagement() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <AtePilotMetrics />
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
@@ -282,6 +286,7 @@ export default function AdminCaseManagement() {
                               {submission.first_name} {submission.last_name}
                             </h3>
                             {getStatusBadge(submission.status)}
+                            {submission.ticket_type === 'photo_radar' && <Badge variant="secondary">Photo Radar · $79 · ATE</Badge>}
                             {submission.service_type === 'ticket_insurance_assessment' && (
                               <Badge variant="secondary">Legacy Ticket Triage · ${TICKET_ASSESSMENT.priceCad}</Badge>
                             )}

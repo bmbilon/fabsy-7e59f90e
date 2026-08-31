@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import { useLocale } from "@/i18n/locale-context";
 import { LocalizedFooter } from "./LocalizedNavigation";
 import {
+  CANONICAL_OFFER_PRICING,
   INSURANCE_IMPACT_REPORT,
+  PHOTO_RADAR,
   RAPID_RESOLUTION,
-  RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
+import PricingLadder from "./PricingLadder";
 
 const Footer = () => {
   const { locale } = useLocale();
@@ -19,6 +21,7 @@ const Footer = () => {
       { name: "About Us", path: "/about" },
       { name: "How It Works", path: "/how-it-works" },
       { name: "What We Help With", path: "/services" },
+      { name: "Fleet accounts", path: "/fleet" },
       { name: "Success Stories", path: "/testimonials" },
     ],
     legal: [
@@ -27,6 +30,7 @@ const Footer = () => {
       { name: "Terms of Service", path: "/terms-of-service" },
     ],
     support: [
+      { name: `Photo Radar ($${PHOTO_RADAR.priceCad} + GST)`, path: PHOTO_RADAR.slug },
       { name: `${RAPID_RESOLUTION.name} ($${RAPID_RESOLUTION.priceCad})`, path: RAPID_RESOLUTION.slug },
       { name: "Submit Your Ticket", path: RAPID_RESOLUTION.intakePath },
       { name: "Contact Us", path: "/contact" },
@@ -148,6 +152,8 @@ const Footer = () => {
 
         {/* Service Description */}
         <div className="text-[10px] text-center text-muted-foreground mb-2">
+          <PricingLadder />
+          <p className="mt-2">Paid prices are CAD plus GST. Government fines are separate.</p>
           <p>
             Rapid Resolution provides eligible Alberta pre-trial traffic ticket agent services for
             ${RAPID_RESOLUTION.priceCad} CAD plus applicable GST. Trial representation is separate.
@@ -167,7 +173,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                {RAPID_RESOLUTION.name} is ${RAPID_RESOLUTION.priceCad} CAD, the {INSURANCE_IMPACT_REPORT.shortName} is ${INSURANCE_IMPACT_REPORT.priceCad} CAD, and both are ${RAPID_RESOLUTION_BUNDLE.priceCad} CAD, plus applicable GST. Government and third-party fees are separate. Accepted orders retain their original written terms, and any written fee waiver controls. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised.
+                {CANONICAL_OFFER_PRICING} Government and third-party fees are separate. Accepted orders retain their original written terms, and any written fee waiver controls. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised. Registered-owner camera notices have no demerits and no insurance impact.
               </p>
             </div>
             

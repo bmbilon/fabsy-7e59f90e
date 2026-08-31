@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Scale, Phone } from "lucide-react";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
-import { RAPID_RESOLUTION } from "@/config/offers";
+import { PHOTO_RADAR, RAPID_RESOLUTION } from "@/config/offers";
+import { isPhotoRadarContentSlug } from "@/lib/photo-radar-pages";
 import { useLocale } from "@/i18n/locale-context";
 import LanguageSelector from "./LanguageSelector";
 import LanguageMessages from "./LanguageMessages";
@@ -27,6 +28,11 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { locale } = useLocale();
+  const isFleet = location.pathname === '/fleet';
+  const photoContext = isFleet || location.pathname === PHOTO_RADAR.slug || isPhotoRadarContentSlug(location.pathname.replace('/content/', '')) || new URLSearchParams(location.search).get('ticket_type') === 'photo_radar';
+  const activeOffer = photoContext ? PHOTO_RADAR : RAPID_RESOLUTION;
+  // The intake owns the current product selection, which may differ from its entry URL.
+  const isIntake = ['/submit-ticket', '/ticket-form'].includes(location.pathname);
 
   if (locale !== "en") return <LocalizedHeader />;
 
@@ -80,9 +86,9 @@ const Header = () => {
                 {PHONE_DISPLAY}
               </Button>
             </a>
-            <Button asChild className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-              <Link to={RAPID_RESOLUTION.intakePath}>Start · ${RAPID_RESOLUTION.priceCad}</Link>
-            </Button>
+            {!isIntake && <Button asChild className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
+              <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath}>{isFleet ? 'Fleet account' : `Start · $${activeOffer.priceCad}${photoContext ? ' + GST' : ''}`}</Link>
+            </Button>}
           </div>
 
           {/* Mobile Menu */}
@@ -142,11 +148,11 @@ const Header = () => {
                       Call {PHONE_DISPLAY}
                     </Button>
                   </a>
-                  <Button asChild className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                    <Link to={RAPID_RESOLUTION.intakePath} onClick={() => setIsOpen(false)}>
-                      Start Rapid Resolution · ${RAPID_RESOLUTION.priceCad}
+                  {!isIntake && <Button asChild className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
+                    <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} onClick={() => setIsOpen(false)}>
+                      {isFleet ? 'Start one fleet intake' : `Start ${photoContext ? 'Photo Radar' : 'Rapid Resolution'} · $${activeOffer.priceCad}${photoContext ? ' + GST' : ''}`}
                     </Link>
-                  </Button>
+                  </Button>}
                 </div>
               </div>
             </SheetContent>

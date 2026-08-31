@@ -1,0 +1,94 @@
+{
+  "pro": {
+    "title": "Pro Driver Discount | {discountPercent}% Off Alberta Ticket Help | Fabsy",
+    "description": "Alberta Class 1, 2 and 4 drivers get {discountPercent}% off eligible officer-issued ticket services after licence verification. Rapid Resolution ${rapidPrice} CAD plus GST.",
+    "badge": "Alberta Class 1, 2 & 4",
+    "heading": "Your licence is part of your livelihood.",
+    "intro": "Get {discountPercent}% off Rapid Resolution for an eligible officer-issued Alberta ticket. We review the evidence and pursue a supported pre-trial resolution, with your driving work in mind.",
+    "scope": "Verified licence required. Officer tickets only. No success fee. Government fines and trial representation are separate.",
+    "serviceName": "Fabsy Pro Driver Rapid Resolution",
+    "serviceDescription": "Pre-trial ticket service for eligible Alberta officer-issued tickets, with {discountPercent}% off for verified Alberta Class 1, 2 or 4 licence holders. Trial representation is separate; no outcome is promised.",
+    "offerDescription": "Plus GST. Verified Alberta Class 1, 2 or 4 licence required. Officer-issued tickets only.",
+    "pricingLabel": "Pro driver pricing",
+    "pricingHeading": "Same service. {discountPercent}% off.",
+    "rapidLabel": "Rapid Resolution",
+    "rapidPriceLine": "Rapid Resolution costs ${rapidPrice} CAD plus GST for verified Alberta Class 1, 2 or 4 licence holders with an eligible officer-issued ticket.",
+    "rapidRegularLine": "Regular service price: ${regularRapidPrice} + GST",
+    "bundleLabel": "Resolution + Insurance Planning",
+    "bundlePriceLine": "The pro driver bundle costs ${bundlePrice} CAD plus GST for verified Alberta Class 1, 2 or 4 licence holders with an eligible officer-issued ticket.",
+    "bundleRegularLine": "Regular bundle price: ${regularBundlePrice} + GST",
+    "bundleNote": "The bundle adds the Insurance Impact & Renewal Planning Report. It is a planning aid, not an insurer quote or a promise of savings.",
+    "eligibilityHeading": "A discount we can verify.",
+    "eligibilityIntro": "Eligibility follows the class on your Alberta licence, not your job title.",
+    "licenceClasses": [
+      { "licence": "Class 1", "title": "Commercial drivers", "detail": "Including tractor-trailer drivers." },
+      { "licence": "Class 2", "title": "Bus drivers", "detail": "Including school and passenger bus drivers." },
+      { "licence": "Class 4", "title": "Passenger & emergency transport", "detail": "Including taxi, ride-share, ambulance and smaller bus drivers." }
+    ],
+    "exclusions": "Class 3 and Class 5 licences do not qualify for this offer, including Class 5 delivery or gig couriers. Photo radar and red-light camera owner notices are excluded. The standalone insurance report is not discounted.",
+    "abstractHeading": "The ticket. The abstract. The employer file.",
+    "abstractText": "For a Class 1 driver, a ticket can raise questions beyond the fine. Alberta's commercial driver abstract includes conviction and commercial inspection information that employers can use to assess safety risks. Tell us about any employer deadline or request for records during intake.",
+    "abstractSource": { "title": "Alberta's guide to driver abstracts", "url": "https://www.alberta.ca/get-drivers-abstract" },
+    "amendmentHeading": "A non-moving amendment can be the request.",
+    "amendmentText": "Where the facts and available procedure support it, Fabsy can ask the prosecutor about amending the charge to a non-moving offence. The evidence, prosecutor and court determine what is available. You decide whether to accept any proposed resolution.",
+    "outcomeDisclaimer": "This is an option to pursue, not a promised result. We cannot promise a clean abstract, continued employment, fewer demerits or an insurance outcome. Fabsy is an Alberta traffic ticket agent service, not a law firm.",
+    "verificationHeading": "How to get the {discountPercent}%.",
+    "verificationSteps": [
+      { "title": "Choose your licence class", "text": "On the officer-ticket intake, declare the class printed on your Alberta licence." },
+      { "title": "Upload a readable licence photo", "text": "We check the class in the uploaded photo against your declaration. The verified match must be Class 1, 2 or 4." },
+      { "title": "Review your checkout price", "text": "If verified before checkout, the discount is applied to the service fee. GST is calculated on the discounted amount." }
+    ],
+    "unverifiedHeading": "Can't verify before checkout?",
+    "unverifiedText": "Checkout stays at the full price. After payment, follow the secure licence-upload prompt to request the {discountPercent}%. Once eligibility is verified, we refund the discount and corresponding GST to your original payment method. A declaration alone does not unlock the discount.",
+    "faqs": [
+      { "question": "Which drivers qualify for the pro discount?", "answer": "A verified Alberta Class 1, 2 or 4 licence is required. The class read from your licence photo must match the class you declare. A job title alone does not qualify. Class 3 and Class 5 licences, including Class 5 gig couriers, are excluded." },
+      { "question": "What does the pro driver service cost?", "answer": "Eligible, verified officer-ticket clients pay ${rapidPrice} CAD plus GST for Rapid Resolution or ${bundlePrice} CAD plus GST for the Resolution + Insurance Planning bundle. These are {discountPercent}% below the regular ${regularRapidPrice} and ${regularBundlePrice} service prices. Government fines and trial representation are separate." },
+      { "question": "Does the discount cover photo radar or a standalone insurance report?", "answer": "No. The pro driver discount applies only to eligible officer-issued ticket services. Photo radar and red-light camera owner notices are excluded, as is the standalone Insurance Impact & Renewal Planning Report." },
+      { "question": "What happens if my licence is not verified before payment?", "answer": "Checkout stays at full price. You can submit a readable licence photo through the secure post-payment prompt. After verification, Fabsy refunds the {discountPercent}% service discount and corresponding GST to the original payment method. A discount already applied at checkout is not refunded a second time." },
+      { "question": "Can Fabsy keep a conviction off my employer's abstract?", "answer": "Fabsy can pursue a supported pre-trial resolution and ask about a non-moving amendment where the facts and procedure allow. The prosecutor and court determine what is available. No clean abstract, employment, demerit or insurance outcome is promised." }
+    ]
+  },
+  "referral": {
+    "title": "Refer a Driver | $50 Officer & $20 Camera Referrals | Fabsy",
+    "description": "Earn $50 for an eligible officer-ticket referral or $20 for a camera-ticket referral. No cap. See Fabsy's referral eligibility and Interac payout terms.",
+    "schemaName": "Fabsy Refer a Driver",
+    "schemaDescription": "Fabsy's referral program terms: $50 CAD for an eligible officer-ticket referral and $20 CAD for an eligible camera-ticket referral.",
+    "badge": "Refer a driver",
+    "heading": "A useful recommendation. A thank-you from Fabsy.",
+    "intro": "Know a driver with an Alberta ticket? Share your link. When their paid file qualifies, we send a referral reward to you.",
+    "rewards": [
+      { "amount": 50, "label": "Officer-ticket referral" },
+      { "amount": 20, "label": "Camera-ticket referral" }
+    ],
+    "scope": "No cap. Paid to the referrer only. Referred fleet accounts and self-referrals are excluded.",
+    "processHeading": "Share. Qualify. Get paid.",
+    "steps": [
+      { "title": "Share your own link", "text": "Your portal has a unique code, a copy button, and WhatsApp and SMS messages you can choose to send." },
+      { "title": "We check the file", "text": "The driver's payment must settle and the Alberta file must be accepted. We check for fleet accounts, self-referrals and refunds." },
+      { "title": "Interac after seven days", "text": "Approved rewards are paid seven days after settlement and acceptance. Track the status and completed transfers in your portal." }
+    ],
+    "termsHeading": "The referral terms, in plain language.",
+    "termsEffective": "Effective August 31, 2026. All rewards are in Canadian dollars.",
+    "rules": [
+      { "title": "A reward for the referrer", "text": "You receive $50 CAD for an eligible officer-ticket referral or $20 CAD for an eligible camera-ticket referral. The referred driver receives no referral discount. They can still qualify independently for the pro driver discount." },
+      { "title": "Past clients and registered portal users", "text": "Sign in or create a free Fabsy portal account to get your own code. There is no limit on eligible referrals or total rewards." },
+      { "title": "30 days, last referral wins", "text": "A referral link or code must be captured before payment. Attribution lasts 30 days, and the most recent valid referral replaces an earlier one. The driver can enter your code at step 3 of intake if the link was not captured." },
+      { "title": "Payment and an accepted file", "text": "A referral qualifies only after the driver's Stripe payment settles and Fabsy accepts the Alberta file into its service pipeline. The seven-day period begins after both conditions are met. Fabsy pays approved rewards by Interac e-transfer, subject to eligibility checks and complete payout details." },
+      { "title": "No fleet-account or self-referral payouts", "text": "Referred fleet accounts are excluded. Referrer and referred driver cannot share an email, phone, address, plate or Stripe customer. Duplicate, fabricated or otherwise ineligible referrals do not qualify." },
+      { "title": "Refunds and payment reviews", "text": "A refunded or disputed referred order puts the reward on hold. Ineligible or cancelled referrals can be voided. A payment shown as pending or eligible is not a completed payout." },
+      { "title": "Payout and tax information", "text": "Provide an Interac delivery email for payment. Your legal name and address are required before a second payout. Additional information may be requested securely for tax reporting; Fabsy issues any required tax slips. You remain responsible for reporting your income." },
+      { "title": "Share honestly", "text": "Only describe results you actually experienced, make clear that you may earn a referral payment, and share with people who want the recommendation. Do not promise an outcome, impersonate Fabsy or send unsolicited bulk messages." }
+    ],
+    "termsPrivacy": "We show only referral status and payout information to the referrer, not the referred driver's case details.",
+    "signupHeading": "Your next recommendation starts here.",
+    "signupText": "Past clients and new portal users can take part. Signing up is free.",
+    "faqs": [
+      { "question": "Who gets the referral reward, and how much is it?", "answer": "The referrer receives $50 CAD for an eligible officer-ticket referral or $20 CAD for an eligible camera-ticket referral. The referred driver receives no referral discount, but may independently qualify for the verified pro driver discount." },
+      { "question": "When is a referral paid?", "answer": "Fabsy pays approved rewards by manual Interac e-transfer seven days after both the referred Stripe payment has settled and the Alberta file has been accepted into the service pipeline. Eligibility checks and required payout details must be complete. Pending or eligible status does not mean money has been sent." },
+      { "question": "Do I need to be a past client, and is there a referral limit?", "answer": "Past clients and registered Fabsy portal users can participate. A portal account is free and there is no cap on eligible referrals or total rewards." },
+      { "question": "How does Fabsy attribute a referral?", "answer": "The most recent valid referral link or code captured before payment wins, within a 30-day window. The driver can enter the code at step 3 of intake if the share link was not captured." },
+      { "question": "Which referrals are excluded or held?", "answer": "Referred fleet accounts and self-referrals are excluded. Matching email, phone, address, plate or Stripe customer blocks a payout. Refunded or disputed orders put the reward on hold, and an ineligible or cancelled referral can be voided." },
+      { "question": "What payout information is required?", "answer": "An Interac delivery email is needed for payment. Your legal name and address are required before the second payout. Fabsy may request additional information securely for applicable tax reporting and issues any required tax slips. You remain responsible for reporting your income." }
+    ]
+  }
+}

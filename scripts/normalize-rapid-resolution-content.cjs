@@ -12,8 +12,15 @@ const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
 const OFFERS = require(path.join(ROOT, 'src/config/offers.json'));
+const PHOTO_RADAR_CONTENT_SLUGS = new Set(require(path.join(ROOT, 'src/config/photoRadarPages.json')));
 
 const CANONICAL_PRICING_COPY = OFFERS.canonicalPricingCopy;
+// Existing reviewed officer-ticket guides still use this exact, current-price
+// statement. It is valid for that scope even though the full ladder now adds
+// Photo Radar. New generated offer copy continues to use the full canonical
+// ladder; this compatibility statement must never replace the $79 owner path.
+const OFFICER_PRICING_COPY = `${OFFERS.rapidResolution.name} costs $${OFFERS.rapidResolution.priceCad} CAD plus applicable GST for eligible Alberta pre-trial matters. The ${OFFERS.insuranceReport.name} costs $${OFFERS.insuranceReport.priceCad} CAD plus applicable GST, or both products cost $${OFFERS.bundle.priceCad} CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate.`;
+const PHOTO_RADAR_PRICING_COPY = `Rapid Resolution: Photo Radar costs $${OFFERS.photoRadar.priceCad} CAD plus 5% GST ($${OFFERS.photoRadar.totalCad.toFixed(2)} total). No trial. No success fee. Government fines are separate.`;
 const CANONICAL_PRICE_RANGE_COPY = `$${OFFERS.insuranceReport.priceCad}–$${OFFERS.bundle.priceCad} CAD plus applicable GST`;
 const RAPID_RESOLUTION_NAME = OFFERS.rapidResolution.name;
 const RAPID_RESOLUTION_ONE_LINE = OFFERS.rapidResolution.oneLineDescription;
@@ -204,6 +211,16 @@ function normalizeCuratedPage(page) {
 }
 
 function normalizePageObject(page, options = {}) {
+  if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug)) {
+    // The reviewed owner-notice pages have their own fine-only scope, FAQs,
+    // sources and $79 CTA. Never replace those with the general RR/IIR copy.
+    const source = path.join(ROOT, 'ssg-pages', `${page.slug}.json`);
+    const reviewed = options.curated ? page : fs.existsSync(source)
+      ? JSON.parse(fs.readFileSync(source, 'utf8')) : null;
+    if (reviewed?.hook && Array.isArray(reviewed.faqs)) {
+      return { ...reviewed, jsonld: JSON.stringify(faqJsonLd(reviewed.faqs)) };
+    }
+  }
   return options.curated ? normalizeCuratedPage(page) : normalizeCachePage(page);
 }
 
@@ -232,6 +249,8 @@ if (require.main === module) run();
 module.exports = {
   CANONICAL_PRICE_RANGE_COPY,
   CANONICAL_PRICING_COPY,
+  OFFICER_PRICING_COPY,
+  PHOTO_RADAR_PRICING_COPY,
   INSURANCE_REPORT_NAME,
   RAPID_RESOLUTION_ACTION_COMMITMENT,
   RAPID_RESOLUTION_NAME,

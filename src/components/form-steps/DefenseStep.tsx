@@ -9,6 +9,7 @@ import { FormData } from "../TicketForm";
 import { Scale, Shield, Users, Camera, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
 
 interface DefenseStepProps {
   formData: FormData;
@@ -140,6 +141,22 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
     "Witnesses or records that support your account",
     "Other relevant context"
   ];
+
+  if (formData.ticketType === "photo_radar") return (
+    <div className="space-y-6">
+      <Card className="space-y-3 border-primary/20 bg-primary/5 p-6">
+        <h3 className="text-xl font-semibold">Your photo radar resolution</h3>
+        <p className="font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>
+        <p className="text-sm leading-relaxed">Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any proposed deal before Fabsy accepts it. No trial. No success fee. No outcome is promised.</p>
+        <p className="text-sm leading-relaxed">This registered-owner notice has no demerits and no insurance impact. We do not need your insurance or driving-record context.</p>
+      </Card>
+      <div className="space-y-3">
+        <Label htmlFor="photo-radar-notes">Anything else we should know? (optional)</Label>
+        <Textarea id="photo-radar-notes" value={formData.explanation} onChange={event => handleFieldUpdate("explanation", event.target.value)} placeholder="For example: the vehicle was sold before the offence, the plate does not appear to match, or you received another notice within five minutes." maxLength={550} rows={4} />
+        <p className="text-xs text-muted-foreground">Describe what you know. Fabsy checks the evidence in disclosure; you do not need to identify a defence yourself.</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-8">

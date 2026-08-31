@@ -11,6 +11,8 @@ import { MapPin, AlertTriangle, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnswerBox from '@/components/AnswerBox';
 import type { FAQItem } from '@/components/FAQSchema';
+import PhotoRadarOfferStrip from '@/components/PhotoRadarOfferStrip';
+import { isPhotoRadarContentSlug } from '@/lib/photo-radar-pages';
 
 type ContentPageData = {
   slug: string;
@@ -312,6 +314,7 @@ const ContentPage = () => {
               offence={pageData.violation}
               city={detectedCity}
               ctaHref="/traffic-ticket-assessment/start"
+              photoRadar={isPhotoRadarContentSlug(slugStr)}
               className="mb-8"
             />
           )}
@@ -427,7 +430,7 @@ const ContentPage = () => {
           )}
 
           {/* CTA */}
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-2xl p-8 text-white text-center">
+          {isPhotoRadarContentSlug(slugStr) ? <PhotoRadarOfferStrip /> : <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-2xl p-8 text-white text-center">
             <Shield className="w-16 h-16 mx-auto mb-4" />
             <h2 className="text-3xl font-bold mb-3">Start Rapid Resolution</h2>
               <p className="text-xl mb-6 text-green-50">
@@ -441,7 +444,7 @@ const ContentPage = () => {
                 Start Rapid Resolution
               </Button>
             </Link>
-          </div>
+          </div>}
         </div>
       </article>
 

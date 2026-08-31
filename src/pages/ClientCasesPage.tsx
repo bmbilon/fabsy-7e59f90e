@@ -42,6 +42,11 @@ function CasesContent() {
       <Badge className="mb-3">Private portal</Badge>
       <h1 className="text-3xl font-bold sm:text-4xl">Your ticket assessments</h1>
       <p className="mt-2 text-muted-foreground">Open a case to see Fabsy's assessment and available next steps.</p>
+      <nav aria-label="Portal navigation" className="mt-5 flex flex-wrap gap-3">
+        <Button asChild variant="outline"><Link to="/portal/referrals">Refer a driver</Link></Button>
+        <Button asChild variant="outline"><Link to="/portal/pro-discount">Verify pro driver discount</Link></Button>
+        <Button asChild variant="outline"><Link to="/portal/insurance-reports">My insurance reports</Link></Button>
+      </nav>
       <div className="mt-8 space-y-4">
         {isLoading ? <p className="text-muted-foreground">Loading cases...</p> : error ? (
           <Card><CardContent className="p-6 text-destructive">{error}</CardContent></Card>

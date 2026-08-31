@@ -1,4 +1,8 @@
 export const EXACT_FABSY_PRICING =
+  "Free Ticket Check; Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total) for eligible Alberta registered-owner automated enforcement notices, with no success fee. Rapid Resolution costs $198 CAD plus applicable GST for other eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or Rapid Resolution and the report cost $229 CAD plus applicable GST. Trial representation is quoted separately; government fines and out-of-scope matters are separate.";
+// Existing officer-ticket content remains accurate. Only its complete,
+// qualified paragraph is compatible; partial prices still fail below.
+export const EXACT_FABSY_OFFICER_PRICING =
   "Rapid Resolution costs $198 CAD plus applicable GST for eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or both products cost $229 CAD plus applicable GST. Trial representation, government fines and out-of-scope matters are separate.";
 export const EXACT_FABSY_ONE_LINE =
   "Rapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits.";
@@ -100,6 +104,7 @@ const addTextViolations = (value: string, violations: Set<string>) => {
 
   const withoutApprovedCommercialFacts = value
     .split(EXACT_FABSY_PRICING).join(" ")
+    .split(EXACT_FABSY_OFFICER_PRICING).join(" ")
     .split(EXACT_FABSY_ONE_LINE).join(" ")
     .split(EXACT_FABSY_ACTION_COMMITMENT).join(" ")
     .split(EXACT_FABSY_SPEED_DISCLAIMER).join(" ");

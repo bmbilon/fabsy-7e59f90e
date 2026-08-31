@@ -1,0 +1,45 @@
+{
+  "verified_on": "2026-08-31",
+  "mode": "live",
+  "verification_method": "Authenticated Stripe Dashboard; no API credentials extracted",
+  "account_id": "acct_1PG64qAt6NWmIwaS",
+  "account_label": "execom",
+  "product": {
+    "id": "prod_VAmmGDIMzF4Njl",
+    "name": "Rapid Resolution: Photo Radar",
+    "metadata": { "fabsy_product": "photo_radar", "review_path": "ate" },
+    "dashboard_url": "https://dashboard.stripe.com/acct_1PG64qAt6NWmIwaS/products/prod_VAmmGDIMzF4Njl"
+  },
+  "price": {
+    "id": "price_1UARCWAt6NWmIwaSdmboYoZP",
+    "currency": "cad",
+    "unit_amount": 7900,
+    "type": "one_time",
+    "tax_behavior": "exclusive",
+    "lookup_key": "fabsy_photo_radar_cad_79_v1",
+    "dashboard_url": "https://dashboard.stripe.com/acct_1PG64qAt6NWmIwaS/prices/price_1UARCWAt6NWmIwaSdmboYoZP"
+  },
+  "gst": {
+    "id": "txr_1UARPtAt6NWmIwaSKJip9xAE",
+    "display_name": "GST",
+    "percentage": 5,
+    "inclusive": false,
+    "active": true,
+    "country": "CA",
+    "state": "AB",
+    "jurisdiction": "Alberta, Canada",
+    "metadata": { "fabsy_tax": "fabsy_alberta_gst_5_v1" },
+    "note": "The Dashboard's separate Tax Type field is unset. The reviewed manual GST rate is identified by its exact display name, jurisdiction, percentage, exclusive calculation and metadata marker.",
+    "dashboard_url": "https://dashboard.stripe.com/acct_1PG64qAt6NWmIwaS/tax-rates/txr_1UARPtAt6NWmIwaSKJip9xAE"
+  },
+  "supabase_configuration": {
+    "project_ref": "gcasbisxfrssonllpqrw",
+    "STRIPE_PHOTO_RADAR_PRICE_ID": "price_1UARCWAt6NWmIwaSdmboYoZP",
+    "STRIPE_GST_TAX_RATE_ID": "txr_1UARPtAt6NWmIwaSKJip9xAE",
+    "both_expected_id_digests_verified": true,
+    "existing_secret_values_changed": false
+  },
+  "customer_or_payment_objects_created": false,
+  "signed_checkout_and_webhook_test_completed": false,
+  "deployment_completed_by_this_task": false
+}

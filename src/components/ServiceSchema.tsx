@@ -1,6 +1,6 @@
 import React from 'react';
 import StaticJsonLd from '@/components/StaticJsonLd';
-import { CANONICAL_OFFER_PRICING, RAPID_RESOLUTION } from '@/config/offers';
+import { CANONICAL_OFFER_PRICING, PHOTO_RADAR, RAPID_RESOLUTION } from '@/config/offers';
 
 type Props = {
   name: string;
@@ -10,6 +10,7 @@ type Props = {
   providerUrl?: string;
   cityName?: string;
   offerDescription?: string;
+  photoRadar?: boolean;
 };
 
 /**
@@ -23,8 +24,10 @@ const ServiceSchema: React.FC<Props> = ({
   providerUrl = 'https://fabsy.ca',
   cityName,
   offerDescription = CANONICAL_OFFER_PRICING,
+  photoRadar = false,
 }) => {
   if (!name || !serviceType || !url) return null;
+  const offer = photoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
 
   const serviceNode: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -36,9 +39,9 @@ const ServiceSchema: React.FC<Props> = ({
     offers: {
       '@type': 'Offer',
       description: offerDescription,
-      price: RAPID_RESOLUTION.priceCad.toFixed(2),
-      priceCurrency: RAPID_RESOLUTION.currency,
-      url: `https://fabsy.ca${RAPID_RESOLUTION.intakePath}`,
+      price: String(offer.priceCad),
+      priceCurrency: offer.currency,
+      url: `https://fabsy.ca${offer.intakePath}`,
     },
   };
 

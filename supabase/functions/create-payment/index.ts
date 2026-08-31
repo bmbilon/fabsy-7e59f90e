@@ -2,6 +2,10 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { LocaleRequestError, localizedPublicPath, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
+import { PHOTO_RADAR_PRODUCT, ProductRequestError, ticketCheckoutProduct } from "../_shared/photo-radar.ts";
+import { verifiedProEvidence } from "../_shared/pro-licence.ts";
+import { PRO_COUPON, PRO_PRICING_VERSION, proPricing } from "../_shared/pro-pricing.ts";
+import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
 
 const TICKET_BASE_CENTS = 19800;
 const IDR_ADDON_CENTS = 3100;
@@ -155,8 +159,12 @@ async function releaseIncludedAssessmentCheckout(
   return data === true;
 }
 
-type TicketCheckoutKind = "ticket_only" | "ticket_with_addon";
-type TicketIntentType = "ticket" | "addon";
+interface ProPriceReservation {
+  pro_verification_id: string | null;
+  pro_coupon: string | null;
+  pro_discount_cents: number;
+  pro_subtotal_cents: number | null;
+}
 
 async function reserveTicketCheckout(
   stripe: Stripe,
@@ -166,16 +174,18 @@ async function reserveTicketCheckout(
   customerEmail: string,
   includeIdrAddon: boolean,
   sourceAssessmentId: string | null,
+  product: ReturnType<typeof ticketCheckoutProduct>,
+  proPrice: ProPriceReservation,
 ) {
-  const expectedType: TicketIntentType = includeIdrAddon ? "addon" : "ticket";
-  const expectedCheckoutKind: TicketCheckoutKind = includeIdrAddon ? "ticket_with_addon" : "ticket_only";
-  const expectedAmountCents = includeIdrAddon ? IDR_ADDON_CENTS : TICKET_BASE_CENTS;
-  const selectFields = "id,client_id,ticket_submission_id,type,checkout_kind,expected_amount_cents,purchaser_email,stripe_checkout_session_id,status,attempts";
+  const expectedType = product.intentType;
+  const expectedCheckoutKind = product.checkoutKind;
+  const expectedAmountCents = product.expectedAmountCents;
+  const selectFields = "id,client_id,ticket_submission_id,type,checkout_kind,expected_amount_cents,purchaser_email,stripe_checkout_session_id,status,attempts,pro_verification_id,pro_coupon,pro_discount_cents,pro_subtotal_cents";
   const initialIntent = await admin
     .from("idr_checkout_intents")
     .select(selectFields)
     .eq("ticket_submission_id", submissionId)
-    .in("checkout_kind", ["ticket_only", "ticket_with_addon"])
+    .in("checkout_kind", ["ticket_only", "ticket_with_addon", "photo_radar"])
     .maybeSingle();
   if (initialIntent.error) throw initialIntent.error;
   let intent = initialIntent.data;
@@ -191,6 +201,7 @@ async function reserveTicketCheckout(
         checkout_kind: expectedCheckoutKind,
         expected_amount_cents: expectedAmountCents,
         purchaser_email: customerEmail,
+        ...proPrice,
       })
       .select(selectFields)
       .single();
@@ -199,7 +210,7 @@ async function reserveTicketCheckout(
         .from("idr_checkout_intents")
         .select(selectFields)
         .eq("ticket_submission_id", submissionId)
-        .in("checkout_kind", ["ticket_only", "ticket_with_addon"])
+        .in("checkout_kind", ["ticket_only", "ticket_with_addon", "photo_radar"])
         .maybeSingle();
       if (raced.error) throw raced.error;
       intent = raced.data;
@@ -227,7 +238,11 @@ async function reserveTicketCheckout(
 
   const productSelectionChanged = intent.type !== expectedType ||
     intent.checkout_kind !== expectedCheckoutKind;
-  const priceChanged = Number(intent.expected_amount_cents) !== expectedAmountCents;
+  const priceChanged = Number(intent.expected_amount_cents) !== expectedAmountCents ||
+    intent.pro_coupon !== proPrice.pro_coupon ||
+    intent.pro_verification_id !== proPrice.pro_verification_id ||
+    Number(intent.pro_discount_cents) !== proPrice.pro_discount_cents ||
+    intent.pro_subtotal_cents !== proPrice.pro_subtotal_cents;
   const selectionChanged = productSelectionChanged || priceChanged;
   if (selectionChanged) {
     if (
@@ -283,6 +298,7 @@ async function reserveTicketCheckout(
         checkout_kind: expectedCheckoutKind,
         expected_amount_cents: expectedAmountCents,
         attempts: nextAttempt,
+        ...proPrice,
         status: "creating",
         stripe_checkout_session_id: null,
       })
@@ -447,7 +463,7 @@ serve(async (req) => {
     const { data: submission, error: submissionError } = await admin
       .from("ticket_submissions")
       .select(
-        "id,client_id,ticket_number,status,ticket_document_path,consent_form_path,representation_access_token_hash,source_assessment_id,representation_includes_assessment,preferred_locale,clients(email)",
+        "id,client_id,ticket_number,status,service_type,ticket_document_path,consent_form_path,representation_access_token_hash,source_assessment_id,representation_includes_assessment,preferred_locale,ticket_type,registered_owner_on_offence_date,order_type,review_path,declared_licence_class,pro_verified,pro_verification_id,ref_code,clients(email)",
       )
       .eq("id", submissionId)
       .maybeSingle();
@@ -467,6 +483,13 @@ serve(async (req) => {
       );
     }
 
+    // Price and routing come only from the authorized stored intake. Browser amounts
+    // and product flags are deliberately ignored, including forged cheaper SKUs.
+    const product = ticketCheckoutProduct(submission, includeIdrAddon);
+    if (product.isPhotoRadar && (submission.order_type !== "photo_radar" || submission.review_path !== "ate" || submission.representation_includes_assessment)) {
+      throw new RequestError("The Photo Radar intake must be reviewed before checkout.", 409);
+    }
+
     // Use the authorized stored preference, never a payment-request override.
     const preferredLocale = parsePreferredLocale(submission.preferred_locale);
     requireReleasedServiceLocale(
@@ -474,6 +497,9 @@ serve(async (req) => {
       Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
       Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
     );
+    if (product.isPhotoRadar || submission.pro_verified === true) {
+      requireEnglishProductLocale(preferredLocale, product.isPhotoRadar ? "photo_radar" : "pro_driver");
+    }
     const ticketDocumentPath = String(submission.ticket_document_path || "");
     const ticketOwnerId = submission.source_assessment_id || submissionId;
     await requireStoredObject(
@@ -562,6 +588,25 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
     checkoutStripe = stripe;
+    const proVerificationId = product.isPhotoRadar ? null : await verifiedProEvidence(admin, submission);
+    const pricing = proPricing(includeIdrAddon, Boolean(proVerificationId));
+    const proPrice: ProPriceReservation = {
+      pro_verification_id: proVerificationId,
+      pro_coupon: proVerificationId ? PRO_COUPON : null,
+      pro_discount_cents: proVerificationId ? pricing.discountCents : 0,
+      pro_subtotal_cents: product.isPhotoRadar ? null : pricing.subtotalCents,
+    };
+    if (proVerificationId) {
+      // PRO20 is a server-applied coupon, never a public promotion-code field.
+      // Fail visibly if billing configuration would charge the wrong price.
+      let coupon;
+      try { coupon = await stripe.coupons.retrieve(PRO_COUPON); }
+      catch { throw new RequestError("Your licence is verified, but the pro discount is temporarily unavailable in checkout. Please contact Fabsy before paying.", 503); }
+      if (!coupon.valid || coupon.percent_off !== 20 || coupon.amount_off != null ||
+        coupon.duration !== "once" || coupon.applies_to?.products?.length) {
+        throw new RequestError("The pro discount needs billing review before checkout. Please contact Fabsy.", 503);
+      }
+    }
     const reservation = await reserveTicketCheckout(
       stripe,
       requestedIdrOrderId || crypto.randomUUID(),
@@ -570,6 +615,8 @@ serve(async (req) => {
       customerEmail,
       includeIdrAddon,
       submission.representation_includes_assessment ? submission.source_assessment_id : null,
+      product,
+      proPrice,
     );
     if (
       submission.representation_includes_assessment &&
@@ -597,7 +644,26 @@ serve(async (req) => {
     }
     const checkoutIntentId = reservation.orderId;
     const idrOrderId = includeIdrAddon ? checkoutIntentId : null;
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+    let photoRadarPriceId: string | null = null;
+    let photoRadarTaxRateId: string | null = null;
+    if (product.isPhotoRadar) {
+      photoRadarPriceId = Deno.env.get("STRIPE_PHOTO_RADAR_PRICE_ID") || null;
+      photoRadarTaxRateId = Deno.env.get("STRIPE_GST_TAX_RATE_ID") || null;
+      if (!photoRadarPriceId || !photoRadarTaxRateId) throw new Error("Photo Radar billing must be provisioned before launch.");
+      const [price, taxRate] = await Promise.all([
+        stripe.prices.retrieve(photoRadarPriceId, { expand: ["product"] }),
+        stripe.taxRates.retrieve(photoRadarTaxRateId),
+      ]);
+      const stripeProduct = price.product;
+      if (!price.active || price.unit_amount !== 7900 || price.currency !== "cad" || price.tax_behavior !== "exclusive" || price.type !== "one_time" ||
+          typeof stripeProduct === "string" || ("deleted" in stripeProduct && stripeProduct.deleted) || !("name" in stripeProduct) || stripeProduct.name !== PHOTO_RADAR_PRODUCT.name ||
+          !taxRate.active || taxRate.inclusive || taxRate.percentage !== 5 || taxRate.country !== "CA" || taxRate.state !== "AB") {
+        throw new Error("Photo Radar billing configuration does not match the approved $82.95 total.");
+      }
+    }
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = product.isPhotoRadar ? [
+      { quantity: 1, price: photoRadarPriceId!, tax_rates: [photoRadarTaxRateId!] },
+    ] : [
       {
         quantity: 1,
         price_data: {
@@ -641,14 +707,28 @@ serve(async (req) => {
       submission_id: submissionId,
       ticket_submission_id: submissionId,
       client_id: clientId,
-      ticket_base_cents: String(TICKET_BASE_CENTS),
+      ticket_base_cents: String(product.baseCents),
       checkout_intent_id: checkoutIntentId,
       checkout_attempt: String(reservation.attempt),
-      fabsy_checkout_kind: includeIdrAddon ? "ticket_with_addon" : "ticket_only",
-      fabsy_product: includeIdrAddon ? "rapid_resolution_bundle" : "rapid_resolution",
-      fabsy_pricing_version: PRICING_VERSION,
+      fabsy_checkout_kind: product.checkoutKind,
+      fabsy_product: product.product,
+      fabsy_pricing_version: product.isPhotoRadar ? PHOTO_RADAR_PRODUCT.pricingVersion : PRICING_VERSION,
+      ticket_type: product.isPhotoRadar ? "photo_radar" : "officer_issued",
+      order_type: product.isPhotoRadar ? "photo_radar" : "rapid_resolution",
+      review_path: product.reviewPath,
       representation_includes_assessment: submission.representation_includes_assessment ? "true" : "false",
     };
+    if (product.isPhotoRadar) Object.assign(metadata, {
+      gst_cents: "395", total_cents: "8295", tax_behavior: "exclusive",
+      registered_owner_on_offence_date: submission.registered_owner_on_offence_date,
+    });
+    if (!product.isPhotoRadar) Object.assign(metadata, {
+      pro_pricing_version: PRO_PRICING_VERSION,
+      pro_coupon: proPrice.pro_coupon || "",
+      pro_verification_id: proVerificationId || "",
+      pro_discount_cents: String(proPrice.pro_discount_cents),
+    });
+    if (submission.ref_code) metadata.ref_code = submission.ref_code;
     if (submission.source_assessment_id) {
       metadata.source_assessment_id = submission.source_assessment_id;
     }
@@ -671,8 +751,10 @@ serve(async (req) => {
       line_items: lineItems,
       mode: "payment",
       payment_method_types: ["card"],
-      allow_promotion_codes: !includeIdrAddon,
-      automatic_tax: { enabled: true },
+      ...(proVerificationId
+        ? { discounts: [{ coupon: PRO_COUPON }] }
+        : { allow_promotion_codes: false }),
+      automatic_tax: { enabled: !product.isPhotoRadar },
       tax_id_collection: { enabled: false },
       success_url: successUrl,
       cancel_url: `${siteUrl}${localizedPublicPath(preferredLocale, "/payment-canceled")}`,
@@ -747,7 +829,7 @@ serve(async (req) => {
         createdStripeSessionId || cleanupClaim.sessionId,
       );
     }
-    const status = error instanceof RequestError || error instanceof LocaleRequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof LocaleRequestError || error instanceof ProductRequestError ? error.status : 500;
     if (status >= 500) console.error("create-payment failed");
     return json(req, {
       error: status >= 500 ? "Unable to create secure checkout." : (error as Error).message,

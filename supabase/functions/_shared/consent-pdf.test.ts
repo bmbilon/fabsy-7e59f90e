@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { decodePDFRawStream, PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFRawStream } from "https://esm.sh/pdf-lib@1.17.1";
-import { CONSENT_SOURCE_ATTACHMENT, createConsentPdf } from "./consent-pdf.ts";
+import { CONSENT_SOURCE_ATTACHMENT, createConsentPdf, PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES } from "./consent-pdf.ts";
 import { ConsentTextError, shapeConsentLine, wrapConsentText } from "./consent-unicode.ts";
 import { CONSENT_FIXTURE_DATE, CONSENT_FIXTURES } from "../../tests/consent-fixtures.ts";
 import reference from "../../tests/consent-shaping-reference.json" with { type: "json" };
-import type { PreferredLocale } from "./locale-policy.ts";
+import { LocaleRequestError, SUPPORTED_LOCALES, type PreferredLocale } from "./locale-policy.ts";
 
 Deno.test("consent shaping matches independent native HarfBuzz glyph IDs and mark positions", async () => {
   for (const item of reference.cases) {
@@ -97,4 +97,33 @@ Deno.test("unsupported characters fail explicitly without substituting or deleti
     return true;
   });
   assert.equal(JSON.stringify(fields), before);
+});
+
+Deno.test("Photo Radar signed PDF uses $82.95 scope and explicit not-guilty authorization without legacy price", async () => {
+  const fields = { ...CONSENT_FIXTURES[0].fields, ticketType: "photo_radar" as const, registeredOwnerOnOffenceDate: "sold_before" };
+  const bytes = await createConsentPdf(fields, "en", new Date(CONSENT_FIXTURE_DATE));
+  const pdf = await PDFDocument.load(bytes);
+  const embedded = pdf.catalog.lookup(PDFName.of("Names"), PDFDict).lookup(PDFName.of("EmbeddedFiles"), PDFDict).lookup(PDFName.of("Names"), PDFArray);
+  const stream = embedded.lookup(1, PDFDict).lookup(PDFName.of("EF"), PDFDict).lookup(PDFName.of("F"));
+  assert.ok(stream instanceof PDFRawStream);
+  const attachment = JSON.parse(new TextDecoder().decode(decodePDFRawStream(stream).decode()));
+  assert.deepEqual(attachment.fields, fields);
+  assert.deepEqual(attachment.authorizationLines, PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES);
+  const clauses = attachment.authorizationLines.join("\n");
+  assert.ok(clauses.includes("$79 CAD plus 5% GST ($82.95 total)"));
+  assert.ok(clauses.includes("Enter a not-guilty plea"));
+  assert.ok(clauses.includes("no trial representation"));
+  assert.ok(!clauses.includes("$198"));
+});
+
+Deno.test("Photo Radar terms cannot be generated for an unreleased product locale", async () => {
+  const fields = { ...CONSENT_FIXTURES[0].fields, ticketType: "photo_radar" as const, registeredOwnerOnOffenceDate: "yes" };
+  for (const locale of SUPPORTED_LOCALES.filter((value) => value !== "en")) {
+    await assert.rejects(createConsentPdf(fields, locale), (error: unknown) => {
+      assert.ok(error instanceof LocaleRequestError);
+      assert.equal(error.status, 409);
+      assert.equal(error.code, "product_locale_not_released");
+      return true;
+    });
+  }
 });

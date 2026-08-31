@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { detectOwnerNotice } from "../_shared/photo-radar.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -423,6 +424,28 @@ serve(async (req) => {
       );
     }
 
+    const detected = detectOwnerNotice(ticketData);
+    const ticketType = ticketData.ticket_type === "officer_issued" || ticketData.ticket_type === "photo_radar"
+      ? ticketData.ticket_type : detected.ticket_type;
+    if (ticketType === "photo_radar") {
+      // Product-specific information is deterministic. Never sell an insurance
+      // report for owner liability or turn extracted wording into a legal finding.
+      const result = fallbackResponse();
+      const hook = "A registered-owner camera notice has no demerits and no insurance impact. Only the fine is on the table.";
+      const pricing = "Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total). No trial. No success fee. Government fines are separate.";
+      const faqs = [
+        { q: "Does photo radar affect insurance in Alberta?", a: "No. Alberta registered-owner automated enforcement notices under TSA s.160(1) have no insurance impact and carry no demerits." },
+        { q: "What can Fabsy do?", a: "For an accepted notice, Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No outcome is promised." },
+        { q: "What does Photo Radar cost?", a: pricing },
+        { q: "When does the 48-hour commitment start?", a: "After complete, readable disclosure is received and matched to the file. It covers Fabsy's next authorized action, not the Crown's response or a final outcome. Keep following the notice's deadlines." },
+      ];
+      result.ai_answer = { hook, explain: `${hook}\n\n${pricing} Check the extracted ticket type and ownership on the offence date. Missing evidence requires review; it does not prove that a notice is invalid.`, faqs, disclaimer: REQUIRED_DISCLAIMER };
+      result.page_json = { ...result.page_json, hook, h1: "Alberta Photo Radar Notice Check", what: `<p>${hook}</p>`, how: `<p>${faqs[1].a}</p>`, next: `<p>${pricing}</p>`, faqs };
+      return new Response(JSON.stringify({ ...result, ticket_type: ticketType, ticket_type_evidence: detected.ticket_type_evidence }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -483,7 +506,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify(response),
+      JSON.stringify({ ...response, ticket_type: ticketType, ticket_type_evidence: detected.ticket_type_evidence }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {

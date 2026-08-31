@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { LocaleRequestError, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
+import { parseTicketClassification, ProductRequestError } from "../_shared/photo-radar.ts";
+import { ELIGIBLE_PRO_CLASSES, normalizedLicenceClass } from "../_shared/pro-pricing.ts";
+import { attachReferralAttribution, recordReferralDeclaredPlate } from "../_shared/referrals.ts";
+import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -28,6 +32,13 @@ const corsHeaders = {
 };
 
 interface SubmissionData {
+  declaredLicenceClass?: unknown;
+  refCode?: unknown;
+  refAttributionToken?: unknown;
+  plateNumber?: unknown;
+  ticket_type?: unknown;
+  ticket_type_source?: unknown;
+  registered_owner_on_offence_date?: unknown;
   preferred_locale?: unknown;
   // Client info
   driversLicense: string;
@@ -121,12 +132,19 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const formData: SubmissionData = await req.json();
+    const classification = parseTicketClassification(formData as unknown as Record<string, unknown>);
     const preferredLocale = parsePreferredLocale(formData.preferred_locale);
     requireReleasedServiceLocale(
       preferredLocale,
       Deno.env.get("FABSY_LIVE_SERVICE_LOCALES"),
       Deno.env.get("FABSY_REVIEWED_SERVICE_LOCALES"),
     );
+    const declaredLicenceClass = normalizedLicenceClass(formData.declaredLicenceClass);
+    if (classification.ticket_type === "photo_radar") {
+      requireEnglishProductLocale(preferredLocale, "photo_radar");
+    } else if (ELIGIBLE_PRO_CLASSES.has(declaredLicenceClass)) {
+      requireEnglishProductLocale(preferredLocale, "pro_driver");
+    }
     
     console.log("[Submit Ticket] Processing submission");
 
@@ -195,7 +213,7 @@ const handler = async (req: Request): Promise<Response> => {
       const accessTokenHash = await sha256(accessToken);
       const { data: source, error: sourceError } = await supabase
         .from("ticket_submissions")
-        .select("id,email,service_type,assessment_access_token_hash,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at")
+        .select("id,email,service_type,assessment_access_token_hash,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at,ticket_type")
         .eq("id", sourceId)
         .maybeSingle();
       if (sourceError) throw sourceError;
@@ -205,9 +223,7 @@ const handler = async (req: Request): Promise<Response> => {
         source.email?.trim().toLowerCase() !== normalizedEmail ||
         source.assessment_access_token_hash !== accessTokenHash ||
         !source.assessment_ticket_path ||
-        !Array.isArray(source.assessment_policy_paths) ||
-        source.assessment_policy_paths.length < 1 ||
-        !source.review_consent ||
+        (classification.ticket_type !== "photo_radar" && (!Array.isArray(source.assessment_policy_paths) || source.assessment_policy_paths.length < 1 || !source.review_consent)) ||
         source.assessment_paid_at
       ) {
         throw new RequestError(
@@ -298,6 +314,8 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const submissionPayload = {
+      declared_licence_class: classification.ticket_type === "photo_radar" ? "unknown" : declaredLicenceClass,
+      ...classification,
       client_id: clientId,
       preferred_locale: preferredLocale,
       first_name: formData.firstName,
@@ -317,12 +335,12 @@ const handler = async (req: Request): Promise<Response> => {
       court_date: formData.courtDate,
       defense_strategy: formData.defenseStrategy,
       additional_notes: formData.additionalNotes,
-      insurance_company: formData.insuranceCompany,
+      insurance_company: classification.ticket_type === "photo_radar" ? null : formData.insuranceCompany,
       sms_opt_in: Boolean(formData.smsOptIn),
       status: 'awaiting_payment',
       service_type: 'representation',
       source_assessment_id: sourceAssessment?.id || null,
-      representation_includes_assessment: Boolean(sourceAssessment),
+      representation_includes_assessment: Boolean(sourceAssessment) && classification.ticket_type !== "photo_radar",
       ticket_document_path: sourceAssessment?.assessment_ticket_path || null,
       representation_access_token_hash: representationAccessTokenHash,
     };
@@ -347,7 +365,7 @@ const handler = async (req: Request): Promise<Response> => {
         .from("idr_checkout_intents")
         .select("id,status")
         .eq("ticket_submission_id", existingSubmission.id)
-        .in("checkout_kind", ["ticket_only", "ticket_with_addon"])
+        .in("checkout_kind", ["ticket_only", "ticket_with_addon", "photo_radar"])
         .in("status", ["creating", "open", "paid"])
         .limit(1)
         .maybeSingle();
@@ -398,6 +416,10 @@ const handler = async (req: Request): Promise<Response> => {
         upload = { path: ticketDocumentPath, token: signedUpload.token, contentType: directUpload.contentType };
       }
 
+      const referralResult = await attachReferralAttribution(supabase, existingSubmission.id, {
+        refCode: formData.refCode, refAttributionToken: formData.refAttributionToken,
+      });
+      await recordReferralDeclaredPlate(supabase, existingSubmission.id, formData.plateNumber);
       return new Response(JSON.stringify({
         success: true,
         submissionId: existingSubmission.id,
@@ -406,6 +428,7 @@ const handler = async (req: Request): Promise<Response> => {
         preferred_locale: preferredLocale,
         accessToken: representationAccessToken,
         upload,
+        referralAttached: referralResult.attached,
       }), {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -444,6 +467,10 @@ const handler = async (req: Request): Promise<Response> => {
       upload = { path: ticketDocumentPath, token: signedUpload.token, contentType: directUpload.contentType };
     }
 
+    const referralResult = await attachReferralAttribution(supabase, submissionData.id, {
+      refCode: formData.refCode, refAttributionToken: formData.refAttributionToken,
+    });
+    await recordReferralDeclaredPlate(supabase, submissionData.id, formData.plateNumber);
     return new Response(JSON.stringify({ 
       success: true,
       submissionId: submissionData.id,
@@ -451,6 +478,7 @@ const handler = async (req: Request): Promise<Response> => {
       preferred_locale: preferredLocale,
       accessToken: representationAccessToken,
       upload,
+      referralAttached: referralResult.attached,
     }), {
       status: 200,
       headers: {
@@ -460,7 +488,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: unknown) {
     console.error("[Submit Ticket] Error:", error);
-    const status = error instanceof RequestError || error instanceof LocaleRequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof LocaleRequestError || error instanceof ProductRequestError ? error.status : 500;
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Submission failed",
