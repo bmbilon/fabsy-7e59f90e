@@ -21,8 +21,14 @@ const PAGE_SIZE = 1000;
 const PAGE_CONTENT_DIR = path.resolve(
   process.env.PAGE_CONTENT_DIR || path.join(process.cwd(), 'src/content/pages')
 );
+const CURATED_PAGE_DIR = path.resolve(process.env.CURATED_PAGE_DIR || path.join(process.cwd(), 'ssg-pages'));
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PUBLIC_DIR = path.resolve(process.env.SITEMAP_PUBLIC_DIR || path.join(process.cwd(), 'public'));
+const SEO_ROUTE_POLICIES = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/config/seoRoutePolicies.json'), 'utf8'));
+const EXCLUDED_PUBLIC_PATHS = new Set([
+  ...Object.keys(SEO_ROUTE_POLICIES.redirects || {}),
+  ...(SEO_ROUTE_POLICIES.gone || []),
+]);
 
 async function fetchAllRows(table, columns, configure = query => query) {
   const rows = [];
@@ -68,7 +74,16 @@ function loadCachedPages() {
       throw new Error(`Invalid or duplicate page_content cache entry: ${filename}`);
     }
     seen.add(slug);
-    pages.push({ slug, updated_at: page.updated_at || undefined });
+    const curatedPath = path.join(CURATED_PAGE_DIR, filename);
+    let reviewedAt;
+    if (fs.existsSync(curatedPath)) {
+      const curated = JSON.parse(fs.readFileSync(curatedPath, 'utf8'));
+      reviewedAt = typeof curated?.reviewed_at === 'string' ? curated.reviewed_at : undefined;
+    }
+    // A reviewed curated record replaces the database body on the public page.
+    // Its review date is therefore the truthful public lastmod; a later DB-only
+    // update can belong to superseded copy that visitors never receive.
+    pages.push({ slug, updated_at: reviewedAt || page.updated_at || undefined });
   }
 
   if (!pages.length) throw new Error('Local page_content cache contains zero pages');
@@ -119,7 +134,13 @@ async function loadBlogPosts() {
     }
     return posts;
   }
-  return fetchAllRows('blog_posts', 'slug, published_at, status', query => query.eq('status', 'published'));
+  return fetchAllRows('blog_posts', 'slug, published_at, updated_at, reviewed_at, status', query => query.eq('status', 'published'));
+}
+
+function latestIso(...values) {
+  const valid = values.filter(value => typeof value === 'string' && !Number.isNaN(Date.parse(value)));
+  if (valid.length === 0) return undefined;
+  return valid.reduce((latest, value) => Date.parse(value) > Date.parse(latest) ? value : latest);
 }
 
 export async function generateSitemap() {
@@ -165,7 +186,8 @@ export async function generateSitemap() {
   ];
 
   const pageContentUrls = pages.filter(
-    p => !/^(?:test(?:[-_]|$)|verify-smoke(?:[-_]|$))/.test(p.slug)
+    p => !/^(?:test(?:[-_]|$)|verify-smoke(?:[-_]|$))/.test(p.slug) &&
+      !EXCLUDED_PUBLIC_PATHS.has(`/content/${p.slug}`)
   ).map(p => ({
     loc: `/content/${p.slug}`,
     priority: '0.8',
@@ -173,11 +195,13 @@ export async function generateSitemap() {
     lastmod: p.updated_at
   }));
 
-  const blogPostUrls = posts.map(p => ({
+  const blogPostUrls = posts.filter(
+    p => !EXCLUDED_PUBLIC_PATHS.has(`/blog/${p.slug}`)
+  ).map(p => ({
     loc: `/blog/${p.slug}`,
     priority: '0.7',
     changefreq: 'weekly',
-    lastmod: p.published_at || undefined
+    lastmod: latestIso(p.published_at, p.updated_at, p.reviewed_at)
   }));
 
   // FAQ sitemap: include primary FAQ page; extend later with pages that include FAQ schema

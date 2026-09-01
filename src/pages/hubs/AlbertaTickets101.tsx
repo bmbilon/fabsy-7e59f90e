@@ -29,7 +29,7 @@ const AlbertaTickets101: React.FC = () => {
     url,
     description:
       'Overview of Alberta traffic tickets, common issuing methods, response instructions, and links to current official information.',
-    dateModified: '2026-08-23',
+    dateModified: '2026-08-31',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -52,7 +52,18 @@ const AlbertaTickets101: React.FC = () => {
         <p className="text-lg leading-relaxed text-foreground mb-3">
           Read the ticket, confirm the alleged offence and response deadline, preserve relevant records, and compare the available response choices before acting. The ticket and current Alberta sources control; general web information cannot replace its instructions.
         </p>
-        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 23, 2026 · General information, not legal advice</p>
+        <p className="mb-3 text-foreground">
+          If the allegation is speeding, start with our{' '}
+          <Link to="/content/speeding-ticket-alberta" className="underline decoration-dashed underline-offset-4 hover:text-primary">
+            guide to fighting a speeding ticket in Alberta
+          </Link>
+          . If you are considering trial, also review{' '}
+          <Link to="/blog/alberta-traffic-trial-evidence-self-represented" className="underline decoration-dashed underline-offset-4 hover:text-primary">
+            what Alberta traffic-trial evidence rules can require
+          </Link>
+          .
+        </p>
+        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 31, 2026 · General information, not legal advice</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">What to know</h2>

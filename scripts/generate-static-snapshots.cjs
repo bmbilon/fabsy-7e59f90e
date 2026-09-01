@@ -337,8 +337,8 @@ function articleJsonLd(page, url) {
     description: page.meta_description,
     url,
     dateModified: page.reviewed_at,
-    author: { '@type': 'Organization', name: BUSINESS_NAME, url: SITE },
-    publisher: { '@type': 'Organization', name: BUSINESS_NAME, url: SITE },
+    author: { '@type': 'Organization', name: BUSINESS_NAME, url: `${SITE}/about` },
+    publisher: { '@type': 'Organization', '@id': `${SITE}/#organization`, name: BUSINESS_NAME, url: SITE },
     citation: page.sources.map((source) => source.url),
   };
 }
@@ -448,7 +448,8 @@ ${articleSchema ? `  <script type="application/ld+json">${safeJsonLd(articleSche
     <article>
       <h1>${esc(page.h1)}</h1>
       <p class="hook">${esc(page.hook)}</p>
-      <h2>Key facts</h2>
+${page.curated ? `      <p>Published by <a href="/about">${BUSINESS_NAME}</a>${page.reviewed_at ? ` · Editorially reviewed ${esc(reviewedLabel(page.reviewed_at))}` : ''} · General information, not legal advice.</p>
+` : ''}      <h2>Key facts</h2>
       <ul class="key-facts">
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}
       </ul>

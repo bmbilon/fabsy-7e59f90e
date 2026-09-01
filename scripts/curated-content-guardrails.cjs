@@ -437,7 +437,7 @@ function curatedPageIssues(page) {
     } else {
       page.sources.forEach((source, index) => {
         if (!present(source?.title)) issues.push(`source ${index + 1}: missing title`);
-        const provincialSource = /^https:\/\/(?:www\.)?(?:alberta\.ca|open\.alberta\.ca|traffictickets\.alberta\.ca)\//i.test(source?.url || '');
+        const provincialSource = /^https:\/\/(?:www\.)?(?:alberta\.ca|open\.alberta\.ca|traffictickets\.alberta\.ca|albertacourts\.ca)\//i.test(source?.url || '');
         const reviewedPhotoRadarSource = PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) &&
           /^https:\/\/(?:www\.)?(?:edmonton\.ca|calgary\.ca|calgarypolice\.ca|calgarypolicecommission\.ca|newsroom\.calgary\.ca|kings-printer\.alberta\.ca|secure\.reddeer\.ca)\//i.test(source?.url || '');
         if (!provincialSource && !reviewedPhotoRadarSource) {

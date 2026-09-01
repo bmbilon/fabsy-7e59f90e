@@ -570,12 +570,13 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
       'secure digital intake',
       'technology-assisted',
       '48-hour clock',
-      'Insurance Impact &amp; Renewal Planning Report',
+      'Insurance Impact & Renewal Planning Report',
       'Trial representation',
       'href="/submit-ticket"',
     ];
     for (const signal of discoverySignals) {
-      if (!html.toLowerCase().includes(signal.toLowerCase())) {
+      const haystack = signal.startsWith('href=') ? html : renderedText;
+      if (!haystack.toLowerCase().includes(signal.toLowerCase())) {
         fail(`${label}: ${photoRadar ? 'Photo Radar' : 'Rapid Resolution'} discovery signal missing: ${signal}`);
       }
     }
@@ -792,8 +793,13 @@ function validateAllPrerendered() {
     }
 
     const titles = [...html.matchAll(/<title>([\s\S]*?)<\/title>/gi)].map((match) => tagText(match[1]));
-    if (titles.length !== 1 || !titles[0] || titles[0].length > 60) {
-      fail(`${label}: must contain one title of at most 60 characters`);
+    // Preserve a blog post's complete editorial headline. Search result title
+    // display is dynamic; silently cutting meaningful words created duplicate
+    // and misleading titles. Curated content/landing pages retain the tighter
+    // 60-character editorial limit.
+    const titleLimit = isBlogSnapshot ? 80 : 60;
+    if (titles.length !== 1 || !titles[0] || titles[0].length > titleLimit) {
+      fail(`${label}: must contain one title of at most ${titleLimit} characters`);
     }
     const descriptionTags = [...html.matchAll(/<meta\b[^>]*name=["']description["'][^>]*>/gi)];
     const description = metaContent(html, 'description');

@@ -16,7 +16,7 @@ import useSafeHead from "@/hooks/useSafeHead";
 const About = () => {
   useSafeHead({
     title: "About Fabsy | Alberta Traffic Ticket Agent Service",
-    description: "Learn about Fabsy Traffic Ticket Services, an agent service supporting Alberta drivers with provincial traffic ticket matters.",
+    description: "Learn about Fabsy Traffic Ticket Services, its Alberta agent service, founder, and source-backed editorial standards.",
     canonical: "https://fabsy.ca/about"
   });
 
@@ -127,6 +127,32 @@ const About = () => {
               </div>
             </Card>
           </div>
+        </div>
+
+        {/* Editorial standards */}
+        <div className="mb-20">
+          <Card className="p-8 md:p-10 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
+            <h2 className="text-3xl font-bold text-card-foreground mb-5">How Fabsy reviews public information</h2>
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                Fabsy's public guides use primary sources where available, including the Government of Alberta,
+                Alberta Court of Justice, and the Traffic Tickets Digital Service. Curated guides identify their
+                sources and last editorial review date so readers can check the controlling information directly.
+              </p>
+              <p>
+                Fabsy distinguishes general legal information from ticket-specific agent services. The website is
+                not legal advice, Fabsy is not a law firm, and no article is presented as a substitute for the
+                notice, current court instructions, or advice from a lawyer.
+              </p>
+              <p>
+                Accuracy concern or changed official guidance? Email{' '}
+                <a href="mailto:hello@fabsy.ca" className="font-semibold text-primary underline underline-offset-4">
+                  hello@fabsy.ca
+                </a>
+                . Learn more about <Link to="/founder" className="font-semibold text-primary underline underline-offset-4">Lauren Bilon, Fabsy's founder</Link>.
+              </p>
+            </div>
+          </Card>
         </div>
 
         {/* Our Values */}

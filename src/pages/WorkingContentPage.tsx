@@ -33,6 +33,9 @@ type DisplayPage = PageRecord & {
   violation: string;
   created_at?: string;
   updated_at?: string;
+  reviewed_at?: string;
+  bullets: string[];
+  sources: Array<{ title: string; url: string }>;
   faqs: FAQItem[];
 };
 
@@ -40,11 +43,51 @@ const BANNED_CONTENT_RE = /(?:no\s+win\s+no\s+fee|risk[\s-]*free|money\s+back|gu
 const SEMANTIC_OVER_CAP_RE = /\b(?:above|greater\s+than|more\s+than|over)\s+95\s*%\+?|\b95\s*%\+?\s+(?:or\s+(?:higher|more)|and\s+above)\b/i;
 const LAWYER_STATUS_RE = /\b(?:Fabsy(?:'s)?|our(?:\s+\w+){0,3})\s+(?:lawyers?|attorneys?|legal\s+team)\b|\b(?:lawyers?|attorneys?)\s+(?:at|from)\s+Fabsy\b|\bFabsy\s+(?:is|operates\s+as)\s+(?!not\b)(?:an?\s+)?law\s+firm\b|\b(?:Fabsy|we)\s+(?:provides?|offers?)\s+legal\s+advice\b/i;
 const UNSAFE_HTML_RE = /<\s*\/?\s*(?:base|button|embed|form|iframe|input|link|math|meta|object|option|script|select|style|svg|textarea)\b|\b(?:formaction|on[a-z]+|src|srcdoc|srcset|style|xlink:href)\s*=|\b(?:data|javascript|vbscript)\s*:|\bexpression\s*\(|\burl\s*\(/i;
-const ALLOWED_CONTENT_TAGS = new Set(['a', 'b', 'h2', 'li', 'p', 'strong', 'ul']);
+const ALLOWED_CONTENT_TAGS = new Set(['a', 'b', 'h2', 'li', 'ol', 'p', 'strong', 'ul']);
 let curatedSlugsPromise: Promise<Set<string>> | null = null;
 
 const text = (value: unknown): string => typeof value === 'string' ? value.trim() : '';
 const stringField = (value: unknown): string => typeof value === 'string' ? value : '';
+
+const stringItems = (value: unknown): string[] => Array.isArray(value)
+  ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+  : [];
+
+const sourceItems = (value: unknown): DisplayPage['sources'] => Array.isArray(value)
+  ? value.flatMap((item) => {
+      if (!item || typeof item !== 'object') return [];
+      const record = item as Record<string, unknown>;
+      const title = stringField(record.title).trim();
+      const url = stringField(record.url).trim();
+      return title && /^https:\/\//i.test(url) ? [{ title, url }] : [];
+    })
+  : [];
+
+const curatedModules = import.meta.glob('../../ssg-pages/*.json', {
+  import: 'default',
+}) as Record<string, () => Promise<unknown>>;
+
+const curatedPageLoaders = new Map<string, () => Promise<unknown>>();
+for (const [path, loader] of Object.entries(curatedModules)) {
+  const curatedSlug = /\/([^/]+)\.json$/.exec(path)?.[1];
+  if (curatedSlug) curatedPageLoaders.set(curatedSlug, loader);
+}
+
+const loadCuratedPage = async (slug: string): Promise<PageRecord | null> => {
+  const loader = curatedPageLoaders.get(slug);
+  if (!loader) return null;
+  const value = await loader();
+  if (!value || typeof value !== 'object') return null;
+  const record = value as PageRecord;
+  return stringField(record.slug) === slug ? record : null;
+};
+
+const formatEditorialDate = (value: string): string => new Date(`${value.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-CA', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
 
 const parseFaqItems = (value: unknown): { items: FAQItem[]; valid: boolean } => {
   let candidate = value;
@@ -69,6 +112,7 @@ const parseFaqItems = (value: unknown): { items: FAQItem[]; valid: boolean } => 
 const displayPage = (page: PageRecord, faqs: FAQItem[]): DisplayPage => {
   const createdAt = stringField(page.created_at);
   const updatedAt = stringField(page.updated_at);
+  const reviewedAt = stringField(page.reviewed_at);
   return {
     ...page,
     slug: stringField(page.slug),
@@ -85,6 +129,9 @@ const displayPage = (page: PageRecord, faqs: FAQItem[]): DisplayPage => {
     violation: stringField(page.violation),
     ...(createdAt ? { created_at: createdAt } : {}),
     ...(updatedAt ? { updated_at: updatedAt } : {}),
+    ...(reviewedAt ? { reviewed_at: reviewedAt } : {}),
+    bullets: stringItems(page.bullets),
+    sources: sourceItems(page.sources),
     faqs,
   };
 };
@@ -104,6 +151,11 @@ const hasOverCapPercentage = (value: string): boolean => {
   }
   return false;
 };
+
+const redactNegatedGuarantees = (value: string): string => value.replace(
+  /\b(?:no|not|never|without|cannot|can't|do\s+not|does\s+not|is\s+not|isn't|are\s+not|aren't)\b[^.!?]{0,64}\bguarantee(?:d|s|ing)?\b/gi,
+  '[negated claim]',
+);
 
 const hasFabsyPricingSignal = (value: string): boolean =>
   /\$\s*(?:49|198|229|488)\b|\bflat\s+\$\s*\d|\b(?:admin|base|contingency|representation|service)\s+fee\b|\bFabsy\b[^.!?\n]{0,100}(?:\$\s*\d|\b(?:charges?|costs?|fees?|pricing)\b)|\b(?:pricing|fee\s+structure|only\s+pay)\b|\b30\s*(?:%|percent)\b[^.!?\n]{0,100}\bfine\s+reduction\b/i.test(value);
@@ -179,7 +231,7 @@ const hasReviewedCuratedBody = (page: PageRecord): boolean => {
     next: page.next,
     faqs: page.faqs,
   });
-  return !BANNED_CONTENT_RE.test(searchable)
+  return !BANNED_CONTENT_RE.test(redactNegatedGuarantees(searchable))
     && !searchable.includes('\u2014')
     && !hasOverCapPercentage(searchable)
     && !LAWYER_STATUS_RE.test(searchable)
@@ -262,6 +314,7 @@ const safeLegacyPage = (page: PageRecord): DisplayPage => {
     how: `<h2>How Fabsy can help</h2><p>Rapid Resolution can handle secure intake, disclosure review, a prosecutor-review request, status notifications and your decision for an eligible pre-trial matter.</p>`,
     next: `<h2>Pricing</h2><p>${pricing}</p>`,
     content: '',
+    sources: [],
     local_info: safeCity !== 'Alberta'
       ? `Fabsy serves ${safeCity} where paid traffic ticket agent representation is permitted.`
       : '',
@@ -323,20 +376,24 @@ const WorkingContentPage = () => {
           setPageData(displayPage(reviewedPhotoRadarPage, parseFaqItems(reviewedPhotoRadarPage.faqs).items));
           return;
         }
-        const [pageResult, curatedSlugs] = await Promise.all([
+        const [pageResult, curatedSlugs, reviewedPage] = await Promise.all([
           supabase
             .from('page_content')
             .select('*')
             .eq('slug', slug)
             .single(),
           loadCuratedSlugs(),
+          loadCuratedPage(slug),
         ]);
         const { data, error: fetchError } = pageResult;
 
         if (fetchError) throw fetchError;
         if (!data) throw new Error('Page not found');
 
-        setPageData(normalizePageForDisplay(data, curatedSlugs.has(slug)));
+        setPageData(normalizePageForDisplay(
+          { ...data, ...(reviewedPage || {}) },
+          Boolean(reviewedPage) || curatedSlugs.has(slug),
+        ));
       } catch (err) {
         console.error('Error fetching page:', err);
         setError(err instanceof Error ? err.message : 'Failed to load page');
@@ -435,7 +492,9 @@ const WorkingContentPage = () => {
         description={pageData.meta_description || 'Content page'}
         url={currentUrl}
         datePublished={pageData.created_at}
-        dateModified={pageData.updated_at}
+        dateModified={pageData.reviewed_at || pageData.updated_at}
+        authorUrl="https://fabsy.ca/about"
+        citations={pageData.sources.map((source) => source.url)}
       />
       <ServiceSchema 
         name={serviceName}
@@ -490,6 +549,15 @@ const WorkingContentPage = () => {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground leading-tight">
             {pageData.h1 || pageData.slug}
           </h1>
+
+          <p className="text-sm text-muted-foreground mb-6">
+            Published by{' '}
+            <Link to="/about" className="underline underline-offset-4 hover:text-primary">
+              Fabsy Traffic Ticket Services
+            </Link>
+            {pageData.reviewed_at ? ` · Reviewed ${formatEditorialDate(pageData.reviewed_at)}` : ''}
+            {' · '}General information, not legal advice
+          </p>
 
           {/* Answer Box - 60-second answer above the fold */}
           {cityName && offence && (
@@ -551,6 +619,15 @@ const WorkingContentPage = () => {
                     <p className="text-foreground font-medium mb-0">{pageData.hook}</p>
                   </div>
                 )}
+
+                {pageData.bullets.length > 0 && (
+                  <section className="rounded-xl border border-border bg-muted/30 p-5 mb-8">
+                    <h2 className="text-2xl font-bold mt-0 mb-3">At a glance</h2>
+                    <ul className="list-disc ml-6 space-y-2 mb-0">
+                      {pageData.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  </section>
+                )}
                 
                 {pageData.what && (
                   <div className="mb-6" dangerouslySetInnerHTML={{ __html: pageData.what }} />
@@ -607,6 +684,22 @@ const WorkingContentPage = () => {
                   pageUrl={currentUrl}
                 />
               </div>
+            )}
+
+            {pageData.sources.length > 0 && (
+              <section className="bg-card rounded-xl p-8 md:p-10 shadow-sm border" aria-labelledby="official-sources-heading">
+                <h2 id="official-sources-heading" className="text-3xl font-bold mb-3 text-foreground">Official sources</h2>
+                <p className="mb-4 text-muted-foreground">Primary sources used for this page:</p>
+                <ul className="list-disc ml-6 space-y-2 text-foreground">
+                  {pageData.sources.map((source) => (
+                    <li key={source.url}>
+                      <a href={source.url} className="underline decoration-dashed underline-offset-4 hover:text-primary">
+                        {source.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             )}
 
             {/* Local Info */}

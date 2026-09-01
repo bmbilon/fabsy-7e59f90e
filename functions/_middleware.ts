@@ -2,10 +2,11 @@
 // Replaces functions/faq.ts and cloudflare-worker.js. Runs on every request.
 import { localizePath, splitLocalePath } from '../src/i18n/locale-policy.mjs';
 import localeRegistry from '../src/i18n/locales.json';
+import seoRoutePolicies from '../src/config/seoRoutePolicies.json';
 
 const LOCALIZED_SNAPSHOT_PATHS = new Set(localeRegistry.phase1Routes.filter(path => !['/terms-of-purchase', '/ticket-form', '/thank-you'].includes(path)));
 
-const BOT = /(bot|crawler|spider|googlebot|bingbot|duckduckbot|yandex|baiduspider|facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|gptbot|chatgpt-user|oai-searchbot|ccbot|anthropic|claudebot|claude-web|perplexitybot|google-extended|applebot|amazonbot|bytespider|meta-externalagent)/i;
+const BOT = /(bot|crawler|spider|googlebot|bingbot|duckduckbot|yandex|baiduspider|facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|gptbot|chatgpt-user|oai-searchbot|ccbot|anthropic|claudebot|claude-user|claude-searchbot|claude-web|perplexitybot|google-extended|applebot|amazonbot|bytespider|meta-externalagent)/i;
 
 // Paths that are real assets or app internals: never rewrite these.
 const PASSTHROUGH = /^\/(assets|prerendered|api|functions|favicon|robots\.txt|sitemap|og-image|_)/i;
@@ -37,6 +38,8 @@ const LEGACY_CONTENT_PATHS = new Set([
   "/fight-speeding-ticket-red-deer",
   "/fight-stop-sign-ticket-alberta",
 ]);
+const SEO_REDIRECTS = new Map(Object.entries(seoRoutePolicies.redirects));
+const GONE_PATHS = new Set(seoRoutePolicies.gone);
 
 function canonicalFor(pathname: string): string {
   const { locale, path } = splitLocalePath(pathname);
@@ -97,6 +100,25 @@ const servePage: PagesFunction = async (context) => {
     const destination = new URL(request.url);
     destination.pathname = `/content${pathname}`;
     return Response.redirect(destination, 301);
+  }
+  const seoRedirect = SEO_REDIRECTS.get(pathname);
+  if (seoRedirect) {
+    const destination = new URL(request.url);
+    destination.pathname = seoRedirect;
+    return Response.redirect(destination, 301);
+  }
+  if (GONE_PATHS.has(pathname)) {
+    return new Response(
+      '<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><title>Article retired | Fabsy</title></head><body><main><h1>This article has been retired</h1><p>Use Fabsy\'s current, source-backed guides from the <a href="/blog">traffic-ticket blog</a>.</p></main></body></html>',
+      {
+        status: 410,
+        headers: {
+          'Cache-Control': 'public, max-age=3600',
+          'Content-Type': 'text/html; charset=UTF-8',
+          'X-Robots-Tag': 'noindex, nofollow',
+        },
+      },
+    );
   }
 
   const ua = request.headers.get("User-Agent") || "";
