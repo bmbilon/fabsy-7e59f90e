@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import promotionPolicy from './pro-driver-promotion-guardrail.cjs';
+import { MACHINE_TRANSLATION_DISCLAIMER_VERSION } from '../src/i18n/locale-policy.mjs';
 import {
   LOCALE_MANIFEST_NAME,
   SITE,
@@ -139,9 +140,13 @@ export function assertLocalizedMainContent(html, context, code, basePath) {
   if (context.released(code) && context.review.locales[code]?.status === 'published') {
     const notices = [...html.matchAll(/<aside\b(?=[^>]*\bdata-translation-status=["']machine-translated["'])[^>]*>([\s\S]*?)<\/aside>/gi)];
     const t = snapshotTranslator(context, code);
-    const expected = ['language.translationNoteTitle', 'language.translationNoteBody'].map(key => decode(esc(t(key)))).join(' ');
+    const expected = ['NOT LEGAL ADVICE', ...['language.translationNoteBody', 'common.notLawFirm', 'language.englishControls'].map(key => decode(esc(t(key))))].join(' ');
+    const disclaimerVersion = notices[0]?.[0].match(/\bdata-publication-disclaimer=["']([^"']+)["']/i)?.[1];
     if (notices.length !== 1 || decode(notices[0][1].replace(/<[^>]*>/g, ' ')) !== expected) {
       throw new Error(`Published machine translation must retain its exact translation disclosure: ${code}${basePath}`);
+    }
+    if (disclaimerVersion !== MACHINE_TRANSLATION_DISCLAIMER_VERSION) {
+      throw new Error(`Published machine translation must retain its indexed-publication disclaimer: ${code}${basePath}`);
     }
   }
 }
@@ -207,7 +212,7 @@ export function renderLocalizedSnapshot(context, record) {
   const translationNotice = !context.released(code)
     ? `<aside class="preview" role="note"><strong>${esc(t('language.draftTitle'))}</strong>${p('language.draftBody')}${p('language.englishControls')}<a href="${SITE}/terms-of-service">${esc(t('language.readEnglish'))}</a>${!indexable && !context.indexableRoutes.has(basePath) ? p('language.paymentBlocked') : ''}</aside>`
     : context.review.locales[code]?.status === 'published'
-      ? `<aside class="translation-note" role="note" data-translation-status="machine-translated"><strong>${esc(t('language.translationNoteTitle'))}</strong>${p('language.translationNoteBody')}</aside>` : '';
+      ? `<aside class="translation-note" role="note" data-translation-status="machine-translated" data-publication-disclaimer="${MACHINE_TRANSLATION_DISCLAIMER_VERSION}"><strong lang="en" dir="ltr">NOT LEGAL ADVICE</strong>${p('language.translationNoteBody')}${p('common.notLawFirm')}${p('language.englishControls')}</aside>` : '';
   const html = `<!DOCTYPE html>
 <html lang="${locale.languageTag}" dir="${locale.dir}">
 <head>
@@ -220,7 +225,7 @@ export function renderLocalizedSnapshot(context, record) {
 <meta property="og:type" content="website">
 ${structuredData}
 <style>
-body{font-family:system-ui,sans-serif;max-width:820px;margin:auto;padding:24px;line-height:1.7;color:#161622;background:#fff}header nav{display:flex;flex-wrap:wrap;gap:14px}a{color:#5b21b6}h1{font-size:2rem;line-height:1.3}h2{font-size:1.3rem}.preview,aside{padding:18px;border:1px solid #d5c5f7;border-inline-start:4px solid #7540c8;border-radius:10px;background:#faf7ff;margin-block:24px}section{margin-block:28px}li{margin-block:8px}.cta{display:inline-block;padding:12px 20px;border-radius:8px;background:#5b21b6;color:#fff;text-decoration:none}details{padding-block:14px;border-block-end:1px solid #ddd}summary{font-weight:600}footer{margin-block-start:40px;border-block-start:1px solid #ddd;padding-block-start:16px;font-size:.9rem}
+body{font-family:system-ui,sans-serif;max-width:820px;margin:auto;padding:24px;line-height:1.7;color:#161622;background:#fff}header nav{display:flex;flex-wrap:wrap;gap:14px}a{color:#5b21b6}h1{font-size:2rem;line-height:1.3}h2{font-size:1.3rem}.preview,aside{padding:18px;border:1px solid #d5c5f7;border-inline-start:4px solid #7540c8;border-radius:10px;background:#faf7ff;margin-block:24px}.translation-note{border-color:#d97706;border-inline-start-color:#b91c1c;background:#fffbeb}.translation-note strong{display:block;color:#991b1b;font-weight:800;letter-spacing:.04em}.translation-note p{margin:.25rem 0}section{margin-block:28px}li{margin-block:8px}.cta{display:inline-block;padding:12px 20px;border-radius:8px;background:#5b21b6;color:#fff;text-decoration:none}details{padding-block:14px;border-block-end:1px solid #ddd}summary{font-weight:600}footer{margin-block-start:40px;border-block-start:1px solid #ddd;padding-block-start:16px;font-size:.9rem}
 </style>
 </head>
 <body>

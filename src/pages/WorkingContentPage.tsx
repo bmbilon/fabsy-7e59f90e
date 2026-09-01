@@ -555,7 +555,7 @@ const WorkingContentPage = () => {
             <Link to="/about" className="underline underline-offset-4 hover:text-primary">
               Fabsy Traffic Ticket Services
             </Link>
-            {pageData.reviewed_at ? ` · Reviewed ${formatEditorialDate(pageData.reviewed_at)}` : ''}
+            {pageData.reviewed_at ? ` · Sources checked ${formatEditorialDate(pageData.reviewed_at)}` : ''}
             {' · '}General information, not legal advice
           </p>
 

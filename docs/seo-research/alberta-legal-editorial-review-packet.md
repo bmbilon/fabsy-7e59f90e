@@ -164,9 +164,9 @@ No name, date, checkbox, or approval state may be populated by the content team 
 5. Set `reviewed_at` or publish an approval statement only after genuine reviewer confirmation. Never invent reviewer identity, credentials, date, or approval.
 6. Keep migrations, deployments, crawler snapshots, sitemap/GSC actions, and legal approval as separate auditable events. Successful deployment is not legal sign-off.
 
-## Translation review gate
+## Optional translation review and owner-publication controls
 
-No translated version of these pages should be published, indexed, added to a sitemap/hreflang set, or described as reviewed until all gates pass:
+These pages do not currently have translated article bodies. If translations are created later, human review remains recommended but is not a publication prerequisite when the owner explicitly authorizes the exact machine-translated version. Publication without review must use a prominent `NOT LEGAL ADVICE` and machine-translation notice, must not identify the copy as reviewed, and must preserve fail-closed source/version controls. The following checklist is required before describing a translation as reviewed:
 
 - [ ] The exact English source version has Alberta-qualified approval and is frozen with its hash, review date, and source-law date.
 - [ ] A human translator or translation reviewer competent in the target language and Alberta legal terminology reviews the entire page; raw machine output is not published as reviewed legal information.
@@ -176,9 +176,9 @@ No translated version of these pages should be published, indexed, added to a si
 - [ ] Links and visible anchor text still identify the correct current authority. The reviewer checks accessibility of the underlying source, even if the authority is available only in English.
 - [ ] A second human performs rendered-page QA for numbers, negation, dates, links, text direction, truncation, metadata, FAQ/JSON-LD parity, canonical/hreflang behavior, and fallback language.
 - [ ] The locale records translator/reviewer identity, competence, dates, source English hash, translation hash/version, disposition, and unresolved limitations.
-- [ ] Any material English change automatically marks every translation stale and removes its reviewed/indexable status until the affected locale is re-reviewed.
+- [ ] Any material English change automatically marks every translation stale and removes its reviewed status until the affected locale is re-reviewed. A separate owner decision is required to republish or re-index changed machine-translated copy.
 
-If a locale has not passed every gate, serve the approved English page or a clearly labelled, non-indexable translation draft; do not imply translated legal review.
+If a locale has not passed every review item, do not imply translated legal review. Any owner-authorized machine publication must remain clearly labelled, bind the exact English and translated versions, preserve official-source and deadline caveats, and keep private or incomplete routes out of Search.
 
 ## Change log template
 

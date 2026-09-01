@@ -14,6 +14,7 @@ import {
   isLocaleIndexable,
   isLocaleReleased,
   LEGAL_SOURCE_DOCUMENT_PATHS,
+  MACHINE_TRANSLATION_DISCLAIMER_VERSION,
   localizePath,
   normalizeLocale,
   preferredLocale,
@@ -108,9 +109,46 @@ const ownerPublication = {
 };
 for (const code of WAVE_ONE_LOCALES.filter(code => code !== 'en')) {
   assert.equal(isLocaleReleased(code, ownerPublication, expected), true, `${code} owner publication must work without a claimed native review`);
-  assert.equal(isLocaleIndexable(code, ownerPublication, expected), false, `${code} machine publication must remain noindex until review approval is recorded`);
+  assert.equal(isLocaleIndexable(code, ownerPublication, expected), false, `${code} machine publication must remain noindex without a separate owner indexing attestation`);
   assert.equal(ownerPublication.locales[code].reviewedBy, null);
   assert.equal(ownerPublication.locales[code].serviceReady, false);
+}
+const indexedOwnerPublication = {
+  ...ownerPublication,
+  locales: Object.fromEntries(Object.entries(ownerPublication.locales).map(([code, entry]) => [code, {
+    ...entry,
+    publication: {
+      ...entry.publication,
+      indexingAuthorizedBy: 'Offline fixture owner',
+      indexingAuthorizedAt: '2026-09-01T00:00:00Z',
+      disclaimerVersion: MACHINE_TRANSLATION_DISCLAIMER_VERSION,
+    },
+  }])),
+};
+for (const code of WAVE_ONE_LOCALES.filter(code => code !== 'en')) {
+  assert.equal(isLocaleReleased(code, indexedOwnerPublication, expected), true, `${code} indexed owner publication must remain released`);
+  assert.equal(isLocaleIndexable(code, indexedOwnerPublication, expected), true, `${code} explicit owner indexing attestation must permit indexing`);
+  assert.equal(indexedOwnerPublication.locales[code].reviewedBy, null, `${code} indexing must not invent a reviewer`);
+  assert.equal(indexedOwnerPublication.locales[code].reviewedAt, null, `${code} indexing must not invent a review date`);
+  assert.equal(indexedOwnerPublication.locales[code].serviceReady, false, `${code} indexing must not imply staffed language service`);
+}
+for (const patch of [
+  { indexingAuthorizedBy: '' },
+  { indexingAuthorizedAt: 'invalid' },
+  { disclaimerVersion: 'not-legal-advice-machine-translation-v0' },
+]) {
+  const entry = indexedOwnerPublication.locales.pa;
+  const record = { ...indexedOwnerPublication, locales: { ...indexedOwnerPublication.locales, pa: { ...entry, publication: { ...entry.publication, ...patch } } } };
+  assert.equal(isLocaleReleased('pa', record, expected), true, 'Invalid indexing attestation must not withdraw an otherwise valid publication');
+  assert.equal(isLocaleIndexable('pa', record, expected), false, 'Invalid indexing attestation must fail closed');
+}
+for (const missing of ['indexingAuthorizedBy', 'indexingAuthorizedAt', 'disclaimerVersion']) {
+  const entry = indexedOwnerPublication.locales.pa;
+  const publication = { ...entry.publication };
+  delete publication[missing];
+  const record = { ...indexedOwnerPublication, locales: { ...indexedOwnerPublication.locales, pa: { ...entry, publication } } };
+  assert.equal(isLocaleReleased('pa', record, expected), true, 'Missing indexing attestation fields must not withdraw an otherwise valid publication');
+  assert.equal(isLocaleIndexable('pa', record, expected), false, `Missing ${missing} must fail closed`);
 }
 for (const patch of [{ publication: undefined }, { status: 'draft' }, { sourceFingerprint: 'stale' }, { bundleFingerprint: 'stale' }, { sourceDocuments: incompleteDocuments }]) {
   const record = { ...ownerPublication, locales: { ...ownerPublication.locales, pa: { ...ownerPublication.locales.pa, ...patch } } };

@@ -62,6 +62,7 @@ assert.deepEqual(schema.citation, ['https://albertacourts.ca/cj/areas-of-law/tra
 
 const blogIndex = fs.readFileSync(new URL('../src/pages/Blog.tsx', import.meta.url), 'utf8');
 const blogPost = fs.readFileSync(new URL('../src/pages/BlogPost.tsx', import.meta.url), 'utf8');
+const adminBlog = fs.readFileSync(new URL('../src/pages/AdminBlog.tsx', import.meta.url), 'utf8');
 const header = fs.readFileSync(new URL('../src/components/Header.tsx', import.meta.url), 'utf8');
 for (const guide of ['/content/speeding-ticket-alberta', '/content/fight-traffic-ticket-alberta']) {
   assert.equal(blogIndex.split(guide).length - 1, 1, `${guide} must be featured exactly once on the blog index`);
@@ -74,5 +75,9 @@ assert(header.includes('englishEditorialReturnPath(location.pathname)'), 'the En
 assert(blogIndex.includes('RETIRED_BLOG_SLUGS.has(post.slug)'), 'retired blog posts must be removed from the index grid');
 assert(blogPost.includes('BLOG_REDIRECTS[blogPath]'), 'client-side article navigation must honor canonical redirects');
 assert(blogPost.includes('GONE_BLOG_PATHS.has(blogPath)'), 'client-side article navigation must honor removed routes');
+assert(!/editorially reviewed/i.test(blogPost), 'blog timestamps must not claim an undocumented editorial review');
+assert(blogPost.includes('Updated {formatBlogEditorialDate(editorialDates.modified.value)}'));
+assert(!/reviewed_at:\s*new Date\(\)\.toISOString\(\)/.test(adminBlog), 'publishing a post must not fabricate a review timestamp');
+assert(/reviewed_at:\s*null/.test(adminBlog), 'editing and publishing a post must clear stale review metadata');
 
 console.log('Blog SEO tests passed.');

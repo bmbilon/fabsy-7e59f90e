@@ -391,7 +391,7 @@ function render(page) {
   const sourcesHtml = page.curated && page.sources.length
     ? `      <aside class="triage sources" aria-labelledby="sources-heading">
         <h2 id="sources-heading">Sources checked</h2>
-        ${page.reviewed_at ? `<p><strong>Reviewed:</strong> ${esc(reviewedLabel(page.reviewed_at))}</p>` : ''}
+        ${page.reviewed_at ? `<p><strong>Sources checked:</strong> ${esc(reviewedLabel(page.reviewed_at))}</p>` : ''}
         <ul>
 ${page.sources.map((source) => `          <li><a href="${esc(source.url)}" rel="noopener noreferrer">${esc(source.title)}</a></li>`).join('\n')}
         </ul>
@@ -448,7 +448,7 @@ ${articleSchema ? `  <script type="application/ld+json">${safeJsonLd(articleSche
     <article>
       <h1>${esc(page.h1)}</h1>
       <p class="hook">${esc(page.hook)}</p>
-${page.curated ? `      <p>Published by <a href="/about">${BUSINESS_NAME}</a>${page.reviewed_at ? ` · Editorially reviewed ${esc(reviewedLabel(page.reviewed_at))}` : ''} · General information, not legal advice.</p>
+${page.curated ? `      <p>Published by <a href="/about">${BUSINESS_NAME}</a>${page.reviewed_at ? ` · Sources checked ${esc(reviewedLabel(page.reviewed_at))}` : ''} · General information, not legal advice.</p>
 ` : ''}      <h2>Key facts</h2>
       <ul class="key-facts">
 ${page.bullets.map((bullet) => `        <li>${esc(bullet)}</li>`).join('\n')}

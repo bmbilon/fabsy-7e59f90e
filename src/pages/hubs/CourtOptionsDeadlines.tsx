@@ -50,7 +50,7 @@ const CourtOptionsDeadlines: React.FC = () => {
         <p className="text-lg leading-relaxed text-foreground mb-3">
           Start with the response choices, instructions, and deadline printed on the ticket. Depending on the notice and current process, the available paths may include payment, requesting a resolution where available, disputing the allegation, or obtaining permitted representation.
         </p>
-        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 31, 2026 · The ticket and current court instructions control</p>
+        <p className="mb-8 text-sm text-muted-foreground">Sources checked August 31, 2026 · The ticket and current court instructions control</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">What to check</h2>

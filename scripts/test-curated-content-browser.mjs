@@ -31,7 +31,7 @@ try {
     assert.equal(await page.title(), record.meta_title);
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), canonical);
     assert.match(await page.locator('main').innerText(), /General information, not legal advice/);
-    assert.match(await page.locator('main').innerText(), /Reviewed August 31, 2026/i);
+    assert.match(await page.locator('main').innerText(), /Sources checked August 31, 2026/i);
 
     const sourceLinks = await page.locator('#official-sources-heading').locator('xpath=..').locator('li a').evaluateAll(
       (links) => links.map((link) => link.href),

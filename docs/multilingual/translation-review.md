@@ -1,20 +1,20 @@
 # Wave 1 translation review
 
-Updated 2026-08-31. **Brett authorized publishing all seven machine-translated interfaces without waiting for native review.** They are public language options with intake and checkout enabled, a small translation note, and the existing English agreements. No native or legal reviewer has approved these translations, and no reviewer has been hired or contacted by this task. Publication must not be represented as professional review or staffed native-language support.
+Updated 2026-09-01. **Brett authorized publishing and indexing all seven machine-translated interfaces without waiting for native or legal review.** They are public language options with intake and checkout enabled, a prominent versioned `NOT LEGAL ADVICE` / machine-translation notice, and the existing English agreements. No native or legal reviewer has approved these translations. Publication and indexing must not be represented as professional review or staffed native-language support.
 
 ## Files and scope
 
-`src/i18n/locales/en.json` is the shared English string contract. Each of the seven other files in that directory has the same 261 leaf keys and interpolation variables. The separate `translation-review.csv` provides one review row per key per non-English language: 1,827 rows. Blank reviewer and approval fields are intentional; publishing a language does not fill them.
+`src/i18n/locales/en.json` is the shared English string contract. Each of the seven other files in that directory has the same 268 leaf keys and interpolation variables. The separate `translation-review.csv` provides one review row per key per non-English language: 1,876 rows. Blank reviewer and approval fields are intentional; publishing or indexing a language does not fill them.
 
 | Bundle | Intended written language | Status |
 | --- | --- | --- |
-| `pa.json` | Punjabi in Gurmukhi script | Published machine translation; native review pending |
-| `tl.json` | Tagalog/Filipino | Published machine translation; native review pending |
-| `zh-hans.json` | Simplified written Chinese | Published machine translation; native review pending |
-| `zh-hant.json` | Traditional written Chinese for Cantonese-reading audiences | Published machine translation; native review pending |
-| `ar.json` | Modern Standard Arabic | Published machine translation; native review pending |
-| `hi.json` | Hindi in Devanagari script | Published machine translation; native review pending |
-| `es.json` | General Spanish | Published machine translation; native review pending |
+| `pa.json` | Punjabi in Gurmukhi script | Published/index-authorized machine translation; no native review recorded |
+| `tl.json` | Tagalog/Filipino | Published/index-authorized machine translation; no native review recorded |
+| `zh-hans.json` | Simplified written Chinese | Published/index-authorized machine translation; no native review recorded |
+| `zh-hant.json` | Traditional written Chinese for Cantonese-reading audiences | Published/index-authorized machine translation; no native review recorded |
+| `ar.json` | Modern Standard Arabic | Published/index-authorized machine translation; no native review recorded |
+| `hi.json` | Hindi in Devanagari script | Published/index-authorized machine translation; no native review recorded |
+| `es.json` | General Spanish | Published/index-authorized machine translation; no native review recorded |
 
 The Traditional Chinese draft was derived from the Simplified Chinese draft using the system's Hans-to-Hant transform, followed by terminology adjustments. It needs independent review for Traditional Chinese usage and the intended Alberta audience. Written Chinese does not establish Cantonese-speaking phone support. Punjabi Gurmukhi must not be substituted for Shahmukhi; Hindi must not be substituted for Urdu script.
 
@@ -87,7 +87,7 @@ The application release record is `src/i18n/review-status.json`. The implementat
 
 Both paths require the current source version, source and bundle fingerprints, and hashes for all eight English legal sources. The earlier 2026-08-31 integration deliberately refreshed these fingerprints after the offer exports, consent form and PDF source were frozen, while retaining Brett's original publication authorization and null native-review fields. The current 1,876-row CSV matches the same 268-key catalogs; no review evidence was invented. The later declined-offer clarification is explicitly English-only and adds the canonical refund JSON to the required source inventory. After that user-approved copy was frozen, its English-source fingerprints were deliberately reconciled without altering translation bundles, original owner authorization, reviewer fields or service readiness. Missing or changed fingerprints prevent publication until the changed copy is deliberately included in a new release record. Do not paste CSV SHA-256 values into implementation fingerprint fields, invent a reviewer, automatically refresh publication hashes during a build, or set `serviceReady` merely because a bundle compiles. Use `node scripts/validate-i18n.mjs --review-values` to inspect the current implementation fingerprints. A publication decision does not approve outgoing translated email templates, guarantee translation accuracy or prove backend deployment.
 
-Owner publication and search indexability are separate gates. Current owner-authorized machine translations remain available with a visible machine-translation notice, but are `noindex` and omitted from locale sitemaps and reciprocal hreflang. Only the `approved` path, with a real reviewer identity/date and `serviceReady: true`, may expose those discovery signals. Updating an owner-publication fingerprint never satisfies that review gate.
+Owner publication and search indexability remain separate gates. The current owner-authorized machine translations are indexable only because the exact-copy publication record now includes Brett's explicit indexing identity/date and `disclaimerVersion: not-legal-advice-machine-translation-v1`. That attestation exposes six useful public-information routes per locale in sitemaps and reciprocal hreflang without asserting professional review. Missing or invalid indexing fields fail closed to `noindex`; private intake/payment-return routes remain `noindex`. Updating a fingerprint alone never authorizes indexing.
 
 ## Contact and operational limits
 

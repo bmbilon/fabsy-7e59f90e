@@ -59,7 +59,7 @@ const AdminBlog = () => {
         content: editedContent,
         meta_description: editedMetaDesc,
         published_at: new Date().toISOString(),
-        reviewed_at: new Date().toISOString()
+        reviewed_at: null
       })
       .eq('id', selectedPost.id);
     

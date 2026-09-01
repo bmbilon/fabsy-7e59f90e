@@ -357,8 +357,8 @@ function redactVerifiedNumericClaims(value, slug) {
 
   text = text
     .replace(/\b\d{1,3}\s*%\s+complete\b/gi, '[form progress]')
-    .replace(/\b(?:last\s+)?reviewed:?\s*\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}\b/gi, '[verified editorial review date]')
-    .replace(/"dateModified"\s*:\s*"\d{4}-\d{2}-\d{2}"/gi, '"dateModified":"[verified editorial review date]"')
+    .replace(/\b(?:last\s+)?(?:reviewed|sources?\s+checked):?\s*\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}\b/gi, '[recorded source-check date]')
+    .replace(/"dateModified"\s*:\s*"\d{4}-\d{2}-\d{2}"/gi, '"dateModified":"[recorded source-check date]"')
     .replace(/\bApril\s+1,?\s+2025\b/gi, '[verified photo radar date]')
     .replace(/\b(?:2|two)\s+to\s+(?:6|six)\s+demerit(?:s|\s+points?)\b/gi, '[verified speeding demerit range]')
     .replace(/\b(?:2|two)\s*(?:demerit(?:s|\s+points?))?\s*\(?\s*(?:for\s+)?(?:up\s+to\s+)?15\s*(?:km\/h\s*)?over\s*\)?/gi, '[verified speeding band]')
