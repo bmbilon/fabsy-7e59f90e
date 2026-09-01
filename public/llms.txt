@@ -30,6 +30,7 @@ Last reviewed: 2026-08-31
 - [Fabsy service scope](https://fabsy.ca/services)
 - [Frequently asked questions](https://fabsy.ca/faq)
 - [Founder and service accountability](https://fabsy.ca/founder)
+- [About Fabsy and its editorial standards](https://fabsy.ca/about)
 
 ## Alberta traffic-ticket guides
 
@@ -37,17 +38,20 @@ Last reviewed: 2026-08-31
 - [Demerits and possible insurance impact](https://fabsy.ca/hubs/demerits-and-insurance)
 - [Photo radar versus officer-issued tickets](https://fabsy.ca/hubs/photo-radar-vs-officer-issued)
 - [Court options and deadlines](https://fabsy.ca/hubs/court-options-and-deadlines)
+- [How to fight a speeding ticket in Alberta](https://fabsy.ca/content/speeding-ticket-alberta)
+- [Alberta traffic-trial evidence for self-represented drivers](https://fabsy.ca/blog/alberta-traffic-trial-evidence-self-represented)
 - [Alberta traffic-ticket blog](https://fabsy.ca/blog)
 
 ## Common Alberta traffic-ticket questions
 
-- [Alberta speeding ticket demerits, court threshold, and options](https://fabsy.ca/content/speeding-ticket-alberta)
+- [How to fight a speeding ticket in Alberta](https://fabsy.ca/content/speeding-ticket-alberta)
+- [How to dispute a traffic ticket in Alberta](https://fabsy.ca/content/fight-traffic-ticket-alberta)
 - [What to do after a speeding ticket in Edmonton](https://fabsy.ca/content/speeding-ticket-edmonton)
 - [What to do after a speeding ticket in Calgary](https://fabsy.ca/content/speeding-ticket-calgary)
 - [How to respond to a stop-sign ticket in Alberta](https://fabsy.ca/content/fight-stop-sign-ticket-alberta)
 - [What to expect after an RCMP speeding ticket in Alberta](https://fabsy.ca/blog/rcmp-speeding-ticket-alberta-guide)
 - [What to do after an RCMP speeding ticket in Alberta](https://fabsy.ca/blog/rcmp-speeding-ticket-alberta-what-to-do)
-- [Speeding more than 50 km/h over the limit in Alberta](https://fabsy.ca/blog/speeding-ticket-over-50kmh-alberta-penalties)
+- [Alberta speeding bands, court threshold, and response options](https://fabsy.ca/content/speeding-ticket-alberta)
 - [Red-light camera tickets in Edmonton](https://fabsy.ca/content/red-light-ticket-edmonton-photo-radar)
 - [Multiple red-light tickets in Calgary](https://fabsy.ca/content/red-light-ticket-calgary-multiple-tickets)
 

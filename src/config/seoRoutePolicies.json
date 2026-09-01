@@ -1,0 +1,27 @@
+{
+  "redirects": {
+    "/blog/alberta-construction-zone-speeding-blitz-drivers-guide": "/blog/construction-zone-speeding-ticket-alberta-penalties",
+    "/blog/canada-day-speeding-ticket-alberta-holiday-enforcement": "/blog/alberta-rcmp-long-weekend-tickets-drivers-guide",
+    "/blog/check-stop-ticket-alberta-penalties-and-options": "/blog/rcmp-traffic-stop-ticket-alberta-what-to-expect",
+    "/blog/construction-zone-speeding-ticket-alberta": "/blog/construction-zone-speeding-ticket-alberta-penalties",
+    "/blog/construction-zone-speeding-ticket-alberta-what-to-expect": "/blog/construction-zone-speeding-ticket-alberta-penalties",
+    "/blog/demerit-points-speeding-ticket-alberta": "/content/demerit-points-alberta",
+    "/blog/distracted-driving-penalties-alberta": "/content/distracted-driving-ticket-alberta",
+    "/blog/distracted-driving-ticket-alberta-what-to-expect": "/content/distracted-driving-ticket-alberta",
+    "/blog/extreme-speeding-ticket-alberta-fines-suspension-options": "/content/speeding-ticket-alberta",
+    "/blog/impaired-driving-charges-alberta": "/blog/impaired-driving-ticket-alberta-penalties-and-options",
+    "/blog/long-weekend-speeding-ticket-alberta-enforcement-guide": "/blog/alberta-rcmp-long-weekend-tickets-drivers-guide",
+    "/blog/speeding-50-over-limit-alberta-fines-suspension-guide": "/content/speeding-ticket-alberta",
+    "/blog/speeding-ticket-construction-zone-alberta-fines-demerits-options": "/blog/construction-zone-speeding-ticket-alberta-penalties",
+    "/blog/speeding-ticket-over-50kmh-alberta-penalties": "/content/speeding-ticket-alberta",
+    "/blog/speeding-ticket-photo-radar-free-zone-alberta": "/blog/alberta-speeding-enforcement-photo-radar-free-roads",
+    "/blog/street-racing-ticket-alberta-penalties": "/blog/stunt-driving-street-racing-ticket-alberta",
+    "/blog/unpaid-traffic-tickets-alberta-consequences": "/blog/alberta-licence-renewal-outstanding-tickets",
+    "/blog/vehicle-enforcement-operation-ticket-alberta": "/blog/vehicle-enforcement-blitz-ticket-alberta-drivers-guide"
+  },
+  "gone": [
+    "/blog/driving-without-licence-alberta-penalties",
+    "/blog/school-zone-speeding-ticket-alberta-penalties",
+    "/blog/speeding-ticket-without-licence-alberta"
+  ]
+}

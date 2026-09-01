@@ -52,8 +52,28 @@ try {
   const outDir = path.join(temp, 'source/prerendered');
   const publicDir = path.join(temp, 'public');
   const contentDir = path.join(temp, 'content-cache');
-  writeJson(path.join(contentDir, 'speeding-ticket-alberta.json'), { slug: 'speeding-ticket-alberta', city: 'Alberta', violation: 'Speeding' });
-  writeJson(path.join(temp, 'blog-posts.json'), [{ slug: 'fixture-blog', status: 'published' }]);
+  const sitemapCuratedDir = path.join(temp, 'sitemap-curated');
+  writeJson(path.join(contentDir, 'speeding-ticket-alberta.json'), {
+    slug: 'speeding-ticket-alberta', city: 'Alberta', violation: 'Speeding',
+    updated_at: '2026-09-01T00:18:27.000Z',
+  });
+  writeJson(path.join(sitemapCuratedDir, 'speeding-ticket-alberta.json'), {
+    slug: 'speeding-ticket-alberta', reviewed_at: '2026-08-31',
+  });
+  writeJson(path.join(temp, 'blog-posts.json'), [
+    {
+      slug: 'fixture-blog',
+      status: 'published',
+      published_at: '2026-08-01T10:00:00.000Z',
+      updated_at: '2026-08-03T10:00:00.000Z',
+      reviewed_at: '2026-08-02T10:00:00.000Z',
+    },
+    {
+      slug: 'demerit-points-speeding-ticket-alberta',
+      status: 'published',
+      published_at: '2026-08-01T10:00:00.000Z',
+    },
+  ]);
   const env = {
     ...process.env,
     LOCALE_REGISTRY_PATH: options.registryPath, LOCALE_REVIEW_PATH: options.reviewPath,
@@ -65,6 +85,7 @@ try {
     PAGE_SYNC_MANIFEST: path.join(temp, 'no-sync-manifest.json'), REQUIRE_PAGE_SYNC_MANIFEST: '0',
     PRERENDER_SRC_DIR: outDir, DIST_PRERENDER_DIR: path.join(temp, 'dist/prerendered'),
     SITEMAP_PUBLIC_DIR: publicDir, SITEMAP_BLOG_CACHE: path.join(temp, 'blog-posts.json'),
+    CURATED_PAGE_DIR: sitemapCuratedDir,
   };
   fs.mkdirSync(env.SNAPSHOT_CURATED_DIR, { recursive: true });
   const run = (script, extraEnv = {}) => execFileSync(process.execPath, [path.join(ROOT, script)], { cwd: ROOT, env: { ...env, ...extraEnv }, encoding: 'utf8', stdio: 'pipe', timeout: 30000 });
@@ -258,7 +279,11 @@ try {
     assert(pa.includes('hreflang="en"') && pa.includes('hreflang="pa"') && pa.includes('hreflang="x-default"'));
     const pages = fs.readFileSync(path.join(publicDir, 'sitemaps/sitemap-pages.xml'), 'utf8');
     assert(pages.includes(`<loc>${SITE}/terms-of-purchase</loc>`));
+    assert(pages.includes('<lastmod>2026-08-03T10:00:00.000Z</lastmod>'));
+    assert(!pages.includes('/blog/demerit-points-speeding-ticket-alberta'));
     const content = fs.readFileSync(path.join(publicDir, 'sitemaps/sitemap-content.xml'), 'utf8');
+    assert(content.includes('<lastmod>2026-08-31</lastmod>'));
+    assert(!content.includes('<lastmod>2026-09-01T00:18:27.000Z</lastmod>'));
     assert(!content.includes('hreflang="pa"'));
   });
   check('existing full-tree guardrails accept intentional previews and locale-root slashes', () => {
@@ -575,6 +600,17 @@ try {
     assert.equal(publishedResponse.headers.get('Content-Language'), 'pa');
     assert.equal(englishResponse.headers.get('X-Robots-Tag'), 'index, follow');
   });
+  const crawlerResponses = await Promise.all(
+    ['Googlebot', 'bingbot', 'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'Claude-User']
+      .map(async (userAgent) => [userAgent, await responseFor('/', englishHtml('/'), userAgent)]),
+  );
+  check('search and answer crawlers receive the canonical prerendered document', () => {
+    for (const [userAgent, response] of crawlerResponses) {
+      assert.equal(response.status, 200, userAgent);
+      assert.equal(response.headers.get('X-Prerendered'), 'true', userAgent);
+      assert.equal(response.headers.get('X-Robots-Tag'), 'index, follow', userAgent);
+    }
+  });
   const shellResponse = await responseFor('/pa/', englishHtml('/'));
   const wrongLanguage = await responseFor('/pa/', englishHtml('/pa/'));
   assetRequests = 0;
@@ -592,6 +628,14 @@ try {
   check('localized aliases preserve locale and query strings without language redirects', () => {
     assert.equal(alias.status, 301);
     assert.equal(alias.headers.get('Location'), `${SITE}/ar/submit-ticket?source=fixture`);
+  });
+  const consolidated = await responseFor('/blog/demerit-points-speeding-ticket-alberta?source=fixture', 'unused', 'Mozilla/5.0');
+  const retired = await responseFor('/blog/driving-without-licence-alberta-penalties', 'unused', 'Googlebot');
+  check('SEO route policies preserve queries and retire unsupported duplicates', () => {
+    assert.equal(consolidated.status, 301);
+    assert.equal(consolidated.headers.get('Location'), `${SITE}/content/demerit-points-alberta?source=fixture`);
+    assert.equal(retired.status, 410);
+    assert.equal(retired.headers.get('X-Robots-Tag'), 'noindex, nofollow');
   });
   const purchaseForHuman = await responseFor('/ar/terms-of-purchase?source=fixture', 'unused', 'Mozilla/5.0');
   check('untranslated purchase terms leave the English handoff to the app without redirecting to a different agreement', () => {

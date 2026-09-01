@@ -13,6 +13,10 @@ const path = require('node:path');
 const ROOT = path.resolve(__dirname, '..');
 const OFFERS = require(path.join(ROOT, 'src/config/offers.json'));
 const PHOTO_RADAR_CONTENT_SLUGS = new Set(require(path.join(ROOT, 'src/config/photoRadarPages.json')));
+const EDITORIAL_AUTHORITY_SLUGS = new Set([
+  'fight-traffic-ticket-alberta',
+  'speeding-ticket-alberta',
+]);
 
 const CANONICAL_PRICING_COPY = OFFERS.canonicalPricingCopy;
 // Existing reviewed officer-ticket guides still use this exact, current-price
@@ -211,6 +215,13 @@ function normalizeCuratedPage(page) {
 }
 
 function normalizePageObject(page, options = {}) {
+  if (options.curated && EDITORIAL_AUTHORITY_SLUGS.has(page?.slug)) {
+    // These exact-query authority guides have reviewed, source-specific FAQs
+    // and internal links. Their offer copy is already enforced by the curated
+    // guardrails, so a build must not replace the editorial body with the
+    // generic product FAQ template.
+    return { ...page, jsonld: JSON.stringify(faqJsonLd(page.faqs || [])) };
+  }
   if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug)) {
     // The reviewed owner-notice pages have their own fine-only scope, FAQs,
     // sources and $79 CTA. Never replace those with the general RR/IIR copy.

@@ -1,17 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, ArrowLeft, Share2, Eye } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Share2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { guardPublishedBlogPost } from '@/lib/published-content-guardrails';
 import useSafeHead from '@/hooks/useSafeHead';
 import { RAPID_RESOLUTION } from '@/config/offers';
+import {
+  blogEditorialDateDisplay,
+  blogSeoTitle,
+  buildBlogPostingSchema,
+  formatBlogEditorialDate,
+  latestEditorialDate,
+  officialBlogSources,
+} from '@/lib/blog-seo';
 
 interface BlogPost {
   id: string;
@@ -22,23 +30,15 @@ interface BlogPost {
   keywords: string[];
   status: string;
   published_at: string;
+  updated_at?: string;
+  reviewed_at?: string;
+  source_data?: unknown;
   author: string;
   category: string;
   aeo_score: number;
   view_count: number;
   featured_image?: string;
 }
-
-const blogSeoTitle = (title: string): string => {
-  const suffix = ' | Fabsy';
-  const maxTitleLength = 60 - suffix.length;
-  const candidate = title.slice(0, maxTitleLength).trim();
-  const lastSpace = candidate.lastIndexOf(' ');
-  const shortened = title.length > maxTitleLength && lastSpace > Math.floor(maxTitleLength / 2)
-    ? candidate.slice(0, lastSpace).trim()
-    : candidate;
-  return `${shortened}${suffix}`;
-};
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -53,13 +53,7 @@ const BlogPost = () => {
     ogType: post ? 'article' : null,
   });
 
-  useEffect(() => {
-    if (slug) {
-      fetchPost();
-    }
-  }, [slug]);
-
-  async function fetchPost() {
+  const fetchPost = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -77,8 +71,6 @@ const BlogPost = () => {
         }
       } else if (data) {
         setPost(guardPublishedBlogPost(data as BlogPost));
-        // Update view count
-        updateViewCount(data.id, data.view_count);
       }
     } catch (err) {
       console.error('Fetch error:', err);
@@ -86,26 +78,13 @@ const BlogPost = () => {
     } finally {
       setLoading(false);
     }
-  }
+  }, [slug]);
 
-  async function updateViewCount(postId: string, currentCount: number) {
-    try {
-      await supabase
-        .from('blog_posts')
-        .update({ view_count: (currentCount || 0) + 1 })
-        .eq('id', postId);
-    } catch (err) {
-      console.warn('Failed to update view count:', err);
+  useEffect(() => {
+    if (slug) {
+      void fetchPost();
     }
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  }, [fetchPost, slug]);
 
   const getEstimatedReadTime = (content: string) => {
     const wordsPerMinute = 200;
@@ -181,33 +160,10 @@ const BlogPost = () => {
 
   if (!post) return <Navigate to="/blog" replace />;
 
-  // Structured data for SEO
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.meta_description,
-    "author": {
-      "@type": "Organization",
-      "name": "Fabsy Traffic Ticket Services"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Fabsy Traffic Ticket Services",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://fabsy.ca/favicon.svg"
-      }
-    },
-    "datePublished": post.published_at,
-    "dateModified": post.published_at,
-    "keywords": post.keywords.join(", "),
-    "articleSection": post.category,
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://fabsy.ca/blog/${post.slug}`
-    }
-  };
+  const structuredData = buildBlogPostingSchema(post);
+  const dateModified = latestEditorialDate(post) || post.published_at;
+  const editorialDates = blogEditorialDateDisplay(post);
+  const officialSources = officialBlogSources(post.source_data);
 
   return (
     <>
@@ -217,7 +173,8 @@ const BlogPost = () => {
         {/* Open Graph */}
         {post.featured_image && <meta property="og:image" content={post.featured_image} />}
         <meta property="article:published_time" content={post.published_at} />
-        <meta property="article:author" content="Fabsy Traffic Ticket Services" />
+        <meta property="article:modified_time" content={dateModified} />
+        <meta property="article:author" content={post.author || 'Fabsy Editorial Team'} />
         <meta property="article:section" content={post.category} />
         {post.keywords.map((keyword) => (
           <meta key={keyword} property="article:tag" content={keyword} />
@@ -259,19 +216,35 @@ const BlogPost = () => {
                   {post.title}
                 </h1>
 
-                <div className="flex items-center justify-between mb-6 pb-6 border-b border-white/10">
-                  <div className="flex items-center gap-6 text-white/70">
+                <div className="flex flex-col gap-4 mb-6 pb-6 border-b border-white/10 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-white/70">
+                    <span>
+                      By{' '}
+                      <Link to="/about" className="font-semibold text-primary-light underline underline-offset-4 hover:text-white">
+                        {post.author || 'Fabsy Editorial Team'}
+                      </Link>
+                    </span>
                     <span className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      {formatDate(post.published_at)}
+                      Published{editorialDates.published?.reviewed ? ' and editorially reviewed' : ''}{' '}
+                      {formatBlogEditorialDate(post.published_at)}
                     </span>
+                    {editorialDates.modified && (
+                      <span className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Updated{editorialDates.modified.reviewed ? ' and editorially reviewed' : ''}{' '}
+                        {formatBlogEditorialDate(editorialDates.modified.value)}
+                      </span>
+                    )}
+                    {editorialDates.reviewed && (
+                      <span className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Editorially reviewed {formatBlogEditorialDate(editorialDates.reviewed.value)}
+                      </span>
+                    )}
                     <span className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
                       {getEstimatedReadTime(post.content)} min read
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      {(post.view_count || 0) + 1} views
                     </span>
                   </div>
                   
@@ -307,7 +280,7 @@ const BlogPost = () => {
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    h1: ({node, ...props}) => <h1 className="text-4xl font-bold mt-8 mb-6 text-white" {...props} />,
+                    h1: ({node, ...props}) => <h2 className="text-3xl font-bold mt-12 mb-6 text-white" {...props} />,
                     h2: ({node, ...props}) => <h2 className="text-3xl font-bold mt-12 mb-6 text-white" {...props} />,
                     h3: ({node, ...props}) => <h3 className="text-2xl font-semibold mt-8 mb-4 text-white" {...props} />,
                     p: ({node, ...props}) => <p className="mb-6 text-white/80 leading-relaxed text-lg" {...props} />,
@@ -345,6 +318,22 @@ const BlogPost = () => {
                 </ReactMarkdown>
               </div>
 
+              {officialSources.length > 0 && (
+                <section className="mt-12 rounded-lg border border-white/20 bg-white/5 p-6" aria-labelledby="article-sources-heading">
+                  <h2 id="article-sources-heading" className="text-2xl font-bold text-white mb-3">Official sources</h2>
+                  <p className="text-white/80 mb-4">Primary sources used for this article:</p>
+                  <ul className="list-disc pl-6 space-y-2 text-white/80">
+                    {officialSources.map((source) => (
+                      <li key={source}>
+                        <a href={source} className="text-primary-light underline underline-offset-4 hover:text-white">
+                          {new URL(source).hostname.replace(/^www\./, '')}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
               {/* Keywords */}
               <footer className="mt-12 pt-8 border-t border-white/10">
                 <div className="mb-6">
@@ -356,6 +345,15 @@ const BlogPost = () => {
                       </Badge>
                     ))}
                   </div>
+                </div>
+
+                <div className="mb-8 rounded-lg border border-white/20 bg-white/5 p-6">
+                  <h3 className="text-xl font-semibold text-white mb-3">Related Alberta traffic-ticket guides</h3>
+                  <ul className="list-disc pl-6 space-y-2 text-white/80">
+                    <li><Link to="/content/speeding-ticket-alberta" className="text-primary-light underline underline-offset-4 hover:text-white">How to fight a speeding ticket in Alberta</Link></li>
+                    <li><Link to="/content/fight-traffic-ticket-alberta" className="text-primary-light underline underline-offset-4 hover:text-white">How to dispute a traffic ticket in Alberta</Link></li>
+                    <li><Link to="/hubs/court-options-and-deadlines" className="text-primary-light underline underline-offset-4 hover:text-white">Court options and response deadlines</Link></li>
+                  </ul>
                 </div>
 
                 {/* Call to Action */}

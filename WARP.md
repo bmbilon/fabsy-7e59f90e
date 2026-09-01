@@ -142,7 +142,8 @@ The project uses Supabase with these main tables:
 ### Indexing & Sitemaps (Live)
 - Sitemap index live at: https://fabsy.ca/sitemap.xml
   - Segmented sitemaps: `/sitemaps/sitemap-pages.xml`, `/sitemaps/sitemap-content.xml`, `/sitemaps/sitemap-faq.xml`
-- Submitted to Google and Bing (pinged via `npm run notify:search` and ready for Search Console/Webmaster Tools)
+- `npm run notify:search` submits changed Fabsy URLs through IndexNow; it does not ping Google.
+- Submit or refresh `sitemap.xml` separately in Google Search Console and Bing Webmaster Tools.
 - Bing verification file is deployed: https://fabsy.ca/BingSiteAuth.xml
 
 ### Spec-Kit Framework Files

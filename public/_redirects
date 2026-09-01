@@ -29,5 +29,26 @@
 /fight-speeding-ticket-red-deer  /content/fight-speeding-ticket-red-deer  301
 /fight-stop-sign-ticket-alberta  /content/fight-stop-sign-ticket-alberta  301
 
+# SEO consolidation redirects. Middleware owns these on production routes;
+# this mirror also covers static preview environments.
+/blog/alberta-construction-zone-speeding-blitz-drivers-guide  /blog/construction-zone-speeding-ticket-alberta-penalties  301
+/blog/canada-day-speeding-ticket-alberta-holiday-enforcement  /blog/alberta-rcmp-long-weekend-tickets-drivers-guide  301
+/blog/check-stop-ticket-alberta-penalties-and-options  /blog/rcmp-traffic-stop-ticket-alberta-what-to-expect  301
+/blog/construction-zone-speeding-ticket-alberta  /blog/construction-zone-speeding-ticket-alberta-penalties  301
+/blog/construction-zone-speeding-ticket-alberta-what-to-expect  /blog/construction-zone-speeding-ticket-alberta-penalties  301
+/blog/demerit-points-speeding-ticket-alberta  /content/demerit-points-alberta  301
+/blog/distracted-driving-penalties-alberta  /content/distracted-driving-ticket-alberta  301
+/blog/distracted-driving-ticket-alberta-what-to-expect  /content/distracted-driving-ticket-alberta  301
+/blog/extreme-speeding-ticket-alberta-fines-suspension-options  /content/speeding-ticket-alberta  301
+/blog/impaired-driving-charges-alberta  /blog/impaired-driving-ticket-alberta-penalties-and-options  301
+/blog/long-weekend-speeding-ticket-alberta-enforcement-guide  /blog/alberta-rcmp-long-weekend-tickets-drivers-guide  301
+/blog/speeding-50-over-limit-alberta-fines-suspension-guide  /content/speeding-ticket-alberta  301
+/blog/speeding-ticket-construction-zone-alberta-fines-demerits-options  /blog/construction-zone-speeding-ticket-alberta-penalties  301
+/blog/speeding-ticket-over-50kmh-alberta-penalties  /content/speeding-ticket-alberta  301
+/blog/speeding-ticket-photo-radar-free-zone-alberta  /blog/alberta-speeding-enforcement-photo-radar-free-roads  301
+/blog/street-racing-ticket-alberta-penalties  /blog/stunt-driving-street-racing-ticket-alberta  301
+/blog/unpaid-traffic-tickets-alberta-consequences  /blog/alberta-licence-renewal-outstanding-tickets  301
+/blog/vehicle-enforcement-operation-ticket-alberta  /blog/vehicle-enforcement-blitz-ticket-alberta-drivers-guide  301
+
 # SPA fallback. Crawler -> prerendered routing is handled by functions/_middleware.ts.
 /*    /index.html   200

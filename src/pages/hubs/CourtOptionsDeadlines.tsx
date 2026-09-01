@@ -27,7 +27,7 @@ const CourtOptionsDeadlines: React.FC = () => {
     name: 'Options and deadlines after an Alberta traffic ticket',
     url,
     description: 'General information about checking the choices and deadline printed on an Alberta traffic ticket and confirming current court instructions.',
-    dateModified: '2026-08-23',
+    dateModified: '2026-08-31',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -50,7 +50,7 @@ const CourtOptionsDeadlines: React.FC = () => {
         <p className="text-lg leading-relaxed text-foreground mb-3">
           Start with the response choices, instructions, and deadline printed on the ticket. Depending on the notice and current process, the available paths may include payment, requesting a resolution where available, disputing the allegation, or obtaining permitted representation.
         </p>
-        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 23, 2026 · The ticket and current court instructions control</p>
+        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 31, 2026 · The ticket and current court instructions control</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">What to check</h2>
@@ -59,6 +59,17 @@ const CourtOptionsDeadlines: React.FC = () => {
             <li>Keep the ticket and any relevant photos, video, or documents.</li>
             <li>Confirm current filing, disclosure, and appearance instructions with the court or an authorized service provider.</li>
           </ul>
+          <p className="mt-4 text-foreground">
+            For a speeding allegation, follow the response path in our{' '}
+            <Link to="/content/speeding-ticket-alberta" className="underline decoration-dashed underline-offset-4 hover:text-primary">
+              Alberta speeding-ticket guide
+            </Link>
+            . A driver considering trial should separately review the{' '}
+            <Link to="/blog/alberta-traffic-trial-evidence-self-represented" className="underline decoration-dashed underline-offset-4 hover:text-primary">
+              disclosure, witness, and admissibility issues involved at trial
+            </Link>
+            .
+          </p>
         </section>
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">

@@ -57,6 +57,17 @@ assert.equal(
 );
 assert.deepEqual(curatedPageIssues(normalizedCurated), []);
 
+const authorityGuide = {
+  ...curated,
+  slug: 'speeding-ticket-alberta',
+  next: `<p>${CANONICAL_PRICING_COPY}</p>`,
+  faqs: [{ q: 'How do you dispute this ticket?', a: 'Follow the instructions printed on the notice.' }],
+};
+const normalizedAuthorityGuide = normalizePageObject(authorityGuide, { curated: true });
+assert.deepEqual(normalizedAuthorityGuide.faqs, authorityGuide.faqs, 'authority-guide FAQs must remain editorial');
+assert.equal(normalizedAuthorityGuide.how, authorityGuide.how, 'authority-guide body must remain editorial');
+assert.deepEqual(JSON.parse(normalizedAuthorityGuide.jsonld), faqJsonLd(authorityGuide.faqs));
+
 require('./test-photo-radar-pricing-compatibility.cjs');
 
 console.log('Rapid Resolution content normalizer tests passed.');

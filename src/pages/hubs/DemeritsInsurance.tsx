@@ -27,7 +27,7 @@ const DemeritsInsurance: React.FC = () => {
     name: 'Do Alberta traffic tickets affect demerits and insurance?',
     url,
     description: 'A cautious overview of Alberta demerit points, driving abstracts, and questions to ask an insurer about a traffic conviction.',
-    dateModified: '2026-08-23',
+    dateModified: '2026-08-31',
     hasPart: [
       {
         '@type': 'ItemList',
@@ -50,7 +50,7 @@ const DemeritsInsurance: React.FC = () => {
         <p className="text-lg leading-relaxed text-foreground mb-3">
           Some convictions carry Alberta demerit points, while insurance treatment is a separate underwriting decision made by an insurer. The ticket type, final outcome, driving record, insurer, and renewal timing can all matter, so a demerit count alone does not answer the insurance question.
         </p>
-        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 23, 2026 · General information, not an insurance quote or legal advice</p>
+        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 31, 2026 · General information, not an insurance quote or legal advice</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Key points</h2>
@@ -59,6 +59,13 @@ const DemeritsInsurance: React.FC = () => {
             <li>Photo radar tickets carry no demerit points and do not appear on the driving abstract.</li>
             <li>Ask your insurer how a particular conviction may affect its underwriting or pricing. Fabsy does not predict insurance outcomes.</li>
           </ul>
+          <p className="mt-4 text-foreground">
+            See the{' '}
+            <Link to="/content/speeding-ticket-alberta" className="underline decoration-dashed underline-offset-4 hover:text-primary">
+              Alberta speeding-ticket guide
+            </Link>{' '}
+            for current speeding bands and response choices.
+          </p>
         </section>
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">

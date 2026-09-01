@@ -4,9 +4,11 @@ type Props = {
   headline: string;
   description: string;
   author?: string;
+  authorUrl?: string;
   datePublished?: string;
   dateModified?: string;
   image?: string;
+  citations?: string[];
   url: string;
 };
 
@@ -17,11 +19,15 @@ const ArticleSchema: React.FC<Props> = ({
   headline,
   description,
   author = "Fabsy Traffic Ticket Services",
-  datePublished = new Date().toISOString(),
-  dateModified = new Date().toISOString(),
+  authorUrl,
+  datePublished,
+  dateModified,
   image,
+  citations = [],
   url,
 }) => {
+  const citationKey = citations.join('\n');
+
   useEffect(() => {
     if (!headline || !description || !url) return;
     if (typeof document === 'undefined') return;
@@ -32,14 +38,20 @@ const ArticleSchema: React.FC<Props> = ({
       headline,
       description,
       ...(image ? { image } : {}),
-      author: { "@type": "Organization", name: author },
+      author: {
+        "@type": "Organization",
+        name: author,
+        ...(authorUrl ? { url: authorUrl } : {}),
+      },
       publisher: {
         "@type": "Organization",
+        "@id": "https://fabsy.ca/#organization",
         name: "Fabsy Traffic Ticket Services",
         logo: { "@type": "ImageObject", url: "https://fabsy.ca/favicon.svg" },
       },
-      datePublished,
-      dateModified,
+      ...(datePublished ? { datePublished } : {}),
+      ...(dateModified ? { dateModified } : {}),
+      ...(citationKey ? { citation: citationKey.split('\n') } : {}),
       url,
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
     };
@@ -64,7 +76,7 @@ const ArticleSchema: React.FC<Props> = ({
         toRemove.remove();
       }
     };
-  }, [headline, description, author, datePublished, dateModified, image, url]);
+  }, [headline, description, author, authorUrl, datePublished, dateModified, image, citationKey, url]);
 
   return null; // No DOM rendering needed
 };
