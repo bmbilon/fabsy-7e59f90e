@@ -7,6 +7,7 @@ import { trackAssessmentEvent } from "@/lib/assessment/analytics";
 import { PHOTO_RADAR, RAPID_RESOLUTION } from "@/config/offers";
 import { isPhotoRadarContentSlug } from "@/lib/photo-radar-pages";
 import { useLocale } from "@/i18n/locale-context";
+import { englishEditorialReturnPath } from "@/i18n/locale-policy.mjs";
 import LanguageSelector from "./LanguageSelector";
 import LanguageMessages from "./LanguageMessages";
 import { LocalizedHeader } from "./LocalizedNavigation";
@@ -34,6 +35,7 @@ const Header = () => {
   const activeOffer = photoContext ? PHOTO_RADAR : RAPID_RESOLUTION;
   // The intake owns the current product selection, which may differ from its entry URL.
   const isIntake = ['/submit-ticket', '/ticket-form'].includes(location.pathname);
+  const isEnglishEditorial = Boolean(englishEditorialReturnPath(location.pathname));
 
   if (locale !== "en") return <LocalizedHeader />;
 
@@ -168,6 +170,12 @@ const Header = () => {
           </div>
         </div>
       </header>
+      {isEnglishEditorial && <aside role="note" className="border-b border-sky-200 bg-sky-50 px-4 py-2.5 text-sm leading-relaxed text-sky-950" data-editorial-language-notice="english-only">
+        <div className="container mx-auto max-w-7xl">
+          <strong>Articles and guides are currently published in English.</strong>{' '}
+          Use the language menu to view Fabsy&apos;s translated service overview; this page itself remains in English.
+        </div>
+      </aside>}
       <LanguageMessages />
     </>
   );

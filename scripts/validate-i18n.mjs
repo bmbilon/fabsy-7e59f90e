@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fingerprint, isLocaleReleased, LEGAL_SOURCE_DOCUMENT_PATHS, WAVE_ONE_LOCALES } from '../src/i18n/locale-policy.mjs';
+import { fingerprint, isLocaleIndexable, isLocaleReleased, LEGAL_SOURCE_DOCUMENT_PATHS, WAVE_ONE_LOCALES } from '../src/i18n/locale-policy.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
@@ -44,21 +44,25 @@ for (const { code, wave } of registry.locales) {
   }
   for (const key of strings.keys()) if (!source.has(key)) failures.push(`${code}: unknown key ${key}`);
   const bundleFingerprint = fingerprint(bundle);
-  const released = isLocaleReleased(code, review, { sourceVersion: registry.sourceVersion, sourceFingerprint, bundleFingerprint, sourceDocuments });
+  const releaseContext = { sourceVersion: registry.sourceVersion, sourceFingerprint, bundleFingerprint, sourceDocuments };
+  const released = isLocaleReleased(code, review, releaseContext);
+  const indexable = isLocaleIndexable(code, review, releaseContext);
   if (review.locales[code]?.status === 'approved' && !released) failures.push(`${code}: approval is incomplete/stale or service is not ready`);
   if (review.locales[code]?.status === 'published' && !released) failures.push(`${code}: owner publication is incomplete or its source/bundle fingerprints are stale`);
+  if (review.locales[code]?.status === 'published' && indexable) failures.push(`${code}: machine-only publication must remain noindex until review approval is recorded`);
+  if (indexable && !released) failures.push(`${code}: indexable locale must also be publicly released`);
   if (code !== 'en' && released) {
     for (const [file, hash] of Object.entries(sourceDocuments)) {
       if (review.locales[code]?.sourceDocuments?.[file] !== hash) failures.push(`${code}: English legal source changed or was not attested: ${file}`);
     }
   }
-  results.push({ locale: code, strings: strings.size, state: released ? 'released' : 'draft', releaseBasis: review.locales[code]?.publication?.basis || review.locales[code]?.status, bundleFingerprint });
+  results.push({ locale: code, strings: strings.size, state: released ? 'released' : 'draft', indexable, releaseBasis: review.locales[code]?.publication?.basis || review.locales[code]?.status, bundleFingerprint });
 }
 if (JSON.stringify(registry.locales.filter(item => item.wave <= 1).map(item => item.code)) !== JSON.stringify(WAVE_ONE_LOCALES)) failures.push('Wave 1 registry and route policy differ');
 if (review.sourceVersion !== registry.sourceVersion) failures.push('Registry and review source versions differ');
 
 if (process.argv.includes('--review-values')) console.log(JSON.stringify({ sourceVersion: registry.sourceVersion, sourceFingerprint, sourceDocuments, locales: results }, null, 2));
-else console.log(`i18n: ${results.length} bundles, ${source.size} source strings; ${results.filter(item => item.state === 'draft').length} unpublished drafts, ${results.filter(item => item.state === 'released' && item.releaseBasis === 'owner_authorized_machine_translation').length} owner-published machine translations.`);
+else console.log(`i18n: ${results.length} bundles, ${source.size} source strings; ${results.filter(item => item.state === 'draft').length} unpublished drafts, ${results.filter(item => item.state === 'released' && item.releaseBasis === 'owner_authorized_machine_translation').length} owner-published machine translations, ${results.filter(item => item.locale !== 'en' && item.indexable).length} review-approved indexable translations.`);
 if (failures.length) {
   console.error(failures.join('\n'));
   process.exitCode = 1;

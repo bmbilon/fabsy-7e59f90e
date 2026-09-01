@@ -3,7 +3,7 @@ import english from './locales/en.json';
 import registry from './locales.json';
 import review from './review-status.json';
 import offers from '@/config/offers.json';
-import { fingerprint, isLocaleReleased, type LocaleCode } from './locale-policy.mjs';
+import { fingerprint, isLocaleIndexable, isLocaleReleased, type LocaleCode } from './locale-policy.mjs';
 import { createLocaleInstance } from './instance';
 
 export { registry, review };
@@ -57,6 +57,16 @@ export function loadLocale(locale: LocaleCode): Promise<i18n> {
 export function localeIsReleased(locale: LocaleCode) {
   const bundle = bundles.get(locale);
   return isLocaleReleased(locale, review, {
+    sourceVersion: registry.sourceVersion,
+    sourceFingerprint,
+    bundleFingerprint: bundle ? fingerprint(bundle) : '',
+    sourceDocuments,
+  });
+}
+
+export function localeIsIndexable(locale: LocaleCode) {
+  const bundle = bundles.get(locale);
+  return isLocaleIndexable(locale, review, {
     sourceVersion: registry.sourceVersion,
     sourceFingerprint,
     bundleFingerprint: bundle ? fingerprint(bundle) : '',

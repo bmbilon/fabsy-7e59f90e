@@ -12,6 +12,7 @@ import remarkGfm from 'remark-gfm';
 import { guardPublishedBlogPost } from '@/lib/published-content-guardrails';
 import useSafeHead from '@/hooks/useSafeHead';
 import { RAPID_RESOLUTION } from '@/config/offers';
+import seoRoutePolicies from '@/config/seoRoutePolicies.json';
 import {
   blogEditorialDateDisplay,
   blogSeoTitle,
@@ -40,8 +41,13 @@ interface BlogPost {
   featured_image?: string;
 }
 
+const BLOG_REDIRECTS = seoRoutePolicies.redirects as Record<string, string>;
+const GONE_BLOG_PATHS = new Set(seoRoutePolicies.gone);
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
+  const blogPath = slug ? `/blog/${slug}` : '';
+  const policyDestination = BLOG_REDIRECTS[blogPath] || (GONE_BLOG_PATHS.has(blogPath) ? '/blog' : null);
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +60,10 @@ const BlogPost = () => {
   });
 
   const fetchPost = useCallback(async () => {
+    if (policyDestination) {
+      setLoading(false);
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -78,13 +88,13 @@ const BlogPost = () => {
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [policyDestination, slug]);
 
   useEffect(() => {
-    if (slug) {
+    if (slug && !policyDestination) {
       void fetchPost();
     }
-  }, [fetchPost, slug]);
+  }, [fetchPost, policyDestination, slug]);
 
   const getEstimatedReadTime = (content: string) => {
     const wordsPerMinute = 200;
@@ -113,6 +123,10 @@ const BlogPost = () => {
     }
   };
 
+
+  if (policyDestination) {
+    return <Navigate to={policyDestination} replace />;
+  }
 
   if (loading) {
     return (

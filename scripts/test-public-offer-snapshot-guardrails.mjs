@@ -49,7 +49,7 @@ try {
   const servicesCard = `<main><section aria-labelledby="ticket-types-heading">${browserFragments.servicesPhotoCard}</section></main>`;
   accepted(servicesCard, '/services', 'Actual registered-owner service card is source-bound and contextual');
   for (const [from, to] of [['$79', '$198'], ['ticket-types-heading', 'unrelated-section'],
-    ['Photo radar and red-light cameras', 'Officer-issued speeding tickets'], ['no success fee.', 'no success fee. The statutory fine is $79.']]) {
+    ['Photo radar and red-light cameras', 'Officer-issued speeding tickets'], ['No success fee.', 'No success fee. The statutory fine is $79.']]) {
     rejected(servicesCard.replace(from, to), '/services', 'Service card amount, product, section and full clause must remain exact');
   }
   rejected(servicesCard, '/rapid-resolution', 'The service-card price cannot migrate to an unrelated route');
@@ -269,7 +269,7 @@ try {
     const block = `<main><section aria-labelledby="${heading}">${strip}${actual.render('/ladder')}</section></main>`;
     accepted(block, route, `${route}: actual source-qualified banner and ladder in their correct section`);
     rejected(block.replace('$79', '$80'), route, `${route}: banner amount remains exact`);
-    rejected(block.replace('No demerits.', ''), route, `${route}: banner requires complete owner-notice scope`);
+    rejected(block.replace('The current demerit schedule assigns no points to an owner conviction under TSA s.160.', ''), route, `${route}: banner requires complete owner-notice scope`);
     rejected(block.replace('href="/photo-radar"', 'href="/submit-ticket"'), route, `${route}: banner must open owner-notice details`);
     rejected(block.replace(heading, 'unrelated-section'), route, `${route}: source-specific main context is required`);
     rejected(block.replace('20% off', '30% off'), route, `${route}: shared ladder cannot change the officer discount`);

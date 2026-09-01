@@ -563,7 +563,8 @@ function validateSnapshots(dbInventory, curatedInventory, reviewedCurated) {
     }
     const discoverySignals = photoRadar ? [
       'Rapid Resolution: Photo Radar', 'not-guilty plea', 'disclosure',
-      'complete, readable disclosure', 'No demerits', 'No insurance impact',
+      'complete, readable disclosure', 'owner conviction under Traffic Safety Act s.160',
+      'does not promise how an insurer will underwrite',
       'No trial', 'No success fee', 'approve any deal', 'href="/photo-radar"',
     ] : [
       'Rapid Resolution',

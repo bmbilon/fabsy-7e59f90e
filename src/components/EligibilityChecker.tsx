@@ -425,7 +425,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
               <div className="mt-2 flex flex-wrap items-end justify-between gap-2">
                 <div>
                   <h4 className="text-lg font-bold">{offer.name} · ${offer.priceCad}</h4>
-                  <p className="text-sm text-muted-foreground">{isPhotoRadar ? "No demerits. No insurance impact. Only the fine is on the table." : "Eligible pre-trial service from intake through your decision on any Crown response."}</p>
+                  <p className="text-sm text-muted-foreground">{isPhotoRadar ? PHOTO_RADAR.insuranceDisclaimer : "Eligible pre-trial service from intake through your decision on any Crown response."}</p>
                 </div>
                 <p className="text-sm font-semibold">CAD · plus GST</p>
               </div>

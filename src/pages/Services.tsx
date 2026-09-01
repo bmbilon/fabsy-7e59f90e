@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   INSURANCE_IMPACT_REPORT,
+  PHOTO_RADAR,
   RAPID_RESOLUTION,
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
@@ -31,7 +32,7 @@ const ticketTypes = [
   { icon: Zap, title: "Speeding tickets", description: "Officer-issued speeding allegations and eligible related provincial ticket matters." },
   { icon: AlertTriangle, title: "Excessive speeding", description: "Ticket review and service-scope confirmation based on the allegation and available process." },
   { icon: Phone, title: "Distracted driving", description: "Pre-trial review of the allegation, disclosure, and available prosecutor-review path." },
-  { icon: Camera, title: "Photo radar and red-light cameras", description: "$79 + GST for Alberta notices mailed to a registered owner. No demerits, no insurance impact, no success fee." },
+  { icon: Camera, title: "Photo radar and red-light cameras", description: `$79 + GST for Alberta notices mailed to a registered owner. ${PHOTO_RADAR.insuranceDisclaimer} No success fee.` },
   { icon: Car, title: "Careless driving", description: "Eligibility assessment and review of disclosure and circumstances for an accepted matter." },
   { icon: Clock3, title: "Other traffic violations", description: "Selected Alberta provincial traffic tickets where agent services are permitted and accepted." },
 ] as const;

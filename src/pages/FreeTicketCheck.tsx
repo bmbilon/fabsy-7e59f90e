@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import useSafeHead from "@/hooks/useSafeHead";
+import { PHOTO_RADAR } from "@/config/offers";
 
 const EligibilityChecker = lazy(() => import("@/components/EligibilityChecker").then(module => ({ default: module.EligibilityChecker })));
 
@@ -23,7 +24,7 @@ export default function FreeTicketCheck() {
         <Card className="p-7 sm:p-10">
           <FileSearch className="h-9 w-9 text-primary" aria-hidden="true" />
           <h1 className="mt-5 text-4xl font-bold">Free Ticket Check</h1>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">Upload your Alberta ticket and check its details and service eligibility before choosing paid help. A photo radar owner notice has no demerits and no insurance impact.</p>
+          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">Upload your Alberta ticket and check its details and service eligibility before choosing paid help. {PHOTO_RADAR.insuranceDisclaimer}</p>
           <p className="mt-4 leading-relaxed text-muted-foreground">No payment is required for this check. It does not retain Fabsy, enter a plea, request disclosure or pause your ticket deadline. Verify extracted details against the notice.</p>
           <Button size="lg" className="mt-7" onClick={() => setOpen(true)}>Check my ticket</Button>
           <p className="mt-5 text-sm text-muted-foreground">Already know it is an owner notice? <Link to="/photo-radar" className="font-semibold text-primary underline">View Photo Radar · $79 + GST</Link>.</p>

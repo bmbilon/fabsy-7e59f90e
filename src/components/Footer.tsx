@@ -175,7 +175,7 @@ const Footer = () => {
                 This information is not intended to create, and receipt or viewing does not constitute, a lawyer-client relationship.
               </p>
               <p>
-                {CANONICAL_OFFER_PRICING} Government and third-party fees are separate. Accepted orders retain their original written terms, and any written fee waiver controls. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised. Registered-owner camera notices have no demerits and no insurance impact.
+                {CANONICAL_OFFER_PRICING} Government and third-party fees are separate. Accepted orders retain their original written terms, and any written fee waiver controls. Results vary, and no court, conviction, demerit, insurance, or premium outcome is promised. Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points; insurer treatment is not promised.
               </p>
             </div>
             

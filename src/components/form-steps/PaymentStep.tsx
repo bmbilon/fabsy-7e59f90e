@@ -308,7 +308,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
             <div>
               <p className="font-semibold">{offer.name}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {isPhotoRadar ? "Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee. No demerits or insurance impact." : "Eligible Alberta pre-trial service through disclosure, prosecutor review, Crown-response explanation and your decision. Trial representation is separate."}
+                {isPhotoRadar ? `Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee. ${PHOTO_RADAR.insuranceDisclaimer}` : "Eligible Alberta pre-trial service through disclosure, prosecutor review, Crown-response explanation and your decision. Trial representation is separate."}
               </p>
             </div>
             <p className="shrink-0 font-bold">${offer.priceCad} CAD</p>

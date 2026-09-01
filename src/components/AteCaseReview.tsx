@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ateNotificationDraft, type AteCaseEvent } from "@/lib/ate-notifications";
 import { ResolutionEmailAction } from "@/components/ResolutionEmailAction";
+import { PHOTO_RADAR } from "@/config/offers";
 
 interface CrownOffer {
   id: string; version: number; response_text: string; proposed_fine_cents: number;
@@ -95,7 +96,7 @@ export function AteCaseReview({ submissionId, offenceDate, ownership, onOutcomeR
       <a className="text-sm underline" href={`/portal/cases/${submissionId}`} target="_blank" rel="noopener noreferrer">Open secure client case link</a>
     </CardContent></Card>
     <Card>
-      <CardHeader><CardTitle>Photo Radar · ATE disclosure review</CardTitle><CardDescription>No demerits, no insurance impact, no IIR, no trial and no success fee. A missing record creates a review question; it does not establish an invalid notice.</CardDescription></CardHeader>
+      <CardHeader><CardTitle>Photo Radar · ATE disclosure review</CardTitle><CardDescription>{PHOTO_RADAR.insuranceDisclaimer} No trial and no success fee. A missing record creates a review question; it does not establish an invalid notice.</CardDescription></CardHeader>
       <CardContent className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label htmlFor="ate-kind">Notice type</Label><select id="ate-kind" className="mt-1 w-full rounded-md border bg-background p-2" value={noticeKind} onChange={(e) => setNoticeKind(e.target.value as AteNoticeKind)}><option value="unknown">Confirm from notice</option><option value="speed">Automated speed enforcement</option><option value="red_light">Red-light camera</option></select></div>

@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LEGAL_SOURCE_DOCUMENT_PATHS, fingerprint, isLocaleReleased } from '../src/i18n/locale-policy.mjs';
+import { LEGAL_SOURCE_DOCUMENT_PATHS, fingerprint, isLocaleIndexable, isLocaleReleased } from '../src/i18n/locale-policy.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const SITE = 'https://fabsy.ca';
@@ -80,7 +80,13 @@ export function loadLocaleSeoContext(options = {}) {
     bundleFingerprint: bundleFingerprints[code],
     sourceDocuments,
   });
-  return { registry, review, locales, bundles, offers, phase1Routes, snapshotRoutes, indexableRoutes, sourceFingerprint, bundleFingerprints, sourceDocuments, released };
+  const indexable = code => isLocaleIndexable(code, review, {
+    sourceVersion: registry.sourceVersion,
+    sourceFingerprint,
+    bundleFingerprint: bundleFingerprints[code],
+    sourceDocuments,
+  });
+  return { registry, review, locales, bundles, offers, phase1Routes, snapshotRoutes, indexableRoutes, sourceFingerprint, bundleFingerprints, sourceDocuments, released, indexable };
 }
 
 export function splitSnapshotRoute(route, context) {
@@ -95,14 +101,14 @@ export function isIndexable(context, code, basePath, existingNoindex = false) {
   if (existingNoindex) return false;
   const route = normalizeRoute(basePath);
   if (code === 'en') return ENGLISH_ONLY_ROUTES.has(route) || !context.phase1Routes.includes(route) || context.indexableRoutes.has(route);
-  return context.released(code) && context.indexableRoutes.has(route);
+  return context.indexable(code) && context.indexableRoutes.has(route);
 }
 
 export function alternateLinks(context, code, basePath, existingNoindex = false) {
   if (!isIndexable(context, code, basePath, existingNoindex)) return [];
   const route = normalizeRoute(basePath);
   const equivalents = context.indexableRoutes.has(route)
-    ? context.locales.filter(locale => locale.code === 'en' || context.released(locale.code))
+    ? context.locales.filter(locale => context.indexable(locale.code))
     : context.locales.filter(locale => locale.code === 'en');
   return [
     ...equivalents.map(locale => ({ languageTag: locale.languageTag, href: canonicalUrl(locale.code, route) })),
@@ -221,8 +227,13 @@ export function routeForSnapshotFile(root, filename) {
 export function verifyLocaleSnapshotCoverage(root, context) {
   const manifest = readJson(path.join(root, LOCALE_MANIFEST_NAME));
   const records = localeSnapshotRecords(context);
+  const localeStates = Object.fromEntries(context.locales.map(locale => [locale.code, {
+    released: context.released(locale.code),
+    indexable: context.indexable(locale.code),
+  }]));
   if (manifest.version !== 1 || manifest.sourceVersion !== context.registry.sourceVersion || manifest.sourceFingerprint !== context.sourceFingerprint
     || fingerprint(manifest.bundleFingerprints || {}) !== fingerprint(context.bundleFingerprints)
+    || fingerprint(manifest.localeStates || {}) !== fingerprint(localeStates)
     || fingerprint(manifest.sourceDocuments || {}) !== fingerprint(context.sourceDocuments)) {
     throw new Error('Localized snapshots are stale: regenerate them after source, price, bundle or review changes');
   }

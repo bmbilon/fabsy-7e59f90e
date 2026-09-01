@@ -82,7 +82,7 @@ const ThankYou: React.FC = () => {
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">How our pricing works</h2>
             <p className="text-sm text-muted-foreground">
-              ${summary.serviceValue.toFixed(2)} service fee + ${summary.tax.toFixed(2)} GST (${summary.total.toFixed(2)} total). {summary.photoRadar ? 'No trial. No success fee. No insurance impact.' : 'Trial representation is separate.'} Government fines are separate.
+              ${summary.serviceValue.toFixed(2)} service fee + ${summary.tax.toFixed(2)} GST (${summary.total.toFixed(2)} total). {summary.photoRadar ? `${PHOTO_RADAR.insuranceDisclaimer} No trial. No success fee.` : 'Trial representation is separate.'} Government fines are separate.
             </p>
           </div>
           <div className="rounded-lg border p-4 bg-card">

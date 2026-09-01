@@ -9,7 +9,7 @@ import { FormData } from "../TicketForm";
 import { Scale, Shield, Users, Camera, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
+import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
 
 interface DefenseStepProps {
   formData: FormData;
@@ -148,7 +148,7 @@ const DefenseStep = ({ formData, updateFormData }: DefenseStepProps) => {
         <h3 className="text-xl font-semibold">Your photo radar resolution</h3>
         <p className="font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>
         <p className="text-sm leading-relaxed">Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any proposed deal before Fabsy accepts it. No trial. No success fee. No outcome is promised.</p>
-        <p className="text-sm leading-relaxed">This registered-owner notice has no demerits and no insurance impact. We do not need your insurance or driving-record context.</p>
+        <p className="text-sm leading-relaxed">{PHOTO_RADAR.insuranceDisclaimer} We do not collect insurance or driving-record context for this service.</p>
       </Card>
       <div className="space-y-3">
         <Label htmlFor="photo-radar-notes">Anything else we should know? (optional)</Label>

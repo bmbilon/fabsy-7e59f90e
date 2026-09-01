@@ -1,3 +1,5 @@
+import { PHOTO_RADAR } from "@/config/offers";
+
 export interface AteCaseEvent {
   id: string;
   event_type: string;
@@ -18,5 +20,5 @@ export function ateNotificationDraft(event: AteCaseEvent, submissionId: string) 
     outcome_recorded: "The final outcome has been recorded on your Photo Radar file. Open your secure case page to review it and any remaining payment instructions.",
     client_instruction: "A client instruction is recorded on the current ATE offer. Verify the exact version, instruction and any expiry in the staff case before taking the next authorized action. This event does not itself accept the Crown agreement.",
   };
-  return `${event.audience === "staff" ? "Internal Fabsy case update" : "Your Fabsy Photo Radar file"}\n\n${update[event.event_type] || "A file update is ready for review."}\n\n${portal}\n\nRegistered-owner camera notices have no demerits and no insurance impact. No trial and no success fee. Keep following the notice's deadlines unless Fabsy confirms otherwise.`;
+  return `${event.audience === "staff" ? "Internal Fabsy case update" : "Your Fabsy Photo Radar file"}\n\n${update[event.event_type] || "A file update is ready for review."}\n\n${portal}\n\n${PHOTO_RADAR.insuranceDisclaimer} No trial and no success fee. Keep following the notice's deadlines unless Fabsy confirms otherwise.`;
 }

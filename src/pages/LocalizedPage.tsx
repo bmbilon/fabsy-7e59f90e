@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useLocale } from '@/i18n/locale-context';
-import { registry, review } from '@/i18n/config';
+import { localeIsIndexable, registry, review } from '@/i18n/config';
 import { localizePath, WAVE_ONE_LOCALES } from '@/i18n/locale-policy.mjs';
 import useSafeHead from '@/hooks/useSafeHead';
 import { RAPID_RESOLUTION } from '@/config/offers';
@@ -121,12 +121,13 @@ function LocalizedContent() {
   const isHome = basePath === '/';
   const isRapid = basePath === '/rapid-resolution';
   const isPurchaseHandoff = basePath === '/terms-of-purchase';
+  const isSearchIndexable = localeIsIndexable(locale);
   const prefix = isHome ? 'home' : isRapid ? 'rapid' : basePath === '/how-it-works' ? 'process' : basePath === '/faq' ? 'faq' : basePath === '/contact' ? 'contact' : basePath === '/terms-of-service' ? 'terms' : 'checkout';
   useSafeHead({
     title: isPurchaseHandoff ? 'Terms of Purchase (English) | Fabsy' : t(`${prefix}.metaTitle`, { defaultValue: t('home.metaTitle') }),
     description: isPurchaseHandoff ? 'The purchase terms are available in English. Read the English document before paying.' : t(`${prefix}.metaDescription`, { defaultValue: t('home.metaDescription') }),
     canonical: `https://fabsy.ca${localizePath(basePath, locale)}`,
-    robots: !isPurchaseHandoff && isReleased && registry.indexableRoutes.includes(basePath) ? 'index, follow' : 'noindex, follow',
+    robots: !isPurchaseHandoff && isSearchIndexable && registry.indexableRoutes.includes(basePath) ? 'index, follow' : 'noindex, follow',
   });
   const known = registry.phase1Routes.includes(basePath);
   return <div className="min-h-screen bg-slate-50 text-slate-900">

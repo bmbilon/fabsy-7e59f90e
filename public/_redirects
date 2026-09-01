@@ -31,24 +31,64 @@
 
 # SEO consolidation redirects. Middleware owns these on production routes;
 # this mirror also covers static preview environments.
-/blog/alberta-construction-zone-speeding-blitz-drivers-guide  /blog/construction-zone-speeding-ticket-alberta-penalties  301
-/blog/canada-day-speeding-ticket-alberta-holiday-enforcement  /blog/alberta-rcmp-long-weekend-tickets-drivers-guide  301
-/blog/check-stop-ticket-alberta-penalties-and-options  /blog/rcmp-traffic-stop-ticket-alberta-what-to-expect  301
-/blog/construction-zone-speeding-ticket-alberta  /blog/construction-zone-speeding-ticket-alberta-penalties  301
-/blog/construction-zone-speeding-ticket-alberta-what-to-expect  /blog/construction-zone-speeding-ticket-alberta-penalties  301
+/blog/alberta-construction-zone-speeding-blitz-drivers-guide  /content/speeding-ticket-alberta  301
+/blog/alberta-photo-radar-school-construction-zones-restricted  /content/photo-radar-ticket-alberta  301
+/blog/alberta-rcmp-long-weekend-tickets-drivers-guide  /content/fight-traffic-ticket-alberta  301
+/blog/canada-day-speeding-ticket-alberta-holiday-enforcement  /content/speeding-ticket-alberta  301
+/blog/caught-driving-over-speed-limit-alberta-fines-suspension  /content/speeding-ticket-alberta  301
+/blog/caught-speeding-way-over-limit-alberta-suspension-fines-options  /content/speeding-ticket-alberta  301
+/blog/check-stop-ticket-alberta-penalties-and-options  /content/fight-traffic-ticket-alberta  301
+/blog/construction-zone-speeding-ticket-alberta  /content/speeding-ticket-alberta  301
+/blog/construction-zone-speeding-ticket-alberta-penalties  /content/speeding-ticket-alberta  301
+/blog/construction-zone-speeding-ticket-alberta-what-to-expect  /content/speeding-ticket-alberta  301
 /blog/demerit-points-speeding-ticket-alberta  /content/demerit-points-alberta  301
 /blog/distracted-driving-penalties-alberta  /content/distracted-driving-ticket-alberta  301
 /blog/distracted-driving-ticket-alberta-what-to-expect  /content/distracted-driving-ticket-alberta  301
+/blog/extreme-speeding-photo-radar-zone-alberta  /content/speeding-ticket-alberta  301
+/blog/extreme-speeding-ticket-alberta-penalties  /content/speeding-ticket-alberta  301
 /blog/extreme-speeding-ticket-alberta-fines-suspension-options  /content/speeding-ticket-alberta  301
+/blog/heritage-day-speeding-ticket-alberta-long-weekend  /content/speeding-ticket-alberta  301
+/blog/high-speed-motorcycle-ticket-alberta  /content/speeding-ticket-alberta  301
 /blog/impaired-driving-charges-alberta  /blog/impaired-driving-ticket-alberta-penalties-and-options  301
-/blog/long-weekend-speeding-ticket-alberta-enforcement-guide  /blog/alberta-rcmp-long-weekend-tickets-drivers-guide  301
+/blog/long-weekend-speeding-ticket-alberta-enforcement-guide  /content/speeding-ticket-alberta  301
+/blog/photo-radar-speeding-ticket-alberta-what-to-expect  /content/photo-radar-ticket-alberta  301
+/blog/rcmp-long-weekend-enforcement-blitz-ticket-alberta  /content/fight-traffic-ticket-alberta  301
+/blog/rcmp-long-weekend-safety-campaign-ticket-alberta  /content/fight-traffic-ticket-alberta  301
+/blog/rcmp-speeding-ticket-alberta-guide  /content/speeding-ticket-alberta  301
+/blog/rcmp-speeding-ticket-alberta-what-to-do  /content/speeding-ticket-alberta  301
+/blog/rcmp-traffic-safety-campaign-ticket-alberta  /content/fight-traffic-ticket-alberta  301
+/blog/rcmp-traffic-stop-ticket-alberta-what-to-expect  /content/fight-traffic-ticket-alberta  301
+/blog/speeding-182-kmh-alberta-extreme-penalties  /content/speeding-ticket-alberta  301
 /blog/speeding-50-over-limit-alberta-fines-suspension-guide  /content/speeding-ticket-alberta  301
-/blog/speeding-ticket-construction-zone-alberta-fines-demerits-options  /blog/construction-zone-speeding-ticket-alberta-penalties  301
+/blog/speeding-over-230-kmh-alberta-penalties-and-options  /content/speeding-ticket-alberta  301
+/blog/speeding-ticket-construction-zone-alberta-fines-demerits-options  /content/speeding-ticket-alberta  301
 /blog/speeding-ticket-over-50kmh-alberta-penalties  /content/speeding-ticket-alberta  301
 /blog/speeding-ticket-photo-radar-free-zone-alberta  /blog/alberta-speeding-enforcement-photo-radar-free-roads  301
 /blog/street-racing-ticket-alberta-penalties  /blog/stunt-driving-street-racing-ticket-alberta  301
 /blog/unpaid-traffic-tickets-alberta-consequences  /blog/alberta-licence-renewal-outstanding-tickets  301
 /blog/vehicle-enforcement-operation-ticket-alberta  /blog/vehicle-enforcement-blitz-ticket-alberta-drivers-guide  301
+
+# Bounded consolidation pilot: generic, zero-click careless-driving scenario pages.
+/content/careless-driving-ticket-calgary-multiple-tickets  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-calgary-officer-error  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-calgary-out-of-province  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-calgary-photo-radar  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-edmonton-photo-radar  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-fort-mcmurray-multiple-tickets  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-fort-mcmurray-officer-error  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-fort-mcmurray-out-of-province  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-fort-mcmurray-photo-radar  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-lethbridge-multiple-tickets  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-lethbridge-officer-error  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-lethbridge-out-of-province  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-medicine-hat-multiple-tickets  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-medicine-hat-officer-error  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-medicine-hat-out-of-province  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-medicine-hat-photo-radar  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-red-deer-multiple-tickets  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-red-deer-officer-error  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-red-deer-out-of-province  /content/careless-driving-ticket-alberta  301
+/content/careless-driving-ticket-red-deer-photo-radar  /content/careless-driving-ticket-alberta  301
 
 # SPA fallback. Crawler -> prerendered routing is handled by functions/_middleware.ts.
 /*    /index.html   200

@@ -28,7 +28,11 @@ for (const slug of slugs) {
   }
   assert.match(page.next, /href="\/photo-radar"/);
   assert.doesNotMatch(JSON.stringify(page), /\$49\b|\$198\b|\$229\b/);
-  assert.ok(page.hook.includes('no insurance impact'));
+  assert.match(page.hook, /current demerit schedule assigns no points for an owner conviction/);
+  assert.match(page.hook, /not a promise about any insurer's underwriting/);
+  assert.doesNotMatch(JSON.stringify(page), /\bhas no insurance impact\b|\bno insurance impact\b(?!\s+report)|\bOnly the fine is on the table\b|\bNo Insurance Impact Report is included or needed\b/i);
+  assert.match(page.what, /Regs\/2002_331\.pdf/);
+  if (slug === 'photo-radar-ticket-alberta') assert.match(page.what, /Acts\/T06\.pdf/);
   assert.ok(page.next.includes('($82.95 total)'));
   assert.ok(page.next.includes(feeRefund.photoHeadline));
   assert.ok(page.next.includes(feeRefund.photoCondition));

@@ -122,7 +122,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
                 <li>{FEE_REFUND.payment}</li>
                 <li>{isPhotoRadar ? FEE_REFUND.photoCondition : FEE_REFUND.condition}</li>
                 <li>{FEE_REFUND.declinedOfferText}</li>
-                {isPhotoRadar && <li>This registered-owner notice carries no demerits and has no insurance impact. Only the fine is on the table; no insurance report is included or needed.</li>}
+                {isPhotoRadar && <li>{PHOTO_RADAR.insuranceDisclaimer}</li>}
                 <li>I may withdraw this consent at any time by providing written notice</li>
                 <li>This consent remains valid until the matter is resolved or withdrawn</li>
               </ul>

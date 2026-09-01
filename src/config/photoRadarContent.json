@@ -1,15 +1,15 @@
 {
   "heroFacts": [
     {
-      "title": "No demerits",
-      "description": "A registered-owner camera notice does not add points to your licence."
+      "title": "No demerit points under the current schedule",
+      "description": "An owner conviction under Traffic Safety Act s.160 receives no demerit points under the current schedule."
     },
     {
-      "title": "No insurance impact",
-      "description": "These notices do not affect your driving record or insurance."
+      "title": "Insurer treatment varies",
+      "description": "No insurer, underwriting, or premium result is promised."
     },
     {
-      "title": "Only the fine is on the table",
+      "title": "Fine review, clearly scoped",
       "description": "We pursue a reduction or withdrawal. Any government fine remains separate from our fee."
     }
   ],
@@ -34,7 +34,7 @@
     },
     {
       "question": "Does photo radar affect insurance in Alberta?",
-      "answer": "No. A photo radar or red-light camera notice issued to the registered owner has no insurance impact and carries no demerits. Only the fine is on the table. An Insurance Impact Report is not included or needed. This does not describe a separate ticket issued to an identified driver."
+      "answer": "Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. That does not promise how an insurer will underwrite, price, or treat a particular record. An Insurance Impact Report is not included. A separate ticket issued to an identified driver is different."
     },
     {
       "question": "What does the $79 fee cover?",
@@ -42,7 +42,7 @@
     },
     {
       "question": "How does the Photo Radar fee refund guarantee work?",
-      "answer": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed. If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits. You approve any deal. Trial representation is not included, and there is no success surcharge. Government fines are separate. See the fee refund guarantee in our Terms of Service for details."
+      "answer": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed. If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. You approve any deal. Trial representation is not included, and there is no success surcharge. Government fines are separate. See the fee refund guarantee in our Terms of Service for details."
     },
     {
       "question": "When does the 48-hour commitment start?",
@@ -69,7 +69,7 @@
       "url": "https://www.alberta.ca/photo-radar-alberta"
     },
     {
-      "title": "Calgary Police: camera tickets and insurance",
+      "title": "Calgary Police: automated traffic enforcement",
       "url": "https://www.calgarypolice.ca/public-safety/traffic-and-road-safety/automated-traffic-enforcement.html"
     },
     {

@@ -8,7 +8,7 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "sourceFingerprint": "fnv1a-e31ca9b8",
       "bundleFingerprint": "fnv1a-cfda4b6d",
       "serviceReady": false,
       "publication": {
@@ -17,21 +17,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+        "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "src/config/feeRefund.json": "fnv1a-9638f7a8",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+        "src/config/feeRefund.json": "fnv1a-06562a22",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
       }
     },
     "tl": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "sourceFingerprint": "fnv1a-e31ca9b8",
       "bundleFingerprint": "fnv1a-e6f20b3a",
       "serviceReady": false,
       "publication": {
@@ -40,21 +40,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+        "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "src/config/feeRefund.json": "fnv1a-9638f7a8",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+        "src/config/feeRefund.json": "fnv1a-06562a22",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
       }
     },
     "zh-hans": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "sourceFingerprint": "fnv1a-e31ca9b8",
       "bundleFingerprint": "fnv1a-a49640e8",
       "serviceReady": false,
       "publication": {
@@ -63,21 +63,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+        "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "src/config/feeRefund.json": "fnv1a-9638f7a8",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+        "src/config/feeRefund.json": "fnv1a-06562a22",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
       }
     },
     "zh-hant": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "sourceFingerprint": "fnv1a-e31ca9b8",
       "bundleFingerprint": "fnv1a-bd0ec53a",
       "serviceReady": false,
       "publication": {
@@ -86,21 +86,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+        "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "src/config/feeRefund.json": "fnv1a-9638f7a8",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+        "src/config/feeRefund.json": "fnv1a-06562a22",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
       }
     },
     "ar": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "sourceFingerprint": "fnv1a-e31ca9b8",
       "bundleFingerprint": "fnv1a-2ea2eaaf",
       "serviceReady": false,
       "publication": {
@@ -109,21 +109,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+        "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "src/config/feeRefund.json": "fnv1a-9638f7a8",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+        "src/config/feeRefund.json": "fnv1a-06562a22",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
       }
     },
     "hi": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "sourceFingerprint": "fnv1a-e31ca9b8",
       "bundleFingerprint": "fnv1a-9a04fa33",
       "serviceReady": false,
       "publication": {
@@ -132,21 +132,21 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+        "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "src/config/feeRefund.json": "fnv1a-9638f7a8",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+        "src/config/feeRefund.json": "fnv1a-06562a22",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
       }
     },
     "es": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-d6eb8ed8",
+      "sourceFingerprint": "fnv1a-e31ca9b8",
       "bundleFingerprint": "fnv1a-f6850a18",
       "serviceReady": false,
       "publication": {
@@ -155,14 +155,14 @@
         "authorizedAt": "2026-08-31T02:09:07.163Z"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+        "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-        "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+        "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
-        "src/config/feeRefund.json": "fnv1a-9638f7a8",
-        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+        "src/config/feeRefund.json": "fnv1a-06562a22",
+        "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
       }
     }
   },

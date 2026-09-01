@@ -203,7 +203,7 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
             </div>
           )}
           <p className="border-t pt-3 text-sm text-muted-foreground">
-            {isPhotoRadar ? <>No demerits. No insurance impact. Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. {PHOTO_RADAR.outcomeDisclaimer}</> : <>This fee covers the eligible pre-trial service described above. Trial representation,
+            {isPhotoRadar ? <>{PHOTO_RADAR.insuranceDisclaimer} Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. {PHOTO_RADAR.outcomeDisclaimer}</> : <>This fee covers the eligible pre-trial service described above. Trial representation,
             government fines and out-of-scope work are separate. {RAPID_RESOLUTION.outcomeDisclaimer}</>}
           </p>
         </div>

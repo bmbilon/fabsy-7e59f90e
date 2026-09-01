@@ -274,6 +274,10 @@ export function generateLocalizedSnapshots(options = {}) {
       sourceFingerprint: context.sourceFingerprint,
       sourceDocuments: context.sourceDocuments,
       bundleFingerprints: context.bundleFingerprints,
+      localeStates: Object.fromEntries(context.locales.map(locale => [locale.code, {
+        released: context.released(locale.code),
+        indexable: context.indexable(locale.code),
+      }])),
       generatedCount: records.length,
       records,
     };
