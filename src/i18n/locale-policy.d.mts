@@ -1,5 +1,6 @@
 export type LocaleCode = 'en' | 'pa' | 'tl' | 'zh-hans' | 'zh-hant' | 'ar' | 'hi' | 'es';
 export const WAVE_ONE_LOCALES: readonly LocaleCode[];
+export const MACHINE_TRANSLATION_DISCLAIMER_VERSION: 'not-legal-advice-machine-translation-v1';
 export const EDITORIAL_RETURN_STATE_KEY: 'fabsyEditorialReturnPath';
 export const LEGAL_SOURCE_DOCUMENT_PATHS: readonly string[];
 export function fingerprint(value: unknown): string;

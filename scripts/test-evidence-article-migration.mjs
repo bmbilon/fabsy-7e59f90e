@@ -61,7 +61,7 @@ const assignedFields = [...updateBlock[1].matchAll(/^\s*([a-z_]+)\s*=/gmi)]
 assert.deepEqual(
   assignedFields,
   ['content', 'reviewed_at', 'updated_at'],
-  'migration must preserve every field except reviewed content and editorial timestamps',
+  'migration must preserve every field except corrected content and its recorded timestamps',
 );
 assert.match(
   updateBlock[1].replace(/\s+/g, ' '),

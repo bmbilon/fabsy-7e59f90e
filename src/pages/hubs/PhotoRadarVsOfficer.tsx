@@ -50,7 +50,7 @@ const PhotoRadarVsOfficer: React.FC = () => {
         <p className="text-lg leading-relaxed text-foreground mb-3">
           A photo-radar notice is generally issued to the registered owner rather than identifying a driver, while an officer-issued ticket identifies the driver who was stopped. That distinction affects demerits, driving-record treatment, available evidence, and the questions worth asking before responding.
         </p>
-        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 23, 2026 · Check the notice and current official Alberta rules</p>
+        <p className="mb-8 text-sm text-muted-foreground">Sources checked August 23, 2026 · Check the notice and current official Alberta rules</p>
 
         <section className="mb-10 rounded-xl border border-primary/20 bg-primary/5 p-6">
           <h2 className="text-2xl font-bold text-foreground">Need the distinction applied to your ticket?</h2>

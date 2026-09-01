@@ -132,12 +132,12 @@ const About = () => {
         {/* Editorial standards */}
         <div className="mb-20">
           <Card className="p-8 md:p-10 bg-gradient-card shadow-elevated border-white/20 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold text-card-foreground mb-5">How Fabsy reviews public information</h2>
+            <h2 className="text-3xl font-bold text-card-foreground mb-5">How Fabsy checks public information</h2>
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
                 Fabsy's public guides use primary sources where available, including the Government of Alberta,
                 Alberta Court of Justice, and the Traffic Tickets Digital Service. Curated guides identify their
-                sources and last editorial review date so readers can check the controlling information directly.
+                sources and last source-check date so readers can check the controlling information directly.
               </p>
               <p>
                 Fabsy distinguishes general legal information from ticket-specific agent services. The website is

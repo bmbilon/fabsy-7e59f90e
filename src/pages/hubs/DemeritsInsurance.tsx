@@ -50,7 +50,7 @@ const DemeritsInsurance: React.FC = () => {
         <p className="text-lg leading-relaxed text-foreground mb-3">
           Some convictions carry Alberta demerit points, while insurance treatment is a separate underwriting decision made by an insurer. The ticket type, final outcome, driving record, insurer, and renewal timing can all matter, so a demerit count alone does not answer the insurance question.
         </p>
-        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 31, 2026 · General information, not an insurance quote or legal advice</p>
+        <p className="mb-8 text-sm text-muted-foreground">Sources checked August 31, 2026 · General information, not an insurance quote or legal advice</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Key points</h2>

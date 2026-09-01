@@ -159,7 +159,10 @@ export function normalizeSnapshotHead(html, route, context) {
     }).replace(/<meta\b[^>]*>/gi, tag => {
       const name = attribute(tag, 'name')?.toLowerCase();
       const property = attribute(tag, 'property')?.toLowerCase();
-      return name === 'robots' || property === 'og:url' ? '' : tag;
+      // Browser-rendered localized snapshots begin with the English shell's
+      // en_CA Open Graph locale. Removing it is more accurate than inventing
+      // an unsupported region/script mapping for a language-only catalog.
+      return name === 'robots' || property === 'og:url' || (code !== 'en' && property === 'og:locale') ? '' : tag;
     });
     return clean.replace(/<\/head>/i,
       `<link rel="canonical" href="${escapeHtml(canonical)}">\n<meta name="robots" content="${robots}">\n<meta property="og:url" content="${escapeHtml(canonical)}">\n${hreflangMarkup(context, code, basePath, existingNoindex)}\n</head>`);
@@ -181,13 +184,16 @@ export function assertSnapshotHead(html, route, context) {
   const robotsTags = [...html.matchAll(/<meta\b[^>]*>/gi)].filter(match => attribute(match[0], 'name')?.toLowerCase() === 'robots');
   if (robotsTags.length !== 1 || !robotsFromHtml(html)) throw new Error(`Snapshot must declare exactly one robots policy: ${route}`);
   const noindex = /\bnoindex\b/i.test(robotsFromHtml(html));
-  if (!isIndexable(context, code, basePath) && !noindex) throw new Error(`Unreviewed or private snapshot is indexable: ${route}`);
-  if (code !== 'en' && isIndexable(context, code, basePath) && noindex) throw new Error(`Approved locale snapshot is unexpectedly noindex: ${route}`);
+  if (!isIndexable(context, code, basePath) && !noindex) throw new Error(`Unattested or private snapshot is indexable: ${route}`);
+  if (code !== 'en' && isIndexable(context, code, basePath) && noindex) throw new Error(`Index-authorized locale snapshot is unexpectedly noindex: ${route}`);
+  const openGraphLocaleTags = [...html.matchAll(/<meta\b[^>]*>/gi)]
+    .map(match => match[0]).filter(tag => attribute(tag, 'property')?.toLowerCase() === 'og:locale');
+  if (code !== 'en' && openGraphLocaleTags.length) throw new Error(`Localized snapshot inherited an English Open Graph locale: ${route}`);
   const actual = [...html.matchAll(/<link\b[^>]*>/gi)]
     .map(match => match[0]).filter(tag => attribute(tag, 'rel') === 'alternate' && attribute(tag, 'hreflang'))
     .map(tag => ({ languageTag: attribute(tag, 'hreflang'), href: attribute(tag, 'href') }));
   const expected = alternateLinks(context, code, basePath, noindex);
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`Snapshot has stale or unreviewed hreflang links: ${route}`);
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error(`Snapshot has stale or unauthorized hreflang links: ${route}`);
 }
 
 export function localeSnapshotRecords(context) {
@@ -238,7 +244,7 @@ export function verifyLocaleSnapshotCoverage(root, context) {
     throw new Error('Localized snapshots are stale: regenerate them after source, price, bundle or review changes');
   }
   if (manifest.generatedCount !== records.length || JSON.stringify(manifest.records) !== JSON.stringify(records)) {
-    throw new Error('Localized snapshot manifest does not match the current routes and approval gates');
+    throw new Error('Localized snapshot manifest does not match the current routes and publication/indexing gates');
   }
   const expected = new Set(records.map(record => path.resolve(snapshotFile(root, record.route))));
   const actual = context.registry.locales.filter(locale => locale.code !== 'en')
@@ -253,10 +259,10 @@ export function verifyLocaleSnapshotCoverage(root, context) {
   }
   for (const basePath of new Set(records.filter(record => record.indexable).map(record => record.basePath))) {
     const filename = snapshotFile(root, basePath);
-    if (!fs.existsSync(filename)) throw new Error(`Approved translation lacks an English counterpart snapshot: ${basePath}`);
+    if (!fs.existsSync(filename)) throw new Error(`Index-authorized translation lacks an English counterpart snapshot: ${basePath}`);
     const english = fs.readFileSync(filename, 'utf8');
     if (canonicalFromHtml(english) !== canonicalUrl('en', basePath) || /\bnoindex\b/i.test(robotsFromHtml(english) || '')) {
-      throw new Error(`Approved translation has no indexable English counterpart: ${basePath}`);
+      throw new Error(`Index-authorized translation has no indexable English counterpart: ${basePath}`);
     }
   }
   return manifest;

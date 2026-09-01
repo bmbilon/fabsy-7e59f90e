@@ -241,9 +241,9 @@ export async function generateSitemap() {
 
   fs.writeFileSync(faqXmlPath, urlset(faqUrls, localeContext));
 
-  // Keep the existing segmented English inventory. Each review-approved translation
-  // gets only its real Phase 1 equivalents, never machine-only or English content
-  // duplicates or intake/checkout/receipt URLs.
+  // Keep the existing segmented English inventory. Each index-authorized translation
+  // gets only its real Phase 1 equivalents, never English editorial duplicates or
+  // intake/checkout/receipt URLs.
   const localePaths = [];
   for (const locale of localeContext.registry.locales.filter(item => item.code !== 'en')) {
     const filename = path.join(PUBLIC_DIR, 'sitemaps', `sitemap-${locale.code}.xml`);

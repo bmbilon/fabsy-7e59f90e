@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useLocale } from '@/i18n/locale-context';
 import { getLocaleInstance, loadLocale, locales, registry, review, type LocaleCode } from '@/i18n/config';
-import { editorialReturnPathFromState, localizePath, preferredLocale } from '@/i18n/locale-policy.mjs';
+import { editorialReturnPathFromState, localizePath, MACHINE_TRANSLATION_DISCLAIMER_VERSION, preferredLocale } from '@/i18n/locale-policy.mjs';
 import { LANGUAGE_PREFERENCE_KEY } from './LanguageSelector';
 
 export default function LanguageMessages() {
@@ -69,10 +69,12 @@ export default function LanguageMessages() {
     </aside></>;
   }
   if (!isEnglish && isReleased && review.locales[locale]?.status === 'published') {
-    return <>{editorialHandoff}<aside role="note" className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs leading-relaxed text-slate-600" data-translation-status="machine-translated">
-      <div className="container mx-auto max-w-6xl">
-        <strong className="font-medium text-slate-700">{t('language.translationNoteTitle')}</strong>
+    return <>{editorialHandoff}<aside role="note" className="border-b-2 border-amber-400 bg-amber-50 px-4 py-4 text-sm leading-relaxed text-amber-950" data-translation-status="machine-translated" data-publication-disclaimer={MACHINE_TRANSLATION_DISCLAIMER_VERSION}>
+      <div className="container mx-auto max-w-6xl space-y-1">
+        <strong className="block font-black tracking-wide text-red-800" lang="en" dir="ltr">NOT LEGAL ADVICE</strong>
         <p>{t('language.translationNoteBody')}</p>
+        <p>{t('common.notLawFirm')}</p>
+        <p>{t('language.englishControls')}</p>
       </div>
     </aside></>;
   }

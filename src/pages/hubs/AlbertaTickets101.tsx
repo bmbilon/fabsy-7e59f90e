@@ -63,7 +63,7 @@ const AlbertaTickets101: React.FC = () => {
           </Link>
           .
         </p>
-        <p className="mb-8 text-sm text-muted-foreground">Reviewed August 31, 2026 · General information, not legal advice</p>
+        <p className="mb-8 text-sm text-muted-foreground">Sources checked August 31, 2026 · General information, not legal advice</p>
 
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">What to know</h2>

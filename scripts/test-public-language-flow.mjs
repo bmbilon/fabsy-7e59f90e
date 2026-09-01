@@ -96,7 +96,7 @@ try {
       import type { FormData } from './src/components/TicketForm';
       import { LocaleContext } from './src/i18n/locale-context';
       import { createLocaleInstance } from './src/i18n/instance';
-      import { EDITORIAL_RETURN_STATE_KEY, editorialReturnPathFromState, localizePath } from './src/i18n/locale-policy.mjs';
+      import { EDITORIAL_RETURN_STATE_KEY, editorialReturnPathFromState, localizePath, MACHINE_TRANSLATION_DISCLAIMER_VERSION } from './src/i18n/locale-policy.mjs';
       import { validateLocalizedIntakeStep } from './src/i18n/intake-validation';
 
       function LocationProbe() {
@@ -168,8 +168,13 @@ try {
             if (review.locales[code].status === 'published') {
               assert.equal(notes.length, 1, code + ' must disclose machine translation once');
               assert.equal(notes[0].getAttribute('role'), 'note');
-              assert.equal(notes[0].querySelector('strong')?.textContent, instance.t('language.translationNoteTitle'));
-              assert.equal(notes[0].querySelector('p')?.textContent, instance.t('language.translationNoteBody'));
+              assert.equal(notes[0].getAttribute('data-publication-disclaimer'), MACHINE_TRANSLATION_DISCLAIMER_VERSION);
+              assert.equal(notes[0].querySelector('strong')?.textContent, 'NOT LEGAL ADVICE');
+              assert.deepEqual([...notes[0].querySelectorAll('p')].map(node => node.textContent), [
+                instance.t('language.translationNoteBody'),
+                instance.t('common.notLawFirm'),
+                instance.t('language.englishControls'),
+              ]);
             } else {
               assert.equal(notes.length, 0, 'A reviewed locale must not be falsely labelled a machine publication');
             }

@@ -1,5 +1,6 @@
 /** Shared browser/build policy. Fingerprints detect editing drift, not authenticity. */
 export const WAVE_ONE_LOCALES = Object.freeze(['en', 'pa', 'tl', 'zh-hans', 'zh-hant', 'ar', 'hi', 'es']);
+export const MACHINE_TRANSLATION_DISCLAIMER_VERSION = 'not-legal-advice-machine-translation-v1';
 export const EDITORIAL_RETURN_STATE_KEY = 'fabsyEditorialReturnPath';
 const SAFE_EDITORIAL_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const LEGAL_SOURCE_DOCUMENT_PATHS = Object.freeze([
@@ -113,6 +114,10 @@ function localeReleaseChecks(code, review, expected) {
     publication?.basis === 'owner_authorized_machine_translation' &&
     typeof publication.authorizedBy === 'string' && publication.authorizedBy.trim() &&
     typeof publication.authorizedAt === 'string' && Number.isFinite(Date.parse(publication.authorizedAt));
+  const ownerIndexingAttestation = ownerPublication &&
+    typeof publication.indexingAuthorizedBy === 'string' && publication.indexingAuthorizedBy.trim() &&
+    typeof publication.indexingAuthorizedAt === 'string' && Number.isFinite(Date.parse(publication.indexingAuthorizedAt)) &&
+    publication.disclaimerVersion === MACHINE_TRANSLATION_DISCLAIMER_VERSION;
   const currentCopy = Boolean(
     legalSourcesMatch &&
     review.sourceVersion === expected?.sourceVersion &&
@@ -121,7 +126,12 @@ function localeReleaseChecks(code, review, expected) {
     entry.sourceFingerprint === expected.sourceFingerprint &&
     entry.bundleFingerprint === expected.bundleFingerprint,
   );
-  return { reviewedRelease: Boolean(reviewedRelease), ownerPublication: Boolean(ownerPublication), currentCopy };
+  return {
+    reviewedRelease: Boolean(reviewedRelease),
+    ownerPublication: Boolean(ownerPublication),
+    ownerIndexingAttestation: Boolean(ownerIndexingAttestation),
+    currentCopy,
+  };
 }
 
 /** A released locale is usable in the language selector and localized journey. */
@@ -131,11 +141,11 @@ export function isLocaleReleased(code, review, expected) {
   return checks.currentCopy && (checks.reviewedRelease || checks.ownerPublication);
 }
 
-/** Only current-copy translations with a recorded human approval may be indexed. */
+/** Indexing requires either human approval or an explicit owner disclaimer attestation. */
 export function isLocaleIndexable(code, review, expected) {
   const checks = localeReleaseChecks(code, review, expected);
   if (checks === true || checks === false) return checks;
-  return checks.currentCopy && checks.reviewedRelease;
+  return checks.currentCopy && (checks.reviewedRelease || checks.ownerIndexingAttestation);
 }
 
 /** Accept-Language header or navigator.languages, ordered by preference. */

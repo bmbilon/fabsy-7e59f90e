@@ -240,20 +240,12 @@ const BlogPost = () => {
                     </span>
                     <span className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Published{editorialDates.published?.reviewed ? ' and editorially reviewed' : ''}{' '}
-                      {formatBlogEditorialDate(post.published_at)}
+                      Published {formatBlogEditorialDate(post.published_at)}
                     </span>
                     {editorialDates.modified && (
                       <span className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        Updated{editorialDates.modified.reviewed ? ' and editorially reviewed' : ''}{' '}
-                        {formatBlogEditorialDate(editorialDates.modified.value)}
-                      </span>
-                    )}
-                    {editorialDates.reviewed && (
-                      <span className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Editorially reviewed {formatBlogEditorialDate(editorialDates.reviewed.value)}
+                        Updated {formatBlogEditorialDate(editorialDates.modified.value)}
                       </span>
                     )}
                     <span className="flex items-center gap-2">
