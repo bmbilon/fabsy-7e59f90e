@@ -96,6 +96,53 @@ assert.deepEqual(
 assert.equal(aiChart.impressions, "2023");
 assert.equal(aiPageRows.impressions, "2252");
 
+const backlinkProspects = load("docs/seo-research/backlink-prospects.csv");
+assert.equal(backlinkProspects.records.length, 20);
+assert.equal(
+  new Set(backlinkProspects.records.map((row) => row.id)).size,
+  backlinkProspects.records.length,
+);
+assert.equal(
+  backlinkProspects.records.filter((row) => row.use_class === "outreach_candidate").length,
+  12,
+);
+assert.equal(
+  backlinkProspects.records.filter((row) => row.use_class === "cite_only_authority").length,
+  8,
+);
+assert.ok(
+  backlinkProspects.records.every(
+    (row) =>
+      row.url.startsWith("https://") &&
+      row.contact_or_resource_path &&
+      row.priority &&
+      row.risk_fit_notes &&
+      row.source_verified_date === "2026-09-01",
+  ),
+  "every backlink prospect must retain its verified source, handling path, and risk notes",
+);
+
+const outreachDrafts = fs.readFileSync(
+  "docs/seo-research/backlink-outreach-drafts.md",
+  "utf8",
+);
+assert.match(outreachDrafts, /Status:\*\* Drafts only — no email was sent/);
+assert.match(outreachDrafts, /Do not send any draft yet/);
+assert.match(outreachDrafts, /qualified human has reviewed the complete page/);
+assert.match(outreachDrafts, /cite_only_authority/);
+
+const legalReviewPacket = fs.readFileSync(
+  "docs/seo-research/alberta-legal-editorial-review-packet.md",
+  "utf8",
+);
+assert.match(legalReviewPacket, /Review status:\*\* \*\*PENDING/);
+assert.match(legalReviewPacket, /no Alberta legal approval is recorded/);
+assert.match(
+  legalReviewPacket,
+  /e91a79d6e321e71370266b64e3f87ce73fe37ca14b81b7b7c012c5961406fa8a/,
+);
+assert.match(legalReviewPacket, /No name, date, checkbox, or approval state may be populated/);
+
 process.stdout.write(
-  `research artifact tests passed (${queryMap.records.length} mapped queries; 30 benchmark prompts; 30 observed Perplexity rows)\n`,
+  `research artifact tests passed (${queryMap.records.length} mapped queries; 30 benchmark prompts; 30 observed Perplexity rows; 20 backlink prospects)\n`,
 );
