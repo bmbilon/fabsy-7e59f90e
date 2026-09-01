@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {
   blogEditorialDateDisplay,
   blogEditorialDateKey,
@@ -58,5 +59,20 @@ assert.equal(schema.author.url, 'https://fabsy.ca/about');
 assert.equal(schema.datePublished, post.published_at);
 assert.equal(schema.dateModified, post.updated_at);
 assert.deepEqual(schema.citation, ['https://albertacourts.ca/cj/areas-of-law/traffic']);
+
+const blogIndex = fs.readFileSync(new URL('../src/pages/Blog.tsx', import.meta.url), 'utf8');
+const blogPost = fs.readFileSync(new URL('../src/pages/BlogPost.tsx', import.meta.url), 'utf8');
+const header = fs.readFileSync(new URL('../src/components/Header.tsx', import.meta.url), 'utf8');
+for (const guide of ['/content/speeding-ticket-alberta', '/content/fight-traffic-ticket-alberta']) {
+  assert.equal(blogIndex.split(guide).length - 1, 1, `${guide} must be featured exactly once on the blog index`);
+}
+assert(blogIndex.includes('Essential Alberta ticket guides'));
+assert(blogIndex.indexOf('<FeaturedGuides />') < blogIndex.indexOf('Latest Articles'), 'featured guides must precede the latest-post grid');
+assert(header.includes('data-editorial-language-notice="english-only"'));
+assert(header.includes('Articles and guides are currently published in English.'));
+assert(header.includes('englishEditorialReturnPath(location.pathname)'), 'the English-only notice must be limited to validated editorial routes');
+assert(blogIndex.includes('RETIRED_BLOG_SLUGS.has(post.slug)'), 'retired blog posts must be removed from the index grid');
+assert(blogPost.includes('BLOG_REDIRECTS[blogPath]'), 'client-side article navigation must honor canonical redirects');
+assert(blogPost.includes('GONE_BLOG_PATHS.has(blogPath)'), 'client-side article navigation must honor removed routes');
 
 console.log('Blog SEO tests passed.');

@@ -218,7 +218,7 @@ async function resolveCasePurchaser(
     );
   }
   if (submission.ticket_type === "photo_radar") {
-    throw new RequestError("Registered-owner camera notices have no insurance impact and are not eligible for an insurance report.", 409);
+    throw new RequestError("An Insurance Impact Report is not available for a registered-owner camera notice. No insurer, underwriting, or premium result is promised.", 409);
   }
   if (
     type === "addon" &&

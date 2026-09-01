@@ -46,7 +46,7 @@ const faqSchema = {
 const PhotoRadar = () => {
   useSafeHead({
     title: "Photo Radar & Red-Light Ticket Help Alberta | $79 | Fabsy",
-    description: "Alberta photo radar or red-light notice? $79 + GST. No demerits or insurance impact. We pursue a Crown reduction or withdrawal. You approve any deal.",
+    description: "Alberta owner convictions under TSA s.160 receive no demerit points under the current schedule. No insurer, underwriting, or premium result is promised.",
     canonical: `https://fabsy.ca${PHOTO_RADAR.slug}`,
   });
 
@@ -65,7 +65,7 @@ const PhotoRadar = () => {
                   Photo radar ticket in the mail? $79 flat.
                 </h1>
                 <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-200 sm:text-xl">
-                  No demerits. No insurance impact. The only thing on the table is the fine.
+                  {PHOTO_RADAR.insuranceDisclaimer}
                 </p>
                 <p className="mt-4 max-w-2xl leading-relaxed text-slate-300">
                   Fabsy enters your not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal.

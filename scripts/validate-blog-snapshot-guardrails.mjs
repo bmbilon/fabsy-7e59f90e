@@ -33,6 +33,24 @@ for (const entry of fs.readdirSync(BLOG_DIR, { withFileTypes: true }).sort((a, b
     content: article?.querySelector('.prose')?.textContent?.replace(/\s+/g, ' ').trim() || '',
   };
   const violations = articleViolations(candidate);
+  if (entry.name === 'alberta-traffic-trial-evidence-self-represented') {
+    if (!candidate.content.includes('Disclosure must be requested and reviewed before trial')) {
+      violations.push('evidence article is missing the reviewed disclosure heading');
+    }
+    if (!candidate.content.includes('The prosecutor and police do not act for you or give legal advice')) {
+      violations.push('evidence article is missing the reviewed disclosure boundary');
+    }
+    if (!article?.querySelector('a[href="https://www.canlii.org/en/ca/scc/doc/1991/1991canlii45/1991canlii45.html"]')) {
+      violations.push('evidence article is missing its Stinchcombe primary citation');
+    }
+    if (!candidate.content.includes('Independent help and court information') ||
+        !article?.querySelector('a[href="https://www.alberta.ca/contact-court-and-justice-services"]')) {
+      violations.push('evidence article is missing independent court-help information');
+    }
+    if (candidate.content.includes('interpreted without legal advice from the Crown or police')) {
+      violations.push('evidence article retained the superseded disclosure heading');
+    }
+  }
   if (violations.length) failures.push({ slug: entry.name, violations });
   checked += 1;
   dom.window.close();

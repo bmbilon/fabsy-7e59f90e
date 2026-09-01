@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Languages } from 'lucide-react';
 import { useLocale } from '@/i18n/locale-context';
 import { loadLocale, registry, type LocaleCode } from '@/i18n/config';
-import { localizePath } from '@/i18n/locale-policy.mjs';
+import {
+  editorialLanguageHandoffDestination,
+  localizePath,
+} from '@/i18n/locale-policy.mjs';
 
 export const LANGUAGE_PREFERENCE_KEY = 'fabsy.language.v1';
 
@@ -29,8 +32,15 @@ export default function LanguageSelector() {
             // while the next dictionary arrives.
             await loadLocale(next);
             try { localStorage.setItem(LANGUAGE_PREFERENCE_KEY, next); } catch { /* Private browsing must not break navigation. */ }
-            const target = next === 'en' || registry.phase1Routes.includes(basePath) ? basePath : '/';
-            navigate(localizePath(target + location.search + location.hash, next), { state: intakeHandoff || location.state });
+            const editorialHandoff = editorialLanguageHandoffDestination(next, basePath, location.pathname, location.state);
+            if (editorialHandoff) {
+              // Editorial copy remains English-only. Move to the translated
+              // overview, or restore it, without inventing a localized article URL.
+              navigate(editorialHandoff.path, { state: editorialHandoff.state });
+            } else {
+              const target = next === 'en' || registry.phase1Routes.includes(basePath) ? basePath : '/';
+              navigate(localizePath(target + location.search + location.hash, next), { state: intakeHandoff || location.state });
+            }
           } catch { /* Stay on the working language when a bundle cannot load. */ }
           finally { setLoading(false); }
         }}>

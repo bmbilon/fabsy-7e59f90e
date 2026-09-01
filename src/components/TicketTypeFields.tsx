@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
+import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
 import { REGISTERED_OWNER_LABELS, type RegisteredOwnerAnswer, type TicketType, type TicketTypeSource } from "@/lib/ticket/ticketType";
 
 interface TicketTypeFieldsProps {
@@ -35,7 +35,7 @@ export default function TicketTypeFields({ ticketType, ticketTypeSource, registe
       </fieldset>
       {isPhotoRadar ? (
         <>
-          <p className="text-sm leading-relaxed"><strong>No demerits. No insurance impact.</strong> Only the fine is on the table. {PHOTO_RADAR_PRICE_LABEL}; no success fee and no trial.</p>
+          <p className="text-sm leading-relaxed">{PHOTO_RADAR.insuranceDisclaimer} {PHOTO_RADAR_PRICE_LABEL}; no success fee and no trial.</p>
           <fieldset disabled={disabled} aria-describedby={`${id}-owner-help`}>
             <legend className="text-sm font-semibold">Was this vehicle registered to you on the offence date? *</legend>
             <div className="mt-3 flex flex-wrap gap-3">

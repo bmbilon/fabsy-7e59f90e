@@ -5,7 +5,21 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build } from 'esbuild';
-import { fingerprint, isLocaleReleased, LEGAL_SOURCE_DOCUMENT_PATHS, localizePath, normalizeLocale, preferredLocale, splitLocalePath, WAVE_ONE_LOCALES } from '../src/i18n/locale-policy.mjs';
+import {
+  EDITORIAL_RETURN_STATE_KEY,
+  editorialLanguageHandoffDestination,
+  editorialReturnPathFromState,
+  englishEditorialReturnPath,
+  fingerprint,
+  isLocaleIndexable,
+  isLocaleReleased,
+  LEGAL_SOURCE_DOCUMENT_PATHS,
+  localizePath,
+  normalizeLocale,
+  preferredLocale,
+  splitLocalePath,
+  WAVE_ONE_LOCALES,
+} from '../src/i18n/locale-policy.mjs';
 
 assert.equal(localizePath('/rapid-resolution?utm_source=community#fees', 'pa'), '/pa/rapid-resolution?utm_source=community#fees');
 assert.equal(localizePath('/pa/faq?gclid=example#answer', 'tl'), '/tl/faq?gclid=example#answer');
@@ -17,6 +31,26 @@ for (const input of ['/pa//untrusted.example/path', '/pa/\\untrusted.example/pat
   assert.equal(new URL(target, 'https://fabsy.ca').origin, 'https://fabsy.ca', 'Locale fallback must remain on Fabsy');
 }
 assert.equal(localizePath('https://example.com/', 'pa'), 'https://example.com/');
+assert.equal(englishEditorialReturnPath('/blog/'), '/blog');
+assert.equal(englishEditorialReturnPath('/blog/alberta-ticket-evidence'), '/blog/alberta-ticket-evidence');
+assert.equal(englishEditorialReturnPath('/content/speeding-ticket-alberta'), '/content/speeding-ticket-alberta');
+for (const unsafe of ['/content', '/blog/article/extra', '/pa/blog/article', '/blog/Article', '/blog/article?query=1', '//blog/article', 'https://fabsy.ca/blog/article']) {
+  assert.equal(englishEditorialReturnPath(unsafe), null, `Unsafe editorial return path must be rejected: ${unsafe}`);
+}
+assert.equal(editorialReturnPathFromState({ [EDITORIAL_RETURN_STATE_KEY]: '/blog/alberta-ticket-evidence' }), '/blog/alberta-ticket-evidence');
+assert.equal(editorialReturnPathFromState({ [EDITORIAL_RETURN_STATE_KEY]: '/pa/blog/alberta-ticket-evidence' }), null);
+assert.equal(editorialReturnPathFromState({ [EDITORIAL_RETURN_STATE_KEY]: 'https://example.com/' }), null);
+for (const source of ['/blog', '/blog/alberta-ticket-evidence', '/content/speeding-ticket-alberta']) {
+  assert.deepEqual(editorialLanguageHandoffDestination('pa', source, source, { untrusted: 'discard' }), {
+    path: '/pa/', state: { [EDITORIAL_RETURN_STATE_KEY]: source },
+  });
+}
+assert.deepEqual(editorialLanguageHandoffDestination('en', '/', '/pa/', { [EDITORIAL_RETURN_STATE_KEY]: '/blog/alberta-ticket-evidence' }), {
+  path: '/blog/alberta-ticket-evidence', state: null,
+});
+assert.equal(editorialLanguageHandoffDestination('pa', '/blog/bad/extra', '/blog/bad/extra', null), null);
+assert.equal(editorialLanguageHandoffDestination('pa', '/blog/article', '/pa/blog/article', null), null);
+assert.equal(editorialLanguageHandoffDestination('en', '/', '/pa/', { [EDITORIAL_RETURN_STATE_KEY]: 'https://example.com/' }), null);
 assert.deepEqual(splitLocalePath('/pa/faq/'), { locale: 'pa', path: '/faq', hasLocalePrefix: true });
 assert.deepEqual(splitLocalePath('/portal/cases'), { locale: 'en', path: '/portal/cases', hasLocalePrefix: false });
 assert.equal(splitLocalePath('/ur/').hasLocalePrefix, false, 'Wave 2 must not silently publish empty pages');
@@ -46,7 +80,10 @@ const expected = { sourceVersion: 'v1', sourceFingerprint: 'source', bundleFinge
 const approval = { sourceVersion: 'v1', locales: { pa: { status: 'approved', reviewedBy: 'Test reviewer', reviewedAt: '2026-08-30', sourceFingerprint: 'source', bundleFingerprint: 'bundle', serviceReady: true, sourceDocuments } } };
 assert.equal(isLocaleReleased('en', {}, expected), true);
 assert.equal(isLocaleReleased('pa', approval, expected), true);
+assert.equal(isLocaleIndexable('en', {}, expected), true);
+assert.equal(isLocaleIndexable('pa', approval, expected), true);
 assert.equal(isLocaleReleased('ur', approval, expected), false);
+assert.equal(isLocaleIndexable('ur', approval, expected), false);
 assert.equal(isLocaleReleased('pa', approval, { ...expected, bundleFingerprint: 'changed translation' }), false);
 assert.equal(isLocaleReleased('pa', approval, { ...expected, sourceFingerprint: 'changed offer' }), false);
 assert.equal(isLocaleReleased('pa', approval, { ...expected, sourceDocuments: { ...sourceDocuments, 'src/pages/TermsOfService.tsx': 'changed terms' } }), false);
@@ -56,6 +93,7 @@ delete incompleteDocuments['src/pages/TermsOfPurchase.tsx'];
 assert.equal(isLocaleReleased('pa', { ...approval, locales: { pa: { ...approval.locales.pa, sourceDocuments: incompleteDocuments } } }, { ...expected, sourceDocuments: incompleteDocuments }), false, 'Matching incomplete records must not bypass purchase-term review');
 for (const patch of [{ status: 'draft' }, { serviceReady: false }, { reviewedBy: null }, { reviewedAt: 'invalid' }]) {
   assert.equal(isLocaleReleased('pa', { ...approval, locales: { pa: { ...approval.locales.pa, ...patch } } }, expected), false);
+  assert.equal(isLocaleIndexable('pa', { ...approval, locales: { pa: { ...approval.locales.pa, ...patch } } }, expected), false);
 }
 
 // The owner may publish machine translations without asserting that a native
@@ -70,6 +108,7 @@ const ownerPublication = {
 };
 for (const code of WAVE_ONE_LOCALES.filter(code => code !== 'en')) {
   assert.equal(isLocaleReleased(code, ownerPublication, expected), true, `${code} owner publication must work without a claimed native review`);
+  assert.equal(isLocaleIndexable(code, ownerPublication, expected), false, `${code} machine publication must remain noindex until review approval is recorded`);
   assert.equal(ownerPublication.locales[code].reviewedBy, null);
   assert.equal(ownerPublication.locales[code].serviceReady, false);
 }
@@ -120,15 +159,21 @@ try {
       import { Route, Routes } from 'react-router-dom';
       import { I18nextProvider } from 'react-i18next';
       import LocalizedPage from './src/pages/LocalizedPage';
+      import LanguageMessages from './src/components/LanguageMessages';
       import { LocaleContext } from './src/i18n/locale-context';
       import { createLocaleInstance } from './src/i18n/instance';
-      import { localizePath } from './src/i18n/locale-policy.mjs';
+      import { EDITORIAL_RETURN_STATE_KEY, localizePath } from './src/i18n/locale-policy.mjs';
       import { lastHead } from '@/hooks/useSafeHead';
       export function render(code, english, bundle, basePath, isReleased = false) {
         const instance = createLocaleInstance(code, english, bundle, [code, 'en'], { price: '$198', reportPrice: '$49', bundlePrice: '$229', proDiscountPercent: '20', proDiscountPrice: '$158.40', proSavings: '$39.60', proBundlePrice: '$183.20', email: 'hello@fabsy.ca' });
         const context = { locale: code, basePath, isReleased, direction: code === 'ar' ? 'rtl' : 'ltr', href: path => localizePath(path, code), availableLocales: [], intakeHandoff: null, setIntakeHandoff: () => undefined };
         const html = renderToStaticMarkup(<StaticRouter location={localizePath(basePath, code) + '?source=review#purchase'}><I18nextProvider i18n={instance}><LocaleContext.Provider value={context}><Routes><Route path="/:locale/*" element={<LocalizedPage />} /></Routes></LocaleContext.Provider></I18nextProvider></StaticRouter>);
         return { html, head: lastHead };
+      }
+      export function renderEditorialHandoff(code, english, bundle, returnPath) {
+        const instance = createLocaleInstance(code, english, bundle, [code, 'en'], { price: '$198', reportPrice: '$49', bundlePrice: '$229', proDiscountPercent: '20', proDiscountPrice: '$158.40', proSavings: '$39.60', proBundlePrice: '$183.20', email: 'hello@fabsy.ca' });
+        const context = { locale: code, basePath: '/', isReleased: true, direction: code === 'ar' ? 'rtl' : 'ltr', href: path => localizePath(path, code), availableLocales: [], intakeHandoff: null, setIntakeHandoff: () => undefined };
+        return renderToStaticMarkup(<StaticRouter location={{ pathname: localizePath('/', code), state: { [EDITORIAL_RETURN_STATE_KEY]: returnPath } }}><I18nextProvider i18n={instance}><LocaleContext.Provider value={context}><LanguageMessages /></LocaleContext.Provider></I18nextProvider></StaticRouter>);
       }
     ` },
     bundle: true, platform: 'node', format: 'cjs', jsx: 'automatic', outfile: handoffFile, logLevel: 'silent',
@@ -143,10 +188,17 @@ try {
         ? 'export default function Shell() { return null; }'
         : args.path === '@/hooks/useSafeHead'
           ? 'export let lastHead; export default function useSafeHead(value) { lastHead = value; }'
-          : 'export const registry = ' + JSON.stringify(registry) + '; export const review = ' + JSON.stringify(review) + ';' }));
+          : 'export const registry = ' + JSON.stringify(registry) + '; export const review = ' + JSON.stringify(review) + '; export const locales = registry.locales.filter(item => item.wave <= 1); export const getLocaleInstance = () => null; export const loadLocale = async () => null; export const localeIsIndexable = () => false;' }));
     } }],
   });
-  const { render: renderLocalizedRoute } = (await import(pathToFileURL(handoffFile).href)).default;
+  const { render: renderLocalizedRoute, renderEditorialHandoff } = (await import(pathToFileURL(handoffFile).href)).default;
+  const paBundle = await readBundle('pa');
+  const editorialReturnPath = '/blog/alberta-ticket-evidence';
+  const editorialHandoff = renderEditorialHandoff('pa', english, paBundle, editorialReturnPath);
+  assert.match(editorialHandoff, /data-editorial-language-handoff="true"/);
+  assert.ok(editorialHandoff.includes(paBundle.common.notFound));
+  assert.ok(editorialHandoff.includes(paBundle.language.readEnglish));
+  assert.match(editorialHandoff, /href="\/blog\/alberta-ticket-evidence"/);
   for (const code of WAVE_ONE_LOCALES.filter(code => code !== 'en')) {
     const bundle = await readBundle(code);
     const { html, head } = renderLocalizedRoute(code, english, bundle, '/terms-of-purchase');

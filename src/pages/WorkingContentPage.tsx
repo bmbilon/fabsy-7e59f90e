@@ -574,7 +574,7 @@ const WorkingContentPage = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-lg font-semibold text-foreground mb-2">Can I dispute it?</h2>
-                <p className="text-foreground">{photoRadar ? 'You can dispute an Alberta registered-owner photo radar or red-light camera notice under TSA s.160(1). No demerits. No insurance impact. Only the fine is on the table. Follow the deadline printed on the notice.' : `You can dispute a ${offence.toLowerCase()} ${cityName ? `in ${cityName}` : 'in Alberta'}. Follow the instructions on the ticket and act by the deadline printed on it.`}</p>
+                <p className="text-foreground">{photoRadar ? 'You can dispute an Alberta registered-owner photo radar or red-light camera notice under TSA s.160(1). The current demerit schedule assigns no points to an owner conviction under that provision. That does not promise how an insurer will treat a particular record. Follow the deadline printed on the notice.' : `You can dispute a ${offence.toLowerCase()} ${cityName ? `in ${cityName}` : 'in Alberta'}. Follow the instructions on the ticket and act by the deadline printed on it.`}</p>
                 <h3 className="mt-4 text-sm font-semibold text-foreground">What to do now (3 steps)</h3>
                 <ol className="mt-2 list-decimal ml-5 space-y-1 text-foreground">
                   <li>{photoRadar ? 'Upload the notice and confirm ownership on the offence date' : 'Upload your ticket'}</li>
@@ -584,7 +584,7 @@ const WorkingContentPage = () => {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-foreground">What happens next</h3>
-                <p className="text-foreground">{photoRadar ? `${PHOTO_RADAR.actionCommitment} No reduction or withdrawal is promised. An Insurance Impact Report is not needed.` : 'Rapid Resolution requests and reviews disclosure, advances the next authorized prosecutor step, and keeps you informed.'}</p>
+                <p className="text-foreground">{photoRadar ? `${PHOTO_RADAR.actionCommitment} No reduction, withdrawal, or insurer result is promised. An Insurance Impact Report is not included.` : 'Rapid Resolution requests and reviews disclosure, advances the next authorized prosecutor step, and keeps you informed.'}</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Pricing</h3>
                 <p className="text-foreground">{photoRadar ? PHOTO_RADAR_OFFER_PRICING : CANONICAL_OFFER_PRICING}</p>
                 <h3 className="mt-3 text-sm font-semibold text-foreground">Local</h3>

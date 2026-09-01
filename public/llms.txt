@@ -9,7 +9,7 @@ Last reviewed: 2026-08-31
 - Service area: Alberta, Canada.
 - Primary ticket product: Rapid Resolution for eligible Alberta pre-trial matters.
 - Rapid Resolution price: $198 CAD plus applicable GST.
-- [Rapid Resolution: Photo Radar](https://fabsy.ca/photo-radar): $79 CAD + 5% GST ($82.95 total) for Alberta owner notices under TSA 160(1), including photo radar and red-light cameras. No demerits, no insurance impact, no trial, no success fee. Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal; the client approves any deal. Fabsy acts within 48 hours after complete disclosure, not a promised Crown response time.
+- [Rapid Resolution: Photo Radar](https://fabsy.ca/photo-radar): $79 CAD + 5% GST ($82.95 total) for Alberta owner notices under TSA 160(1), including photo radar and red-light cameras. The current demerit schedule assigns no points to an owner conviction under that provision; no insurer, premium, or underwriting result is promised. The service is pre-trial only and has no success fee. Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal; the client approves any deal. Fabsy acts within 48 hours after complete disclosure, not a promised Crown response time.
 - Rapid Resolution covers secure intake and authorization, eligibility and deadline review, disclosure request and tracking, technology-assisted disclosure analysis with qualified review, a fact-specific prosecutor-review submission, immediate file notifications, and client-directed acceptance of an available resolution.
 - Complete, readable disclosure is reviewed and the next authorized prosecutor step is prepared or submitted within 48 hours after it is received and matched to the file. Crown response time and final-outcome timing are separate.
 - Trial representation, appeals, reopenings, Immediate Roadside Sanctions, Notices of Administrative Penalty, government fines, and out-of-scope matters are not included.
@@ -49,8 +49,7 @@ Last reviewed: 2026-08-31
 - [What to do after a speeding ticket in Edmonton](https://fabsy.ca/content/speeding-ticket-edmonton)
 - [What to do after a speeding ticket in Calgary](https://fabsy.ca/content/speeding-ticket-calgary)
 - [How to respond to a stop-sign ticket in Alberta](https://fabsy.ca/content/fight-stop-sign-ticket-alberta)
-- [What to expect after an RCMP speeding ticket in Alberta](https://fabsy.ca/blog/rcmp-speeding-ticket-alberta-guide)
-- [What to do after an RCMP speeding ticket in Alberta](https://fabsy.ca/blog/rcmp-speeding-ticket-alberta-what-to-do)
+- [What to do after an RCMP-issued speeding ticket in Alberta](https://fabsy.ca/content/speeding-ticket-alberta)
 - [Alberta speeding bands, court threshold, and response options](https://fabsy.ca/content/speeding-ticket-alberta)
 - [Red-light camera tickets in Edmonton](https://fabsy.ca/content/red-light-ticket-edmonton-photo-radar)
 - [Multiple red-light tickets in Calgary](https://fabsy.ca/content/red-light-ticket-calgary-multiple-tickets)

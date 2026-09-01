@@ -74,10 +74,10 @@ function requiredCopy(route) {
   if (route === '/refer') return [publicContent.referral.heading, publicContent.referral.scope,
     publicContent.referral.termsEffective, ...publicContent.referral.rules.map(rule => rule.text)];
   if (route === '/photo-radar') return ['Photo radar ticket in the mail? $79 flat.', offers.photoRadar.speedDisclaimer,
-    'No demerits', 'No insurance impact', 'No trial', 'No success surcharge', 'You approve any deal'];
+    offers.photoRadar.insuranceDisclaimer, 'No trial', 'No success surcharge', 'You approve any deal'];
   if (route === '/fleet') return [fleet.headline, fleet.accountPricing, offers.photoRadar.speedDisclaimer,
-    'No demerits', 'No insurance impact', 'No success fee', 'You approve each Crown deal'];
-  return ['Free Ticket Check', 'does not retain Fabsy', 'No payment is required'];
+    offers.photoRadar.insuranceDisclaimer, 'No success fee', 'You approve each Crown deal'];
+  return ['Free Ticket Check', 'does not retain Fabsy', 'No payment is required', offers.photoRadar.insuranceDisclaimer];
 }
 
 function publicCopy(route) {
@@ -304,7 +304,7 @@ function redactSourceLinks(document, route) {
     if (!allowed.some(value => exact(element.textContent, value))) continue;
     if (![offers.photoRadar.intakePath, offers.photoRadar.slug].includes(element.getAttribute('href'))) continue;
     const parentText = element.parentElement.textContent;
-    const wrappers = [element.textContent, `Already know it is an owner notice? ${element.textContent}.`, `Just one notice? ${element.textContent}.`, `${element.textContent} No demerits and no insurance impact.`];
+    const wrappers = [element.textContent, `Already know it is an owner notice? ${element.textContent}.`, `Just one notice? ${element.textContent}.`, `${element.textContent} ${offers.photoRadar.insuranceDisclaimer}`];
     if (element.parentElement.tagName === 'P' && !wrappers.some(value => exact(parentText, value))) continue;
     element.textContent = '[exact public offer link]';
   }
@@ -378,7 +378,7 @@ function redactExactPhotoStrip(document, route) {
       ? document.querySelector('main') : null;
   if (!root) return;
   const caption = 'Photo radar or red-light camera notice? $79 + GST, no success fee.';
-  const scope = 'No demerits. No insurance impact. The only thing on the table is the fine. You approve any deal.';
+  const scope = 'The current demerit schedule assigns no points to an owner conviction under TSA s.160. Insurer treatment is not promised. You approve any deal.';
   const source = sourceText('src/components/PhotoRadarOfferStrip.tsx');
   if (!source.includes('Photo radar or red-light camera notice? ${PHOTO_RADAR.priceCad} + GST, no success fee.') ||
       !source.includes(scope) || !source.includes('to={PHOTO_RADAR.slug}')) return;
@@ -429,9 +429,9 @@ function redactExactPhotoControls(document, route) {
   }
   if (route === '/services') {
     const title = 'Photo radar and red-light cameras';
-    const description = '$79 + GST for Alberta notices mailed to a registered owner. No demerits, no insurance impact, no success fee.';
+    const description = `$79 + GST for Alberta notices mailed to a registered owner. ${offers.photoRadar.insuranceDisclaimer} No success fee.`;
     const source = sourceText('src/pages/Services.tsx');
-    if (!source.includes(`title: "${title}", description: "${description}"`)) return;
+    if (!source.includes(`title: "${title}", description: \`$79 + GST for Alberta notices mailed to a registered owner. \${PHOTO_RADAR.insuranceDisclaimer} No success fee.\``)) return;
     for (const paragraph of document.querySelectorAll('section[aria-labelledby="ticket-types-heading"] p')) {
       const heading = paragraph.previousElementSibling;
       if (heading?.tagName === 'H3' && !heading.children.length && exact(heading.textContent, title) &&
@@ -446,6 +446,7 @@ function redactTermsAdditions(document) {
   const substitutions = {
     'PHOTO_RADAR.priceCad': '79', 'PHOTO_RADAR.totalCad.toFixed(2)': '82.95',
     'PHOTO_RADAR.speedDisclaimer': offers.photoRadar.speedDisclaimer,
+    'PHOTO_RADAR.insuranceDisclaimer': offers.photoRadar.insuranceDisclaimer,
     'PRO_DRIVER_DISCOUNT_PERCENT': '20',
     '(PRO_DRIVER_RAPID_CENTS / 100).toFixed(2)': pricing.rapidPrice,
     '(PRO_DRIVER_BUNDLE_CENTS / 100).toFixed(2)': pricing.bundlePrice,
@@ -461,6 +462,7 @@ function redactTermsAdditions(document) {
     ['5C. Rapid Resolution: Photo Radar Terms', 'photo-radar-terms', [
       'Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is guaranteed; the fee-refund guarantee in section 5F applies.',
       offers.photoRadar.speedDisclaimer,
+      offers.photoRadar.insuranceDisclaimer,
     ]],
     ['5D. Pro Driver Discount', 'pro-driver-terms', [
       "Holders of a verified Alberta Class 1, 2 or 4 driver's licence receive 20% off Rapid Resolution for an eligible officer-issued ticket: $158.40 CAD, or $183.20 CAD for the Rapid Resolution and insurance-planning bundle, in each case plus applicable GST.",
@@ -475,7 +477,7 @@ function redactTermsAdditions(document) {
     ['5F. Fee-Refund Guarantee', 'fee-refund-guarantee', [
       feeRefund.headline, feeRefund.payment, feeRefund.condition, feeRefund.declinedOfferText,
       'A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.',
-      'Photo radar and red-light camera owner notices have no demerits, so the comparison is to the original fine only.',
+      'Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points, so the comparison is to the original fine only.',
       'The guarantee covers the service fee actually paid for Rapid Resolution, Rapid Resolution: Photo Radar, or the Rapid Resolution and insurance-planning bundle, including a discounted Pro Driver order. A standalone insurance report is not a ticket-representation service and is not covered by this outcome-based guarantee.',
       'The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. Work performed and payment-processing costs do not reduce a refund due under this guarantee.',
       "The 30-calendar-day period starts when Fabsy receives the Crown's rejection of Fabsy's efforts to obtain a lower original fine, fewer original demerits or withdrawal, and none of those improvements has been obtained. Payment or checkout does not start this clock. An opening or unchanged Crown offer before Fabsy's negotiation efforts have been rejected does not start it either.",

@@ -1,20 +1,20 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-01T00:56:02.947Z",
+  "generatedAt": "2026-09-01T03:34:53.259Z",
   "sourceVersion": "rapid-resolution-2026-08-30",
-  "sourceFingerprint": "fnv1a-d6eb8ed8",
+  "sourceFingerprint": "fnv1a-e31ca9b8",
   "sourceDocuments": {
-    "src/pages/TermsOfService.tsx": "fnv1a-07e93c79",
+    "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
     "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
-    "src/components/form-steps/ConsentStep.tsx": "fnv1a-9801d0f9",
+    "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
     "src/pages/PrivacyPolicy.tsx": "fnv1a-003b0493",
     "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
     "src/config/offers.ts": "fnv1a-4b290fd6",
-    "src/config/feeRefund.json": "fnv1a-9638f7a8",
-    "supabase/functions/_shared/consent-pdf.ts": "fnv1a-f5202725"
+    "src/config/feeRefund.json": "fnv1a-06562a22",
+    "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
   },
   "bundleFingerprints": {
-    "en": "fnv1a-c0910212",
+    "en": "fnv1a-1c3b6ac6",
     "pa": "fnv1a-cfda4b6d",
     "tl": "fnv1a-e6f20b3a",
     "zh-hans": "fnv1a-a49640e8",
@@ -23,6 +23,40 @@
     "hi": "fnv1a-9a04fa33",
     "es": "fnv1a-f6850a18"
   },
+  "localeStates": {
+    "en": {
+      "released": true,
+      "indexable": true
+    },
+    "pa": {
+      "released": true,
+      "indexable": false
+    },
+    "tl": {
+      "released": true,
+      "indexable": false
+    },
+    "zh-hans": {
+      "released": true,
+      "indexable": false
+    },
+    "zh-hant": {
+      "released": true,
+      "indexable": false
+    },
+    "ar": {
+      "released": true,
+      "indexable": false
+    },
+    "hi": {
+      "released": true,
+      "indexable": false
+    },
+    "es": {
+      "released": true,
+      "indexable": false
+    }
+  },
   "generatedCount": 56,
   "records": [
     {
@@ -30,42 +64,42 @@
       "basePath": "/",
       "route": "/pa/",
       "canonical": "https://fabsy.ca/pa/",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "pa",
       "basePath": "/rapid-resolution",
       "route": "/pa/rapid-resolution",
       "canonical": "https://fabsy.ca/pa/rapid-resolution",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "pa",
       "basePath": "/how-it-works",
       "route": "/pa/how-it-works",
       "canonical": "https://fabsy.ca/pa/how-it-works",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "pa",
       "basePath": "/faq",
       "route": "/pa/faq",
       "canonical": "https://fabsy.ca/pa/faq",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "pa",
       "basePath": "/contact",
       "route": "/pa/contact",
       "canonical": "https://fabsy.ca/pa/contact",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "pa",
       "basePath": "/terms-of-service",
       "route": "/pa/terms-of-service",
       "canonical": "https://fabsy.ca/pa/terms-of-service",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "pa",
@@ -86,42 +120,42 @@
       "basePath": "/",
       "route": "/tl/",
       "canonical": "https://fabsy.ca/tl/",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "tl",
       "basePath": "/rapid-resolution",
       "route": "/tl/rapid-resolution",
       "canonical": "https://fabsy.ca/tl/rapid-resolution",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "tl",
       "basePath": "/how-it-works",
       "route": "/tl/how-it-works",
       "canonical": "https://fabsy.ca/tl/how-it-works",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "tl",
       "basePath": "/faq",
       "route": "/tl/faq",
       "canonical": "https://fabsy.ca/tl/faq",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "tl",
       "basePath": "/contact",
       "route": "/tl/contact",
       "canonical": "https://fabsy.ca/tl/contact",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "tl",
       "basePath": "/terms-of-service",
       "route": "/tl/terms-of-service",
       "canonical": "https://fabsy.ca/tl/terms-of-service",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "tl",
@@ -142,42 +176,42 @@
       "basePath": "/",
       "route": "/zh-hans/",
       "canonical": "https://fabsy.ca/zh-hans/",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hans",
       "basePath": "/rapid-resolution",
       "route": "/zh-hans/rapid-resolution",
       "canonical": "https://fabsy.ca/zh-hans/rapid-resolution",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hans",
       "basePath": "/how-it-works",
       "route": "/zh-hans/how-it-works",
       "canonical": "https://fabsy.ca/zh-hans/how-it-works",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hans",
       "basePath": "/faq",
       "route": "/zh-hans/faq",
       "canonical": "https://fabsy.ca/zh-hans/faq",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hans",
       "basePath": "/contact",
       "route": "/zh-hans/contact",
       "canonical": "https://fabsy.ca/zh-hans/contact",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hans",
       "basePath": "/terms-of-service",
       "route": "/zh-hans/terms-of-service",
       "canonical": "https://fabsy.ca/zh-hans/terms-of-service",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hans",
@@ -198,42 +232,42 @@
       "basePath": "/",
       "route": "/zh-hant/",
       "canonical": "https://fabsy.ca/zh-hant/",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hant",
       "basePath": "/rapid-resolution",
       "route": "/zh-hant/rapid-resolution",
       "canonical": "https://fabsy.ca/zh-hant/rapid-resolution",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hant",
       "basePath": "/how-it-works",
       "route": "/zh-hant/how-it-works",
       "canonical": "https://fabsy.ca/zh-hant/how-it-works",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hant",
       "basePath": "/faq",
       "route": "/zh-hant/faq",
       "canonical": "https://fabsy.ca/zh-hant/faq",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hant",
       "basePath": "/contact",
       "route": "/zh-hant/contact",
       "canonical": "https://fabsy.ca/zh-hant/contact",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hant",
       "basePath": "/terms-of-service",
       "route": "/zh-hant/terms-of-service",
       "canonical": "https://fabsy.ca/zh-hant/terms-of-service",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "zh-hant",
@@ -254,42 +288,42 @@
       "basePath": "/",
       "route": "/ar/",
       "canonical": "https://fabsy.ca/ar/",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "ar",
       "basePath": "/rapid-resolution",
       "route": "/ar/rapid-resolution",
       "canonical": "https://fabsy.ca/ar/rapid-resolution",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "ar",
       "basePath": "/how-it-works",
       "route": "/ar/how-it-works",
       "canonical": "https://fabsy.ca/ar/how-it-works",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "ar",
       "basePath": "/faq",
       "route": "/ar/faq",
       "canonical": "https://fabsy.ca/ar/faq",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "ar",
       "basePath": "/contact",
       "route": "/ar/contact",
       "canonical": "https://fabsy.ca/ar/contact",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "ar",
       "basePath": "/terms-of-service",
       "route": "/ar/terms-of-service",
       "canonical": "https://fabsy.ca/ar/terms-of-service",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "ar",
@@ -310,42 +344,42 @@
       "basePath": "/",
       "route": "/hi/",
       "canonical": "https://fabsy.ca/hi/",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "hi",
       "basePath": "/rapid-resolution",
       "route": "/hi/rapid-resolution",
       "canonical": "https://fabsy.ca/hi/rapid-resolution",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "hi",
       "basePath": "/how-it-works",
       "route": "/hi/how-it-works",
       "canonical": "https://fabsy.ca/hi/how-it-works",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "hi",
       "basePath": "/faq",
       "route": "/hi/faq",
       "canonical": "https://fabsy.ca/hi/faq",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "hi",
       "basePath": "/contact",
       "route": "/hi/contact",
       "canonical": "https://fabsy.ca/hi/contact",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "hi",
       "basePath": "/terms-of-service",
       "route": "/hi/terms-of-service",
       "canonical": "https://fabsy.ca/hi/terms-of-service",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "hi",
@@ -366,42 +400,42 @@
       "basePath": "/",
       "route": "/es/",
       "canonical": "https://fabsy.ca/es/",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "es",
       "basePath": "/rapid-resolution",
       "route": "/es/rapid-resolution",
       "canonical": "https://fabsy.ca/es/rapid-resolution",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "es",
       "basePath": "/how-it-works",
       "route": "/es/how-it-works",
       "canonical": "https://fabsy.ca/es/how-it-works",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "es",
       "basePath": "/faq",
       "route": "/es/faq",
       "canonical": "https://fabsy.ca/es/faq",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "es",
       "basePath": "/contact",
       "route": "/es/contact",
       "canonical": "https://fabsy.ca/es/contact",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "es",
       "basePath": "/terms-of-service",
       "route": "/es/terms-of-service",
       "canonical": "https://fabsy.ca/es/terms-of-service",
-      "indexable": true
+      "indexable": false
     },
     {
       "code": "es",

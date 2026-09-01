@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useLocale } from '@/i18n/locale-context';
 import { getLocaleInstance, loadLocale, locales, registry, review, type LocaleCode } from '@/i18n/config';
-import { localizePath, preferredLocale } from '@/i18n/locale-policy.mjs';
+import { editorialReturnPathFromState, localizePath, preferredLocale } from '@/i18n/locale-policy.mjs';
 import { LANGUAGE_PREFERENCE_KEY } from './LanguageSelector';
 
 export default function LanguageMessages() {
@@ -48,27 +48,35 @@ export default function LanguageMessages() {
   }, [isEnglish, basePath, availableCodes]);
 
   const englishUrl = localizePath(basePath + location.search + location.hash, 'en');
+  const editorialReturnPath = !isEnglish && basePath === '/' ? editorialReturnPathFromState(location.state) : null;
+  const editorialHandoff = editorialReturnPath ? <aside role="note" className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950" data-editorial-language-handoff="true">
+    <div className="container mx-auto max-w-6xl">
+      <strong>{t('common.notFound')}</strong>{' '}
+      <Link className="font-semibold underline underline-offset-2" to={editorialReturnPath} state={null}>{t('language.readEnglish')}</Link>
+    </div>
+  </aside> : null;
   // The Router retains receipt capabilities after the visible URL is scrubbed.
   // Keep those values out of href attributes in a potentially tagged document.
   const privateReceiptSwitch = basePath === '/thank-you' && new URLSearchParams(location.search).has('session_id');
   if (!isEnglish && !isReleased) {
-    return <aside className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950" data-translation-status="draft">
+    return <>{editorialHandoff}<aside className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950" data-translation-status="draft">
       <div className="container mx-auto max-w-6xl">
         <strong>{t('language.draftTitle')}</strong>{' '}{t('language.draftBody')}{' '}
         {privateReceiptSwitch
           ? <button type="button" className="font-semibold underline underline-offset-2" onClick={() => navigate(englishUrl, { state: intakeHandoff || location.state })}>{t('language.readEnglish')}</button>
           : <Link className="font-semibold underline underline-offset-2" to={englishUrl} state={intakeHandoff || location.state}>{t('language.readEnglish')}</Link>}
       </div>
-    </aside>;
+    </aside></>;
   }
   if (!isEnglish && isReleased && review.locales[locale]?.status === 'published') {
-    return <aside role="note" className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs leading-relaxed text-slate-600" data-translation-status="machine-translated">
+    return <>{editorialHandoff}<aside role="note" className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs leading-relaxed text-slate-600" data-translation-status="machine-translated">
       <div className="container mx-auto max-w-6xl">
         <strong className="font-medium text-slate-700">{t('language.translationNoteTitle')}</strong>
         <p>{t('language.translationNoteBody')}</p>
       </div>
-    </aside>;
+    </aside></>;
   }
+  if (editorialHandoff) return editorialHandoff;
   if (!suggestion || dismissed) return null;
   const candidate = locales.find(item => item.code === suggestion)!;
   const translated = getLocaleInstance(suggestion)!;

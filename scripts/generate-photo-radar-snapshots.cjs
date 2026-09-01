@@ -42,12 +42,12 @@ ${schemas.map(schema => `<script type="application/ld+json">${json(schema)}</scr
 
 function renderPhotoRadar() {
   const faq = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: content.faqs.map(item => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) };
-  return shell('photo-radar', 'Photo Radar Ticket in Alberta? $79 + GST | Fabsy', 'Alberta photo radar and red-light owner notices: $79 + GST. No demerits or insurance impact. Fee refund terms apply. You approve any Crown deal.', `
+  return shell('photo-radar', 'Photo Radar Ticket in Alberta? $79 + GST | Fabsy', 'Alberta photo radar and red-light owner notices: $79 + GST. Check demerit rules, insurer caveats, review scope and fee-refund terms.', `
 <h1>Photo radar ticket in the mail? $79 flat.</h1>
 <p>Alberta automated enforcement notices mailed to a registered owner under Traffic Safety Act s.160(1), including photo radar speeding and red-light camera notices.</p>
 <section aria-labelledby="photo-fee-refund-heading"><h2 id="photo-fee-refund-heading">${esc(feeRefund.photoHeadline)}</h2><p>${esc(feeRefund.photoCondition)}</p><p lang="en" dir="ltr">${esc(feeRefund.declinedOfferText)}</p><p>${esc(feeRefund.payment)}</p><p><a href="${esc(feeRefund.termsPath)}">${esc(feeRefund.details)}</a></p></section>
 <section aria-label="Three facts">${content.heroFacts.map(fact => `<h2>${esc(fact.title)}</h2><p>${esc(fact.description)}</p>`).join('')}</section>
-<section><h2>Rapid Resolution: Photo Radar</h2><p class="price">$79 + 5% GST ($82.95 total)</p><p>No trial. No success surcharge. No Insurance Impact Report: these owner notices have no insurance impact. Government fines are separate.</p><a class="cta" href="${esc(photo.intakePath)}">Start Photo Radar · $79 + GST</a><p>${esc(photo.outcomeDisclaimer)}</p></section>
+<section><h2>Rapid Resolution: Photo Radar</h2><p class="price">$79 + 5% GST ($82.95 total)</p><p>No trial. No success surcharge. ${esc(photo.insuranceDisclaimer)} Government fines are separate.</p><a class="cta" href="${esc(photo.intakePath)}">Start Photo Radar · $79 + GST</a><p>${esc(photo.outcomeDisclaimer)}</p></section>
 <section><h2>How it works</h2><ol>${content.processSteps.map(step => `<li><h3>${esc(step.title)}</h3><p>${esc(step.description)}</p></li>`).join('')}</ol><p>${esc(photo.speedDisclaimer)}</p></section>
 <section><h2>What we check in disclosure</h2><ul>${content.reviewChecks.map(check => `<li>${esc(check)}</li>`).join('')}</ul><p>A missing item becomes a review question or request to the Crown; it does not prove that a notice must be withdrawn.</p></section>
 <section><h2>Frequently asked questions</h2>${content.faqs.map(item => `<details><summary><h3>${esc(item.question)}</h3></summary><p>${esc(item.answer)}</p></details>`).join('')}</section>
@@ -57,14 +57,14 @@ function renderPhotoRadar() {
 
 function renderFleet() {
   return shell('fleet', 'Alberta Fleet Photo Radar Help | $79 per Ticket | Fabsy', fleet.description, `
-<h1>${esc(fleet.headline)}</h1><p>${esc(fleet.description)}</p><p>${fleet.segments.map(esc).join(' · ')}</p><p class="price">$79 + GST per ticket</p><p>No demerits. No insurance impact. No success fee. You approve each Crown deal.</p>
+<h1>${esc(fleet.headline)}</h1><p>${esc(fleet.description)}</p><p>${fleet.segments.map(esc).join(' · ')}</p><p class="price">$79 + GST per ticket</p><p>${esc(photo.insuranceDisclaimer)} No success fee. You approve each Crown deal.</p>
 <section><h2>One account. A decision on every ticket.</h2><ol>${fleet.steps.map(step => `<li><h3>${esc(step.title)}</h3><p>${esc(step.description)}</p></li>`).join('')}</ol></section>
 <section><h2>5+ tickets a month?</h2><p>${esc(fleet.accountPricing)}</p></section><section><h2>Fine-only service, clearly scoped</h2><p>This service covers Alberta automated notices mailed to a registered owner under TSA 160(1). Officer-issued tickets, trial representation and government fines are separate.</p><p>${esc(photo.speedDisclaimer)}</p></section>
 <section id="fleet-intake"><h2>Introduce your fleet</h2><p>The live fleet intake accepts your business, contact, monthly volume and an optional list of plates in one enquiry. No payment is taken. Fabsy confirms eligibility, authorization, pricing and invoicing before work starts.</p><a class="cta" href="${SITE}/fleet#fleet-intake">Open fleet account intake</a><p>Do not include driver licence or payment details in an enquiry. It does not pause ticket deadlines.</p></section>`, [service('Fabsy Fleet Photo Radar', 'fleet', fleet.description)]);
 }
 
 function renderFreeCheck() {
-  return shell('free-ticket-check', 'Free Alberta Ticket Check | Fabsy', 'Check an Alberta ticket and service eligibility before choosing paid help. No payment is required.', '<h1>Free Ticket Check</h1><p>Upload your Alberta ticket and check its details and service eligibility before choosing paid help. No payment is required.</p><p>This check does not retain Fabsy, enter a plea, request disclosure or pause a ticket deadline. Verify extracted details against the notice.</p><p><a class="cta" href="https://fabsy.ca/free-ticket-check">Open the free ticket checker</a></p><p><a href="/photo-radar">Photo radar or red-light owner notice? $79 + GST.</a> No demerits and no insurance impact.</p>');
+  return shell('free-ticket-check', 'Free Alberta Ticket Check | Fabsy', 'Check an Alberta ticket and service eligibility before choosing paid help. No payment is required.', `<h1>Free Ticket Check</h1><p>Upload your Alberta ticket and check its details and service eligibility before choosing paid help. No payment is required.</p><p>This check does not retain Fabsy, enter a plea, request disclosure or pause a ticket deadline. Verify extracted details against the notice.</p><p><a class="cta" href="https://fabsy.ca/free-ticket-check">Open the free ticket checker</a></p><p><a href="/photo-radar">Photo radar or red-light owner notice? $79 + GST.</a> ${esc(photo.insuranceDisclaimer)}</p>`);
 }
 
 function generatePhotoRadarSnapshots(outDir = path.join(ROOT, 'public/prerendered'), routes = ROUTES) {

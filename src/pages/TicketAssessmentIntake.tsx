@@ -347,7 +347,7 @@ export default function TicketAssessmentIntake() {
             <div className="border-b bg-white p-6 sm:p-8">
               <Badge className="mb-4">Free Ticket Review · upload or take a photo</Badge>
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">One secure intake. Choose the help you need.</h1>
-              <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{isPhotoRadar ? "No demerits. No insurance impact. Only the fine is on the table. Your notice and ownership details carry into the $79 Photo Radar service." : "We scan your ticket, keep the source documents private, and carry the same information into your selected service."}</p>
+              <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">{isPhotoRadar ? `${PHOTO_RADAR.insuranceDisclaimer} Your notice and ownership details carry into the $79 Photo Radar service.` : "We scan your ticket, keep the source documents private, and carry the same information into your selected service."}</p>
               <div className="mt-6"><div className="mb-2 flex items-center justify-between text-sm font-medium"><span>Step {displayStep} of {activeSteps.length}</span><span>{Math.round(progress)}% complete</span></div><Progress value={progress} className="h-2" /></div>
             </div>
             <form onSubmit={submitPriorityReview} className="bg-white p-6 sm:p-8">
@@ -362,7 +362,7 @@ export default function TicketAssessmentIntake() {
           <aside className="space-y-5 lg:sticky lg:top-24">
             <Card className="p-6 shadow-fab"><p className="text-sm font-semibold text-primary">One connected intake</p><ol className="mt-5 space-y-4 text-sm">{(isPhotoRadar ? ["Ticket and ownership check", "Contact and limited review consent", PHOTO_RADAR_PRICE_LABEL] : ["Free ticket capture", "Driving and policy context", "Signed limited review consent", "Choose a priority report or Rapid Resolution"]).map((item, index) => <li key={item} className="flex items-start gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">{index + 1}</span>{item}</li>)}</ol></Card>
             <Card className="p-5"><div className="flex items-start gap-3"><LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><div><p className="font-bold">Private source documents</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{isPhotoRadar ? "Your ticket uses a signed upload into non-public storage and remains linked to the matter Fabsy reviews. No policy documents are requested." : "Ticket and policy files use signed uploads into non-public storage and remain linked to the matter Fabsy reviews."}</p></div></div></Card>
-            <Card className="p-5"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><p className="text-sm leading-relaxed text-muted-foreground">{isPhotoRadar ? "This registered-owner notice has no demerits or insurance impact. Fabsy pursues a Crown reduction or withdrawal; you approve any deal. No trial. No success fee." : "Insurance outcomes vary by insurer, history and renewal timing. Scenarios are estimates, not binding quotes or guarantees."}</p></div></Card>
+            <Card className="p-5"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><p className="text-sm leading-relaxed text-muted-foreground">{isPhotoRadar ? `${PHOTO_RADAR.insuranceDisclaimer} Fabsy pursues a Crown reduction or withdrawal; you approve any deal. No trial. No success fee.` : "Insurance outcomes vary by insurer, history and renewal timing. Scenarios are estimates, not binding quotes or guarantees."}</p></div></Card>
           </aside>
         </div>
       </main>
@@ -427,7 +427,7 @@ function ServiceStep({ isSubmitting, isPhotoRadar, displayStep, chooseRepresenta
     <Card className="space-y-4 border-primary/30 bg-primary/5 p-6">
       <h3 className="text-2xl font-bold">{PHOTO_RADAR.name}</h3>
       <p className="text-xl font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>
-      <p className="text-sm leading-relaxed">No demerits. No insurance impact. Only the fine is on the table.</p>
+      <p className="text-sm leading-relaxed">{PHOTO_RADAR.insuranceDisclaimer}</p>
       <ServiceList items={["Fabsy enters the not-guilty plea and requests disclosure", "Disclosure review and a Crown reduction or withdrawal request", "You approve any proposed deal", "No trial. No success fee."]} color="text-primary" />
       <p className="text-sm text-muted-foreground">{PHOTO_RADAR.actionCommitment} {PHOTO_RADAR.outcomeDisclaimer}</p>
       <Button type="button" size="lg" disabled={isSubmitting} onClick={chooseRepresentation}>{isSubmitting ? "Saving securely..." : "Continue to Photo Radar authorization"}</Button>

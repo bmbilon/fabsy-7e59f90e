@@ -4,7 +4,7 @@ import Footer from '@/components/Footer';
 import StaticJsonLd from '@/components/StaticJsonLd';
 import { Link } from 'react-router-dom';
 import useSafeHead from '@/hooks/useSafeHead';
-import { RAPID_RESOLUTION } from '@/config/offers';
+import { PHOTO_RADAR, RAPID_RESOLUTION } from '@/config/offers';
 
 const PhotoRadarVsOfficer: React.FC = () => {
   const url = 'https://fabsy.ca/hubs/photo-radar-vs-officer-issued';
@@ -61,7 +61,7 @@ const PhotoRadarVsOfficer: React.FC = () => {
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-3 text-foreground">Core differences</h2>
           <ul className="list-disc ml-6 space-y-2 text-foreground">
-            <li>A photo radar notice is issued to the registered owner. It carries no demerit points and does not appear on the driving abstract.</li>
+            <li>A photo radar notice is issued to the registered owner. {PHOTO_RADAR.insuranceDisclaimer}</li>
             <li>An officer-issued ticket identifies a driver. Demerit points depend on the specific offence and outcome.</li>
             <li>The available records vary by matter. Review the ticket instructions and request available disclosure through the current process.</li>
           </ul>

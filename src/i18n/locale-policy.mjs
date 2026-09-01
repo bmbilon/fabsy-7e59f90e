@@ -1,5 +1,7 @@
 /** Shared browser/build policy. Fingerprints detect editing drift, not authenticity. */
 export const WAVE_ONE_LOCALES = Object.freeze(['en', 'pa', 'tl', 'zh-hans', 'zh-hant', 'ar', 'hi', 'es']);
+export const EDITORIAL_RETURN_STATE_KEY = 'fabsyEditorialReturnPath';
+const SAFE_EDITORIAL_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const LEGAL_SOURCE_DOCUMENT_PATHS = Object.freeze([
   'src/pages/TermsOfService.tsx',
   'src/pages/TermsOfPurchase.tsx',
@@ -62,7 +64,37 @@ export function localizePath(value, locale) {
   return `${code === 'en' ? path : `/${code}${path === '/' ? '/' : path}`}${suffix}`;
 }
 
-export function isLocaleReleased(code, review, expected) {
+/** English-only editorial routes that may be carried through a language handoff. */
+export function englishEditorialReturnPath(value) {
+  if (typeof value !== 'string' || value.length > 240) return null;
+  const clean = value.replace(/\/+$/, '') || '/';
+  const parts = clean.split('/');
+  const safeSlug = slug => typeof slug === 'string' && slug.length <= 180 && SAFE_EDITORIAL_SLUG.test(slug);
+  if (clean === '/blog') return clean;
+  if (parts.length === 3 && parts[1] === 'blog' && safeSlug(parts[2])) return clean;
+  if (parts.length === 3 && parts[1] === 'content' && safeSlug(parts[2])) return clean;
+  return null;
+}
+
+export function editorialReturnPathFromState(state) {
+  if (!state || typeof state !== 'object' || Array.isArray(state)) return null;
+  return englishEditorialReturnPath(state[EDITORIAL_RETURN_STATE_KEY]);
+}
+
+/** Returns a route only for the English-editorial/localized-home handoff. */
+export function editorialLanguageHandoffDestination(nextLocale, basePath, pathname, state) {
+  const editorialPath = englishEditorialReturnPath(pathname);
+  if (nextLocale !== 'en' && WAVE_ONE_LOCALES.includes(nextLocale) && editorialPath) {
+    return {
+      path: localizePath('/', nextLocale),
+      state: { [EDITORIAL_RETURN_STATE_KEY]: editorialPath },
+    };
+  }
+  const returnPath = basePath === '/' ? editorialReturnPathFromState(state) : null;
+  return nextLocale === 'en' && returnPath ? { path: returnPath, state: null } : null;
+}
+
+function localeReleaseChecks(code, review, expected) {
   if (code === 'en') return true;
   if (!WAVE_ONE_LOCALES.includes(code)) return false;
   const entry = review?.locales?.[code];
@@ -81,15 +113,29 @@ export function isLocaleReleased(code, review, expected) {
     publication?.basis === 'owner_authorized_machine_translation' &&
     typeof publication.authorizedBy === 'string' && publication.authorizedBy.trim() &&
     typeof publication.authorizedAt === 'string' && Number.isFinite(Date.parse(publication.authorizedAt));
-  return Boolean(
-    (reviewedRelease || ownerPublication) &&
+  const currentCopy = Boolean(
     legalSourcesMatch &&
     review.sourceVersion === expected?.sourceVersion &&
     typeof expected?.sourceFingerprint === 'string' && expected.sourceFingerprint &&
     typeof expected?.bundleFingerprint === 'string' && expected.bundleFingerprint &&
     entry.sourceFingerprint === expected.sourceFingerprint &&
-    entry.bundleFingerprint === expected.bundleFingerprint
+    entry.bundleFingerprint === expected.bundleFingerprint,
   );
+  return { reviewedRelease: Boolean(reviewedRelease), ownerPublication: Boolean(ownerPublication), currentCopy };
+}
+
+/** A released locale is usable in the language selector and localized journey. */
+export function isLocaleReleased(code, review, expected) {
+  const checks = localeReleaseChecks(code, review, expected);
+  if (checks === true || checks === false) return checks;
+  return checks.currentCopy && (checks.reviewedRelease || checks.ownerPublication);
+}
+
+/** Only current-copy translations with a recorded human approval may be indexed. */
+export function isLocaleIndexable(code, review, expected) {
+  const checks = localeReleaseChecks(code, review, expected);
+  if (checks === true || checks === false) return checks;
+  return checks.currentCopy && checks.reviewedRelease;
 }
 
 /** Accept-Language header or navigator.languages, ordered by preference. */

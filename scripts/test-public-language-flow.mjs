@@ -86,7 +86,7 @@ try {
       import assert from 'node:assert/strict';
       import React, { act } from 'react';
       import { createRoot } from 'react-dom/client';
-      import { MemoryRouter } from 'react-router-dom';
+      import { MemoryRouter, useLocation } from 'react-router-dom';
       import { I18nextProvider } from 'react-i18next';
       import PaymentStep from './src/components/form-steps/PaymentStep';
       import LanguageSelector from './src/components/LanguageSelector';
@@ -96,8 +96,14 @@ try {
       import type { FormData } from './src/components/TicketForm';
       import { LocaleContext } from './src/i18n/locale-context';
       import { createLocaleInstance } from './src/i18n/instance';
-      import { localizePath } from './src/i18n/locale-policy.mjs';
+      import { EDITORIAL_RETURN_STATE_KEY, editorialReturnPathFromState, localizePath } from './src/i18n/locale-policy.mjs';
       import { validateLocalizedIntakeStep } from './src/i18n/intake-validation';
+
+      function LocationProbe() {
+        const location = useLocation();
+        return <output data-location-probe data-pathname={location.pathname} data-search={location.search}
+          data-hash={location.hash} data-editorial-return={editorialReturnPathFromState(location.state) || ''} />;
+      }
 
       export async function runChecks({ bundles, review, offers, availableLocales, releaseStates, values, redactProDriverPromotion }) {
         const codes = availableLocales.map(item => item.code);
@@ -196,6 +202,80 @@ try {
             await act(async () => root.unmount());
             container.remove();
           }
+        }
+
+        const englishInstance = createLocaleInstance('en', bundles.en, bundles.en, codes, values);
+        const englishContext = {
+          locale: 'en', basePath: '/blog/offline-editorial-fixture', isReleased: true, direction: 'ltr',
+          href: target => localizePath(target, 'en'), availableLocales, intakeHandoff: null,
+          setIntakeHandoff: () => globalThis.__fabsyOfflineForbidCall('unexpected editorial intake handoff'),
+        };
+        for (const editorialPath of ['/blog/offline-editorial-fixture', '/content/speeding-ticket-alberta']) {
+          const container = document.createElement('div');
+          document.body.append(container);
+          const root = createRoot(container);
+          try {
+            await act(async () => root.render(
+              <MemoryRouter initialEntries={[{ pathname: editorialPath, search: '?discard=1', hash: '#discard', state: { untrusted: 'discard' } }]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <I18nextProvider i18n={englishInstance}><LocaleContext.Provider value={{ ...englishContext, basePath: editorialPath }}>
+                  <LanguageSelector /><LocationProbe />
+                </LocaleContext.Provider></I18nextProvider>
+              </MemoryRouter>
+            ));
+            const selector = container.querySelector('select');
+            await act(async () => {
+              selector.value = 'pa';
+              selector.dispatchEvent(new Event('change', { bubbles: true }));
+              await Promise.resolve();
+            });
+            const probe = container.querySelector('[data-location-probe]');
+            assert.equal(probe.dataset.pathname, '/pa/', editorialPath + ' must hand off to the localized overview');
+            assert.equal(probe.dataset.search, '', 'Editorial query parameters must not leak into the handoff');
+            assert.equal(probe.dataset.hash, '', 'Editorial fragments must not leak into the handoff');
+            assert.equal(probe.dataset.editorialReturn, editorialPath, 'The exact validated English return path must survive in router state');
+            assert.ok(!probe.dataset.pathname.includes('/blog') && !probe.dataset.pathname.includes('/content'), 'The handoff must never invent a localized editorial route');
+          } finally {
+            await act(async () => root.unmount());
+            container.remove();
+          }
+        }
+
+        const paItem = availableLocales.find(item => item.code === 'pa');
+        const paInstance = createLocaleInstance('pa', bundles.en, bundles.pa, codes, values);
+        const returnPath = '/blog/offline-editorial-fixture';
+        const localizedContainer = document.createElement('div');
+        document.body.append(localizedContainer);
+        const localizedRoot = createRoot(localizedContainer);
+        try {
+          await act(async () => localizedRoot.render(
+            <MemoryRouter initialEntries={[{ pathname: '/pa/', state: { [EDITORIAL_RETURN_STATE_KEY]: returnPath } }]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <I18nextProvider i18n={paInstance}><LocaleContext.Provider value={{
+                locale: 'pa', basePath: '/', isReleased: releaseStates.pa, direction: paItem.dir,
+                href: target => localizePath(target, 'pa'), availableLocales, intakeHandoff: null,
+                setIntakeHandoff: () => globalThis.__fabsyOfflineForbidCall('unexpected handoff intake mutation'),
+              }}>
+                <LanguageSelector /><LanguageMessages /><LocationProbe />
+              </LocaleContext.Provider></I18nextProvider>
+            </MemoryRouter>
+          ));
+          const notice = localizedContainer.querySelector('[data-editorial-language-handoff="true"]');
+          assert.ok(notice, 'The localized overview must explain that the editorial page is unavailable in this language');
+          assert.ok(notice.textContent.includes(paInstance.t('common.notFound')));
+          assert.ok(notice.textContent.includes(paInstance.t('language.readEnglish')));
+          assert.equal(notice.querySelector('a')?.getAttribute('href'), returnPath);
+          assert.ok(localizedContainer.querySelector('[data-translation-status="machine-translated"]'), 'The machine-translation disclosure must remain visible beside the handoff');
+          const selector = localizedContainer.querySelector('select');
+          await act(async () => {
+            selector.value = 'en';
+            selector.dispatchEvent(new Event('change', { bubbles: true }));
+            await Promise.resolve();
+          });
+          const probe = localizedContainer.querySelector('[data-location-probe]');
+          assert.equal(probe.dataset.pathname, returnPath, 'Choosing English from the handoff must restore the exact editorial page');
+          assert.equal(probe.dataset.editorialReturn, '', 'The consumed return path must not persist into the English page');
+        } finally {
+          await act(async () => localizedRoot.unmount());
+          localizedContainer.remove();
         }
 
         // Render the actual homepage sections in every language, including the

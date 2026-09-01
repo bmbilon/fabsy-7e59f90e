@@ -137,7 +137,7 @@ const TermsOfService = () => {
               <li>Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal after accepting the file and receiving your authorization.</li>
               <li>You approve any deal. Fabsy will not accept a Crown offer or enter a guilty plea without your case-specific instruction.</li>
               <li>No trial representation and no success fee are included or charged under this product. Government fines remain your responsibility.</li>
-              <li>These owner notices carry no demerits and have no insurance impact. No Insurance Impact Report is included or offered for this ticket.</li>
+              <li>{PHOTO_RADAR.insuranceDisclaimer}</li>
               <li>{PHOTO_RADAR.speedDisclaimer}</li>
               <li>Section 10 and any applicable statutory cancellation or refund rights continue to apply.</li>
             </ul>
@@ -193,7 +193,7 @@ const TermsOfService = () => {
             <p className="mb-4">{FEE_REFUND.declinedOfferText}</p>
             <ul className="list-disc pl-6 space-y-3">
               <li>A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.</li>
-              <li>Photo radar and red-light camera owner notices have no demerits, so the comparison is to the original fine only.</li>
+              <li>Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points, so the comparison is to the original fine only.</li>
               <li>The guarantee covers the service fee actually paid for Rapid Resolution, Rapid Resolution: Photo Radar, or the Rapid Resolution and insurance-planning bundle, including a discounted Pro Driver order. A standalone insurance report is not a ticket-representation service and is not covered by this outcome-based guarantee.</li>
               <li>The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. Work performed and payment-processing costs do not reduce a refund due under this guarantee.</li>
               <li>The 30-calendar-day period starts when Fabsy receives the Crown's rejection of Fabsy's efforts to obtain a lower original fine, fewer original demerits or withdrawal, and none of those improvements has been obtained. Payment or checkout does not start this clock. An opening or unchanged Crown offer before Fabsy's negotiation efforts have been rejected does not start it either.</li>

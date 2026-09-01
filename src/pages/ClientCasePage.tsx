@@ -130,8 +130,8 @@ function CaseContent({ caseId }: { caseId: string }) {
             <div className="space-y-6">
               <div>
                 <Badge>Rapid Resolution: Photo Radar</Badge>
-                <h2 className="mt-4 text-2xl font-bold">Only the fine is on the table</h2>
-                <p className="mt-3 text-muted-foreground">No demerits. No insurance impact. Your service is $79 + 5% GST ($82.95 total), paid upfront, with no trial or success surcharge.</p>
+                <h2 className="mt-4 text-2xl font-bold">Registered-owner notice, clearly scoped</h2>
+                <p className="mt-3 text-muted-foreground">{PHOTO_RADAR.insuranceDisclaimer} Your service is $79 + 5% GST ($82.95 total), paid upfront, with no trial or success surcharge.</p>
                 <p className="mt-3 text-sm text-muted-foreground">
                   No legal outcome is guaranteed. Your service-fee refund rights follow the written purchase terms for your order.{" "}
                   <Link to={FEE_REFUND.termsPath} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-4">Current fee-refund terms</Link>{" "}
@@ -139,7 +139,7 @@ function CaseContent({ caseId }: { caseId: string }) {
                 </p>
                 <p className="mt-3 text-sm text-muted-foreground">{PHOTO_RADAR.actionCommitment} {PHOTO_RADAR.speedDisclaimer}</p>
               </div>
-              {caseRecord.case_outcome ? <p className="rounded-lg border p-4">Recorded outcome: {caseRecord.case_outcome.replace(/_/g, " ")}. No Insurance Impact Report is needed for this registered-owner notice.</p> : <AteClientOffers key={caseRecord.id} submissionId={caseRecord.id} />}
+              {caseRecord.case_outcome ? <p className="rounded-lg border p-4">Recorded outcome: {caseRecord.case_outcome.replace(/_/g, " ")}. An Insurance Impact Report is not included for this registered-owner notice.</p> : <AteClientOffers key={caseRecord.id} submissionId={caseRecord.id} />}
             </div>
           ) : !caseRecord.verdict ? (
             <Alert>

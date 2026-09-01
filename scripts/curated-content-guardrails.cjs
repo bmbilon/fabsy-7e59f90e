@@ -11,8 +11,8 @@ const PHOTO_RADAR_CONTENT = require('../src/config/photoRadarContent.json');
 const PHOTO_RADAR_CONTENT_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
 const FEE_REFUND = require('../src/config/feeRefund.json');
 const REVIEWED_REFUND_SOURCE_HASHES = Object.freeze({
-  'src/config/feeRefund.json': '7c71eb69561754d02aae8cb9f178a8229b6a1203de45eab7e1f86e6f99614732',
-  'src/config/photoRadarContent.json': '90796ae2642f9fc405c80dc6ab459b1118ad5cdd6dd114668151b75a428754af',
+  'src/config/feeRefund.json': 'c3548043cfe7b0a8379bb2b0f35f9c4eacf51ae8aa8969e50136cbfea7465860',
+  'src/config/photoRadarContent.json': '3676436bf756d467feb2a76fee5d80abe5e16e2b04be341a95c811feb3c52940',
 });
 // These are reviewed business-policy passages, not a licence for arbitrary
 // future config values to become legal facts. A copy change requires review.
@@ -246,6 +246,31 @@ function redactSlugVerifiedFacts(value, slug) {
         '[verified stop-sign demerits]'
       );
       break;
+    case 'speeding-ticket-alberta':
+      // Primary sources: Traffic Safety Act s. 86 (court suspension), s. 172
+      // (separate racing/bet-or-wager seizure power), and the current
+      // Demerit Point Program and Service of Documents Regulation, Schedule 1.
+      // Keep these admissions exact and contextual so an arbitrary suspension
+      // duration or speed threshold elsewhere is still rejected.
+      text = replaceWhenNearby(
+        text,
+        /\b(?:3|three)\s+months?\b/gi,
+        /\b(?:court\s+may\s+order|court-ordered|on\s+conviction)\b[^.!?]{0,100}\b(?:licen[cs]e\s+)?suspension\b|\b(?:licen[cs]e\s+)?suspension\b[^.!?]{0,100}\b(?:court\s+may\s+order|court-ordered|on\s+conviction)\b/i,
+        '[verified court suspension maximum]'
+      );
+      text = replaceWhenNearby(
+        text,
+        /\b51\s*km\/h\s+or\s+more\s+over(?:\s+the\s+limit)?\b/gi,
+        /\b(?:court\s+appearance|six\s+(?:demerit\s+)?points?|court\s+may\s+order|automatic\s+roadside\s+suspension)\b/i,
+        '[verified highest speeding band]'
+      );
+      text = replaceWhenNearby(
+        text,
+        /\b24[-\s]+hours?\b/gi,
+        /\b(?:vehicle[-\s]+seizure|s\.?\s*172|racing|bet-or-wager)\b/i,
+        '[verified separate seizure power]'
+      );
+      break;
     case 'photo-radar-ticket-edmonton':
       // Official sources: Alberta.ca "Photo radar in Alberta" and Edmonton automated enforcement.
       text = replaceWhenNearby(
@@ -437,7 +462,7 @@ function curatedPageIssues(page) {
     } else {
       page.sources.forEach((source, index) => {
         if (!present(source?.title)) issues.push(`source ${index + 1}: missing title`);
-        const provincialSource = /^https:\/\/(?:www\.)?(?:alberta\.ca|open\.alberta\.ca|traffictickets\.alberta\.ca|albertacourts\.ca)\//i.test(source?.url || '');
+        const provincialSource = /^https:\/\/(?:www\.)?(?:alberta\.ca|open\.alberta\.ca|traffictickets\.alberta\.ca|albertacourts\.ca|kings-printer\.alberta\.ca)\//i.test(source?.url || '');
         const reviewedPhotoRadarSource = PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) &&
           /^https:\/\/(?:www\.)?(?:edmonton\.ca|calgary\.ca|calgarypolice\.ca|calgarypolicecommission\.ca|newsroom\.calgary\.ca|kings-printer\.alberta\.ca|secure\.reddeer\.ca)\//i.test(source?.url || '');
         if (!provincialSource && !reviewedPhotoRadarSource) {

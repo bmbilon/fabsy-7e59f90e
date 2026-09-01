@@ -10,6 +10,23 @@ export const SAFE_BLOG_FALLBACK_TITLE = 'How to Respond to an Alberta Traffic Ti
 export const SAFE_BLOG_FALLBACK_DESCRIPTION =
   'Review general options for responding to an Alberta traffic ticket and learn when Fabsy may provide authorized agent services.';
 
+const EVIDENCE_ARTICLE_SLUG = 'alberta-traffic-trial-evidence-self-represented';
+const LEGACY_DISCLOSURE_HEADING =
+  '## 2. Disclosure must be requested and interpreted without legal advice from the Crown or police';
+const SAFE_DISCLOSURE_HEADING = '## 2. Disclosure must be requested and reviewed before trial';
+const LEGACY_DISCLOSURE_PARAGRAPH =
+  'Disclosure may contain officer notes, witness statements, photographs, videos, certificates and other records. It helps you understand the prosecution’s case and prepare a response. The Crown prosecutor cannot give you legal advice or procedural tips; although a court clerk may be able to explain the process, the clerk cannot give legal advice either. You are responsible for working out what the materials mean for your defence.';
+const SAFE_DISCLOSURE_PARAGRAPH =
+  "After you or an authorized representative requests disclosure, the prosecutor must provide relevant, non-privileged material in the prosecution's possession or control. The disclosure duty is explained in [R. v. Stinchcombe, 1991 CanLII 45 (SCC)](https://www.canlii.org/en/ca/scc/doc/1991/1991canlii45/1991canlii45.html). The package varies by file and may include officer notes, witness statements, photographs, videos, certificates or other records. Additional device or maintenance records are not automatic and may require a focused request and justification. The prosecutor and police do not act for you or give legal advice. Court staff may provide general process information, but cannot tell you what the material means for your defence.";
+const SAFE_INDEPENDENT_HELP_HEADING = '## Independent help and court information';
+const SAFE_INDEPENDENT_HELP_SECTION = `${SAFE_INDEPENDENT_HELP_HEADING}
+
+Independent support is not the same as representation, and eligibility varies. [Alberta Court and Justice Services](https://www.alberta.ca/contact-court-and-justice-services) provides general court-system and process information. [Student Legal Assistance](https://slacalgary.com/about/) lists traffic and bylaw matters among its services for low-income Calgary-area residents, and [Calgary Legal Guidance](https://clg.ab.ca/) offers free short-term guidance to eligible clients. [Legal Aid Alberta](https://www.legalaid.ab.ca/resources/help-centre/qualifying/) says traffic tickets generally do not qualify, subject to limited exceptions. Confirm eligibility and scope directly, and do not let a referral search cause you to miss the deadline on your ticket.`;
+const LEGACY_SUCCESS_INSURANCE_SENTENCE =
+  'A successful dispute means no conviction, no demerits, and no insurance ' + 'impact from that ticket.';
+const SAFE_SUCCESS_INSURANCE_SENTENCE =
+  "A successful dispute may result in no conviction on that ticket. Any demerit or insurer treatment depends on the final record and the insurer's own practices; no insurance outcome is promised.";
+
 export const SAFE_BLOG_FALLBACK_ARTICLE = `Traffic ticket rules, procedures, and available outcomes depend on the allegation, the evidence, the court location, and current Alberta requirements. Numerical penalties and deadlines can change, so check the notice you received and current official sources before deciding what to do.
 
 ## Start with the ticket
@@ -318,6 +335,30 @@ function fallbackPost(post) {
   };
 }
 
+function applyTargetedLegalCorrections(post) {
+  const generallyCorrected = {
+    ...post,
+    content: String(post?.content || '').replace(
+      LEGACY_SUCCESS_INSURANCE_SENTENCE,
+      SAFE_SUCCESS_INSURANCE_SENTENCE,
+    ),
+  };
+  if (post?.slug !== EVIDENCE_ARTICLE_SLUG) return generallyCorrected;
+
+  let content = generallyCorrected.content
+    .replace(LEGACY_DISCLOSURE_HEADING, SAFE_DISCLOSURE_HEADING)
+    .replace(LEGACY_DISCLOSURE_PARAGRAPH, SAFE_DISCLOSURE_PARAGRAPH);
+  if (!content.includes(SAFE_INDEPENDENT_HELP_HEADING)) {
+    content = content.includes('\n## Official sources')
+      ? content.replace('\n## Official sources', `\n${SAFE_INDEPENDENT_HELP_SECTION}\n\n## Official sources`)
+      : `${content}\n\n${SAFE_INDEPENDENT_HELP_SECTION}`;
+  }
+  return {
+    ...generallyCorrected,
+    content,
+  };
+}
+
 function outcomeRateViolations(value, field) {
   const violations = [];
   if (SEMANTIC_OVER_CAP_RE.test(value)) {
@@ -386,6 +427,8 @@ export function markdownToGuardrailText(value) {
 }
 
 export function guardPublishedBlogFields(post) {
+  post = applyTargetedLegalCorrections(post);
+
   if (post.slug === 'alberta-traffic-ticket-comparison-guide') {
     return {
       ...post,

@@ -123,4 +123,25 @@ const comparison = guardPublishedBlogFields(post({
 }));
 assert.deepEqual(articleViolations(comparison), []);
 
+const evidenceArticle = guardPublishedBlogFields(post({
+  slug: 'alberta-traffic-trial-evidence-self-represented',
+  content: `## 2. Disclosure must be requested and interpreted without legal advice from the Crown or police
+
+Disclosure may contain officer notes, witness statements, photographs, videos, certificates and other records. It helps you understand the prosecution’s case and prepare a response. The Crown prosecutor cannot give you legal advice or procedural tips; although a court clerk may be able to explain the process, the clerk cannot give legal advice either. You are responsible for working out what the materials mean for your defence.`,
+}));
+assert.match(evidenceArticle.content, /Disclosure must be requested and reviewed before trial/);
+assert.match(evidenceArticle.content, /Court staff may provide general process information/);
+assert.match(evidenceArticle.content, /Additional device or maintenance records are not automatic/);
+assert.match(evidenceArticle.content, /1991canlii45/);
+assert.match(evidenceArticle.content, /Independent help and court information/);
+assert.match(evidenceArticle.content, /Legal Aid Alberta.*traffic tickets generally do not qualify/s);
+assert.doesNotMatch(evidenceArticle.content, /procedural tips|interpreted without legal advice/);
+
+const successfulDispute = guard({
+  slug: 'vehicle-enforcement-stop-speeding-ticket-alberta',
+  content: 'A successful dispute means no conviction, no demerits, and no insurance impact from that ticket.',
+});
+assert.match(successfulDispute.content, /insurer's own practices; no insurance outcome is promised/);
+assert.doesNotMatch(successfulDispute.content, /no insurance impact/i);
+
 console.log('Published blog guardrail tests passed.');

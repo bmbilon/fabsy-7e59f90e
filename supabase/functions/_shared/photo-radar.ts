@@ -56,7 +56,7 @@ export function ticketCheckoutProduct(stored: { ticket_type?: unknown; registere
   }
   const isPhotoRadar = stored.ticket_type === "photo_radar";
   if (isPhotoRadar && includeIdrAddon) {
-    throw new ProductRequestError("Registered-owner camera notices have no insurance impact. An insurance report cannot be added to Photo Radar.");
+    throw new ProductRequestError("An Insurance Impact Report cannot be added to Photo Radar. No insurer, underwriting, or premium result is promised.");
   }
   if (isPhotoRadar && !["yes", "sold_before", "stolen"].includes(String(stored.registered_owner_on_offence_date))) {
     throw new ProductRequestError("Complete the registered-owner question before checkout.");

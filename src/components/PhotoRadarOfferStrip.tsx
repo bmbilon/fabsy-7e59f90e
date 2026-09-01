@@ -12,7 +12,7 @@ export default function PhotoRadarOfferStrip() {
         </span>
         <span className="inline-flex items-center gap-2 text-sm">Check eligibility <ArrowRight className="h-4 w-4" aria-hidden="true" /></span>
       </Link>
-      <p className="mt-2 text-sm leading-relaxed text-slate-600">No demerits. No insurance impact. The only thing on the table is the fine. You approve any deal.</p>
+      <p className="mt-2 text-sm leading-relaxed text-slate-600">The current demerit schedule assigns no points to an owner conviction under TSA s.160. Insurer treatment is not promised. You approve any deal.</p>
     </div>
   );
 }

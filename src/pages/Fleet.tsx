@@ -75,7 +75,7 @@ export default function Fleet() {
               <Button asChild size="lg"><a href="#fleet-intake">Start one fleet intake</a></Button>
               <p className="text-lg font-semibold">${PHOTO_RADAR.priceCad} + GST per ticket</p>
             </div>
-            <p className="mt-5 text-sm text-slate-300">No demerits. No insurance impact. No success fee. You approve each Crown deal.</p>
+            <p className="mt-5 text-sm text-slate-300">{PHOTO_RADAR.insuranceDisclaimer} No success fee. You approve each Crown deal.</p>
           </div>
         </section>
 

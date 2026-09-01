@@ -30,15 +30,15 @@ try {
           ['fight-photo-radar-ticket-calgary', 'Calgary'],
         ];
         for (const [slug, city] of guides) {
-          test(slug + ' offers the fine-only $79 service and overrides an old generic CTA', () => {
+          test(slug + ' offers the owner-notice $79 service and overrides an old generic CTA', () => {
             const html = render({ offence: 'photo radar', city, ctaHref: '/submit-ticket', photoRadar: isPhotoRadarContentSlug(slug) });
             assert.ok(html.includes('href="/photo-radar"'));
             assert.ok(html.includes('Photo Radar - $79 + GST'));
             assert.ok(html.includes('$82.95 total'));
-            assert.match(html, /no demerits/i);
-            assert.match(html, /no insurance impact/i);
-            assert.ok(html.includes('Only the fine is on the table.'));
-            assert.ok(html.includes('An Insurance Impact Report is not included or needed.'));
+            assert.match(html, /owner conviction under Traffic Safety Act s\.160 receives no demerit points/i);
+            assert.match(html, /does not promise how an insurer will underwrite, price, or treat a particular record/i);
+            assert.ok(html.includes('An Insurance Impact Report is not included.'));
+            assert.doesNotMatch(html, /no insurance impact|Only the fine is on the table/i);
             assert.ok(html.includes('You approve any deal. No trial. No success fee.'));
             assert.ok(html.includes('No outcome is promised.'));
             assert.ok(html.includes('48 hours after complete disclosure'));

@@ -431,10 +431,10 @@ serve(async (req) => {
       // Product-specific information is deterministic. Never sell an insurance
       // report for owner liability or turn extracted wording into a legal finding.
       const result = fallbackResponse();
-      const hook = "A registered-owner camera notice has no demerits and no insurance impact. Only the fine is on the table.";
+      const hook = "Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. No insurer, underwriting, or premium result is promised.";
       const pricing = "Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total). No trial. No success fee. Government fines are separate.";
       const faqs = [
-        { q: "Does photo radar affect insurance in Alberta?", a: "No. Alberta registered-owner automated enforcement notices under TSA s.160(1) have no insurance impact and carry no demerits." },
+        { q: "Does photo radar affect insurance in Alberta?", a: "The current demerit schedule assigns no points to an owner conviction under Traffic Safety Act s.160. That does not promise how an insurer will underwrite, price, or treat a particular record." },
         { q: "What can Fabsy do?", a: "For an accepted notice, Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No outcome is promised." },
         { q: "What does Photo Radar cost?", a: pricing },
         { q: "When does the 48-hour commitment start?", a: "After complete, readable disclosure is received and matched to the file. It covers Fabsy's next authorized action, not the Crown's response or a final outcome. Keep following the notice's deadlines." },

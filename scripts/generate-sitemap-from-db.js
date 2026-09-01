@@ -241,13 +241,13 @@ export async function generateSitemap() {
 
   fs.writeFileSync(faqXmlPath, urlset(faqUrls, localeContext));
 
-  // Keep the existing segmented English inventory. Each released translation
-  // gets only its real, reviewed Phase 1 equivalents, never English content
+  // Keep the existing segmented English inventory. Each review-approved translation
+  // gets only its real Phase 1 equivalents, never machine-only or English content
   // duplicates or intake/checkout/receipt URLs.
   const localePaths = [];
   for (const locale of localeContext.registry.locales.filter(item => item.code !== 'en')) {
     const filename = path.join(PUBLIC_DIR, 'sitemaps', `sitemap-${locale.code}.xml`);
-    if (!localeContext.released(locale.code)) {
+    if (!localeContext.indexable(locale.code)) {
       fs.rmSync(filename, { force: true });
       continue;
     }
