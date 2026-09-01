@@ -1,10 +1,12 @@
 # Fabsy SEO research and evidence artifacts
 
-This directory separates three things that were previously easy to conflate:
+This directory separates evidence and operating artifacts that are easy to conflate:
 
 1. first-party observed evidence;
 2. fixed research plans and benchmark prompts;
-3. advisory content-consolidation candidates.
+3. advisory content-consolidation candidates;
+4. legal/editorial review controls; and
+5. earned-link research and unsent outreach drafts.
 
 Nothing here authorizes a redirect, noindex, deletion, canonical change, or legal-content publication.
 
@@ -15,6 +17,11 @@ Nothing here authorizes a redirect, noindex, deletion, canonical change, or lega
 - `citation-benchmark-observed-perplexity-2026-08-31.csv` — one observed anonymous/incognito Perplexity run with stable result URLs where available.
 - `citation-benchmark-observations-template.csv` — empty schema for future platform runs.
 - `citation-benchmark-procedure.md` — controlled execution, evidence, and KPI rules.
+- `citation-benchmark-runs/YYYY-MM-DD/` — non-overwriting dated monthly run artifacts created by the benchmark generator.
+- `kpi-measurement-spec.md` — primary SEO/business/citation KPI definitions, sources, targets, guardrails, and known instrumentation gaps.
+- `alberta-legal-editorial-review-packet.md` — version-bound checklist for a qualified Alberta reviewer; approval remains pending until a real reviewer completes it.
+- `backlink-prospects.csv` — 12 bounded outreach candidates and eight citation-only authorities, with verification, fit, and risk notes.
+- `backlink-outreach-drafts.md` — unsent, relationship-first drafts that remain gated on completed qualified review of the exact linked page.
 - `gsc-aggregate-baseline.csv` — manually verified aggregate Search Console facts and explicit dimensional caveats.
 - `gsc-generative-ai-top-pages.csv` — selected observed page rows from the authenticated Generative AI Features export.
 - `first-party-evidence-baseline.md` — human-readable evidence receipt and interpretation limits.
@@ -59,4 +66,17 @@ Run tests with:
 ```sh
 node scripts/seo-evidence/test-score-content-consolidation.mjs
 node scripts/seo-evidence/test-research-artifacts.mjs
+node scripts/seo-evidence/test-create-citation-benchmark-run.mjs
 ```
+
+Create a new citation run without touching prior results:
+
+```sh
+node scripts/seo-evidence/create-citation-benchmark-run.mjs \
+  --platform perplexity \
+  --date YYYY-MM-DD \
+  --repetition 1 \
+  --reviewer REVIEWER_INITIALS
+```
+
+The generator writes 30 `planned_not_run` rows under a dated directory using exclusive file creation. Follow `citation-benchmark-procedure.md` to record only direct observations.

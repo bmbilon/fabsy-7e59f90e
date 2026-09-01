@@ -14,7 +14,32 @@ The fixed prompts are in `citation-benchmark-queries.csv`. Do not silently rewri
 - `observed_repeated_run` means the prompt was executed as one of the later controlled repetitions.
 - Blank, `not_recorded`, and `not_reviewed` are intentional unknowns. They must not be converted to `no`.
 
-The 2026-08-31 Perplexity run is stored separately in `citation-benchmark-observed-perplexity-2026-08-31.csv`. The empty `citation-benchmark-observations-template.csv` is for future observations.
+The 2026-08-31 Perplexity run is stored separately in `citation-benchmark-observed-perplexity-2026-08-31.csv`. The empty `citation-benchmark-observations-template.csv` defines the schema. Create future run artifacts with the repository generator instead of copying or editing the template.
+
+## Create a dated non-overwriting run artifact
+
+Create one file per platform/date/repetition before opening the platform. For example:
+
+```sh
+node scripts/seo-evidence/create-citation-benchmark-run.mjs \
+  --platform perplexity \
+  --date 2026-09-30 \
+  --repetition 1 \
+  --model "not disclosed" \
+  --location "Alberta, Canada" \
+  --personalization anonymous-incognito \
+  --reviewer REVIEWER_INITIALS
+```
+
+The deterministic output is:
+
+```text
+docs/seo-research/citation-benchmark-runs/2026-09-30/citation-benchmark-perplexity-2026-09-30-r1.csv
+```
+
+Allowed platform keys are `google`, `bing`, `perplexity`, `chatgpt`, and `claude`. Use `--repetition 1`, `2`, and `3` for the controlled monthly panel. The generator reads the fixed 30-prompt file in order, creates only `planned_not_run` rows, and refuses to overwrite an existing path. It has no `--force` option. If an attempted run is invalid, retain it with an explanatory note and create the next repetition number; never recycle a completed run ID.
+
+After executing each prompt, replace that row's planning state only with directly observed fields and an appropriate completed `observation_status`. Review the completed CSV before considering it immutable. Do not fill unreviewed fields with `no`, copy facts from another repetition, or modify a prior month's completed file.
 
 ## Platforms
 
@@ -30,7 +55,7 @@ If a consumer interface or web-search mode is unavailable, record the row as `no
 
 ## Controlled run protocol
 
-1. Create a unique `run_id`, such as `perplexity-2026-09-30-r1`.
+1. Use the generated unique `run_id`, such as `perplexity-2026-09-30-r1`; do not hand-edit it.
 2. Record the local run date, interface/product name, visible model or index if disclosed, whether web search was enabled, and location if known.
 3. Use an anonymous/incognito or fresh session. Record any personalization that could not be disabled.
 4. Run one clean direct search per prompt in benchmark order. Do not mention Fabsy unless the fixed prompt itself does.
@@ -86,4 +111,4 @@ Do not describe 2/30 as a stable Perplexity ranking. Compare only after at least
 
 Search Console Generative AI Features impressions prove that a Fabsy URL appeared in that first-party report. They do not prove which query caused the impression, that a user read the answer, or that the URL was a textual citation. Keep GSC visibility and the controlled citation benchmark as complementary datasets.
 
-The aggregate and page-row provenance rules are documented in `gsc-aggregate-baseline.csv` and `first-party-evidence-baseline.md`.
+The aggregate and page-row provenance rules are documented in `gsc-aggregate-baseline.csv` and `first-party-evidence-baseline.md`. Primary KPI definitions, targets, and measurement gaps are documented in `kpi-measurement-spec.md`.
