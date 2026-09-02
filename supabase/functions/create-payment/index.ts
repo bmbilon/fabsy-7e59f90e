@@ -6,6 +6,10 @@ import { PHOTO_RADAR_PRODUCT, ProductRequestError, ticketCheckoutProduct } from 
 import { verifiedProEvidence } from "../_shared/pro-licence.ts";
 import { PRO_COUPON, PRO_PRICING_VERSION, proPricing } from "../_shared/pro-pricing.ts";
 import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
+import {
+  recordMetaCheckoutAttributionBestEffort,
+  sha256CheckoutSessionId,
+} from "../_shared/meta-capi.ts";
 
 const TICKET_BASE_CENTS = 19800;
 const IDR_ADDON_CENTS = 3100;
@@ -39,6 +43,55 @@ class RequestError extends Error {
     super(message);
     this.status = status;
   }
+}
+
+function metaCheckoutAttributionInput(
+  sessionId: string,
+  raw: unknown,
+  clientUserAgent: string | null,
+) {
+  const record = raw && typeof raw === "object" && !Array.isArray(raw)
+    ? raw as Record<string, unknown>
+    : null;
+  const consentGranted = record?.consentVersion === "meta-measurement-v1" &&
+    typeof record.consentedAt === "string";
+  return {
+    checkoutSessionId: sessionId,
+    consentGranted,
+    consentVersion: record?.consentVersion,
+    consentedAt: record?.consentedAt,
+    fbp: record?.fbp,
+    fbc: record?.fbc,
+    // Browser input cannot substitute another user agent. The Edge request
+    // header is the only accepted source for this consented match field.
+    clientUserAgent,
+  };
+}
+
+async function recordMetaCheckoutAttribution(
+  sessionId: string,
+  raw: unknown,
+  clientUserAgent: string | null,
+) {
+  const result = await recordMetaCheckoutAttributionBestEffort(
+    admin,
+    metaCheckoutAttributionInput(sessionId, raw, clientUserAgent),
+  );
+  // Accepted measurement is optional and may fail without interrupting payment.
+  // Withdrawal is different: never return a reusable URL while an earlier
+  // accepted attribution might still be attached to that same Stripe session.
+  if (!result.ok && result.reason === "clear_rpc_failed") {
+    throw new RequestError(
+      "Your privacy choice could not be applied to this checkout. Please try again.",
+      503,
+    );
+  }
+  return {
+    ...result,
+    withdrawalHandle: result.recorded
+      ? await sha256CheckoutSessionId(sessionId)
+      : null,
+  };
 }
 
 function cors(req: Request) {
@@ -434,6 +487,7 @@ serve(async (req) => {
     }
 
     const raw = await req.json();
+    const rawMetaMeasurement = raw?.metaMeasurement;
     const formData = raw?.formData;
     if (!formData || typeof formData !== "object") {
       throw new RequestError("formData is required.");
@@ -635,11 +689,23 @@ serve(async (req) => {
       };
     }
     if (reservation?.url) {
+      let metaAttributionHandle: string | null = null;
+      if (!product.isPhotoRadar && reservation.sessionId) {
+        const attribution = await recordMetaCheckoutAttribution(
+          reservation.sessionId,
+          rawMetaMeasurement,
+          req.headers.get("user-agent"),
+        );
+        metaAttributionHandle = attribution.withdrawalHandle;
+      }
       return json(req, {
         url: reservation.url,
         checkoutIntentId: reservation.orderId,
         idrOrderId: includeIdrAddon ? reservation.orderId : null,
         reused: true,
+        ...(metaAttributionHandle
+          ? { metaAttributionHandle }
+          : {}),
       });
     }
     const checkoutIntentId = reservation.orderId;
@@ -808,7 +874,21 @@ serve(async (req) => {
         sessionId: session.id,
       };
     }
-    return json(req, { url: session.url, checkoutIntentId, idrOrderId });
+    let metaAttributionHandle: string | null = null;
+    if (!product.isPhotoRadar) {
+      const attribution = await recordMetaCheckoutAttribution(
+        session.id,
+        rawMetaMeasurement,
+        req.headers.get("user-agent"),
+      );
+      metaAttributionHandle = attribution.withdrawalHandle;
+    }
+    return json(req, {
+      url: session.url,
+      checkoutIntentId,
+      idrOrderId,
+      ...(metaAttributionHandle ? { metaAttributionHandle } : {}),
+    });
   } catch (error) {
     if (createdStripeSessionId && checkoutStripe) {
       try {

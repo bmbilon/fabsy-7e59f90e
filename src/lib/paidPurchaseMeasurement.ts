@@ -24,7 +24,7 @@ export type PaidPurchaseDispatch = (eventName: string, params: Record<string, un
 
 const eligibleOrderTypes = new Set(["rapid_resolution", "rapid_resolution_bundle", "photo_radar"]);
 
-async function opaqueTransactionId(sessionId: string): Promise<string | null> {
+export async function opaqueTransactionId(sessionId: string): Promise<string | null> {
   try {
     const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(sessionId));
     const bytes = new Uint8Array(digest);

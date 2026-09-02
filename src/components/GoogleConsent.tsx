@@ -5,28 +5,27 @@ import { Button } from '@/components/ui/button';
 import { googleConsentCopy } from '@/i18n/googleConsentCopy';
 import { splitLocalePath } from '@/i18n/locale-policy.mjs';
 import registry from '@/i18n/locales.json';
-import {
-  getGoogleConsentChoice,
-  GOOGLE_CONSENT_CHANGED,
-  GOOGLE_CONSENT_STORAGE_KEY,
-  setGoogleConsentChoice,
-  type GoogleConsentChoice,
-} from '@/lib/googleConsent';
+import * as consent from '@/lib/googleConsent';
+import type { GoogleConsentChoice } from '@/lib/googleConsent';
 import { publicMeasurementPath } from '@/lib/googleMeasurement';
 
 function subscribeToConsent(notify: () => void) {
   const onStorage = (event: StorageEvent) => {
-    if (event.key === GOOGLE_CONSENT_STORAGE_KEY || event.key === null) notify();
+    if (event.key === consent.GOOGLE_CONSENT_STORAGE_KEY ||
+        event.key === consent.META_CONSENT_STORAGE_KEY || event.key === null) notify();
   };
-  window.addEventListener(GOOGLE_CONSENT_CHANGED, notify);
+  window.addEventListener(consent.GOOGLE_CONSENT_CHANGED, notify);
+  if (consent.META_CONSENT_CHANGED) window.addEventListener(consent.META_CONSENT_CHANGED, notify);
   window.addEventListener('storage', onStorage);
   return () => {
-    window.removeEventListener(GOOGLE_CONSENT_CHANGED, notify);
+    window.removeEventListener(consent.GOOGLE_CONSENT_CHANGED, notify);
+    if (consent.META_CONSENT_CHANGED) window.removeEventListener(consent.META_CONSENT_CHANGED, notify);
     window.removeEventListener('storage', onStorage);
   };
 }
 
 const serverChoice = (): GoogleConsentChoice => 'unknown';
+const getMetaChoice = (): GoogleConsentChoice => consent.getMetaConsentChoice?.() ?? consent.getGoogleConsentChoice();
 
 /** Choice UI only. Loading, storage, expiration and withdrawal live in the consent/measurement modules. */
 export default function GoogleConsent() {
@@ -34,7 +33,10 @@ export default function GoogleConsent() {
   const { locale, path: basePath } = splitLocalePath(location.pathname);
   const localeInfo = registry.locales.find(item => item.code === locale)!;
   const copy = googleConsentCopy[locale];
-  const choice = useSyncExternalStore(subscribeToConsent, getGoogleConsentChoice, serverChoice);
+  const googleChoice = useSyncExternalStore(subscribeToConsent, consent.getGoogleConsentChoice, serverChoice);
+  // In legacy/offline adapters without a Meta state, mirror Google only for
+  // compatibility. Production always has the separate Meta v1 record.
+  const metaChoice = useSyncExternalStore(subscribeToConsent, getMetaChoice, serverChoice);
   const [settingsLocation, setSettingsLocation] = useState<string | null>(null);
   const [dismissedInitial, setDismissedInitial] = useState(false);
   const settingsButton = useRef<HTMLButtonElement>(null);
@@ -47,9 +49,20 @@ export default function GoogleConsent() {
   const sensitive = /(?:^|\/)representation-consent(?:\/|$)/.test(basePath);
   // A manually opened panel does not follow navigation into a form or portal.
   const settingsOpen = settingsLocation === location.key;
-  const initialBanner = choice === 'unknown' && !dismissedInitial && Boolean(publicMeasurementPath(location.pathname));
+  const initialBanner = (googleChoice === 'unknown' || metaChoice === 'unknown') &&
+    !dismissedInitial && Boolean(publicMeasurementPath(location.pathname));
   const panelOpen = settingsOpen || initialBanner;
-  const status = choice === 'accepted' ? copy.acceptedStatus : choice === 'declined' ? copy.declinedStatus : copy.unknownStatus;
+  const status = googleChoice === 'accepted' && metaChoice === 'accepted'
+    ? copy.acceptedStatus
+    : googleChoice === 'declined' && metaChoice === 'declined'
+      ? copy.declinedStatus
+      : googleChoice === 'accepted' && metaChoice === 'unknown'
+        ? copy.googleOnlyStatus
+        : googleChoice === 'unknown' && metaChoice === 'accepted'
+          ? copy.metaOnlyStatus
+          : googleChoice !== 'unknown' && metaChoice !== 'unknown'
+            ? copy.mixedStatus
+            : copy.unknownStatus;
 
   useEffect(() => {
     // The automatic banner never steals focus from page content. Opening
@@ -66,13 +79,15 @@ export default function GoogleConsent() {
   };
 
   const choose = (next: 'accepted' | 'declined') => {
-    setGoogleConsentChoice(next);
+    consent.setGoogleConsentChoice(next);
+    consent.setMetaConsentChoice?.(next);
     closeSettings();
   };
 
   if (sensitive) return null;
 
-  return <div lang={localeInfo.languageTag} dir={localeInfo.dir as 'ltr' | 'rtl'} data-google-consent-controls>
+  return <div lang={localeInfo.languageTag} dir={localeInfo.dir as 'ltr' | 'rtl'}
+    data-google-consent-controls data-measurement-consent-controls>
     {/* In normal document flow: this control cannot cover the mobile purchase bar. */}
     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-slate-50 px-4 py-3 text-center">
       <Button ref={settingsButton} type="button" variant="link" className="h-auto min-h-11 whitespace-normal px-2 py-2 text-slate-700"
@@ -104,7 +119,7 @@ export default function GoogleConsent() {
           {copy.allow}
         </Button>
         <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-3 py-3 text-center text-sm text-slate-900" data-google-consent-choice="declined" onClick={() => choose('declined')}>
-          {choice === 'accepted' ? copy.withdraw : copy.decline}
+          {googleChoice === 'accepted' || metaChoice === 'accepted' ? copy.withdraw : copy.decline}
         </Button>
       </div>
       <p className="mt-3 text-xs leading-relaxed text-slate-600">{copy.changeHint}{' '}

@@ -1,12 +1,15 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Router, type BrowserRouterProps } from 'react-router-dom';
-import { publicGoogleMeasurementUrl } from '@/lib/googleMeasurement';
-import { createMeasurementHistory, type PublicMeasurementUrl } from '@/lib/measurementNavigation';
+import { publicMeasurementDocumentUrl, publicProviderMeasurementUrl } from '@/lib/publicMeasurementUrl';
+import {
+  createMeasurementHistory, type ProviderMeasurementUrl, type PublicMeasurementUrl,
+} from '@/lib/measurementNavigation';
 import GoogleMeasurementGuardian from './GoogleMeasurementGuardian';
 
 interface MeasurementRouterProps extends Pick<BrowserRouterProps, 'basename' | 'future' | 'window'> {
   children: ReactNode;
   isPublicUrl?: PublicMeasurementUrl;
+  isProviderPublicUrl?: ProviderMeasurementUrl;
   /** Used only by offline tests, so no actual document requests occur. */
   navigateDocument?: (url: URL, method: 'assign' | 'replace') => void;
 }
@@ -14,12 +17,16 @@ interface MeasurementRouterProps extends Pick<BrowserRouterProps, 'basename' | '
 /** Route private pages only inside a fresh, permanently untagged document. */
 export default function MeasurementRouter({
   children, basename, future, window: suppliedWindow,
-  isPublicUrl = publicGoogleMeasurementUrl, navigateDocument,
+  isPublicUrl = publicMeasurementDocumentUrl, isProviderPublicUrl, navigateDocument,
 }: MeasurementRouterProps) {
   const historyRef = useRef<ReturnType<typeof createMeasurementHistory>>();
   if (!historyRef.current) {
     historyRef.current = createMeasurementHistory({
-      window: suppliedWindow || window, isPublicUrl, navigateDocument,
+      window: suppliedWindow || window,
+      isPublicUrl,
+      isProviderPublicUrl: isProviderPublicUrl ||
+        (isPublicUrl === publicMeasurementDocumentUrl ? publicProviderMeasurementUrl : undefined),
+      navigateDocument,
     });
   }
   const history = historyRef.current;

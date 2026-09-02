@@ -8,6 +8,11 @@ import { validatePhotoRadarPaidSession } from "../_shared/photo-radar.ts";
 import { PRO_COUPON, validateProPayment } from "../_shared/pro-pricing.ts";
 import { recordReferralCheckoutPayment, recordReferralRefund } from "../_shared/referrals.ts";
 import { reconcileProRefund } from "../_shared/pro-refund.ts";
+import {
+  clearMetaCheckoutAttribution,
+  enqueueMetaPurchase,
+} from "../_shared/meta-capi.ts";
+import { currentMetaPurchaseFromSignedCheckout } from "../_shared/meta-purchase.ts";
 
 type IdrOrderType = "standalone" | "addon";
 type CheckoutIntentType = IdrOrderType | "ticket" | "assessment" | "photo_radar";
@@ -18,6 +23,7 @@ type SupabaseAdmin = ReturnType<typeof createClient<any>>;
 
 interface CheckoutSessionData {
   id: string;
+  livemode: boolean;
   amount_subtotal: number | null;
   amount_total: number | null;
   client_reference_id: string | null;
@@ -40,6 +46,8 @@ interface CheckoutSessionData {
 interface StripeEventData {
   id: string;
   type: string;
+  created: number;
+  livemode: boolean;
   data: { object: CheckoutSessionData };
 }
 
@@ -62,6 +70,19 @@ function json(body: unknown, status = 200): Response {
     status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+async function enqueueCurrentMetaPurchaseIfEligible(
+  supabase: SupabaseAdmin,
+  event: StripeEventData,
+  session: CheckoutSessionData,
+) {
+  const purchase = currentMetaPurchaseFromSignedCheckout(event, session);
+  if (!purchase) return;
+  // A missing consented attribution is an intentional no-op. Database/RPC
+  // failures throw so Stripe retries the signed webhook instead of losing the
+  // conversion after checkout fulfillment.
+  await enqueueMetaPurchase(supabase, purchase);
 }
 
 function isUuid(value: string | undefined): value is string {
@@ -1181,6 +1202,13 @@ serve(async (req: Request): Promise<Response> => {
       event.type === "checkout.session.async_payment_failed" ||
       event.type === "checkout.session.expired"
     ) {
+      const failedCheckoutKind = session.metadata?.fabsy_checkout_kind;
+      if (
+        failedCheckoutKind === "ticket_only" ||
+        failedCheckoutKind === "ticket_with_addon"
+      ) {
+        await clearMetaCheckoutAttribution(supabase, session.id);
+      }
       const released = await releaseFailedCheckoutIntent(
         supabase,
         session,
@@ -1221,6 +1249,7 @@ serve(async (req: Request): Promise<Response> => {
           ticketBaseCents,
         );
       }
+      await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
       return json({ received: true, handled: true, result });
     }
     if (!session.metadata?.idr_order_id) {
@@ -1242,6 +1271,9 @@ serve(async (req: Request): Promise<Response> => {
         session.metadata.source_assessment_id,
         ticketBaseCents,
       );
+    }
+    if (session.metadata?.fabsy_checkout_kind === "ticket_with_addon") {
+      await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
     }
     return json({ received: true, handled: true, result });
   } catch {

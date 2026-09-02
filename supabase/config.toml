@@ -101,6 +101,12 @@ verify_jwt = false
 [functions.idr-payment-webhook]
 verify_jwt = false
 
+[functions.meta-capi-worker]
+verify_jwt = true
+
+[functions.withdraw-meta-measurement]
+verify_jwt = false
+
 [functions.generate-idr-report]
 verify_jwt = true
 

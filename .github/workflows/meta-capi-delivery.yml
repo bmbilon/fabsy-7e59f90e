@@ -1,0 +1,42 @@
+name: Meta CAPI delivery
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+
+concurrency:
+  group: meta-capi-delivery
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deliver:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deliver pending consented purchase events
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          response="$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            --header "Content-Type: application/json" \
+            --data '{"limit":25}' \
+            "$SUPABASE_URL/functions/v1/meta-capi-worker")"
+          echo "$response" | jq -e '
+            type == "object" and
+            (.ok == true) and
+            ((.claimed // 0) | type == "number") and
+            ((.sent // 0) | type == "number") and
+            ((.retried // 0) | type == "number") and
+            ((.dead // 0) == 0) and
+            ((.terminal_failures // 0) == 0) and
+            ((.unresolved // 0) == 0)
+          ' >/dev/null

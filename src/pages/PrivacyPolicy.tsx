@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
         <p className="text-white/70 mb-8">
-          Last updated: August 31, 2026
+          Last updated: September 2, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -125,11 +125,13 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
             <p>
-              Google Analytics 4 and Google Ads measurement are optional. Their measurement
-              scripts do not load before you choose Allow measurement. If you decline, fresh
-              page loads do not load those scripts. You can revisit Privacy choices to change
-              your choice. We remember your choice in this browser for up to 180 days;
-              clearing browser storage or using another browser may remove that choice.
+              Google Analytics 4, Google Ads measurement and Meta measurement are optional.
+              Their scripts do not load before you choose Allow measurement. Google and Meta
+              permissions are stored separately, and a Google choice saved before Meta was
+              introduced does not give Meta permission. The current Privacy choices control
+              lets you allow or decline both providers together. You can revisit it at any time.
+              We remember each choice in this browser for up to 180 days; clearing browser
+              storage or using another browser may remove a choice.
             </p>
             <p className="mt-4">
               With your permission, Google measurement records visits to approved public
@@ -141,16 +143,35 @@ const PrivacyPolicy = () => {
               duplicate counting.
             </p>
             <p className="mt-4">
-              Google measurement stays off ticket intake, contact and fleet forms, other
-              personal-information forms, client portals, admin pages, and representation
-              authorization and document-verification flows. We do not include names,
-              email addresses, phone numbers, licence or plate details, ticket numbers,
-              uploaded files, free-text answers, assessment results, private access tokens
-              or case identifiers in Google measurement events.
+              With your permission, Meta Pixel records a manually sent PageView on the three
+              approved Rapid Resolution ad landing URLs. It records a PageView on the cleaned
+              payment-confirmation page only after our server verifies an eligible paid Rapid
+              Resolution or Rapid Resolution Bundle checkout. A Purchase is then sent for that
+              same verified checkout. The verified purchase may also be sent through
+              Meta Conversions API with the same opaque event reference so Meta can deduplicate it.
+              Meta receives these generic PageView and Purchase events and may process the purchase
+              value, currency, service identifier, browser and device information, browser user
+              agent, and valid Meta browser or ad-click identifiers (_fbp and _fbc) when present.
+              When a consented checkout opens, this browser temporarily keeps an opaque withdrawal
+              handle until the server acknowledges its removal, so a later refusal can retire
+              unsent server-side attribution throughout the complete delivery window.
+              Meta may use this data under its Business Tools terms and privacy policy for
+              measurement and ad delivery. Fabsy does not send Meta names, email addresses or
+              phone numbers for matching.
             </p>
             <p className="mt-4">
-              Google personalized advertising, Google signals and enhanced conversions
-              remain disabled. Learn more about Google's practices in the{' '}
+              Google and Meta measurement stay off ticket intake, contact and fleet forms,
+              other personal-information forms, client portals, admin pages, and representation
+              authorization and document-verification flows. We do not include names, email
+              addresses, phone numbers, licence or plate details, ticket numbers, uploaded files,
+              free-text answers, assessment results, private access tokens or case identifiers in
+              measurement events. Meta automatic events and advanced matching are disabled; we do
+              not send Lead or form events. No Meta retargeting audience is configured for this
+              release. Google personalized advertising, Google signals and enhanced conversions
+              remain disabled.
+            </p>
+            <p className="mt-4">
+              Learn more about these providers in the{' '}
               <a
                 href="https://policies.google.com/privacy"
                 className="underline"
@@ -158,14 +179,23 @@ const PrivacyPolicy = () => {
                 rel="noreferrer"
               >
                 Google Privacy Policy
+              </a>{' '}
+              and{' '}
+              <a
+                href="https://www.facebook.com/privacy/policy/"
+                className="underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Meta Privacy Policy
               </a>.
             </p>
             <p className="mt-4">
-              This choice controls optional Google measurement, not every website provider.
+              These choices control optional Google and Meta measurement, not every website provider.
               Providers needed for hosting, security, payments and case services remain
               separate. Existing Cloudflare infrastructure and performance analytics are
-              also separate from this Google choice. Declining Google measurement does not turn off
-              all cookies, infrastructure or service providers.
+              also separate. Declining measurement does not turn off all cookies,
+              infrastructure or service providers.
             </p>
             <p className="mt-4">
               Referral links and manually entered codes are stored with an attribution date in the browser's intake

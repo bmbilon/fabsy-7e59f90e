@@ -25,14 +25,29 @@ jobs:
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: 'npm' }
+        with: { node-version: '22', cache: 'npm' }
       - run: npm ci
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check measurement Edge Functions
+        run: |
+          deno check \
+            supabase/functions/_shared/meta-capi.ts \
+            supabase/functions/_shared/meta-purchase.ts \
+            supabase/functions/create-payment/index.ts \
+            supabase/functions/idr-payment-webhook/index.ts \
+            supabase/functions/meta-capi-worker/index.ts \
+            supabase/functions/withdraw-meta-measurement/index.ts
       - name: Build guarded snapshots and app
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           VITE_GOOGLE_MEASUREMENT_ENABLED: ${{ vars.VITE_GOOGLE_MEASUREMENT_ENABLED }}
+          VITE_META_MEASUREMENT_ENABLED: ${{ vars.VITE_META_MEASUREMENT_ENABLED }}
+          VITE_META_PIXEL_ID: ${{ vars.VITE_META_PIXEL_ID }}
           VITE_GA4_MEASUREMENT_ID: G-26G8CMWTKY
           VITE_GADS_ID: ${{ secrets.VITE_GADS_ID }}
           VITE_GADS_CONVERSION_LABEL: ${{ secrets.VITE_GADS_CONVERSION_LABEL }}

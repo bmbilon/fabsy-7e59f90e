@@ -10,6 +10,7 @@ declare global {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
     fabsyAnalyticsInitialized?: boolean;
+    fabsyMeasurementReloadRequested?: boolean;
   }
 }
 
@@ -165,7 +166,10 @@ export function stopGoogleMeasurementAndReload(): void {
   // Do not queue a denied-mode ping. The persisted choice prevents any Google
   // request in the replacement document. Already-sent requests cannot be recalled.
   window.gtag = () => undefined;
-  window.location.reload();
+  if (!window.fabsyMeasurementReloadRequested) {
+    window.fabsyMeasurementReloadRequested = true;
+    window.location.reload();
+  }
 }
 
 export function recheckGoogleMeasurementConsent(): void {

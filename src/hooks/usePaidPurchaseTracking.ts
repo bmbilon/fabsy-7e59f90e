@@ -6,6 +6,12 @@ import {
   dispatchGoogleMeasurement, GOOGLE_MEASUREMENT_READY,
   removeCheckoutTokenFromUrl,
 } from '@/lib/googleMeasurement';
+import { META_MEASUREMENT_READY, reportMetaPurchase } from '@/lib/metaMeasurement';
+
+const purchaseStorage = {
+  getItem: (key: string) => window.sessionStorage.getItem(key),
+  setItem: (key: string, value: string) => window.sessionStorage.setItem(key, value),
+};
 
 // Retain memory deduplication across remounts; storage is optional.
 const report = createPaidPurchaseReporter((eventName, params) => {
@@ -15,10 +21,7 @@ const report = createPaidPurchaseReporter((eventName, params) => {
   if (!current || current.page_location !== params.page_location ||
       !/\/thank-you$/.test(new URL(current.page_location).pathname)) return false;
   return dispatchGoogleMeasurement(eventName, params);
-}, {
-  getItem: key => window.sessionStorage.getItem(key),
-  setItem: (key, value) => window.sessionStorage.setItem(key, value),
-});
+}, purchaseStorage);
 
 export function usePaidPurchaseTracking(receipt: CheckoutReceipt | null, sessionId: string | null): void {
   useEffect(() => {
@@ -29,12 +32,19 @@ export function usePaidPurchaseTracking(receipt: CheckoutReceipt | null, session
     const attempt = () => {
       const context = currentGooglePageContext();
       const config = currentGoogleMeasurementConfig();
-      if (!context || !/\/thank-you$/.test(new URL(context.page_location).pathname)) return;
-      void report(receipt, sessionId, config, context, Boolean(config.ga4Id || config.adsId))
-        .catch(() => { /* Measurement must not interrupt a receipt or expose its token. */ });
+      if (context && /\/thank-you$/.test(new URL(context.page_location).pathname)) {
+        void report(receipt, sessionId, config, context, Boolean(config.ga4Id || config.adsId))
+          .catch(() => { /* Measurement must not interrupt a receipt or expose its token. */ });
+      }
+      void reportMetaPurchase(receipt, sessionId, purchaseStorage)
+        .catch(() => { /* Meta measurement is optional and must not affect the receipt. */ });
     };
     window.addEventListener(GOOGLE_MEASUREMENT_READY, attempt);
+    window.addEventListener(META_MEASUREMENT_READY, attempt);
     attempt();
-    return () => window.removeEventListener(GOOGLE_MEASUREMENT_READY, attempt);
+    return () => {
+      window.removeEventListener(GOOGLE_MEASUREMENT_READY, attempt);
+      window.removeEventListener(META_MEASUREMENT_READY, attempt);
+    };
   }, [receipt, sessionId]);
 }

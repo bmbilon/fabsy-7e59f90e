@@ -23,6 +23,13 @@ import { ticketCheckoutSelection } from "@/lib/ticket/ticketType";
 import { isProLicenceClass, licencePhotoAsDataUrl, normalizeLicenceClass, proCheckoutSubtotalCents, validateProLicenceFile, verifiedProResponse, type ProVerificationResponse } from "@/lib/pro-drivers/intake";
 import { latestReferralAttribution } from "@/lib/referrals/attribution";
 import { referralForCheckout } from "@/lib/referrals/capture";
+import { currentMetaCheckoutContext } from "@/lib/metaMeasurement";
+import {
+  flushMetaCheckoutAttributionWithdrawals,
+  rememberMetaCheckoutAttributionHandle,
+  withdrawMetaCheckoutAttributionHandles,
+} from "@/lib/metaCheckoutWithdrawal";
+import { getMetaConsentChoice } from "@/lib/googleConsent";
 import {
   INSURANCE_IMPACT_REPORT,
   PHOTO_RADAR,
@@ -242,11 +249,23 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           clientId,
           accessToken: representationAccessToken,
           includeIdrAddon,
+          ...(!isPhotoRadar ? { metaMeasurement: currentMetaCheckoutContext() } : {}),
           ...(includeIdrAddon ? { idrOrderId } : {}),
         },
       });
       if (checkoutError || !checkout?.url) {
         throw checkoutError || new Error("Secure checkout did not return a payment URL.");
+      }
+      if (checkout.metaAttributionHandle !== undefined) {
+        const remembered = rememberMetaCheckoutAttributionHandle(checkout.metaAttributionHandle);
+        if (!remembered || getMetaConsentChoice() !== 'accepted') {
+          const withdrawn = remembered
+            ? await flushMetaCheckoutAttributionWithdrawals()
+            : await withdrawMetaCheckoutAttributionHandles([checkout.metaAttributionHandle]);
+          if (!withdrawn) {
+            throw new Error("Your optional measurement privacy control could not be secured for this checkout. Please try again.");
+          }
+        }
       }
       window.location.assign(checkout.url);
     } catch (error) {
