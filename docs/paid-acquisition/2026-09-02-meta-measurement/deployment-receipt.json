@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-02T19:26:08.733064Z",
+  "status": "live_pixel_and_enabled_capi_health_verified_first_real_purchase_pending",
+  "project": {
+    "name": "Fabsy",
+    "production_origin": "https://fabsy.ca",
+    "supabase_project_ref": "gcasbisxfrssonllpqrw"
+  },
+  "source": {
+    "implementation_commit": "497c9c03e8d0d0abba9cb75df92c838542170e73",
+    "generated_main_commit": "d2cf8a371d28b2a56515f7a706b1181ea274f6f1",
+    "base_commit": "a62ee761383de453c178961f334647f49d435f71",
+    "file_sha256": {
+      "src/lib/metaMeasurement.ts": "1b74799bca91b3ce9e9374a0779587ed4e34fa99eb4d6b92e2a058d5e249d4ce",
+      "src/lib/metaCheckoutWithdrawal.ts": "68ea29814de4b41cb12f5932357671620738801770cf96995b84b507cef5471f",
+      "src/lib/paidPurchaseMeasurement.ts": "624274740f45cc3f2597318198c17172dd576a53f3446dea9751e16647de2b35",
+      "src/lib/publicMeasurementUrl.ts": "c0dd6427a172ac944263a1c73bcb1684916be76b57df20fe83d082460b07b711",
+      "src/components/Analytics.tsx": "c5ade398ada0c29fe1b9b0eb9ef72886b9458ccf319430bc8469af69185944e2",
+      "src/components/GoogleConsent.tsx": "dca39213b73995801580f7adcfbce0a4648b56755a91bb44d9c3ac1f8390e0e1",
+      "src/components/GoogleMeasurementGuardian.tsx": "2642c70cc907bee461da921e79b23d3719ee822a21d3e9e380c93b75ea1af745",
+      "src/components/MeasurementRouter.tsx": "57bb902e0266618ada7fe1cb1f7f23c75e26f0a0c2242c56e231ac0d33ec1b8b",
+      "src/components/form-steps/PaymentStep.tsx": "456e6f3068a57a91f37a2eff44ba3c27f362414fcf3fee17e1d4f79001b2dafe",
+      "src/hooks/usePaidPurchaseTracking.ts": "6f2d7500d044f8f298a421bb235ece6f77115a055e70a9d36c79e979e66878e5",
+      "supabase/functions/_shared/meta-capi.ts": "4484577c447e47cb7e7e6976dca2ff7df09a94a2a84837272dfb533b1116740c",
+      "supabase/functions/_shared/meta-purchase.ts": "36d915285b10df945435c4b7592540b43292f4c77e36647bb9eb2bb56d259413",
+      "supabase/functions/create-payment/index.ts": "3ff437c1768171719585480cc2aedaaf281dc53a27445bef000de43c5310e4ec",
+      "supabase/functions/idr-payment-webhook/index.ts": "89091cdd643bda4d98afea6379fafe27ba4591e7f5ea5daf4548e1ce9ec0ca71",
+      "supabase/functions/meta-capi-worker/index.ts": "b4961aa1054cc37a4bfff38ecf985db22adaaad6a65c348a734bf530d882fe0f",
+      "supabase/functions/withdraw-meta-measurement/index.ts": "b1ad53d19d9097342416a2b02cd89fda8e87bcd98aad278216d317fbe48c09b7",
+      "supabase/migrations/20260902124500_meta_capi_purchase_outbox.sql": "c8916120fb4cbc58d0ec8b7edc7b6258e458ea3f43c1cc56918da2bbcf6c36f4",
+      "supabase/migrations/20260902160000_meta_capi_terminal_health.sql": "a5cac842a0ace06b8e5fda250534c8b7729fa72facdbe547d84ff61dabe50748",
+      ".github/workflows/meta-capi-delivery.yml": "42586942fe11e29d054263d3e9506fd5747856e43e5e52016d221172f3e9a860"
+    }
+  },
+  "meta": {
+    "business_id": "1716937736206286",
+    "ad_account_id": "1102946998970411",
+    "dataset_name": "Fabsy Web Events",
+    "dataset_id": "2917050565322500",
+    "dataset_category": "Personal hardship",
+    "automatic_advanced_matching": "off",
+    "automatic_events_without_code": "off",
+    "access_token": {
+      "generated": true,
+      "stored_in": "Supabase Edge Function secrets",
+      "value_recorded": false,
+      "dataset_quality_api_permission": false
+    },
+    "events_manager_state": {
+      "pixel_overview_activity": "not_yet_processed_at_final_readback",
+      "capi_connection": "pending_until_first_eligible_server_event",
+      "provider_notice": "Events may take up to 30 minutes to appear"
+    }
+  },
+  "scope": {
+    "eligible_products": [
+      "ticket_only",
+      "ticket_with_addon"
+    ],
+    "excluded_products": [
+      "photo_radar",
+      "assessment",
+      "standalone_insurance_report",
+      "later_insurance_report"
+    ],
+    "browser_events": [
+      "PageView",
+      "Purchase"
+    ],
+    "server_events": [
+      "Purchase"
+    ],
+    "pageview_urls": {
+      "path": "/rapid-resolution",
+      "utm_source": "meta",
+      "utm_medium": "paid_social",
+      "utm_campaign": "rr_ab_en_creative_20260831",
+      "utm_content": [
+        "rr_relief_v1",
+        "rr_flat_fee_v1",
+        "rr_client_control_v1"
+      ]
+    },
+    "purchase_gate": "verified live Stripe receipt for Rapid Resolution or its bundle",
+    "deduplication": "same SHA-256 event_id sent by browser and server",
+    "values_cad_net_of_tax": {
+      "ticket_only": [
+        158.4,
+        198.0
+      ],
+      "ticket_with_addon": [
+        183.2,
+        229.0
+      ]
+    },
+    "not_used": [
+      "Lead",
+      "automatic events",
+      "advanced matching",
+      "customer lists",
+      "retargeting audiences"
+    ]
+  },
+  "privacy": {
+    "meta_consent_version": 1,
+    "default": "denied",
+    "withdrawal": "immediately retires browser tag, removes Meta first-party identifiers, and fences queued/server retries",
+    "delivery_window_days": 7,
+    "unqueued_checkout_attribution_retention_days": 30,
+    "sent_retention_days": 90,
+    "dead_or_unqueued_retention_days": 30
+  },
+  "database": {
+    "migrations_applied": [
+      "20260902124500_meta_capi_purchase_outbox",
+      "20260902160000_meta_capi_terminal_health"
+    ],
+    "delivery_window_days": 7,
+    "daily_retention_job": true,
+    "terminal_failure_health_rpc": true
+  },
+  "functions": [
+    {
+      "slug": "create-payment",
+      "status": "ACTIVE",
+      "version": 192,
+      "ezbr_sha256": "4711138ef0ea9c1edace34ffdbd1cd1f240b1e619f1f4bd78df26306fa9a3377"
+    },
+    {
+      "slug": "idr-payment-webhook",
+      "status": "ACTIVE",
+      "version": 20,
+      "ezbr_sha256": "3901515cee029aa66b800389ca92250ac5afdd61015d9170d6ca43b037676d5c"
+    },
+    {
+      "slug": "meta-capi-worker",
+      "status": "ACTIVE",
+      "version": 3,
+      "ezbr_sha256": "b5e2b51689c73eb49fa91beaf2ce667b9273aaffbc823ced71646c9ec1c8a31d"
+    },
+    {
+      "slug": "withdraw-meta-measurement",
+      "status": "ACTIVE",
+      "version": 2,
+      "ezbr_sha256": "eb14fca64e8027cf7e778a29af8e7185318b9c6cb27c0771a069bfde133d7904"
+    }
+  ],
+  "live_browser_verification": {
+    "eligible_url": "https://fabsy.ca/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_ab_en_creative_20260831&utm_content=rr_relief_v1",
+    "before_consent": {
+      "meta_scripts": 0,
+      "pixel_runtime": false
+    },
+    "after_consent": {
+      "pixel_runtime": true,
+      "fbevents_script": true,
+      "dataset_config_script": true,
+      "visible_status": "Google and Meta measurement are allowed on eligible pages."
+    },
+    "withdrawal": {
+      "pixel_runtime": false,
+      "meta_scripts": 0
+    },
+    "reacceptance": {
+      "pixel_runtime": true,
+      "fbevents_script": true,
+      "dataset_config_script": true
+    },
+    "excluded_pages": [
+      {
+        "url": "https://fabsy.ca/photo-radar?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_ab_en_creative_20260831&utm_content=rr_relief_v1",
+        "meta_scripts": 0,
+        "pixel_runtime": false
+      },
+      {
+        "url": "https://fabsy.ca/?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_ab_en_creative_20260831&utm_content=rr_relief_v1",
+        "meta_scripts": 0,
+        "pixel_runtime": false
+      }
+    ]
+  },
+  "capi_health": {
+    "direct_production_call": {
+      "http_status": 200,
+      "ok": true,
+      "claimed": 0,
+      "sent": 0,
+      "retried": 0,
+      "dead": 0,
+      "invalid": 0,
+      "cancelled": 0,
+      "unresolved": 0,
+      "terminal_failures": 0
+    },
+    "scheduled_workflow": {
+      "run_id": 33672666885,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33672666885",
+      "head_sha": "d2cf8a371d28b2a56515f7a706b1181ea274f6f1"
+    }
+  },
+  "validation": {
+    "measurement_contract": "pass; 139 CAPI assertions plus browser, consent UI, webhook, and isolation suites",
+    "typescript": "pass",
+    "deno_edge_functions": "pass",
+    "eslint": "pass",
+    "full_build": "pass",
+    "fresh_postgresql_17_migration_apply": "pass",
+    "independent_reviews": [
+      "privacy and delivery protocol reviewed",
+      "terminal failure observability PASS with no blockers"
+    ],
+    "github_runs": [
+      {
+        "name": "Build and Deploy",
+        "run_id": 33669921496,
+        "conclusion": "success",
+        "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33669921496"
+      },
+      {
+        "name": "Prerender refresh",
+        "run_id": 33669921512,
+        "conclusion": "success",
+        "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33669921512"
+      },
+      {
+        "name": "Validate FAQ parity",
+        "run_id": 33669921576,
+        "conclusion": "success",
+        "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/33669921576"
+      }
+    ]
+  },
+  "unchanged": {
+    "meta_campaigns_and_ads": true,
+    "google_ads_and_measurement": true,
+    "billing_and_budgets": true
+  },
+  "limitations": [
+    "No synthetic Purchase was sent.",
+    "The first real eligible, consented Rapid Resolution purchase must confirm browser/server Purchase receipt and event-id deduplication in Meta Events Manager.",
+    "Meta Events Manager still showed no processed activity at the final immediate readback and labels the CAPI connection pending until it receives an eligible event."
+  ]
+}
