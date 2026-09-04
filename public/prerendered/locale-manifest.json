@@ -1,27 +1,28 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-02T19:37:31.869Z",
+  "generatedAt": "2026-09-04T23:46:59.841Z",
   "sourceVersion": "rapid-resolution-2026-08-30",
-  "sourceFingerprint": "fnv1a-e31ca9b8",
+  "sourceFingerprint": "fnv1a-94f49c0b",
   "sourceDocuments": {
     "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
     "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
     "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
-    "src/pages/PrivacyPolicy.tsx": "fnv1a-3dfd575b",
+    "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
+    "src/pages/PrivacyPolicy.tsx": "fnv1a-22095d9a",
     "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
     "src/config/offers.ts": "fnv1a-4b290fd6",
     "src/config/feeRefund.json": "fnv1a-06562a22",
     "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
   },
   "bundleFingerprints": {
-    "en": "fnv1a-1c3b6ac6",
-    "pa": "fnv1a-cfda4b6d",
-    "tl": "fnv1a-e6f20b3a",
-    "zh-hans": "fnv1a-a49640e8",
-    "zh-hant": "fnv1a-bd0ec53a",
-    "ar": "fnv1a-2ea2eaaf",
-    "hi": "fnv1a-9a04fa33",
-    "es": "fnv1a-f6850a18"
+    "en": "fnv1a-08c07177",
+    "pa": "fnv1a-8cc780e5",
+    "tl": "fnv1a-a74e1f73",
+    "zh-hans": "fnv1a-b7a61309",
+    "zh-hant": "fnv1a-3681efe1",
+    "ar": "fnv1a-32fe4e24",
+    "hi": "fnv1a-bf325cc6",
+    "es": "fnv1a-9727a4e5"
   },
   "localeStates": {
     "en": {
