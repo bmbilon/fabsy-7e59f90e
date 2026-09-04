@@ -73,6 +73,13 @@ export default function AdminDashboard() {
       path: "/admin/aeo",
       color: "from-orange-500 to-orange-600"
     },
+    {
+      title: "Paid Acquisition Funnel",
+      description: "Monitor consented landing, lead, checkout, and purchase stages",
+      icon: BarChart3,
+      path: "/admin/acquisition",
+      color: "from-blue-600 to-indigo-700"
+    },
   ];
 
   useEffect(() => {

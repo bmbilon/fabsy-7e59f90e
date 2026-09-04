@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { createPaidPurchaseReporter } from '@/lib/paidPurchaseMeasurement';
-import type { CheckoutReceipt } from '@/lib/checkoutReceipt';
+import { paidCheckoutSummary, type CheckoutReceipt } from '@/lib/checkoutReceipt';
 import {
   currentGoogleMeasurementConfig, currentGooglePageContext,
   dispatchGoogleMeasurement, GOOGLE_MEASUREMENT_READY,

@@ -4,6 +4,7 @@ import { getGoogleConsentChoice } from './googleConsent';
 import {
   googleTagMayLoadInDocument, markGoogleTagPending, scrubCheckoutReceiptUrl,
 } from './measurementNavigation';
+import { CLICK_ID_KEYS, UTM_KEYS, uniqueSafeSearchValues } from './acquisitionParameters';
 
 declare global {
   interface Window {
@@ -62,20 +63,22 @@ export function publicMeasurementPath(pathname: string): string | null {
   return publicPaths.has(base) ? path : null;
 }
 
-function hasOnlyClickIdentifiers(url: URL): boolean {
+function hasOnlyApprovedAcquisitionParameters(url: URL): boolean {
   if (url.hash) return false;
-  const keys = new Set<string>();
-  for (const [key, value] of url.searchParams) {
-    if (!['gclid', 'gbraid', 'wbraid'].includes(key) || keys.has(key) ||
-        !/^[A-Za-z0-9_-]{1,512}$/.test(value) || /\s/.test(value)) return false;
-    keys.add(key);
-  }
-  return true;
+  const basePath = url.pathname
+    .replace(/^\/(?:en|pa|tl|zh-hans|zh-hant|ar|es|hi)(?=\/|$)/, '')
+    .replace(/\/$/, '') || '/';
+  const paidLanding = basePath === '/rapid-resolution';
+  const allowed = new Set<string>([
+    ...CLICK_ID_KEYS.filter(key => paidLanding || key !== 'fbclid'),
+    ...(paidLanding ? UTM_KEYS : []),
+  ]);
+  return uniqueSafeSearchValues(url, allowed) !== null;
 }
 
 /** Router classification only; destination/origin and referrer gates stay separate. */
 export function publicGoogleMeasurementUrl(url: URL): boolean {
-  return Boolean(publicMeasurementPath(url.pathname)) && !url.username && !url.password && hasOnlyClickIdentifiers(url);
+  return Boolean(publicMeasurementPath(url.pathname)) && !url.username && !url.password && hasOnlyApprovedAcquisitionParameters(url);
 }
 
 export function safeGooglePageContext(href: string, referrer: string): PaidPurchaseContext | null {

@@ -31,6 +31,12 @@ import {
   withdrawMetaCheckoutAttributionHandles,
 } from "@/lib/metaCheckoutWithdrawal";
 import { getMetaConsentChoice } from "@/lib/googleConsent";
+import { currentFunnelCheckoutContext } from "@/lib/funnelMeasurement";
+import { getFabsyFunnelConsentChoice } from "@/lib/fabsyFunnelConsent";
+import {
+  checkoutMeasurementEnvelope,
+  checkoutMeasurementWithdrawalRequired,
+} from "@/lib/checkoutMeasurement";
 import {
   INSURANCE_IMPACT_REPORT,
   PHOTO_RADAR,
@@ -254,6 +260,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
           accessToken: representationAccessToken,
           ...(intakeDraft ? { draftId: intakeDraft.draftId } : {}),
           includeIdrAddon,
+          funnelMeasurement: currentFunnelCheckoutContext(),
           ...(!isPhotoRadar ? { metaMeasurement: currentMetaCheckoutContext() } : {}),
           ...(includeIdrAddon ? { idrOrderId } : {}),
         },
@@ -261,12 +268,20 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
       if (checkoutError || !checkout?.url) {
         throw checkoutError || new Error("Secure checkout did not return a payment URL.");
       }
-      if (checkout.metaAttributionHandle !== undefined) {
-        const remembered = rememberMetaCheckoutAttributionHandle(checkout.metaAttributionHandle);
-        if (!remembered || getMetaConsentChoice() !== 'accepted') {
+      const checkoutMeasurement = checkoutMeasurementEnvelope(checkout);
+      if (checkoutMeasurement) {
+        const remembered = rememberMetaCheckoutAttributionHandle(checkoutMeasurement.handle);
+        const consentChanged = checkoutMeasurementWithdrawalRequired(
+          checkoutMeasurement.scopes,
+          {
+            meta: getMetaConsentChoice(),
+            funnel: getFabsyFunnelConsentChoice(),
+          },
+        );
+        if (!remembered || consentChanged) {
           const withdrawn = remembered
             ? await flushMetaCheckoutAttributionWithdrawals()
-            : await withdrawMetaCheckoutAttributionHandles([checkout.metaAttributionHandle]);
+            : await withdrawMetaCheckoutAttributionHandles([checkoutMeasurement.handle]);
           if (!withdrawn) {
             throw new Error("Your optional measurement privacy control could not be secured for this checkout. Please try again.");
           }

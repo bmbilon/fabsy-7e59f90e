@@ -30,6 +30,9 @@ const { currentMetaPurchaseFromSignedCheckout } = await import(
 const { enqueueMetaPurchase, MetaCapiDeliveryError } = await import(
   pathToFileURL(capiPath).href
 );
+const { parsePaidFunnelCheckoutContext, paidFunnelProductFromSignedCheckout } = await import(
+  pathToFileURL(path.join(repoRoot, "supabase/functions/_shared/funnel-checkout.ts")).href
+);
 
 const ids = {
   intent: "11111111-1111-4111-8111-111111111111",
@@ -92,6 +95,23 @@ assert.deepEqual(map(), {
   eventTimeEpochSeconds: event.created,
   contentId: "rapid_resolution",
 });
+assert.equal(paidFunnelProductFromSignedCheckout(event, rr), "rapid_resolution");
+const consentedAt = new Date().toISOString();
+assert.deepEqual(parsePaidFunnelCheckoutContext({
+  consentVersion: "fabsy-funnel-v1",
+  consentedAt,
+  sessionId: ids.verification,
+}), {
+  consentVersion: "fabsy-funnel-v1",
+  consentedAt,
+  sessionId: ids.verification,
+});
+assert.equal(parsePaidFunnelCheckoutContext({
+  consentVersion: "fabsy-funnel-v1",
+  consentedAt,
+  sessionId: ids.verification,
+  email: "person@example.invalid",
+}), null);
 
 const proRr = {
   amount_total: 16_632,
@@ -139,7 +159,29 @@ function bundle(pro = false) {
 }
 assert.equal(map({}, bundle(false))?.valueCents, 22_900);
 assert.equal(map({}, bundle(false))?.contentId, "rapid_resolution_bundle");
+assert.equal(paidFunnelProductFromSignedCheckout(event, { ...rr, ...bundle(false) }), "rapid_resolution_bundle");
 assert.equal(map({}, bundle(true))?.valueCents, 18_320);
+
+const photoRadar = {
+  ...rr,
+  id: "cs_live_SYNTHETIC_PHOTO_12345678",
+  amount_subtotal: 7_900,
+  amount_total: 8_295,
+  total_details: { amount_discount: 0, amount_tax: 395, amount_shipping: 0 },
+  metadata: {
+    fabsy_checkout_kind: "photo_radar",
+    fabsy_product: "photo_radar",
+    fabsy_pricing_version: "photo_radar_2026_08",
+    ticket_type: "photo_radar",
+    review_path: "ate",
+    ticket_base_cents: "7900",
+    gst_cents: "395",
+    total_cents: "8295",
+    representation_includes_assessment: "false",
+  },
+};
+assert.equal(paidFunnelProductFromSignedCheckout(event, photoRadar), "photo_radar");
+assert.equal(paidFunnelProductFromSignedCheckout({ ...event, livemode: false }, photoRadar), null);
 
 const immutableInput = bundle(true);
 const snapshot = structuredClone(immutableInput);
@@ -207,6 +249,11 @@ assert.match(
 assert.equal(
   webhook.match(/await enqueueCurrentMetaPurchaseIfEligible\(supabase, event, session\);/g)?.length,
   2,
+);
+assert.equal(
+  webhook.match(/await recordCurrentPaidFunnelPurchaseIfEligible\(supabase, event, session\);/g)?.length,
+  3,
+  "RR, bundle and Photo Radar all use the signed webhook for first-party purchase",
 );
 assert.ok(
   webhook.indexOf("await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);") >

@@ -98,6 +98,12 @@ verify_jwt = false
 [functions.send-lead-capture]
 verify_jwt = false
 
+[functions.record-funnel-event]
+verify_jwt = false
+
+[functions.paid-funnel-report]
+verify_jwt = false
+
 [functions.create-idr-payment]
 verify_jwt = false
 

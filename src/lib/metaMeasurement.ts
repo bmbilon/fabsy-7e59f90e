@@ -9,6 +9,7 @@ import {
 import { opaqueTransactionId, type PaidPurchaseContext, type PaidPurchaseStorage } from './paidPurchaseMeasurement';
 import { publicMeasurementPath } from './googleMeasurement';
 import { requestMetaCheckoutAttributionWithdrawal } from './metaCheckoutWithdrawal';
+import { uniqueSafeSearchValues } from './acquisitionParameters';
 
 type MetaPixelFunction = ((...args: unknown[]) => void) & {
   callMethod?: (...args: unknown[]) => void;
@@ -49,11 +50,6 @@ export interface MetaCheckoutContext {
 }
 
 const productionOrigins = new Set(['https://fabsy.ca', 'https://www.fabsy.ca']);
-const rapidResolutionCampaignContents = new Set([
-  'rr_relief_v1',
-  'rr_flat_fee_v1',
-  'rr_client_control_v1',
-]);
 const eligibleOrderTypes = new Set(['rapid_resolution', 'rapid_resolution_bundle']);
 const eligiblePurchaseValues: Record<string, ReadonlySet<number>> = {
   rapid_resolution: new Set([158.4, 198]),
@@ -108,25 +104,20 @@ export function currentMetaCheckoutContext(): MetaCheckoutContext | null {
   return context;
 }
 
-function exactRapidResolutionCampaign(url: URL): boolean {
-  const allowedKeys = new Set(['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'fbclid']);
-  const values = new Map<string, string>();
-  for (const [key, value] of url.searchParams) {
-    if (!allowedKeys.has(key) || values.has(key)) return false;
-    values.set(key, value);
-  }
-  if (values.size !== 4 && values.size !== 5) return false;
+function approvedRapidResolutionCampaign(url: URL): boolean {
+  const allowedKeys = new Set(['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid']);
+  const values = uniqueSafeSearchValues(url, allowedKeys);
+  if (!values) return false;
+  if (values.size < 4 || values.size > 6) return false;
   if (values.get('utm_source') !== 'meta' || values.get('utm_medium') !== 'paid_social' ||
-      values.get('utm_campaign') !== 'rr_ab_en_creative_20260831' ||
-      !rapidResolutionCampaignContents.has(values.get('utm_content') || '')) return false;
-  const clickId = values.get('fbclid');
-  return clickId === undefined || (/^[A-Za-z0-9_-]{1,512}$/.test(clickId) && !/\s/.test(clickId));
+      !values.get('utm_campaign') || !values.get('utm_content')) return false;
+  return true;
 }
 
 /** Meta starts only on the three reviewed ad landings. Receipt access is dynamic. */
 export function publicMetaMeasurementUrl(url: URL): boolean {
   if (url.username || url.password || url.hash) return false;
-  return url.pathname === '/rapid-resolution' && exactRapidResolutionCampaign(url);
+  return url.pathname === '/rapid-resolution' && approvedRapidResolutionCampaign(url);
 }
 
 function safeMetaContext(

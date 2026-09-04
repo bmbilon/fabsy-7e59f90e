@@ -20,6 +20,7 @@ const bundle = await build({
       import { MemoryRouter } from 'react-router-dom';
       import GoogleConsent from './src/components/GoogleConsent';
       export * from './src/lib/googleConsent';
+      export * from './src/lib/fabsyFunnelConsent';
       export { googleConsentCopy } from './src/i18n/googleConsentCopy';
       let root;
       export async function mount(route = '/') {
@@ -82,11 +83,12 @@ test('a prior Google-only acceptance prompts for Meta and the combined controls 
     assert.equal(api.getMetaConsentChoice(), 'unknown');
     await api.mount();
     assert.ok(dom.window.document.querySelector('[data-google-consent-panel]'), 'Meta unknown must reopen the choice UI');
-    assert.ok(dom.window.document.body.textContent.includes(api.googleConsentCopy.en.googleOnlyStatus));
+    assert.ok(dom.window.document.body.textContent.includes(api.googleConsentCopy.en.mixedStatus));
 
     await api.click('[data-google-consent-choice="accepted"]');
     assert.equal(api.getGoogleConsentChoice(), 'accepted');
     assert.equal(api.getMetaConsentChoice(), 'accepted');
+    assert.equal(api.getFabsyFunnelConsentChoice(), 'accepted');
     assert.equal(dom.window.document.querySelector('[data-google-consent-panel]'), null);
     assert.ok(dom.window.document.body.textContent.includes(api.googleConsentCopy.en.acceptedStatus));
 
@@ -94,6 +96,7 @@ test('a prior Google-only acceptance prompts for Meta and the combined controls 
     await api.click('[data-google-consent-choice="declined"]');
     assert.equal(api.getGoogleConsentChoice(), 'declined');
     assert.equal(api.getMetaConsentChoice(), 'declined');
+    assert.equal(api.getFabsyFunnelConsentChoice(), 'declined');
     assert.ok(dom.window.document.body.textContent.includes(api.googleConsentCopy.en.declinedStatus));
     assert.equal(dom.window.document.querySelectorAll('script[src]').length, 0);
     assert.deepEqual(network, []);

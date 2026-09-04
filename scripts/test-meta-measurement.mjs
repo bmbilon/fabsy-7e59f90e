@@ -126,7 +126,7 @@ test('Meta production gate requires the exact flag, Pixel ID and production orig
   } finally { r.close(); }
 });
 
-test('Meta URL policy admits only the three English RR campaigns; receipts require verification', async () => {
+test('Meta URL policy admits safe English RR campaigns without a hard-coded campaign name; receipts require verification', async () => {
   const r = await runtime();
   try {
     for (const content of ['rr_relief_v1', 'rr_flat_fee_v1', 'rr_client_control_v1']) {
@@ -134,9 +134,13 @@ test('Meta URL policy admits only the three English RR campaigns; receipts requi
         const url = new URL(`https://fabsy.ca/rapid-resolution${campaign(content)}${extra}`);
         assert.equal(r.api.publicMetaMeasurementUrl(url), true, url.href);
         assert.equal(r.api.publicMeasurementDocumentUrl(url), true, url.href);
-        assert.equal(r.api.publicGoogleMeasurementUrl(url), false, 'Meta UTMs must not widen Google');
+        assert.equal(r.api.publicGoogleMeasurementUrl(url), true, 'consented GA4 may measure approved Meta landing traffic');
       }
     }
+    for (const suffix of [
+      '?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_creative_v2&utm_content=rr_easy_v2',
+      '?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_creative_v3&utm_content=rr_price_v2&utm_term=alberta_ticket&fbclid=SYNTHETIC_META',
+    ]) assert.equal(r.api.publicMetaMeasurementUrl(new URL(`https://fabsy.ca/rapid-resolution${suffix}`)), true, suffix);
     for (const path of ['/thank-you', '/thank-you/', '/en/thank-you', '/pa/thank-you/', '/tl/thank-you', '/zh-hans/thank-you', '/zh-hant/thank-you', '/ar/thank-you', '/hi/thank-you', '/es/thank-you/']) {
       const url = new URL(`https://fabsy.ca${path}`);
       assert.equal(r.api.publicMetaMeasurementUrl(url), false, path);
@@ -147,11 +151,12 @@ test('Meta URL policy admits only the three English RR campaigns; receipts requi
       'https://fabsy.ca/rapid-resolution',
       `https://fabsy.ca/es/rapid-resolution${campaign('rr_relief_v1')}`,
       `https://fabsy.ca/rapid-resolution/${campaign('rr_relief_v1')}`,
-      `https://fabsy.ca/rapid-resolution${campaign('rr_unknown')}`,
-      `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}&utm_term=ticket`,
       `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}&fbclid=ONE&fbclid=TWO`,
       `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}#private`,
       `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}&email=person%40example.invalid`,
+      'https://fabsy.ca/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=person%40example.invalid&utm_content=rr',
+      'https://fabsy.ca/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr&utm_content=contains%20spaces',
+      'https://fabsy.ca/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr',
       'https://fabsy.ca/thank-you?session_id=cs_live_SYNTHETIC',
       'https://fabsy.ca/es/thank-you?gclid=SYNTHETIC',
     ]) assert.equal(r.api.publicMetaMeasurementUrl(new URL(href)), false, href);
@@ -487,7 +492,7 @@ test('a pending Meta tag makes private SPA navigation use a new document', async
   } finally { r.close(); }
 });
 
-test('loaded providers cannot cross the Google and Meta URL policies inside one document', async () => {
+test('approved Meta landings can also reach GA4, while provider policies still isolate later navigation', async () => {
   const meta = await runtime();
   try {
     const requests = [];
@@ -499,8 +504,8 @@ test('loaded providers cannot cross the Google and Meta URL policies inside one 
     });
     const unlisten = router.listen(() => undefined);
     try {
-      assert.equal(meta.api.markMeasurementTagPending('google', meta.win), false,
-        'the Google tag must not start on a Meta-only landing');
+      assert.equal(meta.api.markMeasurementTagPending('google', meta.win), true,
+        'consented GA4 must not silently lose approved Meta landing traffic');
       assert.equal(meta.api.markMeasurementTagPending('meta', meta.win), true);
       router.navigator.push('/');
       assert.deepEqual(plain(requests), [{ href: 'https://fabsy.ca/', method: 'assign' }]);
@@ -523,8 +528,11 @@ test('loaded providers cannot cross the Google and Meta URL policies inside one 
         'the Meta tag must not start on a Google-only page');
       assert.equal(google.api.markMeasurementTagPending('google', google.win), true);
       router.navigator.push(new URL(landing).pathname + new URL(landing).search);
-      assert.deepEqual(plain(requests), [{ href: landing, method: 'assign' }]);
-      assert.equal(router.getSnapshot().blocked, true);
+      assert.deepEqual(plain(requests), []);
+      assert.equal(router.getSnapshot().blocked, false);
+      assert.equal(google.win.location.href, landing);
+      assert.equal(google.api.markMeasurementTagPending('meta', google.win), true,
+        'Meta can start after the same clean public document reaches its approved landing');
     } finally { unlisten(); }
   } finally { google.close(); }
 });

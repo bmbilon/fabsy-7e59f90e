@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
         <p className="text-white/70 mb-8">
-          Last updated: September 2, 2026
+          Last updated: September 3, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -125,13 +125,26 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
             <p>
-              Google Analytics 4, Google Ads measurement and Meta measurement are optional.
-              Their scripts do not load before you choose Allow measurement. Google and Meta
-              permissions are stored separately, and a Google choice saved before Meta was
-              introduced does not give Meta permission. The current Privacy choices control
-              lets you allow or decline both providers together. You can revisit it at any time.
-              We remember each choice in this browser for up to 180 days; clearing browser
-              storage or using another browser may remove a choice.
+              Fabsy's first-party funnel measurement, Google Analytics 4, Google Ads measurement
+              and Meta measurement are optional. Fabsy does not record an optional funnel event,
+              and the Google or Meta scripts do not load, before you choose Allow measurement.
+              Fabsy, Google and Meta permissions are stored separately, so an earlier provider
+              choice does not silently authorize a newly introduced measurement purpose. The
+              current Privacy choices control lets you allow or decline all three together. You
+              can revisit it at any time. We remember each choice in this browser for up to 180
+              days; clearing browser storage or using another browser may remove a choice.
+            </p>
+            <p className="mt-4">
+              With your permission, Fabsy records a limited sequence of named funnel steps: an
+              approved Rapid Resolution landing view, primary-button or phone click, intake start,
+              ticket-upload completion, saved lead, completed intake step, checkout start or
+              cancellation, and a purchase confirmed by our server. These records use a random
+              browser-session identifier, the named step, the page category, campaign parameters
+              and, when present, a one-way hash of an advertising click identifier. Fabsy does not
+              store the raw click identifier, raw page URL, IP address, user agent, ticket contents,
+              uploaded file, form answers, name, email address or phone number in this funnel-event
+              table. Funnel events are retained for up to 400 days for campaign and conversion-rate
+              comparison, then can be purged.
             </p>
             <p className="mt-4">
               With your permission, Google measurement records visits to approved public
@@ -160,13 +173,15 @@ const PrivacyPolicy = () => {
               phone numbers for matching.
             </p>
             <p className="mt-4">
-              Google and Meta measurement stay off ticket intake, contact and fleet forms,
+              Google and Meta provider measurement stay off ticket intake, contact and fleet forms,
               other personal-information forms, client portals, admin pages, and representation
               authorization and document-verification flows. We do not include names, email
               addresses, phone numbers, licence or plate details, ticket numbers, uploaded files,
               free-text answers, assessment results, private access tokens or case identifiers in
-              measurement events. Meta automatic events and advanced matching are disabled; we do
-              not send Lead or form events. No Meta retargeting audience is configured for this
+              Google or Meta measurement events. Fabsy's separate, consented first-party funnel
+              events on ticket intake contain only the named progress step described above and no
+              form contents. Meta automatic events and advanced matching are disabled; we do not
+              send Meta Lead or form events. No Meta retargeting audience is configured for this
               release. Google personalized advertising, Google signals and enhanced conversions
               remain disabled.
             </p>

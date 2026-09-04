@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCaseManagement from "./pages/AdminCaseManagement";
+import AdminPaidFunnel from "./pages/AdminPaidFunnel";
 import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
 import AdminBlog from "./pages/AdminBlog";
 import AdminUserManagement from "./pages/AdminUserManagement";
@@ -41,6 +42,7 @@ import Analytics from "./components/Analytics";
 import GoogleConsent from "./components/GoogleConsent";
 import MeasurementRouter from "./components/MeasurementRouter";
 import AcquisitionTracker from "./components/AcquisitionTracker";
+import FunnelMeasurement from "./components/FunnelMeasurement";
 import ScrollToTop from "./components/ScrollToTop";
 import CallBar from "./components/CallBar";
 import InsuranceDamageReport from "./pages/InsuranceDamageReport";
@@ -84,6 +86,7 @@ const RouteAnalytics = () => {
   return (
     <>
       <AcquisitionTracker />
+      <FunnelMeasurement />
       <ReferralAttribution />
       <Analytics />
     </>
@@ -154,6 +157,7 @@ const App = () => (
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/cases" element={<AdminCaseManagement />} />
+          <Route path="/admin/acquisition" element={<AdminPaidFunnel />} />
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
           <Route path="/admin/users" element={<AdminUserManagement />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />

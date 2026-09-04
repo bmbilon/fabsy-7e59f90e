@@ -10,6 +10,7 @@ import {
   recordMetaCheckoutAttributionBestEffort,
   sha256CheckoutSessionId,
 } from "../_shared/meta-capi.ts";
+import { parsePaidFunnelCheckoutContext } from "../_shared/funnel-checkout.ts";
 
 const TICKET_BASE_CENTS = 19800;
 const IDR_ADDON_CENTS = 3100;
@@ -92,6 +93,40 @@ async function recordMetaCheckoutAttribution(
       ? await sha256CheckoutSessionId(sessionId)
       : null,
   };
+}
+
+async function recordPaidFunnelCheckoutAttribution(
+  checkoutSessionId: string,
+  raw: unknown,
+): Promise<string | null> {
+  const handle = await sha256CheckoutSessionId(checkoutSessionId);
+  const context = parsePaidFunnelCheckoutContext(raw);
+  if (!context) {
+    const { data, error } = await admin.rpc("withdraw_paid_funnel_checkout", {
+      p_checkout_session_hash: handle,
+    });
+    // An absent/withdrawn choice must never leave a previous correlation live.
+    if (error || data !== true) {
+      throw new RequestError(
+        "Your privacy choice could not be applied to this checkout. Please try again.",
+        503,
+      );
+    }
+    return null;
+  }
+  const { data, error } = await admin.rpc("record_paid_funnel_checkout", {
+    p_checkout_session_hash: handle,
+    p_session_id: context.sessionId,
+    p_consent_version: context.consentVersion,
+    p_consented_at: context.consentedAt,
+  });
+  // Funnel measurement is optional. Payment remains available if a new
+  // correlation cannot be recorded; no false purchase will be created.
+  if (error || data !== true) {
+    console.warn("[create-payment] paid_funnel_correlation_unavailable");
+    return null;
+  }
+  return handle;
 }
 
 function cors(req: Request) {
@@ -488,6 +523,7 @@ serve(async (req) => {
 
     const raw = await req.json();
     const rawMetaMeasurement = raw?.metaMeasurement;
+    const rawFunnelMeasurement = raw?.funnelMeasurement;
     const formData = raw?.formData;
     if (!formData || typeof formData !== "object") {
       throw new RequestError("formData is required.");
@@ -704,13 +740,32 @@ serve(async (req) => {
         );
         metaAttributionHandle = attribution.withdrawalHandle;
       }
+      const funnelAttributionHandle = await recordPaidFunnelCheckoutAttribution(
+        reservation.sessionId!,
+        rawFunnelMeasurement,
+      );
+      if (metaAttributionHandle && funnelAttributionHandle && metaAttributionHandle !== funnelAttributionHandle) {
+        throw new Error("Measurement checkout handles do not match.");
+      }
+      const measurementAttributionHandle = metaAttributionHandle || funnelAttributionHandle;
+      const measurementAttributionScopes = {
+        meta: Boolean(metaAttributionHandle),
+        funnel: Boolean(funnelAttributionHandle),
+      };
       return json(req, {
         url: reservation.url,
         checkoutIntentId: reservation.orderId,
         idrOrderId: includeIdrAddon ? reservation.orderId : null,
         reused: true,
-        ...(metaAttributionHandle
-          ? { metaAttributionHandle }
+        ...(measurementAttributionHandle
+          ? {
+            // Keep the legacy alias during a rolling deployment. New clients
+            // use the explicit scopes and never treat a funnel-only handle as
+            // evidence that Meta attribution was recorded.
+            metaAttributionHandle: measurementAttributionHandle,
+            measurementAttributionHandle,
+            measurementAttributionScopes,
+          }
           : {}),
       });
     }
@@ -889,11 +944,29 @@ serve(async (req) => {
       );
       metaAttributionHandle = attribution.withdrawalHandle;
     }
+    const funnelAttributionHandle = await recordPaidFunnelCheckoutAttribution(
+      session.id,
+      rawFunnelMeasurement,
+    );
+    if (metaAttributionHandle && funnelAttributionHandle && metaAttributionHandle !== funnelAttributionHandle) {
+      throw new Error("Measurement checkout handles do not match.");
+    }
+    const measurementAttributionHandle = metaAttributionHandle || funnelAttributionHandle;
+    const measurementAttributionScopes = {
+      meta: Boolean(metaAttributionHandle),
+      funnel: Boolean(funnelAttributionHandle),
+    };
     return json(req, {
       url: session.url,
       checkoutIntentId,
       idrOrderId,
-      ...(metaAttributionHandle ? { metaAttributionHandle } : {}),
+      ...(measurementAttributionHandle
+        ? {
+          metaAttributionHandle: measurementAttributionHandle,
+          measurementAttributionHandle,
+          measurementAttributionScopes,
+        }
+        : {}),
     });
   } catch (error) {
     if (createdStripeSessionId && checkoutStripe) {

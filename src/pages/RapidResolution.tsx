@@ -179,13 +179,13 @@ const RapidResolution = () => {
                 </p>
                 <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:mt-6 sm:flex sm:flex-row sm:gap-3">
                   <Button asChild size="lg" className="min-h-12 min-w-0 px-4 text-base font-bold shadow-glow sm:px-7">
-                    <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta">
+                    <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="hero">
                       Upload your ticket
                       <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                     </Link>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="min-h-12 border-slate-500 bg-transparent px-4 text-base font-bold text-white hover:bg-slate-800 hover:text-white sm:px-6">
-                    <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`} data-funnel-action="phone">
+                    <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`} data-funnel-action="phone" data-funnel-position="hero">
                       <Phone className="mr-2 h-5 w-5" aria-hidden="true" />
                       Call
                     </a>
@@ -212,7 +212,7 @@ const RapidResolution = () => {
                     ))}
                   </ul>
                   <Button asChild size="lg" className="mt-7 w-full font-bold">
-                    <Link to={RAPID_RESOLUTION.intakePath}>Upload your ticket</Link>
+                    <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="hero">Upload your ticket</Link>
                   </Button>
                 </div>
               </Card>
@@ -332,7 +332,7 @@ const RapidResolution = () => {
                 <h3 className="mt-5 text-2xl font-bold">{RAPID_RESOLUTION.name}</h3>
                 <p className="mt-3 text-4xl font-bold">${RAPID_RESOLUTION.priceCad}</p>
                 <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">Eligible Alberta pre-trial ticket resolution from intake through an available client-directed resolution.</p>
-                <Button asChild className="mt-6"><Link to={RAPID_RESOLUTION.intakePath}>Start now</Link></Button>
+                <Button asChild className="mt-6"><Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="section">Start now</Link></Button>
               </Card>
               <Card className="flex flex-col p-7 shadow-fab">
                 <FileCheck2 className="h-7 w-7 text-primary" aria-hidden="true" />
@@ -346,7 +346,7 @@ const RapidResolution = () => {
                 <h3 className="mt-5 text-2xl font-bold">{RAPID_RESOLUTION_BUNDLE.shortName}</h3>
                 <p className="mt-3 text-4xl font-bold text-primary">${RAPID_RESOLUTION_BUNDLE.priceCad}</p>
                 <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">Rapid Resolution plus the Insurance Impact & Renewal Planning Report for one bundle price.</p>
-                <Button asChild className="mt-6"><Link to={RAPID_RESOLUTION.intakePath}>Choose the bundle</Link></Button>
+                <Button asChild className="mt-6"><Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="section">Choose the bundle</Link></Button>
               </Card>
             </div>
           </div>
@@ -372,7 +372,7 @@ const RapidResolution = () => {
             <h2 id="rapid-final-heading" className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Put your ticket into motion today.</h2>
             <p className="mx-auto mt-4 max-w-2xl text-slate-300">Upload your ticket, complete the secure intake, and choose the service that fits your file.</p>
             <Button asChild size="lg" className="mt-7 min-h-12 px-8 text-base font-bold">
-              <Link to={RAPID_RESOLUTION.intakePath}>
+              <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="footer">
                 Start Rapid Resolution
                 <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
               </Link>

@@ -11,8 +11,10 @@ import { reconcileProRefund } from "../_shared/pro-refund.ts";
 import {
   clearMetaCheckoutAttribution,
   enqueueMetaPurchase,
+  sha256CheckoutSessionId,
 } from "../_shared/meta-capi.ts";
 import { currentMetaPurchaseFromSignedCheckout } from "../_shared/meta-purchase.ts";
+import { paidFunnelProductFromSignedCheckout } from "../_shared/funnel-checkout.ts";
 
 type IdrOrderType = "standalone" | "addon";
 type CheckoutIntentType = IdrOrderType | "ticket" | "assessment" | "photo_radar";
@@ -83,6 +85,27 @@ async function enqueueCurrentMetaPurchaseIfEligible(
   // failures throw so Stripe retries the signed webhook instead of losing the
   // conversion after checkout fulfillment.
   await enqueueMetaPurchase(supabase, purchase);
+}
+
+async function recordCurrentPaidFunnelPurchaseIfEligible(
+  supabase: SupabaseAdmin,
+  event: StripeEventData,
+  session: CheckoutSessionData,
+) {
+  const product = paidFunnelProductFromSignedCheckout(event, session);
+  if (!product) return;
+  const checkoutHash = await sha256CheckoutSessionId(session.id);
+  const { data, error } = await supabase.rpc("record_verified_paid_funnel_purchase", {
+    p_checkout_session_hash: checkoutHash,
+    p_event_id: crypto.randomUUID(),
+    p_occurred_at: new Date(event.created * 1000).toISOString(),
+    p_product: product,
+  });
+  // False is an intentional no-op for a visitor who did not consent. Database
+  // errors throw so Stripe retries instead of silently losing a verified row.
+  if (error || (data !== true && data !== false)) {
+    throw new Error("Verified funnel purchase could not be recorded.");
+  }
 }
 
 function isUuid(value: string | undefined): value is string {
@@ -1223,6 +1246,7 @@ serve(async (req: Request): Promise<Response> => {
     if (session.metadata?.fabsy_checkout_kind === "photo_radar") {
       const result = await persistPaidPhotoRadarCheckout(supabase, session);
       await recordRepresentationPayment(supabase, session);
+      await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
       return json({ received: true, handled: true, result, review_path: "ate" });
     }
     if (session.metadata?.fabsy_checkout_kind === "ticket_assessment") {
@@ -1249,6 +1273,7 @@ serve(async (req: Request): Promise<Response> => {
           ticketBaseCents,
         );
       }
+      await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
       await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
       return json({ received: true, handled: true, result });
     }
@@ -1273,6 +1298,7 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
     if (session.metadata?.fabsy_checkout_kind === "ticket_with_addon") {
+      await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
       await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
     }
     return json({ received: true, handled: true, result });

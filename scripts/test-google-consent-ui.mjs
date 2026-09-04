@@ -88,6 +88,10 @@ try {
       import registry from './src/i18n/locales.json';
       import { publicMeasurementPath } from './src/lib/googleMeasurement';
       import { choices, reset, externalChoice, getGoogleConsentChoice } from 'offline-consent-state';
+      import {
+        FABSY_FUNNEL_CONSENT_STORAGE_KEY,
+        setFabsyFunnelConsentChoice,
+      } from './src/lib/fabsyFunnelConsent';
 
       export async function runChecks() {
         const locales = registry.locales.filter(item => item.wave <= 1);
@@ -111,6 +115,8 @@ try {
 
         async function mount(route, choice = 'unknown') {
           reset(choice);
+          window.localStorage.removeItem(FABSY_FUNNEL_CONSENT_STORAGE_KEY);
+          if (choice !== 'unknown') setFabsyFunnelConsentChoice(choice);
           const container = document.createElement('div');
           document.body.append(container);
           const previous = document.createElement('button');
@@ -206,9 +212,15 @@ try {
             assert.equal(panel(view.container), null);
 
             // Refresh from the shared state API, including a cross-tab storage notification.
-            await act(async () => externalChoice('accepted'));
+            await act(async () => {
+              externalChoice('accepted');
+              setFabsyFunnelConsentChoice('accepted');
+            });
             assert.ok(view.container.textContent.includes(copy.acceptedStatus));
-            await act(async () => externalChoice('declined', 'storage'));
+            await act(async () => {
+              externalChoice('declined', 'storage');
+              setFabsyFunnelConsentChoice('declined');
+            });
             assert.ok(view.container.textContent.includes(copy.declinedStatus));
           } finally { await view.unmount(); }
 
