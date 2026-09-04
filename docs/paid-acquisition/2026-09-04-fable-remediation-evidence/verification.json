@@ -1,80 +1,302 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-09-04T14:48:11Z",
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-04T16:32:09Z",
   "candidate": {
     "worktree": "/private/tmp/fabsy-paid-acquisition-readiness",
     "branch": "codex/paid-acquisition-readiness",
-    "sourceCommit": "eb299d7a7d61ff29283cd482393dbe997dd124cf",
-    "priorReviewCommit": "f2fde2aeb1d633f3ae432e9758f3bc823a1cac7f"
+    "agreedFailingBaseline": "f2fde2aeb1d633f3ae432e9758f3bc823a1cac7f",
+    "frozenSourceCommit": "b1cca461e9d56ca75cd43f473a31a42c3bbaed33",
+    "readinessPath": "docs/paid-acquisition/2026-09-03-restart-readiness.json",
+    "evidenceDirectory": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence",
+    "evidenceCommit": null,
+    "readinessCommit": null,
+    "chainBinding": "The evidence commit cannot truthfully contain its own final commit ID. The direct-successor readiness commit is authoritative for all seven localReview fields. Reviewers must verify B -> S -> E -> R, exact path restrictions and a clean worktree from the readiness record at HEAD."
   },
   "decision": {
-    "localCode": "READY_FOR_INDEPENDENT_REVIEW",
+    "localCode": "READY_FOR_FRESH_INDEPENDENT_REVIEW_AFTER_PINNED_HANDOFF_VALIDATES",
     "production": "NO_GO",
+    "deploymentAuthorized": false,
+    "providerMutationAuthorized": false,
     "spendAuthorized": false
   },
-  "build": {
-    "browserConfiguredCommand": "npx vite build",
-    "browserConfiguredResult": "PASS",
-    "artifacts": [
+  "toolchain": {
+    "operatingSystem": "Darwin 25.2.0 arm64",
+    "node": "22.17.0",
+    "npm": "10.9.2",
+    "vite": "5.4.19",
+    "deno": "2.9.5",
+    "postgresql": "14.19",
+    "python": "3.13.5"
+  },
+  "dependencies": {
+    "command": "npm ci --offline --cache /private/tmp/fabsy-npm-cache --logs-dir /private/tmp/fabsy-npm-logs --no-audit --no-fund",
+    "result": "PASS_708_PACKAGES",
+    "lockfileUsed": true,
+    "auditFixRun": false,
+    "note": "An earlier sandboxed npm attempt failed on restricted DNS and a secondary npm exit-handler error. A permitted clean install populated the cache; this exact offline reinstall then passed at frozen source S."
+  },
+  "deterministicEvidenceBuild": {
+    "sourceCommit": "b1cca461e9d56ca75cd43f473a31a42c3bbaed33",
+    "command": "npm run build:evidence",
+    "script": "scripts/build-paid-acquisition-evidence.mjs",
+    "mode": "paid-acquisition-evidence",
+    "childEnvironment": {
+      "inherited": [
+        "PATH"
+      ],
+      "fixed": {
+        "LANG": "C",
+        "LC_ALL": "C",
+        "NODE_ENV": "production",
+        "SOURCE_DATE_EPOCH": "1788530400",
+        "TZ": "UTC",
+        "VITE_FABSY_FUNNEL_MEASUREMENT_ENABLED": "false",
+        "VITE_GOOGLE_MEASUREMENT_ENABLED": "false",
+        "VITE_META_MEASUREMENT_ENABLED": "false",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_paid_acquisition_evidence_only",
+        "VITE_SUPABASE_URL": "https://abcdefghijklmnopqrst.supabase.co"
+      }
+    },
+    "ordinaryAmbientRun": "PASS",
+    "hostileAmbientRun": {
+      "result": "PASS",
+      "ambientInputsRejectedByChild": [
+        "BROWSERSLIST=ie 11",
+        "BROWSERSLIST_ENV=hostile-proof",
+        "hostile BROWSERSLIST_CONFIG path",
+        "hostile VITE Google value",
+        "hostile VITE Meta value",
+        "hostile VITE Supabase values"
+      ]
+    },
+    "comparison": "IDENTICAL_COMPLETE_SORTED_DIST_INVENTORIES",
+    "artifactCount": 1346,
+    "inventoryPath": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/dist-artifact-hashes.sha256",
+    "inventorySha256": "8a3d4b2e323a28b29de37021f94eaf9e58faba3647b472d536fd5c5efea5bc50",
+    "selectedArtifacts": [
       {
         "path": "dist/index.html",
-        "sha256": "41e15a6f70d4c5c1ffecd96f7446ad3910792ce6d74ceca6d918144cc32e3827"
+        "sha256": "952c86ccac58a717f770f52f00131e5804e3485b9dc24196c531b2276fa96598"
       },
       {
-        "path": "dist/assets/index-C8cSYGwa.js",
-        "sha256": "4dfcab4fd488a2f007d21ae1b159a2fe335ecf623082f7a36c51995b8a3e0fdd"
+        "path": "dist/assets/index-BiKzCkMS.js",
+        "sha256": "45fc57ffbec06ded9397186c46cd35f3302cf505d53137135f77d0c2206cd48f"
       },
       {
-        "path": "dist/assets/index-sIGPoD9p.css",
-        "sha256": "802cb7f0bcc43331de3328fca16d6d0142453f181c60e2db58e21767af1cf866"
+        "path": "dist/assets/index-Bc-MDAyn.css",
+        "sha256": "af4c13f580d69a5b07b2605fcbf66bb1e1f966774501b11d2715fa9db1149b82"
       }
     ],
-    "releaseCommand": "npm run build",
-    "releaseResult": "EXPECTED_OWNER_GATE_BLOCK",
-    "releaseBlock": "Privacy Policy source changed; all seven non-English legal-publication fingerprints require fresh owner publication. No attestation was fabricated."
+    "scope": "LOCAL_SYNTHETIC_RENDERING_EVIDENCE_ONLY",
+    "limitations": [
+      "This build is intentionally measurement-disabled and contains synthetic Supabase browser configuration.",
+      "It skips the normal npm prebuild and postbuild pipeline.",
+      "It is not a production build, deployment receipt, provider readback or tag proof.",
+      "Repeatability beyond the recorded toolchain is not asserted."
+    ]
   },
-  "crawlerSnapshots": [
-    {
-      "path": "public/prerendered/index.html",
-      "sha256": "29e3f2352910ee4bc6c0e942393c6d83f1935a617d99f4835b316b6bd882c89f"
-    },
-    {
-      "path": "public/prerendered/rapid-resolution/index.html",
-      "sha256": "63a7b1852786f4862b25d8d213b89c1f5325eab9104166fd613826e258603238"
-    }
-  ],
+  "normalReleaseBuild": {
+    "command": "npm run build",
+    "result": "EXPECTED_OWNER_CONTROLLED_PUBLICATION_GATE_BLOCK",
+    "generatedLanguageBundles": 8,
+    "sourceStrings": 268,
+    "nonEnglishLegalLocalesRequiringOwnerPublication": 7,
+    "ownerPublishedMachineTranslations": 0,
+    "indexableTranslations": 0,
+    "affectedLocales": [
+      "pa",
+      "tl",
+      "zh-hans",
+      "zh-hant",
+      "ar",
+      "hi",
+      "es"
+    ],
+    "reason": "The Privacy Policy source changed and the seven non-English legal-publication fingerprints are stale or unpublished. No owner attestation was fabricated and no generated file was written before the check stopped."
+  },
   "mobileEvidence": {
     "browser": "Codex in-app browser",
+    "buildSource": "synthetic deterministic evidence build at frozen source S",
     "geometryPath": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/mobile-layout-geometry.json",
-    "viewports": ["360x560", "360x640", "390x844"],
-    "result": "PASS",
-    "facts": [
-      "The H1, outcome, qualified service-fee refund, price, Upload, and Call are visible in the first view.",
-      "The 104px initial consent panel begins below the hero Upload and Call actions at every captured viewport.",
-      "The mobile sticky action is display:none while the initial consent panel is open."
+    "geometrySha256": "190df172ad4a9db60ec450e5533735b14d907e691a58f2accaa436b1cc8ed194",
+    "result": "PASS_LOCAL",
+    "method": "Explicit CSS viewport override, DOM geometry capture and same-state screenshot capture",
+    "captures": [
+      {
+        "cssViewport": "360x560",
+        "visualViewport": "345x560",
+        "raster": "345x537",
+        "mimeType": "image/jpeg",
+        "path": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-css-360x560-raster-345x537.jpg",
+        "sha256": "d8b3bf13834809e59c86c945d3d359d9c0c1f09ff17b2ad064ce367ce53d0315"
+      },
+      {
+        "cssViewport": "360x640",
+        "visualViewport": "345x640",
+        "raster": "345x613",
+        "mimeType": "image/jpeg",
+        "path": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-css-360x640-raster-345x613.jpg",
+        "sha256": "259aa533f29dea74c2702c7834c19222fa8352dc641b2c6a26d5b9b1bc507b7f"
+      },
+      {
+        "cssViewport": "390x844",
+        "visualViewport": "375x844",
+        "raster": "375x812",
+        "mimeType": "image/jpeg",
+        "path": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-css-390x844-raster-375x812.jpg",
+        "sha256": "2de16688f4546bb285ed61604d625c6c2279f6ef0d0f83d2d3bcb8f4bc3ecfda"
+      }
+    ],
+    "assertions": [
+      "H1, outcome, qualified service-fee refund, price, Upload and Call are present and visible in every captured first view.",
+      "The initial consent panel does not overlap Upload or Call in any captured viewport.",
+      "The competing sticky action is display:none while the initial consent panel is open.",
+      "Each filename, recorded raster, JFIF image/jpeg MIME type, byte count and SHA-256 agree."
+    ],
+    "productionOpen": [
+      "Real iOS in-app browser verification",
+      "Saved Slow 4G verification",
+      "Fresh production before-consent and after-consent captures"
     ]
   },
   "verification": [
-    {"check": "npm run test:ads-readiness", "result": "PASS"},
-    {"check": "npm run ci:ads-readiness", "result": "PASS_VALID_NO_GO_44_OPEN_REQUIREMENTS"},
-    {"check": "npm run test:measurement", "result": "PASS"},
-    {"check": "npm run test:ticket-upload", "result": "PASS_29_MOUNTED_PLUS_13_LOWER_LEVEL"},
-    {"check": "npm run test:seo", "result": "PASS"},
-    {"check": "Deno ticket draft, cleanup and resume delivery tests", "result": "PASS_35_OF_35"},
-    {"check": "Deno check release functions", "result": "PASS"},
-    {"check": "test_ticket_intake_draft_migration.py", "result": "PASS"},
-    {"check": "test_paid_funnel_measurement_migration.py", "result": "PASS"},
-    {"check": "test_paid_payment_refund_ledger_migration.py", "result": "PASS"},
-    {"check": "test_ticket_submission_notification_migration.py", "result": "PASS"},
-    {"check": "TypeScript app and node configs", "result": "PASS"},
-    {"check": "Changed-file ESLint", "result": "PASS_0_ERRORS_1_PRE_EXISTING_HOOK_WARNING"},
-    {"check": "Actionlint, workflow YAML parse and git diff --check", "result": "PASS"},
-    {"check": "Public-offer guardrails", "result": "PASS_211"},
-    {"check": "Homepage conversion readiness", "result": "PASS_11"},
-    {"check": "Homepage visual guardrails", "result": "PASS_37"},
-    {"check": "Snapshot offer, runtime-hygiene and full snapshot guardrails", "result": "PASS"}
+    {
+      "check": "npm run test:measurement",
+      "result": "PASS_15_OF_15_FUNNEL_CASES",
+      "coverage": "Initial malformed and expired consent, live expiry, cross-tab removal, pageshow recovery, visible-document recovery and current undecided touch preservation"
+    },
+    {
+      "check": "npm run test:ticket-upload",
+      "result": "PASS_29_MOUNTED_PLUS_13_LOWER_LEVEL"
+    },
+    {
+      "check": "npm run test:seo",
+      "result": "PASS"
+    },
+    {
+      "check": "npm run test:ads-readiness",
+      "result": "PASS_ADVERSARIAL_CONTROL_SUITE",
+      "coverage": "Explicit FAIL and NO-GO, omitted/nonexistent evidence, missing/duplicate manifest rows, symlinks, traversal, dirty evidence, fake and non-direct commits, self-selected baseline, hostile bundles, stale/future/pre-deployment receipts, role aliases, invalid deployment order, unreviewed provider objective-goal pairs, fake Supabase origins, UTM drift, source drift, evidence-bearing unpinned NO_GO, and evidence-free predeployment NO_GO"
+    },
+    {
+      "check": "npm run ci:ads-readiness at frozen source S before final E/R handoff",
+      "result": "EXPECTED_CI_INVALID_UNPINNED_EVIDENCE",
+      "note": "The record intentionally contained repository evidence while localReview was null. A passing final CI refusal validation belongs to readiness commit R, not this pre-E evidence file."
+    },
+    {
+      "check": "Deno shared Edge Function suites",
+      "result": "PASS_35_OF_35",
+      "breakdown": "12 ticket-intake-draft cleanup, 11 resume-delivery, 12 notification cases"
+    },
+    {
+      "check": "Deno check release function entrypoints",
+      "result": "PASS_13_OF_13"
+    },
+    {
+      "check": "Disposable PostgreSQL migration suites",
+      "result": "PASS_4_OF_4_RUNNERS_10_OF_10_FIXTURES",
+      "breakdown": "ticket intake 7, funnel 1, payment/refund ledger 1, notification 1, including concurrency"
+    },
+    {
+      "check": "TypeScript app and node configs",
+      "result": "PASS_BOTH"
+    },
+    {
+      "check": "Changed-file ESLint from B through S",
+      "result": "PASS_0_ERRORS_1_PREEXISTING_HOOK_WARNING",
+      "warning": "src/pages/AdminCaseManagement.tsx:117"
+    },
+    {
+      "check": "Repository-wide ESLint",
+      "result": "BASELINE_BROKEN_UNCHANGED_36_ERRORS_22_WARNINGS",
+      "note": "This was not represented as a candidate pass. Changed-file lint is the scoped gate."
+    },
+    {
+      "check": "Actionlint and workflow YAML validation",
+      "result": "PASS"
+    },
+    {
+      "check": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "check": "Public-offer guardrails",
+      "result": "PASS_211"
+    },
+    {
+      "check": "Homepage conversion readiness",
+      "result": "PASS_11"
+    },
+    {
+      "check": "Homepage visual guardrails",
+      "result": "PASS_37"
+    },
+    {
+      "check": "Snapshot guardrails",
+      "result": "PASS_38_CURATED_1122_GENERATED_0_FULL_TREE_FAILURES"
+    },
+    {
+      "check": "Runtime hygiene and remaining published/generated/content/Pro/Photo guardrails",
+      "result": "PASS"
+    }
   ],
-  "priorFindings": {
+  "latestFableFindings": [
+    {
+      "finding": "Converted draft retained sensitive draft_data forever and restrictive foreign keys blocked erasure",
+      "status": "CLOSED_LOCAL",
+      "evidence": "supabase/migrations/20260903191000_ticket_intake_converted_retention.sql plus disposable PostgreSQL fixtures",
+      "productionStatus": "OPEN"
+    },
+    {
+      "finding": "A converted draft dead-ended the browser with no fresh-intake path",
+      "status": "CLOSED_LOCAL",
+      "evidence": "src/hooks/useTicketIntakeDraft.ts, src/components/TicketForm.tsx and ticket-upload regression suite",
+      "productionStatus": "OPEN"
+    },
+    {
+      "finding": "Initial consent panel obscured primary actions on small screens",
+      "status": "CLOSED_LOCAL",
+      "evidence": "Bound geometry and fresh JPEG captures at 360x560, 360x640 and 390x844",
+      "productionStatus": "REAL_IOS_AND_SLOW_4G_OPEN"
+    },
+    {
+      "finding": "Validator accepted fabricated evidence, fake commits and fake bundle values",
+      "status": "CLOSED_LOCAL",
+      "evidence": "Schema-3 fail-closed validator and adversarial committed-fixture tests",
+      "productionStatus": "FINAL_PINNED_HANDOFF_AND_INDEPENDENT_REVIEW_OPEN"
+    },
+    {
+      "finding": "Resume-delivery contact rotation could reset send limits and permit international SMS",
+      "status": "CLOSED_LOCAL_SAFE_DEFAULT",
+      "evidence": "Five sends per draft lifetime, ten action attempts per hour, NANP-only SMS, converted denial and indeterminate provider-outcome handling",
+      "productionStatus": "DELIVERY_DISABLED_AND_PRODUCTION_PROOF_OPEN"
+    },
+    {
+      "finding": "Deployment order omitted the base draft migration and conflicted with automatic frontend and active cleanup schedule behavior",
+      "status": "CLOSED_LOCAL",
+      "evidence": "Ordered runbook, manually gated build workflow and schedule variable exact-true guard",
+      "productionStatus": "EXECUTION_OPEN"
+    }
+  ],
+  "additionalEvidenceControlFindings": [
+    {
+      "finding": "Stale attribution could survive an initial or missed consent expiry",
+      "status": "CLOSED_LOCAL"
+    },
+    {
+      "finding": "Evidence-bearing NO_GO could self-pin or pass without a complete commit chain",
+      "status": "CLOSED_LOCAL_PENDING_FINAL_R_VALIDATION"
+    },
+    {
+      "finding": "Synthetic build inherited ambient VITE and Browserslist inputs",
+      "status": "CLOSED_LOCAL"
+    },
+    {
+      "finding": "Old screenshots misstated PNG type and viewport-to-raster provenance",
+      "status": "CLOSED_LOCAL"
+    }
+  ],
+  "historicalFindingDisposition": {
     "P1-1": "CLOSED_LOCAL",
     "P1-2": "CLOSED_LOCAL",
     "P1-3": "CLOSED_LOCAL_REAL_DEVICE_PROOF_OPEN",
@@ -98,16 +320,17 @@
     "P2-16": "CLOSED_LOCAL_TRUSTED_PROXY_PRODUCTION_PROOF_OPEN"
   },
   "productionOpen": [
-    "Owner publication of the seven changed legal translations and a passing release build",
-    "Ordered migrations, functions, signed webhook, cleanup manual run, gated schedule and frontend-last deployment",
-    "Production bundle-byte and crawler message-match proof",
+    "Owner publication of all seven changed legal translations and a passing normal release build",
+    "A fresh production S2 -> E2 -> R2 chain beginning with an evidence-free NO_GO reset and both readiness suites passing",
+    "Ordered migrations, core functions, signed webhook, create-payment order, manual cleanup proof, gated schedule and frontend-last deployment",
+    "Immutable deployed source/tag/deployment ID, canonical production bundle bytes and crawler message-match proof",
     "Real iOS in-app-browser and saved Slow 4G evidence",
-    "Production trusted cf-connecting-ip proof",
-    "Controlled intake, checkout, webhook, notification, measurement, conversion and refund evidence",
-    "Stripe Fabsy merchant identity and phone/contact-route tests",
-    "Meta dataset restriction/objective and Google conversion-action readbacks",
-    "Owner economics inputs, capacity, CAC/CPL/CPC and maximum-loss approval",
-    "Independent production review, written GO and separate spend authorization"
+    "Staging and production trusted cf-connecting-ip proof",
+    "Controlled intake, checkout, signed webhook, notification, measurement, conversion, cancellation and authorized refund evidence",
+    "Stripe Fabsy merchant identity and real phone/contact-route tests",
+    "Meta dataset restriction/objective and Google conversion-action provider readbacks",
+    "Owner economics inputs, operating capacity, maximum CAC/CPL/CPC and maximum-loss approval",
+    "Independent production review, written GO by a distinct approver and separate spend authorization by a fourth distinct actor"
   ],
   "actionsNotTaken": [
     "push",
