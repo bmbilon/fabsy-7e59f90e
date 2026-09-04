@@ -253,7 +253,13 @@ const buildIdentity = { dist, fileCount: assetHashes.length, treeSha256: sha256(
 await fs.writeFile(path.join(artifacts, 'build-files.json'), JSON.stringify(assetHashes, null, 2));
 
 const nonce = crypto.randomBytes(5).toString('hex');
-const privateValues = [`FabsyPrivate${nonce}`, `fabsy.private.${nonce}@example.invalid`, `PRIVATE-NOTES-${nonce}`, `FT${nonce}`];
+const privateValues = [
+  `FabsyPrivate${nonce}`,
+  `fabsy.private.${nonce}@example.invalid`,
+  `PRIVATE-NOTES-${nonce}`,
+  `FT${nonce}`,
+  `403555${String(parseInt(nonce, 16) % 10000).padStart(4, '0')}`,
+];
 const receiptToken = `cs_test_FabsyNetworkFixture${nonce}`;
 const requests = []; const documentEvents = []; const checks = []; const failures = []; const contexts = [];
 let activeScenario = 'setup'; let sequence = 0; let browser;
@@ -323,7 +329,7 @@ async function isolatedContext({ holdLoader = false, locale = 'en-CA' } = {}) {
       if (!recordedBlocked && document.querySelector('main[aria-busy="true"]')) {
         recordedBlocked = true; record({ kind: 'blocked-dom' });
       }
-      if (!recordedPrivate && document.querySelector('#ticketNumber, #firstName, #fleet-company, form #message, form input[type="file"][accept*="application/pdf"]')) {
+      if (!recordedPrivate && document.querySelector('#lead-email, #lead-phone, #ticketNumber, #firstName, #fleet-company, form #message, form input[type="file"][accept*="application/pdf"]')) {
         recordedPrivate = true; record({ kind: 'private-dom', tagPresent: Boolean(document.getElementById('fabsy-google-tag')) });
       }
     });
@@ -430,12 +436,12 @@ async function untagged(page, documentId, observationMs = 1000) {
 async function fillPrivate(page, pathname) {
   if (pathname === '/contact') { await page.locator('#name').fill(privateValues[0]); await page.locator('#email').fill(privateValues[1]); await page.locator('#message').fill(privateValues[2]); }
   else if (pathname === '/submit-ticket') {
-    // Capture must finish before the production form reveals private fields.
-    // A PDF opens manual review locally while all service requests stay blocked.
+    // Exercise the supported upload and current early lead-capture UI while all
+    // service requests stay blocked. Never cross the lead-save boundary.
     await page.locator('form input[type="file"][accept*="application/pdf"]').setInputFiles(syntheticTicketPdf());
-    await page.locator('#ticketNumber').waitFor({ state: 'visible' });
-    await page.locator('#ticketNumber').fill(privateValues[3]);
-    await page.locator('#location').fill(privateValues[2]);
+    await page.locator('#lead-email').waitFor({ state: 'visible' });
+    await page.locator('#lead-email').fill(privateValues[1]);
+    await page.locator('#lead-phone').fill(privateValues[4]);
   }
   else if (pathname === '/fleet') { await page.locator('#fleet-company').fill(privateValues[0]); await page.locator('#fleet-email').fill(privateValues[1]); await page.locator('#fleet-notes').fill(privateValues[2]); }
 }
