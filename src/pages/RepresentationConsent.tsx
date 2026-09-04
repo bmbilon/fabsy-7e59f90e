@@ -184,9 +184,8 @@ const INITIAL_FORM: ConsentFormData = {
   accepted: false,
 };
 
-const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, "") ||
-  "https://gcasbisxfrssonllpqrw.supabase.co";
-const CONSENT_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/representation-consent`;
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim().replace(/\/$/, "") || "";
+const CONSENT_FUNCTION_URL = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/representation-consent` : "";
 const OFFICIAL_APTO_URL = "https://cfr.forms.gov.ab.ca/Form/APTO13348.pdf";
 const MAX_MANUAL_SCAN_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_MANUAL_TYPES = ["application/pdf", "image/jpeg", "image/png"];
@@ -239,7 +238,7 @@ function formatFileSize(bytes: number) {
 }
 
 function trustedPdfUrl(value: string | undefined) {
-  if (!value) return "";
+  if (!value || !SUPABASE_URL) return "";
   try {
     const candidate = new URL(value);
     const serviceOrigin = new URL(SUPABASE_URL).origin;
@@ -281,6 +280,12 @@ function isFinishedStatus(status: ConsentResponse["status"]) {
 }
 
 async function requestConsent(token: string, body: Record<string, unknown>): Promise<ConsentResponse> {
+  if (!CONSENT_FUNCTION_URL) {
+    throw new ConsentRequestError({
+      code: "configuration_missing",
+      message: "The secure consent service is not configured.",
+    });
+  }
   let response: Response;
   try {
     response = await fetch(CONSENT_FUNCTION_URL, {

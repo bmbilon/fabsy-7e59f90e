@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "limitPerQueue": 25,
+  "maxClaims": 50,
+  "claimed": 3,
+  "deleted": 3,
+  "deferred": 0,
+  "objectDeletions": {
+    "claimed": 1,
+    "deleted": 1,
+    "deferred": 0
+  },
+  "expiredDrafts": {
+    "claimed": 2,
+    "deleted": 2,
+    "deferred": 0
+  },
+  "convertedDrafts": {
+    "purged": 1
+  },
+  "notificationDispatches": {
+    "markedIndeterminate": 2
+  }
+}

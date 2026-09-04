@@ -8,6 +8,11 @@ export default function LeadCaptureFields({ formData, updateFormData, error }: {
   updateFormData: (updates: Partial<FormData>) => void;
   error?: string;
 }) {
+  const email = formData.email.trim();
+  const phone = formData.phone.trim();
+  const emailInvalid = Boolean(email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const phoneInvalid = Boolean(phone) && phone.replace(/\D/g, "").length < 7;
+
   return <div className="mt-6 space-y-5 rounded-xl border border-primary/15 bg-primary/5 p-5 sm:p-6">
     <div>
       <h3 className="text-lg font-semibold">Where can we follow up?</h3>
@@ -18,13 +23,19 @@ export default function LeadCaptureFields({ formData, updateFormData, error }: {
         <Label htmlFor="lead-email">Email</Label>
         <Input id="lead-email" type="email" inputMode="email" autoComplete="email" maxLength={254}
           value={formData.email} onChange={event => updateFormData({ email: event.target.value })}
-          placeholder="you@example.com" />
+          placeholder="you@example.com" aria-invalid={emailInvalid}
+          aria-describedby={`lead-email-help${emailInvalid ? " lead-email-error" : ""}`} />
+        <p id="lead-email-help" className="text-xs text-muted-foreground">Use an address you can access for the secure return link.</p>
+        {emailInvalid ? <p id="lead-email-error" className="text-sm text-destructive" role="alert">Enter a complete email address, such as you@example.com.</p> : null}
       </div>
       <div className="space-y-2">
         <Label htmlFor="lead-phone">Phone</Label>
         <Input id="lead-phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={32}
           value={formData.phone} onChange={event => updateFormData({ phone: event.target.value })}
-          placeholder="403-555-0123" />
+          placeholder="403-555-0123" aria-invalid={phoneInvalid}
+          aria-describedby={`lead-phone-help${phoneInvalid ? " lead-phone-error" : ""}`} />
+        <p id="lead-phone-help" className="text-xs text-muted-foreground">Include an area code when possible.</p>
+        {phoneInvalid ? <p id="lead-phone-error" className="text-sm text-destructive" role="alert">Enter a phone number with at least seven digits.</p> : null}
       </div>
     </div>
     <label htmlFor="alberta-confirmed" className="flex cursor-pointer items-start gap-3 rounded-lg border bg-background p-4 text-sm leading-relaxed">

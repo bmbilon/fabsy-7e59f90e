@@ -50,9 +50,27 @@ interface TicketDetailsStepProps {
   onCaptureStateChange?: (state: TicketCaptureState) => void;
   mode?: "all" | "capture" | "details";
   hasStoredTicket?: boolean;
+  allowReplacement?: boolean;
+  onTicketFileSelection?: (file: File | null) => void;
+  replacementReady?: boolean;
+  replacementSaving?: boolean;
+  onSaveReplacement?: () => void;
 }
 
-const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketReviewData(formData), skipInitialScan = false, onCaptureStateChange, mode = "all", hasStoredTicket = false }: TicketDetailsStepProps) => {
+const TicketDetailsStep = ({
+  formData,
+  updateFormData,
+  reviewReady = hasTicketReviewData(formData),
+  skipInitialScan = false,
+  onCaptureStateChange,
+  mode = "all",
+  hasStoredTicket = false,
+  allowReplacement = false,
+  onTicketFileSelection,
+  replacementReady = false,
+  replacementSaving = false,
+  onSaveReplacement,
+}: TicketDetailsStepProps) => {
   const [openOffenceCombobox, setOpenOffenceCombobox] = useState(false);
   const [offenceSearchValue, setOffenceSearchValue] = useState("");
   const manuallyEditedDate = useRef<Date | string | undefined>(formData.issueDate);
@@ -196,8 +214,11 @@ const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketRe
   return (
     <>
       <form className="space-y-8" onSubmit={event => event.preventDefault()}>
-        {mode !== "details" && <TicketCapture
+        {(mode !== "details" || allowReplacement) && <TicketCapture
           file={formData.ticketImage}
+          label={mode === "details" && hasStoredTicket
+            ? "Replace the saved ticket PDF or clear image"
+            : undefined}
           onFileChange={ticketImage => {
             manuallyEditedDate.current = undefined;
             lastExtraction.current = null;
@@ -211,13 +232,20 @@ const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketRe
               courtDate: undefined, courtJurisdiction: "", agentRepresentationPermitted: null,
               vehicleSeized: false, sourceAssessmentId: "", sourceAssessmentAccessToken: "",
             }));
+            onTicketFileSelection?.(ticketImage);
           }}
           onOcrData={applyTicketOCR}
           onCaptureStateChange={onCaptureStateChange}
           required={!formData.sourceAssessmentId && !hasStoredTicket}
           skipInitialScan={skipInitialScan}
         />}
-        {(formData.sourceAssessmentId || hasStoredTicket) && !formData.ticketImage ? <p className="text-sm text-muted-foreground">Your ticket is stored privately and linked to this intake.</p> : null}
+        {mode === "details" && allowReplacement && formData.ticketImage ? <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <p className="text-sm text-muted-foreground">Review the captured details below, then save this file to replace the ticket currently linked to your intake.</p>
+          <Button type="button" className="mt-3 min-h-11" disabled={!replacementReady || replacementSaving} onClick={onSaveReplacement}>
+            {replacementSaving ? "Saving replacement…" : "Save replacement ticket"}
+          </Button>
+        </div> : null}
+        {(formData.sourceAssessmentId || hasStoredTicket) && !formData.ticketImage ? <p className="text-sm text-muted-foreground">Your ticket is stored privately and linked to this intake. Choose a replacement only if the wrong ticket was uploaded.</p> : null}
 
       {mode !== "capture" && reviewReady && <div className="space-y-6 animate-in fade-in duration-300">
         <div role="status" className="rounded-lg border border-primary/20 bg-primary/5 p-4">

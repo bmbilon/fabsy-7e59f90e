@@ -4,6 +4,7 @@ import {
   FunnelRequestError,
   parseFunnelEventRequest,
 } from '../_shared/funnel-measurement.ts';
+import { requestAddress } from '../_shared/ticket-intake-draft.ts';
 
 const allowedOrigins = new Set(['https://fabsy.ca', 'https://www.fabsy.ca']);
 const requestCounts = new Map<string, { count: number; resetAt: number }>();
@@ -27,10 +28,7 @@ function json(origin: string | null, status: number, body: unknown): Response {
 }
 
 function rateLimitKey(request: Request): string {
-  return request.headers.get('cf-connecting-ip') ||
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown';
+  return requestAddress(request);
 }
 
 function withinRateLimit(request: Request, now = Date.now()): boolean {

@@ -6,6 +6,7 @@ const REFUND_PATTERN = /^re_[A-Za-z0-9_]{8,240}$/;
 const EVENT_PATTERN = /^evt_[A-Za-z0-9_]{8,240}$/;
 const CURRENCY_PATTERN = /^[a-z]{3}$/;
 const REFUND_STATUSES = new Set(['pending', 'requires_action', 'succeeded', 'failed', 'canceled']);
+const PAID_LEDGER_EPOCH_SECONDS = Date.UTC(2026, 0, 1) / 1000;
 const encoder = new TextEncoder();
 
 export interface PaidPaymentRpcClient {
@@ -144,7 +145,8 @@ export async function paidRefundLedgerRecord(
       typeof event.id !== 'string' || !EVENT_PATTERN.test(event.id) ||
       typeof refund.id !== 'string' || !REFUND_PATTERN.test(refund.id) ||
       !paymentIntentId || !PAYMENT_INTENT_PATTERN.test(paymentIntentId) ||
-      !refundCreated || !statusObserved || amountCents === null ||
+      !refundCreated || refundCreated < PAID_LEDGER_EPOCH_SECONDS ||
+      !statusObserved || amountCents === null ||
       refund.currency !== 'cad' || !CURRENCY_PATTERN.test(refund.currency) ||
       typeof refund.status !== 'string' || !REFUND_STATUSES.has(refund.status)) return null;
   return {

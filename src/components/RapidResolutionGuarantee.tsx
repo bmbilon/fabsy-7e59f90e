@@ -14,7 +14,7 @@ export default function RapidResolutionGuarantee() {
           <div>
             <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-primary-dark">
               <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-              Our money-back policy
+              Our service-fee refund policy
             </p>
             <h2 id="money-back-guarantee-heading" className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
               A reduction, a withdrawal, or your fee back.
@@ -47,7 +47,7 @@ export default function RapidResolutionGuarantee() {
           <p className="font-semibold text-slate-950">{HOMEPAGE_REFUND_COPY.paymentTiming}</p>
           <p className="mt-2">{HOMEPAGE_REFUND_COPY.refundScope}</p>
           <Link to={HOMEPAGE_REFUND_COPY.termsPath} className="mt-3 inline-flex min-h-11 items-center rounded-sm font-semibold text-primary-dark underline underline-offset-4 hover:text-blue-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-            Read the full money-back policy
+            Read the full service-fee refund policy
           </Link>
         </div>
       </div>

@@ -300,10 +300,26 @@ export async function requestFingerprint(secret: string, address: string) {
 }
 
 export function requestAddress(req: Request) {
-  return req.headers.get("cf-connecting-ip")?.trim() ||
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip")?.trim() ||
-    "unknown";
+  // Cloudflare overwrites this header at the trusted edge. Forwarding headers
+  // can be supplied by a client in non-Cloudflare paths, so never use them to
+  // create a distinct rate-limit bucket.
+  const value = req.headers.get("cf-connecting-ip")?.trim() || "";
+  const ipv4 = value.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4 && ipv4.slice(1).every((part) => Number(part) <= 255)) {
+    return value;
+  }
+  if (
+    value.length >= 2 && value.length <= 45 && value.includes(":") &&
+    /^[0-9a-f:]+$/i.test(value)
+  ) {
+    try {
+      new URL(`http://[${value}]/`);
+      return value.toLowerCase();
+    } catch {
+      // Fall through to the shared anonymous bucket.
+    }
+  }
+  return "unknown";
 }
 
 function normalizeEmail(value: unknown) {

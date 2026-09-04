@@ -122,8 +122,8 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   field(hero, 'p', heroSupport, 'qualified supporting headline');
   field(hero, 'p', `${qualification} ${feeRefund.condition}`, 'hero outcome qualification and Crown-rejection trigger');
   field(hero, 'p', price, 'Rapid Resolution upfront price and GST');
-  field(hero, 'p', 'For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the money-back guarantee works',
-    'hero scope and policy destination', [[policyAnchor, 'How the money-back guarantee works']]);
+  field(hero, 'p', 'For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the service-fee refund works',
+    'hero scope and policy destination', [[policyAnchor, 'How the service-fee refund works']]);
   field(hero, 'a', 'Get help with my ticket', 'Rapid Resolution intake destination', [[offers.rapidResolution.intakePath, 'Get help with my ticket']]);
 
   field(policy, 'h2#money-back-guarantee-heading', 'A reduction, a withdrawal, or your fee back.', 'policy heading');
@@ -134,12 +134,12 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   field(policy, 'p', feeRefund.condition, 'Crown-rejection refund trigger');
   field(policy, 'p', feeRefund.payment, 'upfront payment disclosure');
   field(policy, 'p', refundScope, 'full published product and fee scope');
-  field(policy, 'a', 'Read the full money-back policy', 'published policy link', [[feeRefund.termsPath, 'Read the full money-back policy']]);
+  field(policy, 'a', 'Read the full service-fee refund policy', 'published policy link', [[feeRefund.termsPath, 'Read the full service-fee refund policy']]);
 
   field(outcomes, 'p#homepage-outcomes-context', 'For eligible officer-issued tickets. Illustrations only, not a prediction.', 'illustrative officer-ticket scope');
   field(outcomes, 'h3', 'We Negotiate. You Decide.', 'client-decision heading');
   field(outcomes, 'p', feeRefund.declinedOfferText, 'client-decision refund boundary');
-  field(outcomes, 'p', `${qualification} Read the money-back policy.`, 'outcome policy qualification', [[policyAnchor, 'Read the money-back policy.']]);
+  field(outcomes, 'p', `${qualification} Read the service-fee refund policy.`, 'outcome policy qualification', [[policyAnchor, 'Read the service-fee refund policy.']]);
   // Radix only mounts the selected illustration. A no-reduction panel must
   // retain the complete trigger if it is the panel captured by prerendering.
   if ([...outcomes.querySelectorAll('[role="tabpanel"]')].some(panel => panel.textContent.includes('No penalty reduction'))) {
@@ -151,7 +151,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   field(driver, 'p', `${qualification} See the refund conditions and 30-day timing.`, 'driver-section qualification', [[policyAnchor, 'See the refund conditions and 30-day timing.']]);
   field(driver, 'p', price, 'driver-section upfront price and GST');
   field(driver, 'a', 'Start Rapid Resolution', 'driver-section intake destination', [[offers.rapidResolution.intakePath, 'Start Rapid Resolution']]);
-  field(pricing, 'a', 'Service-fee money-back guarantee · See policy', 'Rapid Resolution policy link', [[policyAnchor, 'Service-fee money-back guarantee · See policy']]);
+  field(pricing, 'a', 'Rapid Resolution service-fee refund · See policy', 'Rapid Resolution policy link', [[policyAnchor, 'Rapid Resolution service-fee refund · See policy']]);
   field(pricing, 'a', 'Service-fee refund guarantee · See policy', 'bundle policy link', [[policyAnchor, 'Service-fee refund guarantee · See policy']]);
 
   const clock = process.querySelector('aside[aria-labelledby="homepage-speed-heading"]') || document.createElement('aside');
@@ -170,7 +170,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
 
   const faq = main.querySelector('section[aria-labelledby="homepage-faq-heading"]');
   if (faq) {
-    field(faq, 'button', 'When do I get my money back if there is no reduction?', 'refund FAQ question');
+    field(faq, 'button', 'When is my service fee refunded if there is no reduction?', 'refund FAQ question');
     // Expanded accordion answers must be complete plain fields. Closed
     // answers are unmounted, and never substitute for the visible policy.
     for (const answer of [

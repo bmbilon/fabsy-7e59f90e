@@ -45,14 +45,39 @@ interface IntakeLead {
   resume_delivery_channel: "email" | "sms" | null;
   resume_delivery_sent_at: string | null;
   resume_delivery_attempt_count: number;
+  resume_delivery_failure_code: "configuration_missing" | "request_rejected" | "rate_limited" | "outcome_unknown" | null;
+  staff_follow_up_status: "open" | "contacted" | "dismissed";
+  staff_follow_up_updated_at: string | null;
+  staff_follow_up_updated_by: string | null;
   expires_at: string;
   updated_at: string;
+}
+
+type IntakeLeadView = "outstanding" | "dismissed";
+
+function resumeDeliveryStatusText(lead: IntakeLead): string {
+  if (lead.resume_delivery_failure_code === "outcome_unknown") {
+    return "provider outcome unknown; do not retry automatically";
+  }
+  if (lead.resume_delivery_failure_code === "configuration_missing") {
+    return "delivery configuration missing";
+  }
+  if (lead.resume_delivery_failure_code === "request_rejected") {
+    return "provider rejected delivery";
+  }
+  if (lead.resume_delivery_failure_code === "rate_limited") {
+    return "provider rate limited delivery";
+  }
+  return `resume link ${lead.resume_delivery_status}${lead.resume_delivery_channel ? ` by ${lead.resume_delivery_channel}` : ""}`;
 }
 
 export default function AdminCaseManagement() {
   const [submissions, setSubmissions] = useState<TicketSubmission[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<TicketSubmission[]>([]);
   const [intakeLeads, setIntakeLeads] = useState<IntakeLead[]>([]);
+  const [intakeLeadError, setIntakeLeadError] = useState<string | null>(null);
+  const [intakeLeadView, setIntakeLeadView] = useState<IntakeLeadView>("outstanding");
+  const [updatingIntakeLeadIds, setUpdatingIntakeLeadIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -110,6 +135,7 @@ export default function AdminCaseManagement() {
 
   const checkAuthAndFetchData = async () => {
     try {
+      setIntakeLeadError(null);
       const roleData = await getIdrStaffRole();
 
       if (!roleData) {
@@ -140,7 +166,7 @@ export default function AdminCaseManagement() {
         .neq('status', 'assessment_checkout_open')
         .order('created_at', { ascending: false }),
         supabase.from('ticket_intake_drafts')
-          .select('id,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,expires_at,updated_at')
+          .select('id,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,expires_at,updated_at')
           .in('status', ['active', 'converted'])
           .not('ticket_uploaded_at', 'is', null)
           .gt('expires_at', new Date().toISOString())
@@ -148,8 +174,6 @@ export default function AdminCaseManagement() {
       ]);
 
       const { data, error } = submissionResult;
-      if (leadResult.error) throw leadResult.error;
-
       if (error) throw error;
 
       const transformedData = data?.map((sub): TicketSubmission => ({
@@ -171,11 +195,17 @@ export default function AdminCaseManagement() {
 
       setSubmissions(transformedData);
       setFilteredSubmissions(transformedData);
-      const managedCaseIds = new Set(transformedData.map(submission => submission.id));
-      setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
-        Boolean(lead.ticket_uploaded_at) &&
-        (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
-      ));
+      if (leadResult.error) {
+        console.error('Incomplete ticket intake queue unavailable:', leadResult.error);
+        setIntakeLeads([]);
+        setIntakeLeadError('Incomplete intakes could not be loaded. Existing submitted cases remain available below.');
+      } else {
+        const managedCaseIds = new Set(transformedData.map(submission => submission.id));
+        setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
+          Boolean(lead.ticket_uploaded_at) &&
+          (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
+        ));
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -197,6 +227,44 @@ export default function AdminCaseManagement() {
       return;
     }
     window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const updateIntakeLeadStatus = async (
+    lead: IntakeLead,
+    status: IntakeLead["staff_follow_up_status"],
+  ) => {
+    setUpdatingIntakeLeadIds(current => current.includes(lead.id) ? current : [...current, lead.id]);
+    try {
+      const { data, error } = await supabase.rpc('set_ticket_intake_follow_up_status', {
+        p_id: lead.id,
+        p_expected_status: lead.staff_follow_up_status,
+        p_status: status,
+      });
+      const updated = data?.[0];
+      if (error || !updated) throw error || new Error('No disposition row was returned.');
+
+      setIntakeLeads(current => current.map(candidate => candidate.id === lead.id
+        ? {
+            ...candidate,
+            staff_follow_up_status: updated.follow_up_status as IntakeLead["staff_follow_up_status"],
+            staff_follow_up_updated_at: updated.follow_up_updated_at,
+            staff_follow_up_updated_by: updated.follow_up_updated_by,
+          }
+        : candidate));
+      toast({
+        title: status === "contacted" ? "Lead marked contacted" : status === "dismissed" ? "Lead dismissed" : "Lead reopened",
+        description: "This records queue status only. It did not send a message.",
+      });
+    } catch (error) {
+      console.error('Incomplete ticket intake disposition could not be saved:', error);
+      toast({
+        title: "Follow-up status not saved",
+        description: "Another staff update or an expired intake may have changed this lead. Reload the queue and try again. No message was sent.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingIntakeLeadIds(current => current.filter(id => id !== lead.id));
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -229,6 +297,10 @@ export default function AdminCaseManagement() {
     );
   }
 
+  const outstandingIntakeLeads = intakeLeads.filter(lead => lead.staff_follow_up_status !== "dismissed");
+  const dismissedIntakeLeads = intakeLeads.filter(lead => lead.staff_follow_up_status === "dismissed");
+  const visibleIntakeLeads = intakeLeadView === "dismissed" ? dismissedIntakeLeads : outstandingIntakeLeads;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -258,33 +330,67 @@ export default function AdminCaseManagement() {
                 <CardTitle>Incomplete ticket intakes</CardTitle>
                 <CardDescription>Uploaded tickets whose customers have allowed intake follow-up but have not completed payment.</CardDescription>
               </div>
-              <Badge variant="outline">{intakeLeads.length} open</Badge>
+              <Badge variant={intakeLeadError ? "destructive" : "outline"}>
+                {intakeLeadError ? "Queue unavailable" : `${outstandingIntakeLeads.length} outstanding`}
+              </Badge>
             </div>
           </CardHeader>
           <CardContent>
-            {intakeLeads.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">No incomplete uploaded intakes.</p> : <div className="space-y-3">
-              {intakeLeads.map(lead => <div key={lead.id} className="flex flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 md:flex-row md:items-center md:justify-between">
+            {intakeLeadError ? (
+              <div role="alert" className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+                <p className="font-semibold">Lead follow-up queue is unavailable</p>
+                <p className="mt-1">{intakeLeadError} Do not treat this as proof that there are no open leads.</p>
+                <Button type="button" variant="outline" size="sm" className="mt-3" onClick={() => void checkAuthAndFetchData()}>
+                  Retry lead queue
+                </Button>
+              </div>
+            ) : intakeLeads.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">No incomplete uploaded intakes.</p> : <div className="space-y-4">
+              <div className="flex flex-wrap gap-2" aria-label="Incomplete intake queue filter">
+                <Button type="button" size="sm" variant={intakeLeadView === "outstanding" ? "default" : "outline"} onClick={() => setIntakeLeadView("outstanding")}>
+                  Outstanding ({outstandingIntakeLeads.length})
+                </Button>
+                <Button type="button" size="sm" variant={intakeLeadView === "dismissed" ? "default" : "outline"} onClick={() => setIntakeLeadView("dismissed")}>
+                  Dismissed ({dismissedIntakeLeads.length})
+                </Button>
+              </div>
+              {visibleIntakeLeads.length === 0 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">No {intakeLeadView} incomplete intakes.</p>
+              ) : visibleIntakeLeads.map(lead => <div key={lead.id} className="flex flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 md:flex-row md:items-center md:justify-between">
                 <div className="min-w-0 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline">{lead.status === "converted" ? "Checkout started" : `Step ${lead.current_step} of 6`}</Badge>
+                    <Badge variant={lead.staff_follow_up_status === "contacted" ? "secondary" : "outline"}>
+                      {lead.staff_follow_up_status === "open" ? "Follow-up open" : lead.staff_follow_up_status === "contacted" ? "Contacted" : "Dismissed"}
+                    </Badge>
                     <span className="text-xs text-muted-foreground">Updated {formatDistanceToNow(new Date(lead.updated_at), { addSuffix: true })}</span>
                   </div>
                   <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-                    {lead.email ? <span className="flex min-w-0 items-center gap-2"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /><span className="break-all">{lead.email}</span></span> : null}
-                    {lead.phone ? <span className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" />{lead.phone}</span> : null}
+                    {lead.email ? <a href={`mailto:${lead.email}`} className="flex min-w-0 items-center gap-2 font-medium text-primary underline underline-offset-4"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /><span className="break-all">{lead.email}</span></a> : null}
+                    {lead.phone ? <a href={`tel:${lead.phone.replace(/[^+\d]/g, '')}`} className="flex items-center gap-2 font-medium text-primary underline underline-offset-4"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" />{lead.phone}</a> : null}
                   </div>
                   <p className="text-xs text-muted-foreground">Locale: {lead.preferred_locale} · Ticket {(lead.ticket_document_size_bytes / 1024).toFixed(0)} KB · Resume access expires {new Date(lead.expires_at).toLocaleDateString()}</p>
                   <p className={`text-xs ${lead.resume_delivery_status === "failed" ? "font-medium text-destructive" : "text-muted-foreground"}`}>
-                    Resume link: {lead.resume_delivery_status}{lead.resume_delivery_channel ? ` by ${lead.resume_delivery_channel}` : ""}
+                    Follow-up status: {resumeDeliveryStatusText(lead)}
                     {lead.resume_delivery_sent_at ? ` · sent ${formatDistanceToNow(new Date(lead.resume_delivery_sent_at), { addSuffix: true })}` : ""}
-                    {lead.resume_delivery_attempt_count > 1 ? ` · ${lead.resume_delivery_attempt_count} attempts` : ""}
+                    {lead.resume_delivery_attempt_count > 0 ? ` · ${lead.resume_delivery_attempt_count} provider attempt${lead.resume_delivery_attempt_count === 1 ? "" : "s"}` : ""}
                   </p>
+                  {lead.staff_follow_up_updated_at ? (
+                    <p className="text-xs text-muted-foreground">Queue status updated {formatDistanceToNow(new Date(lead.staff_follow_up_updated_at), { addSuffix: true })}</p>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant="outline" onClick={() => void openLeadTicket(lead)}>
                     <FileText className="mr-2 h-4 w-4" aria-hidden="true" />Open ticket
                   </Button>
                   {lead.converted_submission_id ? <Button type="button" onClick={() => navigate(`/admin/submissions/${lead.converted_submission_id}`)}>Open checkout case</Button> : null}
+                  {lead.staff_follow_up_status === "open" ? (
+                    <Button type="button" variant="secondary" disabled={updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "contacted")}>Mark contacted</Button>
+                  ) : null}
+                  {lead.staff_follow_up_status !== "dismissed" ? (
+                    <Button type="button" variant="outline" disabled={updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "dismissed")}>Dismiss from queue</Button>
+                  ) : (
+                    <Button type="button" variant="outline" disabled={updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "open")}>Reopen</Button>
+                  )}
                 </div>
               </div>)}
             </div>}

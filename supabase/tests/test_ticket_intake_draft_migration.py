@@ -32,7 +32,7 @@ $$;
 create table public.clients (id uuid primary key);
 create table public.ticket_submissions (
   id uuid primary key,
-  client_id uuid not null references public.clients(id),
+  client_id uuid not null references public.clients(id) on delete cascade,
   service_type text not null,
   status text not null,
   representation_access_token_hash text,
@@ -98,16 +98,23 @@ def run() -> None:
             command([*connection, "-f", str(ROOT / "supabase/migrations/20260903181000_ticket_intake_draft_cleanup.sql")])
             command([*connection, "-f", str(ROOT / "supabase/migrations/20260903182000_ticket_intake_rotation_recovery.sql")])
             command([*connection, "-f", str(ROOT / "supabase/migrations/20260903190000_ticket_intake_object_deletion_queue.sql")])
+            command([*connection, "-f", str(ROOT / "supabase/migrations/20260903191000_ticket_intake_converted_retention.sql")])
+            command([*connection, "-f", str(ROOT / "supabase/migrations/20260903192000_ticket_intake_delivery_abuse_controls.sql")])
+            command([*connection, "-f", str(ROOT / "supabase/migrations/20260903194000_ticket_intake_staff_follow_up.sql")])
             result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-drafts.test.sql"))])
             delivery_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-resume-delivery.test.sql"))])
             cleanup_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-draft-cleanup.test.sql"))])
             rotation_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-rotation-recovery.test.sql"))])
             object_deletion_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-object-deletion-queue.test.sql"))])
+            abuse_control_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-delivery-abuse-controls.test.sql"))])
+            staff_follow_up_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-staff-follow-up.test.sql"))])
             print(result.stdout.strip())
             print(delivery_result.stdout.strip())
             print(cleanup_result.stdout.strip())
             print(rotation_result.stdout.strip())
             print(object_deletion_result.stdout.strip())
+            print(abuse_control_result.stdout.strip())
+            print(staff_follow_up_result.stdout.strip())
         finally:
             if started:
                 command([binaries["pg_ctl"], "-D", str(cluster), "-m", "immediate", "-w", "stop"])

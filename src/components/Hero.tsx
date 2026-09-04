@@ -74,7 +74,7 @@ const Hero = () => (
         <p className="mx-auto mt-4 max-w-xl text-xs leading-relaxed text-slate-400">
           For eligible Alberta pre-trial matters. Government fines and trial representation are separate.{" "}
           <a href="#money-back-guarantee" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-blue-200 underline underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
-            How the money-back guarantee works
+            How the service-fee refund works
           </a>
         </p>
       </div>

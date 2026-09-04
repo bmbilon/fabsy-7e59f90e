@@ -75,9 +75,10 @@ export function rememberMetaCheckoutAttributionHandle(handle: unknown, candidate
 
 function endpointConfiguration(): { url: string; publishableKey: string } | null {
   const env = import.meta.env as PublicSupabaseEnvironment;
-  const base = (env.VITE_SUPABASE_URL || 'https://gcasbisxfrssonllpqrw.supabase.co').replace(/\/$/, '');
-  const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    'sb_publishable_KEo-G1wij9RC_IDDzblisw_VISRvwrX';
+  const configuredBase = env.VITE_SUPABASE_URL?.trim();
+  const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
+  if (!configuredBase || !publishableKey) return null;
+  const base = configuredBase.replace(/\/$/, '');
   try {
     const url = new URL(`${base}/functions/v1/withdraw-meta-measurement`);
     if (url.protocol !== 'https:' || url.username || url.password || !publishableKey || /\s/.test(publishableKey)) return null;

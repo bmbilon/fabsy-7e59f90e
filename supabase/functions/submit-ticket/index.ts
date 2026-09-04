@@ -5,7 +5,7 @@ import { parseTicketClassification, ProductRequestError } from "../_shared/photo
 import { ELIGIBLE_PRO_CLASSES, normalizedLicenceClass } from "../_shared/pro-pricing.ts";
 import { attachReferralAttribution, recordReferralDeclaredPlate } from "../_shared/referrals.ts";
 import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
-import { DraftRequestError, parseDraftAccessToken } from "../_shared/ticket-intake-draft.ts";
+import { DraftRequestError, parseDraftAccessToken, requestAddress } from "../_shared/ticket-intake-draft.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -128,9 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     // Rate limiting by IP address
-    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0] || 
-                     req.headers.get("x-real-ip") || 
-                     "unknown";
+    const clientIP = requestAddress(req);
     
     const now = Date.now();
     const tracker = submissionTracker.get(clientIP);

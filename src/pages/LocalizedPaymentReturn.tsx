@@ -9,7 +9,7 @@ import { useLocale } from '@/i18n/locale-context';
 import useSafeHead from '@/hooks/useSafeHead';
 import { usePaidPurchaseTracking } from '@/hooks/usePaidPurchaseTracking';
 import { paidCheckoutSummary, type CheckoutReceipt } from '@/lib/checkoutReceipt';
-import { forgetIntakeDraft } from '@/lib/ticket/intakeDraft';
+import { forgetAllIntakeDraftAccess } from '@/lib/ticket/intakeDraft';
 
 export default function LocalizedPaymentReturn() {
   const { t } = useTranslation();
@@ -36,7 +36,7 @@ export default function LocalizedPaymentReturn() {
   }, [sessionId, isReleased, locale]);
 
   useEffect(() => {
-    if (paidCheckoutSummary(receipt)) forgetIntakeDraft();
+    if (paidCheckoutSummary(receipt)) forgetAllIntakeDraftAccess();
   }, [receipt]);
 
   return <div className="min-h-screen bg-slate-50 text-slate-900"><Header /><main className="container mx-auto max-w-3xl space-y-6 px-4 py-16">

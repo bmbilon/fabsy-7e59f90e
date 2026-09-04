@@ -8,6 +8,7 @@ import {
   editorialLanguageHandoffDestination,
   localizePath,
 } from '@/i18n/locale-policy.mjs';
+import { languageNavigationSuffix } from '@/lib/languageNavigation';
 
 export const LANGUAGE_PREFERENCE_KEY = 'fabsy.language.v1';
 
@@ -39,7 +40,7 @@ export default function LanguageSelector() {
               navigate(editorialHandoff.path, { state: editorialHandoff.state });
             } else {
               const target = next === 'en' || registry.phase1Routes.includes(basePath) ? basePath : '/';
-              navigate(localizePath(target + location.search + location.hash, next), { state: intakeHandoff || location.state });
+              navigate(localizePath(target + languageNavigationSuffix(location.search, location.hash), next), { state: intakeHandoff || location.state });
             }
           } catch { /* Stay on the working language when a bundle cannot load. */ }
           finally { setLoading(false); }

@@ -1,8 +1,14 @@
 import { getFabsyFunnelConsentGrant } from './fabsyFunnelConsent';
+import {
+  FUNNEL_EVENT_DEDUPE_PREFIX,
+  FUNNEL_SESSION_STORAGE_KEY,
+} from './funnelSessionStorage';
 import { readMarketingAttribution } from './marketingAttribution';
 
-export const FUNNEL_SESSION_STORAGE_KEY = 'fabsy:funnel-session:v1';
-const DEDUPE_PREFIX = 'fabsy:funnel-event:v1:';
+export {
+  FUNNEL_EVENT_DEDUPE_PREFIX,
+  FUNNEL_SESSION_STORAGE_KEY,
+} from './funnelSessionStorage';
 
 export const FUNNEL_EVENT_NAMES = [
   'landing_view',
@@ -59,9 +65,10 @@ const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-
 const inFlight = new Set<string>();
 
 function endpointConfiguration(env: FunnelMeasurementEnvironment): { url: string; publishableKey: string } | null {
-  const base = (env.VITE_SUPABASE_URL || 'https://gcasbisxfrssonllpqrw.supabase.co').replace(/\/$/, '');
-  const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    'sb_publishable_KEo-G1wij9RC_IDDzblisw_VISRvwrX';
+  const configuredBase = env.VITE_SUPABASE_URL?.trim();
+  const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
+  if (!configuredBase || !publishableKey) return null;
+  const base = configuredBase.replace(/\/$/, '');
   try {
     const url = new URL(`${base}/functions/v1/record-funnel-event`);
     if (url.protocol !== 'https:' || url.username || url.password || !publishableKey || /\s/.test(publishableKey)) return null;
@@ -151,7 +158,7 @@ export function currentFunnelCheckoutContext(): FunnelCheckoutContext | null {
   if (!grant || !sessionId) return null;
   return {
     consentVersion: 'fabsy-funnel-v1',
-    consentedAt: new Date(grant.savedAt).toISOString(),
+    consentedAt: new Date(new Date(grant.savedAt).setUTCHours(0, 0, 0, 0)).toISOString(),
     sessionId,
   };
 }
@@ -212,7 +219,7 @@ export async function recordFunnelEvent(
   const eventId = randomUuid();
   if (!sessionId || !eventId) return false;
   const dedupeKey = options.dedupeKey?.replace(/[^A-Za-z0-9._:-]/g, '').slice(0, 100);
-  const storageKey = dedupeKey ? `${DEDUPE_PREFIX}${dedupeKey}` : null;
+  const storageKey = dedupeKey ? `${FUNNEL_EVENT_DEDUPE_PREFIX}${dedupeKey}` : null;
   if (storageKey) {
     try { if (window.sessionStorage.getItem(storageKey) === '1') return true; } catch { /* Memory still deduplicates in-flight. */ }
     if (inFlight.has(storageKey)) return true;
@@ -225,7 +232,7 @@ export async function recordFunnelEvent(
     occurredAt: new Date().toISOString(),
     pageKey,
     consentVersion: 'fabsy-funnel-v1',
-    consentedAt: new Date(grant.savedAt).toISOString(),
+    consentedAt: new Date(new Date(grant.savedAt).setUTCHours(0, 0, 0, 0)).toISOString(),
     ...safeAttribution(),
     ...(options.step === undefined ? {} : { step: options.step }),
     ...(options.position ? { position: options.position } : {}),
@@ -233,7 +240,12 @@ export async function recordFunnelEvent(
   try {
     if (!await sendPayload(payload)) return false;
     if (storageKey) {
-      try { window.sessionStorage.setItem(storageKey, '1'); } catch { /* Server idempotency remains authoritative. */ }
+      const currentGrant = getFabsyFunnelConsentGrant();
+      if (!currentGrant || currentGrant.savedAt !== grant.savedAt) return false;
+      try {
+        if (window.sessionStorage.getItem(FUNNEL_SESSION_STORAGE_KEY) !== sessionId) return false;
+        window.sessionStorage.setItem(storageKey, '1');
+      } catch { /* Server idempotency remains authoritative; no unverified marker is written. */ }
     }
     return true;
   } catch {

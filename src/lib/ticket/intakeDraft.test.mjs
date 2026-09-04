@@ -134,6 +134,16 @@ test("pending rotations retain a distinct 256-bit candidate through the server s
   assert.equal(draft.readPendingIntakeDraftRotation(storage), null);
 });
 
+test("starting another intake or confirming payment clears both browser capabilities", () => {
+  const removed = [];
+  const storage = { removeItem: key => removed.push(key) };
+  draft.forgetAllIntakeDraftAccess(storage);
+  assert.deepEqual(removed.sort(), [
+    draft.INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY,
+    draft.INTAKE_DRAFT_STORAGE_KEY,
+  ].sort());
+});
+
 test("malformed or expired pending rotations are rejected and removed", () => {
   let removed = false;
   const storage = {

@@ -90,6 +90,7 @@ try {
       import { I18nextProvider } from 'react-i18next';
       import PaymentStep from './src/components/form-steps/PaymentStep';
       import LanguageSelector from './src/components/LanguageSelector';
+      import { languageNavigationSuffix } from './src/lib/languageNavigation';
       import LanguageMessages from './src/components/LanguageMessages';
       import InsuranceContextSection from './src/components/InsuranceContextSection';
       import ProDriverSection from './src/components/ProDriverSection';
@@ -106,6 +107,8 @@ try {
       }
 
       export async function runChecks({ bundles, review, offers, availableLocales, releaseStates, values, redactProDriverPromotion }) {
+        assert.equal(languageNavigationSuffix('?source=test', '#section'), '?source=test#section');
+        assert.equal(languageNavigationSuffix('?source=test', '#resume=' + 'a'.repeat(64)), '?source=test', 'language changes must never re-expose a resume capability');
         const codes = availableLocales.map(item => item.code);
         const formData: FormData = {
           sourceAssessmentId: '', sourceAssessmentAccessToken: '',

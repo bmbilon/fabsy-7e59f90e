@@ -73,7 +73,7 @@ const faqItems = [
     a: `${HOMEPAGE_REFUND_COPY.outcomeQualification} ${HOMEPAGE_REFUND_COPY.successDefinition}`,
   },
   {
-    q: "When do I get my money back if there is no reduction?",
+    q: "When is my service fee refunded if there is no reduction?",
     a: `${HOMEPAGE_REFUND_COPY.refundCondition} ${HOMEPAGE_REFUND_COPY.paymentTiming} ${HOMEPAGE_REFUND_COPY.refundScope}`,
   },
   {
@@ -156,7 +156,7 @@ export default function AssessmentHomepageJourney() {
                 ))}
               </ul>
               <a href="#money-back-guarantee" className="mt-5 text-sm font-semibold text-primary-dark underline underline-offset-4">
-                Service-fee money-back guarantee · See policy
+                Rapid Resolution service-fee refund · See policy
               </a>
               <Button asChild className="mt-6">
                 <Link to={RAPID_RESOLUTION.intakePath}>Start Rapid Resolution</Link>

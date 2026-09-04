@@ -19,6 +19,7 @@ import {
   parseDraftReplacementAccessToken,
   parseJsonBody,
   parseTicketFileMetadata,
+  requestAddress,
   requestFingerprint,
   resolveDraftReplacementAccessToken,
   sanitizeDraftData,
@@ -68,6 +69,45 @@ Deno.test("request fingerprints are keyed and do not disclose the source address
   assert(/^[0-9a-f]{64}$/.test(first));
   assert(first !== second);
   assert(!first.includes("203.0.113.1"));
+});
+
+Deno.test("rate limits use only a valid address asserted by the trusted edge", () => {
+  assertEquals(
+    requestAddress(
+      new Request("https://fabsy.ca", {
+        headers: {
+          "cf-connecting-ip": "203.0.113.8",
+          "x-forwarded-for": "198.51.100.1",
+          "x-real-ip": "192.0.2.1",
+        },
+      }),
+    ),
+    "203.0.113.8",
+  );
+  assertEquals(
+    requestAddress(
+      new Request("https://fabsy.ca", {
+        headers: { "cf-connecting-ip": "2001:DB8::9" },
+      }),
+    ),
+    "2001:db8::9",
+  );
+  assertEquals(
+    requestAddress(
+      new Request("https://fabsy.ca", {
+        headers: { "x-forwarded-for": "198.51.100.44" },
+      }),
+    ),
+    "unknown",
+  );
+  assertEquals(
+    requestAddress(
+      new Request("https://fabsy.ca", {
+        headers: { "cf-connecting-ip": "999.1.2.3" },
+      }),
+    ),
+    "unknown",
+  );
 });
 
 Deno.test("legacy saves require a reload only when contact would rotate", () => {

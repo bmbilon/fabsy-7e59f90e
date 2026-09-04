@@ -284,6 +284,20 @@ export function forgetIntakeDraft(storage: Pick<Storage, "removeItem"> = localSt
   }
 }
 
+/**
+ * Clear every browser-held bearer capability for the current intake.
+ *
+ * A pending rotation contains both the old token and a candidate token, so
+ * clearing only the active capability can leave enough state for a later
+ * reload to recover an intake the customer deliberately left behind.
+ */
+export function forgetAllIntakeDraftAccess(
+  storage: Pick<Storage, "removeItem"> = localStorage,
+): void {
+  forgetIntakeDraft(storage);
+  forgetPendingIntakeDraftRotation(storage);
+}
+
 export function resumeTokenFromHash(hash: string): string | null {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const token = params.get(INTAKE_DRAFT_RESUME_PARAMETER);

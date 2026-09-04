@@ -189,7 +189,7 @@ export default function HomepageOutcomeExplorer() {
             <p className="mt-2 text-xs leading-relaxed text-slate-600">
               {HOMEPAGE_REFUND_COPY.outcomeQualification}{" "}
               <a href="#money-back-guarantee" className="font-semibold text-primary-dark underline underline-offset-4">
-                Read the money-back policy.
+                Read the service-fee refund policy.
               </a>
             </p>
           </div>

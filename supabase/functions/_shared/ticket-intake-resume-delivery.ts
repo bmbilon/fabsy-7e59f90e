@@ -24,6 +24,7 @@ export interface ResumeDeliveryRowState {
   resume_delivery_channel: ResumeDeliveryChannel | null;
   resume_delivery_sent_at: string | null;
   resume_delivery_attempt_count: number;
+  resume_delivery_lifetime_attempt_count: number;
 }
 
 export interface PublicResumeDeliveryState {
@@ -125,11 +126,15 @@ export function publicResumeDeliveryState(
   automaticEnabled = false,
 ): PublicResumeDeliveryState {
   const attempts = Number(row.resume_delivery_attempt_count);
+  const lifetimeAttempts = Number(
+    row.resume_delivery_lifetime_attempt_count,
+  );
   return {
     status: row.resume_delivery_status,
     channel: row.resume_delivery_channel,
     sentAt: row.resume_delivery_sent_at,
-    canRetry: automaticEnabled && (
+    canRetry: automaticEnabled && Number.isInteger(lifetimeAttempts) &&
+      lifetimeAttempts < MAX_RESUME_DELIVERY_ATTEMPTS && (
       (row.resume_delivery_status === "pending" &&
         Boolean(row.ticket_uploaded_at)) ||
       (row.resume_delivery_status === "failed" &&
@@ -174,7 +179,8 @@ export function renderTicketIntakeResumeSms(resumeUrl: string): string {
 export function twilioRecipient(phone: string): string {
   if (/^\d{10}$/.test(phone)) return `+1${phone}`;
   if (/^1\d{10}$/.test(phone)) return `+${phone}`;
-  return phone;
+  if (/^\+1\d{10}$/.test(phone)) return phone;
+  throw new Error("SMS resume delivery requires a North American number.");
 }
 
 function configurationFailure(): ResumeDeliveryAttemptResult {

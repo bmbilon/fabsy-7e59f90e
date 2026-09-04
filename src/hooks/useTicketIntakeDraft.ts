@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createIntakeDraftPendingRotation,
+  forgetAllIntakeDraftAccess,
   forgetIntakeDraft,
   forgetPendingIntakeDraftRotation,
   hydrateIntakeDraftData,
@@ -453,6 +454,21 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     }
   }, [applyRecord]);
 
+  const startNewIntake = useCallback(() => {
+    // A converted checkout can remain readable for support/recovery, but it
+    // must never trap this browser in that immutable intake. Clear both the
+    // active bearer and any retained rotation candidate before resetting UI.
+    forgetAllIntakeDraftAccess();
+    pendingRotationRef.current = null;
+    capabilityRef.current = null;
+    revisionRef.current = 0;
+    saveQueue.current = Promise.resolve(null);
+    setCapability(null);
+    setRecord(null);
+    setError("");
+    setStatus("idle");
+  }, []);
+
   return {
     capability,
     record,
@@ -466,5 +482,6 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     discardPendingUpload,
     discardingPendingUpload,
     getResumeUrl,
+    startNewIntake,
   };
 }

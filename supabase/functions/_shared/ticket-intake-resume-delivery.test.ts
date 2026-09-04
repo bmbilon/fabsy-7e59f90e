@@ -3,6 +3,7 @@ import {
   assertEquals,
   assertRejects,
   assertStringIncludes,
+  assertThrows,
 } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import {
   deliverTicketIntakeResume,
@@ -68,6 +69,7 @@ Deno.test("public delivery state omits claims, failures and provider details", (
       resume_delivery_channel: "email",
       resume_delivery_sent_at: null,
       resume_delivery_attempt_count: 1,
+      resume_delivery_lifetime_attempt_count: 1,
     }, true),
     {
       status: "failed",
@@ -84,6 +86,7 @@ Deno.test("public delivery state omits claims, failures and provider details", (
       resume_delivery_channel: "sms",
       resume_delivery_sent_at: null,
       resume_delivery_attempt_count: 1,
+      resume_delivery_lifetime_attempt_count: 1,
     }, true).canRetry,
     false,
   );
@@ -94,6 +97,7 @@ Deno.test("public delivery state omits claims, failures and provider details", (
       resume_delivery_channel: "email",
       resume_delivery_sent_at: null,
       resume_delivery_attempt_count: 5,
+      resume_delivery_lifetime_attempt_count: 5,
     }, true).canRetry,
     false,
   );
@@ -104,6 +108,7 @@ Deno.test("public delivery state omits claims, failures and provider details", (
       resume_delivery_channel: null,
       resume_delivery_sent_at: null,
       resume_delivery_attempt_count: 0,
+      resume_delivery_lifetime_attempt_count: 0,
     }),
     {
       status: "pending",
@@ -120,8 +125,20 @@ Deno.test("public delivery state omits claims, failures and provider details", (
       resume_delivery_channel: null,
       resume_delivery_sent_at: null,
       resume_delivery_attempt_count: 0,
+      resume_delivery_lifetime_attempt_count: 0,
     }, true).canRetry,
     true,
+  );
+  assertEquals(
+    publicResumeDeliveryState({
+      ticket_uploaded_at: "2026-09-03T12:00:00Z",
+      resume_delivery_status: "pending",
+      resume_delivery_channel: null,
+      resume_delivery_sent_at: null,
+      resume_delivery_attempt_count: 0,
+      resume_delivery_lifetime_attempt_count: 5,
+    }, true).canRetry,
+    false,
   );
 });
 
@@ -230,10 +247,11 @@ Deno.test("provider outcomes distinguish definite failures from ambiguous sends"
   );
 });
 
-Deno.test("Twilio recipient normalization preserves canonical international numbers", async () => {
+Deno.test("Twilio recipient normalization permits North American numbers only", async () => {
   assertEquals(twilioRecipient("4035550123"), "+14035550123");
   assertEquals(twilioRecipient("14035550123"), "+14035550123");
-  assertEquals(twilioRecipient("+442071838750"), "+442071838750");
+  assertEquals(twilioRecipient("+14035550123"), "+14035550123");
+  assertThrows(() => twilioRecipient("+442071838750"), Error, "North American");
 
   let encodedBody = "";
   const result = await deliverTicketIntakeResume({

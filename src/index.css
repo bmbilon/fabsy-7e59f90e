@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@media (max-width: 767px) {
+  html[data-initial-measurement-consent-open="true"] [data-mobile-call-bar] {
+    display: none;
+  }
+}
+
 /* Fabsy Design System - Professional, Calm, Trustworthy.
    Palette: deep navy, slate, steel-blue accent. All colors HSL. */
 

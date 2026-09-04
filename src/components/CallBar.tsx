@@ -26,7 +26,7 @@ const CallBar = () => {
   const priceLabel = `$${activeOffer.priceCad} CAD + GST`;
 
   return (
-    <div className="md:hidden fixed inset-x-0 bottom-0 z-40 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-white/95 backdrop-blur-sm border-t border-muted shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
+    <div data-mobile-call-bar className="md:hidden fixed inset-x-0 bottom-0 z-40 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-white/95 backdrop-blur-sm border-t border-muted shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
       {showAssessmentCta ? (
         <Link
           to={activeOffer.intakePath}

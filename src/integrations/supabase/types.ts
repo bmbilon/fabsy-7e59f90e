@@ -300,6 +300,9 @@ export type Database = {
           resume_delivery_failed_at: string | null
           resume_delivery_attempt_count: number
           resume_delivery_failure_code: string | null
+          staff_follow_up_status: string
+          staff_follow_up_updated_at: string | null
+          staff_follow_up_updated_by: string | null
           cleanup_claim_id: string | null
           cleanup_claimed_at: string | null
           cleanup_claim_expires_at: string | null
@@ -346,6 +349,9 @@ export type Database = {
           resume_delivery_failed_at?: string | null
           resume_delivery_attempt_count?: number
           resume_delivery_failure_code?: string | null
+          staff_follow_up_status?: string
+          staff_follow_up_updated_at?: string | null
+          staff_follow_up_updated_by?: string | null
           cleanup_claim_id?: string | null
           cleanup_claimed_at?: string | null
           cleanup_claim_expires_at?: string | null
@@ -392,6 +398,9 @@ export type Database = {
           resume_delivery_failed_at?: string | null
           resume_delivery_attempt_count?: number
           resume_delivery_failure_code?: string | null
+          staff_follow_up_status?: string
+          staff_follow_up_updated_at?: string | null
+          staff_follow_up_updated_by?: string | null
           cleanup_claim_id?: string | null
           cleanup_claimed_at?: string | null
           cleanup_claim_expires_at?: string | null
@@ -871,6 +880,15 @@ export type Database = {
           p_replacement_access_token_hash: string | null
         }
         Returns: Database["public"]["Tables"]["ticket_intake_drafts"]["Row"]
+      }
+      set_ticket_intake_follow_up_status: {
+        Args: { p_expected_status: string; p_id: string; p_status: string }
+        Returns: {
+          draft_id: string
+          follow_up_status: string
+          follow_up_updated_at: string | null
+          follow_up_updated_by: string | null
+        }[]
       }
     }
     Enums: {

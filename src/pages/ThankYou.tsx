@@ -8,7 +8,7 @@ import useSafeHead from '@/hooks/useSafeHead';
 import { usePaidPurchaseTracking } from '@/hooks/usePaidPurchaseTracking';
 import { PHOTO_RADAR, RAPID_RESOLUTION } from '@/config/offers';
 import { paidCheckoutSummary, type CheckoutReceipt } from '@/lib/checkoutReceipt';
-import { forgetIntakeDraft } from '@/lib/ticket/intakeDraft';
+import { forgetAllIntakeDraftAccess } from '@/lib/ticket/intakeDraft';
 
 const ThankYou: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -64,7 +64,7 @@ const ThankYou: React.FC = () => {
   }, [sessionId]);
 
   useEffect(() => {
-    if (paidCheckoutSummary(receipt)) forgetIntakeDraft();
+    if (paidCheckoutSummary(receipt)) forgetAllIntakeDraftAccess();
   }, [receipt]);
 
   return (

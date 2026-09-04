@@ -139,6 +139,33 @@ test('unrelated refund shapes are ledger no-ops and do not block the shared webh
   assert.equal(rpcCalls, 0);
 });
 
+test('pre-ledger refunds are ignored before any RPC and cannot poison a later charge.refunded event', async () => {
+  const refundEvent = {
+    id: 'evt_SYNTHETIC_LEGACY_REFUND_12345678',
+    type: 'charge.refunded',
+    created: event.created + 60,
+    livemode: true,
+  };
+  const legacyRefund = {
+    id: 're_SYNTHETIC_LEGACY_12345678',
+    amount: 5_000,
+    created: Math.floor(Date.parse('2025-12-31T23:59:59.000Z') / 1000),
+    currency: 'cad',
+    payment_intent: session.payment_intent,
+    status: 'succeeded',
+  };
+  let rpcCalls = 0;
+  const client = {
+    async rpc() {
+      rpcCalls += 1;
+      return { data: true, error: null };
+    },
+  };
+  assert.equal(await ledger.paidRefundLedgerRecord(refundEvent, legacyRefund), null);
+  assert.equal(await ledger.recordPaidRefundLedger(client, refundEvent, legacyRefund), false);
+  assert.equal(rpcCalls, 0);
+});
+
 test('RPC adapters preserve unsupported no-ops and fail conflicts or uncertain writes', async () => {
   const calls = [];
   const conflict = { async rpc(name, parameters) {

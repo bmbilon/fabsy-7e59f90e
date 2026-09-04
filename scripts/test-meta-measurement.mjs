@@ -14,6 +14,8 @@ const enabledEnv = {
   PROD: true,
   VITE_META_MEASUREMENT_ENABLED: 'true',
   VITE_META_PIXEL_ID: expectedPixelId,
+  VITE_SUPABASE_URL: 'https://gcasbisxfrssonllpqrw.supabase.co',
+  VITE_SUPABASE_PUBLISHABLE_KEY: 'synthetic-test-publishable-key',
 };
 const campaign = content => `?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_ab_en_creative_20260831&utm_content=${content}`;
 const landing = `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}`;
@@ -358,6 +360,25 @@ test('opaque checkout handles persist until acknowledged and withdraw without ex
     assert.equal(r.api.rememberMetaCheckoutAttributionHandle('b'.repeat(64), r.win), true);
     assert.equal(await r.api.flushMetaCheckoutAttributionWithdrawals(r.win), false);
     assert.equal(r.win.localStorage.length, 1, 'a failed withdrawal remains retryable');
+  } finally { r.close(); }
+});
+
+test('checkout attribution withdrawal fails closed when the browser Supabase configuration is absent', async () => {
+  const r = await runtime(landing, {
+    PROD: true,
+    VITE_META_MEASUREMENT_ENABLED: 'true',
+    VITE_META_PIXEL_ID: expectedPixelId,
+  });
+  try {
+    const requests = [];
+    r.win.fetch = async (...args) => {
+      requests.push(args);
+      return { ok: true };
+    };
+    assert.equal(r.api.rememberMetaCheckoutAttributionHandle('c'.repeat(64), r.win), true);
+    assert.equal(await r.api.flushMetaCheckoutAttributionWithdrawals(r.win), false);
+    assert.equal(requests.length, 0);
+    assert.equal(r.win.localStorage.length, 1, 'the pending withdrawal remains available for a correctly configured build');
   } finally { r.close(); }
 });
 

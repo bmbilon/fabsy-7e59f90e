@@ -18,9 +18,15 @@ if (!process.execArgv.includes('--experimental-strip-types')) {
 }
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const enabledEnv = { PROD: true, VITE_FABSY_FUNNEL_MEASUREMENT_ENABLED: 'true' };
+const productionSupabaseFallback = 'gcasbisxfrssonllpqrw.supabase.co';
+const enabledEnv = {
+  PROD: true,
+  VITE_FABSY_FUNNEL_MEASUREMENT_ENABLED: 'true',
+  VITE_SUPABASE_URL: 'https://synthetic-project.supabase.co',
+  VITE_SUPABASE_PUBLISHABLE_KEY: 'synthetic-publishable-key',
+};
 
-async function bundle() {
+async function bundle(env = enabledEnv) {
   const result = await build({
     absWorkingDir: root,
     stdin: {
@@ -40,18 +46,21 @@ async function bundle() {
     platform: 'browser',
     format: 'cjs',
     logLevel: 'silent',
-    define: { 'import.meta.env': JSON.stringify(enabledEnv) },
+    define: { 'import.meta.env': JSON.stringify(env) },
   });
   return result.outputFiles[0].text;
 }
 
-async function runtime(href = 'https://fabsy.ca/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_launch_v2&utm_content=rr_easy_v2&fbclid=SYNTHETIC_CLICK') {
+async function runtime(
+  href = 'https://fabsy.ca/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_launch_v2&utm_content=rr_easy_v2&fbclid=SYNTHETIC_CLICK',
+  env = enabledEnv,
+) {
   const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: href, runScripts: 'outside-only' });
   const context = dom.getInternalVMContext();
   context.module = { exports: {} };
   context.exports = context.module.exports;
   Object.defineProperty(context, 'crypto', { configurable: true, value: webcrypto });
-  runInContext(await bundle(), context);
+  runInContext(await bundle(env), context);
   const calls = [];
   dom.window.fetch = async (url, options) => {
     calls.push({ url, options });
@@ -76,10 +85,45 @@ test('first-party consent is explicit, versioned and expires', async () => {
     assert.equal(checkoutContext.consentVersion, 'fabsy-funnel-v1');
     assert.match(checkoutContext.sessionId, /^[0-9a-f-]{36}$/i);
     assert.ok(Date.parse(checkoutContext.consentedAt) <= Date.now());
+    assert.match(checkoutContext.consentedAt, /T00:00:00\.000Z$/);
+    assert.equal(r.win.sessionStorage.getItem(r.api.FUNNEL_SESSION_STORAGE_KEY), checkoutContext.sessionId);
     r.api.setFabsyFunnelConsentChoice('declined');
     assert.equal(r.api.getFabsyFunnelConsentChoice(), 'declined');
     assert.equal(r.api.currentFunnelCheckoutContext(), null);
+    assert.equal(r.win.sessionStorage.getItem(r.api.FUNNEL_SESSION_STORAGE_KEY), null);
   } finally { r.close(); }
+});
+
+test('an environment without explicit Supabase public configuration fails closed', async () => {
+  const r = await runtime(undefined, {
+    PROD: true,
+    VITE_FABSY_FUNNEL_MEASUREMENT_ENABLED: 'true',
+  });
+  try {
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    assert.equal(await r.api.recordFunnelEvent('landing_view'), false);
+    assert.equal(r.api.rememberMetaCheckoutAttributionHandle('e'.repeat(64), r.win), true);
+    assert.equal(await r.api.flushMetaCheckoutAttributionWithdrawals(r.win), false);
+    assert.equal(r.calls.length, 0);
+  } finally { r.close(); }
+});
+
+test('browser data and consent modules contain no hard-coded production Supabase fallback', async () => {
+  for (const relativePath of [
+    'src/integrations/supabase/client.ts',
+    'src/lib/funnelMeasurement.ts',
+    'src/lib/metaCheckoutWithdrawal.ts',
+    'src/pages/RepresentationConsent.tsx',
+  ]) {
+    const source = await fs.readFile(path.resolve(root, relativePath), 'utf8');
+    // The browser client may name the expected production host as an allowlist;
+    // reject only an executable default/fallback to that host.
+    assert.doesNotMatch(
+      source,
+      new RegExp(String.raw`(?:\|\||\?\?)\s*['"]https://${productionSupabaseFallback.replaceAll('.', String.raw`\.`)}`),
+      relativePath,
+    );
+  }
 });
 
 test('ad attribution stays memory-only until first-party measurement consent', async () => {
@@ -182,7 +226,7 @@ test('first-party-only refusal withdraws a remembered checkout while Meta may re
   } finally { r.close(); }
 });
 
-test('document guardian withdraws first-party checkout attribution on cross-tab removal and expiry', async () => {
+test('document guardian preserves undecided attribution but retires it on cross-tab removal and expiry', async () => {
   const guardianBundle = await build({
     absWorkingDir: root,
     stdin: {
@@ -194,6 +238,7 @@ test('document guardian withdraws first-party checkout attribution on cross-tab 
         import { createRoot } from 'react-dom/client';
         import GoogleMeasurementGuardian from './src/components/GoogleMeasurementGuardian';
         export * from './src/lib/fabsyFunnelConsent';
+        export * from './src/lib/marketingAttribution';
         export { setMetaConsentChoice, getMetaConsentChoice } from './src/lib/googleConsent';
         export { rememberMetaCheckoutAttributionHandle } from './src/lib/metaCheckoutWithdrawal';
         let root;
@@ -211,10 +256,17 @@ test('document guardian withdraws first-party checkout attribution on cross-tab 
     format: 'cjs',
     jsx: 'automatic',
     logLevel: 'silent',
-    define: { 'import.meta.env': JSON.stringify({ PROD: false }), 'process.env.NODE_ENV': '"test"' },
+    define: {
+      'import.meta.env': JSON.stringify({
+        PROD: false,
+        VITE_SUPABASE_URL: 'https://synthetic-project.supabase.co',
+        VITE_SUPABASE_PUBLISHABLE_KEY: 'synthetic-publishable-key',
+      }),
+      'process.env.NODE_ENV': '"test"',
+    },
   });
 
-  for (const scenario of ['cross-tab-removal', 'expiry']) {
+  for (const scenario of ['initial-unknown', 'cross-tab-removal', 'expiry']) {
     const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', {
       url: 'https://fabsy.ca/rapid-resolution',
       runScripts: 'outside-only',
@@ -236,21 +288,37 @@ test('document guardian withdraws first-party checkout attribution on cross-tab 
     const api = context.module.exports;
     try {
       api.setMetaConsentChoice('accepted');
-      api.setFabsyFunnelConsentChoice('accepted');
+      // Capture before first-party consent while the route tracker is present,
+      // then model navigation to the secure consent document where only the
+      // document-lifetime guardian remains mounted.
+      const pending = api.captureMarketingAttribution(
+        '?utm_source=meta&utm_campaign=must_not_revive&utm_content=secure_route',
+        '/rapid-resolution',
+        '',
+      );
+      assert.equal(pending.utm_campaign, 'must_not_revive', scenario);
       assert.equal(api.getMetaConsentChoice(), 'accepted');
       const handle = (scenario === 'expiry' ? 'c' : 'd').repeat(64);
-      assert.equal(api.rememberMetaCheckoutAttributionHandle(handle, dom.window), true);
-
-      if (scenario === 'expiry') {
+      if (scenario !== 'initial-unknown') {
         dom.window.localStorage.setItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY, JSON.stringify({
           version: 1,
           choice: 'accepted',
-          savedAt: Date.now() - api.FABSY_FUNNEL_CONSENT_MAX_AGE_MS + 30,
+          savedAt: scenario === 'expiry'
+            ? Date.now() - api.FABSY_FUNNEL_CONSENT_MAX_AGE_MS + 30
+            : Date.now(),
         }));
+        assert.equal(api.rememberMetaCheckoutAttributionHandle(handle, dom.window), true);
       }
+
       await api.mount();
 
-      if (scenario === 'cross-tab-removal') {
+      if (scenario === 'initial-unknown') {
+        assert.equal(api.getFabsyFunnelConsentChoice(), 'unknown', scenario);
+        api.setFabsyFunnelConsentChoice('accepted');
+        const persisted = api.persistPendingMarketingAttribution();
+        assert.equal(persisted.utm_campaign, 'must_not_revive', scenario);
+        assert.ok(dom.window.localStorage.getItem(api.MARKETING_STORAGE_KEY), scenario);
+      } else if (scenario === 'cross-tab-removal') {
         dom.window.localStorage.removeItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY);
         await api.tick(() => dom.window.dispatchEvent(new dom.window.StorageEvent('storage', {
           key: api.FABSY_FUNNEL_CONSENT_STORAGE_KEY,
@@ -260,11 +328,18 @@ test('document guardian withdraws first-party checkout attribution on cross-tab 
         await api.tick(() => new Promise(resolve => dom.window.setTimeout(resolve, 60)));
       }
 
-      assert.equal(api.getMetaConsentChoice(), 'accepted', scenario);
-      assert.equal(api.getFabsyFunnelConsentChoice(), 'unknown', scenario);
       const withdrawals = calls.filter(call => String(call.url).endsWith('/functions/v1/withdraw-meta-measurement'));
-      assert.equal(withdrawals.length, 1, scenario);
-      assert.deepEqual(JSON.parse(withdrawals[0].options.body), { handles: [handle] });
+      if (scenario === 'initial-unknown') {
+        assert.equal(withdrawals.length, 0, scenario);
+      } else {
+        assert.equal(api.getMetaConsentChoice(), 'accepted', scenario);
+        assert.equal(api.getFabsyFunnelConsentChoice(), 'unknown', scenario);
+        api.setFabsyFunnelConsentChoice('accepted');
+        assert.deepEqual(JSON.parse(JSON.stringify(api.persistPendingMarketingAttribution())), {}, scenario);
+        assert.equal(dom.window.localStorage.getItem(api.MARKETING_STORAGE_KEY), null, scenario);
+        assert.equal(withdrawals.length, 1, scenario);
+        assert.deepEqual(JSON.parse(withdrawals[0].options.body), { handles: [handle] });
+      }
     } finally {
       await api.unmount();
       for (const channel of channels) { channel.port1.close(); channel.port2.close(); }
@@ -307,12 +382,47 @@ test('client funnel payload is consent gated, deduplicated and PII free', async 
     const body = JSON.parse(call.options.body);
     assert.equal(body.eventName, 'landing_view');
     assert.equal(body.pageKey, 'rapid_resolution');
+    assert.match(body.consentedAt, /T00:00:00\.000Z$/);
     assert.equal(body.attribution.utm_campaign, 'rr_launch_v2');
     assert.deepEqual(body.clickId, { kind: 'fbclid', value: 'SYNTHETIC_CLICK' });
     const serialized = JSON.stringify(body);
     for (const forbidden of ['email', 'phone', 'ticketNumber', 'freeText', 'referrer', 'userAgent', 'pathname']) {
       assert.equal(serialized.includes(forbidden), false, forbidden);
     }
+    const dedupeStorageKey = `${r.api.FUNNEL_EVENT_DEDUPE_PREFIX}landing_view`;
+    assert.equal(r.win.sessionStorage.getItem(dedupeStorageKey), '1');
+    r.api.setFabsyFunnelConsentChoice('declined');
+    assert.equal(r.win.sessionStorage.getItem(r.api.FUNNEL_SESSION_STORAGE_KEY), null);
+    assert.equal(r.win.sessionStorage.getItem(dedupeStorageKey), null);
+  } finally { r.close(); }
+});
+
+test('consent withdrawal during a deferred funnel request cannot restore its dedupe marker', async () => {
+  const r = await runtime();
+  try {
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    let releaseFetch;
+    r.win.fetch = (url, options) => {
+      r.calls.push({ url, options });
+      return new Promise(resolve => {
+        releaseFetch = () => resolve({ status: 202, json: async () => ({ accepted: true }) });
+      });
+    };
+
+    const dedupeKey = 'deferred-withdrawal';
+    const storageKey = `${r.api.FUNNEL_EVENT_DEDUPE_PREFIX}${dedupeKey}`;
+    const pending = r.api.recordFunnelEvent('landing_view', { dedupeKey });
+    assert.equal(typeof releaseFetch, 'function', 'Expected the funnel request to remain deferred');
+    assert.match(r.win.sessionStorage.getItem(r.api.FUNNEL_SESSION_STORAGE_KEY), /^[0-9a-f-]{36}$/i);
+
+    r.api.setFabsyFunnelConsentChoice('declined');
+    assert.equal(r.win.sessionStorage.getItem(r.api.FUNNEL_SESSION_STORAGE_KEY), null);
+    releaseFetch();
+
+    assert.equal(await pending, false);
+    assert.equal(r.win.sessionStorage.getItem(storageKey), null);
+    assert.equal(r.win.sessionStorage.getItem(r.api.FUNNEL_SESSION_STORAGE_KEY), null);
+    assert.equal(r.calls.length, 1);
   } finally { r.close(); }
 });
 

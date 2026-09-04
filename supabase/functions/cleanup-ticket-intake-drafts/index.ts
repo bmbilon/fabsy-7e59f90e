@@ -66,6 +66,40 @@ serve(async (request) => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    // A terminated notification worker cannot run its catch block. Convert
+    // abandoned durable claims to a visible manual-review state without ever
+    // releasing their at-most-once delivery fence.
+    const staleNotificationResult = await supabase.rpc(
+      "mark_stale_ticket_submission_notifications_indeterminate",
+      { p_limit: limit },
+    );
+    if (
+      staleNotificationResult.error ||
+      typeof staleNotificationResult.data !== "number" ||
+      !Number.isInteger(staleNotificationResult.data) ||
+      staleNotificationResult.data < 0 ||
+      staleNotificationResult.data > limit
+    ) {
+      throw new Error("cleanup_stale_notification_mark_failed");
+    }
+
+    // Converted drafts contain a redundant autosave copy of canonical case
+    // data. Purge only their database rows after the post-expiry grace; this
+    // RPC never returns paths and never enters either Storage deletion flow.
+    const convertedPurgeResult = await supabase.rpc(
+      "purge_expired_converted_ticket_intake_drafts",
+      { p_limit: limit },
+    );
+    if (
+      convertedPurgeResult.error ||
+      typeof convertedPurgeResult.data !== "number" ||
+      !Number.isInteger(convertedPurgeResult.data) ||
+      convertedPurgeResult.data < 0 ||
+      convertedPurgeResult.data > limit
+    ) {
+      throw new Error("cleanup_converted_purge_failed");
+    }
+
     // Give each queue independent bounded claim capacity so object backlog
     // cannot consume the draft queue's allocation. Total claims across both
     // queues never exceed twice the caller's per-queue limit.
@@ -182,6 +216,10 @@ serve(async (request) => {
       deferred: objectSummary.deferred + draftSummary.deferred,
       objectDeletions: objectSummary,
       expiredDrafts: draftSummary,
+      convertedDrafts: { purged: convertedPurgeResult.data },
+      notificationDispatches: {
+        markedIndeterminate: staleNotificationResult.data,
+      },
     });
   } catch (error) {
     if (error instanceof TicketIntakeCleanupRequestError) {

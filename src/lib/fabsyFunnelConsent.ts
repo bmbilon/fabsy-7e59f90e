@@ -1,4 +1,5 @@
 import { requestMetaCheckoutAttributionWithdrawal } from './metaCheckoutWithdrawal';
+import { clearFunnelSessionState } from './funnelSessionStorage';
 
 export type FabsyFunnelConsentChoice = 'unknown' | 'accepted' | 'declined';
 
@@ -93,6 +94,9 @@ export function setFabsyFunnelConsentChoice(choice: 'accepted' | 'declined'): vo
       try { window.localStorage.removeItem(FABSY_FUNNEL_CONSENT_STORAGE_KEY); } catch { /* Non-consent remains the default. */ }
     }
   }
-  if (choice === 'declined') requestMetaCheckoutAttributionWithdrawal();
+  if (choice === 'declined') {
+    try { clearFunnelSessionState(window.sessionStorage); } catch { /* No durable state remains accessible. */ }
+    requestMetaCheckoutAttributionWithdrawal();
+  }
   window.dispatchEvent(new Event(FABSY_FUNNEL_CONSENT_CHANGED));
 }

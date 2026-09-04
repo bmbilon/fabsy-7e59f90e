@@ -27,18 +27,29 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: 'npm' }
       - run: npm ci
+      - name: Validate paid-acquisition launch-control schema and adversarial cases
+        run: |
+          npm run test:ads-readiness
+          npm run ci:ads-readiness
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Type-check measurement Edge Functions
+      - name: Type-check paid-acquisition Edge Functions
         run: |
-          deno check \
+          deno check --node-modules-dir=none --frozen \
             supabase/functions/_shared/meta-capi.ts \
             supabase/functions/_shared/meta-purchase.ts \
+            supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
             supabase/functions/idr-payment-webhook/index.ts \
             supabase/functions/meta-capi-worker/index.ts \
+            supabase/functions/ticket-intake-draft/index.ts \
+            supabase/functions/submit-ticket/index.ts \
+            supabase/functions/cleanup-ticket-intake-drafts/index.ts \
+            supabase/functions/record-funnel-event/index.ts \
+            supabase/functions/paid-funnel-report/index.ts \
+            supabase/functions/send-notification/index.ts \
             supabase/functions/withdraw-meta-measurement/index.ts
       - name: Build guarded snapshots and app
         env:
@@ -53,6 +64,7 @@ jobs:
           VITE_GADS_CONVERSION_LABEL: ${{ secrets.VITE_GADS_CONVERSION_LABEL }}
           VITE_GADS_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PURCHASE_LABEL }}
           VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL }}
+          REQUIRE_BROWSER_SUPABASE_CONFIG: '1'
           REQUIRE_PAGE_SYNC: '1'
           REQUIRE_PAGE_SYNC_MANIFEST: '1'
           REQUIRE_SNAPSHOT_MANIFEST: '1'
@@ -93,7 +105,9 @@ jobs:
           REQUIRE_SNAPSHOT_MANIFEST: '1'
         run: node scripts/copy-prerendered.js
       - name: Commit refreshed snapshots
+        if: github.ref == 'refs/heads/main'
         run: |
+          set -euo pipefail
           git config user.name  "fabsy-ci"
           git config user.email "ci@fabsy.ca"
           git add -- \
@@ -108,16 +122,6 @@ jobs:
             exit 0
           fi
           git commit -m "ci: refresh generated crawler snapshots"
-          git pull --rebase origin main
+          git fetch --no-tags origin main
+          test "$(git rev-parse refs/remotes/origin/main)" = "$GITHUB_SHA"
           git push origin HEAD:main
-      - name: Deploy scheduled or requested refresh to Cloudflare Pages
-        if: github.event_name != 'push'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=fabsy --branch=main
-      - name: Submit refreshed URLs to IndexNow
-        if: github.event_name != 'push'
-        continue-on-error: true
-        run: node scripts/submit-indexnow.mjs --from "${{ github.sha }}" --to HEAD

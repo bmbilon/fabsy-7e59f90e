@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, FileSearch, Loader2 } from 'lucide-react';
 import type { FormData } from './TicketForm';
+import LeadCaptureFields from './form-steps/LeadCaptureFields';
 import PaymentStep from './form-steps/PaymentStep';
 import FeeRefundNotice from './FeeRefundNotice';
 import { Button } from './ui/button';
@@ -13,6 +14,7 @@ import { Textarea } from './ui/textarea';
 import { useLocale } from '@/i18n/locale-context';
 import { LOCALIZED_INTAKE_FIELD_LIMITS, validateLocalizedIntakeStep, type IntakeErrors } from '@/i18n/intake-validation';
 import { TICKET_CAPTURE_BROWSE_ACCEPT, validateTicketCaptureFile } from '@/lib/ticket/ticketCapture';
+import { resetTicketTypeForUpload } from '@/lib/ticket/ticketType';
 import type { IntakeDraftCapability } from '@/lib/ticket/intakeDraft';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -55,16 +57,28 @@ function LocalizedCheck({ name, data, update, label }: { name: keyof FormData; d
   </label>;
 }
 
-export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false, hasPendingTicketUpload = false, resumeAccess = null }: {
+export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false, hasPendingTicketUpload = false, allowReplacement = false, onTicketFileSelection, replacementReady = false, replacementSaving = false, onSaveReplacement, resumeAccess = null, leadSaved, leadReady, leadSaving, leadError, onSaveLead }: {
   formData: FormData; updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void; currentStep: number; nextStep: () => void; prevStep: () => void; intakeDraft?: IntakeDraftCapability | null; hasStoredTicket?: boolean;
   hasPendingTicketUpload?: boolean;
+  allowReplacement?: boolean;
+  onTicketFileSelection?: (file: File | null) => void;
+  replacementReady?: boolean;
+  replacementSaving?: boolean;
+  onSaveReplacement?: () => void;
   resumeAccess?: ReactNode;
+  leadSaved: boolean;
+  leadReady: boolean;
+  leadSaving: boolean;
+  leadError?: string;
+  onSaveLead: () => Promise<boolean>;
 }) {
   const { t } = useTranslation();
   const { isReleased, locale, href } = useLocale();
   const [errors, setErrors] = useState<IntakeErrors>({});
   const [scanning, setScanning] = useState(false);
   const [scanMessage, setScanMessage] = useState('');
+  const [replacementMessage, setReplacementMessage] = useState('');
+  const [leadValidationAttempted, setLeadValidationAttempted] = useState(false);
   const scanId = useRef(0);
   const editedDuringScan = useRef(new Set<keyof FormData>());
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -81,13 +95,21 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
     const text = value instanceof Date ? (Number.isFinite(value.getTime()) ? new Intl.DateTimeFormat(locale).format(value) : '—') : String(value || '—');
     return <div key={key} className="min-w-0 rounded-lg bg-slate-50 p-4"><dt className="text-xs text-slate-500">{t(`intake.fields.${key}`)}</dt><dd className="mt-1 whitespace-pre-wrap break-words text-sm" dir="auto">{text}</dd></div>;
   })}</dl>;
-  const moveNext = () => {
+  const moveNext = async () => {
+    if (currentStep === 1 && (hasPendingTicketUpload || (hasStoredTicket && formData.ticketImage))) {
+      setReplacementMessage('Save or remove the replacement ticket before continuing.');
+      return;
+    }
     const nextErrors = validateLocalizedIntakeStep(currentStep, formData);
     if (currentStep === 1 && hasStoredTicket) delete nextErrors.ticketImage;
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       document.getElementById(`localized-${Object.keys(nextErrors)[0]}`)?.focus();
       return;
+    }
+    if (currentStep === 1 && !leadSaved) {
+      setLeadValidationAttempted(true);
+      if (!leadReady || !await onSaveLead()) return;
     }
     nextStep();
     headingRef.current?.focus();
@@ -158,7 +180,38 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
       <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-bold outline-none">{t(`intake.steps.${stepKeys[currentStep - 1]}`)}</h2>
       {currentStep === 1 && <>
         <div className="space-y-3 rounded-xl border border-dashed border-slate-300 p-5">
-          {hasStoredTicket ? <><p className="font-medium">{t('intake.fields.ticketImage')}</p><p className="text-sm text-slate-600" lang="en" dir="ltr">Your ticket is stored privately and linked to this intake.</p></> : <><Label htmlFor="localized-ticketImage">{t('intake.fields.ticketImage')} *</Label><Input type="file" id="localized-ticketImage" accept={TICKET_CAPTURE_BROWSE_ACCEPT} className="h-auto cursor-pointer py-2" aria-invalid={Boolean(errors.ticketImage)} aria-describedby="localized-ticketImage-error" onChange={event => {
+          {hasStoredTicket ? <><p className="font-medium">{t('intake.fields.ticketImage')}</p><p className="text-sm text-slate-600" lang="en" dir="ltr">Your ticket is stored privately and linked to this intake.</p>{allowReplacement ? <div className="space-y-3" lang="en" dir="ltr">
+            <Label htmlFor="localized-ticketImage">Replace the saved ticket PDF or clear image</Label>
+            <Input type="file" id="localized-ticketImage" accept={TICKET_CAPTURE_BROWSE_ACCEPT} className="h-auto cursor-pointer py-2" aria-invalid={Boolean(errors.ticketImage)} aria-describedby="localized-ticketImage-error" onChange={event => {
+              const file = event.target.files?.[0] ?? null;
+              scanId.current += 1;
+              setScanning(false);
+              setScanMessage('');
+              setReplacementMessage('');
+              if (!file) {
+                onTicketFileSelection?.(null);
+                return;
+              }
+              if (!validateTicketCaptureFile(file).valid) {
+                setErrors(value => ({ ...value, ticketImage: 'intake.validation.fileFormat' }));
+                event.target.value = '';
+                return;
+              }
+              onTicketFileSelection?.(file);
+              updateFormData(current => ({
+                ...resetTicketTypeForUpload(current),
+                ticketImage: file,
+                ticketNumber: '', plateNumber: '', issueDate: undefined,
+                location: '', officer: '', officerBadge: '', offenceSection: '',
+                offenceSubSection: '', offenceDescription: '', violation: '', fineAmount: '',
+                courtDate: undefined, courtJurisdiction: '', agentRepresentationPermitted: null,
+                vehicleSeized: false, sourceAssessmentId: '', sourceAssessmentAccessToken: '',
+              }));
+            }} />
+            {formData.ticketImage ? <Button type="button" disabled={!replacementReady || replacementSaving} onClick={onSaveReplacement}>
+              {replacementSaving ? 'Saving replacement…' : 'Save replacement ticket'}
+            </Button> : null}
+          </div> : null}</> : <><Label htmlFor="localized-ticketImage">{t('intake.fields.ticketImage')} *</Label><Input type="file" id="localized-ticketImage" accept={TICKET_CAPTURE_BROWSE_ACCEPT} className="h-auto cursor-pointer py-2" aria-invalid={Boolean(errors.ticketImage)} aria-describedby="localized-ticketImage-error" onChange={event => {
             const file = event.target.files?.[0];
             scanId.current += 1;
             setScanning(false);
@@ -175,11 +228,21 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
           <p className="text-xs text-slate-500" dir="ltr">PDF · JPG · PNG · WebP · HEIC · HEIF · ≤ 10 MB</p>
           {formData.ticketImage && <p className="break-all text-sm" dir="auto">{formData.ticketImage.name}</p>}
           {errors.ticketImage && <p id="localized-ticketImage-error" className="text-sm text-red-700">{t(errors.ticketImage)}</p>}
-          {isReleased && !hasStoredTicket && <Button type="button" variant="outline" onClick={scanTicket} disabled={!formData.ticketImage || scanning} className="h-auto whitespace-normal py-2">
+          {isReleased && (!hasStoredTicket || Boolean(formData.ticketImage)) && <Button type="button" variant="outline" onClick={scanTicket} disabled={!formData.ticketImage || scanning} className="h-auto whitespace-normal py-2">
             {scanning ? <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <FileSearch className="me-2 h-4 w-4" aria-hidden="true" />}{t(scanning ? 'common.loading' : 'intake.scanTicket')}
           </Button>}
           {scanMessage && <p role="status" className="text-sm leading-relaxed">{t(scanMessage)}</p>}
+          {replacementMessage && <p role="alert" className="text-sm leading-relaxed text-red-700" lang="en" dir="ltr">{replacementMessage}</p>}
         </div>
+        {!leadSaved && <div lang="en" dir="ltr">
+          <p className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
+            {t('language.englishControls')}
+          </p>
+          <LeadCaptureFields formData={formData} updateFormData={update} error={leadError} />
+          {leadValidationAttempted && !leadReady ? <p className="mt-3 text-sm text-red-700" role="alert">
+            Add a valid email or phone number and select both confirmations before saving.
+          </p> : null}
+        </div>}
         <div className="grid gap-5 sm:grid-cols-2">
           {field('ticketNumber', { required: true })}{field('issueDate', { required: true, type: 'date' })}
           {field('location', { required: true })}{field('fineAmount', { required: true })}
@@ -223,7 +286,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
       {resumeAccess}
       <div className="flex items-center justify-between gap-3 border-t pt-6">
         <Button type="button" variant="outline" disabled={currentStep === 1 || scanning} onClick={() => { setErrors({}); prevStep(); headingRef.current?.focus(); }}><ArrowLeft className="me-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" />{t('common.back')}</Button>
-        {currentStep < 6 && <Button type="button" disabled={scanning} onClick={moveNext}>{t('common.next')}<ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" /></Button>}
+        {currentStep < 6 && <Button type="button" disabled={scanning || leadSaving} onClick={() => void moveNext()}>{leadSaving ? t('common.loading') : t('common.next')}<ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" /></Button>}
       </div>
     </Card>
   </section>;

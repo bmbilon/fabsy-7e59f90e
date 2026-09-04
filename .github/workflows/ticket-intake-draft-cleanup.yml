@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   cleanup:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && vars.TICKET_INTAKE_CLEANUP_SCHEDULE_ENABLED == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Delete queued and expired private ticket intake objects
@@ -45,6 +46,8 @@ jobs:
             ((.expiredDrafts.claimed // -1) | valid_count and . <= 25) and
             ((.expiredDrafts.deleted // -1) | valid_count) and
             ((.expiredDrafts.deferred // -1) | valid_count) and
+            ((.convertedDrafts.purged // -1) | valid_count and . <= 25) and
+            ((.notificationDispatches.markedIndeterminate // -1) | valid_count and . <= 25) and
             (.deleted + .deferred == .claimed) and
             (.objectDeletions.deleted + .objectDeletions.deferred == .objectDeletions.claimed) and
             (.expiredDrafts.deleted + .expiredDrafts.deferred == .expiredDrafts.claimed) and

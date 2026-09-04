@@ -103,9 +103,16 @@ const App = () => (
         <MeasurementRouter>
         <LocaleProvider>
         <LocaleAlternates />
+        <a
+          href="#app-main-content"
+          className="sr-only fixed left-3 top-3 z-[100] rounded-md bg-white px-4 py-3 font-semibold text-slate-950 shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          Skip to main content
+        </a>
         {/* Analytics must be inside the router; secure bearer-token routes are excluded. */}
         <RouteAnalytics />
         <ScrollToTop />
+        <div id="app-main-content" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/pro-drivers" element={<RouteSuspense><ProDrivers /></RouteSuspense>} />
@@ -183,6 +190,7 @@ const App = () => (
           <Route path="/:locale/*" element={<Suspense fallback={<div className="min-h-screen" aria-busy="true" />}><LocalizedPage /></Suspense>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </div>
         <CallBar />
         <GoogleConsent />
         </LocaleProvider>

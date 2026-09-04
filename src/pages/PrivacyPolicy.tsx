@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
         <p className="text-white/70 mb-8">
-          Last updated: September 3, 2026
+          Last updated: September 4, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -108,6 +108,27 @@ const PrivacyPolicy = () => {
               appropriate business records. Retention periods depend on the type of information
               and the reason it was collected.
             </p>
+            <p className="mt-4">
+              If you upload a ticket, provide an email address or phone number, confirm Alberta
+              eligibility and allow intake follow-up, Fabsy saves an access-controlled
+              partial intake on our server so you can continue later. Depending on how far you
+              proceed, that draft can include your contact information, ticket document and the
+              answers you entered, including identification, address, date of birth, driver&apos;s
+              licence, offence and witness information. It does not store your signature or licence
+              photo. A private resume capability authorizes access; Fabsy stores only its one-way
+              hash. When automated resume delivery is enabled, Fabsy may send or retry a resume link
+              a limited number of times through the email or SMS channel you authorized. You can
+              also copy the link yourself.
+            </p>
+            <p className="mt-4">
+              Each permitted draft save sets its expiry to 30 days later. Expired, incomplete drafts
+              and their private ticket uploads enter a bounded deletion process after a 24-hour
+              safety period. If a draft becomes a submitted case, the redundant draft row is purged
+              after its existing expiry and the same 24-hour safety period, without deleting the
+              canonical client, submission or case-document record. Those canonical service and
+              business records remain subject to the general retention rules above and applicable
+              access or erasure rights.
+            </p>
           </section>
 
           <section>
@@ -144,8 +165,9 @@ const PrivacyPolicy = () => {
               and, when present, a one-way hash of an advertising click identifier. Fabsy does not
               store the raw click identifier, raw page URL, IP address, user agent, ticket contents,
               uploaded file, form answers, name, email address or phone number in this funnel-event
-              table. Funnel events are retained for up to 400 days for campaign and conversion-rate
-              comparison, then can be purged.
+              table. The consent timestamp attached to an event is reduced to the UTC calendar day,
+              rather than preserving the exact time you chose. Funnel events are retained for up to
+              400 days for campaign and conversion-rate comparison, then can be purged.
             </p>
             <p className="mt-4">
               With your permission, Google measurement records visits to approved public
@@ -169,8 +191,8 @@ const PrivacyPolicy = () => {
               records follow the business-record retention rules in section 5.
             </p>
             <p className="mt-4">
-              With your permission, Meta Pixel records a manually sent PageView on the three
-              approved Rapid Resolution ad landing URLs. It records a PageView on the cleaned
+              With your permission, Meta Pixel records a manually sent PageView on approved
+              Rapid Resolution paid-ad landing visits. It records a PageView on the cleaned
               payment-confirmation page only after our server verifies an eligible paid Rapid
               Resolution or Rapid Resolution Bundle checkout. A Purchase is then sent for that
               same verified checkout. The verified purchase may also be sent through

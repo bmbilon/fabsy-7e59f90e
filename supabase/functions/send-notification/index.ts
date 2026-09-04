@@ -41,6 +41,12 @@ interface NotificationRequest {
   accessToken: string;
 }
 
+interface NotificationClaim {
+  acquired?: unknown;
+  status?: unknown;
+  failureCode?: unknown;
+  manualReviewRequired?: unknown;
+}
 
 class RequestError extends Error {
   constructor(message: string, public status = 400) {
@@ -65,6 +71,11 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  let claimedSubmissionId: string | null = null;
+  let dispatchClaimId: string | null = null;
+  let providerRequestStarted = false;
+  const providerDeliveryFailures: string[] = [];
 
   try {
     const request = await req.json() as Partial<NotificationRequest>;
@@ -107,6 +118,29 @@ const handler = async (req: Request): Promise<Response> => {
     const localeContext = { preferredLocale: ticketData.preferredLocale, template: "ticket_received" as const };
     const configuredSiteUrl = Deno.env.get("SITE_URL") || "https://fabsy.ca";
     const siteOrigin = new URL(configuredSiteUrl).origin;
+
+    dispatchClaimId = crypto.randomUUID();
+    const { data: rawClaim, error: claimError } = await supabase.rpc(
+      "claim_ticket_submission_notification",
+      { p_submission_id: submissionId, p_claim_id: dispatchClaimId },
+    );
+    if (claimError) throw claimError;
+    const claim = rawClaim as NotificationClaim | null;
+    if (claim?.acquired !== true) {
+      const deliveryStatus = typeof claim?.status === "string" ? claim.status : "indeterminate";
+      return new Response(JSON.stringify({
+        success: true,
+        deduplicated: true,
+        deliveryStatus,
+        manualReviewRequired: deliveryStatus === "indeterminate" || claim?.manualReviewRequired === true,
+        ...(typeof claim?.failureCode === "string" ? { failureCode: claim.failureCode } : {}),
+        localization: notificationLocale(localeContext),
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    claimedSubmissionId = submissionId;
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
@@ -142,6 +176,10 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending admin notification to ${adminEmails.length} admin(s)`);
 
     // SECURITY: This email contains ALL client data and should ONLY go to verified admin users
+    // Mark the dispatch outcome as ambiguous before the first provider call.
+    // A network error can happen after a provider accepts a message, so an
+    // automatic retry from this point could duplicate client/admin delivery.
+    providerRequestStarted = true;
     const emailResponse = await resend.emails.send({
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "brett@execom.ca",
@@ -149,8 +187,12 @@ const handler = async (req: Request): Promise<Response> => {
       subject: `Payment Pending - ${ticketData.firstName} ${ticketData.lastName}`,
       html: renderTicketAdminEmailHtml(ticketData, siteOrigin),
     });
-
-    console.log("Admin email sent successfully:", emailResponse);
+    if (emailResponse && typeof emailResponse === "object" && "error" in emailResponse && emailResponse.error) {
+      providerDeliveryFailures.push("admin_email_rejected");
+      console.error("Admin email provider rejected delivery:", emailResponse.error);
+    } else {
+      console.log("Admin email accepted by provider:", emailResponse);
+    }
 
     // Fetch the dynamically generated consent form from storage with retry logic
     let pdfBuffer: ArrayBuffer | null = null;
@@ -216,8 +258,12 @@ const handler = async (req: Request): Promise<Response> => {
         content: arrayBufferToBase64(pdfBuffer),
       }] : [],
     }, localeContext));
-
-    console.log("Client confirmation email sent successfully:", clientEmailResponse);
+    if (clientEmailResponse && typeof clientEmailResponse === "object" && "error" in clientEmailResponse && clientEmailResponse.error) {
+      providerDeliveryFailures.push("client_email_rejected");
+      console.error("Client email provider rejected delivery:", clientEmailResponse.error);
+    } else {
+      console.log("Client email accepted by provider:", clientEmailResponse);
+    }
 
     // SECURITY: Send SMS notification to admin - contains client data, only for verified admin
     // TODO: Consider storing admin phone numbers in database for better security
@@ -244,13 +290,15 @@ const handler = async (req: Request): Promise<Response> => {
       if (!adminSmsResult.ok) {
         const errorText = await adminSmsResult.text();
         console.error("Admin Twilio SMS error:", errorText);
+        providerDeliveryFailures.push("admin_sms_rejected");
       } else {
         adminSmsResponse = await adminSmsResult.json();
         console.log("Admin SMS sent successfully:", adminSmsResponse);
       }
     } catch (smsError: unknown) {
       console.error("Error sending admin SMS:", getErrorMessage(smsError));
-      // Continue even if SMS fails
+      providerDeliveryFailures.push("admin_sms_error");
+      // Attempt the remaining channel, then fence this dispatch as indeterminate.
     }
 
     // SECURITY: Send SMS notification to CLIENT - generic confirmation only, no sensitive data
@@ -279,16 +327,36 @@ const handler = async (req: Request): Promise<Response> => {
         if (!clientSmsResult.ok) {
           const errorText = await clientSmsResult.text();
           console.error("Client Twilio SMS error:", errorText);
+          providerDeliveryFailures.push("client_sms_rejected");
         } else {
           clientSmsResponse = await clientSmsResult.json();
           console.log("Client SMS sent successfully:", clientSmsResponse);
         }
       } catch (smsError: unknown) {
         console.error("Error sending client SMS:", getErrorMessage(smsError));
-        // Continue even if SMS fails
+        providerDeliveryFailures.push("client_sms_error");
+        // Finish the bundle below as indeterminate; never auto-repeat it.
       }
     } else {
       console.log("Client opted out of SMS notifications");
+    }
+
+    if (providerDeliveryFailures.length) {
+      console.error("One or more notification providers rejected delivery:", providerDeliveryFailures);
+      throw new Error("One or more notification deliveries were not accepted by the provider.");
+    }
+
+    const { data: finished, error: finishError } = await supabase.rpc(
+      "finish_ticket_submission_notification",
+      {
+        p_submission_id: submissionId,
+        p_claim_id: dispatchClaimId,
+        p_status: "sent",
+        p_failure_code: null,
+      },
+    );
+    if (finishError || finished !== true) {
+      throw finishError || new Error("Notification dispatch state could not be finalized.");
     }
 
     return new Response(JSON.stringify({ 
@@ -307,6 +375,20 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: unknown) {
     console.error("Error in send-notification function:", error);
+    if (claimedSubmissionId && dispatchClaimId) {
+      const completionStatus = providerRequestStarted ? "indeterminate" : "failed_before_delivery";
+      const failureCode = error instanceof RequestError ? "request_error" : "dispatch_error";
+      const { error: finishError } = await supabase.rpc(
+        "finish_ticket_submission_notification",
+        {
+          p_submission_id: claimedSubmissionId,
+          p_claim_id: dispatchClaimId,
+          p_status: completionStatus,
+          p_failure_code: failureCode,
+        },
+      );
+      if (finishError) console.error("Notification dispatch failure state could not be recorded:", finishError);
+    }
     const status = error instanceof RequestError ? error.status : 500;
     return new Response(
       JSON.stringify({ error: getErrorMessage(error) }),

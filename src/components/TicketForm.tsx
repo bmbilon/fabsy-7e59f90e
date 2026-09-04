@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
 import { useLocale } from "@/i18n/locale-context";
+import { validateLocalizedIntakeStep } from "@/i18n/intake-validation";
 import LocalizedTicketJourney from "./LocalizedTicketJourney";
 import { applyDetectedTicketType, applyTicketType, ticketDateAsLocalDate, ticketDateFromExtraction, type RegisteredOwnerAnswer, type TicketType, type TicketTypeSource } from "@/lib/ticket/ticketType";
 import { isProLicenceClass, LICENCE_CLASS_OPTIONS, normalizeLicenceClass, type LicenceClass } from "@/lib/pro-drivers/intake";
@@ -312,6 +313,8 @@ const TicketForm = ({
   const [captureState, setCaptureState] = useState<TicketCaptureState>(() => hasTicketReviewData(formData) ? "complete" : "empty");
   const [completedTicketFile, setCompletedTicketFile] = useState<File | null>(() => hasTicketReviewData(formData) ? formData.ticketImage : null);
   const [leadSaved, setLeadSaved] = useState(Boolean(sourceAssessment));
+  const [replacementTicketFile, setReplacementTicketFile] = useState<File | null>(null);
+  const replacementTicketSnapshot = useRef<FormData | null>(null);
   const ticketDraftRevision = useRef(0);
   const formStartSent = useRef(false);
   const autosaveTimer = useRef<number | null>(null);
@@ -342,10 +345,14 @@ const TicketForm = ({
   });
   const intakeDraftCapability = intakeDraft.capability;
   const intakeDraftRecordStatus = intakeDraft.record?.status;
+  const convertedIntake = intakeDraftRecordStatus === "converted";
   const saveIntakeDraft = intakeDraft.save;
-  const ticketReviewReady = captureState === "complete" || captureState === "manual"
-    || intakeDraft.hasUploadedTicket
-    || (!formData.ticketImage && (Boolean(formData.sourceAssessmentId) || hasTicketReviewData(formData)));
+  const replacementReviewReady = captureState === "complete" || captureState === "manual";
+  const ticketReviewReady = replacementTicketFile
+    ? replacementReviewReady
+    : replacementReviewReady
+      || intakeDraft.hasUploadedTicket
+      || (!formData.ticketImage && (Boolean(formData.sourceAssessmentId) || hasTicketReviewData(formData)));
   const captureOnly = currentStep === 1 && !leadSaved;
   const handleCaptureStateChange = (state: TicketCaptureState) => {
     setCaptureState(state);
@@ -439,27 +446,39 @@ const TicketForm = ({
   const leadPhone = formData.phone.trim();
   const leadEmailValid = !leadEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(leadEmail);
   const leadPhoneValid = !leadPhone || leadPhone.replace(/\D/g, "").length >= 7;
+  const localizedTicketReady = locale !== "en" && Object.keys(validateLocalizedIntakeStep(1, formData)).length === 0;
+  const replacementSaveReady = locale !== "en"
+    ? Boolean(replacementTicketFile) && localizedTicketReady
+    : replacementReviewReady;
   const isLeadValid = Boolean(
-    formData.ticketImage && ticketReviewReady &&
+    formData.ticketImage && (ticketReviewReady || localizedTicketReady) &&
     (leadEmail || leadPhone) && leadEmailValid && leadPhoneValid &&
     formData.albertaConfirmed && formData.contactPermission
   );
 
   const saveLead = async () => {
-    if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") return;
+    if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") return false;
     try {
       const saved = await intakeDraft.createOrUpload(formData.ticketImage, formData as unknown as Record<string, unknown>);
       setLeadSaved(true);
+      // The confirmed private object is now the source of truth. Dropping the
+      // browser File prevents the review screen from presenting that same file
+      // as an unsaved replacement.
+      setFormData(current => ({ ...current, ticketImage: null }));
+      setCompletedTicketFile(null);
+      setCaptureState("complete");
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
       window.dispatchEvent(new CustomEvent("fabsy:intake-lead-saved"));
       toast({ title: "Your intake is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
       scrollToForm();
+      return true;
     } catch (failure) {
       toast({
         title: "We could not finish saving",
         description: failure instanceof Error ? failure.message : "Try saving the intake again.",
         variant: "destructive",
       });
+      return false;
     }
   };
 
@@ -468,6 +487,94 @@ const TicketForm = ({
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleTicketFileSelection = (file: File | null) => {
+    if (file) {
+      if (!replacementTicketSnapshot.current) {
+        replacementTicketSnapshot.current = { ...formData, ticketImage: null };
+      }
+      setReplacementTicketFile(file);
+      return;
+    }
+
+    setReplacementTicketFile(null);
+    const previous = replacementTicketSnapshot.current;
+    replacementTicketSnapshot.current = null;
+    if (previous) {
+      ticketDraftRevision.current += 1;
+      setFormData({ ...previous, ticketImage: null });
+      setCaptureState("complete");
+      setCompletedTicketFile(null);
+    }
+  };
+
+  const saveReplacementTicket = async () => {
+    if (!replacementTicketFile || !replacementSaveReady || intakeDraft.status === "saving") return;
+    const previous = replacementTicketSnapshot.current;
+    try {
+      await intakeDraft.createOrUpload(
+        replacementTicketFile,
+        formData as unknown as Record<string, unknown>,
+      );
+      replacementTicketSnapshot.current = null;
+      setReplacementTicketFile(null);
+      setFormData(current => ({ ...current, ticketImage: null }));
+      setCompletedTicketFile(null);
+      setCaptureState("complete");
+      window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
+      toast({
+        title: "Replacement ticket saved",
+        description: "The new private ticket file and the details you reviewed are now linked to this intake.",
+      });
+    } catch (failure) {
+      replacementTicketSnapshot.current = null;
+      setReplacementTicketFile(null);
+      if (previous) {
+        ticketDraftRevision.current += 1;
+        setFormData({ ...previous, ticketImage: null });
+        setCompletedTicketFile(null);
+        setCaptureState("complete");
+        try {
+          await intakeDraft.save(previous as unknown as Record<string, unknown>, currentStep, Math.max(0, currentStep - 1));
+        } catch {
+          // The visible draft error and a reload from the last confirmed ticket
+          // remain the recovery path when even the rollback save is unavailable.
+        }
+      }
+      toast({
+        title: "The replacement was not saved",
+        description: failure instanceof Error
+          ? failure.message
+          : "Your previous ticket remains linked. Choose the replacement again to retry.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startNewIntake = () => {
+    if (autosaveTimer.current !== null) {
+      window.clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = null;
+    }
+    intakeDraft.startNewIntake();
+    replacementTicketSnapshot.current = null;
+    ticketDraftRevision.current += 1;
+    formStartSent.current = false;
+    setReplacementTicketFile(null);
+    setLeadSaved(false);
+    setCaptureState("empty");
+    setCompletedTicketFile(null);
+    const fresh = {
+      ...initialFormData,
+      referral: readActiveReferral(),
+    } as FormData;
+    setFormData(initialTicketType
+      ? applyTicketType(fresh, initialTicketType, "entry")
+      : fresh);
+    setCurrentStep(1);
+    scrollToForm();
+    toast({ title: "New intake ready", description: "Add the next ticket when you’re ready." });
   };
 
   const nextStep = async () => {
@@ -510,7 +617,7 @@ const TicketForm = ({
   };
 
   useEffect(() => {
-    if (!leadSaved || !intakeDraftCapability || intakeDraftRecordStatus === "converted") return;
+    if (!leadSaved || !intakeDraftCapability || intakeDraftRecordStatus === "converted" || replacementTicketFile) return;
     autosaveTimer.current = window.setTimeout(() => {
       autosaveTimer.current = null;
       void saveIntakeDraft(
@@ -528,7 +635,7 @@ const TicketForm = ({
         autosaveTimer.current = null;
       }
     };
-  }, [formData, currentStep, leadSaved, intakeDraftCapability, intakeDraftRecordStatus, saveIntakeDraft]);
+  }, [formData, currentStep, leadSaved, intakeDraftCapability, intakeDraftRecordStatus, replacementTicketFile, saveIntakeDraft]);
 
   const copyResumeLink = async () => {
     const url = intakeDraft.getResumeUrl();
@@ -582,20 +689,23 @@ const TicketForm = ({
   const resumeAccess = intakeDraft.capability ? <div lang="en" className="my-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
     <div className="min-w-0 flex-1">
       <p className="font-medium">Secure return access</p>
-      <p className="text-muted-foreground" aria-live="polite">{hasPendingTicketUpload
+      <p className="text-muted-foreground" aria-live="polite">{convertedIntake
+        ? "A checkout was already created for this saved intake. Continue only if payment is still outstanding, or start a new intake for another ticket."
+        : hasPendingTicketUpload
         ? "A replacement upload did not finish. Keep your last confirmed ticket before continuing, or choose the replacement again."
         : resumeDeliveryMessage(delivery, intakeDraft.hasUploadedTicket)}</p>
-      {intakeDraft.error ? <p className="mt-1 text-destructive">{intakeDraft.error}</p> : null}
+      {intakeDraft.error ? <p className="mt-1 text-destructive" role="alert">{intakeDraft.error}</p> : null}
     </div>
     <div className="flex flex-wrap gap-2">
       {hasPendingTicketUpload ? <Button type="button" variant="outline" disabled={intakeDraft.discardingPendingUpload} onClick={() => void discardPendingUpload()}>
         {intakeDraft.discardingPendingUpload ? "Restoring…" : "Keep previous ticket"}
       </Button> : null}
-      {!hasPendingTicketUpload && delivery?.mode === "automatic" &&
+      {!convertedIntake && !hasPendingTicketUpload && delivery?.mode === "automatic" &&
         ((delivery.status === "failed" && delivery.canRetry) || delivery.status === "pending") ? <Button type="button" variant="outline" disabled={intakeDraft.deliveryRetrying} onClick={() => void retryResumeDelivery()}>
         {intakeDraft.deliveryRetrying ? "Sending…" : delivery.status === "pending" ? "Send resume link" : "Retry sending"}
       </Button> : null}
       <Button type="button" variant="outline" onClick={() => void copyResumeLink()}>Copy resume link</Button>
+      {convertedIntake ? <Button type="button" onClick={startNewIntake}>Start a new intake</Button> : null}
     </div>
   </div> : null;
 
@@ -611,6 +721,11 @@ const TicketForm = ({
             onCaptureStateChange={handleCaptureStateChange}
             mode={captureOnly ? "capture" : "details"}
             hasStoredTicket={intakeDraft.hasUploadedTicket}
+            allowReplacement={!captureOnly && !convertedIntake && intakeDraft.hasUploadedTicket}
+            onTicketFileSelection={!captureOnly && !convertedIntake ? handleTicketFileSelection : undefined}
+            replacementReady={replacementReviewReady}
+            replacementSaving={intakeDraft.status === "saving"}
+            onSaveReplacement={() => void saveReplacementTicket()}
           />
           {captureOnly ? <LeadCaptureFields formData={formData} updateFormData={updateFormData} error={intakeDraft.error} /> : null}
           {!captureOnly && ticketReviewReady && !isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
@@ -650,6 +765,7 @@ const TicketForm = ({
         return !!(
           leadSaved &&
           ticketReviewReady &&
+          !replacementTicketFile &&
           !hasPendingTicketUpload &&
           (formData.ticketImage || formData.sourceAssessmentId || intakeDraft.hasUploadedTicket) &&
           missingRequiredTicketFields(formData).length === 0 &&
@@ -695,6 +811,7 @@ const TicketForm = ({
     switch (currentStep) {
       case 1:
         if (hasPendingTicketUpload) m.push("Finish or discard the replacement ticket upload");
+        if (replacementTicketFile) m.push("Save or remove the replacement ticket");
         if (!formData.ticketImage && !formData.sourceAssessmentId && !intakeDraft.hasUploadedTicket) m.push("Ticket PDF or photo");
         m.push(...missingRequiredTicketFields(formData).map(field => ({
           ticketNumber: "Ticket number", issueDate: isPhotoRadar ? "Offence date" : "Issue date",
@@ -743,7 +860,13 @@ const TicketForm = ({
   );
   if (locale !== "en") return <LocalizedTicketJourney formData={formData} updateFormData={updateFormData} currentStep={currentStep} nextStep={nextStep} prevStep={prevStep}
     intakeDraft={intakeDraft.capability && intakeDraft.hasUploadedTicket && !hasPendingTicketUpload ? intakeDraft.capability : null}
-    hasStoredTicket={intakeDraft.hasUploadedTicket} hasPendingTicketUpload={hasPendingTicketUpload} resumeAccess={resumeAccess} />;
+    hasStoredTicket={intakeDraft.hasUploadedTicket} hasPendingTicketUpload={hasPendingTicketUpload}
+    allowReplacement={!convertedIntake && intakeDraft.hasUploadedTicket}
+    onTicketFileSelection={!convertedIntake ? handleTicketFileSelection : undefined}
+    replacementReady={replacementSaveReady} replacementSaving={intakeDraft.status === "saving"}
+    onSaveReplacement={() => void saveReplacementTicket()} resumeAccess={resumeAccess}
+    leadSaved={leadSaved} leadReady={isLeadValid} leadSaving={intakeDraft.status === "saving"} leadError={intakeDraft.error}
+    onSaveLead={saveLead} />;
 
   return (
     <section className={`${captureOnly ? "py-4 sm:py-8" : "py-10 sm:py-16"} bg-gradient-soft min-h-screen`}>
@@ -798,6 +921,14 @@ const TicketForm = ({
           </div>
         </Card>}
 
+        {convertedIntake ? <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-primary/30 bg-white p-5 shadow-fab" role="status" data-converted-intake-recovery>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-foreground">This saved intake already has a checkout.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Continue if payment is still outstanding. If you already paid or this is a different ticket, start a new intake.</p>
+          </div>
+          <Button type="button" onClick={startNewIntake}>Start a new intake</Button>
+        </div> : null}
+
         {/* Form Content */}
         <Card className="p-4 sm:p-8 bg-gradient-card shadow-elevated border-primary/10">
           {currentStep > 1 && <div className="mb-8">
@@ -813,7 +944,7 @@ const TicketForm = ({
                 disabled={currentStep === 1 || intakeDraft.record?.status === "converted"}
                 className="flex items-center gap-2"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 Previous
               </Button>
               {currentStep !== 5 && currentStep < 6 && (
@@ -823,7 +954,7 @@ const TicketForm = ({
                   className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
                 >
                   Continue
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               )}
           </div>}
@@ -837,7 +968,7 @@ const TicketForm = ({
             <Button type="button" className="h-auto min-h-12 w-full whitespace-normal bg-gradient-primary py-3 hover:opacity-90"
               onClick={() => void saveLead()} disabled={!isLeadValid || intakeDraft.status === "saving" || intakeDraft.status === "loading"}>
               {intakeDraft.status === "saving" ? "Saving your ticket securely…" : "Save ticket and review details"}
-              {intakeDraft.status !== "saving" ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
+              {intakeDraft.status !== "saving" ? <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /> : null}
             </Button>
             {!isLeadValid ? <p className="mt-3 text-right text-sm text-muted-foreground">
               Still needed: {[
@@ -857,7 +988,7 @@ const TicketForm = ({
                 disabled={currentStep === 1 || intakeDraft.record?.status === "converted"}
                 className="flex items-center gap-2"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 Previous
               </Button>
               {currentStep !== 5 && currentStep < 6 && (
@@ -867,7 +998,7 @@ const TicketForm = ({
                   className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
                 >
                   Continue
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               )}
           </div>}

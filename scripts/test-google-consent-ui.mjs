@@ -142,6 +142,7 @@ try {
           assert.equal(document.activeElement, previous, 'Automatic UI must not steal page focus');
           return {
             container,
+            previous,
             navigate: async route => act(async () => navigate(route)),
             unmount: async () => {
               assert.equal(container.querySelector('input').value, 'Keep this private value');
@@ -175,7 +176,7 @@ try {
             assert.equal(panel(view.container).getAttribute('role'), 'region');
             assert.equal(panel(view.container).getAttribute('aria-modal'), null, 'The banner must remain nonmodal');
             assert.equal(panel(view.container).getAttribute('data-google-consent-panel-mode'), 'initial');
-            assert.ok(panel(view.container).className.includes('max-h-[25vh]'), 'The automatic banner must stay within one quarter of the viewport');
+            assert.ok(panel(view.container).className.includes('max-h-[6.5rem]'), 'The automatic mobile banner must stay short enough to leave first-view actions unobstructed');
             assert.ok(panel(view.container).className.includes('overflow-hidden'), 'The automatic banner keeps its action row visible');
             const titleId = panel(view.container).getAttribute('aria-labelledby');
             assert.equal(document.getElementById(titleId).textContent, copy.title);
@@ -193,7 +194,7 @@ try {
             assert.equal(panel(view.container), null, 'Escape can dismiss the nonmodal banner');
             assert.equal(getGoogleConsentChoice(), 'unknown', 'Dismissal is not acceptance or refusal');
             assert.deepEqual(choices, []);
-            assert.equal(document.activeElement, settings(view.container));
+            assert.equal(document.activeElement, view.previous, 'Dismissing automatic UI must not move focus to the end-of-document settings control');
 
             await openSettings(view.container, copy);
             await click(decision(view.container, 'declined'));

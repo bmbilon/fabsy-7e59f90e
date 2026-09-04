@@ -161,13 +161,13 @@ const RapidResolution = () => {
                 </p>
                 <p className="mt-2 max-w-xl text-xs font-medium leading-4 text-slate-200 sm:mt-4 sm:text-sm sm:leading-6" data-rapid-refund-summary>
                   If the Crown rejects those efforts and no fine or demerit reduction or withdrawal is obtained,
-                  your service fee is refunded
+                  your service fee is refunded.{' '}
                   <Link
                     to={FEE_REFUND.termsPath}
-                    className="font-bold text-white underline decoration-1 underline-offset-4 hover:text-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-light"
+                    className="inline-flex min-h-6 items-center rounded-sm font-bold text-white underline decoration-1 underline-offset-4 hover:text-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-light"
                     aria-label="Read the full fee-refund conditions"
                   >
-                    <span aria-hidden="true">*</span><span className="sr-only">Full fee-refund conditions</span>
+                    Refund terms
                   </Link>. No legal outcome is guaranteed.
                 </p>
                 <p className="mt-2 text-white sm:mt-5" data-rapid-price>

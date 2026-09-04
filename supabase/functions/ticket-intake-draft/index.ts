@@ -83,6 +83,7 @@ type DraftRow = {
   resume_delivery_sent_at: string | null;
   resume_delivery_failed_at: string | null;
   resume_delivery_attempt_count: number;
+  resume_delivery_lifetime_attempt_count: number;
   resume_delivery_failure_code: ResumeDeliveryFailureCode | null;
 };
 
@@ -166,6 +167,10 @@ type AdminDatabase = {
         };
         Returns: DraftRow;
       };
+      consume_ticket_intake_resume_action_limit: {
+        Args: { p_request_fingerprint: string };
+        Returns: boolean;
+      };
       discard_pending_ticket_intake_draft_upload: {
         Args: {
           p_id: string;
@@ -219,7 +224,7 @@ function responseForDraft(row: DraftRow) {
     clientId: row.client_id,
     resumeDelivery: publicResumeDeliveryState(
       row,
-      resumeDeliveryEnabled(
+      row.status === "active" && resumeDeliveryEnabled(
         Deno.env.get("TICKET_INTAKE_RESUME_DELIVERY_ENABLED"),
       ),
     ),
@@ -232,6 +237,13 @@ function mapDatabaseFailure(error: { message?: string } | null) {
       "Too many saved intakes. Please try again later.",
       429,
       "draft_create_rate_limit",
+    );
+  }
+  if (error?.message?.includes("TICKET_INTAKE_RESUME_ACTION_RATE_LIMIT")) {
+    throw new DraftStateError(
+      "Too many resume-link changes. Please try again later.",
+      429,
+      "draft_resume_action_rate_limit",
     );
   }
   if (error?.message?.includes("TICKET_INTAKE_REVISION_CONFLICT")) {
@@ -286,7 +298,7 @@ async function activeDraft(
   let query = admin
     .from("ticket_intake_drafts")
     .select(
-      "id,access_token_hash,email,phone,preferred_locale,alberta_confirmed,contact_permission,draft_data,current_step,completed_step,revision,status,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,pending_ticket_document_path,pending_ticket_document_content_type,pending_ticket_document_size_bytes,converted_submission_id,client_id,expires_at,resume_delivery_status,resume_delivery_generation,resume_delivery_channel,resume_delivery_claim_id,resume_delivery_claimed_at,resume_delivery_claim_expires_at,resume_delivery_attempted_at,resume_delivery_sent_at,resume_delivery_failed_at,resume_delivery_attempt_count,resume_delivery_failure_code",
+      "id,access_token_hash,email,phone,preferred_locale,alberta_confirmed,contact_permission,draft_data,current_step,completed_step,revision,status,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,pending_ticket_document_path,pending_ticket_document_content_type,pending_ticket_document_size_bytes,converted_submission_id,client_id,expires_at,resume_delivery_status,resume_delivery_generation,resume_delivery_channel,resume_delivery_claim_id,resume_delivery_claimed_at,resume_delivery_claim_expires_at,resume_delivery_attempted_at,resume_delivery_sent_at,resume_delivery_failed_at,resume_delivery_attempt_count,resume_delivery_lifetime_attempt_count,resume_delivery_failure_code",
     )
     .eq("access_token_hash", accessTokenHash);
   if (draftId) query = query.eq("id", draftId);
@@ -536,6 +548,23 @@ async function safeAttemptResumeDelivery(
   );
 }
 
+async function consumeResumeActionLimit(
+  admin: SupabaseAdmin,
+  serviceRoleKey: string,
+  req: Request,
+) {
+  const fingerprint = await requestFingerprint(
+    serviceRoleKey,
+    `resume:${requestAddress(req)}`,
+  );
+  const { data, error } = await admin.rpc(
+    "consume_ticket_intake_resume_action_limit",
+    { p_request_fingerprint: fingerprint },
+  );
+  if (error) mapDatabaseFailure(error);
+  if (data !== true) throw new Error("Resume action limit was not recorded.");
+}
+
 async function createDraft(
   admin: SupabaseAdmin,
   body: JsonRecord,
@@ -627,7 +656,12 @@ async function readDraft(admin: SupabaseAdmin, body: JsonRecord) {
   return responseForDraft(row);
 }
 
-async function saveDraft(admin: SupabaseAdmin, body: JsonRecord) {
+async function saveDraft(
+  admin: SupabaseAdmin,
+  body: JsonRecord,
+  serviceRoleKey: string,
+  req: Request,
+) {
   assertAllowedKeys(body, [
     "action",
     "draftId",
@@ -653,21 +687,24 @@ async function saveDraft(admin: SupabaseAdmin, body: JsonRecord) {
     { email: row.email, phone: row.phone },
     draftData,
   );
-  if (
-    !replacementClientRetained && draftContactChangeRequiresCapabilityRotation(
+  const contactChangeRequiresRotation =
+    draftContactChangeRequiresCapabilityRotation(
       { email: row.email, phone: row.phone },
       contact,
       {
         status: row.resume_delivery_status,
         attemptCount: row.resume_delivery_attempt_count,
       },
-    )
-  ) {
+    );
+  if (!replacementClientRetained && contactChangeRequiresRotation) {
     throw new DraftStateError(
       "Reload this page before changing resume-link contact details.",
       409,
       "draft_rotation_requires_reload",
     );
+  }
+  if (contactChangeRequiresRotation) {
+    await consumeResumeActionLimit(admin, serviceRoleKey, req);
   }
   const synchronizedDraft = syncContactIntoDraftData(draftData, contact);
   const { data, error } = await admin.rpc("save_ticket_intake_draft", {
@@ -840,9 +877,15 @@ async function confirmUpload(admin: SupabaseAdmin, body: JsonRecord) {
   return responseForDraft(delivered);
 }
 
-async function retryResumeDelivery(admin: SupabaseAdmin, body: JsonRecord) {
+async function retryResumeDelivery(
+  admin: SupabaseAdmin,
+  body: JsonRecord,
+  serviceRoleKey: string,
+  req: Request,
+) {
   assertAllowedKeys(body, ["action", "draftId", "accessToken"]);
   const { row, accessToken, accessTokenHash } = await activeDraft(admin, body);
+  requireMutable(row);
   if (!row.ticket_uploaded_at) {
     throw new DraftStateError(
       "Upload the ticket before sending a resume link.",
@@ -854,8 +897,10 @@ async function retryResumeDelivery(admin: SupabaseAdmin, body: JsonRecord) {
     Deno.env.get("TICKET_INTAKE_RESUME_DELIVERY_ENABLED"),
   );
   const retryFailure = row.resume_delivery_status === "failed" &&
-    row.resume_delivery_attempt_count < MAX_RESUME_DELIVERY_ATTEMPTS;
-  const sendPending = row.resume_delivery_status === "pending";
+    row.resume_delivery_attempt_count < MAX_RESUME_DELIVERY_ATTEMPTS &&
+    row.resume_delivery_lifetime_attempt_count < MAX_RESUME_DELIVERY_ATTEMPTS;
+  const sendPending = row.resume_delivery_status === "pending" &&
+    row.resume_delivery_lifetime_attempt_count < MAX_RESUME_DELIVERY_ATTEMPTS;
   if (!automaticEnabled || (!retryFailure && !sendPending)) {
     throw new DraftStateError(
       "This resume delivery cannot be retried.",
@@ -863,6 +908,7 @@ async function retryResumeDelivery(admin: SupabaseAdmin, body: JsonRecord) {
       "draft_delivery_not_retryable",
     );
   }
+  await consumeResumeActionLimit(admin, serviceRoleKey, req);
   const delivered = await safeAttemptResumeDelivery(
     admin,
     row,
@@ -917,7 +963,7 @@ serve(async (req) => {
       : body.action === "read"
       ? await readDraft(admin, body)
       : body.action === "save"
-      ? await saveDraft(admin, body)
+      ? await saveDraft(admin, body, serviceRoleKey, req)
       : body.action === "prepare_upload"
       ? await prepareUpload(admin, body)
       : body.action === "confirm_upload"
@@ -925,7 +971,7 @@ serve(async (req) => {
       : body.action === "discard_pending_upload"
       ? await discardPendingUpload(admin, body)
       : body.action === "retry_delivery"
-      ? await retryResumeDelivery(admin, body)
+      ? await retryResumeDelivery(admin, body, serviceRoleKey, req)
       : (() => {
         throw new DraftRequestError("action is invalid.");
       })();

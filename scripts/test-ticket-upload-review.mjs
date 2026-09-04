@@ -67,7 +67,19 @@ const compiled = await build({
     setup(bundler) {
       const modules = {
         backend: "export const supabase = { functions: { invoke: (...args) => globalThis.__ticketReviewBackend.invoke(...args) }, storage: { from: (...args) => globalThis.__ticketReviewBackend.storageFrom(...args) } };",
-        locale: "const locale = { locale: 'en', setIntakeHandoff() {} }; export const useLocale = () => locale;",
+        locale: `export const useLocale = () => ({
+          locale: globalThis.__ticketReviewLocale || 'en',
+          basePath: '/submit-ticket',
+          isReleased: true,
+          href: path => path,
+          setIntakeHandoff() {},
+        });`,
+        i18n: `export const useTranslation = () => ({ t: (key, options = {}) => ({
+          'common.next': 'Continue',
+          'common.back': 'Back',
+          'common.loading': 'Saving…',
+          'language.englishControls': 'The English terms control if the translation differs.',
+        }[key] || options.defaultValue || key) });`,
         toast: "const value = { toast() {} }; export const useToast = () => value;",
         cache: "const value = { getCachedTicketData: (...args) => globalThis.__ticketReviewBackend.readCache(...args), isCacheKeyValid: () => true }; export const useTicketCache = () => value;",
         referral: `
@@ -81,6 +93,7 @@ const compiled = await build({
       const boundaries = [
         [/integrations\/supabase\/client$/, "backend"],
         [/i18n\/locale-context$/, "locale"],
+        [/^react-i18next$/, "i18n"],
         [/hooks\/use-toast$/, "toast"],
         [/hooks\/useTicketCache$/, "cache"],
         [/lib\/referrals\/capture$/, "referral"],
@@ -90,7 +103,7 @@ const compiled = await build({
       }
       // These later screens are outside this flow's coverage. Keep the actual
       // wizard navigation mounted, including its Continue/Previous validation.
-      bundler.onResolve({ filter: /(?:^|\/)(PersonalInfoStep|DefenseStep|ConsentStep|PaymentStep|ReviewStep|LocalizedTicketJourney|InstantTicketAnalyzer)$/ }, () => ({ path: "later-step", namespace: "offline-review" }));
+      bundler.onResolve({ filter: /(?:^|\/)(PersonalInfoStep|DefenseStep|ConsentStep|PaymentStep|ReviewStep|InstantTicketAnalyzer)$/ }, () => ({ path: "later-step", namespace: "offline-review" }));
       bundler.onLoad({ filter: /.*/, namespace: "offline-review" }, ({ path }) => ({
         contents: modules[path] ?? "export default function LaterStepBoundary() { return null; }",
         loader: "js",
@@ -115,7 +128,7 @@ const completeTicket = {
   courtDate: null,
 };
 
-async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false, pendingUpload = false, deliveryStatus = "sent", deliveryChannel = "email", deliveryMode = "automatic", rotateOnSave = false, loseSaveResponseAfterCommit = false, deferRecoveryUntilReload = false, storageWriteFails = false } = {}) {
+async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false, pendingUpload = false, deliveryStatus = "sent", deliveryChannel = "email", deliveryMode = "automatic", rotateOnSave = false, loseSaveResponseAfterCommit = false, deferRecoveryUntilReload = false, storageWriteFails = false, locale = "en" } = {}) {
   const domErrors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on("jsdomError", error => domErrors.push(error));
@@ -155,6 +168,7 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
     }
   };
   window.IS_REACT_ACT_ENVIRONMENT = true;
+  window.__ticketReviewLocale = locale;
   let draftRevision = 1;
   const draftToken = "a".repeat(64);
   let activeDraftToken = draftToken;
@@ -180,7 +194,7 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
   const draftResponse = (extra = {}) => ({
     success: true, draftId, revision: draftRevision,
     contact: { email: "driver@example.test", phone: "" },
-    albertaConfirmed: true, contactPermission: true, preferredLocale: "en",
+    albertaConfirmed: true, contactPermission: true, preferredLocale: locale,
     currentStep: serverCurrentStep,
     completedStep: serverCompletedStep,
     draftData: serverDraftData,
@@ -412,6 +426,61 @@ test("a fresh intake presents capture first and waits for the current OCR scan b
   app.continueEnabled();
 });
 
+test("a released localized intake saves the lead and then autosaves later fields", async t => {
+  const app = await runtime(t, {}, { locale: "es" });
+  await app.choose(app.file("localized-ticket.pdf", "application/pdf"));
+  await app.edit("localized-ticketNumber", "LOCALIZED-TEST-1");
+  await app.edit("localized-issueDate", "2026-06-01");
+  await app.edit("localized-location", "Calgary");
+  await app.edit("localized-fineAmount", "198");
+  await app.edit("localized-offenceDescription", "Synthetic offline fixture");
+  await app.edit("lead-email", "localized@example.test");
+  await app.api.click(app.field("alberta-confirmed"));
+  await app.api.click(app.field("contact-permission"));
+
+  assert.match(app.document.body.textContent, /English terms control/i,
+    "localized lead confirmations remain explicitly identified as English controls");
+  await app.api.click(app.button("Continue"));
+  await app.until(() => app.document.getElementById("localized-firstName"),
+    "the localized journey should advance only after its private draft is saved");
+
+  assert.deepEqual(app.draftRequests.slice(0, 2).map(request => request.action), ["create", "confirm_upload"]);
+  assert.equal(app.draftRequests[0].preferredLocale, "es");
+  assert.equal(app.draftRequests[0].albertaConfirmed, true);
+  assert.equal(app.draftRequests[0].contactPermission, true);
+  assert.equal(app.uploadRequests.length, 1);
+
+  await app.edit("localized-firstName", "Prueba");
+  await app.api.act(async () => { await new Promise(resolveTick => setTimeout(resolveTick, 750)); });
+  await app.until(() => app.draftRequests.some(request => request.action === "save"),
+    "later localized fields should autosave through the same private draft");
+});
+
+test("a released localized saved intake can replace the wrong ticket before continuing", async t => {
+  const app = await runtime(t, {}, { locale: "es", resumeDraft: true });
+  await app.until(() => app.document.getElementById("localized-ticketNumber"), "Expected the localized saved ticket to restore");
+  assert.match(app.document.body.textContent, /replace the saved ticket/i);
+
+  await app.choose(app.file("localized-replacement.pdf", "application/pdf"));
+  assert.equal(app.field("localized-ticketNumber").value, "", "selecting a replacement clears values from the previous ticket");
+  assert.ok(app.button("Save replacement ticket").disabled, "the replacement cannot save before required details are reviewed");
+
+  await app.edit("localized-ticketNumber", "LOCALIZED-REPLACEMENT-1");
+  await app.edit("localized-issueDate", "2026-06-02");
+  await app.edit("localized-location", "Edmonton");
+  await app.edit("localized-fineAmount", "250");
+  await app.edit("localized-offenceDescription", "Synthetic replacement fixture");
+  assert.equal(app.button("Save replacement ticket").disabled, false);
+  await app.api.click(app.button("Save replacement ticket"));
+  await app.until(
+    () => app.draftRequests.filter(request => request.action === "confirm_upload").length === 1,
+    "Expected the localized replacement upload to be confirmed",
+  );
+  assert.deepEqual(app.draftRequests.map(request => request.action).slice(-2), ["prepare_upload", "confirm_upload"]);
+  assert.equal(app.buttons("Save replacement ticket").length, 0);
+  assert.match(app.document.body.textContent, /stored privately and linked to this intake/i);
+});
+
 test("disabled provider delivery presents a truthful manual copy fallback without a futile retry", async t => {
   const app = await runtime(t, {}, {
     deliveryStatus: "pending",
@@ -585,6 +654,75 @@ test("a converted intake resumes at fresh consent after a reload or canceled che
   assert.deepEqual(app.draftRequests.map(request => request.action), ["read"], "Immutable converted drafts are not autosaved");
   assert.ok(app.buttons("Previous").every(node => node.disabled), "Recovery cannot edit fields already converted into the submission");
   assert.match(app.document.body.textContent, /Consent Form/);
+  app.window.localStorage.setItem("fabsy.ticket-intake-pending-rotation.v1", JSON.stringify({
+    draftId: "550e8400-e29b-41d4-a716-446655440000",
+    oldAccessToken: "a".repeat(64),
+    candidateAccessToken: "b".repeat(64),
+    expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
+    revision: 1,
+  }));
+  await app.api.click(app.button("Start a new intake"));
+  await app.until(() => app.buttons("Take photo").length > 0, "Expected a clean capture screen for another ticket");
+  assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1"), null);
+  assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"), null);
+  assert.doesNotMatch(app.document.body.textContent, /already has a checkout/i);
+});
+
+for (const deliveryStatus of ["pending", "failed"]) {
+  test(`a converted intake cannot request a ${deliveryStatus} resume delivery`, async t => {
+    const app = await runtime(t, {}, {
+      resumeDraft: true,
+      convertedDraft: true,
+      deliveryStatus,
+      deliveryChannel: deliveryStatus === "failed" ? "email" : null,
+    });
+    await app.until(
+      () => /already has a checkout/i.test(app.document.body.textContent),
+      "Expected converted checkout recovery",
+    );
+    assert.equal(app.buttons("Send resume link").length, 0);
+    assert.equal(app.buttons("Retry sending").length, 0);
+    assert.deepEqual(app.draftRequests.map(request => request.action), ["read"]);
+  });
+}
+
+test("a saved lead can replace the wrong private ticket before continuing", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file("synthetic-wrong-ticket.png"));
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.saveLead();
+  assert.match(app.document.body.textContent, /choose a replacement only if the wrong ticket was uploaded/i);
+
+  await app.choose(app.file("synthetic-correct-ticket.png"));
+  await app.waitForScan(2);
+  app.continueBlocked();
+  await app.finish(1, { ...completeTicket, ticketNumber: "SYNTHETIC-CORRECT-TICKET", fineAmount: "315" });
+  assert.ok(app.button("Save replacement ticket"));
+  await app.api.click(app.button("Save replacement ticket"));
+  await app.until(
+    () => app.draftRequests.filter(request => request.action === "confirm_upload").length === 2,
+    "Expected the replacement upload to be confirmed",
+  );
+  assert.equal(app.uploadRequests.length, 2);
+  assert.equal(app.field("ticketNumber").value, "SYNTHETIC-CORRECT-TICKET");
+  assert.equal(app.field("fineAmount").value, "315");
+  assert.equal(app.buttons("Save replacement ticket").length, 0);
+  app.continueEnabled();
+});
+
+test("lead contact validation is exposed to assistive technology", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file());
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.edit("lead-email", "not-an-email");
+  await app.edit("lead-phone", "123");
+  assert.equal(app.field("lead-email").getAttribute("aria-invalid"), "true");
+  assert.match(app.document.getElementById("lead-email-error").textContent, /complete email/i);
+  assert.equal(app.field("lead-phone").getAttribute("aria-invalid"), "true");
+  assert.match(app.document.getElementById("lead-phone-error").textContent, /seven digits/i);
+  app.continueBlocked();
 });
 
 test("partial OCR highlights missing details accessibly and clears the error after a correction", async t => {

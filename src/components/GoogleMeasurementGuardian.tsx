@@ -15,6 +15,8 @@ import {
   getFabsyFunnelConsentChoice,
 } from '@/lib/fabsyFunnelConsent';
 import { requestMetaCheckoutAttributionWithdrawal } from '@/lib/metaCheckoutWithdrawal';
+import { clearFunnelSessionState } from '@/lib/funnelSessionStorage';
+import { clearMarketingAttribution } from '@/lib/marketingAttribution';
 
 /**
  * Document lifetime observer, independent of route children. A full navigation
@@ -25,11 +27,21 @@ import { requestMetaCheckoutAttributionWithdrawal } from '@/lib/metaCheckoutWith
 export default function GoogleMeasurementGuardian() {
   useEffect(() => {
     let expiryTimer: number | undefined;
-    const recheck = () => {
+    const recheck = (retireNonAcceptedFirstPartyState = false) => {
       window.clearTimeout(expiryTimer);
       recheckGoogleMeasurementConsent();
       recheckMetaMeasurementConsent();
-      if (getFabsyFunnelConsentChoice() !== 'accepted') {
+      const fabsyChoice = getFabsyFunnelConsentChoice();
+      if (fabsyChoice === 'declined' ||
+          (retireNonAcceptedFirstPartyState && fabsyChoice !== 'accepted')) {
+        // This observer remains mounted even on secure routes where the
+        // acquisition tracker is intentionally absent. Retire both durable and
+        // document-only attribution here so a later consent grant cannot revive
+        // campaign data after a refusal, cross-tab removal, or expiry. An
+        // initial unknown choice is deliberately not retired: current-page
+        // campaign data may remain memory-only until the visitor decides.
+        clearMarketingAttribution();
+        clearFunnelSessionState(window.sessionStorage);
         requestMetaCheckoutAttributionWithdrawal();
       }
       const remaining = [
@@ -68,22 +80,24 @@ export default function GoogleMeasurementGuardian() {
     const onVisible = () => {
       if (document.visibilityState === 'visible') recheck();
     };
-    window.addEventListener(GOOGLE_CONTEXT_READY, recheck);
-    window.addEventListener(GOOGLE_CONSENT_CHANGED, recheck);
-    window.addEventListener(META_CONSENT_CHANGED, recheck);
-    window.addEventListener(FABSY_FUNNEL_CONSENT_CHANGED, recheck);
+    const onProviderStateChanged = () => recheck();
+    const onFabsyConsentChanged = () => recheck(true);
+    window.addEventListener(GOOGLE_CONTEXT_READY, onProviderStateChanged);
+    window.addEventListener(GOOGLE_CONSENT_CHANGED, onProviderStateChanged);
+    window.addEventListener(META_CONSENT_CHANGED, onProviderStateChanged);
+    window.addEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onFabsyConsentChanged);
     window.addEventListener('storage', onStorage);
-    window.addEventListener('pageshow', recheck);
+    window.addEventListener('pageshow', onProviderStateChanged);
     document.addEventListener('visibilitychange', onVisible);
     recheck();
     return () => {
       window.clearTimeout(expiryTimer);
-      window.removeEventListener(GOOGLE_CONTEXT_READY, recheck);
-      window.removeEventListener(GOOGLE_CONSENT_CHANGED, recheck);
-      window.removeEventListener(META_CONSENT_CHANGED, recheck);
-      window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, recheck);
+      window.removeEventListener(GOOGLE_CONTEXT_READY, onProviderStateChanged);
+      window.removeEventListener(GOOGLE_CONSENT_CHANGED, onProviderStateChanged);
+      window.removeEventListener(META_CONSENT_CHANGED, onProviderStateChanged);
+      window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onFabsyConsentChanged);
       window.removeEventListener('storage', onStorage);
-      window.removeEventListener('pageshow', recheck);
+      window.removeEventListener('pageshow', onProviderStateChanged);
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);

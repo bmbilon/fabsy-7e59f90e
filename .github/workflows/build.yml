@@ -1,10 +1,25 @@
-name: Build and Deploy
+name: Build and optional frontend deploy
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      deploy_frontend:
+        description: 'Deploy the built frontend after backend-first verification'
+        required: true
+        default: false
+        type: boolean
+      backend_release_commit:
+        description: 'Exact 40-character commit already proven backend-ready'
+        required: false
+        type: string
+      backend_first_confirmation:
+        description: 'Type BACKEND_READY_FRONTEND_LAST to permit deployment'
+        required: false
+        type: string
 
 jobs:
   build:
@@ -25,19 +40,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate paid-acquisition launch-control schema and adversarial cases
+        run: |
+          npm run test:ads-readiness
+          npm run ci:ads-readiness
+
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
-      - name: Type-check measurement Edge Functions
+      - name: Type-check paid-acquisition Edge Functions
         run: |
-          deno check \
+          deno check --node-modules-dir=none --frozen \
             supabase/functions/_shared/meta-capi.ts \
             supabase/functions/_shared/meta-purchase.ts \
+            supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
             supabase/functions/idr-payment-webhook/index.ts \
             supabase/functions/meta-capi-worker/index.ts \
+            supabase/functions/ticket-intake-draft/index.ts \
+            supabase/functions/submit-ticket/index.ts \
+            supabase/functions/cleanup-ticket-intake-drafts/index.ts \
+            supabase/functions/record-funnel-event/index.ts \
+            supabase/functions/paid-funnel-report/index.ts \
+            supabase/functions/send-notification/index.ts \
             supabase/functions/withdraw-meta-measurement/index.ts
       
       - name: Build guarded snapshots and app
@@ -53,6 +80,7 @@ jobs:
           VITE_GADS_CONVERSION_LABEL: ${{ secrets.VITE_GADS_CONVERSION_LABEL }}
           VITE_GADS_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PURCHASE_LABEL }}
           VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL }}
+          REQUIRE_BROWSER_SUPABASE_CONFIG: ${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deploy_frontend == true && '1' || '0' }}
           REQUIRE_PAGE_SYNC: ${{ github.event_name == 'push' && '1' || '0' }}
           REQUIRE_PAGE_SYNC_MANIFEST: ${{ github.event_name == 'push' && '1' || '0' }}
           REQUIRE_SNAPSHOT_MANIFEST: '1'
@@ -105,8 +133,20 @@ jobs:
           REQUIRE_SNAPSHOT_MANIFEST: '1'
         run: node scripts/copy-prerendered.js
 
+      - name: Verify backend-first frontend deployment gate
+        if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deploy_frontend == true
+        env:
+          REQUESTED_COMMIT: ${{ inputs.backend_release_commit }}
+          CONFIRMATION: ${{ inputs.backend_first_confirmation }}
+          PINNED_DEPLOYABLE_COMMIT: ${{ vars.FABSY_FRONTEND_DEPLOY_COMMIT }}
+        run: |
+          set -euo pipefail
+          test "$REQUESTED_COMMIT" = "$GITHUB_SHA"
+          test "$PINNED_DEPLOYABLE_COMMIT" = "$GITHUB_SHA"
+          test "$CONFIRMATION" = "BACKEND_READY_FRONTEND_LAST"
+
       - name: Deploy to Cloudflare Pages
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deploy_frontend == true
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -114,6 +154,6 @@ jobs:
           command: pages deploy dist --project-name=fabsy --branch=main
 
       - name: Submit changed URLs to IndexNow
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.deploy_frontend == true
         continue-on-error: true
         run: node scripts/submit-indexnow.mjs --from "${{ github.event.before }}" --to WORKTREE

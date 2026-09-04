@@ -78,12 +78,19 @@ export default function GoogleConsent() {
     if (settingsOpen && !sensitive) heading.current?.focus({ preventScroll: true });
   }, [settingsOpen, sensitive]);
 
+  useEffect(() => {
+    const attribute = 'data-initial-measurement-consent-open';
+    if (compactInitialBanner) document.documentElement.setAttribute(attribute, 'true');
+    else document.documentElement.removeAttribute(attribute);
+    return () => document.documentElement.removeAttribute(attribute);
+  }, [compactInitialBanner]);
+
   const closeSettings = () => {
     setSettingsLocation(null);
     // Dismissal never becomes acceptance or refusal. Measurement stays off
     // when there is no stored choice; settings remain available below.
     setDismissedInitial(true);
-    settingsButton.current?.focus({ preventScroll: true });
+    if (settingsOpen) settingsButton.current?.focus({ preventScroll: true });
   };
 
   const choose = (next: 'accepted' | 'declined') => {
@@ -110,7 +117,7 @@ export default function GoogleConsent() {
       data-google-consent-panel
       data-google-consent-panel-mode={compactInitialBanner ? 'initial' : 'settings'}
       className={compactInitialBanner
-        ? 'fixed inset-x-2 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[60] max-h-[25vh] overflow-hidden rounded-lg border border-slate-300 bg-white p-2.5 text-start text-slate-900 shadow-xl md:inset-x-auto md:bottom-4 md:end-4 md:w-[32rem] md:max-w-[calc(100vw-2rem)] md:p-3'
+        ? 'fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-[60] max-h-[6.5rem] overflow-hidden rounded-lg border border-slate-300 bg-white p-2.5 text-start text-slate-900 shadow-xl md:inset-x-auto md:bottom-4 md:end-4 md:w-[32rem] md:max-h-[25vh] md:max-w-[calc(100vw-2rem)] md:p-3'
         : 'fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[60] max-h-[60vh] overflow-y-auto rounded-xl border border-slate-300 bg-white p-4 text-start text-slate-900 shadow-xl md:inset-x-auto md:bottom-4 md:end-4 md:w-[30rem] md:max-w-[calc(100vw-2rem)] md:p-5'}
       onKeyDown={event => {
         if (event.key === 'Escape') {
@@ -118,17 +125,17 @@ export default function GoogleConsent() {
           closeSettings();
         }
       }}>
-      {compactInitialBanner ? <div className="grid max-h-[calc(25vh-1.25rem)] grid-rows-[minmax(0,1fr)_auto] gap-2 md:max-h-[calc(25vh-1.5rem)]">
+      {compactInitialBanner ? <div className="grid max-h-[calc(6.5rem-1.25rem)] grid-rows-[minmax(0,1fr)_auto] gap-2 md:max-h-[calc(25vh-1.5rem)]">
         <h2 id={headingId} ref={heading} tabIndex={-1} className="sr-only outline-none">{copy.title}</h2>
-        <p id={descriptionId} className="min-h-0 overflow-y-auto text-[11px] leading-[15px] text-slate-700 sm:text-xs sm:leading-4">
+        <p id={descriptionId} tabIndex={0} className="min-h-0 overflow-y-auto text-xs leading-4 text-slate-700" aria-label={`${copy.title}. ${copy.body}`}>
           {copy.body}{' '}
           <Link to="/privacy-policy" className="font-medium text-slate-800 underline underline-offset-2" onClick={closeSettings}>{copy.privacyPolicy}</Link>
         </p>
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.75rem] items-stretch gap-1.5">
-          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-2 py-1.5 text-center text-[11px] leading-4 text-slate-900 sm:text-xs" data-google-consent-choice="accepted" onClick={() => choose('accepted')}>
+          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-2 py-1.5 text-center text-xs leading-4 text-slate-900" data-google-consent-choice="accepted" onClick={() => choose('accepted')}>
             {copy.allow}
           </Button>
-          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-2 py-1.5 text-center text-[11px] leading-4 text-slate-900 sm:text-xs" data-google-consent-choice="declined" onClick={() => choose('declined')}>
+          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-2 py-1.5 text-center text-xs leading-4 text-slate-900" data-google-consent-choice="declined" onClick={() => choose('declined')}>
             {copy.decline}
           </Button>
           <Button type="button" variant="ghost" size="icon" className="min-h-11 min-w-11 shrink-0" aria-label={copy.close} onClick={closeSettings}>
