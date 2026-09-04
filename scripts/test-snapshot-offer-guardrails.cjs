@@ -10,6 +10,7 @@ const { withoutExactPhotoCatalogOffer } = require('./public-offer-snapshot-guard
 const {
   browserTextGuardrailIssues,
   containsDisallowedOfferPricing,
+  hasPlaceholderTelephoneNumber,
 } = require('./validate-snapshot-guardrails.cjs');
 
 const promotion = proDriverPromotionValues(offers);
@@ -118,6 +119,36 @@ for (const copy of [
   offers.rapidResolution.oneLineDescription,
 ]) {
   assert.deepEqual(browserTextGuardrailIssues(page(copy), 'index'), [], copy);
+}
+for (const slug of ['index', 'rapid-resolution']) {
+  assert.deepEqual(
+    browserTextGuardrailIssues(page('Start online · $198 CAD + GST'), slug),
+    [],
+    `${slug} admits the exact Rapid Resolution sticky CTA`,
+  );
+}
+assert.ok(
+  browserTextGuardrailIssues(page('Start online · $198 CAD + GST'), 'contact')
+    .includes('unsupported monetary legal claim'),
+  'the short sticky CTA does not license an unnamed amount on unrelated routes',
+);
+assert.ok(
+  browserTextGuardrailIssues(page('Start online · $199 CAD + GST'), 'index')
+    .includes('unsupported monetary legal claim'),
+  'the sticky CTA admission remains pinned to the approved amount',
+);
+const leadPhoneInput = '<input autocomplete="tel" id="lead-phone" inputmode="tel" placeholder="403-555-0123" type="tel">';
+assert.equal(
+  hasPlaceholderTelephoneNumber(leadPhoneInput),
+  false,
+  'the exact phone-format example on the private-data input is not treated as published contact information',
+);
+for (const html of [
+  '<p>Call 403-555-0123</p>',
+  '<input id="other-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="403-555-0123">',
+  leadPhoneInput.replace('>', ' aria-label="Call 403-555-0123">'),
+]) {
+  assert.equal(hasPlaceholderTelephoneNumber(html), true, 'all other telephone-shaped fixtures remain blocked');
 }
 
 assert.deepEqual(browserTextGuardrailIssues(page(

@@ -176,6 +176,31 @@ function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const PLACEHOLDER_TELEPHONE_RE = /\b(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]?555[ .-]?\d{4}\b/;
+
+function tagAttribute(tag, name) {
+  const match = new RegExp(`\\s${name}\\s*=\\s*(["'])(.*?)\\1`, 'i').exec(tag);
+  return match ? decodeHtml(match[2]) : '';
+}
+
+function redactLeadPhoneFormatPlaceholder(value) {
+  return String(value).replace(/<input\b[^>]*>/gi, (tag) => {
+    const exactLeadPhoneInput =
+      tagAttribute(tag, 'id') === 'lead-phone' &&
+      tagAttribute(tag, 'type').toLowerCase() === 'tel' &&
+      tagAttribute(tag, 'inputmode').toLowerCase() === 'tel' &&
+      tagAttribute(tag, 'autocomplete').toLowerCase() === 'tel' &&
+      tagAttribute(tag, 'placeholder') === '403-555-0123';
+    return exactLeadPhoneInput
+      ? tag.replace(/\splaceholder\s*=\s*(["'])403-555-0123\1/i, ' placeholder="[telephone format example]"')
+      : tag;
+  });
+}
+
+function hasPlaceholderTelephoneNumber(value) {
+  return PLACEHOLDER_TELEPHONE_RE.test(redactLeadPhoneFormatPlaceholder(value));
+}
+
 /**
  * Curated/generated articles require the complete approved pricing paragraph.
  * Browser UI also contains named price cards, navigation and checkout links.
@@ -196,6 +221,8 @@ function redactBrowserCommercialFacts(value, slug) {
       `${rapid}\\s*\\|\\s*Alberta (?:Traffic )?Ticket (?:Help|Service)\\s*\\|\\s*`,
       `${rapid} provides eligible Alberta pre-trial traffic ticket agent services for\\s+`,
       '(?:Start|Start Rapid Resolution)\\s*·\\s*',
+      ...(slug === 'index' || slug === 'rapid-resolution'
+        ? ['Start online\\s*·\\s*'] : []),
       'Start Rapid Resolution View everything included\\s+',
       ...(slug === 'submit-ticket' ? ['continue to the transparent\\s+'] : []),
       ...(slug === 'index' || slug === 'rapid-resolution'
@@ -786,7 +813,7 @@ function validateAllPrerendered() {
     if (hasDisallowedOfferPricing(html, promotionRoute)) {
       fail(`${label}: Fabsy Offer schema contains an unapproved fixed price`);
     }
-    if (/\b(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]?555[ .-]?\d{4}\b/.test(html)) {
+    if (hasPlaceholderTelephoneNumber(html)) {
       fail(`${label}: placeholder telephone number`);
     }
     if (hasDisallowedRatingOrReviewSchema(html)) {
@@ -943,6 +970,7 @@ function publicSnapshotGuardrailIssues(html, route) {
 module.exports = {
   browserTextGuardrailIssues,
   containsDisallowedOfferPricing,
+  hasPlaceholderTelephoneNumber,
   redactBrowserCommercialFacts,
   publicSnapshotGuardrailIssues,
 };
