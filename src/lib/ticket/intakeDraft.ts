@@ -25,6 +25,14 @@ export type IntakeDraftUpload = {
   maxBytes: number;
 };
 
+export type IntakeDraftResumeDelivery = {
+  status: "pending" | "sending" | "sent" | "failed";
+  channel: "email" | "sms" | null;
+  sentAt: string | null;
+  canRetry: boolean;
+  mode: "manual" | "automatic";
+};
+
 export type IntakeDraftRecord = {
   draftId: string;
   revision: number;
@@ -37,10 +45,12 @@ export type IntakeDraftRecord = {
   draftData: Record<string, unknown>;
   ticketDocumentPath: string;
   ticketUploadedAt: string | null;
+  hasPendingTicketUpload: boolean;
   status: string;
   expiresAt: string;
   convertedSubmissionId?: string | null;
   clientId?: string | null;
+  resumeDelivery: IntakeDraftResumeDelivery;
   accessToken?: string;
   upload?: IntakeDraftUpload;
 };
@@ -114,7 +124,12 @@ export function readStoredIntakeDraft(storage: Pick<Storage, "getItem" | "remove
   } catch {
     // Remove malformed state below.
   }
-  storage.removeItem(INTAKE_DRAFT_STORAGE_KEY);
+  try {
+    storage.removeItem(INTAKE_DRAFT_STORAGE_KEY);
+  } catch {
+    // Storage can be blocked by browser privacy settings. The caller can still
+    // retain a newly validated capability in memory for the active tab.
+  }
   return null;
 }
 
@@ -124,7 +139,11 @@ export function rememberIntakeDraft(capability: IntakeDraftCapability, storage: 
 }
 
 export function forgetIntakeDraft(storage: Pick<Storage, "removeItem"> = localStorage): void {
-  storage.removeItem(INTAKE_DRAFT_STORAGE_KEY);
+  try {
+    storage.removeItem(INTAKE_DRAFT_STORAGE_KEY);
+  } catch {
+    // Expired server access still wins even when browser storage is blocked.
+  }
 }
 
 export function resumeTokenFromHash(hash: string): string | null {

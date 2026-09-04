@@ -41,6 +41,10 @@ interface IntakeLead {
   ticket_document_content_type: string;
   ticket_document_size_bytes: number;
   ticket_uploaded_at: string;
+  resume_delivery_status: "pending" | "sending" | "sent" | "failed";
+  resume_delivery_channel: "email" | "sms" | null;
+  resume_delivery_sent_at: string | null;
+  resume_delivery_attempt_count: number;
   expires_at: string;
   updated_at: string;
 }
@@ -136,7 +140,7 @@ export default function AdminCaseManagement() {
         .neq('status', 'assessment_checkout_open')
         .order('created_at', { ascending: false }),
         supabase.from('ticket_intake_drafts')
-          .select('id,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,expires_at,updated_at')
+          .select('id,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,expires_at,updated_at')
           .in('status', ['active', 'converted'])
           .not('ticket_uploaded_at', 'is', null)
           .gt('expires_at', new Date().toISOString())
@@ -270,6 +274,11 @@ export default function AdminCaseManagement() {
                     {lead.phone ? <span className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" />{lead.phone}</span> : null}
                   </div>
                   <p className="text-xs text-muted-foreground">Locale: {lead.preferred_locale} · Ticket {(lead.ticket_document_size_bytes / 1024).toFixed(0)} KB · Resume access expires {new Date(lead.expires_at).toLocaleDateString()}</p>
+                  <p className={`text-xs ${lead.resume_delivery_status === "failed" ? "font-medium text-destructive" : "text-muted-foreground"}`}>
+                    Resume link: {lead.resume_delivery_status}{lead.resume_delivery_channel ? ` by ${lead.resume_delivery_channel}` : ""}
+                    {lead.resume_delivery_sent_at ? ` · sent ${formatDistanceToNow(new Date(lead.resume_delivery_sent_at), { addSuffix: true })}` : ""}
+                    {lead.resume_delivery_attempt_count > 1 ? ` · ${lead.resume_delivery_attempt_count} attempts` : ""}
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant="outline" onClick={() => void openLeadTicket(lead)}>

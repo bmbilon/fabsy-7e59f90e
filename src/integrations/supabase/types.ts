@@ -271,6 +271,17 @@ export type Database = {
           contact_permission: boolean
           contact_permission_version: string
           contact_permission_recorded_at: string
+          resume_delivery_status: string
+          resume_delivery_generation: number
+          resume_delivery_channel: string | null
+          resume_delivery_claim_id: string | null
+          resume_delivery_claimed_at: string | null
+          resume_delivery_claim_expires_at: string | null
+          resume_delivery_attempted_at: string | null
+          resume_delivery_sent_at: string | null
+          resume_delivery_failed_at: string | null
+          resume_delivery_attempt_count: number
+          resume_delivery_failure_code: string | null
           draft_data: Json
           schema_version: number
           current_step: number
@@ -281,6 +292,9 @@ export type Database = {
           ticket_document_content_type: string
           ticket_document_size_bytes: number
           ticket_uploaded_at: string | null
+          pending_ticket_document_path: string | null
+          pending_ticket_document_content_type: string | null
+          pending_ticket_document_size_bytes: number | null
           converted_submission_id: string | null
           client_id: string | null
           converted_at: string | null
@@ -299,6 +313,17 @@ export type Database = {
           contact_permission?: boolean
           contact_permission_version?: string
           contact_permission_recorded_at?: string
+          resume_delivery_status?: string
+          resume_delivery_generation?: number
+          resume_delivery_channel?: string | null
+          resume_delivery_claim_id?: string | null
+          resume_delivery_claimed_at?: string | null
+          resume_delivery_claim_expires_at?: string | null
+          resume_delivery_attempted_at?: string | null
+          resume_delivery_sent_at?: string | null
+          resume_delivery_failed_at?: string | null
+          resume_delivery_attempt_count?: number
+          resume_delivery_failure_code?: string | null
           draft_data?: Json
           schema_version?: number
           current_step?: number
@@ -309,6 +334,9 @@ export type Database = {
           ticket_document_content_type: string
           ticket_document_size_bytes: number
           ticket_uploaded_at?: string | null
+          pending_ticket_document_path?: string | null
+          pending_ticket_document_content_type?: string | null
+          pending_ticket_document_size_bytes?: number | null
           converted_submission_id?: string | null
           client_id?: string | null
           converted_at?: string | null
@@ -327,6 +355,17 @@ export type Database = {
           contact_permission?: boolean
           contact_permission_version?: string
           contact_permission_recorded_at?: string
+          resume_delivery_status?: string
+          resume_delivery_generation?: number
+          resume_delivery_channel?: string | null
+          resume_delivery_claim_id?: string | null
+          resume_delivery_claimed_at?: string | null
+          resume_delivery_claim_expires_at?: string | null
+          resume_delivery_attempted_at?: string | null
+          resume_delivery_sent_at?: string | null
+          resume_delivery_failed_at?: string | null
+          resume_delivery_attempt_count?: number
+          resume_delivery_failure_code?: string | null
           draft_data?: Json
           schema_version?: number
           current_step?: number
@@ -337,6 +376,9 @@ export type Database = {
           ticket_document_content_type?: string
           ticket_document_size_bytes?: number
           ticket_uploaded_at?: string | null
+          pending_ticket_document_path?: string | null
+          pending_ticket_document_content_type?: string | null
+          pending_ticket_document_size_bytes?: number | null
           converted_submission_id?: string | null
           client_id?: string | null
           converted_at?: string | null

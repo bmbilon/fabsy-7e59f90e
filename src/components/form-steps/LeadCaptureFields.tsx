@@ -35,7 +35,7 @@ export default function LeadCaptureFields({ formData, updateFormData, error }: {
     <label htmlFor="contact-permission" className="flex cursor-pointer items-start gap-3 rounded-lg border bg-background p-4 text-sm leading-relaxed">
       <Checkbox id="contact-permission" className="mt-0.5" checked={formData.contactPermission}
         onCheckedChange={checked => updateFormData({ contactPermission: checked === true })} />
-      <span>I give Fabsy permission to contact me about this ticket and this intake using the email address or phone number I provided. This is not marketing consent or authorization to act on the ticket.</span>
+      <span>I give Fabsy permission to send me a secure resume link and contact me about this ticket intake using the email address or phone number I provided. Anyone with the link can open my saved intake, so I will not forward it. This is not marketing consent or authorization to act on the ticket.</span>
     </label>
     <p className="text-xs leading-relaxed text-muted-foreground">Saving this intake does not extend the response date on your ticket and does not create a representation agreement.</p>
     {error ? <p className="text-sm text-destructive" role="alert">{error}</p> : null}

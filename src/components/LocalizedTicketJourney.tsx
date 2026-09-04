@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, FileSearch, Loader2 } from 'lucide-react';
@@ -55,8 +55,10 @@ function LocalizedCheck({ name, data, update, label }: { name: keyof FormData; d
   </label>;
 }
 
-export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false }: {
+export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false, hasPendingTicketUpload = false, resumeAccess = null }: {
   formData: FormData; updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void; currentStep: number; nextStep: () => void; prevStep: () => void; intakeDraft?: IntakeDraftCapability | null; hasStoredTicket?: boolean;
+  hasPendingTicketUpload?: boolean;
+  resumeAccess?: ReactNode;
 }) {
   const { t } = useTranslation();
   const { isReleased, locale, href } = useLocale();
@@ -215,7 +217,10 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
         {summaryFields(['ticketNumber', 'issueDate', 'offenceDescription', 'fineAmount', 'location', 'courtDate', 'firstName', 'lastName', 'email', 'phone', 'address', 'city', 'province', 'postalCode', 'dateOfBirth', 'driversLicense', 'pleaType', 'explanation', 'circumstances', 'additionalNotes', 'digitalSignature'])}
         <p className="text-sm leading-relaxed text-slate-600">{t('intake.review.languageNote')}</p>
       </>}
-      {currentStep === 6 && <PaymentStep formData={formData} updateFormData={update} intakeDraft={intakeDraft} />}
+      {currentStep === 6 && (hasPendingTicketUpload
+        ? <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-900">Keep your last confirmed ticket or finish its replacement before checkout.</p>
+        : <PaymentStep formData={formData} updateFormData={update} intakeDraft={intakeDraft} />)}
+      {resumeAccess}
       <div className="flex items-center justify-between gap-3 border-t pt-6">
         <Button type="button" variant="outline" disabled={currentStep === 1 || scanning} onClick={() => { setErrors({}); prevStep(); headingRef.current?.focus(); }}><ArrowLeft className="me-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" />{t('common.back')}</Button>
         {currentStep < 6 && <Button type="button" disabled={scanning} onClick={moveNext}>{t('common.next')}<ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" /></Button>}

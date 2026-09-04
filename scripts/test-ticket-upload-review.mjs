@@ -115,7 +115,7 @@ const completeTicket = {
   courtDate: null,
 };
 
-async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false } = {}) {
+async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false, pendingUpload = false, deliveryStatus = "sent", deliveryChannel = "email", deliveryMode = "automatic", rotateOnSave = false, storageWriteFails = false } = {}) {
   const domErrors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on("jsdomError", error => domErrors.push(error));
@@ -157,7 +157,15 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
   window.IS_REACT_ACT_ENVIRONMENT = true;
   let draftRevision = 1;
   const draftToken = "a".repeat(64);
+  const rotatedDraftToken = "b".repeat(64);
   const draftId = "550e8400-e29b-41d4-a716-446655440000";
+  const resumeDelivery = (status = "pending", channel = null, mode = "automatic") => ({
+    status,
+    channel,
+    sentAt: status === "sent" ? new Date().toISOString() : null,
+    canRetry: status === "failed",
+    mode,
+  });
   const draftResponse = (extra = {}) => ({
     success: true, draftId, revision: draftRevision,
     contact: { email: "driver@example.test", phone: "" },
@@ -165,6 +173,8 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
     currentStep: 1, completedStep: 0, draftData: {},
     ticketDocumentPath: `${draftId}/representation-ticket-r1.png`,
     ticketUploadedAt: null, status: "active",
+    hasPendingTicketUpload: false,
+    resumeDelivery: resumeDelivery(),
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     ...extra,
   });
@@ -180,19 +190,46 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
         if (action === "prepare_upload") {
           draftRevision += 1;
           return Promise.resolve({ data: draftResponse({
+            hasPendingTicketUpload: !unuploadedDraft,
             upload: { bucket: "assessment-tickets", path: `${draftId}/representation-ticket-r${draftRevision}.png`, token: "signed-retry-upload", contentType: options.body.file.contentType, maxBytes: options.body.file.size },
           }), error: null });
         }
-        if (action === "confirm_upload") return Promise.resolve({ data: draftResponse({ ticketUploadedAt: new Date().toISOString() }), error: null });
+        if (action === "confirm_upload") return Promise.resolve({ data: draftResponse({
+          ticketUploadedAt: new Date().toISOString(),
+          hasPendingTicketUpload: false,
+          resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
+        }), error: null });
+        if (action === "retry_delivery") return Promise.resolve({ data: draftResponse({
+          ticketUploadedAt: new Date().toISOString(),
+          resumeDelivery: resumeDelivery("sent", deliveryChannel),
+        }), error: null });
         if (action === "read") return Promise.resolve({ data: draftResponse({
           contact: { email: "driver@example.test", phone: "4035550123" },
           draftData: { ...completeTicket, ticketType: "officer_issued", ticketTypeSource: "upload", email: "driver@example.test", phone: "4035550123" },
           ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString(),
+          hasPendingTicketUpload: pendingUpload,
+          resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
           ...(convertedDraft ? { status: "converted", currentStep: 6, completedStep: 5, convertedSubmissionId: draftId, clientId: "550e8400-e29b-41d4-a716-446655440001" } : {}),
         }), error: null });
         if (action === "save") {
           draftRevision += 1;
-          return Promise.resolve({ data: draftResponse({ currentStep: options.body.currentStep, completedStep: options.body.completedStep, draftData: options.body.draftData, ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString() }), error: null });
+          return Promise.resolve({ data: draftResponse({
+            currentStep: options.body.currentStep,
+            completedStep: options.body.completedStep,
+            draftData: options.body.draftData,
+            ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString(),
+            ...(rotateOnSave ? { accessToken: rotatedDraftToken } : {}),
+          }), error: null });
+        }
+        if (action === "discard_pending_upload") {
+          draftRevision += 1;
+          return Promise.resolve({ data: draftResponse({
+            contact: { email: "driver@example.test", phone: "4035550123" },
+            draftData: { ...completeTicket, ticketType: "officer_issued", ticketTypeSource: "upload", email: "driver@example.test", phone: "4035550123" },
+            ticketUploadedAt: new Date().toISOString(),
+            hasPendingTicketUpload: false,
+            resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
+          }), error: null });
         }
         throw new Error(`Unexpected draft action: ${action}`);
       }
@@ -217,6 +254,12 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
     accessToken: draftToken,
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
   }));
+  if (storageWriteFails) {
+    Object.defineProperty(Object.getPrototypeOf(window.localStorage), "setItem", {
+      configurable: true,
+      value() { throw new window.DOMException("Synthetic storage denial", "QuotaExceededError"); },
+    });
+  }
   window.module = { exports: {} };
   window.eval(script);
   const api = window.module.exports;
@@ -317,12 +360,59 @@ test("a fresh intake presents capture first and waits for the current OCR scan b
   await app.finish(0);
   app.hiddenDetails();
   assert.ok(app.field("lead-email"), "Contact details are collected before the full ticket form");
+  assert.match(app.document.body.textContent, /permission to send me a secure resume link/i);
+  assert.match(app.document.body.textContent, /anyone with the link can open my saved intake/i);
   await app.saveLead();
   assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
   assert.equal(app.field("fineAmount").value, "200");
   assert.equal(app.uploadRequests.length, 1, "The ticket is uploaded once through a signed private URL");
   assert.deepEqual(app.draftRequests.map(request => request.action).slice(0, 2), ["create", "confirm_upload"]);
+  assert.match(app.document.body.textContent, /emailed your secure resume link/i);
+  assert.ok(app.button("Copy resume link"), "A copy-link fallback remains available after delivery");
   app.continueEnabled();
+});
+
+test("disabled provider delivery presents a truthful manual copy fallback without a futile retry", async t => {
+  const app = await runtime(t, {}, {
+    deliveryStatus: "pending",
+    deliveryChannel: null,
+    deliveryMode: "manual",
+  });
+  await app.choose(app.file());
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.saveLead();
+  assert.match(app.document.body.textContent, /copy the secure resume link below so you can return/i);
+  assert.ok(app.button("Copy resume link"));
+  assert.equal(app.buttons("Retry sending").length, 0);
+  assert.doesNotMatch(app.document.body.textContent, /could not send the secure resume link/i);
+});
+
+test("a blocked browser storage write keeps a newly created capability usable in memory", async t => {
+  const app = await runtime(t, {}, { storageWriteFails: true });
+  await app.choose(app.file());
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.saveLead();
+  assert.match(app.document.body.textContent, /could not remember your secure return access/i);
+  assert.ok(app.button("Copy resume link"));
+  await app.api.click(app.button("Continue"));
+  assert.equal(app.draftRequests.at(-1)?.action, "save");
+  assert.equal(app.draftRequests.at(-1)?.accessToken, "a".repeat(64));
+});
+
+test("a definite delivery failure stays visible, retryable and keeps the copy-link fallback", async t => {
+  const app = await runtime(t, {}, { deliveryStatus: "failed", deliveryChannel: "email" });
+  await app.choose(app.file());
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.saveLead();
+  assert.match(app.document.body.textContent, /could not send the secure resume link/i);
+  assert.ok(app.button("Copy resume link"));
+  await app.api.click(app.button("Retry sending"));
+  await app.until(() => /emailed your secure resume link/i.test(app.document.body.textContent), "Expected a successful explicit delivery retry");
+  assert.deepEqual(app.draftRequests.map(request => request.action), ["create", "confirm_upload", "retry_delivery"]);
+  assert.equal(app.buttons("Retry sending").length, 0, "A sent link cannot be retried from the intake");
 });
 
 test("a refresh restores an uploaded intake from its local capability without requiring the File object", async t => {
@@ -334,6 +424,41 @@ test("a refresh restores an uploaded intake from its local capability without re
   assert.equal(app.document.getElementById("lead-email"), null, "The minimum lead screen is complete after a verified upload");
   assert.match(app.document.body.textContent, /stored privately/i);
   app.continueEnabled();
+});
+
+test("a reload discards an unfinished replacement and restores the last confirmed ticket", async t => {
+  const app = await runtime(t, {}, { resumeDraft: true, pendingUpload: true });
+  await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved ticket to restore");
+  assert.deepEqual(
+    app.draftRequests.map(request => request.action),
+    ["read", "discard_pending_upload"],
+  );
+  assert.equal(app.buttons("Keep previous ticket").length, 0, "Successful automatic recovery clears the pending replacement");
+  app.continueEnabled();
+});
+
+test("the browser adopts a capability rotated by a contact-saving response", async t => {
+  const app = await runtime(t, {}, { resumeDraft: true, rotateOnSave: true });
+  await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved ticket to restore");
+  await app.api.click(app.button("Continue"));
+  await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected the saved step to advance");
+  const stored = JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1"));
+  assert.equal(stored.accessToken, "b".repeat(64));
+});
+
+test("a rotated capability remains usable in memory when browser storage rejects it", async t => {
+  const app = await runtime(t, {}, {
+    resumeDraft: true,
+    rotateOnSave: true,
+    storageWriteFails: true,
+  });
+  await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved ticket to restore");
+  await app.api.click(app.button("Continue"));
+  await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected the saved step to advance");
+  assert.match(app.document.body.textContent, /could not remember your secure return access/i);
+  await app.api.click(app.button("Send resume link"));
+  assert.equal(app.draftRequests.at(-1)?.action, "retry_delivery");
+  assert.equal(app.draftRequests.at(-1)?.accessToken, "b".repeat(64));
 });
 
 test("a draft whose first upload failed can retry without losing its synchronized contact", async t => {

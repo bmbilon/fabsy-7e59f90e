@@ -6,8 +6,11 @@ import {
 } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import {
   createDraftAccessToken,
+  discardedPendingObjectForCleanup,
+  draftCapabilityWasRotated,
   DraftRequestError,
   draftStoragePath,
+  draftUploadVerificationTarget,
   isAllowedTicketIntakeOrigin,
   mergeDraftContact,
   parseDraftAccessToken,
@@ -166,4 +169,66 @@ Deno.test("helpers never accept async malformed capability input", async () => {
   await assertRejects(async () => {
     parseDraftAccessToken(await Promise.resolve("not-a-capability"));
   }, DraftRequestError);
+});
+
+Deno.test("replacement verification preserves the confirmed ticket until the pending object wins", () => {
+  const confirmed = {
+    ticket_document_path: "draft/confirmed.pdf",
+    ticket_document_content_type: "application/pdf",
+    ticket_document_size_bytes: 1200,
+    pending_ticket_document_path: "draft/replacement.jpg",
+    pending_ticket_document_content_type: "image/jpeg",
+    pending_ticket_document_size_bytes: 2400,
+  };
+  assertEquals(draftUploadVerificationTarget(confirmed), {
+    path: "draft/replacement.jpg",
+    contentType: "image/jpeg",
+    size: 2400,
+    replacement: true,
+  });
+  assertEquals(
+    draftUploadVerificationTarget({
+      ...confirmed,
+      pending_ticket_document_path: null,
+      pending_ticket_document_content_type: null,
+      pending_ticket_document_size_bytes: null,
+    }),
+    {
+      path: "draft/confirmed.pdf",
+      contentType: "application/pdf",
+      size: 1200,
+      replacement: false,
+    },
+  );
+});
+
+Deno.test("discard cleanup never removes a concurrently confirmed or still-pending object", () => {
+  const pending = "draft/replacement.jpg";
+  assertEquals(
+    discardedPendingObjectForCleanup(pending, {
+      ticket_document_path: "draft/confirmed.pdf",
+      pending_ticket_document_path: null,
+    }),
+    pending,
+  );
+  assertEquals(
+    discardedPendingObjectForCleanup(pending, {
+      ticket_document_path: pending,
+      pending_ticket_document_path: null,
+    }),
+    null,
+  );
+  assertEquals(
+    discardedPendingObjectForCleanup(pending, {
+      ticket_document_path: "draft/confirmed.pdf",
+      pending_ticket_document_path: pending,
+    }),
+    null,
+  );
+});
+
+Deno.test("capability rotation is acknowledged only for the server-provided replacement hash", () => {
+  assert(draftCapabilityWasRotated("old", "new", "new"));
+  assert(!draftCapabilityWasRotated("old", "unexpected", "new"));
+  assert(!draftCapabilityWasRotated("same", "same", "same"));
 });

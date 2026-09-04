@@ -7,8 +7,11 @@ import {
 import {
   assertAllowedKeys,
   createDraftAccessToken,
+  discardedPendingObjectForCleanup,
+  draftCapabilityWasRotated,
   DraftRequestError,
   draftStoragePath,
+  draftUploadVerificationTarget,
   isAllowedTicketIntakeOrigin,
   MAX_TICKET_FILE_BYTES,
   mergeDraftContact,
@@ -28,6 +31,17 @@ import {
   syncContactIntoDraftData,
   ticketIntakeResponseHeaders,
 } from "../_shared/ticket-intake-draft.ts";
+import {
+  deliverTicketIntakeResume,
+  MAX_RESUME_DELIVERY_ATTEMPTS,
+  preserveConfirmedDraftOnDeliveryFailure,
+  publicResumeDeliveryState,
+  type ResumeDeliveryChannel,
+  resumeDeliveryEnabled,
+  type ResumeDeliveryFailureCode,
+  type ResumeDeliveryStatus,
+  safeResumeDeliveryAttempt,
+} from "../_shared/ticket-intake-resume-delivery.ts";
 
 const STORAGE_BUCKET = "assessment-tickets";
 const FUNCTION_ALLOWED_ORIGINS =
@@ -51,9 +65,23 @@ type DraftRow = {
   ticket_document_content_type: string;
   ticket_document_size_bytes: number;
   ticket_uploaded_at: string | null;
+  pending_ticket_document_path: string | null;
+  pending_ticket_document_content_type: string | null;
+  pending_ticket_document_size_bytes: number | null;
   converted_submission_id: string | null;
   client_id: string | null;
   expires_at: string;
+  resume_delivery_status: ResumeDeliveryStatus;
+  resume_delivery_generation: number;
+  resume_delivery_channel: ResumeDeliveryChannel | null;
+  resume_delivery_claim_id: string | null;
+  resume_delivery_claimed_at: string | null;
+  resume_delivery_claim_expires_at: string | null;
+  resume_delivery_attempted_at: string | null;
+  resume_delivery_sent_at: string | null;
+  resume_delivery_failed_at: string | null;
+  resume_delivery_attempt_count: number;
+  resume_delivery_failure_code: ResumeDeliveryFailureCode | null;
 };
 
 type AdminDatabase = {
@@ -95,6 +123,7 @@ type AdminDatabase = {
           p_current_step: number;
           p_completed_step: number;
           p_draft_data: JsonRecord;
+          p_replacement_access_token_hash: string;
         };
         Returns: DraftRow;
       };
@@ -110,6 +139,32 @@ type AdminDatabase = {
         Returns: DraftRow;
       };
       confirm_ticket_intake_draft_upload: {
+        Args: {
+          p_id: string;
+          p_access_token_hash: string;
+          p_expected_revision: number;
+        };
+        Returns: DraftRow;
+      };
+      claim_ticket_intake_resume_delivery: {
+        Args: {
+          p_id: string;
+          p_access_token_hash: string;
+          p_claim_id: string;
+          p_retry: boolean;
+        };
+        Returns: DraftRow;
+      };
+      complete_ticket_intake_resume_delivery: {
+        Args: {
+          p_id: string;
+          p_claim_id: string;
+          p_outcome: "sent" | "failed" | "indeterminate";
+          p_failure_code: ResumeDeliveryFailureCode | null;
+        };
+        Returns: DraftRow;
+      };
+      discard_pending_ticket_intake_draft_upload: {
         Args: {
           p_id: string;
           p_access_token_hash: string;
@@ -155,10 +210,17 @@ function responseForDraft(row: DraftRow) {
     draftData: row.draft_data || {},
     ticketDocumentPath: row.ticket_document_path,
     ticketUploadedAt: row.ticket_uploaded_at,
+    hasPendingTicketUpload: Boolean(row.pending_ticket_document_path),
     status: row.status,
     expiresAt: row.expires_at,
     convertedSubmissionId: row.converted_submission_id,
     clientId: row.client_id,
+    resumeDelivery: publicResumeDeliveryState(
+      row,
+      resumeDeliveryEnabled(
+        Deno.env.get("TICKET_INTAKE_RESUME_DELIVERY_ENABLED"),
+      ),
+    ),
   };
 }
 
@@ -177,6 +239,29 @@ function mapDatabaseFailure(error: { message?: string } | null) {
       "draft_revision_conflict",
     );
   }
+  if (error?.message?.includes("TICKET_INTAKE_DELIVERY_NOT_READY")) {
+    throw new DraftStateError(
+      "Upload the ticket before sending a resume link.",
+      409,
+      "draft_delivery_not_ready",
+    );
+  }
+  if (error?.message?.includes("TICKET_INTAKE_DELIVERY_ACCESS_DENIED")) {
+    throw new DraftStateError(
+      "This saved intake is not available.",
+      404,
+      "draft_not_found",
+    );
+  }
+  if (
+    error?.message?.includes("TICKET_INTAKE_PENDING_UPLOAD_NOT_DISCARDABLE")
+  ) {
+    throw new DraftStateError(
+      "There is no confirmed ticket to keep.",
+      409,
+      "draft_pending_upload_not_discardable",
+    );
+  }
   throw new Error("Draft database operation failed.");
 }
 
@@ -190,7 +275,7 @@ async function activeDraft(
   let query = admin
     .from("ticket_intake_drafts")
     .select(
-      "id,access_token_hash,email,phone,preferred_locale,alberta_confirmed,contact_permission,draft_data,current_step,completed_step,revision,status,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,converted_submission_id,client_id,expires_at",
+      "id,access_token_hash,email,phone,preferred_locale,alberta_confirmed,contact_permission,draft_data,current_step,completed_step,revision,status,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,pending_ticket_document_path,pending_ticket_document_content_type,pending_ticket_document_size_bytes,converted_submission_id,client_id,expires_at,resume_delivery_status,resume_delivery_generation,resume_delivery_channel,resume_delivery_claim_id,resume_delivery_claimed_at,resume_delivery_claim_expires_at,resume_delivery_attempted_at,resume_delivery_sent_at,resume_delivery_failed_at,resume_delivery_attempt_count,resume_delivery_failure_code",
     )
     .eq("access_token_hash", accessTokenHash);
   if (draftId) query = query.eq("id", draftId);
@@ -252,6 +337,140 @@ async function signedUpload(
     contentType: row.ticket_document_content_type,
     maxBytes: MAX_TICKET_FILE_BYTES,
   };
+}
+
+async function removeStorageObjectsBestEffort(
+  admin: SupabaseAdmin,
+  paths: string[],
+) {
+  if (!paths.length) return;
+  try {
+    await admin.storage.from(STORAGE_BUCKET).remove(paths);
+  } catch {
+    // Never expose or log private object paths. The database reference has
+    // already moved, so a later retention sweep can remove an orphan.
+  }
+}
+
+async function completeResumeDelivery(
+  admin: SupabaseAdmin,
+  row: DraftRow,
+  claimId: string,
+  outcome: "sent" | "failed" | "indeterminate",
+  failureCode: ResumeDeliveryFailureCode | null,
+) {
+  const { data, error } = await admin.rpc(
+    "complete_ticket_intake_resume_delivery",
+    {
+      p_id: row.id,
+      p_claim_id: claimId,
+      p_outcome: outcome,
+      p_failure_code: failureCode,
+    },
+  );
+  if (error) mapDatabaseFailure(error);
+  return rowFromResult(data);
+}
+
+async function attemptResumeDelivery(
+  admin: SupabaseAdmin,
+  row: DraftRow,
+  accessToken: string,
+  accessTokenHash: string,
+  retry: boolean,
+): Promise<DraftRow> {
+  const deliveryEnabled = resumeDeliveryEnabled(
+    Deno.env.get("TICKET_INTAKE_RESUME_DELIVERY_ENABLED"),
+  );
+  if (!deliveryEnabled) return row;
+
+  const claimId = crypto.randomUUID();
+  const { data, error } = await admin.rpc(
+    "claim_ticket_intake_resume_delivery",
+    {
+      p_id: row.id,
+      p_access_token_hash: accessTokenHash,
+      p_claim_id: claimId,
+      p_retry: retry,
+    },
+  );
+  if (error) mapDatabaseFailure(error);
+  const claimed = rowFromResult(data);
+  if (
+    claimed.resume_delivery_status !== "sending" ||
+    claimed.resume_delivery_claim_id !== claimId
+  ) {
+    return claimed;
+  }
+
+  const recipient = claimed.resume_delivery_channel === "email"
+    ? claimed.email
+    : claimed.phone;
+  if (!recipient || !claimed.resume_delivery_channel) {
+    try {
+      return await completeResumeDelivery(
+        admin,
+        claimed,
+        claimId,
+        "failed",
+        "configuration_missing",
+      );
+    } catch {
+      return claimed;
+    }
+  }
+  const attempt = await safeResumeDeliveryAttempt(() =>
+    deliverTicketIntakeResume({
+      draftId: claimed.id,
+      accessToken,
+      generation: claimed.resume_delivery_generation,
+      channel: claimed.resume_delivery_channel!,
+      recipient,
+      preferredLocale: claimed.preferred_locale as Parameters<
+        typeof deliverTicketIntakeResume
+      >[0]["preferredLocale"],
+      configuration: {
+        siteUrl: Deno.env.get("SITE_URL"),
+        resendApiKey: Deno.env.get("RESEND_API_KEY"),
+        resendFrom: Deno.env.get("TICKET_INTAKE_RESUME_FROM_EMAIL"),
+        resendReplyTo: Deno.env.get("TICKET_INTAKE_RESUME_REPLY_TO"),
+        twilioAccountSid: Deno.env.get("TWILIO_ACCOUNT_SID"),
+        twilioAuthToken: Deno.env.get("TWILIO_AUTH_TOKEN"),
+        twilioPhoneNumber: Deno.env.get("TWILIO_PHONE_NUMBER"),
+      },
+    })
+  );
+  try {
+    return await completeResumeDelivery(
+      admin,
+      claimed,
+      claimId,
+      attempt.outcome,
+      attempt.failureCode,
+    );
+  } catch {
+    return claimed;
+  }
+}
+
+async function safeAttemptResumeDelivery(
+  admin: SupabaseAdmin,
+  row: DraftRow,
+  accessToken: string,
+  accessTokenHash: string,
+  retry: boolean,
+) {
+  return await preserveConfirmedDraftOnDeliveryFailure(
+    row,
+    () =>
+      attemptResumeDelivery(
+        admin,
+        row,
+        accessToken,
+        accessTokenHash,
+        retry,
+      ),
+  );
 }
 
 async function createDraft(
@@ -366,6 +585,8 @@ async function saveDraft(admin: SupabaseAdmin, body: JsonRecord) {
     draftData,
   );
   const synchronizedDraft = syncContactIntoDraftData(draftData, contact);
+  const replacementAccessToken = createDraftAccessToken();
+  const replacementAccessTokenHash = await sha256Hex(replacementAccessToken);
   const { data, error } = await admin.rpc("save_ticket_intake_draft", {
     p_id: row.id,
     p_access_token_hash: accessTokenHash,
@@ -375,9 +596,21 @@ async function saveDraft(admin: SupabaseAdmin, body: JsonRecord) {
     p_current_step: currentStep,
     p_completed_step: completedStep,
     p_draft_data: synchronizedDraft,
+    p_replacement_access_token_hash: replacementAccessTokenHash,
   });
   if (error) mapDatabaseFailure(error);
-  return responseForDraft(rowFromResult(data));
+  const saved = rowFromResult(data);
+  const capabilityRotated = draftCapabilityWasRotated(
+    accessTokenHash,
+    saved.access_token_hash,
+    replacementAccessTokenHash,
+  );
+  return {
+    ...responseForDraft(saved),
+    ...(capabilityRotated
+      ? { accessToken: replacementAccessToken, capabilityRotated: true }
+      : {}),
+  };
 }
 
 async function prepareUpload(admin: SupabaseAdmin, body: JsonRecord) {
@@ -413,23 +646,53 @@ async function prepareUpload(admin: SupabaseAdmin, body: JsonRecord) {
   );
   if (error) mapDatabaseFailure(error);
   const prepared = rowFromResult(data);
-  if (row.ticket_document_path !== prepared.ticket_document_path) {
-    const { error: cleanupError } = await admin.storage.from(STORAGE_BUCKET)
-      .remove([row.ticket_document_path]);
-    if (cleanupError) {
-      // Cleanup is best effort; the old path is no longer accepted by this draft.
-    }
+  const obsoletePath = row.pending_ticket_document_path ||
+    (!row.ticket_uploaded_at ? row.ticket_document_path : null);
+  if (obsoletePath && obsoletePath !== path) {
+    await removeStorageObjectsBestEffort(admin, [obsoletePath]);
   }
   return { ...responseForDraft(prepared), upload };
 }
 
-async function confirmUpload(admin: SupabaseAdmin, body: JsonRecord) {
+async function discardPendingUpload(admin: SupabaseAdmin, body: JsonRecord) {
   assertAllowedKeys(body, ["action", "draftId", "accessToken", "revision"]);
   const { row, accessTokenHash } = await activeDraft(admin, body);
+  requireMutable(row);
+  const revision = parseRevision(body.revision);
+  if (!row.pending_ticket_document_path) return responseForDraft(row);
+  const pendingPath = row.pending_ticket_document_path;
+  const { data, error } = await admin.rpc(
+    "discard_pending_ticket_intake_draft_upload",
+    {
+      p_id: row.id,
+      p_access_token_hash: accessTokenHash,
+      p_expected_revision: revision,
+    },
+  );
+  if (error) mapDatabaseFailure(error);
+  const discarded = rowFromResult(data);
+  const cleanupPath = discardedPendingObjectForCleanup(pendingPath, discarded);
+  if (cleanupPath) await removeStorageObjectsBestEffort(admin, [cleanupPath]);
+  return responseForDraft(discarded);
+}
+
+async function confirmUpload(admin: SupabaseAdmin, body: JsonRecord) {
+  assertAllowedKeys(body, ["action", "draftId", "accessToken", "revision"]);
+  const { row, accessToken, accessTokenHash } = await activeDraft(admin, body);
   requireMutable(row);
   const revision = body.revision === undefined
     ? row.revision
     : parseRevision(body.revision);
+  if (row.ticket_uploaded_at && !row.pending_ticket_document_path) {
+    const delivered = await safeAttemptResumeDelivery(
+      admin,
+      row,
+      accessToken,
+      accessTokenHash,
+      false,
+    );
+    return responseForDraft(delivered);
+  }
   if (revision !== Number(row.revision)) {
     throw new DraftStateError(
       "This saved intake changed in another tab. Reload it before confirming the upload.",
@@ -437,11 +700,10 @@ async function confirmUpload(admin: SupabaseAdmin, body: JsonRecord) {
       "draft_revision_conflict",
     );
   }
-  if (row.ticket_uploaded_at) return responseForDraft(row);
-
-  const slash = row.ticket_document_path.indexOf("/");
-  const folder = row.ticket_document_path.slice(0, slash);
-  const filename = row.ticket_document_path.slice(slash + 1);
+  const target = draftUploadVerificationTarget(row);
+  const slash = target.path.indexOf("/");
+  const folder = target.path.slice(0, slash);
+  const filename = target.path.slice(slash + 1);
   if (folder !== row.id || !filename) {
     throw new Error("Stored ticket path is invalid.");
   }
@@ -458,8 +720,8 @@ async function confirmUpload(admin: SupabaseAdmin, body: JsonRecord) {
   if (
     !storageObjectMatches(
       {
-        contentType: row.ticket_document_content_type,
-        size: row.ticket_document_size_bytes,
+        contentType: target.contentType,
+        size: target.size,
       },
       metadata,
     )
@@ -480,7 +742,54 @@ async function confirmUpload(admin: SupabaseAdmin, body: JsonRecord) {
     },
   );
   if (error) mapDatabaseFailure(error);
-  return responseForDraft(rowFromResult(data));
+  const confirmed = rowFromResult(data);
+  if (
+    target.replacement &&
+    row.ticket_document_path !== confirmed.ticket_document_path
+  ) {
+    await removeStorageObjectsBestEffort(admin, [row.ticket_document_path]);
+  }
+  const delivered = await safeAttemptResumeDelivery(
+    admin,
+    confirmed,
+    accessToken,
+    accessTokenHash,
+    false,
+  );
+  return responseForDraft(delivered);
+}
+
+async function retryResumeDelivery(admin: SupabaseAdmin, body: JsonRecord) {
+  assertAllowedKeys(body, ["action", "draftId", "accessToken"]);
+  const { row, accessToken, accessTokenHash } = await activeDraft(admin, body);
+  if (!row.ticket_uploaded_at) {
+    throw new DraftStateError(
+      "Upload the ticket before sending a resume link.",
+      409,
+      "draft_delivery_not_ready",
+    );
+  }
+  const automaticEnabled = resumeDeliveryEnabled(
+    Deno.env.get("TICKET_INTAKE_RESUME_DELIVERY_ENABLED"),
+  );
+  const retryFailure = row.resume_delivery_status === "failed" &&
+    row.resume_delivery_attempt_count < MAX_RESUME_DELIVERY_ATTEMPTS;
+  const sendPending = row.resume_delivery_status === "pending";
+  if (!automaticEnabled || (!retryFailure && !sendPending)) {
+    throw new DraftStateError(
+      "This resume delivery cannot be retried.",
+      409,
+      "draft_delivery_not_retryable",
+    );
+  }
+  const delivered = await safeAttemptResumeDelivery(
+    admin,
+    row,
+    accessToken,
+    accessTokenHash,
+    retryFailure,
+  );
+  return responseForDraft(delivered);
 }
 
 serve(async (req) => {
@@ -532,6 +841,10 @@ serve(async (req) => {
       ? await prepareUpload(admin, body)
       : body.action === "confirm_upload"
       ? await confirmUpload(admin, body)
+      : body.action === "discard_pending_upload"
+      ? await discardPendingUpload(admin, body)
+      : body.action === "retry_delivery"
+      ? await retryResumeDelivery(admin, body)
       : (() => {
         throw new DraftRequestError("action is invalid.");
       })();

@@ -26,6 +26,7 @@ import { isProLicenceClass, LICENCE_CLASS_OPTIONS, normalizeLicenceClass, type L
 import { latestReferralAttribution, normalizeReferralCode, ReferralCaptureError, type ReferralAttribution } from "@/lib/referrals/attribution";
 import { captureReferralCode, captureReferralFromLocation, clearReferralAttribution, readActiveReferral, REFERRAL_ATTRIBUTION_EVENT } from "@/lib/referrals/capture";
 import { useTicketIntakeDraft } from "@/hooks/useTicketIntakeDraft";
+import type { IntakeDraftResumeDelivery } from "@/lib/ticket/intakeDraft";
 
 export interface FormData {
   // Unified intake handoff
@@ -167,6 +168,19 @@ const steps = [
   { id: 5, title: "Review", description: "Review your information" },
   { id: 6, title: "Payment", description: "Secure payment processing" }
 ];
+
+function resumeDeliveryMessage(delivery?: IntakeDraftResumeDelivery, hasUploadedTicket = true) {
+  if (!hasUploadedTicket) return "Your intake is saved, but the private ticket upload still needs to finish. Copy the secure link so you can return.";
+  if (delivery?.status === "sent") {
+    return delivery.channel === "sms"
+      ? "We texted your secure resume link. You can also copy it below."
+      : "We emailed your secure resume link. You can also copy it below.";
+  }
+  if (delivery?.mode === "manual") return "Your intake is saved. Copy the secure resume link below so you can return.";
+  if (delivery?.status === "failed") return "Your intake is saved, but we could not send the secure resume link. Retry or copy it below.";
+  if (delivery?.status === "sending") return "Your intake is saved, but we could not confirm whether the secure resume link was sent. Copy it below now.";
+  return "Your intake is saved. Send the secure resume link or copy it below now.";
+}
 
 function mergeCachedTicketData(current: FormData, raw: Record<string, unknown>): FormData {
   const merged = applyDetectedTicketType({
@@ -434,11 +448,11 @@ const TicketForm = ({
   const saveLead = async () => {
     if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") return;
     try {
-      await intakeDraft.createOrUpload(formData.ticketImage, formData as unknown as Record<string, unknown>);
+      const saved = await intakeDraft.createOrUpload(formData.ticketImage, formData as unknown as Record<string, unknown>);
       setLeadSaved(true);
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
       window.dispatchEvent(new CustomEvent("fabsy:intake-lead-saved"));
-      toast({ title: "Your intake is saved", description: "Your ticket is stored privately. Continue reviewing the captured details below." });
+      toast({ title: "Your intake is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
       scrollToForm();
     } catch (failure) {
       toast({
@@ -458,6 +472,14 @@ const TicketForm = ({
 
   const nextStep = async () => {
     if (currentStep < steps.length) {
+      if (intakeDraft.record?.hasPendingTicketUpload) {
+        toast({
+          title: "Finish the ticket replacement first",
+          description: "Retry the upload or keep your last confirmed ticket before continuing.",
+          variant: "destructive",
+        });
+        return;
+      }
       if (autosaveTimer.current !== null) {
         window.clearTimeout(autosaveTimer.current);
         autosaveTimer.current = null;
@@ -508,6 +530,75 @@ const TicketForm = ({
     };
   }, [formData, currentStep, leadSaved, intakeDraftCapability, intakeDraftRecordStatus, saveIntakeDraft]);
 
+  const copyResumeLink = async () => {
+    const url = intakeDraft.getResumeUrl();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Secure resume link copied" });
+    } catch {
+      toast({ title: "Could not copy the link", description: "Use this browser to continue the saved intake.", variant: "destructive" });
+    }
+  };
+
+  const retryResumeDelivery = async () => {
+    try {
+      const updated = await intakeDraft.retryDelivery();
+      const sent = updated.resumeDelivery?.status === "sent";
+      toast({
+        title: sent ? "Secure resume link sent" : "Resume link was not sent",
+        description: sent
+          ? resumeDeliveryMessage(updated.resumeDelivery)
+          : "Your intake remains saved. Copy the secure link below and try delivery again later.",
+        ...(sent ? {} : { variant: "destructive" as const }),
+      });
+    } catch (failure) {
+      toast({
+        title: "Resume link was not sent",
+        description: failure instanceof Error ? failure.message : "Your intake remains saved. Copy the secure link below.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const discardPendingUpload = async () => {
+    try {
+      await intakeDraft.discardPendingUpload();
+      toast({
+        title: "Previous ticket kept",
+        description: "The unfinished replacement was discarded. You can continue with your last confirmed ticket.",
+      });
+    } catch (failure) {
+      toast({
+        title: "Could not restore the previous ticket",
+        description: failure instanceof Error ? failure.message : "Try again before continuing.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const delivery = intakeDraft.record?.resumeDelivery;
+  const hasPendingTicketUpload = intakeDraft.record?.hasPendingTicketUpload === true;
+  const resumeAccess = intakeDraft.capability ? <div lang="en" className="my-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
+    <div className="min-w-0 flex-1">
+      <p className="font-medium">Secure return access</p>
+      <p className="text-muted-foreground" aria-live="polite">{hasPendingTicketUpload
+        ? "A replacement upload did not finish. Keep your last confirmed ticket before continuing, or choose the replacement again."
+        : resumeDeliveryMessage(delivery, intakeDraft.hasUploadedTicket)}</p>
+      {intakeDraft.error ? <p className="mt-1 text-destructive">{intakeDraft.error}</p> : null}
+    </div>
+    <div className="flex flex-wrap gap-2">
+      {hasPendingTicketUpload ? <Button type="button" variant="outline" disabled={intakeDraft.discardingPendingUpload} onClick={() => void discardPendingUpload()}>
+        {intakeDraft.discardingPendingUpload ? "Restoring…" : "Keep previous ticket"}
+      </Button> : null}
+      {!hasPendingTicketUpload && delivery?.mode === "automatic" &&
+        ((delivery.status === "failed" && delivery.canRetry) || delivery.status === "pending") ? <Button type="button" variant="outline" disabled={intakeDraft.deliveryRetrying} onClick={() => void retryResumeDelivery()}>
+        {intakeDraft.deliveryRetrying ? "Sending…" : delivery.status === "pending" ? "Send resume link" : "Retry sending"}
+      </Button> : null}
+      <Button type="button" variant="outline" onClick={() => void copyResumeLink()}>Copy resume link</Button>
+    </div>
+  </div> : null;
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -522,22 +613,6 @@ const TicketForm = ({
             hasStoredTicket={intakeDraft.hasUploadedTicket}
           />
           {captureOnly ? <LeadCaptureFields formData={formData} updateFormData={updateFormData} error={intakeDraft.error} /> : null}
-          {!captureOnly && intakeDraft.capability ? <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
-            <div>
-              <p className="font-medium">{intakeDraft.status === "saving" ? "Saving your changes…" : intakeDraft.status === "error" ? "Some changes are not saved yet." : "Your intake is saved."}</p>
-              <p className="text-muted-foreground">Keep a secure resume link if you want to finish on another device. Anyone with the link can open this intake.</p>
-            </div>
-            <Button type="button" variant="outline" onClick={async () => {
-              const url = intakeDraft.getResumeUrl();
-              if (!url) return;
-              try {
-                await navigator.clipboard.writeText(url);
-                toast({ title: "Secure resume link copied" });
-              } catch {
-                toast({ title: "Could not copy the link", description: "Use this browser to continue the saved intake.", variant: "destructive" });
-              }
-            }}>Copy resume link</Button>
-          </div> : null}
           {!captureOnly && ticketReviewReady && !isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
             <Label htmlFor="pro-licence-class" className="text-base font-semibold">Alberta licence class</Label>
             <Select value={formData.licenceClass} onValueChange={value => updateFormData({ licenceClass: normalizeLicenceClass(value) })}>
@@ -560,7 +635,9 @@ const TicketForm = ({
       case 5:
         return <ReviewStep formData={formData} onSubmit={nextStep} />;
       case 6:
-        return <PaymentStep formData={formData} updateFormData={updateFormData} intakeDraft={intakeDraft.capability && intakeDraft.hasUploadedTicket ? intakeDraft.capability : null} />;
+        return hasPendingTicketUpload
+          ? <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm">Keep your last confirmed ticket or finish its replacement before checkout.</p>
+          : <PaymentStep formData={formData} updateFormData={updateFormData} intakeDraft={intakeDraft.capability && intakeDraft.hasUploadedTicket ? intakeDraft.capability : null} />;
       default:
         return null;
     }
@@ -573,6 +650,7 @@ const TicketForm = ({
         return !!(
           leadSaved &&
           ticketReviewReady &&
+          !hasPendingTicketUpload &&
           (formData.ticketImage || formData.sourceAssessmentId || intakeDraft.hasUploadedTicket) &&
           missingRequiredTicketFields(formData).length === 0 &&
           (!isPhotoRadar || formData.registeredOwnerOnOffenceDate) &&
@@ -616,6 +694,7 @@ const TicketForm = ({
     const m: string[] = [];
     switch (currentStep) {
       case 1:
+        if (hasPendingTicketUpload) m.push("Finish or discard the replacement ticket upload");
         if (!formData.ticketImage && !formData.sourceAssessmentId && !intakeDraft.hasUploadedTicket) m.push("Ticket PDF or photo");
         m.push(...missingRequiredTicketFields(formData).map(field => ({
           ticketNumber: "Ticket number", issueDate: isPhotoRadar ? "Offence date" : "Issue date",
@@ -663,8 +742,8 @@ const TicketForm = ({
     </section>
   );
   if (locale !== "en") return <LocalizedTicketJourney formData={formData} updateFormData={updateFormData} currentStep={currentStep} nextStep={nextStep} prevStep={prevStep}
-    intakeDraft={intakeDraft.capability && intakeDraft.hasUploadedTicket ? intakeDraft.capability : null}
-    hasStoredTicket={intakeDraft.hasUploadedTicket} />;
+    intakeDraft={intakeDraft.capability && intakeDraft.hasUploadedTicket && !hasPendingTicketUpload ? intakeDraft.capability : null}
+    hasStoredTicket={intakeDraft.hasUploadedTicket} hasPendingTicketUpload={hasPendingTicketUpload} resumeAccess={resumeAccess} />;
 
   return (
     <section className={`${captureOnly ? "py-4 sm:py-8" : "py-10 sm:py-16"} bg-gradient-soft min-h-screen`}>
@@ -750,6 +829,8 @@ const TicketForm = ({
           </div>}
 
           {renderStep()}
+
+          {resumeAccess}
 
           {/* Navigation - Bottom */}
           {captureOnly && <div className="mt-8 border-t pt-6">

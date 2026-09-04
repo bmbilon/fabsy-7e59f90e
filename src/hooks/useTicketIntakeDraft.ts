@@ -4,6 +4,7 @@ import {
   hydrateIntakeDraftData,
   invokeIntakeDraft,
   isIntakeDraftAccessToken,
+  isIntakeDraftCapability,
   readStoredIntakeDraft,
   rememberIntakeDraft,
   resumeTokenFromHash,
@@ -26,6 +27,8 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
   const [capability, setCapability] = useState<IntakeDraftCapability | null>(null);
   const [record, setRecord] = useState<IntakeDraftRecord | null>(null);
   const [status, setStatus] = useState<IntakeDraftStatus>("loading");
+  const [deliveryRetrying, setDeliveryRetrying] = useState(false);
+  const [discardingPendingUpload, setDiscardingPendingUpload] = useState(false);
   const [error, setError] = useState("");
   const capabilityRef = useRef<IntakeDraftCapability | null>(null);
   const revisionRef = useRef(0);
@@ -34,16 +37,54 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
   restoreRef.current = onRestore;
 
   const applyRecord = useCallback((next: IntakeDraftRecord, accessToken?: string) => {
-    const token = accessToken ?? capabilityRef.current?.accessToken;
+    // A contact correction after a delivery attempt rotates the bearer
+    // capability. Prefer that newly issued token over the prior local copy.
+    const token = next.accessToken ?? accessToken ?? capabilityRef.current?.accessToken;
     if (!token || !isIntakeDraftAccessToken(token)) throw new Error("The secure resume token is invalid.");
     const nextCapability = { draftId: next.draftId, accessToken: token, expiresAt: next.expiresAt };
-    rememberIntakeDraft(nextCapability);
+    if (!isIntakeDraftCapability(nextCapability)) throw new Error("The secure resume capability is invalid or expired.");
+    let storageFailed = false;
+    try {
+      rememberIntakeDraft(nextCapability);
+    } catch {
+      storageFailed = true;
+    }
     capabilityRef.current = nextCapability;
     revisionRef.current = next.revision;
     setCapability(nextCapability);
     setRecord(next);
+    if (storageFailed) {
+      setError("This browser could not remember your secure return access. Your intake remains saved in this tab; copy the resume link now before closing it.");
+    }
     return nextCapability;
   }, []);
+
+  const discardPendingUpload = useCallback(async () => {
+    const activeCapability = capabilityRef.current;
+    if (!activeCapability) throw new Error("The secure intake session was lost.");
+    setDiscardingPendingUpload(true);
+    setError("");
+    try {
+      const restored = await invokeIntakeDraft({
+        action: "discard_pending_upload",
+        draftId: activeCapability.draftId,
+        accessToken: activeCapability.accessToken,
+        revision: revisionRef.current,
+      });
+      applyRecord(restored);
+      setStatus("saved");
+      return restored;
+    } catch (failure) {
+      const message = failure instanceof Error
+        ? failure.message
+        : "The unfinished replacement upload could not be discarded.";
+      setError(message);
+      setStatus("error");
+      throw failure;
+    } finally {
+      setDiscardingPendingUpload(false);
+    }
+  }, [applyRecord]);
 
   useEffect(() => {
     let active = true;
@@ -67,12 +108,27 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
         return;
       }
       try {
-        const restored = await invokeIntakeDraft({
+        let restored = await invokeIntakeDraft({
           action: "read",
           accessToken,
           ...(stored?.draftId ? { draftId: stored.draftId } : {}),
         });
         if (!active) return;
+        if (restored.hasPendingTicketUpload) {
+          // A browser close or failed upload must not leave an invisible
+          // replacement blocking checkout. Restore the last confirmed ticket.
+          try {
+            restored = await invokeIntakeDraft({
+              action: "discard_pending_upload",
+              draftId: restored.draftId,
+              accessToken,
+              revision: restored.revision,
+            });
+          } catch {
+            // Keep the capability and expose a manual recovery action below.
+          }
+          if (!active) return;
+        }
         applyRecord(restored, accessToken);
         restoreRef.current(restored, {
           ...hydrateIntakeDraftData(restored.draftData || {}),
@@ -81,7 +137,12 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
           albertaConfirmed: restored.albertaConfirmed === true,
           contactPermission: restored.contactPermission === true,
         });
-        setStatus("saved");
+        if (restored.hasPendingTicketUpload) {
+          setError("A replacement ticket upload is unfinished. Keep your last confirmed ticket before continuing.");
+          setStatus("error");
+        } else {
+          setStatus("saved");
+        }
       } catch (failure) {
         if (!active) return;
         forgetIntakeDraft();
@@ -101,6 +162,7 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     if ("error" in descriptor) throw new Error(descriptor.error);
     setStatus("saving");
     setError("");
+    let preparedReplacement = Boolean(record?.hasPendingTicketUpload);
     try {
       let created: IntakeDraftRecord;
       const current = capabilityRef.current;
@@ -115,14 +177,17 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
           draftData: serializeIntakeDraftData(formData),
         });
         applyRecord(synchronized);
+        const synchronizedCapability = capabilityRef.current;
+        if (!synchronizedCapability) throw new Error("The secure intake session was lost.");
         created = await invokeIntakeDraft({
           action: "prepare_upload",
-          draftId: current.draftId,
-          accessToken: current.accessToken,
+          draftId: synchronizedCapability.draftId,
+          accessToken: synchronizedCapability.accessToken,
           revision: revisionRef.current,
           file: { contentType: descriptor.mimeType, size: file.size },
         });
         applyRecord(created);
+        preparedReplacement = created.hasPendingTicketUpload;
       } else {
         created = await invokeIntakeDraft({
           action: "create",
@@ -152,12 +217,26 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
       setStatus("saved");
       return confirmed;
     } catch (failure) {
+      if (preparedReplacement && capabilityRef.current) {
+        try {
+          const restored = await invokeIntakeDraft({
+            action: "discard_pending_upload",
+            draftId: capabilityRef.current.draftId,
+            accessToken: capabilityRef.current.accessToken,
+            revision: revisionRef.current,
+          });
+          applyRecord(restored);
+        } catch {
+          // Keep the pending state visible so checkout remains blocked and the
+          // customer can explicitly recover the last confirmed ticket.
+        }
+      }
       const message = failure instanceof Error ? failure.message : "Your intake could not be saved.";
       setError(message);
       setStatus("error");
       throw failure;
     }
-  }, [applyRecord, preferredLocale]);
+  }, [applyRecord, preferredLocale, record?.hasPendingTicketUpload]);
 
   const save = useCallback((formData: Record<string, unknown>, currentStep: number, completedStep: number) => {
     const snapshot = serializeIntakeDraftData(formData);
@@ -197,6 +276,28 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     return activeCapability ? resumeUrl(activeCapability, window.location) : null;
   }, []);
 
+  const retryDelivery = useCallback(async () => {
+    const activeCapability = capabilityRef.current;
+    if (!activeCapability) throw new Error("The secure intake session was lost.");
+    setDeliveryRetrying(true);
+    setError("");
+    try {
+      const delivered = await invokeIntakeDraft({
+        action: "retry_delivery",
+        draftId: activeCapability.draftId,
+        accessToken: activeCapability.accessToken,
+      });
+      applyRecord(delivered);
+      return delivered;
+    } catch (failure) {
+      const message = failure instanceof Error ? failure.message : "The secure resume link could not be sent.";
+      setError(message);
+      throw failure;
+    } finally {
+      setDeliveryRetrying(false);
+    }
+  }, [applyRecord]);
+
   return {
     capability,
     record,
@@ -205,6 +306,10 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     hasUploadedTicket: Boolean(record?.ticketUploadedAt && record.ticketDocumentPath),
     createOrUpload,
     save,
+    retryDelivery,
+    deliveryRetrying,
+    discardPendingUpload,
+    discardingPendingUpload,
     getResumeUrl,
   };
 }

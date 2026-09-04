@@ -505,3 +505,58 @@ export function storageObjectMatches(
       actual.size === expected.size,
   );
 }
+
+/** A replacement stays pending until its object is verified; the last confirmed
+ * object remains the public draft document throughout a failed/interrupted upload. */
+export function draftUploadVerificationTarget(row: {
+  ticket_document_path: string;
+  ticket_document_content_type: string;
+  ticket_document_size_bytes: number;
+  pending_ticket_document_path?: string | null;
+  pending_ticket_document_content_type?: string | null;
+  pending_ticket_document_size_bytes?: number | null;
+}) {
+  if (
+    row.pending_ticket_document_path &&
+    row.pending_ticket_document_content_type &&
+    typeof row.pending_ticket_document_size_bytes === "number"
+  ) {
+    return {
+      path: row.pending_ticket_document_path,
+      contentType: row.pending_ticket_document_content_type,
+      size: row.pending_ticket_document_size_bytes,
+      replacement: true,
+    } as const;
+  }
+  return {
+    path: row.ticket_document_path,
+    contentType: row.ticket_document_content_type,
+    size: row.ticket_document_size_bytes,
+    replacement: false,
+  } as const;
+}
+
+export function discardedPendingObjectForCleanup(
+  previousPendingPath: string | null,
+  returned: {
+    ticket_document_path: string;
+    pending_ticket_document_path?: string | null;
+  },
+): string | null {
+  if (
+    !previousPendingPath ||
+    returned.ticket_document_path === previousPendingPath ||
+    returned.pending_ticket_document_path === previousPendingPath
+  ) {
+    return null;
+  }
+  return previousPendingPath;
+}
+
+export function draftCapabilityWasRotated(
+  previousHash: string,
+  returnedHash: string,
+  candidateHash: string,
+): boolean {
+  return previousHash !== returnedHash && returnedHash === candidateHash;
+}

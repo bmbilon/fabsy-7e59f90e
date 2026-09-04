@@ -82,6 +82,12 @@ test("resume links keep the bearer token in the fragment and strip it after use"
   }, { origin: "https://fabsy.test", pathname: "/submit-ticket" });
   assert.equal(url, `https://fabsy.test/submit-ticket#resume=${token}`);
   assert.equal(new URL(url).search, "");
+  const localizedUrl = draft.resumeUrl({
+    draftId: "550e8400-e29b-41d4-a716-446655440000",
+    accessToken: token,
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+  }, { origin: "https://fabsy.test", pathname: "/pa/submit-ticket" });
+  assert.equal(localizedUrl, `https://fabsy.test/pa/submit-ticket#resume=${token}`);
 });
 
 test("stored capabilities reject malformed and expired bearer tokens", () => {

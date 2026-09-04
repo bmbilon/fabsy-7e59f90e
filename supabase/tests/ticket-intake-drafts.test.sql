@@ -77,7 +77,8 @@ $$;
 select public.save_ticket_intake_draft(
   '00000000-0000-4000-8000-000000000101', repeat('a', 64), 1,
   'updated@example.com', null, 2::smallint, 1::smallint,
-  '{"email":"updated@example.com","firstName":"Test"}'::jsonb
+  '{"email":"updated@example.com","firstName":"Test"}'::jsonb,
+  repeat('9', 64)
 );
 
 do $$
@@ -98,7 +99,8 @@ begin
   begin
     perform public.save_ticket_intake_draft(
       '00000000-0000-4000-8000-000000000101', repeat('a', 64), 1,
-      'lead@example.com', null, 2::smallint, 1::smallint, '{}'::jsonb
+      'lead@example.com', null, 2::smallint, 1::smallint, '{}'::jsonb,
+      repeat('9', 64)
     );
     raise exception 'stale draft save unexpectedly succeeded';
   exception when others then
