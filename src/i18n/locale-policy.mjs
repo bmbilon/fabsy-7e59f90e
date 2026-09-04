@@ -7,6 +7,7 @@ export const LEGAL_SOURCE_DOCUMENT_PATHS = Object.freeze([
   'src/pages/TermsOfService.tsx',
   'src/pages/TermsOfPurchase.tsx',
   'src/components/form-steps/ConsentStep.tsx',
+  'src/components/form-steps/LeadCaptureFields.tsx',
   'src/pages/PrivacyPolicy.tsx',
   'src/config/pro-drivers.ts',
   'src/config/offers.ts',

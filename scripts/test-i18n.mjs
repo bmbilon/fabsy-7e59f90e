@@ -70,6 +70,7 @@ const sourceDocuments = {
   'src/pages/TermsOfService.tsx': 'terms-fixture',
   'src/pages/TermsOfPurchase.tsx': 'purchase-fixture',
   'src/components/form-steps/ConsentStep.tsx': 'consent-fixture',
+  'src/components/form-steps/LeadCaptureFields.tsx': 'lead-capture-consent-fixture',
   'src/pages/PrivacyPolicy.tsx': 'privacy-fixture',
   'src/config/pro-drivers.ts': 'pro-pricing-fixture',
   'src/config/offers.ts': 'offer-contract-fixture',

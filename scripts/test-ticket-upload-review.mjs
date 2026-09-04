@@ -440,6 +440,13 @@ test("a released localized intake saves the lead and then autosaves later fields
 
   assert.match(app.document.body.textContent, /English terms control/i,
     "localized lead confirmations remain explicitly identified as English controls");
+  const englishControlsNotice = [...app.document.querySelectorAll('p')]
+    .find(node => /English terms control/i.test(node.textContent));
+  assert.ok(englishControlsNotice);
+  assert.equal(englishControlsNotice.closest('[lang="en"]'), null,
+    "the translated control notice must inherit the selected language, not be mislabeled as English");
+  assert.equal(app.field("lead-email").closest('[lang]')?.getAttribute('lang'), 'en',
+    "the untranslated lead consent fields must remain explicitly marked as English fallback content");
   await app.api.click(app.button("Continue"));
   await app.until(() => app.document.getElementById("localized-firstName"),
     "the localized journey should advance only after its private draft is saved");

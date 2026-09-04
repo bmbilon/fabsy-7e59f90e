@@ -234,14 +234,16 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
           {scanMessage && <p role="status" className="text-sm leading-relaxed">{t(scanMessage)}</p>}
           {replacementMessage && <p role="alert" className="text-sm leading-relaxed text-red-700" lang="en" dir="ltr">{replacementMessage}</p>}
         </div>
-        {!leadSaved && <div lang="en" dir="ltr">
+        {!leadSaved && <div>
           <p className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
             {t('language.englishControls')}
           </p>
-          <LeadCaptureFields formData={formData} updateFormData={update} error={leadError} />
-          {leadValidationAttempted && !leadReady ? <p className="mt-3 text-sm text-red-700" role="alert">
-            Add a valid email or phone number and select both confirmations before saving.
-          </p> : null}
+          <div lang="en" dir="ltr">
+            <LeadCaptureFields formData={formData} updateFormData={update} error={leadError} />
+            {leadValidationAttempted && !leadReady ? <p className="mt-3 text-sm text-red-700" role="alert">
+              Add a valid email or phone number and select both confirmations before saving.
+            </p> : null}
+          </div>
         </div>}
         <div className="grid gap-5 sm:grid-cols-2">
           {field('ticketNumber', { required: true })}{field('issueDate', { required: true, type: 'date' })}
@@ -281,7 +283,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
         <p className="text-sm leading-relaxed text-slate-600">{t('intake.review.languageNote')}</p>
       </>}
       {currentStep === 6 && (hasPendingTicketUpload
-        ? <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-900">Keep your last confirmed ticket or finish its replacement before checkout.</p>
+        ? <p role="alert" lang="en" dir="ltr" className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-900">Keep your last confirmed ticket or finish its replacement before checkout.</p>
         : <PaymentStep formData={formData} updateFormData={update} intakeDraft={intakeDraft} />)}
       {resumeAccess}
       <div className="flex items-center justify-between gap-3 border-t pt-6">
