@@ -47,6 +47,7 @@ const PrivacyPolicy = () => {
               <li>Verify pro driver eligibility from private licence evidence and administer the discount or corresponding payment adjustment</li>
               <li>Attribute referrals, check Alberta scope and fleet-account exclusions, and compare referrer and referred-driver email, phone, address, plate and payment-customer records to detect self-referrals and fraud</li>
               <li>Administer referral payouts, resolve refund or payment disputes and meet applicable tax-reporting obligations</li>
+              <li>Reconcile aggregate purchase and refund amounts and evaluate paid-acquisition economics using PII-free payment references</li>
               <li>Comply with legal obligations and court requirements</li>
               <li>Improve our services and website functionality</li>
             </ul>
@@ -154,6 +155,18 @@ const PrivacyPolicy = () => {
               advertising click identifiers. Purchase events include the service, purchase
               value, currency, tax and an opaque transaction reference used to prevent
               duplicate counting.
+            </p>
+            <p className="mt-4">
+              Separately from optional browser analytics, after Stripe verifies a payment or
+              refund, Fabsy keeps a private PII-free financial ledger containing the service,
+              amount, tax, currency, refund status and timestamps. Stripe Checkout Session,
+              PaymentIntent, Event and Refund identifiers are stored in that ledger only as
+              one-way SHA-256 hashes. It does not contain a name, email address, phone number,
+              case or ticket identifier, uploaded file, form answer, IP address or user agent.
+              An anonymous campaign-session link is added only when Fabsy funnel measurement
+              consent was active for that checkout, and a measurement withdrawal cannot create
+              or restore that link. Refund facts are not sent to Google or Meta. These financial
+              records follow the business-record retention rules in section 5.
             </p>
             <p className="mt-4">
               With your permission, Meta Pixel records a manually sent PageView on the three

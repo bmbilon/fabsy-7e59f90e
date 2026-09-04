@@ -50,6 +50,29 @@ interface FunnelReport {
   events: EventTotal[];
   campaigns: CampaignTotal[];
   daily: Array<{ day: string; landing_sessions: number; lead_sessions: number; purchase_sessions: number }>;
+  financials?: {
+    scope: 'all_customer_purchases_from_signed_stripe_webhooks';
+    amount_basis: 'gross_customer_cash_including_tax';
+    refund_events_sent_to_ad_providers: false;
+    purchase_count: number;
+    currently_attributed_purchase_count: number;
+    unattributed_or_withdrawn_purchase_count: number;
+    succeeded_refund_count: number;
+    succeeded_refund_amount_cents: number;
+    unmatched_succeeded_refund_count: number;
+    unmatched_succeeded_refund_amount_cents: number;
+    purchase_cohort: {
+      purchase_count: number;
+      refunded_purchase_count: number;
+      any_refund_purchase_rate: number | null;
+      gross_purchase_amount_cents: number;
+      succeeded_refund_amount_cents: number;
+      gross_refund_adjusted_amount_cents: number;
+      business_reason_status: 'not_classified_by_stripe_webhook';
+    };
+    net_retained_customer_status: 'not_measurable_without_qualifying_crown_rejection';
+    new_vs_returning_customer_status: 'not_implemented_without_canonical_customer_order_identity';
+  };
 }
 
 const windows = [1, 7, 14, 30, 90] as const;
@@ -89,11 +112,35 @@ function normalizeReport(value: FunnelReport): FunnelReport {
         }))
       : [],
     daily: Array.isArray(value.daily) ? value.daily : [],
+    financials: value.financials ? {
+      ...value.financials,
+      purchase_count: numberValue(value.financials.purchase_count),
+      currently_attributed_purchase_count: numberValue(value.financials.currently_attributed_purchase_count),
+      unattributed_or_withdrawn_purchase_count: numberValue(value.financials.unattributed_or_withdrawn_purchase_count),
+      succeeded_refund_count: numberValue(value.financials.succeeded_refund_count),
+      succeeded_refund_amount_cents: numberValue(value.financials.succeeded_refund_amount_cents),
+      unmatched_succeeded_refund_count: numberValue(value.financials.unmatched_succeeded_refund_count),
+      unmatched_succeeded_refund_amount_cents: numberValue(value.financials.unmatched_succeeded_refund_amount_cents),
+      purchase_cohort: {
+        ...value.financials.purchase_cohort,
+        purchase_count: numberValue(value.financials.purchase_cohort.purchase_count),
+        refunded_purchase_count: numberValue(value.financials.purchase_cohort.refunded_purchase_count),
+        any_refund_purchase_rate: value.financials.purchase_cohort.any_refund_purchase_rate === null
+          ? null : numberValue(value.financials.purchase_cohort.any_refund_purchase_rate),
+        gross_purchase_amount_cents: numberValue(value.financials.purchase_cohort.gross_purchase_amount_cents),
+        succeeded_refund_amount_cents: numberValue(value.financials.purchase_cohort.succeeded_refund_amount_cents),
+        gross_refund_adjusted_amount_cents: numberValue(value.financials.purchase_cohort.gross_refund_adjusted_amount_cents),
+      },
+    } : undefined,
   };
 }
 
 function percent(numerator: number, denominator: number): string {
   return denominator > 0 ? `${((numerator / denominator) * 100).toFixed(1)}%` : '—';
+}
+
+function cad(cents: number): string {
+  return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(cents / 100);
 }
 
 export default function AdminPaidFunnel() {
@@ -136,6 +183,7 @@ export default function AdminPaidFunnel() {
   const landingSessions = eventSessions.get('landing_view') || 0;
   const phoneSessions = eventSessions.get('phone_click') || 0;
   const canceledSessions = eventSessions.get('checkout_canceled') || 0;
+  const cohort = report?.financials?.purchase_cohort;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -209,6 +257,30 @@ export default function AdminPaidFunnel() {
                 </div>
               </div>;
             })}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Verified payment and refund cash facts</CardTitle>
+            <CardDescription>
+              All-customer, order-level facts from signed Stripe webhooks. Amounts include tax and are separate from the consented-session funnel above. Refund facts are never sent to Google or Meta.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Purchases in window</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : cohort?.purchase_count ?? 'Not measurable'}</div></div>
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Purchases with any refund</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : cohort ? `${cohort.refunded_purchase_count} (${cohort.any_refund_purchase_rate === null ? '—' : `${(cohort.any_refund_purchase_rate * 100).toFixed(1)}%`})` : 'Not measurable'}</div></div>
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Gross purchases</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : cohort ? cad(cohort.gross_purchase_amount_cents) : 'Not measurable'}</div></div>
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Succeeded refunds</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : cohort ? cad(cohort.succeeded_refund_amount_cents) : 'Not measurable'}</div></div>
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Refund-adjusted gross</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : cohort ? cad(cohort.gross_refund_adjusted_amount_cents) : 'Not measurable'}</div></div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Refund business reasons are not classified by Stripe. Net-retained customers remain not measurable until Fabsy records the qualifying Crown-rejection condition; the 30-day clock is never inferred from payment date.
+            </p>
+            {report?.financials?.unmatched_succeeded_refund_count ? <p className="text-sm font-medium text-amber-700">
+              {report.financials.unmatched_succeeded_refund_count} succeeded refund(s), totaling {cad(report.financials.unmatched_succeeded_refund_amount_cents)}, are not yet matched to a supported paid-acquisition product.
+            </p> : null}
           </CardContent>
         </Card>
 

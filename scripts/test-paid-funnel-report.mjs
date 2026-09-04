@@ -48,4 +48,7 @@ test('admin report clearly identifies consent scope and platform reconciliation'
   assert.match(ui, /Reconcile them with Meta and Google clicks, spend, and consent acceptance/i);
   assert.match(ui, /Recoverable lead rate/);
   assert.match(ui, /Verified purchases/);
+  assert.match(ui, /All-customer, order-level facts from signed Stripe webhooks/i);
+  assert.match(ui, /Net-retained customers remain not measurable/i);
+  assert.match(ui, /Refund facts are never sent to Google or Meta/i);
 });

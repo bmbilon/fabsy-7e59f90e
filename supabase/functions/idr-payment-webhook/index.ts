@@ -15,6 +15,10 @@ import {
 } from "../_shared/meta-capi.ts";
 import { currentMetaPurchaseFromSignedCheckout } from "../_shared/meta-purchase.ts";
 import { paidFunnelProductFromSignedCheckout } from "../_shared/funnel-checkout.ts";
+import {
+  recordPaidPurchaseLedger,
+  recordPaidRefundLedger,
+} from "../_shared/paid-payment-ledger.ts";
 
 type IdrOrderType = "standalone" | "addon";
 type CheckoutIntentType = IdrOrderType | "ticket" | "assessment" | "photo_radar";
@@ -106,6 +110,42 @@ async function recordCurrentPaidFunnelPurchaseIfEligible(
   if (error || (data !== true && data !== false)) {
     throw new Error("Verified funnel purchase could not be recorded.");
   }
+}
+
+async function recordCurrentPaidPaymentPurchaseIfEligible(
+  supabase: SupabaseAdmin,
+  event: StripeEventData,
+  session: CheckoutSessionData,
+) {
+  // Unsupported/non-acquisition products are intentional no-ops. A valid
+  // projected purchase must persist; conflicts throw so Stripe retries.
+  await recordPaidPurchaseLedger(supabase, event, session);
+}
+
+async function recordChargeRefundLedger(
+  stripe: Stripe,
+  supabase: SupabaseAdmin,
+  event: StripeEventData,
+  charge: Stripe.Charge,
+) {
+  if (!charge.id || charge.amount_refunded <= 0) return;
+  let startingAfter: string | undefined;
+  for (let pageNumber = 0; pageNumber < 100; pageNumber += 1) {
+    const page = await stripe.refunds.list({
+      charge: charge.id,
+      limit: 100,
+      ...(startingAfter ? { starting_after: startingAfter } : {}),
+    });
+    for (const refund of page.data) {
+      await recordPaidRefundLedger(supabase, event, refund);
+    }
+    if (!page.has_more) return;
+    startingAfter = page.data.at(-1)?.id;
+    if (!startingAfter) {
+      throw new Error("Stripe refund pagination could not be completed.");
+    }
+  }
+  throw new Error("Stripe refund pagination exceeded its safety bound.");
 }
 
 function isUuid(value: string | undefined): value is string {
@@ -1191,6 +1231,7 @@ serve(async (req: Request): Promise<Response> => {
       const refund = await stripe.refunds.retrieve(session.id);
       const paymentIntentId = typeof refund.payment_intent === "string"
         ? refund.payment_intent : refund.payment_intent?.id;
+      await recordPaidRefundLedger(supabase, event, refund);
       if (paymentIntentId && refund.status !== "failed" && refund.status !== "canceled") {
         await recordReferralRefund(supabase, {
           paymentIntentId, refundedAt: new Date(refund.created * 1000).toISOString(), eventId: event.id,
@@ -1206,6 +1247,7 @@ serve(async (req: Request): Promise<Response> => {
       if (paymentIntentId && charge.amount_refunded > 0) {
         await recordReferralRefund(supabase, { paymentIntentId, eventId: event.id });
       }
+      await recordChargeRefundLedger(stripe, supabase, event, charge);
       return json({ received: true, handled: true });
     }
     if (event.type === "charge.dispute.created") {
@@ -1247,6 +1289,7 @@ serve(async (req: Request): Promise<Response> => {
       const result = await persistPaidPhotoRadarCheckout(supabase, session);
       await recordRepresentationPayment(supabase, session);
       await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
+      await recordCurrentPaidPaymentPurchaseIfEligible(supabase, event, session);
       return json({ received: true, handled: true, result, review_path: "ate" });
     }
     if (session.metadata?.fabsy_checkout_kind === "ticket_assessment") {
@@ -1274,6 +1317,7 @@ serve(async (req: Request): Promise<Response> => {
         );
       }
       await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
+      await recordCurrentPaidPaymentPurchaseIfEligible(supabase, event, session);
       await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
       return json({ received: true, handled: true, result });
     }
@@ -1299,6 +1343,7 @@ serve(async (req: Request): Promise<Response> => {
     }
     if (session.metadata?.fabsy_checkout_kind === "ticket_with_addon") {
       await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
+      await recordCurrentPaidPaymentPurchaseIfEligible(supabase, event, session);
       await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
     }
     return json({ received: true, handled: true, result });
