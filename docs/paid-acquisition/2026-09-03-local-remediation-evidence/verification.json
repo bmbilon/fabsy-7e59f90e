@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-04T03:05:26Z",
+  "decision": "LOCAL_BUILD_PASS_PRODUCTION_NO_GO",
+  "repository": {
+    "worktree": "/private/tmp/fabsy-paid-acquisition-readiness",
+    "branch": "codex/paid-acquisition-readiness",
+    "baseCommit": "de4ba6137c63e2abe7f8a055b671573e9e84c43a",
+    "implementationHead": "c7eff24c8bebd836cf74e7d148bece2bbb384fe2"
+  },
+  "ownerInputs": {
+    "rapidResolutionPriceCadBeforeGst": 198,
+    "fulfillmentCostCad": 0,
+    "stillRequired": [
+      "effective refund rate including eligibility and out-of-scope refunds",
+      "average support cost per paid customer",
+      "required contribution per paid customer",
+      "qualified-lead-to-paid rate or explicit no-history declaration",
+      "weekly case capacity",
+      "live payment, tax, refund and dispute fee readback"
+    ]
+  },
+  "implemented": [
+    "conversion-focused Rapid Resolution first view with qualified offer, upfront price, upload and phone actions",
+    "qualified homepage promise and mobile action path",
+    "private capability-addressed early lead with autosave, refresh, Back and cancel recovery",
+    "gated resume delivery with copy-link fallback and recoverable capability rotation",
+    "consent-gated PII-free first-party funnel events and aggregate reporting",
+    "safe paid attribution with withdrawal fencing and signed-webhook-only purchases",
+    "PII-free all-customer purchase and refund cash ledger",
+    "bounded expired-draft cleanup and durable exact-path object deletion queue",
+    "fail-closed 21-gate restart validator with spend-loss and pause ceilings"
+  ],
+  "verification": [
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "detail": "Full prebuild, Vite production build and prerendered copy completed. Browserslist age, Sass deprecation, mixed static/dynamic import and large-chunk notices remain warnings."
+    },
+    {
+      "command": "npm run test:i18n",
+      "status": "PASS",
+      "detail": "8 bundles; 268 source strings; 7 owner-published machine translations; 1876 translation-review rows current."
+    },
+    {
+      "command": "npm run test:measurement",
+      "status": "PASS",
+      "detail": "Google, Meta, signed purchase webhook, consent, navigation, first-party funnel, aggregate report and payment/refund ledger suites passed."
+    },
+    {
+      "command": "npm run test:ticket-upload",
+      "status": "PASS",
+      "detail": "23 mounted ticket-flow checks and 12 intake/cache/date node tests passed."
+    },
+    {
+      "command": "deno test --no-lock supabase/functions/_shared/ticket-intake-draft.test.ts supabase/functions/_shared/ticket-intake-resume-delivery.test.ts supabase/functions/_shared/ticket-intake-draft-cleanup.test.ts",
+      "status": "PASS",
+      "detail": "34 tests passed."
+    },
+    {
+      "command": "python3 supabase/tests/test_ticket_intake_draft_migration.py",
+      "status": "PASS",
+      "detail": "Disposable local PostgreSQL migration chain passed draft, resume delivery, expiry cleanup, rotation recovery, exact-path deletion, converted-case exclusion and poison-row fairness assertions."
+    },
+    {
+      "command": "python3 supabase/tests/test_paid_funnel_measurement_migration.py",
+      "status": "PASS",
+      "detail": "Disposable local PostgreSQL checkout withdrawal fence assertions passed."
+    },
+    {
+      "command": "python3 supabase/tests/test_paid_payment_refund_ledger_migration.py",
+      "status": "PASS",
+      "detail": "Disposable local PostgreSQL purchase/refund ledger assertions passed."
+    },
+    {
+      "command": "npx tsc -p tsconfig.app.json --noEmit",
+      "status": "PASS"
+    },
+    {
+      "command": "changed-file eslint from base to implementation head",
+      "status": "PASS_WITH_WARNINGS",
+      "detail": "0 errors; 2 existing exhaustive-deps warnings in AdminCaseManagement and AdminDashboard."
+    },
+    {
+      "command": "npm run lint",
+      "status": "BASELINE_FAIL",
+      "detail": "36 errors and 22 warnings in pre-existing unrelated files; the changed-file lint gate has no error."
+    },
+    {
+      "command": "npm run test:ads-readiness",
+      "status": "PASS",
+      "detail": "Valid GO control passes; missing evidence, excessive spend, mixed platforms and authorization gaps fail closed."
+    },
+    {
+      "command": "npm run ads:readiness",
+      "status": "EXPECTED_NO_GO",
+      "detail": "54 blockers remain because production, owner, provider, independent review and spend evidence is deliberately absent."
+    },
+    {
+      "command": "public offer, homepage conversion, homepage visual, snapshot offer and contrast guardrails",
+      "status": "PASS",
+      "detail": "211 public-offer checks, 11 homepage conversion checks and 37 homepage visual checks passed."
+    },
+    {
+      "command": "Deno check, Actionlint, scheduler coherent/inconsistent fixtures and git diff --check",
+      "status": "PASS"
+    }
+  ],
+  "buildArtifacts": [
+    {
+      "path": "dist/index.html",
+      "sha256": "d432286d828831bcd96b6626e7f0dcb4780134131c3d6f319e842c704e747993"
+    },
+    {
+      "path": "dist/assets/index-D748ezzy.js",
+      "sha256": "5c93a9ff3a0d86b1d3358f23a81058f300f7eb48dee79a67e92cde31dee6f551"
+    },
+    {
+      "path": "dist/assets/index-D350HWvm.css",
+      "sha256": "94120a1db1f60c8c9cf50583329a36eb67c9082cfb1213209bad1a1e8e11f9d7"
+    }
+  ],
+  "independentReview": {
+    "sourceRevision": "c7eff24c8bebd836cf74e7d148bece2bbb384fe2",
+    "verdict": "No new P0 or P1 security, measurement, payment or conversion regression found in the implemented controls.",
+    "openP1": "Converted ticket_intake_drafts retain duplicate email, phone, payload and access/resume capability hashes indefinitely because cleanup excludes converted rows. Safe redaction or deletion must be authorized and built before retention can be called complete."
+  },
+  "deploymentOrder": [
+    "Keep Meta and Google paused.",
+    "Apply migrations 170000, 173000, 180000, 181000, 182000, 183000, 184000, 185000 and 190000 in order.",
+    "Deploy server functions against the completed schemas; make the signed webhook live before create-payment accepts a controlled checkout.",
+    "Configure cleanup secrets, run one manual zero-deferred cleanup, then enable the hourly schedule.",
+    "Leave resume provider delivery off until separately configured and tested; copy-link fallback remains available.",
+    "Deploy the frontend last.",
+    "With ads paused, complete production mobile, privacy, intake, cancellation, payment/refund, notification, phone, provider and attribution evidence.",
+    "Obtain independent GO, then separate capped spend authorization."
+  ],
+  "productionBlockers": [
+    "No code or migration in this branch is deployed or proven on production.",
+    "Converted draft-row duplicate-data retention P1 remains open.",
+    "Real iOS in-app-browser and Slow 4G checks remain open.",
+    "Phone, voicemail, contact email and customer/admin notification paths remain unverified.",
+    "Stripe public identity still requires Fabsy-branded provider readback.",
+    "Meta dataset restriction/objective and Google conversion provider readbacks remain open.",
+    "A controlled paid checkout and separately authorized refund/replay test remain open.",
+    "Resume provider delivery and cleanup scheduling remain unverified in production.",
+    "Net retained and guarantee-reason reporting require a canonical qualifying Crown-rejection field; they are not inferred from payment time.",
+    "Historical orphan objects and Fable QA artifacts require separately reviewed cleanup.",
+    "Economics, reviewer GO and capped spend authorization are incomplete."
+  ],
+  "actionsNotTaken": [
+    "no production deployment",
+    "no database migration against production",
+    "no provider setting or tracking change",
+    "no campaign activation, budget change or advertising spend",
+    "no payment, refund, customer message, email or SMS",
+    "no deletion of historical or production data"
+  ]
+}
