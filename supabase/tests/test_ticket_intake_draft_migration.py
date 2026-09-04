@@ -61,6 +61,25 @@ create policy "System can upload consent forms" on storage.objects for insert
 grant all on public.clients, public.ticket_submissions to service_role;
 """
 
+LEGACY_TICKET_CACHE_BOOTSTRAP = r"""create table public.ticket_cache (
+  id uuid primary key default gen_random_uuid(),
+  cache_key text unique not null,
+  ticket_data jsonb not null,
+  expires_at timestamptz not null default now() + interval '1 day'
+);
+alter table public.ticket_cache enable row level security;
+grant all on public.ticket_cache to anon, authenticated, service_role;
+create policy "Allow anonymous access to ticket cache" on public.ticket_cache for all using (true);
+create function public.cleanup_expired_ticket_cache() returns void language sql as $$
+  delete from public.ticket_cache where expires_at < now()
+$$;
+grant execute on function public.cleanup_expired_ticket_cache() to public, anon, authenticated, service_role;
+"""
+
+BOOTSTRAP_WITHOUT_LEGACY_CACHE = BOOTSTRAP.replace(LEGACY_TICKET_CACHE_BOOTSTRAP, "")
+if BOOTSTRAP_WITHOUT_LEGACY_CACHE == BOOTSTRAP:
+    raise RuntimeError("Legacy cache bootstrap fixture was not found")
+
 
 def run() -> None:
     binaries = {name: shutil.which(name) for name in ("initdb", "pg_ctl", "psql")}
@@ -115,6 +134,40 @@ def run() -> None:
             print(object_deletion_result.stdout.strip())
             print(abuse_control_result.stdout.strip())
             print(staff_follow_up_result.stdout.strip())
+        finally:
+            if started:
+                command([binaries["pg_ctl"], "-D", str(cluster), "-m", "immediate", "-w", "stop"])
+
+    # Production can legitimately lack the legacy ticket_cache relation. Prove
+    # the first migration still applies atomically against that lineage.
+    with tempfile.TemporaryDirectory(prefix="fabsy-ticket-draft-no-legacy-pg-", dir="/tmp") as folder:
+        temporary = Path(folder)
+        cluster = temporary / "data"
+        socket = temporary / "socket"
+        socket.mkdir()
+        bootstrap = temporary / "bootstrap-without-legacy-cache.sql"
+        bootstrap.write_text(BOOTSTRAP_WITHOUT_LEGACY_CACHE)
+        command([binaries["initdb"], "-D", str(cluster), "-A", "trust", "-U", "fabsy_no_legacy_test", "--no-locale", "--encoding=UTF8"])
+        started = False
+        try:
+            command([
+                binaries["pg_ctl"], "-D", str(cluster), "-l", str(temporary / "postgres.log"),
+                "-o", shlex.join(["-k", str(socket), "-h", "", "-p", "55444"]), "-w", "start",
+            ])
+            started = True
+            connection = [
+                binaries["psql"], "-X", "-q", "-h", str(socket), "-p", "55444",
+                "-U", "fabsy_no_legacy_test", "-d", "postgres", "-v", "ON_ERROR_STOP=1",
+            ]
+            command([*connection, "-f", str(bootstrap)])
+            command([*connection, "-f", str(ROOT / "supabase/migrations/20260903120000_ticket_intake_drafts.sql")])
+            result = command([
+                *connection, "-A", "-t", "-c",
+                "select to_regclass('public.ticket_intake_drafts')::text",
+            ])
+            if result.stdout.strip() != "ticket_intake_drafts":
+                raise RuntimeError("Private intake schema was not created without the legacy cache")
+            print("missing legacy ticket cache compatibility passed")
         finally:
             if started:
                 command([binaries["pg_ctl"], "-D", str(cluster), "-m", "immediate", "-w", "stop"])

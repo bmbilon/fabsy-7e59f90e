@@ -414,14 +414,24 @@ create trigger convert_ticket_intake_draft_after_submission
   after insert on public.ticket_submissions
   for each row execute function public.convert_ticket_intake_draft_on_submission();
 
--- Remove two legacy public-write paths. Service-role Edge Functions bypass RLS
--- and remain able to manage these records and private PDFs.
-drop policy if exists "Allow anonymous access to ticket cache" on public.ticket_cache;
-alter table public.ticket_cache force row level security;
-revoke all on table public.ticket_cache from public, anon, authenticated;
-grant all on table public.ticket_cache to service_role;
-revoke all on function public.cleanup_expired_ticket_cache() from public, anon, authenticated;
-grant execute on function public.cleanup_expired_ticket_cache() to service_role;
+-- Remove two legacy public-write paths when the legacy cache exists. Some
+-- production lineages never installed that pre-versioned cache migration, so
+-- hardening it must not prevent the private intake schema from being created.
+do $legacy_ticket_cache_hardening$
+begin
+  if to_regclass('public.ticket_cache') is not null then
+    execute 'drop policy if exists "Allow anonymous access to ticket cache" on public.ticket_cache';
+    execute 'alter table public.ticket_cache force row level security';
+    execute 'revoke all on table public.ticket_cache from public, anon, authenticated';
+    execute 'grant all on table public.ticket_cache to service_role';
+  end if;
+
+  if to_regprocedure('public.cleanup_expired_ticket_cache()') is not null then
+    execute 'revoke all on function public.cleanup_expired_ticket_cache() from public, anon, authenticated';
+    execute 'grant execute on function public.cleanup_expired_ticket_cache() to service_role';
+  end if;
+end
+$legacy_ticket_cache_hardening$;
 
 drop policy if exists "System can upload consent forms" on storage.objects;
 
