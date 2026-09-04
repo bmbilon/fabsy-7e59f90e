@@ -1,3 +1,5 @@
+import { requestMetaCheckoutAttributionWithdrawal } from './metaCheckoutWithdrawal';
+
 export type FabsyFunnelConsentChoice = 'unknown' | 'accepted' | 'declined';
 
 export const FABSY_FUNNEL_CONSENT_CHANGED = 'fabsy:funnel-consent-changed';
@@ -91,5 +93,6 @@ export function setFabsyFunnelConsentChoice(choice: 'accepted' | 'declined'): vo
       try { window.localStorage.removeItem(FABSY_FUNNEL_CONSENT_STORAGE_KEY); } catch { /* Non-consent remains the default. */ }
     }
   }
+  if (choice === 'declined') requestMetaCheckoutAttributionWithdrawal();
   window.dispatchEvent(new Event(FABSY_FUNNEL_CONSENT_CHANGED));
 }

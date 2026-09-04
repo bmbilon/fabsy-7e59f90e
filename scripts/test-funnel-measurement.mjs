@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { webcrypto } from 'node:crypto';
+import { MessageChannel } from 'node:worker_threads';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { runInContext } from 'node:vm';
 import { build } from 'esbuild';
@@ -31,6 +32,7 @@ async function bundle() {
         export * from './src/lib/marketingAttribution';
         export * from './src/lib/funnelMeasurement';
         export * from './src/lib/checkoutMeasurement';
+        export * from './src/lib/metaCheckoutWithdrawal';
       `,
     },
     bundle: true,
@@ -94,12 +96,181 @@ test('ad attribution stays memory-only until first-party measurement consent', a
     const persisted = r.api.persistPendingMarketingAttribution();
     assert.equal(persisted.fbclid, 'SYNTHETIC_CLICK');
     assert.equal(persisted.utm_content, 'rr_easy_v2');
-    assert.equal(JSON.parse(r.win.localStorage.getItem(r.api.MARKETING_STORAGE_KEY)).landing_page, '/rapid-resolution');
+    const durable = JSON.parse(r.win.localStorage.getItem(r.api.MARKETING_STORAGE_KEY));
+    assert.equal(durable.version, 3);
+    assert.equal(durable.consentSavedAt, r.api.getFabsyFunnelConsentGrant().savedAt);
+    assert.equal(durable.attribution.landing_page, '/rapid-resolution');
+    assert.ok(Date.parse(durable.attribution.first_touch_at) >= durable.consentSavedAt);
 
     r.api.setFabsyFunnelConsentChoice('declined');
     r.api.clearMarketingAttribution();
     assert.equal(r.win.localStorage.getItem(r.api.MARKETING_STORAGE_KEY), null);
   } finally { r.close(); }
+});
+
+test('retired, malformed and prior-consent attribution can never be revived by a new grant', async () => {
+  for (const fixture of ['retired-v2', 'legacy', 'prior-grant', 'malformed-current']) {
+    const r = await runtime('https://fabsy.ca/rapid-resolution');
+    try {
+      const stale = {
+        utm_source: 'meta',
+        utm_campaign: 'stale_campaign',
+        landing_page: '/rapid-resolution',
+        first_touch_at: new Date(Date.now() - 60_000).toISOString(),
+      };
+      if (fixture === 'retired-v2') r.win.localStorage.setItem('fabsy_marketing_v2', JSON.stringify(stale));
+      if (fixture === 'legacy') r.win.localStorage.setItem('fabsy_marketing', JSON.stringify({ ...stale, email: 'person@example.invalid' }));
+      r.api.setFabsyFunnelConsentChoice('accepted');
+      const grant = r.api.getFabsyFunnelConsentGrant();
+      if (fixture === 'prior-grant') {
+        r.win.localStorage.setItem(r.api.MARKETING_STORAGE_KEY, JSON.stringify({
+          version: 3,
+          consentSavedAt: grant.savedAt - 1,
+          attribution: { ...stale, first_touch_at: new Date(grant.savedAt).toISOString() },
+        }));
+      }
+      if (fixture === 'malformed-current') {
+        r.win.localStorage.setItem(r.api.MARKETING_STORAGE_KEY, JSON.stringify({
+          version: 3,
+          consentSavedAt: grant.savedAt,
+          attribution: { ...stale, first_touch_at: new Date(grant.savedAt).toISOString(), unexpected: 'value' },
+        }));
+      }
+      assert.deepEqual(JSON.parse(JSON.stringify(r.api.readMarketingAttribution())), {}, fixture);
+      assert.equal(r.win.localStorage.getItem('fabsy_marketing_v2'), null, fixture);
+      assert.equal(r.win.localStorage.getItem('fabsy_marketing'), null, fixture);
+      assert.equal(r.win.localStorage.getItem(r.api.MARKETING_STORAGE_KEY), null, fixture);
+    } finally { r.close(); }
+  }
+});
+
+test('consent-bound attribution remains usable in this document when only its durable write is blocked', async () => {
+  const r = await runtime();
+  try {
+    r.api.captureMarketingAttribution(r.win.location.search, '/rapid-resolution', '');
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    const durableStorage = r.win.localStorage;
+    Object.defineProperty(r.win, 'localStorage', { configurable: true, value: {
+      getItem: key => durableStorage.getItem(key),
+      setItem: (key, value) => {
+        if (key === r.api.MARKETING_STORAGE_KEY) throw new Error('Synthetic attribution-only storage failure');
+        durableStorage.setItem(key, value);
+      },
+      removeItem: key => durableStorage.removeItem(key),
+      clear: () => durableStorage.clear(),
+      key: index => durableStorage.key(index),
+      get length() { return durableStorage.length; },
+    } });
+    const persisted = r.api.persistPendingMarketingAttribution();
+    assert.equal(persisted.utm_campaign, 'rr_launch_v2');
+    assert.equal(durableStorage.getItem(r.api.MARKETING_STORAGE_KEY), null);
+    assert.equal(r.api.readMarketingAttribution().fbclid, 'SYNTHETIC_CLICK');
+  } finally { r.close(); }
+});
+
+test('first-party-only refusal withdraws a remembered checkout while Meta may remain accepted', async () => {
+  const r = await runtime('https://fabsy.ca/rapid-resolution');
+  try {
+    const handle = 'b'.repeat(64);
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    assert.equal(r.api.rememberMetaCheckoutAttributionHandle(handle, r.win), true);
+    r.api.setFabsyFunnelConsentChoice('declined');
+    await new Promise(resolve => r.win.setTimeout(resolve, 0));
+    const withdrawal = r.calls.find(call => String(call.url).endsWith('/functions/v1/withdraw-meta-measurement'));
+    assert.ok(withdrawal);
+    assert.deepEqual(JSON.parse(withdrawal.options.body), { handles: [handle] });
+  } finally { r.close(); }
+});
+
+test('document guardian withdraws first-party checkout attribution on cross-tab removal and expiry', async () => {
+  const guardianBundle = await build({
+    absWorkingDir: root,
+    stdin: {
+      resolveDir: root,
+      sourcefile: 'funnel-consent-guardian-fixture.tsx',
+      loader: 'tsx',
+      contents: `
+        import React, { act } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import GoogleMeasurementGuardian from './src/components/GoogleMeasurementGuardian';
+        export * from './src/lib/fabsyFunnelConsent';
+        export { setMetaConsentChoice, getMetaConsentChoice } from './src/lib/googleConsent';
+        export { rememberMetaCheckoutAttributionHandle } from './src/lib/metaCheckoutWithdrawal';
+        let root;
+        export async function mount() {
+          root = createRoot(document.getElementById('root'));
+          await act(async () => root.render(<GoogleMeasurementGuardian />));
+        }
+        export async function tick(callback) { await act(async () => callback()); }
+        export async function unmount() { await act(async () => root?.unmount()); }
+      `,
+    },
+    bundle: true,
+    write: false,
+    platform: 'browser',
+    format: 'cjs',
+    jsx: 'automatic',
+    logLevel: 'silent',
+    define: { 'import.meta.env': JSON.stringify({ PROD: false }), 'process.env.NODE_ENV': '"test"' },
+  });
+
+  for (const scenario of ['cross-tab-removal', 'expiry']) {
+    const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', {
+      url: 'https://fabsy.ca/rapid-resolution',
+      runScripts: 'outside-only',
+    });
+    const context = dom.getInternalVMContext();
+    context.module = { exports: {} };
+    context.exports = context.module.exports;
+    dom.window.IS_REACT_ACT_ENVIRONMENT = true;
+    const calls = [];
+    const channels = [];
+    dom.window.MessageChannel = class {
+      constructor() { const channel = new MessageChannel(); channels.push(channel); return channel; }
+    };
+    dom.window.fetch = async (url, options) => {
+      calls.push({ url, options });
+      return { ok: true, status: 202, json: async () => ({ accepted: true }) };
+    };
+    runInContext(guardianBundle.outputFiles[0].text, context);
+    const api = context.module.exports;
+    try {
+      api.setMetaConsentChoice('accepted');
+      api.setFabsyFunnelConsentChoice('accepted');
+      assert.equal(api.getMetaConsentChoice(), 'accepted');
+      const handle = (scenario === 'expiry' ? 'c' : 'd').repeat(64);
+      assert.equal(api.rememberMetaCheckoutAttributionHandle(handle, dom.window), true);
+
+      if (scenario === 'expiry') {
+        dom.window.localStorage.setItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY, JSON.stringify({
+          version: 1,
+          choice: 'accepted',
+          savedAt: Date.now() - api.FABSY_FUNNEL_CONSENT_MAX_AGE_MS + 30,
+        }));
+      }
+      await api.mount();
+
+      if (scenario === 'cross-tab-removal') {
+        dom.window.localStorage.removeItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY);
+        await api.tick(() => dom.window.dispatchEvent(new dom.window.StorageEvent('storage', {
+          key: api.FABSY_FUNNEL_CONSENT_STORAGE_KEY,
+          storageArea: dom.window.localStorage,
+        })));
+      } else {
+        await api.tick(() => new Promise(resolve => dom.window.setTimeout(resolve, 60)));
+      }
+
+      assert.equal(api.getMetaConsentChoice(), 'accepted', scenario);
+      assert.equal(api.getFabsyFunnelConsentChoice(), 'unknown', scenario);
+      const withdrawals = calls.filter(call => String(call.url).endsWith('/functions/v1/withdraw-meta-measurement'));
+      assert.equal(withdrawals.length, 1, scenario);
+      assert.deepEqual(JSON.parse(withdrawals[0].options.body), { handles: [handle] });
+    } finally {
+      await api.unmount();
+      for (const channel of channels) { channel.port1.close(); channel.port2.close(); }
+      dom.window.close();
+    }
+  }
 });
 
 test('malformed or personal-looking campaign fields are never retained', async () => {

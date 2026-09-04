@@ -1,6 +1,7 @@
 const META_CHECKOUT_WITHDRAWAL_STORAGE_KEY = 'fabsy:meta-checkout-withdrawal:v1';
 const MAX_HANDLES = 16;
 const HANDLE_PATTERN = /^[0-9a-f]{64}$/;
+let flushInFlight: Promise<boolean> | null = null;
 
 interface StoredHandle {
   handle: string;
@@ -119,8 +120,7 @@ export async function withdrawMetaCheckoutAttributionHandles(
   return sendWithdrawal(handles as string[], win);
 }
 
-/** Retry-safe withdrawal used on explicit refusal, expiry, and cross-tab changes. */
-export async function flushMetaCheckoutAttributionWithdrawals(candidate?: Window): Promise<boolean> {
+async function performFlush(candidate?: Window): Promise<boolean> {
   const win = browserWindow(candidate);
   if (!win) return true;
   const entries = readHandles(win);
@@ -132,6 +132,16 @@ export async function flushMetaCheckoutAttributionWithdrawals(candidate?: Window
   if (!await withdrawMetaCheckoutAttributionHandles(handles, win)) return false;
   const sent = new Set(handles);
   return writeHandles(win, readHandles(win).filter(entry => !sent.has(entry.handle)));
+}
+
+/** Retry-safe withdrawal used on explicit refusal, expiry, and cross-tab changes. */
+export function flushMetaCheckoutAttributionWithdrawals(candidate?: Window): Promise<boolean> {
+  if (flushInFlight) return flushInFlight;
+  const operation = performFlush(candidate).finally(() => {
+    if (flushInFlight === operation) flushInFlight = null;
+  });
+  flushInFlight = operation;
+  return operation;
 }
 
 export function requestMetaCheckoutAttributionWithdrawal(candidate?: Window): void {
