@@ -8,6 +8,7 @@ import {
   FileSearch,
   LockKeyhole,
   MessageSquareText,
+  Phone,
   Scale,
   ShieldCheck,
   Upload,
@@ -28,6 +29,9 @@ import {
 import useSafeHead from "@/hooks/useSafeHead";
 import FeeRefundNotice from "@/components/FeeRefundNotice";
 import { FEE_REFUND } from "@/config/feeRefund";
+
+const PHONE_DISPLAY = "(825) 793-2279";
+const PHONE_HREF = "tel:+18257932279";
 
 const processSteps = [
   {
@@ -142,39 +146,54 @@ const RapidResolution = () => {
       <Header />
 
       <main>
-        <section className="relative overflow-hidden bg-gradient-hero px-4 py-16 text-white sm:py-20 lg:py-24">
-          <div className="container relative z-10 mx-auto max-w-6xl">
-            <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-14">
-              <div>
-                <Badge className="border-primary/30 bg-primary/10 text-primary-light">
-                  Alberta pre-trial ticket resolution
-                </Badge>
-                <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-[1.04] tracking-tight text-white sm:text-5xl lg:text-6xl">
-                  Your ticket, moving forward now.
+        <section
+          className="relative overflow-hidden bg-gradient-hero px-4 pb-10 pt-3 text-white sm:py-14 lg:py-16"
+          data-rapid-first-view
+        >
+          <div className="container relative z-10 mx-auto max-w-6xl px-0 sm:px-8">
+            <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-14">
+              <div className="max-w-2xl">
+                <h1 className="max-w-xl text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  Got an Alberta traffic ticket?
                 </h1>
-                <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-200 sm:text-xl">
-                  We handle intake, disclosure, analysis, prosecutor review, and client updates for
-                  an eligible Alberta traffic ticket, from one secure online journey.
+                <p className="mt-2 max-w-xl text-base font-semibold leading-6 text-slate-100 sm:mt-5 sm:text-xl sm:leading-7" data-rapid-offer>
+                  Fabsy negotiates your ticket for a lower fine, fewer demerits, or withdrawal.
                 </p>
-                <FeeRefundNotice tone="dark" className="mt-6" />
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <Button asChild size="lg" className="min-h-12 px-7 text-base font-bold shadow-glow">
-                    <Link to={RAPID_RESOLUTION.intakePath}>
-                      Start Rapid Resolution
+                <p className="mt-2 max-w-xl text-xs font-medium leading-4 text-slate-200 sm:mt-4 sm:text-sm sm:leading-6" data-rapid-refund-summary>
+                  If the Crown rejects those efforts and no fine or demerit reduction or withdrawal is obtained,
+                  your service fee is refunded
+                  <Link
+                    to={FEE_REFUND.termsPath}
+                    className="font-bold text-white underline decoration-1 underline-offset-4 hover:text-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-light"
+                    aria-label="Read the full fee-refund conditions"
+                  >
+                    <span aria-hidden="true">*</span><span className="sr-only">Full fee-refund conditions</span>
+                  </Link>. No legal outcome is guaranteed.
+                </p>
+                <p className="mt-2 text-white sm:mt-5" data-rapid-price>
+                  <span className="block text-xs font-bold uppercase tracking-[0.12em] text-primary-light sm:text-sm">Rapid Resolution</span>
+                  <span className="mt-0.5 flex items-baseline gap-2">
+                    <span className="text-2xl font-bold tracking-tight sm:text-3xl">${RAPID_RESOLUTION.priceCad} CAD + GST</span>
+                    <span className="text-xs text-slate-300">Paid upfront</span>
+                  </span>
+                </p>
+                <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:mt-6 sm:flex sm:flex-row sm:gap-3">
+                  <Button asChild size="lg" className="min-h-12 min-w-0 px-4 text-base font-bold shadow-glow sm:px-7">
+                    <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta">
+                      Upload your ticket
                       <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                     </Link>
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="min-h-12 border-slate-500 bg-transparent px-7 text-base font-bold text-white hover:bg-slate-800 hover:text-white">
-                    <a href="#how-it-works">See the process</a>
+                  <Button asChild size="lg" variant="outline" className="min-h-12 border-slate-500 bg-transparent px-4 text-base font-bold text-white hover:bg-slate-800 hover:text-white sm:px-6">
+                    <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`} data-funnel-action="phone">
+                      <Phone className="mr-2 h-5 w-5" aria-hidden="true" />
+                      Call
+                    </a>
                   </Button>
                 </div>
-                <p className="mt-5 max-w-3xl text-sm leading-relaxed text-slate-300">
-                  Eligible pre-trial matters only. Trial representation is separate. Outcomes vary
-                  and no withdrawal, reduction, demerit, or insurance result is promised.
-                </p>
               </div>
 
-              <Card className="overflow-hidden border-white/15 bg-white shadow-2xl">
+              <Card className="hidden overflow-hidden border-white/15 bg-white shadow-2xl lg:block" data-rapid-price-card>
                 <div className="border-b bg-primary/5 p-7 sm:p-8">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary">Rapid Resolution</p>
                   <div className="mt-3 flex items-end gap-2">
@@ -198,6 +217,8 @@ const RapidResolution = () => {
                 </div>
               </Card>
             </div>
+
+            <FeeRefundNotice tone="dark" className="mt-8 sm:mt-10" />
 
             <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {trustPoints.map(({ icon: Icon, label }) => (

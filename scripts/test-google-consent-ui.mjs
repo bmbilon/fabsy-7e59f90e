@@ -100,9 +100,12 @@ try {
         const settings = element => element.querySelector('button[aria-expanded]');
         const decision = (element, choice) => element.querySelector('[data-google-consent-choice="' + choice + '"]');
         const click = async element => { assert.ok(element); await act(async () => element.click()); };
-        const openSettings = async element => {
+        const openSettings = async (element, copy) => {
           await click(settings(element));
           assert.ok(panel(element));
+          assert.equal(panel(element).getAttribute('data-google-consent-panel-mode'), 'settings');
+          assert.ok(panel(element).className.includes('max-h-[60vh]'));
+          for (const key of ['body', 'scope', 'changeHint']) assert.ok(panel(element).textContent.includes(copy[key]));
           assert.equal(document.activeElement, panel(element).querySelector('h2'), 'Deliberate settings opening should focus its heading');
         };
 
@@ -165,11 +168,14 @@ try {
             assert.ok(panel(view.container), locale.code + ' public home should offer an initial choice');
             assert.equal(panel(view.container).getAttribute('role'), 'region');
             assert.equal(panel(view.container).getAttribute('aria-modal'), null, 'The banner must remain nonmodal');
+            assert.equal(panel(view.container).getAttribute('data-google-consent-panel-mode'), 'initial');
+            assert.ok(panel(view.container).className.includes('max-h-[25vh]'), 'The automatic banner must stay within one quarter of the viewport');
+            assert.ok(panel(view.container).className.includes('overflow-hidden'), 'The automatic banner keeps its action row visible');
             const titleId = panel(view.container).getAttribute('aria-labelledby');
             assert.equal(document.getElementById(titleId).textContent, copy.title);
             assert.equal(panel(view.container).querySelector('a').getAttribute('href'), '/privacy-policy');
             assert.equal(panel(view.container).querySelector('a').textContent, copy.privacyPolicy);
-            for (const key of ['body', 'scope', 'changeHint']) assert.ok(panel(view.container).textContent.includes(copy[key]));
+            assert.ok(panel(view.container).textContent.includes(copy.body));
             assert.equal(decision(view.container, 'accepted').textContent, copy.allow);
             assert.equal(decision(view.container, 'declined').textContent, copy.decline);
             assert.equal(decision(view.container, 'accepted').className, decision(view.container, 'declined').className, 'Allow and decline must have equal visual treatment');
@@ -183,17 +189,17 @@ try {
             assert.deepEqual(choices, []);
             assert.equal(document.activeElement, settings(view.container));
 
-            await openSettings(view.container);
+            await openSettings(view.container, copy);
             await click(decision(view.container, 'declined'));
             assert.deepEqual(choices, ['declined']);
             assert.equal(panel(view.container), null);
             assert.ok(view.container.textContent.includes(copy.declinedStatus));
-            await openSettings(view.container);
+            await openSettings(view.container, copy);
             await click(decision(view.container, 'accepted'));
             assert.deepEqual(choices, ['declined', 'accepted']);
             assert.equal(panel(view.container), null);
             assert.ok(view.container.textContent.includes(copy.acceptedStatus));
-            await openSettings(view.container);
+            await openSettings(view.container, copy);
             assert.equal(decision(view.container, 'declined').textContent, copy.withdraw, 'Stored acceptance must have an explicit withdrawal action');
             await click(decision(view.container, 'declined'));
             assert.deepEqual(choices, ['declined', 'accepted', 'declined']);
@@ -213,7 +219,7 @@ try {
             try {
               assert.equal(panel(privateView.container), null, target + ' must not show an automatic first-choice banner');
               assert.ok(settings(privateView.container), 'Privacy choices must remain revisitable on forms');
-              await openSettings(privateView.container);
+              await openSettings(privateView.container, copy);
               await click(privateView.container.querySelector('button[aria-label="' + copy.close + '"]'));
               assert.equal(panel(privateView.container), null);
               assert.equal(getGoogleConsentChoice(), 'unknown');
@@ -238,7 +244,7 @@ try {
         }
         const navigation = await mount('/ar/');
         try {
-          await openSettings(navigation.container);
+          await openSettings(navigation.container, googleConsentCopy.ar);
           await navigation.navigate('/ar/submit-ticket');
           assert.equal(panel(navigation.container), null, 'A manually opened public panel must not follow navigation into a private form');
           assert.deepEqual(choices, []);

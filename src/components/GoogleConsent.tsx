@@ -52,6 +52,7 @@ export default function GoogleConsent() {
   const initialBanner = (googleChoice === 'unknown' || metaChoice === 'unknown') &&
     !dismissedInitial && Boolean(publicMeasurementPath(location.pathname));
   const panelOpen = settingsOpen || initialBanner;
+  const compactInitialBanner = initialBanner && !settingsOpen;
   const status = googleChoice === 'accepted' && metaChoice === 'accepted'
     ? copy.acceptedStatus
     : googleChoice === 'declined' && metaChoice === 'declined'
@@ -99,32 +100,54 @@ export default function GoogleConsent() {
     </div>
     {panelOpen && <section id={panelId} role="region" aria-labelledby={headingId} aria-describedby={descriptionId}
       data-google-consent-panel
-      className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[60] max-h-[60vh] overflow-y-auto rounded-xl border border-slate-300 bg-white p-4 text-start text-slate-900 shadow-xl md:inset-x-auto md:bottom-4 md:end-4 md:w-[30rem] md:max-w-[calc(100vw-2rem)] md:p-5"
+      data-google-consent-panel-mode={compactInitialBanner ? 'initial' : 'settings'}
+      className={compactInitialBanner
+        ? 'fixed inset-x-2 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[60] max-h-[25vh] overflow-hidden rounded-lg border border-slate-300 bg-white p-2.5 text-start text-slate-900 shadow-xl md:inset-x-auto md:bottom-4 md:end-4 md:w-[32rem] md:max-w-[calc(100vw-2rem)] md:p-3'
+        : 'fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[60] max-h-[60vh] overflow-y-auto rounded-xl border border-slate-300 bg-white p-4 text-start text-slate-900 shadow-xl md:inset-x-auto md:bottom-4 md:end-4 md:w-[30rem] md:max-w-[calc(100vw-2rem)] md:p-5'}
       onKeyDown={event => {
         if (event.key === 'Escape') {
           event.preventDefault();
           closeSettings();
         }
       }}>
-      <div className="flex items-start justify-between gap-3">
-        <h2 id={headingId} ref={heading} tabIndex={-1} className="text-base font-semibold leading-relaxed outline-none">{copy.title}</h2>
-        <Button type="button" variant="ghost" size="icon" className="-mt-2 -me-2 min-h-11 min-w-11 shrink-0" aria-label={copy.close} onClick={closeSettings}>
-          <X className="h-4 w-4" aria-hidden="true" />
-        </Button>
-      </div>
-      <p id={descriptionId} className="mt-2 text-sm leading-relaxed text-slate-700">{copy.body}</p>
-      <p className="mt-2 text-xs leading-relaxed text-slate-600">{copy.scope}</p>
-      <div className="mt-4 grid grid-cols-2 items-stretch gap-3">
-        <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-3 py-3 text-center text-sm text-slate-900" data-google-consent-choice="accepted" onClick={() => choose('accepted')}>
-          {copy.allow}
-        </Button>
-        <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-3 py-3 text-center text-sm text-slate-900" data-google-consent-choice="declined" onClick={() => choose('declined')}>
-          {googleChoice === 'accepted' || metaChoice === 'accepted' ? copy.withdraw : copy.decline}
-        </Button>
-      </div>
-      <p className="mt-3 text-xs leading-relaxed text-slate-600">{copy.changeHint}{' '}
-        <Link to="/privacy-policy" className="inline-block py-1 font-medium text-slate-800 underline underline-offset-2" onClick={closeSettings}>{copy.privacyPolicy}</Link>
-      </p>
+      {compactInitialBanner ? <div className="grid max-h-[calc(25vh-1.25rem)] grid-rows-[minmax(0,1fr)_auto] gap-2 md:max-h-[calc(25vh-1.5rem)]">
+        <h2 id={headingId} ref={heading} tabIndex={-1} className="sr-only outline-none">{copy.title}</h2>
+        <p id={descriptionId} className="min-h-0 overflow-y-auto text-[11px] leading-[15px] text-slate-700 sm:text-xs sm:leading-4">
+          {copy.body}{' '}
+          <Link to="/privacy-policy" className="font-medium text-slate-800 underline underline-offset-2" onClick={closeSettings}>{copy.privacyPolicy}</Link>
+        </p>
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.75rem] items-stretch gap-1.5">
+          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-2 py-1.5 text-center text-[11px] leading-4 text-slate-900 sm:text-xs" data-google-consent-choice="accepted" onClick={() => choose('accepted')}>
+            {copy.allow}
+          </Button>
+          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-2 py-1.5 text-center text-[11px] leading-4 text-slate-900 sm:text-xs" data-google-consent-choice="declined" onClick={() => choose('declined')}>
+            {copy.decline}
+          </Button>
+          <Button type="button" variant="ghost" size="icon" className="min-h-11 min-w-11 shrink-0" aria-label={copy.close} onClick={closeSettings}>
+            <X className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </div>
+      </div> : <>
+        <div className="flex items-start justify-between gap-3">
+          <h2 id={headingId} ref={heading} tabIndex={-1} className="text-base font-semibold leading-relaxed outline-none">{copy.title}</h2>
+          <Button type="button" variant="ghost" size="icon" className="-mt-2 -me-2 min-h-11 min-w-11 shrink-0" aria-label={copy.close} onClick={closeSettings}>
+            <X className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </div>
+        <p id={descriptionId} className="mt-2 text-sm leading-relaxed text-slate-700">{copy.body}</p>
+        <p className="mt-2 text-xs leading-relaxed text-slate-600">{copy.scope}</p>
+        <div className="mt-4 grid grid-cols-2 items-stretch gap-3">
+          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-3 py-3 text-center text-sm text-slate-900" data-google-consent-choice="accepted" onClick={() => choose('accepted')}>
+            {copy.allow}
+          </Button>
+          <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-3 py-3 text-center text-sm text-slate-900" data-google-consent-choice="declined" onClick={() => choose('declined')}>
+            {googleChoice === 'accepted' || metaChoice === 'accepted' ? copy.withdraw : copy.decline}
+          </Button>
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-slate-600">{copy.changeHint}{' '}
+          <Link to="/privacy-policy" className="inline-block py-1 font-medium text-slate-800 underline underline-offset-2" onClick={closeSettings}>{copy.privacyPolicy}</Link>
+        </p>
+      </>}
     </section>}
   </div>;
 }

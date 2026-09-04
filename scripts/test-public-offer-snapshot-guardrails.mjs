@@ -173,6 +173,43 @@ try {
   });
   const actual = require(bundle);
   for (const route of routes.keys()) accepted(actual.render(route), route, `${route}: actual React output`);
+  const rapidDom = new JSDOM(actual.render('/rapid-resolution'));
+  const rapidDocument = rapidDom.window.document;
+  const rapidFirstView = rapidDocument.querySelector('[data-rapid-first-view]');
+  const rapidOffer = rapidFirstView?.querySelector('[data-rapid-offer]');
+  const rapidRefundSummary = rapidFirstView?.querySelector('[data-rapid-refund-summary]');
+  const rapidPrice = rapidFirstView?.querySelector('[data-rapid-price]');
+  const rapidPrimaryCta = rapidFirstView?.querySelector('[data-funnel-action="primary_cta"]');
+  const rapidPhone = rapidFirstView?.querySelector('[data-funnel-action="phone"]');
+  const rapidFullRefundNotice = rapidFirstView?.querySelector('aside[data-fee-refund-notice="ticket-representation"]');
+  const rapidProcess = rapidDocument.querySelector('#how-it-works');
+  assert.equal(rapidDocument.querySelectorAll('[data-rapid-first-view]').length, 1, 'Rapid Resolution has one first-view offer');
+  assert.equal(rapidFirstView?.querySelector('h1')?.textContent.trim(), 'Got an Alberta traffic ticket?');
+  for (const fragment of ['lower fine', 'fewer demerits', 'withdrawal']) {
+    assert.ok(rapidOffer?.textContent.includes(fragment), `Rapid Resolution first-view offer includes ${fragment}`);
+  }
+  for (const fragment of ['service fee is refunded', 'No legal outcome is guaranteed']) {
+    assert.ok(rapidRefundSummary?.textContent.includes(fragment), `Rapid Resolution first-view refund summary includes ${fragment}`);
+  }
+  assert.equal(rapidRefundSummary?.querySelector('a')?.getAttribute('href'), feeRefund.termsPath, 'The compact refund promise links to the full published terms');
+  for (const fragment of ['Rapid Resolution', '$198 CAD + GST', 'Paid upfront']) {
+    assert.ok(rapidPrice?.textContent.includes(fragment), `Rapid Resolution first-view price includes ${fragment}`);
+  }
+  assert.equal(rapidPrimaryCta?.getAttribute('href'), '/submit-ticket');
+  assert.equal(rapidPrimaryCta?.textContent.trim(), 'Upload your ticket');
+  assert.equal(rapidPhone?.getAttribute('href'), 'tel:+18257932279');
+  assert.equal(rapidPhone?.textContent.trim(), 'Call');
+  for (const [earlier, later, label] of [
+    [rapidRefundSummary, rapidPrice, 'refund qualification precedes the price'],
+    [rapidPrice, rapidPrimaryCta, 'price precedes the primary action'],
+    [rapidPrimaryCta, rapidFullRefundNotice, 'full refund detail follows the primary action'],
+    [rapidPrimaryCta, rapidProcess, 'process detail follows the primary action'],
+  ]) {
+    assert.ok(earlier && later && earlier.compareDocumentPosition(later) & rapidDom.window.Node.DOCUMENT_POSITION_FOLLOWING, `Rapid Resolution ${label}`);
+  }
+  assert.doesNotMatch(rapidDocument.body.textContent, /you don[’']t pay|success guaranteed/i, 'Rapid Resolution avoids an unqualified outcome promise');
+  rapidDom.window.close();
+  checks += 20;
   const footer = actual.render('/footer');
   accepted(footer, '/about', 'Actual Footer admits only its exact Legal navigation entry');
   accepted(`<main>${footer}</main>`, '/about', 'Exact footer navigation works when the page main encloses the footer');
