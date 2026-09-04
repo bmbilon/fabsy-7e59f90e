@@ -51,7 +51,9 @@ create table public.ticket_intake_draft_object_deletions (
 );
 
 create index ticket_intake_draft_object_deletions_queue_idx
-  on public.ticket_intake_draft_object_deletions (eligible_at, id)
+  on public.ticket_intake_draft_object_deletions (
+    cleanup_attempt_count, eligible_at, id
+  )
   where deleted_at is null;
 
 comment on table public.ticket_intake_draft_object_deletions is
@@ -378,7 +380,10 @@ begin
         where draft.ticket_document_path = queued.object_path
            or draft.pending_ticket_document_path = queued.object_path
       )
-    order by queued.eligible_at, queued.id
+    -- Rotate failed paths behind untried work. Without attempt-first ordering,
+    -- a full batch of permanently failing oldest objects would starve every
+    -- newer known path forever.
+    order by queued.cleanup_attempt_count, queued.eligible_at, queued.id
     limit p_limit
   loop
     perform pg_advisory_xact_lock(

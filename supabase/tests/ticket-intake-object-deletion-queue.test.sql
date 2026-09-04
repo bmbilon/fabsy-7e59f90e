@@ -203,6 +203,40 @@ begin
 end
 $$;
 
+-- Poison rows rotate behind untried eligible work. A permanently failing old
+-- batch therefore cannot consume every future worker claim.
+insert into public.ticket_intake_draft_object_deletions (
+  id, draft_id, object_path, queued_at, eligible_at, cleanup_attempt_count
+) values
+  (
+    '00000000-0000-4000-8000-000000000901',
+    '00000000-0000-4000-8000-000000000821',
+    '00000000-0000-4000-8000-000000000821/representation-ticket-r1.pdf',
+    now() - interval '3 days', now() - interval '2 days', 4
+  ),
+  (
+    '00000000-0000-4000-8000-000000000902',
+    '00000000-0000-4000-8000-000000000822',
+    '00000000-0000-4000-8000-000000000822/representation-ticket-r1.pdf',
+    now() - interval '25 hours', now() - interval '1 hour', 0
+  );
+
+create temporary table fair_object_claim as
+select * from public.claim_ticket_intake_draft_object_deletions(
+  '00000000-0000-4000-8000-000000000624', 1
+);
+
+do $$
+begin
+  if (select count(*) from fair_object_claim) <> 1 or not exists (
+    select 1 from fair_object_claim
+    where deletion_id = '00000000-0000-4000-8000-000000000902'
+  ) then
+    raise exception 'failed oldest path starved newer untried deletion work';
+  end if;
+end
+$$;
+
 -- A path already referenced by a converted case is never claimable, even if a
 -- privileged repair accidentally places it in the queue.
 select public.create_ticket_intake_draft(

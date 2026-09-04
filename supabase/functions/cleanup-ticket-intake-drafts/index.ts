@@ -66,9 +66,9 @@ serve(async (request) => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // Give each queue independent bounded capacity so a sustained stream of
-    // superseded paths cannot starve expired draft/PII cleanup. Total claims
-    // across both queues never exceed twice the caller's per-queue limit.
+    // Give each queue independent bounded claim capacity so object backlog
+    // cannot consume the draft queue's allocation. Total claims across both
+    // queues never exceed twice the caller's per-queue limit.
     const objectClaimId = crypto.randomUUID();
     const objectClaimResult = await supabase.rpc(
       "claim_ticket_intake_draft_object_deletions",
