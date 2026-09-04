@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-04T18:01:59Z",
+  "release": {
+    "branch": "codex/publish-legal-translations",
+    "baseCommit": "c4faa9ad47b7a96216a792760ac6df8a452edfc3",
+    "sourceCommit": "21a835414668d1def468236988130244bea10d70",
+    "originMainAtPreparation": "de4ba6137c63e2abe7f8a055b671573e9e84c43a",
+    "commitsAheadOfOriginMain": 25,
+    "remoteSourceCommitVerified": true,
+    "remoteBranch": "origin/codex/publish-legal-translations"
+  },
+  "decision": {
+    "sourcePublication": "PASS",
+    "remoteBranchPublication": "PASS",
+    "productionDeployment": "NOT_PERFORMED",
+    "paidAcquisitionReadiness": "NO_GO",
+    "paidAcquisitionOpenRequirements": 45
+  },
+  "locales": [
+    "pa",
+    "tl",
+    "zh-hans",
+    "zh-hant",
+    "ar",
+    "hi",
+    "es"
+  ],
+  "publicationContract": {
+    "status": "published",
+    "basis": "owner_authorized_machine_translation",
+    "authorizedBy": "Brett Bilon",
+    "authorizedAt": "2026-08-31T02:09:07.163Z",
+    "indexingAuthorizedBy": "Brett Bilon",
+    "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
+    "disclaimerVersion": "not-legal-advice-machine-translation-v1",
+    "reviewedBy": null,
+    "reviewedAt": null,
+    "serviceReady": false,
+    "nativeReviewClaimed": false,
+    "legalReviewClaimed": false
+  },
+  "fingerprints": {
+    "sourceVersion": "rapid-resolution-2026-08-30",
+    "sourceFingerprint": "fnv1a-94f49c0b",
+    "sourceDocuments": {
+      "src/pages/TermsOfService.tsx": "fnv1a-027cf293",
+      "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
+      "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
+      "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
+      "src/pages/PrivacyPolicy.tsx": "fnv1a-22095d9a",
+      "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
+      "src/config/offers.ts": "fnv1a-4b290fd6",
+      "src/config/feeRefund.json": "fnv1a-06562a22",
+      "supabase/functions/_shared/consent-pdf.ts": "fnv1a-a9ddc65a"
+    },
+    "localeBundles": {
+      "pa": "fnv1a-8cc780e5",
+      "tl": "fnv1a-a74e1f73",
+      "zh-hans": "fnv1a-b7a61309",
+      "zh-hant": "fnv1a-3681efe1",
+      "ar": "fnv1a-32fe4e24",
+      "hi": "fnv1a-bf325cc6",
+      "es": "fnv1a-9727a4e5"
+    }
+  },
+  "scope": {
+    "translatedCatalogKeysPerLocale": 268,
+    "reviewInventoryRows": 1876,
+    "indexablePublicInformationUrls": 42,
+    "noindexPrivateOrReturnSnapshots": 14,
+    "legalSourceDocumentCount": 9,
+    "corrections": [
+      "Qualified the translated Photo Radar no-demerit statement by the current schedule and owner conviction under Traffic Safety Act s.160.",
+      "Corrected three Spanish negative predicates that could otherwise read affirmatively or ambiguously.",
+      "Corrected the Punjabi cancellation clause from both parties to either party.",
+      "Added the untranslated lead-capture consent fallback to legal-source attestation and corrected language metadata at the handoff boundary."
+    ]
+  },
+  "verification": [
+    {
+      "command": "node scripts/validate-i18n.mjs --review-values",
+      "result": "PASS_7_OWNER_PUBLISHED_7_INDEXABLE"
+    },
+    {
+      "command": "npm run test:i18n",
+      "result": "PASS_8_BUNDLES_268_KEYS_1876_REVIEW_ROWS"
+    },
+    {
+      "command": "node scripts/test-ticket-upload-review.mjs",
+      "result": "PASS_29_OF_29"
+    },
+    {
+      "command": "npx tsc -p tsconfig.app.json --noEmit",
+      "result": "PASS"
+    },
+    {
+      "command": "npx tsc -p tsconfig.node.json --noEmit",
+      "result": "PASS"
+    },
+    {
+      "command": "npm run test:ads-readiness",
+      "result": "PASS"
+    },
+    {
+      "command": "npm run ci:ads-readiness",
+      "result": "PASS_VALID_INTENTIONAL_NO_GO_45_REQUIREMENTS"
+    },
+    {
+      "command": "git diff --check c4faa9ad47b7a96216a792760ac6df8a452edfc3..21a835414668d1def468236988130244bea10d70",
+      "result": "PASS"
+    }
+  ],
+  "independentReview": {
+    "result": "PASS",
+    "reviewedCommit": "21a835414668d1def468236988130244bea10d70",
+    "sourcePublicationBlockers": 0,
+    "findingResolved": "The two inaccurate release-note sentences were corrected before this receipt.",
+    "artifactRequirement": "The controlled production pipeline must regenerate the locale manifest and 56 full browser-prerendered localized pages before deployment."
+  },
+  "deploymentBoundary": {
+    "exactRefreshDeployedToProduction": false,
+    "reason": "This branch is built on a paid-acquisition candidate that is 25 commits ahead of origin/main and remains NO_GO. Deploying it would publish unrelated backend and funnel work.",
+    "requiredNextStep": "Integrate through the controlled backend-first release process, then regenerate and verify full browser prerenders before the frontend-last deployment.",
+    "staleTrackedPrerendersCommitted": false,
+    "directLightweightSnapshotOutputCommitted": false
+  },
+  "actionsNotTaken": [
+    "production deployment",
+    "database migration",
+    "Edge Function deployment",
+    "advertising provider mutation",
+    "campaign activation",
+    "advertising spend",
+    "payment or refund transaction",
+    "email or customer contact"
+  ]
+}
