@@ -260,6 +260,24 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_intake_draft_cleanup_tombstones: {
+        Row: {
+          path_hash: string
+          draft_id: string
+          recorded_at: string
+        }
+        Insert: {
+          path_hash: string
+          draft_id: string
+          recorded_at?: string
+        }
+        Update: {
+          path_hash?: string
+          draft_id?: string
+          recorded_at?: string
+        }
+        Relationships: []
+      }
       ticket_intake_drafts: {
         Row: {
           id: string
@@ -282,6 +300,10 @@ export type Database = {
           resume_delivery_failed_at: string | null
           resume_delivery_attempt_count: number
           resume_delivery_failure_code: string | null
+          cleanup_claim_id: string | null
+          cleanup_claimed_at: string | null
+          cleanup_claim_expires_at: string | null
+          cleanup_attempt_count: number
           draft_data: Json
           schema_version: number
           current_step: number
@@ -324,6 +346,10 @@ export type Database = {
           resume_delivery_failed_at?: string | null
           resume_delivery_attempt_count?: number
           resume_delivery_failure_code?: string | null
+          cleanup_claim_id?: string | null
+          cleanup_claimed_at?: string | null
+          cleanup_claim_expires_at?: string | null
+          cleanup_attempt_count?: number
           draft_data?: Json
           schema_version?: number
           current_step?: number
@@ -366,6 +392,10 @@ export type Database = {
           resume_delivery_failed_at?: string | null
           resume_delivery_attempt_count?: number
           resume_delivery_failure_code?: string | null
+          cleanup_claim_id?: string | null
+          cleanup_claimed_at?: string | null
+          cleanup_claim_expires_at?: string | null
+          cleanup_attempt_count?: number
           draft_data?: Json
           schema_version?: number
           current_step?: number
@@ -774,6 +804,15 @@ export type Database = {
       }
     }
     Functions: {
+      claim_expired_ticket_intake_drafts: {
+        Args: { p_claim_id: string; p_limit?: number }
+        Returns: {
+          draft_id: string
+          claim_id: string
+          current_path: string
+          pending_path: string | null
+        }[]
+      }
       claim_ticket_intake_translations: {
         Args: { p_limit?: number }
         Returns: Database["public"]["Tables"]["ticket_intake_translations"]["Row"][]
@@ -784,6 +823,10 @@ export type Database = {
       }
       fail_ticket_intake_translation: {
         Args: { p_id: string; p_claim_token: string; p_error_code: string }
+        Returns: boolean
+      }
+      finalize_ticket_intake_draft_cleanup: {
+        Args: { p_id: string; p_claim_id: string }
         Returns: boolean
       }
       review_ticket_intake_translation: {
@@ -805,6 +848,14 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      record_ticket_intake_draft_cleanup_tombstones: {
+        Args: { p_id: string; p_claim_id: string; p_path_hashes: string[] }
+        Returns: number
+      }
+      release_ticket_intake_draft_cleanup: {
+        Args: { p_id: string; p_claim_id: string }
         Returns: boolean
       }
     }
