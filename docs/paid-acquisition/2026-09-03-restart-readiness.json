@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "decision": "NO_GO",
+  "release": {
+    "sourceCommit": null,
+    "deploymentId": null,
+    "productionUrl": "https://fabsy.ca/rapid-resolution",
+    "bundlePath": null,
+    "bundleSha256": null,
+    "evidenceDirectory": null
+  },
+  "economics": {
+    "priceCad": 198,
+    "paymentFeesCad": null,
+    "fulfillmentCostCad": 0,
+    "refundRate": null,
+    "supportCostCad": null,
+    "requiredContributionCad": null,
+    "qualifiedLeadToPaidRate": null,
+    "plannedLandingToPurchaseRate": null,
+    "observedClickToLandingRate": null,
+    "approvedMaximumCacCad": null,
+    "approvedMaximumCplCad": null,
+    "approvedBreakEvenCpcCad": null,
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "operations": {
+    "weeklyCaseCapacity": null,
+    "maximumMediaLossCad": null,
+    "phoneTestEvidence": null,
+    "notificationTestEvidence": null,
+    "stripeBrandingEvidence": null
+  },
+  "gates": [
+    { "id": 1, "status": "OWNER_INPUT", "evidence": [] },
+    { "id": 2, "status": "OWNER_INPUT", "evidence": [] },
+    { "id": 3, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["docs/paid-acquisition/2026-09-03-homepage-conversion-readiness.md"] },
+    { "id": 4, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 5, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["docs/paid-acquisition/2026-09-03-homepage-conversion-readiness.md"] },
+    { "id": 6, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 7, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["supabase/migrations/20260903120000_ticket_intake_drafts.sql"] },
+    { "id": 8, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["scripts/test-ticket-upload-review.mjs"] },
+    { "id": 9, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["scripts/test-funnel-measurement.mjs"] },
+    { "id": 10, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 11, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 12, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 13, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 14, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 15, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["src/lib/marketingAttribution.ts"] },
+    { "id": 16, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["scripts/test-google-consent-ui.mjs", "scripts/test-meta-consent-ui.mjs"] },
+    { "id": 17, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": [] },
+    { "id": 18, "status": "PRODUCTION_OPEN", "evidence": [] },
+    { "id": 19, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["src/lib/acquisitionParameters.ts"] },
+    { "id": 20, "status": "OWNER_INPUT", "evidence": ["docs/paid-acquisition/2026-09-03-paid-acquisition-restart-runbook.md"] },
+    { "id": 21, "status": "PRODUCTION_OPEN", "evidence": [] }
+  ],
+  "review": {
+    "releaseOwner": null,
+    "independentReviewer": null,
+    "reviewedAt": null,
+    "providerStatusBeforeLaunch": null,
+    "oneClickPauseSeconds": null,
+    "goApprovedBy": null,
+    "goApprovedAt": null
+  },
+  "spendAuthorization": null
+}

@@ -13,6 +13,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "i18n:review": "node scripts/generate-translation-review.mjs",
+    "ads:readiness": "node scripts/paid-acquisition-readiness.mjs",
+    "test:ads-readiness": "node scripts/test-paid-acquisition-readiness-control.mjs",
     "test:i18n": "node scripts/validate-i18n.mjs && node scripts/generate-translation-review.mjs --check && node scripts/test-i18n.mjs && node scripts/test-locale-seo.mjs && node scripts/test-public-language-flow.mjs",
     "prerender:all": "PRERENDER_BASE_URL=${PRERENDER_BASE_URL:-https://fabsy.ca} PRERENDER_OUT_DIR=public/prerendered node scripts/prerender-all.js",
     "notify:search": "node scripts/submit-indexnow.mjs",
