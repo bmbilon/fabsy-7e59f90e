@@ -48,9 +48,11 @@ interface TicketDetailsStepProps {
   reviewReady?: boolean;
   skipInitialScan?: boolean;
   onCaptureStateChange?: (state: TicketCaptureState) => void;
+  mode?: "all" | "capture" | "details";
+  hasStoredTicket?: boolean;
 }
 
-const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketReviewData(formData), skipInitialScan = false, onCaptureStateChange }: TicketDetailsStepProps) => {
+const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketReviewData(formData), skipInitialScan = false, onCaptureStateChange, mode = "all", hasStoredTicket = false }: TicketDetailsStepProps) => {
   const [openOffenceCombobox, setOpenOffenceCombobox] = useState(false);
   const [offenceSearchValue, setOffenceSearchValue] = useState("");
   const manuallyEditedDate = useRef<Date | string | undefined>(formData.issueDate);
@@ -194,7 +196,7 @@ const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketRe
   return (
     <>
       <form className="space-y-8" onSubmit={event => event.preventDefault()}>
-        <TicketCapture
+        {mode !== "details" && <TicketCapture
           file={formData.ticketImage}
           onFileChange={ticketImage => {
             manuallyEditedDate.current = undefined;
@@ -212,12 +214,12 @@ const TicketDetailsStep = ({ formData, updateFormData, reviewReady = hasTicketRe
           }}
           onOcrData={applyTicketOCR}
           onCaptureStateChange={onCaptureStateChange}
-          required={!formData.sourceAssessmentId}
+          required={!formData.sourceAssessmentId && !hasStoredTicket}
           skipInitialScan={skipInitialScan}
-        />
-        {formData.sourceAssessmentId && !formData.ticketImage ? <p className="text-sm text-muted-foreground">The ticket from your earlier intake is already linked to this matter.</p> : null}
+        />}
+        {(formData.sourceAssessmentId || hasStoredTicket) && !formData.ticketImage ? <p className="text-sm text-muted-foreground">Your ticket is stored privately and linked to this intake.</p> : null}
 
-      {reviewReady && <div className="space-y-6 animate-in fade-in duration-300">
+      {mode !== "capture" && reviewReady && <div className="space-y-6 animate-in fade-in duration-300">
         <div role="status" className="rounded-lg border border-primary/20 bg-primary/5 p-4">
           <h3 className="font-semibold">Review your ticket details</h3>
           <p className="mt-1 text-sm text-muted-foreground">Check the captured details against your ticket. Red borders show details that need your attention. Fields marked * are required; other details can be left blank if they are not printed on your ticket.</p>

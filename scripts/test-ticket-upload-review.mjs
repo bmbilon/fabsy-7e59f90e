@@ -66,7 +66,7 @@ const compiled = await build({
     name: "offline-ticket-review-boundaries",
     setup(bundler) {
       const modules = {
-        backend: "export const supabase = { functions: { invoke: (...args) => globalThis.__ticketReviewBackend.invoke(...args) } };",
+        backend: "export const supabase = { functions: { invoke: (...args) => globalThis.__ticketReviewBackend.invoke(...args) }, storage: { from: (...args) => globalThis.__ticketReviewBackend.storageFrom(...args) } };",
         locale: "const locale = { locale: 'en', setIntakeHandoff() {} }; export const useLocale = () => locale;",
         toast: "const value = { toast() {} }; export const useToast = () => value;",
         cache: "const value = { getCachedTicketData: (...args) => globalThis.__ticketReviewBackend.readCache(...args), isCacheKeyValid: () => true }; export const useTicketCache = () => value;",
@@ -115,7 +115,7 @@ const completeTicket = {
   courtDate: null,
 };
 
-async function runtime(t, props = {}, { cacheKey } = {}) {
+async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false } = {}) {
   const domErrors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on("jsdomError", error => domErrors.push(error));
@@ -128,6 +128,8 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
   });
   const { window } = dom;
   const requests = [];
+  const draftRequests = [];
+  const uploadRequests = [];
   const cacheRequests = [];
   const forbidden = [];
   const channels = [];
@@ -153,20 +155,68 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
     }
   };
   window.IS_REACT_ACT_ENVIRONMENT = true;
+  let draftRevision = 1;
+  const draftToken = "a".repeat(64);
+  const draftId = "550e8400-e29b-41d4-a716-446655440000";
+  const draftResponse = (extra = {}) => ({
+    success: true, draftId, revision: draftRevision,
+    contact: { email: "driver@example.test", phone: "" },
+    albertaConfirmed: true, contactPermission: true, preferredLocale: "en",
+    currentStep: 1, completedStep: 0, draftData: {},
+    ticketDocumentPath: `${draftId}/representation-ticket-r1.png`,
+    ticketUploadedAt: null, status: "active",
+    expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
+    ...extra,
+  });
   window.__ticketReviewBackend = {
     invoke(name, options) {
-      if (name !== "ocr-ticket") {
-        forbidden.push(name);
-        throw new Error(`Unexpected backend call: ${name}`);
+      if (name === "ticket-intake-draft") {
+        const action = options.body.action;
+        draftRequests.push(options.body);
+        if (action === "create") return Promise.resolve({ data: draftResponse({
+          accessToken: draftToken,
+          upload: { bucket: "assessment-tickets", path: `${draftId}/representation-ticket-r1.png`, token: "signed-upload", contentType: options.body.file.contentType, maxBytes: options.body.file.size },
+        }), error: null });
+        if (action === "prepare_upload") {
+          draftRevision += 1;
+          return Promise.resolve({ data: draftResponse({
+            upload: { bucket: "assessment-tickets", path: `${draftId}/representation-ticket-r${draftRevision}.png`, token: "signed-retry-upload", contentType: options.body.file.contentType, maxBytes: options.body.file.size },
+          }), error: null });
+        }
+        if (action === "confirm_upload") return Promise.resolve({ data: draftResponse({ ticketUploadedAt: new Date().toISOString() }), error: null });
+        if (action === "read") return Promise.resolve({ data: draftResponse({
+          contact: { email: "driver@example.test", phone: "4035550123" },
+          draftData: { ...completeTicket, ticketType: "officer_issued", ticketTypeSource: "upload", email: "driver@example.test", phone: "4035550123" },
+          ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString(),
+          ...(convertedDraft ? { status: "converted", currentStep: 6, completedStep: 5, convertedSubmissionId: draftId, clientId: "550e8400-e29b-41d4-a716-446655440001" } : {}),
+        }), error: null });
+        if (action === "save") {
+          draftRevision += 1;
+          return Promise.resolve({ data: draftResponse({ currentStep: options.body.currentStep, completedStep: options.body.completedStep, draftData: options.body.draftData, ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString() }), error: null });
+        }
+        throw new Error(`Unexpected draft action: ${action}`);
       }
+      if (name !== "ocr-ticket") throw new Error(`Unexpected backend call: ${name}`);
       assert.match(options.body.imageBase64, /^data:image\/(png|jpeg|webp);base64,/);
       return deferredRequest(requests, { name });
+    },
+    storageFrom(bucket) {
+      assert.equal(bucket, "assessment-tickets");
+      return { uploadToSignedUrl: async (path, token, file, options) => {
+        uploadRequests.push({ path, token, file, options });
+        return { data: { path }, error: null };
+      } };
     },
     readCache(key) {
       return deferredRequest(cacheRequests, { key });
     },
   };
   if (cacheKey) window.localStorage.setItem("ticket-cache-key", cacheKey);
+  if (resumeDraft) window.localStorage.setItem("fabsy.ticket-intake-capability.v1", JSON.stringify({
+    draftId,
+    accessToken: draftToken,
+    expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
+  }));
   window.module = { exports: {} };
   window.eval(script);
   const api = window.module.exports;
@@ -241,7 +291,14 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
     await api.changeText(field(id), value);
     await flush();
   };
-  return { window, document, api, requests, cacheRequests, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit };
+  const saveLead = async () => {
+    await edit("lead-email", "driver@example.test");
+    await api.click(field("alberta-confirmed"));
+    await api.click(field("contact-permission"));
+    await api.click(button("Save ticket and review details"));
+    await until(() => document.getElementById("ticketNumber"), "Expected ticket review after the minimum lead was saved");
+  };
+  return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit, saveLead };
 }
 
 test("a fresh intake presents capture first and waits for the current OCR scan before showing details", async t => {
@@ -258,9 +315,46 @@ test("a fresh intake presents capture first and waits for the current OCR scan b
   assert.match(app.document.body.textContent, /scanning/i);
 
   await app.finish(0);
+  app.hiddenDetails();
+  assert.ok(app.field("lead-email"), "Contact details are collected before the full ticket form");
+  await app.saveLead();
   assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
   assert.equal(app.field("fineAmount").value, "200");
+  assert.equal(app.uploadRequests.length, 1, "The ticket is uploaded once through a signed private URL");
+  assert.deepEqual(app.draftRequests.map(request => request.action).slice(0, 2), ["create", "confirm_upload"]);
   app.continueEnabled();
+});
+
+test("a refresh restores an uploaded intake from its local capability without requiring the File object", async t => {
+  const app = await runtime(t, {}, { resumeDraft: true });
+  await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved draft to restore");
+  assert.equal(app.requests.length, 0, "Restoring a saved ticket must not run OCR again");
+  assert.equal(app.draftRequests[0]?.action, "read");
+  assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
+  assert.equal(app.document.getElementById("lead-email"), null, "The minimum lead screen is complete after a verified upload");
+  assert.match(app.document.body.textContent, /stored privately/i);
+  app.continueEnabled();
+});
+
+test("a draft whose first upload failed can retry without losing its synchronized contact", async t => {
+  const app = await runtime(t, {}, { resumeDraft: true, unuploadedDraft: true });
+  await app.until(() => app.document.getElementById("lead-email"), "Expected the incomplete lead screen to restore");
+  assert.equal(app.field("lead-email").value, "driver@example.test");
+  await app.choose(app.file("synthetic-retry.png"));
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.api.click(app.button("Save ticket and review details"));
+  await app.until(() => app.document.getElementById("ticketNumber"), "Expected the retried private upload to finish");
+  assert.deepEqual(app.draftRequests.map(request => request.action), ["read", "save", "prepare_upload", "confirm_upload"]);
+  assert.equal(app.uploadRequests[0]?.token, "signed-retry-upload");
+});
+
+test("a converted intake resumes at fresh consent after a reload or canceled checkout", async t => {
+  const app = await runtime(t, {}, { resumeDraft: true, convertedDraft: true });
+  await app.until(() => /Step 4 of 6/.test(app.document.body.textContent), "Expected converted intake to return to consent");
+  assert.deepEqual(app.draftRequests.map(request => request.action), ["read"], "Immutable converted drafts are not autosaved");
+  assert.ok(app.buttons("Previous").every(node => node.disabled), "Recovery cannot edit fields already converted into the submission");
+  assert.match(app.document.body.textContent, /Consent Form/);
 });
 
 test("partial OCR highlights missing details accessibly and clears the error after a correction", async t => {
@@ -268,6 +362,7 @@ test("partial OCR highlights missing details accessibly and clears the error aft
   await app.choose(app.file());
   await app.waitForScan(1);
   await app.finish(0, { ...completeTicket, fineAmount: null });
+  await app.saveLead();
   app.flagged("fineAmount");
   app.continueBlocked();
   assert.equal(app.field("ticketNumber").getAttribute("aria-invalid"), "false");
@@ -285,6 +380,7 @@ test("PDF capture opens manual review without attempting OCR", async t => {
   const app = await runtime(t);
   await app.choose(app.file("synthetic-ticket.pdf", "application/pdf"));
   assert.equal(app.requests.length, 0);
+  await app.saveLead();
   assert.equal(app.field("ticketNumber").value, "");
   app.flagged("ticketNumber");
   app.continueBlocked();
@@ -298,6 +394,7 @@ test("an OCR failure preserves the selected file and opens a usable manual corre
   await app.api.act(async () => app.requests[0].resolve({ data: null, error: new Error("Synthetic OCR failure") }));
   await app.flush();
   assert.match(app.document.body.textContent, /synthetic-unreadable\.png/);
+  await app.saveLead();
   assert.equal(app.field("ticketNumber").value, "");
   app.flagged("ticketNumber");
   await app.edit("ticketNumber", "SYNTHETIC-MANUAL-CORRECTION");
@@ -305,18 +402,18 @@ test("an OCR failure preserves the selected file and opens a usable manual corre
   app.continueBlocked();
 });
 
-test("an accepted replacement clears values from the earlier ticket, including manual corrections", async t => {
+test("an accepted replacement before saving clears values from the earlier ticket", async t => {
   const app = await runtime(t);
   await app.choose(app.file("synthetic-first.png"));
   await app.waitForScan(1);
   await app.finish(0);
-  await app.edit("fineAmount", "999.50");
 
   await app.choose(app.file("synthetic-second.png"));
   await app.waitForScan(2);
   app.hiddenDetails();
   app.continueBlocked();
   await app.finish(1, { ticketNumber: "SYNTHETIC-TICKET-B", issueDate: "2026-06-03", location: null, fineAmount: null });
+  await app.saveLead();
   assert.equal(app.field("ticketNumber").value, "SYNTHETIC-TICKET-B");
   assert.equal(app.field("fineAmount").value, "");
   assert.equal(app.field("location").value, "");
@@ -324,7 +421,7 @@ test("an accepted replacement clears values from the earlier ticket, including m
   app.continueBlocked();
 });
 
-test("late results from replaced and removed scans cannot repopulate the current ticket", async t => {
+test("late results from a replaced scan cannot repopulate the current ticket", async t => {
   const app = await runtime(t);
   await app.choose(app.file("synthetic-old.png"));
   await app.waitForScan(1);
@@ -332,17 +429,9 @@ test("late results from replaced and removed scans cannot repopulate the current
   await app.waitForScan(2);
   await app.finish(1, { ...completeTicket, ticketNumber: "SYNTHETIC-CURRENT" });
   await app.finish(0, { ...completeTicket, ticketNumber: "SYNTHETIC-STALE", fineAmount: "999" });
+  await app.saveLead();
   assert.equal(app.field("ticketNumber").value, "SYNTHETIC-CURRENT");
   assert.equal(app.field("fineAmount").value, "200");
-
-  await app.choose(app.file("synthetic-removed.png"));
-  await app.waitForScan(3);
-  await app.api.click(app.button("Remove"));
-  app.hiddenDetails();
-  await app.finish(2, { ...completeTicket, ticketNumber: "SYNTHETIC-REMOVED" });
-  app.hiddenDetails();
-  app.continueBlocked();
-  assert.doesNotMatch(app.document.body.textContent, /SYNTHETIC-REMOVED/);
 });
 
 test("returning from the next step preserves the reviewed file and manual edits without rescanning", async t => {
@@ -350,6 +439,7 @@ test("returning from the next step preserves the reviewed file and manual edits 
   await app.choose(app.file());
   await app.waitForScan(1);
   await app.finish(0);
+  await app.saveLead();
   await app.edit("ticketNumber", "SYNTHETIC-REVIEWED");
   await app.edit("fineAmount", "315.25");
   app.continueEnabled();
@@ -371,25 +461,23 @@ test("canceling, repeating or rejecting a replacement retains the existing revie
   await app.waitForScan(1);
   await app.finish(0);
   await app.choose(undefined);
-  assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
   await app.choose(selected);
-  assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
   await app.choose(app.file("not-a-ticket.txt", "text/plain"));
   assert.equal(app.requests.length, 1);
+  await app.saveLead();
   assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
   app.continueEnabled();
 });
 
-test("late cached data cannot replace a new ticket that the user uploaded and corrected", async t => {
+test("legacy remote-cache keys are discarded without a lookup", async t => {
   const app = await runtime(t, {}, { cacheKey: "synthetic-cache-key" });
-  await app.until(() => app.cacheRequests.length === 1, "Expected the deferred cache lookup");
+  assert.equal(app.window.localStorage.getItem("ticket-cache-key"), null);
+  assert.equal(app.cacheRequests.length, 0, "Retired cache keys must never trigger a remote request");
   await app.choose(app.file("synthetic-new-upload.png"));
   await app.waitForScan(1);
   await app.finish(0);
-  await app.edit("ticketNumber", "SYNTHETIC-USER-CORRECTED");
-  await app.api.act(async () => app.cacheRequests[0].resolve({ ticketData: { ...completeTicket, ticketNumber: "SYNTHETIC-OLD-CACHE", fineAmount: "888" } }));
-  await app.flush();
-  assert.equal(app.field("ticketNumber").value, "SYNTHETIC-USER-CORRECTED");
+  await app.saveLead();
+  assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
   assert.equal(app.field("fineAmount").value, "200");
   app.continueEnabled();
 });
@@ -408,6 +496,7 @@ test("photo radar review still requires the owner's answer after OCR completes",
   await app.choose(app.file("synthetic-owner-notice.png"));
   await app.waitForScan(1);
   await app.finish(0, { ...completeTicket, ticketType: "photo_radar", offenceDate: "2026-05-28" });
+  await app.saveLead();
   assert.match(app.document.body.textContent, /Was this vehicle registered to you on the offence date/);
   assert.equal(app.document.getElementById("vehicleSeized"), null);
   app.continueBlocked();
@@ -422,6 +511,7 @@ test("a vehicle-seizure flag continues to block officer-ticket checkout", async 
   await app.choose(app.file());
   await app.waitForScan(1);
   await app.finish(0);
+  await app.saveLead();
   app.continueEnabled();
   await app.api.click(app.field("vehicleSeized"));
   app.continueBlocked();

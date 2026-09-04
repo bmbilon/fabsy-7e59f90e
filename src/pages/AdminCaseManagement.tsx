@@ -28,9 +28,27 @@ interface TicketSubmission {
   created_at: string;
 }
 
+interface IntakeLead {
+  id: string;
+  email: string | null;
+  phone: string | null;
+  preferred_locale: string;
+  current_step: number;
+  completed_step: number;
+  status: "active" | "converted";
+  converted_submission_id: string | null;
+  ticket_document_path: string;
+  ticket_document_content_type: string;
+  ticket_document_size_bytes: number;
+  ticket_uploaded_at: string;
+  expires_at: string;
+  updated_at: string;
+}
+
 export default function AdminCaseManagement() {
   const [submissions, setSubmissions] = useState<TicketSubmission[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<TicketSubmission[]>([]);
+  const [intakeLeads, setIntakeLeads] = useState<IntakeLead[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -102,9 +120,8 @@ export default function AdminCaseManagement() {
 
       setUserRole(roleData);
 
-      const { data, error } = await supabase
-        .from('ticket_submissions')
-        .select(`
+      const [submissionResult, leadResult] = await Promise.all([
+        supabase.from('ticket_submissions').select(`
           *,
           clients (
             first_name,
@@ -117,7 +134,17 @@ export default function AdminCaseManagement() {
         .neq('status', 'awaiting_payment')
         .neq('status', 'assessment_awaiting_payment')
         .neq('status', 'assessment_checkout_open')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }),
+        supabase.from('ticket_intake_drafts')
+          .select('id,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,expires_at,updated_at')
+          .in('status', ['active', 'converted'])
+          .not('ticket_uploaded_at', 'is', null)
+          .gt('expires_at', new Date().toISOString())
+          .order('updated_at', { ascending: false }),
+      ]);
+
+      const { data, error } = submissionResult;
+      if (leadResult.error) throw leadResult.error;
 
       if (error) throw error;
 
@@ -140,6 +167,11 @@ export default function AdminCaseManagement() {
 
       setSubmissions(transformedData);
       setFilteredSubmissions(transformedData);
+      const managedCaseIds = new Set(transformedData.map(submission => submission.id));
+      setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
+        Boolean(lead.ticket_uploaded_at) &&
+        (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
+      ));
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -150,6 +182,17 @@ export default function AdminCaseManagement() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const openLeadTicket = async (lead: IntakeLead) => {
+    const { data, error } = await supabase.storage
+      .from('assessment-tickets')
+      .createSignedUrl(lead.ticket_document_path, 60);
+    if (error || !data?.signedUrl) {
+      toast({ title: "Ticket unavailable", description: "The private ticket file could not be opened.", variant: "destructive" });
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
   };
 
   const getStatusBadge = (status: string) => {
@@ -204,6 +247,40 @@ export default function AdminCaseManagement() {
 
       <main className="container mx-auto px-4 py-8">
         <AtePilotMetrics />
+        <Card className="mb-8 border-amber-300/70">
+          <CardHeader>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <CardTitle>Incomplete ticket intakes</CardTitle>
+                <CardDescription>Uploaded tickets whose customers have allowed intake follow-up but have not completed payment.</CardDescription>
+              </div>
+              <Badge variant="outline">{intakeLeads.length} open</Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {intakeLeads.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">No incomplete uploaded intakes.</p> : <div className="space-y-3">
+              {intakeLeads.map(lead => <div key={lead.id} className="flex flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 md:flex-row md:items-center md:justify-between">
+                <div className="min-w-0 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline">{lead.status === "converted" ? "Checkout started" : `Step ${lead.current_step} of 6`}</Badge>
+                    <span className="text-xs text-muted-foreground">Updated {formatDistanceToNow(new Date(lead.updated_at), { addSuffix: true })}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+                    {lead.email ? <span className="flex min-w-0 items-center gap-2"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /><span className="break-all">{lead.email}</span></span> : null}
+                    {lead.phone ? <span className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" />{lead.phone}</span> : null}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Locale: {lead.preferred_locale} · Ticket {(lead.ticket_document_size_bytes / 1024).toFixed(0)} KB · Resume access expires {new Date(lead.expires_at).toLocaleDateString()}</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" onClick={() => void openLeadTicket(lead)}>
+                    <FileText className="mr-2 h-4 w-4" aria-hidden="true" />Open ticket
+                  </Button>
+                  {lead.converted_submission_id ? <Button type="button" onClick={() => navigate(`/admin/submissions/${lead.converted_submission_id}`)}>Open checkout case</Button> : null}
+                </div>
+              </div>)}
+            </div>}
+          </CardContent>
+        </Card>
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>

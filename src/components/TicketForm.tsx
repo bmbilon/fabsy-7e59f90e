@@ -15,8 +15,8 @@ import DefenseStep from "./form-steps/DefenseStep";
 import ConsentStep from "./form-steps/ConsentStep";
 import PaymentStep from "./form-steps/PaymentStep";
 import ReviewStep from "./form-steps/ReviewStep";
+import LeadCaptureFields from "./form-steps/LeadCaptureFields";
 import { useToast } from "@/hooks/use-toast";
-import { useTicketCache } from "@/hooks/useTicketCache";
 import { Link } from "react-router-dom";
 import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
 import { useLocale } from "@/i18n/locale-context";
@@ -25,6 +25,7 @@ import { applyDetectedTicketType, applyTicketType, ticketDateAsLocalDate, ticket
 import { isProLicenceClass, LICENCE_CLASS_OPTIONS, normalizeLicenceClass, type LicenceClass } from "@/lib/pro-drivers/intake";
 import { latestReferralAttribution, normalizeReferralCode, ReferralCaptureError, type ReferralAttribution } from "@/lib/referrals/attribution";
 import { captureReferralCode, captureReferralFromLocation, clearReferralAttribution, readActiveReferral, REFERRAL_ATTRIBUTION_EVENT } from "@/lib/referrals/capture";
+import { useTicketIntakeDraft } from "@/hooks/useTicketIntakeDraft";
 
 export interface FormData {
   // Unified intake handoff
@@ -36,6 +37,8 @@ export interface FormData {
   lastName: string;
   email: string;
   phone: string;
+  albertaConfirmed: boolean;
+  contactPermission: boolean;
   smsOptIn: boolean;
   address: string;
   city: string;
@@ -100,6 +103,8 @@ const initialFormData: FormData = {
   lastName: "",
   email: "",
   phone: "",
+  albertaConfirmed: false,
+  contactPermission: false,
   smsOptIn: false,
   address: "",
   city: "",
@@ -292,17 +297,47 @@ const TicketForm = ({
   const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const [captureState, setCaptureState] = useState<TicketCaptureState>(() => hasTicketReviewData(formData) ? "complete" : "empty");
   const [completedTicketFile, setCompletedTicketFile] = useState<File | null>(() => hasTicketReviewData(formData) ? formData.ticketImage : null);
+  const [leadSaved, setLeadSaved] = useState(Boolean(sourceAssessment));
   const ticketDraftRevision = useRef(0);
+  const formStartSent = useRef(false);
+  const autosaveTimer = useRef<number | null>(null);
   const cacheLoadStarted = useRef(false);
+  const intakeDraft = useTicketIntakeDraft({
+    preferredLocale: locale,
+    onRestore: (record, values) => {
+      ticketDraftRevision.current += 1;
+      setFormData(current => ({
+        ...current,
+        ...values,
+        ticketImage: null,
+        driversLicenseImage: null,
+        referral: latestReferralAttribution([current.referral, readActiveReferral()]),
+      } as FormData));
+      // Conversion happens before consent storage and checkout creation. A
+      // reload or Stripe cancellation therefore returns to fresh consent so a
+      // prior signature never has to be persisted in the resumable draft.
+      setCurrentStep(record.status === "converted"
+        ? 4
+        : Math.max(1, Math.min(record.currentStep || 1, steps.length)));
+      if (record.ticketUploadedAt && record.ticketDocumentPath) {
+        setLeadSaved(true);
+        setCaptureState("complete");
+        setCompletedTicketFile(null);
+      }
+    },
+  });
+  const intakeDraftCapability = intakeDraft.capability;
+  const intakeDraftRecordStatus = intakeDraft.record?.status;
+  const saveIntakeDraft = intakeDraft.save;
   const ticketReviewReady = captureState === "complete" || captureState === "manual"
+    || intakeDraft.hasUploadedTicket
     || (!formData.ticketImage && (Boolean(formData.sourceAssessmentId) || hasTicketReviewData(formData)));
-  const captureOnly = currentStep === 1 && !ticketReviewReady;
+  const captureOnly = currentStep === 1 && !leadSaved;
   const handleCaptureStateChange = (state: TicketCaptureState) => {
     setCaptureState(state);
     if (state === "complete" || state === "manual") setCompletedTicketFile(formData.ticketImage);
     else setCompletedTicketFile(null);
   };
-  const [isLoadingTicketData, setIsLoadingTicketData] = useState(false);
   useEffect(() => {
     const syncReferral = () => setFormData(current => ({ ...current, referral: readActiveReferral() }));
     window.addEventListener(REFERRAL_ATTRIBUTION_EVENT, syncReferral);
@@ -327,109 +362,45 @@ const TicketForm = ({
     });
   }, [formData, currentStep, setIntakeHandoff]);
   const { toast } = useToast();
-  const { getCachedTicketData, isCacheKeyValid } = useTicketCache();
 
-  // Check for ticket data from eligibility checker on mount
+  // The eligibility checker hands OCR data to this route in the same browser.
+  // Legacy remote-cache keys are discarded and are never sent over the wire.
   useEffect(() => {
-    if (locale !== "en" || initialPrefill || initialTicketType || cacheLoadStarted.current) return;
+    localStorage.removeItem('ticket-cache-key');
+    if (locale !== "en" || initialPrefill || initialTicketType || intakeDraft.status === "loading" || intakeDraft.capability || cacheLoadStarted.current) return;
     cacheLoadStarted.current = true;
     const revision = ticketDraftRevision.current;
     const canHydrate = () => ticketDraftRevision.current === revision;
-    const loadTicketData = async () => {
-      console.log('[TicketForm] Starting ticket data loading process...');
-      
-      // Prioritize direct localStorage first for immediate reliability
-      await tryLocalStorageData();
-      
-      // Then try Supabase cache as enhancement (non-blocking)
-      const cacheKey = localStorage.getItem('ticket-cache-key');
-      if (cacheKey && isCacheKeyValid && getCachedTicketData) {
-        console.log(`[TicketForm] Also attempting Supabase cache with key: ${cacheKey}`);
-        setIsLoadingTicketData(true);
-        
+    const localHandoffs = [
+      ['eligibility-ocr-data', 'Your ticket information has been automatically filled in.'],
+      ['eligibility-ocr-data-backup', 'Your ticket information has been loaded from backup data.'],
+    ] as const;
+    for (const [key, description] of localHandoffs) {
+      const stored = localStorage.getItem(key);
+      if (stored) {
         try {
-          const cachedData = await getCachedTicketData(cacheKey);
-          if (canHydrate() && cachedData?.ticketData && Object.keys(cachedData.ticketData).length > 0) {
-            console.log('[TicketForm] Supabase cache data available, updating form...');
-            
-            // Update form with cached data (may override localStorage)
-            setFormData(prev => canHydrate() ? mergeCachedTicketData(prev, cachedData.ticketData) : prev);
-            localStorage.removeItem('ticket-cache-key');
-            
-            console.log('[TicketForm] Form updated with Supabase cache data');
-          }
-        } catch (error) {
-          console.error('[TicketForm] Supabase cache failed (non-blocking):', error);
-        } finally {
-          setIsLoadingTicketData(false);
-        }
-      }
-    };
-    
-    const tryLocalStorageData = async () => {
-      console.log('[TicketForm] Checking localStorage for ticket data...');
-      
-      // Check primary localStorage key first
-      const primaryData = localStorage.getItem('eligibility-ocr-data');
-      const backupData = localStorage.getItem('eligibility-ocr-data-backup');
-      
-      console.log('[TicketForm] Primary data available:', !!primaryData);
-      console.log('[TicketForm] Backup data available:', !!backupData);
-      
-      // Try primary data first (most recent format)
-      if (primaryData) {
-        try {
-          const ocrData = JSON.parse(primaryData);
-          
-          // Update form with primary data
-          if (!canHydrate()) return false;
-          setFormData(prev => canHydrate() ? mergeCachedTicketData(prev, ocrData) : prev);
-          
-          // Clean up primary localStorage
-          localStorage.removeItem('eligibility-ocr-data');
-          
+          const ocrData = JSON.parse(stored) as unknown;
+          if (!ocrData || typeof ocrData !== 'object' || Array.isArray(ocrData)) throw new Error('Invalid local OCR handoff');
+          if (!canHydrate()) return;
+          setFormData(prev => canHydrate() ? mergeCachedTicketData(prev, ocrData as Record<string, unknown>) : prev);
+          localStorage.removeItem(key);
           toast({
             title: "Ticket Details Pre-filled!",
-            description: "Your ticket information has been automatically filled in.",
+            description,
           });
-          return true; // Success
-        } catch (error) {
-          console.error('[TicketForm] Error parsing primary OCR data:', error);
-          localStorage.removeItem('eligibility-ocr-data');
+          return;
+        } catch {
+          localStorage.removeItem(key);
         }
       }
-      
-      // Try backup data if primary failed
-      if (backupData) {
-        try {
-          const ocrData = JSON.parse(backupData);
-          
-          // Update form with backup data
-          if (!canHydrate()) return false;
-          setFormData(prev => canHydrate() ? mergeCachedTicketData(prev, ocrData) : prev);
-          
-          // Clean up backup localStorage
-          localStorage.removeItem('eligibility-ocr-data-backup');
-          
-          toast({
-            title: "Ticket Details Pre-filled!",
-            description: "Your ticket information has been loaded from backup data.",
-          });
-          return true; // Success
-        } catch (error) {
-          console.error('[TicketForm] Error parsing backup OCR data:', error);
-          localStorage.removeItem('eligibility-ocr-data-backup');
-        }
-      }
-      
-      console.log('[TicketForm] No valid localStorage data found - form will remain empty');
-      return false; // No data found
-    };
-    
-    loadTicketData();
-  }, [getCachedTicketData, isCacheKeyValid, toast, locale, initialPrefill, initialTicketType]);
+    }
+  }, [toast, locale, initialPrefill, initialTicketType, intakeDraft.status, intakeDraft.capability]);
 
   const updateFormData = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => {
+    if (!formStartSent.current) {
+      formStartSent.current = true;
+      window.dispatchEvent(new CustomEvent("fabsy:intake-form-start"));
+    }
     ticketDraftRevision.current += 1;
     setFormData(prev => {
       const update = typeof updates === 'function' ? updates(prev) : updates;
@@ -450,6 +421,34 @@ const TicketForm = ({
     });
   };
 
+  const leadEmail = formData.email.trim();
+  const leadPhone = formData.phone.trim();
+  const leadEmailValid = !leadEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(leadEmail);
+  const leadPhoneValid = !leadPhone || leadPhone.replace(/\D/g, "").length >= 7;
+  const isLeadValid = Boolean(
+    formData.ticketImage && ticketReviewReady &&
+    (leadEmail || leadPhone) && leadEmailValid && leadPhoneValid &&
+    formData.albertaConfirmed && formData.contactPermission
+  );
+
+  const saveLead = async () => {
+    if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") return;
+    try {
+      await intakeDraft.createOrUpload(formData.ticketImage, formData as unknown as Record<string, unknown>);
+      setLeadSaved(true);
+      window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
+      window.dispatchEvent(new CustomEvent("fabsy:intake-lead-saved"));
+      toast({ title: "Your intake is saved", description: "Your ticket is stored privately. Continue reviewing the captured details below." });
+      scrollToForm();
+    } catch (failure) {
+      toast({
+        title: "We could not finish saving",
+        description: failure instanceof Error ? failure.message : "Try saving the intake again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const scrollToForm = () => {
     const formElement = document.getElementById('ticket-form-container');
     if (formElement) {
@@ -457,19 +456,57 @@ const TicketForm = ({
     }
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < steps.length) {
+      if (autosaveTimer.current !== null) {
+        window.clearTimeout(autosaveTimer.current);
+        autosaveTimer.current = null;
+      }
+      if (intakeDraft.capability && intakeDraft.record?.status !== "converted") {
+        try {
+          await intakeDraft.save(formData as unknown as Record<string, unknown>, currentStep + 1, currentStep);
+        } catch (failure) {
+          toast({
+            title: "Your latest changes are not saved yet",
+            description: failure instanceof Error ? failure.message : "Try continuing again.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+      window.dispatchEvent(new CustomEvent("fabsy:intake-step-completed", { detail: { step: currentStep } }));
       setCurrentStep(currentStep + 1);
       scrollToForm();
     }
   };
 
   const prevStep = () => {
-    if (currentStep > 1) {
+    if (currentStep > 1 && intakeDraft.record?.status !== "converted") {
       setCurrentStep(currentStep - 1);
       scrollToForm();
     }
   };
+
+  useEffect(() => {
+    if (!leadSaved || !intakeDraftCapability || intakeDraftRecordStatus === "converted") return;
+    autosaveTimer.current = window.setTimeout(() => {
+      autosaveTimer.current = null;
+      void saveIntakeDraft(
+        formData as unknown as Record<string, unknown>,
+        currentStep,
+        Math.max(0, currentStep - 1),
+      ).catch(() => {
+        // The visible save status and the next explicit Continue retry carry
+        // this error; do not interrupt typing with repeated toast messages.
+      });
+    }, 700);
+    return () => {
+      if (autosaveTimer.current !== null) {
+        window.clearTimeout(autosaveTimer.current);
+        autosaveTimer.current = null;
+      }
+    };
+  }, [formData, currentStep, leadSaved, intakeDraftCapability, intakeDraftRecordStatus, saveIntakeDraft]);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -481,8 +518,27 @@ const TicketForm = ({
             reviewReady={ticketReviewReady}
             skipInitialScan={ticketReviewReady && completedTicketFile === formData.ticketImage}
             onCaptureStateChange={handleCaptureStateChange}
+            mode={captureOnly ? "capture" : "details"}
+            hasStoredTicket={intakeDraft.hasUploadedTicket}
           />
-          {ticketReviewReady && !isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
+          {captureOnly ? <LeadCaptureFields formData={formData} updateFormData={updateFormData} error={intakeDraft.error} /> : null}
+          {!captureOnly && intakeDraft.capability ? <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
+            <div>
+              <p className="font-medium">{intakeDraft.status === "saving" ? "Saving your changes…" : intakeDraft.status === "error" ? "Some changes are not saved yet." : "Your intake is saved."}</p>
+              <p className="text-muted-foreground">Keep a secure resume link if you want to finish on another device. Anyone with the link can open this intake.</p>
+            </div>
+            <Button type="button" variant="outline" onClick={async () => {
+              const url = intakeDraft.getResumeUrl();
+              if (!url) return;
+              try {
+                await navigator.clipboard.writeText(url);
+                toast({ title: "Secure resume link copied" });
+              } catch {
+                toast({ title: "Could not copy the link", description: "Use this browser to continue the saved intake.", variant: "destructive" });
+              }
+            }}>Copy resume link</Button>
+          </div> : null}
+          {!captureOnly && ticketReviewReady && !isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
             <Label htmlFor="pro-licence-class" className="text-base font-semibold">Alberta licence class</Label>
             <Select value={formData.licenceClass} onValueChange={value => updateFormData({ licenceClass: normalizeLicenceClass(value) })}>
               <SelectTrigger id="pro-licence-class" aria-describedby="pro-licence-class-help"><SelectValue /></SelectTrigger>
@@ -504,7 +560,7 @@ const TicketForm = ({
       case 5:
         return <ReviewStep formData={formData} onSubmit={nextStep} />;
       case 6:
-        return <PaymentStep formData={formData} updateFormData={updateFormData} />;
+        return <PaymentStep formData={formData} updateFormData={updateFormData} intakeDraft={intakeDraft.capability && intakeDraft.hasUploadedTicket ? intakeDraft.capability : null} />;
       default:
         return null;
     }
@@ -515,8 +571,9 @@ const TicketForm = ({
     switch (currentStep) {
       case 1: // Ticket Details
         return !!(
+          leadSaved &&
           ticketReviewReady &&
-          (formData.ticketImage || formData.sourceAssessmentId) &&
+          (formData.ticketImage || formData.sourceAssessmentId || intakeDraft.hasUploadedTicket) &&
           missingRequiredTicketFields(formData).length === 0 &&
           (!isPhotoRadar || formData.registeredOwnerOnOffenceDate) &&
           !formData.vehicleSeized
@@ -559,7 +616,7 @@ const TicketForm = ({
     const m: string[] = [];
     switch (currentStep) {
       case 1:
-        if (!formData.ticketImage && !formData.sourceAssessmentId) m.push("Ticket PDF or photo");
+        if (!formData.ticketImage && !formData.sourceAssessmentId && !intakeDraft.hasUploadedTicket) m.push("Ticket PDF or photo");
         m.push(...missingRequiredTicketFields(formData).map(field => ({
           ticketNumber: "Ticket number", issueDate: isPhotoRadar ? "Offence date" : "Issue date",
           location: "Location", fineAmount: "Fine amount",
@@ -605,7 +662,9 @@ const TicketForm = ({
       <Button asChild><Link to={isPhotoRadar ? PHOTO_RADAR.intakePath : "/submit-ticket?ticket_type=officer_issued"} state={{ prefillTicketData: { ...formData, ...(isPhotoRadar ? { offenceDate: ticketDateFromExtraction(null, "photo_radar", formData.issueDate ?? "") } : {}), consentGiven: false, digitalSignature: "" }, startAtStep: Math.min(currentStep, 4), ticketImage: formData.ticketImage }}>Continue in English</Link></Button>
     </section>
   );
-  if (locale !== "en") return <LocalizedTicketJourney formData={formData} updateFormData={updateFormData} currentStep={currentStep} nextStep={nextStep} prevStep={prevStep} />;
+  if (locale !== "en") return <LocalizedTicketJourney formData={formData} updateFormData={updateFormData} currentStep={currentStep} nextStep={nextStep} prevStep={prevStep}
+    intakeDraft={intakeDraft.capability && intakeDraft.hasUploadedTicket ? intakeDraft.capability : null}
+    hasStoredTicket={intakeDraft.hasUploadedTicket} />;
 
   return (
     <section className={`${captureOnly ? "py-4 sm:py-8" : "py-10 sm:py-16"} bg-gradient-soft min-h-screen`}>
@@ -626,17 +685,6 @@ const TicketForm = ({
             </Link></>}
           </p>
         </div>
-
-        {/* Loading indicator for ticket data */}
-        {isLoadingTicketData && (
-          <Card className="p-6 mb-8 bg-gradient-card shadow-fab border-primary/10">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-              <p className="text-lg font-medium">Loading your ticket details...</p>
-              <p className="text-muted-foreground">We're retrieving the information from your eligibility check.</p>
-            </div>
-          </Card>
-        )}
 
         {/* Progress */}
         {currentStep > 1 && <Card className="p-6 mb-8 bg-gradient-card shadow-fab border-primary/10">
@@ -683,7 +731,7 @@ const TicketForm = ({
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
-                disabled={currentStep === 1}
+                disabled={currentStep === 1 || intakeDraft.record?.status === "converted"}
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -692,7 +740,7 @@ const TicketForm = ({
               {currentStep !== 5 && currentStep < 6 && (
                 <Button 
                   onClick={nextStep}
-                  disabled={!isStepValid()}
+                disabled={!isStepValid() || intakeDraft.status === "saving"}
                   className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
                 >
                   Continue
@@ -704,11 +752,28 @@ const TicketForm = ({
           {renderStep()}
 
           {/* Navigation - Bottom */}
+          {captureOnly && <div className="mt-8 border-t pt-6">
+            <Button type="button" className="h-auto min-h-12 w-full whitespace-normal bg-gradient-primary py-3 hover:opacity-90"
+              onClick={() => void saveLead()} disabled={!isLeadValid || intakeDraft.status === "saving" || intakeDraft.status === "loading"}>
+              {intakeDraft.status === "saving" ? "Saving your ticket securely…" : "Save ticket and review details"}
+              {intakeDraft.status !== "saving" ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
+            </Button>
+            {!isLeadValid ? <p className="mt-3 text-right text-sm text-muted-foreground">
+              Still needed: {[
+                !formData.ticketImage || !ticketReviewReady ? "ticket PDF or photo" : "",
+                !(leadEmail || leadPhone) ? "email or phone" : "",
+                !leadEmailValid ? "valid email" : "",
+                !leadPhoneValid ? "valid phone" : "",
+                !formData.albertaConfirmed ? "Alberta ticket confirmation" : "",
+                !formData.contactPermission ? "contact permission" : "",
+              ].filter(Boolean).join(", ")}
+            </p> : null}
+          </div>}
           {!captureOnly && <div className="flex justify-between mt-8 pt-6 border-t">
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
-                disabled={currentStep === 1}
+                disabled={currentStep === 1 || intakeDraft.record?.status === "converted"}
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -717,7 +782,7 @@ const TicketForm = ({
               {currentStep !== 5 && currentStep < 6 && (
                 <Button 
                   onClick={nextStep}
-                  disabled={!isStepValid()}
+                  disabled={!isStepValid() || intakeDraft.status === "saving"}
                   className="bg-gradient-primary hover:opacity-90 transition-smooth flex items-center gap-2"
                 >
                   Continue

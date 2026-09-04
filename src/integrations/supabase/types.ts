@@ -260,6 +260,108 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_intake_drafts: {
+        Row: {
+          id: string
+          access_token_hash: string
+          email: string | null
+          phone: string | null
+          preferred_locale: string
+          alberta_confirmed: boolean
+          contact_permission: boolean
+          contact_permission_version: string
+          contact_permission_recorded_at: string
+          draft_data: Json
+          schema_version: number
+          current_step: number
+          completed_step: number
+          revision: number
+          status: string
+          ticket_document_path: string
+          ticket_document_content_type: string
+          ticket_document_size_bytes: number
+          ticket_uploaded_at: string | null
+          converted_submission_id: string | null
+          client_id: string | null
+          converted_at: string | null
+          expires_at: string
+          last_saved_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          access_token_hash: string
+          email?: string | null
+          phone?: string | null
+          preferred_locale?: string
+          alberta_confirmed?: boolean
+          contact_permission?: boolean
+          contact_permission_version?: string
+          contact_permission_recorded_at?: string
+          draft_data?: Json
+          schema_version?: number
+          current_step?: number
+          completed_step?: number
+          revision?: number
+          status?: string
+          ticket_document_path: string
+          ticket_document_content_type: string
+          ticket_document_size_bytes: number
+          ticket_uploaded_at?: string | null
+          converted_submission_id?: string | null
+          client_id?: string | null
+          converted_at?: string | null
+          expires_at?: string
+          last_saved_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          access_token_hash?: string
+          email?: string | null
+          phone?: string | null
+          preferred_locale?: string
+          alberta_confirmed?: boolean
+          contact_permission?: boolean
+          contact_permission_version?: string
+          contact_permission_recorded_at?: string
+          draft_data?: Json
+          schema_version?: number
+          current_step?: number
+          completed_step?: number
+          revision?: number
+          status?: string
+          ticket_document_path?: string
+          ticket_document_content_type?: string
+          ticket_document_size_bytes?: number
+          ticket_uploaded_at?: string | null
+          converted_submission_id?: string | null
+          client_id?: string | null
+          converted_at?: string | null
+          expires_at?: string
+          last_saved_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_intake_drafts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_intake_drafts_converted_submission_id_fkey"
+            columns: ["converted_submission_id"]
+            isOneToOne: true
+            referencedRelation: "ticket_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_intake_translations: {
         Row: {
           id: string

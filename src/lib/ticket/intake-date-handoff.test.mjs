@@ -21,15 +21,12 @@ globalThis.requestAnimationFrame = dom.window.requestAnimationFrame.bind(dom.win
 globalThis.cancelAnimationFrame = dom.window.cancelAnimationFrame.bind(dom.window);
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 dom.window.scrollTo = () => {};
-const originalLog = console.log;
-console.log = (...args) => { if (!String(args[0]).startsWith("[TicketForm]")) originalLog(...args); };
-
 try {
   const outfile = path.join(temporary, "TicketForm.mjs");
   const mocks = {
     "@/i18n/locale-context": `export const useLocale = () => ({ locale: "en", setIntakeHandoff: globalThis.__intakeDateTest.setIntakeHandoff });`,
     "@/hooks/use-toast": `export const useToast = () => ({ toast: globalThis.__intakeDateTest.toast });`,
-    "@/hooks/useTicketCache": `export const useTicketCache = () => ({ getCachedTicketData: globalThis.__intakeDateTest.getCachedTicketData, isCacheKeyValid: globalThis.__intakeDateTest.isCacheKeyValid });`,
+    "@/hooks/useTicketIntakeDraft": `export const useTicketIntakeDraft = () => ({ capability: null, record: null, status: "idle", error: "", hasUploadedTicket: false, createOrUpload: async () => null, save: async () => null, getResumeUrl: () => null });`,
     "@/lib/referrals/capture": `export const readActiveReferral = () => null; export const captureReferralFromLocation = async () => null; export const captureReferralCode = async () => null; export const clearReferralAttribution = () => {}; export const REFERRAL_ATTRIBUTION_EVENT = "test-referral-event";`,
     "./form-steps/TicketDetailsStep": `export default function TicketDetailsStep(props) { globalThis.__intakeDateTest.details = props; return null; }`,
     ...Object.fromEntries(["PersonalInfoStep", "DefenseStep", "ConsentStep", "PaymentStep", "ReviewStep"].map(name => [`./form-steps/${name}`, "export default function TestStep() { return null; }"])),
@@ -57,8 +54,7 @@ try {
     localStorage.clear();
     for (const [key, value] of Object.entries(fixture.storage || {})) localStorage.setItem(key, value);
     const test = {
-      cacheCalls: 0, details: null, handoff: null, toast: () => {}, isCacheKeyValid: () => true,
-      getCachedTicketData: async () => { test.cacheCalls += 1; return fixture.cacheResult ?? null; },
+      details: null, handoff: null, toast: () => {},
       setIntakeHandoff: value => { test.handoff = value; },
     };
     globalThis.__intakeDateTest = test;
@@ -82,7 +78,10 @@ try {
     assert.equal(day(view.test.details.formData.issueDate), "2026-08-02", "Resolve the product before mapping a raw prefill date");
     await view.close();
   }
-  const noOffenceDate = await mount({ initialPrefill: { ticketType: "photo_radar", issueDate: "2026-08-25" } });
+  const noOffenceDate = await mount({
+    initialPrefill: { ticketType: "photo_radar", issueDate: "2026-08-25" },
+    sourceAssessment: { submissionId: "550e8400-e29b-41d4-a716-446655440000", accessToken: "test-source-token" },
+  });
   assert.equal(noOffenceDate.test.details.formData.issueDate, undefined, "A camera notice's issue date must not stand in for its offence date");
   assert.ok(noOffenceDate.container.textContent.includes("Offence date"), "The missing-field hint names the required camera date");
   await noOffenceDate.close();
@@ -100,19 +99,16 @@ try {
   } });
   assert.equal(explicitCamera.test.details.formData.ticketType, "photo_radar", "A product link must win over an old unrelated cache");
   assert.equal(explicitCamera.test.details.formData.issueDate, undefined);
-  assert.equal(explicitCamera.test.cacheCalls, 0);
+  assert.equal(localStorage.getItem("ticket-cache-key"), null, "Legacy remote-cache keys are discarded without a lookup");
   await explicitCamera.close();
 
   for (const manualDate of [new Date(2026, 7, 3, 12), undefined]) {
-    let releaseCache;
-    const cacheResult = new Promise(resolve => { releaseCache = resolve; });
-    const view = await mount({}, { storage: { "ticket-cache-key": "delayed-cache-fixture" }, cacheResult });
-    assert.equal(view.test.cacheCalls, 1);
+    const view = await mount({}, { storage: { "ticket-cache-key": "retired-cache-fixture" } });
+    assert.equal(localStorage.getItem("ticket-cache-key"), null);
     await view.update({ ticketType: "photo_radar", ticketTypeSource: "manual" });
     await view.update({ issueDate: manualDate });
-    await act(async () => releaseCache({ ticketData: { ticketType: "officer_issued", issueDate: "2026-08-25", offenceDate: "2026-08-02" } }));
     assert.equal(view.test.details.formData.ticketType, "photo_radar");
-    assert.equal(day(view.test.details.formData.issueDate), day(manualDate), "Late cache hydration preserves manual edits and explicit clears");
+    assert.equal(day(view.test.details.formData.issueDate), day(manualDate));
     await view.update(() => ({ ticketType: "photo_radar", ticketTypeSource: "upload", issueDate: new Date(2026, 7, 4, 12) }));
     assert.equal(day(view.test.details.formData.issueDate), day(manualDate), "A delayed OCR child cannot overwrite an edited or cleared date");
     const handoff = view.test.handoff.prefillTicketData;
@@ -131,9 +127,8 @@ try {
   const officer = await mount({ initialPrefill: { ticketType: "officer_issued", issueDate: "2026-08-25" } });
   assert.equal(day(officer.test.details.formData.issueDate), "2026-08-25", "Date-only strings must not shift to the prior Alberta calendar day");
   await officer.close();
-  console.log("Intake date handoff tests passed (raw dates, all caches, product routing, manual corrections/clears, late OCR, locale remount and new-ticket reset).");
+  console.log("Intake date handoff tests passed (raw dates, local handoff, retired cache keys, product routing, manual corrections/clears, late OCR, locale remount and new-ticket reset).");
 } finally {
-  console.log = originalLog;
   dom.window.close();
   delete globalThis.__intakeDateTest;
   await fs.rm(temporary, { recursive: true, force: true });

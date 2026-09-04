@@ -20,6 +20,7 @@ import {
 } from "@/config/idr";
 import { validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
 import { ticketCheckoutSelection } from "@/lib/ticket/ticketType";
+import type { IntakeDraftCapability } from "@/lib/ticket/intakeDraft";
 import { isProLicenceClass, licencePhotoAsDataUrl, normalizeLicenceClass, proCheckoutSubtotalCents, validateProLicenceFile, verifiedProResponse, type ProVerificationResponse } from "@/lib/pro-drivers/intake";
 import { latestReferralAttribution } from "@/lib/referrals/attribution";
 import { referralForCheckout } from "@/lib/referrals/capture";
@@ -41,6 +42,7 @@ import {
 interface PaymentStepProps {
   formData: FormData;
   updateFormData: (updates: Partial<FormData>) => void;
+  intakeDraft?: IntakeDraftCapability | null;
 }
 
 class CheckoutFailure extends Error {
@@ -62,7 +64,7 @@ async function functionErrorDetails(error: unknown, fallback: string): Promise<{
   return { message: error instanceof Error && error.message ? error.message : fallback };
 }
 
-export default function PaymentStep({ formData, updateFormData }: PaymentStepProps) {
+export default function PaymentStep({ formData, updateFormData, intakeDraft = null }: PaymentStepProps) {
   const { t } = useTranslation();
   const { locale, isReleased, href } = useLocale();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -131,7 +133,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
         }
         : null;
       const ticketFile = formData.ticketImage;
-      if (!sourceAssessment && !ticketFile) {
+      if (!sourceAssessment && !intakeDraft && !ticketFile) {
         throw new Error("Return to Ticket Details and attach the ticket PDF or photo before checkout.");
       }
       let ticketMimeType: string | undefined;
@@ -171,9 +173,11 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           defenseStrategy: buildIntakeDefenseStrategy(formData),
           additionalNotes: buildIntakeAdditionalNotes(formData),
           insuranceCompany: isPhotoRadar ? "" : formData.insuranceCompany,
-          ...(sourceAssessment ? { sourceAssessment } : {
-            file: { contentType: ticketMimeType!, size: ticketFile!.size },
-          }),
+          ...(sourceAssessment
+            ? { sourceAssessment }
+            : intakeDraft
+              ? { draftId: intakeDraft.draftId, draftAccessToken: intakeDraft.accessToken }
+              : { file: { contentType: ticketMimeType!, size: ticketFile!.size } }),
         },
       });
 
@@ -188,7 +192,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
       const submissionId = submission.submissionId as string;
       const clientId = submission.clientId as string;
       const representationAccessToken = submission.accessToken as string;
-      if (submission.upload?.path && submission.upload?.token && ticketFile) {
+      if (!intakeDraft && submission.upload?.path && submission.upload?.token && ticketFile) {
         if (!ticketMimeType) throw new Error("The ticket file type could not be validated.");
         const { error: uploadError } = await supabase.storage
           .from("assessment-tickets")
@@ -248,6 +252,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           submissionId,
           clientId,
           accessToken: representationAccessToken,
+          ...(intakeDraft ? { draftId: intakeDraft.draftId } : {}),
           includeIdrAddon,
           ...(!isPhotoRadar ? { metaMeasurement: currentMetaCheckoutContext() } : {}),
           ...(includeIdrAddon ? { idrOrderId } : {}),
@@ -267,6 +272,7 @@ export default function PaymentStep({ formData, updateFormData }: PaymentStepPro
           }
         }
       }
+      window.dispatchEvent(new CustomEvent("fabsy:intake-checkout-started"));
       window.location.assign(checkout.url);
     } catch (error) {
       console.error("Ticket checkout failed", error);

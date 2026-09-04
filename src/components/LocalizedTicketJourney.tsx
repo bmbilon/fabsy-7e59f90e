@@ -13,6 +13,7 @@ import { Textarea } from './ui/textarea';
 import { useLocale } from '@/i18n/locale-context';
 import { LOCALIZED_INTAKE_FIELD_LIMITS, validateLocalizedIntakeStep, type IntakeErrors } from '@/i18n/intake-validation';
 import { TICKET_CAPTURE_BROWSE_ACCEPT, validateTicketCaptureFile } from '@/lib/ticket/ticketCapture';
+import type { IntakeDraftCapability } from '@/lib/ticket/intakeDraft';
 import { supabase } from '@/integrations/supabase/client';
 
 const stepKeys = ['ticket', 'personal', 'account', 'consent', 'review', 'payment'];
@@ -54,8 +55,8 @@ function LocalizedCheck({ name, data, update, label }: { name: keyof FormData; d
   </label>;
 }
 
-export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep }: {
-  formData: FormData; updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void; currentStep: number; nextStep: () => void; prevStep: () => void;
+export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false }: {
+  formData: FormData; updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void; currentStep: number; nextStep: () => void; prevStep: () => void; intakeDraft?: IntakeDraftCapability | null; hasStoredTicket?: boolean;
 }) {
   const { t } = useTranslation();
   const { isReleased, locale, href } = useLocale();
@@ -80,6 +81,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
   })}</dl>;
   const moveNext = () => {
     const nextErrors = validateLocalizedIntakeStep(currentStep, formData);
+    if (currentStep === 1 && hasStoredTicket) delete nextErrors.ticketImage;
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       document.getElementById(`localized-${Object.keys(nextErrors)[0]}`)?.focus();
@@ -154,8 +156,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
       <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-bold outline-none">{t(`intake.steps.${stepKeys[currentStep - 1]}`)}</h2>
       {currentStep === 1 && <>
         <div className="space-y-3 rounded-xl border border-dashed border-slate-300 p-5">
-          <Label htmlFor="localized-ticketImage">{t('intake.fields.ticketImage')} *</Label>
-          <Input type="file" id="localized-ticketImage" accept={TICKET_CAPTURE_BROWSE_ACCEPT} className="h-auto cursor-pointer py-2" aria-invalid={Boolean(errors.ticketImage)} aria-describedby="localized-ticketImage-error" onChange={event => {
+          {hasStoredTicket ? <><p className="font-medium">{t('intake.fields.ticketImage')}</p><p className="text-sm text-slate-600" lang="en" dir="ltr">Your ticket is stored privately and linked to this intake.</p></> : <><Label htmlFor="localized-ticketImage">{t('intake.fields.ticketImage')} *</Label><Input type="file" id="localized-ticketImage" accept={TICKET_CAPTURE_BROWSE_ACCEPT} className="h-auto cursor-pointer py-2" aria-invalid={Boolean(errors.ticketImage)} aria-describedby="localized-ticketImage-error" onChange={event => {
             const file = event.target.files?.[0];
             scanId.current += 1;
             setScanning(false);
@@ -168,11 +169,11 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
               return;
             }
             update({ ticketImage: file });
-          }} />
+          }} /></>}
           <p className="text-xs text-slate-500" dir="ltr">PDF · JPG · PNG · WebP · HEIC · HEIF · ≤ 10 MB</p>
           {formData.ticketImage && <p className="break-all text-sm" dir="auto">{formData.ticketImage.name}</p>}
           {errors.ticketImage && <p id="localized-ticketImage-error" className="text-sm text-red-700">{t(errors.ticketImage)}</p>}
-          {isReleased && <Button type="button" variant="outline" onClick={scanTicket} disabled={!formData.ticketImage || scanning} className="h-auto whitespace-normal py-2">
+          {isReleased && !hasStoredTicket && <Button type="button" variant="outline" onClick={scanTicket} disabled={!formData.ticketImage || scanning} className="h-auto whitespace-normal py-2">
             {scanning ? <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <FileSearch className="me-2 h-4 w-4" aria-hidden="true" />}{t(scanning ? 'common.loading' : 'intake.scanTicket')}
           </Button>}
           {scanMessage && <p role="status" className="text-sm leading-relaxed">{t(scanMessage)}</p>}
@@ -214,7 +215,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
         {summaryFields(['ticketNumber', 'issueDate', 'offenceDescription', 'fineAmount', 'location', 'courtDate', 'firstName', 'lastName', 'email', 'phone', 'address', 'city', 'province', 'postalCode', 'dateOfBirth', 'driversLicense', 'pleaType', 'explanation', 'circumstances', 'additionalNotes', 'digitalSignature'])}
         <p className="text-sm leading-relaxed text-slate-600">{t('intake.review.languageNote')}</p>
       </>}
-      {currentStep === 6 && <PaymentStep formData={formData} updateFormData={update} />}
+      {currentStep === 6 && <PaymentStep formData={formData} updateFormData={update} intakeDraft={intakeDraft} />}
       <div className="flex items-center justify-between gap-3 border-t pt-6">
         <Button type="button" variant="outline" disabled={currentStep === 1 || scanning} onClick={() => { setErrors({}); prevStep(); headingRef.current?.focus(); }}><ArrowLeft className="me-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" />{t('common.back')}</Button>
         {currentStep < 6 && <Button type="button" disabled={scanning} onClick={moveNext}>{t('common.next')}<ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" /></Button>}

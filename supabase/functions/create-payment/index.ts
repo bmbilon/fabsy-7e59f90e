@@ -495,6 +495,12 @@ serve(async (req) => {
 
     const submissionId = requiredUuid(raw.submissionId, "submissionId");
     const clientId = requiredUuid(raw.clientId, "clientId");
+    const draftId = raw.draftId === undefined || raw.draftId === null
+      ? null
+      : requiredUuid(raw.draftId, "draftId");
+    if (draftId && draftId !== submissionId) {
+      throw new RequestError("The saved intake does not match this ticket checkout.", 403);
+    }
     const accessToken = requiredString(raw.accessToken, "accessToken", 200);
     if (accessToken.length < 32) {
       throw new RequestError("Submission authorization is invalid.", 403);
@@ -823,7 +829,7 @@ serve(async (req) => {
       automatic_tax: { enabled: !product.isPhotoRadar },
       tax_id_collection: { enabled: false },
       success_url: successUrl,
-      cancel_url: `${siteUrl}${localizedPublicPath(preferredLocale, "/payment-canceled")}`,
+      cancel_url: `${siteUrl}${localizedPublicPath(preferredLocale, "/payment-canceled")}${draftId ? `?draft=${encodeURIComponent(draftId)}` : ""}`,
       metadata,
       payment_intent_data: { metadata },
     };

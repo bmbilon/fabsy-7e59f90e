@@ -9,6 +9,7 @@ import { useLocale } from '@/i18n/locale-context';
 import useSafeHead from '@/hooks/useSafeHead';
 import { usePaidPurchaseTracking } from '@/hooks/usePaidPurchaseTracking';
 import { paidCheckoutSummary, type CheckoutReceipt } from '@/lib/checkoutReceipt';
+import { forgetIntakeDraft } from '@/lib/ticket/intakeDraft';
 
 export default function LocalizedPaymentReturn() {
   const { t } = useTranslation();
@@ -33,6 +34,10 @@ export default function LocalizedPaymentReturn() {
     }).catch(() => undefined).finally(() => { if (!cancelled) setVerifying(false); });
     return () => { cancelled = true; };
   }, [sessionId, isReleased, locale]);
+
+  useEffect(() => {
+    if (paidCheckoutSummary(receipt)) forgetIntakeDraft();
+  }, [receipt]);
 
   return <div className="min-h-screen bg-slate-50 text-slate-900"><Header /><main className="container mx-auto max-w-3xl space-y-6 px-4 py-16">
     <h1 className="text-3xl font-bold">{t(receipt ? 'notifications.payment.subject' : 'checkout.title')}</h1>
