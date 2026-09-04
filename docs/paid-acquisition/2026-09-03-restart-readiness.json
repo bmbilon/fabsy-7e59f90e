@@ -1,7 +1,15 @@
 {
   "schemaVersion": 3,
   "decision": "NO_GO",
-  "localReview": null,
+  "localReview": {
+    "baseCommit": "f2fde2aeb1d633f3ae432e9758f3bc823a1cac7f",
+    "sourceCommit": "b1cca461e9d56ca75cd43f473a31a42c3bbaed33",
+    "evidenceCommit": "ea685f1d2eea91dc1eba51c9bc4b790c71396d15",
+    "readinessPath": "docs/paid-acquisition/2026-09-03-restart-readiness.json",
+    "evidenceDirectory": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence",
+    "manifestPath": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/artifact-hashes.sha256",
+    "manifestEntryCount": 84
+  },
   "release": {
     "sourceCommit": null,
     "deployedGitRef": null,
@@ -128,7 +136,7 @@
   "gates": [
     { "id": 1, "status": "OWNER_INPUT", "evidence": [] },
     { "id": 2, "status": "OWNER_INPUT", "evidence": [] },
-    { "id": 3, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["docs/paid-acquisition/2026-09-04-fable-remediation-evidence/mobile-layout-geometry.json", "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-360x560-initial-consent.png", "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-360x640-initial-consent.png", "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-390x844-initial-consent.png"] },
+    { "id": 3, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["docs/paid-acquisition/2026-09-04-fable-remediation-evidence/mobile-layout-geometry.json", "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-css-360x560-raster-345x537.jpg", "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-css-360x640-raster-345x613.jpg", "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/screenshots/rapid-resolution-css-390x844-raster-375x812.jpg"] },
     { "id": 4, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["public/prerendered/index.html", "public/prerendered/rapid-resolution/index.html", "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/verification.json"] },
     { "id": 5, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["docs/paid-acquisition/2026-09-04-fable-remediation-evidence/mobile-layout-geometry.json"] },
     { "id": 6, "status": "LOCAL_PASS_PRODUCTION_OPEN", "evidence": ["docs/paid-acquisition/2026-09-04-fable-remediation-evidence/mobile-layout-geometry.json"] },
