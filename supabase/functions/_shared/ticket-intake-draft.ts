@@ -228,6 +228,37 @@ export function parseDraftAccessToken(value: unknown) {
   return value;
 }
 
+export function parseDraftReplacementAccessToken(
+  value: unknown,
+  activeAccessToken: string,
+) {
+  const candidate = parseDraftAccessToken(value);
+  if (candidate === activeAccessToken) {
+    throw new DraftRequestError(
+      "The replacement saved-intake capability is invalid.",
+      400,
+      "draft_replacement_access_token_invalid",
+    );
+  }
+  return candidate;
+}
+
+export function resolveDraftReplacementAccessToken(
+  value: unknown,
+  activeAccessToken: string,
+) {
+  if (value === undefined) {
+    return {
+      accessToken: null,
+      clientRetained: false as const,
+    };
+  }
+  return {
+    accessToken: parseDraftReplacementAccessToken(value, activeAccessToken),
+    clientRetained: true as const,
+  };
+}
+
 export function parseOptionalDraftId(value: unknown) {
   if (value === undefined) return null;
   if (typeof value !== "string" || !UUID_PATTERN.test(value)) {
@@ -559,4 +590,13 @@ export function draftCapabilityWasRotated(
   candidateHash: string,
 ): boolean {
   return previousHash !== returnedHash && returnedHash === candidateHash;
+}
+
+export function draftContactChangeRequiresCapabilityRotation(
+  current: { email: string | null; phone: string | null },
+  next: { email: string | null; phone: string | null },
+  delivery: { status: string; attemptCount: number },
+): boolean {
+  return (current.email !== next.email || current.phone !== next.phone) &&
+    (delivery.status !== "pending" || delivery.attemptCount > 0);
 }

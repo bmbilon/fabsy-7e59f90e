@@ -858,6 +858,20 @@ export type Database = {
         Args: { p_id: string; p_claim_id: string }
         Returns: boolean
       }
+      save_ticket_intake_draft: {
+        Args: {
+          p_id: string
+          p_access_token_hash: string
+          p_expected_revision: number
+          p_email: string | null
+          p_phone: string | null
+          p_current_step: number
+          p_completed_step: number
+          p_draft_data: Json
+          p_replacement_access_token_hash: string | null
+        }
+        Returns: Database["public"]["Tables"]["ticket_intake_drafts"]["Row"]
+      }
     }
     Enums: {
       app_role: "admin" | "case_manager" | "user"

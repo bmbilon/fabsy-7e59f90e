@@ -1,18 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  createIntakeDraftPendingRotation,
   forgetIntakeDraft,
+  forgetPendingIntakeDraftRotation,
   hydrateIntakeDraftData,
+  intakeDraftSaveWasApplied,
   invokeIntakeDraft,
   isIntakeDraftAccessToken,
   isIntakeDraftCapability,
   readStoredIntakeDraft,
+  readPendingIntakeDraftRotation,
   rememberIntakeDraft,
+  rememberPendingIntakeDraftRotation,
   resumeTokenFromHash,
   resumeUrl,
   serializeIntakeDraftData,
   stripResumeTokenFromUrl,
   uploadIntakeTicket,
   type IntakeDraftCapability,
+  type IntakeDraftPendingRotation,
   type IntakeDraftRecord,
   type IntakeDraftStatus,
 } from "@/lib/ticket/intakeDraft";
@@ -31,6 +37,7 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
   const [discardingPendingUpload, setDiscardingPendingUpload] = useState(false);
   const [error, setError] = useState("");
   const capabilityRef = useRef<IntakeDraftCapability | null>(null);
+  const pendingRotationRef = useRef<IntakeDraftPendingRotation | null>(null);
   const revisionRef = useRef(0);
   const restoreRef = useRef(onRestore);
   const saveQueue = useRef<Promise<IntakeDraftRecord | null>>(Promise.resolve(null));
@@ -56,8 +63,121 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     if (storageFailed) {
       setError("This browser could not remember your secure return access. Your intake remains saved in this tab; copy the resume link now before closing it.");
     }
-    return nextCapability;
+    return { capability: nextCapability, storageFailed };
   }, []);
+
+  const clearPendingRotation = useCallback(() => {
+    pendingRotationRef.current = null;
+    forgetPendingIntakeDraftRotation();
+  }, []);
+
+  const retainRotationCandidate = useCallback((
+    activeCapability: IntakeDraftCapability,
+    revision: number,
+  ) => {
+    const retained = pendingRotationRef.current;
+    if (
+      retained && retained.draftId === activeCapability.draftId &&
+      retained.oldAccessToken === activeCapability.accessToken &&
+      retained.revision === revision
+    ) return retained;
+
+    const pending = createIntakeDraftPendingRotation(
+      activeCapability,
+      revision,
+    );
+    pendingRotationRef.current = pending;
+    try {
+      rememberPendingIntakeDraftRotation(pending);
+    } catch {
+      setError("This browser could not remember your secure return access. Your intake remains saved in this tab; copy the resume link now before closing it.");
+    }
+    return pending;
+  }, []);
+
+  const resolvePendingRotation = useCallback(async (
+    pending: IntakeDraftPendingRotation,
+  ) => {
+    let lastFailure: unknown = new Error("The saved intake could not be recovered.");
+    for (
+      const accessToken of [
+        pending.oldAccessToken,
+        pending.candidateAccessToken,
+      ]
+    ) {
+      try {
+        const restored = await invokeIntakeDraft({
+          action: "read",
+          draftId: pending.draftId,
+          accessToken,
+        });
+        const applied = applyRecord(restored, accessToken);
+        if (!applied.storageFailed) {
+          clearPendingRotation();
+          setError("");
+        }
+        return restored;
+      } catch (failure) {
+        lastFailure = failure;
+      }
+    }
+    throw lastFailure;
+  }, [applyRecord, clearPendingRotation]);
+
+  const saveWithRotation = useCallback(async (
+    activeCapability: IntakeDraftCapability,
+    draftData: Record<string, unknown>,
+    currentStep: number,
+    completedStep: number,
+  ) => {
+    const pending = retainRotationCandidate(
+      activeCapability,
+      revisionRef.current,
+    );
+    const request = {
+      action: "save",
+      draftId: pending.draftId,
+      accessToken: pending.oldAccessToken,
+      replacementAccessToken: pending.candidateAccessToken,
+      revision: pending.revision,
+      currentStep,
+      completedStep,
+      draftData,
+    };
+    try {
+      const saved = await invokeIntakeDraft(request);
+      const selectedToken = saved.capabilityRotated
+        ? pending.candidateAccessToken
+        : pending.oldAccessToken;
+      const applied = applyRecord(saved, selectedToken);
+      if (!applied.storageFailed) {
+        clearPendingRotation();
+        setError("");
+      }
+      return saved;
+    } catch (failure) {
+      let recovered: IntakeDraftRecord;
+      try {
+        recovered = await resolvePendingRotation(pending);
+      } catch {
+        throw failure;
+      }
+      if (
+        intakeDraftSaveWasApplied(recovered, {
+          revision: pending.revision,
+          currentStep,
+          completedStep,
+          draftData,
+        })
+      ) return recovered;
+      throw failure;
+    }
+  }, [
+    applyRecord,
+    clearPendingRotation,
+    resolvePendingRotation,
+    retainRotationCandidate,
+  ]);
 
   const discardPendingUpload = useCallback(async () => {
     const activeCapability = capabilityRef.current;
@@ -102,17 +222,57 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
         return;
       }
       const stored = resumeToken ? null : readStoredIntakeDraft();
-      const accessToken = resumeToken ?? stored?.accessToken;
-      if (!accessToken) {
+      let pending = resumeToken ? null : readPendingIntakeDraftRotation();
+      if (
+        pending && stored && (
+          pending.draftId !== stored.draftId ||
+          ![
+            pending.oldAccessToken,
+            pending.candidateAccessToken,
+          ].includes(stored.accessToken)
+        )
+      ) {
+        forgetPendingIntakeDraftRotation();
+        pending = null;
+      }
+      pendingRotationRef.current = pending;
+      const attempts = resumeToken
+        ? [{ accessToken: resumeToken, draftId: undefined }]
+        : pending
+        ? [
+          { accessToken: pending.oldAccessToken, draftId: pending.draftId },
+          {
+            accessToken: pending.candidateAccessToken,
+            draftId: pending.draftId,
+          },
+        ]
+        : stored
+        ? [{ accessToken: stored.accessToken, draftId: stored.draftId }]
+        : [];
+      if (!attempts.length) {
         if (active) setStatus("idle");
         return;
       }
       try {
-        let restored = await invokeIntakeDraft({
-          action: "read",
-          accessToken,
-          ...(stored?.draftId ? { draftId: stored.draftId } : {}),
-        });
+        let restored: IntakeDraftRecord | null = null;
+        let resolvedAccessToken = "";
+        let lastFailure: unknown = new Error(
+          "The saved intake link is no longer available.",
+        );
+        for (const attempt of attempts) {
+          try {
+            restored = await invokeIntakeDraft({
+              action: "read",
+              accessToken: attempt.accessToken,
+              ...(attempt.draftId ? { draftId: attempt.draftId } : {}),
+            });
+            resolvedAccessToken = attempt.accessToken;
+            break;
+          } catch (failure) {
+            lastFailure = failure;
+          }
+        }
+        if (!restored) throw lastFailure;
         if (!active) return;
         if (restored.hasPendingTicketUpload) {
           // A browser close or failed upload must not leave an invisible
@@ -121,7 +281,7 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
             restored = await invokeIntakeDraft({
               action: "discard_pending_upload",
               draftId: restored.draftId,
-              accessToken,
+              accessToken: resolvedAccessToken,
               revision: restored.revision,
             });
           } catch {
@@ -129,7 +289,8 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
           }
           if (!active) return;
         }
-        applyRecord(restored, accessToken);
+        const applied = applyRecord(restored, resolvedAccessToken);
+        if (pending && !applied.storageFailed) clearPendingRotation();
         restoreRef.current(restored, {
           ...hydrateIntakeDraftData(restored.draftData || {}),
           email: restored.contact?.email || "",
@@ -145,17 +306,19 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
         }
       } catch (failure) {
         if (!active) return;
-        forgetIntakeDraft();
-        capabilityRef.current = null;
-        setCapability(null);
-        setRecord(null);
+        if (!pending) {
+          forgetIntakeDraft();
+          capabilityRef.current = null;
+          setCapability(null);
+          setRecord(null);
+        }
         setError(failure instanceof Error ? failure.message : "The saved intake link is no longer available.");
         setStatus("error");
       }
     };
     void initialize();
     return () => { active = false; };
-  }, [applyRecord]);
+  }, [applyRecord, clearPendingRotation]);
 
   const createOrUpload = useCallback(async (file: File, formData: Record<string, unknown>) => {
     const descriptor = validateTicketCaptureFile(file);
@@ -167,16 +330,12 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
       let created: IntakeDraftRecord;
       const current = capabilityRef.current;
       if (current) {
-        const synchronized = await invokeIntakeDraft({
-          action: "save",
-          draftId: current.draftId,
-          accessToken: current.accessToken,
-          revision: revisionRef.current,
-          currentStep: 1,
-          completedStep: 0,
-          draftData: serializeIntakeDraftData(formData),
-        });
-        applyRecord(synchronized);
+        const synchronized = await saveWithRotation(
+          current,
+          serializeIntakeDraftData(formData),
+          1,
+          0,
+        );
         const synchronizedCapability = capabilityRef.current;
         if (!synchronizedCapability) throw new Error("The secure intake session was lost.");
         created = await invokeIntakeDraft({
@@ -236,7 +395,7 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
       setStatus("error");
       throw failure;
     }
-  }, [applyRecord, preferredLocale, record?.hasPendingTicketUpload]);
+  }, [applyRecord, preferredLocale, record?.hasPendingTicketUpload, saveWithRotation]);
 
   const save = useCallback((formData: Record<string, unknown>, currentStep: number, completedStep: number) => {
     const snapshot = serializeIntakeDraftData(formData);
@@ -248,16 +407,12 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
         setStatus("saving");
         setError("");
         try {
-          const saved = await invokeIntakeDraft({
-            action: "save",
-            draftId: activeCapability.draftId,
-            accessToken: activeCapability.accessToken,
-            revision: revisionRef.current,
+          const saved = await saveWithRotation(
+            activeCapability,
+            snapshot,
             currentStep,
             completedStep,
-            draftData: snapshot,
-          });
-          applyRecord(saved);
+          );
           setStatus("saved");
           return saved;
         } catch (failure) {
@@ -269,7 +424,7 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
       });
     saveQueue.current = operation;
     return operation;
-  }, [applyRecord]);
+  }, [saveWithRotation]);
 
   const getResumeUrl = useCallback(() => {
     const activeCapability = capabilityRef.current;

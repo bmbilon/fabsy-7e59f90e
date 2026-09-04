@@ -1,15 +1,26 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const INTAKE_DRAFT_STORAGE_KEY = "fabsy.ticket-intake-capability.v1";
+export const INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY =
+  "fabsy.ticket-intake-pending-rotation.v1";
 export const INTAKE_DRAFT_RESUME_PARAMETER = "resume";
 
 const ACCESS_TOKEN_PATTERN = /^[a-f0-9]{64}$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const PENDING_ROTATION_RECOVERY_MS = 31 * 24 * 60 * 60 * 1000;
 
 export type IntakeDraftCapability = {
   draftId: string;
   accessToken: string;
   expiresAt: string;
+};
+
+export type IntakeDraftPendingRotation = {
+  draftId: string;
+  oldAccessToken: string;
+  candidateAccessToken: string;
+  expiresAt: string;
+  revision: number;
 };
 
 export type IntakeDraftContact = {
@@ -51,6 +62,7 @@ export type IntakeDraftRecord = {
   convertedSubmissionId?: string | null;
   clientId?: string | null;
   resumeDelivery: IntakeDraftResumeDelivery;
+  capabilityRotated?: boolean;
   accessToken?: string;
   upload?: IntakeDraftUpload;
 };
@@ -103,8 +115,51 @@ export function hydrateIntakeDraftData(raw: Record<string, unknown>): Record<str
   return { ...hydrated, consentGiven: false, digitalSignature: "" };
 }
 
+function normalizedSavedDraftValue(key: string, value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const normalized = value.trim();
+  if (key === "email") return normalized.toLowerCase();
+  if (key === "phone") {
+    if (!normalized) return "";
+    const digits = normalized.replace(/\D/g, "");
+    return normalized.startsWith("+") ? `+${digits}` : digits;
+  }
+  return normalized;
+}
+
+export function intakeDraftSaveWasApplied(
+  record: IntakeDraftRecord,
+  expected: {
+    revision: number;
+    currentStep: number;
+    completedStep: number;
+    draftData: Record<string, unknown>;
+  },
+): boolean {
+  if (
+    record.revision !== expected.revision + 1 ||
+    record.currentStep !== expected.currentStep ||
+    record.completedStep < expected.completedStep
+  ) return false;
+  const actualKeys = Object.keys(record.draftData).sort();
+  const expectedKeys = Object.keys(expected.draftData).sort();
+  if (actualKeys.length !== expectedKeys.length ||
+    actualKeys.some((key, index) => key !== expectedKeys[index])) return false;
+  return expectedKeys.every((key) =>
+    Object.is(
+      record.draftData[key],
+      normalizedSavedDraftValue(key, expected.draftData[key]),
+    )
+  );
+}
+
 export function isIntakeDraftAccessToken(value: unknown): value is string {
   return typeof value === "string" && ACCESS_TOKEN_PATTERN.test(value);
+}
+
+export function createIntakeDraftAccessToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return [...bytes].map((part) => part.toString(16).padStart(2, "0")).join("");
 }
 
 export function isIntakeDraftCapability(value: unknown): value is IntakeDraftCapability {
@@ -115,6 +170,47 @@ export function isIntakeDraftCapability(value: unknown): value is IntakeDraftCap
     && typeof candidate.expiresAt === "string"
     && Number.isFinite(Date.parse(candidate.expiresAt))
     && Date.parse(candidate.expiresAt) > Date.now();
+}
+
+export function isIntakeDraftPendingRotation(
+  value: unknown,
+): value is IntakeDraftPendingRotation {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<IntakeDraftPendingRotation>;
+  return typeof candidate.draftId === "string" &&
+    UUID_PATTERN.test(candidate.draftId) &&
+    isIntakeDraftAccessToken(candidate.oldAccessToken) &&
+    isIntakeDraftAccessToken(candidate.candidateAccessToken) &&
+    candidate.oldAccessToken !== candidate.candidateAccessToken &&
+    typeof candidate.expiresAt === "string" &&
+    Number.isFinite(Date.parse(candidate.expiresAt)) &&
+    Date.parse(candidate.expiresAt) > Date.now() &&
+    typeof candidate.revision === "number" &&
+    Number.isSafeInteger(candidate.revision) && candidate.revision >= 1;
+}
+
+export function createIntakeDraftPendingRotation(
+  capability: IntakeDraftCapability,
+  revision: number,
+): IntakeDraftPendingRotation {
+  if (!isIntakeDraftCapability(capability) ||
+    !Number.isSafeInteger(revision) || revision < 1) {
+    throw new Error("The saved intake capability cannot be rotated.");
+  }
+  let candidateAccessToken = createIntakeDraftAccessToken();
+  while (candidateAccessToken === capability.accessToken) {
+    candidateAccessToken = createIntakeDraftAccessToken();
+  }
+  return {
+    draftId: capability.draftId,
+    oldAccessToken: capability.accessToken,
+    candidateAccessToken,
+    expiresAt: new Date(Math.max(
+      Date.parse(capability.expiresAt),
+      Date.now() + PENDING_ROTATION_RECOVERY_MS,
+    )).toISOString(),
+    revision,
+  };
 }
 
 export function readStoredIntakeDraft(storage: Pick<Storage, "getItem" | "removeItem"> = localStorage): IntakeDraftCapability | null {
@@ -136,6 +232,48 @@ export function readStoredIntakeDraft(storage: Pick<Storage, "getItem" | "remove
 export function rememberIntakeDraft(capability: IntakeDraftCapability, storage: Pick<Storage, "setItem"> = localStorage): void {
   if (!isIntakeDraftCapability(capability)) throw new Error("The saved intake link is invalid or expired.");
   storage.setItem(INTAKE_DRAFT_STORAGE_KEY, JSON.stringify(capability));
+}
+
+export function readPendingIntakeDraftRotation(
+  storage: Pick<Storage, "getItem" | "removeItem"> = localStorage,
+): IntakeDraftPendingRotation | null {
+  try {
+    const value = JSON.parse(
+      storage.getItem(INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY) || "null",
+    ) as unknown;
+    if (isIntakeDraftPendingRotation(value)) return value;
+  } catch {
+    // Remove malformed state below.
+  }
+  try {
+    storage.removeItem(INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY);
+  } catch {
+    // The active tab can retain a candidate in memory when storage is blocked.
+  }
+  return null;
+}
+
+export function rememberPendingIntakeDraftRotation(
+  pending: IntakeDraftPendingRotation,
+  storage: Pick<Storage, "setItem"> = localStorage,
+): void {
+  if (!isIntakeDraftPendingRotation(pending)) {
+    throw new Error("The pending capability rotation is invalid or expired.");
+  }
+  storage.setItem(
+    INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY,
+    JSON.stringify(pending),
+  );
+}
+
+export function forgetPendingIntakeDraftRotation(
+  storage: Pick<Storage, "removeItem"> = localStorage,
+): void {
+  try {
+    storage.removeItem(INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY);
+  } catch {
+    // Clearing browser storage is best effort; server capability checks win.
+  }
 }
 
 export function forgetIntakeDraft(storage: Pick<Storage, "removeItem"> = localStorage): void {

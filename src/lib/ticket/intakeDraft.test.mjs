@@ -104,6 +104,81 @@ test("stored capabilities reject malformed and expired bearer tokens", () => {
   assert.equal(removed, true);
 });
 
+test("pending rotations retain a distinct 256-bit candidate through the server save horizon", () => {
+  const now = Date.now();
+  const capability = {
+    draftId: "550e8400-e29b-41d4-a716-446655440000",
+    accessToken: "b".repeat(64),
+    // Exercise a save immediately before the old capability expires.
+    expiresAt: new Date(now + 1_000).toISOString(),
+  };
+  const pending = draft.createIntakeDraftPendingRotation(capability, 7);
+  assert.match(pending.candidateAccessToken, /^[0-9a-f]{64}$/);
+  assert.notEqual(pending.candidateAccessToken, capability.accessToken);
+  assert.equal(pending.oldAccessToken, capability.accessToken);
+  assert.equal(pending.revision, 7);
+  assert.ok(
+    Date.parse(pending.expiresAt) >= now + 30 * 24 * 60 * 60 * 1_000,
+    "a near-expiry commit must remain recoverable after the server extends it",
+  );
+
+  const values = new Map();
+  const storage = {
+    getItem: key => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+    removeItem: key => values.delete(key),
+  };
+  draft.rememberPendingIntakeDraftRotation(pending, storage);
+  assert.deepEqual(draft.readPendingIntakeDraftRotation(storage), pending);
+  draft.forgetPendingIntakeDraftRotation(storage);
+  assert.equal(draft.readPendingIntakeDraftRotation(storage), null);
+});
+
+test("malformed or expired pending rotations are rejected and removed", () => {
+  let removed = false;
+  const storage = {
+    getItem: () => JSON.stringify({
+      draftId: "550e8400-e29b-41d4-a716-446655440000",
+      oldAccessToken: "b".repeat(64),
+      candidateAccessToken: "b".repeat(64),
+      expiresAt: new Date(Date.now() - 1_000).toISOString(),
+      revision: 1,
+    }),
+    removeItem: () => { removed = true; },
+  };
+  assert.equal(draft.readPendingIntakeDraftRotation(storage), null);
+  assert.equal(removed, true);
+});
+
+test("ambiguous save recovery accepts only the exact committed next revision", () => {
+  const expected = {
+    revision: 4,
+    currentStep: 2,
+    completedStep: 1,
+    draftData: {
+      email: " Person@Example.Test ",
+      phone: "(403) 555-0123",
+      ticketNumber: " TEST-42 ",
+    },
+  };
+  const record = {
+    revision: 5,
+    currentStep: 2,
+    completedStep: 2,
+    draftData: {
+      email: "person@example.test",
+      phone: "4035550123",
+      ticketNumber: "TEST-42",
+    },
+  };
+  assert.equal(draft.intakeDraftSaveWasApplied(record, expected), true);
+  assert.equal(draft.intakeDraftSaveWasApplied({ ...record, revision: 6 }, expected), false);
+  assert.equal(draft.intakeDraftSaveWasApplied({
+    ...record,
+    draftData: { ...record.draftData, ticketNumber: "DIFFERENT" },
+  }, expected), false);
+});
+
 test("Stripe cancellation returns only an opaque draft id, never a bearer capability", () => {
   const cancelUrl = createPaymentSource.split("\n").find(line => line.includes("cancel_url:"));
   assert.ok(cancelUrl, "create-payment must define an explicit cancellation URL");

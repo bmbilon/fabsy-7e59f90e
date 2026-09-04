@@ -115,7 +115,7 @@ const completeTicket = {
   courtDate: null,
 };
 
-async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false, pendingUpload = false, deliveryStatus = "sent", deliveryChannel = "email", deliveryMode = "automatic", rotateOnSave = false, storageWriteFails = false } = {}) {
+async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false, pendingUpload = false, deliveryStatus = "sent", deliveryChannel = "email", deliveryMode = "automatic", rotateOnSave = false, loseSaveResponseAfterCommit = false, deferRecoveryUntilReload = false, storageWriteFails = false } = {}) {
   const domErrors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on("jsdomError", error => domErrors.push(error));
@@ -157,7 +157,18 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
   window.IS_REACT_ACT_ENVIRONMENT = true;
   let draftRevision = 1;
   const draftToken = "a".repeat(64);
-  const rotatedDraftToken = "b".repeat(64);
+  let activeDraftToken = draftToken;
+  let recoveryReadsBlocked = false;
+  let saveCommitted = false;
+  let serverCurrentStep = 1;
+  let serverCompletedStep = 0;
+  let serverDraftData = {
+    ...completeTicket,
+    ticketType: "officer_issued",
+    ticketTypeSource: "upload",
+    email: "driver@example.test",
+    phone: "4035550123",
+  };
   const draftId = "550e8400-e29b-41d4-a716-446655440000";
   const resumeDelivery = (status = "pending", channel = null, mode = "automatic") => ({
     status,
@@ -170,7 +181,9 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
     success: true, draftId, revision: draftRevision,
     contact: { email: "driver@example.test", phone: "" },
     albertaConfirmed: true, contactPermission: true, preferredLocale: "en",
-    currentStep: 1, completedStep: 0, draftData: {},
+    currentStep: serverCurrentStep,
+    completedStep: serverCompletedStep,
+    draftData: serverDraftData,
     ticketDocumentPath: `${draftId}/representation-ticket-r1.png`,
     ticketUploadedAt: null, status: "active",
     hasPendingTicketUpload: false,
@@ -203,23 +216,43 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
           ticketUploadedAt: new Date().toISOString(),
           resumeDelivery: resumeDelivery("sent", deliveryChannel),
         }), error: null });
-        if (action === "read") return Promise.resolve({ data: draftResponse({
+        if (action === "read") {
+          if (recoveryReadsBlocked || options.body.accessToken !== activeDraftToken) {
+            return Promise.resolve({ data: null, error: new Error("Synthetic draft capability rejected") });
+          }
+          return Promise.resolve({ data: draftResponse({
           contact: { email: "driver@example.test", phone: "4035550123" },
-          draftData: { ...completeTicket, ticketType: "officer_issued", ticketTypeSource: "upload", email: "driver@example.test", phone: "4035550123" },
+          draftData: serverDraftData,
           ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString(),
           hasPendingTicketUpload: pendingUpload,
           resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
           ...(convertedDraft ? { status: "converted", currentStep: 6, completedStep: 5, convertedSubmissionId: draftId, clientId: "550e8400-e29b-41d4-a716-446655440001" } : {}),
-        }), error: null });
-        if (action === "save") {
-          draftRevision += 1;
-          return Promise.resolve({ data: draftResponse({
-            currentStep: options.body.currentStep,
-            completedStep: options.body.completedStep,
-            draftData: options.body.draftData,
-            ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString(),
-            ...(rotateOnSave ? { accessToken: rotatedDraftToken } : {}),
           }), error: null });
+        }
+        if (action === "save") {
+          assert.match(options.body.replacementAccessToken, /^[0-9a-f]{64}$/);
+          assert.notEqual(options.body.replacementAccessToken, options.body.accessToken);
+          if (!storageWriteFails) {
+            const retained = JSON.parse(window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"));
+            assert.equal(retained.oldAccessToken, options.body.accessToken, "the old capability stays active until save resolves");
+            assert.equal(retained.candidateAccessToken, options.body.replacementAccessToken, "the recovery candidate is persisted before save");
+            assert.equal(retained.revision, options.body.revision);
+          }
+          draftRevision += 1;
+          serverCurrentStep = options.body.currentStep;
+          serverCompletedStep = Math.max(serverCompletedStep, options.body.completedStep);
+          serverDraftData = options.body.draftData;
+          if (rotateOnSave) activeDraftToken = options.body.replacementAccessToken;
+          saveCommitted = true;
+          const result = { data: draftResponse({
+            ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString(),
+            ...(rotateOnSave ? { capabilityRotated: true } : {}),
+          }), error: null };
+          if (loseSaveResponseAfterCommit) {
+            recoveryReadsBlocked = deferRecoveryUntilReload;
+            return Promise.resolve({ data: null, error: new Error("Synthetic response lost after commit") });
+          }
+          return Promise.resolve(result);
         }
         if (action === "discard_pending_upload") {
           draftRevision += 1;
@@ -341,7 +374,14 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
     await api.click(button("Save ticket and review details"));
     await until(() => document.getElementById("ticketNumber"), "Expected ticket review after the minimum lead was saved");
   };
-  return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit, saveLead };
+  const reloadAfterLostResponse = async () => {
+    assert.equal(saveCommitted, true, "the synthetic save must commit before reload recovery");
+    recoveryReadsBlocked = false;
+    await api.unmount();
+    await api.mount(props);
+    await flush();
+  };
+  return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit, saveLead, reloadAfterLostResponse, activeDraftToken: () => activeDraftToken };
 }
 
 test("a fresh intake presents capture first and waits for the current OCR scan before showing details", async t => {
@@ -442,23 +482,88 @@ test("the browser adopts a capability rotated by a contact-saving response", asy
   await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved ticket to restore");
   await app.api.click(app.button("Continue"));
   await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected the saved step to advance");
+  const saveRequest = app.draftRequests.find(request => request.action === "save");
+  assert.match(saveRequest.replacementAccessToken, /^[0-9a-f]{64}$/);
+  assert.notEqual(saveRequest.replacementAccessToken, "a".repeat(64));
   const stored = JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1"));
-  assert.equal(stored.accessToken, "b".repeat(64));
+  assert.equal(stored.accessToken, saveRequest.replacementAccessToken);
+  assert.equal(app.activeDraftToken(), saveRequest.replacementAccessToken);
+  assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"), null);
 });
 
-test("a rotated capability remains usable in memory when browser storage rejects it", async t => {
+test("a committed rotation survives response loss and reload with the retained candidate", async t => {
   const app = await runtime(t, {}, {
     resumeDraft: true,
     rotateOnSave: true,
+    loseSaveResponseAfterCommit: true,
+    deferRecoveryUntilReload: true,
+  });
+  await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved draft to restore");
+  await app.api.click(app.button("Continue"));
+  await app.until(
+    () =>
+      app.draftRequests.filter((request) => request.action === "read").length ===
+      3,
+    "Expected both in-tab recovery probes to fail before reload",
+  );
+  const saveRequest = app.draftRequests.find(request => request.action === "save");
+  const retained = JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"));
+  assert.equal(retained.oldAccessToken, "a".repeat(64));
+  assert.equal(retained.candidateAccessToken, saveRequest.replacementAccessToken);
+  assert.equal(app.activeDraftToken(), retained.candidateAccessToken);
+
+  const requestsBeforeReload = app.draftRequests.length;
+  await app.reloadAfterLostResponse();
+  await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected candidate recovery to restore the committed step");
+  const recoveryReads = app.draftRequests.slice(requestsBeforeReload).filter(request => request.action === "read");
+  assert.deepEqual(
+    recoveryReads.map(request => request.accessToken),
+    [retained.oldAccessToken, retained.candidateAccessToken],
+    "reload must prove the old capability is revoked before adopting the candidate",
+  );
+  const stored = JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1"));
+  assert.equal(stored.accessToken, retained.candidateAccessToken);
+  assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"), null);
+});
+
+test("a lost save response without rotation recovers with the still-active old capability", async t => {
+  const app = await runtime(t, {}, {
+    resumeDraft: true,
+    loseSaveResponseAfterCommit: true,
+  });
+  await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved draft to restore");
+  await app.api.click(app.button("Continue"));
+  await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected old-capability recovery to confirm the committed save");
+  const saveRequest = app.draftRequests.find(request => request.action === "save");
+  const recoveryReads = app.draftRequests.filter(request => request.action === "read").slice(1);
+  assert.equal(recoveryReads.length, 1);
+  assert.equal(recoveryReads[0].accessToken, "a".repeat(64));
+  assert.equal(app.activeDraftToken(), "a".repeat(64));
+  assert.notEqual(saveRequest.replacementAccessToken, app.activeDraftToken());
+  const candidateProbe = await app.window.__ticketReviewBackend.invoke("ticket-intake-draft", {
+    body: { action: "read", draftId: saveRequest.draftId, accessToken: saveRequest.replacementAccessToken },
+  });
+  assert.ok(candidateProbe.error, "an unused candidate must never authenticate");
+  assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"), null);
+});
+
+test("a response-loss-recovered capability remains usable when browser storage rejects it", async t => {
+  const app = await runtime(t, {}, {
+    resumeDraft: true,
+    rotateOnSave: true,
+    loseSaveResponseAfterCommit: true,
+    deliveryStatus: "failed",
+    deliveryChannel: "email",
     storageWriteFails: true,
   });
   await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved ticket to restore");
   await app.api.click(app.button("Continue"));
   await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected the saved step to advance");
   assert.match(app.document.body.textContent, /could not remember your secure return access/i);
-  await app.api.click(app.button("Send resume link"));
+  const saveRequest = app.draftRequests.find(request => request.action === "save");
+  await app.api.click(app.button("Retry sending"));
   assert.equal(app.draftRequests.at(-1)?.action, "retry_delivery");
-  assert.equal(app.draftRequests.at(-1)?.accessToken, "b".repeat(64));
+  assert.equal(app.draftRequests.at(-1)?.accessToken, saveRequest.replacementAccessToken);
 });
 
 test("a draft whose first upload failed can retry without losing its synchronized contact", async t => {

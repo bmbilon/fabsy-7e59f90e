@@ -96,12 +96,15 @@ def run() -> None:
             command([*connection, "-f", str(ROOT / "supabase/migrations/20260903120000_ticket_intake_drafts.sql")])
             command([*connection, "-f", str(ROOT / "supabase/migrations/20260903180000_ticket_intake_resume_delivery.sql")])
             command([*connection, "-f", str(ROOT / "supabase/migrations/20260903181000_ticket_intake_draft_cleanup.sql")])
+            command([*connection, "-f", str(ROOT / "supabase/migrations/20260903182000_ticket_intake_rotation_recovery.sql")])
             result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-drafts.test.sql"))])
             delivery_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-resume-delivery.test.sql"))])
             cleanup_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-draft-cleanup.test.sql"))])
+            rotation_result = command([*connection, "-f", str(Path(__file__).with_name("ticket-intake-rotation-recovery.test.sql"))])
             print(result.stdout.strip())
             print(delivery_result.stdout.strip())
             print(cleanup_result.stdout.strip())
+            print(rotation_result.stdout.strip())
         finally:
             if started:
                 command([binaries["pg_ctl"], "-D", str(cluster), "-m", "immediate", "-w", "stop"])

@@ -9,6 +9,7 @@ import {
   createDraftAccessToken,
   discardedPendingObjectForCleanup,
   draftCapabilityWasRotated,
+  draftContactChangeRequiresCapabilityRotation,
   DraftRequestError,
   draftStoragePath,
   draftUploadVerificationTarget,
@@ -25,6 +26,7 @@ import {
   parseTicketFileMetadata,
   requestAddress,
   requestFingerprint,
+  resolveDraftReplacementAccessToken,
   sanitizeDraftData,
   sha256Hex,
   storageObjectMatches,
@@ -123,7 +125,7 @@ type AdminDatabase = {
           p_current_step: number;
           p_completed_step: number;
           p_draft_data: JsonRecord;
-          p_replacement_access_token_hash: string;
+          p_replacement_access_token_hash: string | null;
         };
         Returns: DraftRow;
       };
@@ -239,6 +241,15 @@ function mapDatabaseFailure(error: { message?: string } | null) {
       "draft_revision_conflict",
     );
   }
+  if (
+    error?.message?.includes("TICKET_INTAKE_REPLACEMENT_CAPABILITY_INVALID")
+  ) {
+    throw new DraftStateError(
+      "Reload this page before changing resume-link contact details.",
+      409,
+      "draft_rotation_requires_reload",
+    );
+  }
   if (error?.message?.includes("TICKET_INTAKE_DELIVERY_NOT_READY")) {
     throw new DraftStateError(
       "Upload the ticket before sending a resume link.",
@@ -308,6 +319,57 @@ async function activeDraft(
     );
   }
   return { row, accessToken, accessTokenHash };
+}
+
+async function activeDraftForSave(
+  admin: SupabaseAdmin,
+  body: JsonRecord,
+): Promise<{
+  row: DraftRow;
+  accessTokenHash: string;
+  replacementAccessTokenHash: string | null;
+  replacementClientRetained: boolean;
+}> {
+  const accessToken = parseDraftAccessToken(body.accessToken);
+  const replacement = resolveDraftReplacementAccessToken(
+    body.replacementAccessToken,
+    accessToken,
+  );
+  const accessTokenHash = await sha256Hex(accessToken);
+  const replacementAccessTokenHash = replacement.clientRetained
+    ? await sha256Hex(replacement.accessToken)
+    : null;
+
+  try {
+    const { row } = await activeDraft(admin, body);
+    return {
+      row,
+      accessTokenHash,
+      replacementAccessTokenHash,
+      replacementClientRetained: replacement.clientRetained,
+    };
+  } catch (error) {
+    if (
+      !(error instanceof DraftStateError) || error.code !== "draft_not_found"
+    ) {
+      throw error;
+    }
+    if (!replacement.clientRetained) throw error;
+  }
+
+  // A lost response may follow an atomic rotation. The old capability is
+  // already revoked, so authenticate the exact client-retained candidate and
+  // let the RPC verify an unchanged replay of expected revision + 1.
+  const { row } = await activeDraft(admin, {
+    ...body,
+    accessToken: replacement.accessToken,
+  });
+  return {
+    row,
+    accessTokenHash,
+    replacementAccessTokenHash,
+    replacementClientRetained: true,
+  };
 }
 
 function requireMutable(row: DraftRow) {
@@ -573,8 +635,14 @@ async function saveDraft(admin: SupabaseAdmin, body: JsonRecord) {
     "currentStep",
     "completedStep",
     "draftData",
+    "replacementAccessToken",
   ]);
-  const { row, accessTokenHash } = await activeDraft(admin, body);
+  const {
+    row,
+    accessTokenHash,
+    replacementAccessTokenHash,
+    replacementClientRetained,
+  } = await activeDraftForSave(admin, body);
   requireMutable(row);
   const revision = parseRevision(body.revision);
   const currentStep = parseDraftStep(body.currentStep, "currentStep");
@@ -584,9 +652,23 @@ async function saveDraft(admin: SupabaseAdmin, body: JsonRecord) {
     { email: row.email, phone: row.phone },
     draftData,
   );
+  if (
+    !replacementClientRetained && draftContactChangeRequiresCapabilityRotation(
+      { email: row.email, phone: row.phone },
+      contact,
+      {
+        status: row.resume_delivery_status,
+        attemptCount: row.resume_delivery_attempt_count,
+      },
+    )
+  ) {
+    throw new DraftStateError(
+      "Reload this page before changing resume-link contact details.",
+      409,
+      "draft_rotation_requires_reload",
+    );
+  }
   const synchronizedDraft = syncContactIntoDraftData(draftData, contact);
-  const replacementAccessToken = createDraftAccessToken();
-  const replacementAccessTokenHash = await sha256Hex(replacementAccessToken);
   const { data, error } = await admin.rpc("save_ticket_intake_draft", {
     p_id: row.id,
     p_access_token_hash: accessTokenHash,
@@ -603,13 +685,11 @@ async function saveDraft(admin: SupabaseAdmin, body: JsonRecord) {
   const capabilityRotated = draftCapabilityWasRotated(
     accessTokenHash,
     saved.access_token_hash,
-    replacementAccessTokenHash,
+    replacementAccessTokenHash || "",
   );
   return {
     ...responseForDraft(saved),
-    ...(capabilityRotated
-      ? { accessToken: replacementAccessToken, capabilityRotated: true }
-      : {}),
+    ...(capabilityRotated ? { capabilityRotated: true } : {}),
   };
 }
 

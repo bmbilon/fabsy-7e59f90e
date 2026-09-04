@@ -8,6 +8,7 @@ import {
   createDraftAccessToken,
   discardedPendingObjectForCleanup,
   draftCapabilityWasRotated,
+  draftContactChangeRequiresCapabilityRotation,
   DraftRequestError,
   draftStoragePath,
   draftUploadVerificationTarget,
@@ -15,9 +16,11 @@ import {
   mergeDraftContact,
   parseDraftAccessToken,
   parseDraftContact,
+  parseDraftReplacementAccessToken,
   parseJsonBody,
   parseTicketFileMetadata,
   requestFingerprint,
+  resolveDraftReplacementAccessToken,
   sanitizeDraftData,
   sha256Hex,
   storageObjectMatches,
@@ -35,6 +38,28 @@ Deno.test("draft capabilities contain 256 random bits and only hashes are persis
   assertEquals(hash.length, 64);
   assert(hash !== first);
   assertThrows(() => parseDraftAccessToken("short"), DraftRequestError);
+  assertEquals(
+    parseDraftReplacementAccessToken("c".repeat(64), first),
+    "c".repeat(64),
+  );
+  const sameCandidate = assertThrows(
+    () => parseDraftReplacementAccessToken(first, first),
+    DraftRequestError,
+  );
+  assertEquals(
+    sameCandidate.code,
+    "draft_replacement_access_token_invalid",
+  );
+  const legacyReplacement = resolveDraftReplacementAccessToken(
+    undefined,
+    first,
+  );
+  assertEquals(legacyReplacement.clientRetained, false);
+  assertEquals(legacyReplacement.accessToken, null);
+  assertEquals(
+    resolveDraftReplacementAccessToken("c".repeat(64), first),
+    { accessToken: "c".repeat(64), clientRetained: true },
+  );
 });
 
 Deno.test("request fingerprints are keyed and do not disclose the source address", async () => {
@@ -43,6 +68,34 @@ Deno.test("request fingerprints are keyed and do not disclose the source address
   assert(/^[0-9a-f]{64}$/.test(first));
   assert(first !== second);
   assert(!first.includes("203.0.113.1"));
+});
+
+Deno.test("legacy saves require a reload only when contact would rotate", () => {
+  const current = { email: "old@example.test", phone: null };
+  assertEquals(
+    draftContactChangeRequiresCapabilityRotation(
+      current,
+      { email: "new@example.test", phone: null },
+      { status: "failed", attemptCount: 1 },
+    ),
+    true,
+  );
+  assertEquals(
+    draftContactChangeRequiresCapabilityRotation(
+      current,
+      { email: "new@example.test", phone: null },
+      { status: "pending", attemptCount: 0 },
+    ),
+    false,
+  );
+  assertEquals(
+    draftContactChangeRequiresCapabilityRotation(
+      current,
+      current,
+      { status: "sent", attemptCount: 1 },
+    ),
+    false,
+  );
 });
 
 Deno.test("draft input allowlist rejects signatures, files, bearer credentials and unknown fields", () => {
