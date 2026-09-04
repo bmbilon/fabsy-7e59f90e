@@ -1,0 +1,303 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-04T14:43:09.071Z",
+  "candidateUrl": "http://127.0.0.1:4182/rapid-resolution",
+  "bundlePath": "/assets/index-C8cSYGwa.js",
+  "method": "Codex in-app browser DOM geometry plus viewport screenshots",
+  "assertions": {
+    "firstViewElements": [
+      "h1",
+      "offer",
+      "qualified service-fee refund",
+      "price",
+      "upload",
+      "phone"
+    ],
+    "initialConsentPanelDoesNotOverlapPrimaryActions": true,
+    "mobileStickyHiddenWhileInitialConsentOpen": true
+  },
+  "viewports": [
+    {
+      "h1": {
+        "bottom": 140,
+        "display": "block",
+        "height": 63,
+        "left": 16,
+        "right": 329,
+        "text": "Got an Alberta traffic ticket?",
+        "top": 77,
+        "visibility": "visible",
+        "width": 313
+      },
+      "panel": {
+        "bottom": 552,
+        "display": "block",
+        "height": 104,
+        "left": 8,
+        "right": 337,
+        "text": "Your privacy choicesAllow Fabsy’s first-party funnel measurement and Google Analytics, Google Ads and Meta Pixel cookies to measure visits, key progress steps and completed purchases? This helps us understand how people find and use Fabsy. Privacy policyAllow measurementNo thanks",
+        "top": 448,
+        "visibility": "visible",
+        "width": 329
+      },
+      "phone": {
+        "bottom": 422,
+        "display": "flex",
+        "height": 48,
+        "left": 233.1953125,
+        "right": 329,
+        "text": "Call",
+        "top": 374,
+        "visibility": "visible",
+        "width": 95.8046875
+      },
+      "price": {
+        "bottom": 358,
+        "display": "block",
+        "height": 50,
+        "left": 16,
+        "right": 329,
+        "text": "Rapid Resolution$198 CAD + GSTPaid upfront",
+        "top": 308,
+        "visibility": "visible",
+        "width": 313
+      },
+      "promise": {
+        "bottom": 204,
+        "display": "block",
+        "height": 48,
+        "left": 16,
+        "right": 329,
+        "text": "Fabsy negotiates your ticket for a lower fine, fewer demerits, or withdrawal.",
+        "top": 156,
+        "visibility": "visible",
+        "width": 313
+      },
+      "refund": {
+        "bottom": 292,
+        "display": "block",
+        "height": 72,
+        "left": 16,
+        "right": 329,
+        "text": "If the Crown rejects those efforts and no fine or demerit reduction or withdrawal is obtained, your service fee is refunded. Refund terms. No legal outcome is guaranteed.",
+        "top": 220,
+        "visibility": "visible",
+        "width": 313
+      },
+      "sticky": {
+        "bottom": 0,
+        "display": "none",
+        "height": 0,
+        "left": 0,
+        "right": 0,
+        "text": "Start online · $198 CAD + GST",
+        "top": 0,
+        "visibility": "visible",
+        "width": 0
+      },
+      "upload": {
+        "bottom": 422,
+        "display": "flex",
+        "height": 48,
+        "left": 16,
+        "right": 225.1953125,
+        "text": "Upload your ticket",
+        "top": 374,
+        "visibility": "visible",
+        "width": 209.1953125
+      },
+      "viewport": {
+        "height": 560,
+        "width": 360
+      }
+    },
+    {
+      "h1": {
+        "bottom": 140,
+        "display": "block",
+        "height": 63,
+        "left": 16,
+        "right": 329,
+        "text": "Got an Alberta traffic ticket?",
+        "top": 77,
+        "visibility": "visible",
+        "width": 313
+      },
+      "panel": {
+        "bottom": 632,
+        "display": "block",
+        "height": 104,
+        "left": 8,
+        "right": 337,
+        "text": "Your privacy choicesAllow Fabsy’s first-party funnel measurement and Google Analytics, Google Ads and Meta Pixel cookies to measure visits, key progress steps and completed purchases? This helps us understand how people find and use Fabsy. Privacy policyAllow measurementNo thanks",
+        "top": 528,
+        "visibility": "visible",
+        "width": 329
+      },
+      "phone": {
+        "bottom": 422,
+        "display": "flex",
+        "height": 48,
+        "left": 233.1953125,
+        "right": 329,
+        "text": "Call",
+        "top": 374,
+        "visibility": "visible",
+        "width": 95.8046875
+      },
+      "price": {
+        "bottom": 358,
+        "display": "block",
+        "height": 50,
+        "left": 16,
+        "right": 329,
+        "text": "Rapid Resolution$198 CAD + GSTPaid upfront",
+        "top": 308,
+        "visibility": "visible",
+        "width": 313
+      },
+      "promise": {
+        "bottom": 204,
+        "display": "block",
+        "height": 48,
+        "left": 16,
+        "right": 329,
+        "text": "Fabsy negotiates your ticket for a lower fine, fewer demerits, or withdrawal.",
+        "top": 156,
+        "visibility": "visible",
+        "width": 313
+      },
+      "refund": {
+        "bottom": 292,
+        "display": "block",
+        "height": 72,
+        "left": 16,
+        "right": 329,
+        "text": "If the Crown rejects those efforts and no fine or demerit reduction or withdrawal is obtained, your service fee is refunded. Refund terms. No legal outcome is guaranteed.",
+        "top": 220,
+        "visibility": "visible",
+        "width": 313
+      },
+      "sticky": {
+        "bottom": 0,
+        "display": "none",
+        "height": 0,
+        "left": 0,
+        "right": 0,
+        "text": "Start online · $198 CAD + GST",
+        "top": 0,
+        "visibility": "visible",
+        "width": 0
+      },
+      "upload": {
+        "bottom": 422,
+        "display": "flex",
+        "height": 48,
+        "left": 16,
+        "right": 225.1953125,
+        "text": "Upload your ticket",
+        "top": 374,
+        "visibility": "visible",
+        "width": 209.1953125
+      },
+      "viewport": {
+        "height": 640,
+        "width": 360
+      }
+    },
+    {
+      "h1": {
+        "bottom": 140,
+        "display": "block",
+        "height": 63,
+        "left": 16,
+        "right": 359,
+        "text": "Got an Alberta traffic ticket?",
+        "top": 77,
+        "visibility": "visible",
+        "width": 343
+      },
+      "panel": {
+        "bottom": 836,
+        "display": "block",
+        "height": 104,
+        "left": 8,
+        "right": 367,
+        "text": "Your privacy choicesAllow Fabsy’s first-party funnel measurement and Google Analytics, Google Ads and Meta Pixel cookies to measure visits, key progress steps and completed purchases? This helps us understand how people find and use Fabsy. Privacy policyAllow measurementNo thanks",
+        "top": 732,
+        "visibility": "visible",
+        "width": 359
+      },
+      "phone": {
+        "bottom": 406,
+        "display": "flex",
+        "height": 48,
+        "left": 263.1953125,
+        "right": 359,
+        "text": "Call",
+        "top": 358,
+        "visibility": "visible",
+        "width": 95.8046875
+      },
+      "price": {
+        "bottom": 342,
+        "display": "block",
+        "height": 50,
+        "left": 16,
+        "right": 359,
+        "text": "Rapid Resolution$198 CAD + GSTPaid upfront",
+        "top": 292,
+        "visibility": "visible",
+        "width": 343
+      },
+      "promise": {
+        "bottom": 204,
+        "display": "block",
+        "height": 48,
+        "left": 16,
+        "right": 359,
+        "text": "Fabsy negotiates your ticket for a lower fine, fewer demerits, or withdrawal.",
+        "top": 156,
+        "visibility": "visible",
+        "width": 343
+      },
+      "refund": {
+        "bottom": 276,
+        "display": "block",
+        "height": 56,
+        "left": 16,
+        "right": 359,
+        "text": "If the Crown rejects those efforts and no fine or demerit reduction or withdrawal is obtained, your service fee is refunded. Refund terms. No legal outcome is guaranteed.",
+        "top": 220,
+        "visibility": "visible",
+        "width": 343
+      },
+      "sticky": {
+        "bottom": 0,
+        "display": "none",
+        "height": 0,
+        "left": 0,
+        "right": 0,
+        "text": "Start online · $198 CAD + GST",
+        "top": 0,
+        "visibility": "visible",
+        "width": 0
+      },
+      "upload": {
+        "bottom": 406,
+        "display": "flex",
+        "height": 48,
+        "left": 16,
+        "right": 255.1953125,
+        "text": "Upload your ticket",
+        "top": 358,
+        "visibility": "visible",
+        "width": 239.1953125
+      },
+      "viewport": {
+        "height": 844,
+        "width": 390
+      }
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-04T14:48:11Z",
+  "candidate": {
+    "worktree": "/private/tmp/fabsy-paid-acquisition-readiness",
+    "branch": "codex/paid-acquisition-readiness",
+    "sourceCommit": "eb299d7a7d61ff29283cd482393dbe997dd124cf",
+    "priorReviewCommit": "f2fde2aeb1d633f3ae432e9758f3bc823a1cac7f"
+  },
+  "decision": {
+    "localCode": "READY_FOR_INDEPENDENT_REVIEW",
+    "production": "NO_GO",
+    "spendAuthorized": false
+  },
+  "build": {
+    "browserConfiguredCommand": "npx vite build",
+    "browserConfiguredResult": "PASS",
+    "artifacts": [
+      {
+        "path": "dist/index.html",
+        "sha256": "41e15a6f70d4c5c1ffecd96f7446ad3910792ce6d74ceca6d918144cc32e3827"
+      },
+      {
+        "path": "dist/assets/index-C8cSYGwa.js",
+        "sha256": "4dfcab4fd488a2f007d21ae1b159a2fe335ecf623082f7a36c51995b8a3e0fdd"
+      },
+      {
+        "path": "dist/assets/index-sIGPoD9p.css",
+        "sha256": "802cb7f0bcc43331de3328fca16d6d0142453f181c60e2db58e21767af1cf866"
+      }
+    ],
+    "releaseCommand": "npm run build",
+    "releaseResult": "EXPECTED_OWNER_GATE_BLOCK",
+    "releaseBlock": "Privacy Policy source changed; all seven non-English legal-publication fingerprints require fresh owner publication. No attestation was fabricated."
+  },
+  "crawlerSnapshots": [
+    {
+      "path": "public/prerendered/index.html",
+      "sha256": "29e3f2352910ee4bc6c0e942393c6d83f1935a617d99f4835b316b6bd882c89f"
+    },
+    {
+      "path": "public/prerendered/rapid-resolution/index.html",
+      "sha256": "63a7b1852786f4862b25d8d213b89c1f5325eab9104166fd613826e258603238"
+    }
+  ],
+  "mobileEvidence": {
+    "browser": "Codex in-app browser",
+    "geometryPath": "docs/paid-acquisition/2026-09-04-fable-remediation-evidence/mobile-layout-geometry.json",
+    "viewports": ["360x560", "360x640", "390x844"],
+    "result": "PASS",
+    "facts": [
+      "The H1, outcome, qualified service-fee refund, price, Upload, and Call are visible in the first view.",
+      "The 104px initial consent panel begins below the hero Upload and Call actions at every captured viewport.",
+      "The mobile sticky action is display:none while the initial consent panel is open."
+    ]
+  },
+  "verification": [
+    {"check": "npm run test:ads-readiness", "result": "PASS"},
+    {"check": "npm run ci:ads-readiness", "result": "PASS_VALID_NO_GO_44_OPEN_REQUIREMENTS"},
+    {"check": "npm run test:measurement", "result": "PASS"},
+    {"check": "npm run test:ticket-upload", "result": "PASS_29_MOUNTED_PLUS_13_LOWER_LEVEL"},
+    {"check": "npm run test:seo", "result": "PASS"},
+    {"check": "Deno ticket draft, cleanup and resume delivery tests", "result": "PASS_35_OF_35"},
+    {"check": "Deno check release functions", "result": "PASS"},
+    {"check": "test_ticket_intake_draft_migration.py", "result": "PASS"},
+    {"check": "test_paid_funnel_measurement_migration.py", "result": "PASS"},
+    {"check": "test_paid_payment_refund_ledger_migration.py", "result": "PASS"},
+    {"check": "test_ticket_submission_notification_migration.py", "result": "PASS"},
+    {"check": "TypeScript app and node configs", "result": "PASS"},
+    {"check": "Changed-file ESLint", "result": "PASS_0_ERRORS_1_PRE_EXISTING_HOOK_WARNING"},
+    {"check": "Actionlint, workflow YAML parse and git diff --check", "result": "PASS"},
+    {"check": "Public-offer guardrails", "result": "PASS_211"},
+    {"check": "Homepage conversion readiness", "result": "PASS_11"},
+    {"check": "Homepage visual guardrails", "result": "PASS_37"},
+    {"check": "Snapshot offer, runtime-hygiene and full snapshot guardrails", "result": "PASS"}
+  ],
+  "priorFindings": {
+    "P1-1": "CLOSED_LOCAL",
+    "P1-2": "CLOSED_LOCAL",
+    "P1-3": "CLOSED_LOCAL_REAL_DEVICE_PROOF_OPEN",
+    "P1-4": "CLOSED_LOCAL_PRODUCTION_EVIDENCE_OPEN",
+    "P1-5": "CLOSED_LOCAL_PROVIDER_DELIVERY_REMAINS_OFF",
+    "P2-1": "CLOSED_LOCAL",
+    "P2-2": "CLOSED_LOCAL",
+    "P2-3": "CLOSED_LOCAL",
+    "P2-4": "CLOSED_LOCAL_EXTERNAL_GIT_INTEGRATION_READBACK_OPEN",
+    "P2-5": "CLOSED_LOCAL_MANUAL_PRODUCTION_PROOF_OPEN",
+    "P2-6": "CLOSED_LOCAL_OWNER_TRANSLATION_PUBLICATION_OPEN",
+    "P2-7": "CLOSED_LOCAL",
+    "P2-8": "CLOSED_LOCAL",
+    "P2-9": "CLOSED_LOCAL",
+    "P2-10": "CLOSED_LOCAL",
+    "P2-11": "CLOSED_LOCAL",
+    "P2-12": "PARTIAL_SAFE_STAFF_LIFECYCLE_ADDED_RESEND_INTENTIONALLY_ABSENT",
+    "P2-13": "CLOSED_LOCAL",
+    "P2-14": "CLOSED_LOCAL_VISIBLE_LABELS_QUALIFIED_AS_SERVICE_FEE",
+    "P2-15": "CLOSED_LOCAL",
+    "P2-16": "CLOSED_LOCAL_TRUSTED_PROXY_PRODUCTION_PROOF_OPEN"
+  },
+  "productionOpen": [
+    "Owner publication of the seven changed legal translations and a passing release build",
+    "Ordered migrations, functions, signed webhook, cleanup manual run, gated schedule and frontend-last deployment",
+    "Production bundle-byte and crawler message-match proof",
+    "Real iOS in-app-browser and saved Slow 4G evidence",
+    "Production trusted cf-connecting-ip proof",
+    "Controlled intake, checkout, webhook, notification, measurement, conversion and refund evidence",
+    "Stripe Fabsy merchant identity and phone/contact-route tests",
+    "Meta dataset restriction/objective and Google conversion-action readbacks",
+    "Owner economics inputs, capacity, CAC/CPL/CPC and maximum-loss approval",
+    "Independent production review, written GO and separate spend authorization"
+  ],
+  "actionsNotTaken": [
+    "push",
+    "deployment",
+    "production database or storage mutation",
+    "provider configuration change",
+    "message or phone call",
+    "payment or refund",
+    "record deletion",
+    "campaign mutation or activation",
+    "advertising spend"
+  ]
+}
