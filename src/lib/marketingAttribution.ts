@@ -242,6 +242,17 @@ export function persistPendingMarketingAttribution(): MarketingAttribution {
 
 export function clearMarketingAttribution(): void {
   pendingAttribution = {};
+  clearConsentedMarketingAttribution();
+}
+
+/**
+ * Remove attribution that belonged to an earlier consent grant while keeping
+ * the current document's undecided, memory-only first touch. This lets the
+ * document-lifetime guardian retire stale durable state discovered on mount or
+ * after browser suspension without discarding the campaign that opened the
+ * still-undecided page.
+ */
+export function clearConsentedMarketingAttribution(): void {
   consentedMemoryAttribution = null;
   removeStorageKeys([MARKETING_STORAGE_KEY, ...RETIRED_MARKETING_STORAGE_KEYS]);
 }

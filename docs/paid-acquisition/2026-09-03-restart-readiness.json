@@ -1,6 +1,7 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "decision": "NO_GO",
+  "localReview": null,
   "release": {
     "sourceCommit": null,
     "deployedGitRef": null,

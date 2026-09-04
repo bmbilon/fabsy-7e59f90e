@@ -16,7 +16,10 @@ import {
 } from '@/lib/fabsyFunnelConsent';
 import { requestMetaCheckoutAttributionWithdrawal } from '@/lib/metaCheckoutWithdrawal';
 import { clearFunnelSessionState } from '@/lib/funnelSessionStorage';
-import { clearMarketingAttribution } from '@/lib/marketingAttribution';
+import {
+  clearConsentedMarketingAttribution,
+  clearMarketingAttribution,
+} from '@/lib/marketingAttribution';
 
 /**
  * Document lifetime observer, independent of route children. A full navigation
@@ -27,11 +30,16 @@ import { clearMarketingAttribution } from '@/lib/marketingAttribution';
 export default function GoogleMeasurementGuardian() {
   useEffect(() => {
     let expiryTimer: number | undefined;
-    const recheck = (retireNonAcceptedFirstPartyState = false) => {
+    let previousFabsyChoice = getFabsyFunnelConsentChoice();
+    const recheck = (
+      retireNonAcceptedFirstPartyState = false,
+      auditUnknownFirstPartyState = false,
+    ) => {
       window.clearTimeout(expiryTimer);
       recheckGoogleMeasurementConsent();
       recheckMetaMeasurementConsent();
       const fabsyChoice = getFabsyFunnelConsentChoice();
+      const lostAcceptedGrant = previousFabsyChoice === 'accepted' && fabsyChoice === 'unknown';
       if (fabsyChoice === 'declined' ||
           (retireNonAcceptedFirstPartyState && fabsyChoice !== 'accepted')) {
         // This observer remains mounted even on secure routes where the
@@ -43,7 +51,19 @@ export default function GoogleMeasurementGuardian() {
         clearMarketingAttribution();
         clearFunnelSessionState(window.sessionStorage);
         requestMetaCheckoutAttributionWithdrawal();
+      } else if (auditUnknownFirstPartyState && fabsyChoice === 'unknown') {
+        // A browser may wake after the saved grant expired or was removed while
+        // this document was suspended, so no storage event or live timer is
+        // guaranteed. Always retire state from the earlier grant. Preserve only
+        // the current document's undecided, memory-only first touch so a fresh
+        // visitor can still choose whether to retain the campaign that opened
+        // this page.
+        if (lostAcceptedGrant) clearMarketingAttribution();
+        else clearConsentedMarketingAttribution();
+        clearFunnelSessionState(window.sessionStorage);
+        requestMetaCheckoutAttributionWithdrawal();
       }
+      previousFabsyChoice = fabsyChoice;
       const remaining = [
         googleConsentRemainingMilliseconds(),
         metaConsentRemainingMilliseconds(),
@@ -78,7 +98,7 @@ export default function GoogleMeasurementGuardian() {
       if (fabsyChanged) window.dispatchEvent(new Event(FABSY_FUNNEL_CONSENT_CHANGED));
     };
     const onVisible = () => {
-      if (document.visibilityState === 'visible') recheck();
+      if (document.visibilityState === 'visible') recheck(false, true);
     };
     const onProviderStateChanged = () => recheck();
     const onFabsyConsentChanged = () => recheck(true);
@@ -87,9 +107,10 @@ export default function GoogleMeasurementGuardian() {
     window.addEventListener(META_CONSENT_CHANGED, onProviderStateChanged);
     window.addEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onFabsyConsentChanged);
     window.addEventListener('storage', onStorage);
-    window.addEventListener('pageshow', onProviderStateChanged);
+    const onPageShow = () => recheck(false, true);
+    window.addEventListener('pageshow', onPageShow);
     document.addEventListener('visibilitychange', onVisible);
-    recheck();
+    recheck(false, true);
     return () => {
       window.clearTimeout(expiryTimer);
       window.removeEventListener(GOOGLE_CONTEXT_READY, onProviderStateChanged);
@@ -97,7 +118,7 @@ export default function GoogleMeasurementGuardian() {
       window.removeEventListener(META_CONSENT_CHANGED, onProviderStateChanged);
       window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onFabsyConsentChanged);
       window.removeEventListener('storage', onStorage);
-      window.removeEventListener('pageshow', onProviderStateChanged);
+      window.removeEventListener('pageshow', onPageShow);
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);

@@ -36,6 +36,8 @@ async function bundle(env = enabledEnv) {
       contents: `
         export * from './src/lib/fabsyFunnelConsent';
         export * from './src/lib/marketingAttribution';
+        export * from './src/lib/funnelSessionStorage';
+        export { currentFunnelSessionId } from './src/lib/funnelMeasurement';
         export * from './src/lib/funnelMeasurement';
         export * from './src/lib/checkoutMeasurement';
         export * from './src/lib/metaCheckoutWithdrawal';
@@ -239,6 +241,8 @@ test('document guardian preserves undecided attribution but retires it on cross-
         import GoogleMeasurementGuardian from './src/components/GoogleMeasurementGuardian';
         export * from './src/lib/fabsyFunnelConsent';
         export * from './src/lib/marketingAttribution';
+        export { FUNNEL_EVENT_DEDUPE_PREFIX, FUNNEL_SESSION_STORAGE_KEY } from './src/lib/funnelSessionStorage';
+        export { currentFunnelSessionId } from './src/lib/funnelMeasurement';
         export { setMetaConsentChoice, getMetaConsentChoice } from './src/lib/googleConsent';
         export { rememberMetaCheckoutAttributionHandle } from './src/lib/metaCheckoutWithdrawal';
         let root;
@@ -266,7 +270,14 @@ test('document guardian preserves undecided attribution but retires it on cross-
     },
   });
 
-  for (const scenario of ['initial-unknown', 'cross-tab-removal', 'expiry']) {
+  for (const scenario of [
+    'initial-unknown',
+    'initial-expired',
+    'initial-malformed',
+    'cross-tab-removal',
+    'missed-removal-pageshow',
+    'expiry',
+  ]) {
     const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', {
       url: 'https://fabsy.ca/rapid-resolution',
       runScripts: 'outside-only',
@@ -299,15 +310,29 @@ test('document guardian preserves undecided attribution but retires it on cross-
       assert.equal(pending.utm_campaign, 'must_not_revive', scenario);
       assert.equal(api.getMetaConsentChoice(), 'accepted');
       const handle = (scenario === 'expiry' ? 'c' : 'd').repeat(64);
-      if (scenario !== 'initial-unknown') {
+      if (!['initial-unknown', 'initial-malformed'].includes(scenario)) {
         dom.window.localStorage.setItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY, JSON.stringify({
           version: 1,
           choice: 'accepted',
-          savedAt: scenario === 'expiry'
+          savedAt: scenario === 'initial-expired'
+            ? Date.now() - api.FABSY_FUNNEL_CONSENT_MAX_AGE_MS - 1
+            : scenario === 'expiry'
             ? Date.now() - api.FABSY_FUNNEL_CONSENT_MAX_AGE_MS + 30
             : Date.now(),
         }));
-        assert.equal(api.rememberMetaCheckoutAttributionHandle(handle, dom.window), true);
+        if (scenario !== 'initial-expired') {
+          assert.equal(api.rememberMetaCheckoutAttributionHandle(handle, dom.window), true);
+        }
+      } else if (scenario === 'initial-malformed') {
+        dom.window.localStorage.setItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY, '{"version":1,"choice":');
+      }
+
+      const staleSessionId = '11111111-1111-4111-8111-111111111111';
+      if (['initial-expired', 'initial-malformed', 'missed-removal-pageshow'].includes(scenario)) {
+        assert.equal(typeof api.FUNNEL_SESSION_STORAGE_KEY, 'string');
+        assert.equal(typeof api.FUNNEL_EVENT_DEDUPE_PREFIX, 'string');
+        dom.window.sessionStorage.setItem(api.FUNNEL_SESSION_STORAGE_KEY, staleSessionId);
+        dom.window.sessionStorage.setItem(`${api.FUNNEL_EVENT_DEDUPE_PREFIX}page_view:stale`, '1');
       }
 
       await api.mount();
@@ -318,18 +343,30 @@ test('document guardian preserves undecided attribution but retires it on cross-
         const persisted = api.persistPendingMarketingAttribution();
         assert.equal(persisted.utm_campaign, 'must_not_revive', scenario);
         assert.ok(dom.window.localStorage.getItem(api.MARKETING_STORAGE_KEY), scenario);
+      } else if (scenario === 'initial-expired' || scenario === 'initial-malformed') {
+        assert.equal(api.getFabsyFunnelConsentChoice(), 'unknown', scenario);
+        assert.equal(dom.window.sessionStorage.getItem(api.FUNNEL_SESSION_STORAGE_KEY), null, scenario);
+        assert.equal(dom.window.sessionStorage.getItem(`${api.FUNNEL_EVENT_DEDUPE_PREFIX}page_view:stale`), null, scenario);
+        api.setFabsyFunnelConsentChoice('accepted');
+        const persisted = api.persistPendingMarketingAttribution();
+        assert.equal(persisted.utm_campaign, 'must_not_revive', scenario);
+        const newSessionId = api.currentFunnelSessionId(dom.window.sessionStorage);
+        assert.notEqual(newSessionId, staleSessionId, scenario);
       } else if (scenario === 'cross-tab-removal') {
         dom.window.localStorage.removeItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY);
         await api.tick(() => dom.window.dispatchEvent(new dom.window.StorageEvent('storage', {
           key: api.FABSY_FUNNEL_CONSENT_STORAGE_KEY,
           storageArea: dom.window.localStorage,
         })));
+      } else if (scenario === 'missed-removal-pageshow') {
+        dom.window.localStorage.removeItem(api.FABSY_FUNNEL_CONSENT_STORAGE_KEY);
+        await api.tick(() => dom.window.dispatchEvent(new dom.window.PageTransitionEvent('pageshow')));
       } else {
         await api.tick(() => new Promise(resolve => dom.window.setTimeout(resolve, 60)));
       }
 
       const withdrawals = calls.filter(call => String(call.url).endsWith('/functions/v1/withdraw-meta-measurement'));
-      if (scenario === 'initial-unknown') {
+      if (['initial-unknown', 'initial-expired', 'initial-malformed'].includes(scenario)) {
         assert.equal(withdrawals.length, 0, scenario);
       } else {
         assert.equal(api.getMetaConsentChoice(), 'accepted', scenario);

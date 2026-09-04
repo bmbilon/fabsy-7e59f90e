@@ -11,6 +11,7 @@ const SHA256 = /^[0-9a-f]{64}$/;
 const COMMIT = /^[0-9a-f]{40}$/;
 const PROVIDER_ID = /^[A-Za-z0-9][A-Za-z0-9._:@/-]{1,127}$/;
 const ACTOR_ID = /^[a-z0-9][a-z0-9._:@/-]{2,127}$/;
+const SUPABASE_PROJECT_REF = /^[a-z0-9]{20}$/;
 const ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 const CANONICAL_PRODUCTION_ORIGIN = 'https://fabsy.ca';
 const APPROVED_PAID_LANDING_PATHS = new Set(['/rapid-resolution']);
@@ -106,6 +107,29 @@ export const EXPECTED_TRUSTED_IP_FUNCTIONS = Object.freeze([
   'record-funnel-event',
   'submit-ticket',
 ]);
+const REVIEWED_PROVIDER_OPTIMIZATION = Object.freeze({
+  meta: Object.freeze({ SALES: Object.freeze(['PURCHASE']) }),
+  google: Object.freeze({ SALES: Object.freeze(['PURCHASE']) }),
+});
+const RELEASE_CRITICAL_PATHS = Object.freeze([
+  '.github/workflows',
+  'components.json',
+  'deno.lock',
+  'index.html',
+  'package.json',
+  'package-lock.json',
+  'postcss.config.js',
+  'public',
+  'scripts',
+  'src',
+  'supabase',
+  'tailwind.config.ts',
+  'tsconfig.app.json',
+  'tsconfig.json',
+  'tsconfig.node.json',
+  'vite.config.ts',
+]);
+const NEGATIVE_EVIDENCE_VERDICTS = new Set(['BLOCKED', 'ERROR', 'FAIL', 'FAILED', 'FAILURE', 'NO_GO']);
 const MONEY_TOLERANCE = 0.011;
 const FUTURE_TOLERANCE_MS = 5 * 60 * 1000;
 const MAX_GO_EVIDENCE_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -286,8 +310,12 @@ function gitRefIsAnnotatedTag(root, ref) {
 }
 
 function commitIsAncestorOfHead(root, commit) {
+  return commitIsAncestor(root, commit, 'HEAD');
+}
+
+function commitIsAncestor(root, commit, descendant) {
   try {
-    execFileSync('git', ['-C', root, 'merge-base', '--is-ancestor', commit, 'HEAD'], { stdio: 'ignore' });
+    execFileSync('git', ['-C', root, 'merge-base', '--is-ancestor', commit, descendant], { stdio: 'ignore' });
     return true;
   } catch {
     return false;
@@ -340,6 +368,72 @@ function changedTrackedPaths(root, from, to, relativePaths) {
   } catch {
     return null;
   }
+}
+
+function repositoryStatus(root) {
+  try {
+    return execFileSync('git', ['-C', root, 'status', '--porcelain=v1', '--untracked-files=all'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function regularFilesRecursively(root, directory) {
+  const realRoot = fs.realpathSync(root);
+  const files = [];
+  const invalid = [];
+  const visit = current => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const absolute = path.join(current, entry.name);
+      // Use the lexical path until after lstat. Calling realpath first follows a
+      // symlink and throws for a broken link instead of reporting an integrity
+      // failure through the validator.
+      const relative = path.relative(realRoot, absolute).replaceAll(path.sep, '/');
+      const stat = fs.lstatSync(absolute);
+      if (stat.isSymbolicLink()) {
+        invalid.push(relative);
+      } else if (stat.isDirectory()) {
+        visit(absolute);
+      } else if (stat.isFile()) {
+        files.push(relative);
+      } else {
+        invalid.push(relative);
+      }
+    }
+  };
+  visit(directory);
+  return { files: files.sort(), invalid: invalid.sort() };
+}
+
+function explicitNegativeEvidence(value, location = '$') {
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) {
+      const result = explicitNegativeEvidence(item, `${location}[${index}]`);
+      if (result) return result;
+    }
+    return null;
+  }
+  if (!isPlainObject(value)) return null;
+  for (const [key, item] of Object.entries(value)) {
+    const itemLocation = `${location}.${key}`;
+    if (['result', 'status', 'decision', 'verdict', 'conclusion'].includes(key) && typeof item === 'string') {
+      const normalizedVerdict = item.trim().toUpperCase()
+        .replace(/[^A-Z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+      if (NEGATIVE_EVIDENCE_VERDICTS.has(normalizedVerdict)) {
+        return `${itemLocation}=${JSON.stringify(item)}`;
+      }
+    }
+    if (['passed', 'ready', 'success'].includes(key) && item === false) {
+      return `${itemLocation}=false`;
+    }
+    const nested = explicitNegativeEvidence(item, itemLocation);
+    if (nested) return nested;
+  }
+  return null;
 }
 
 function exactKeys(value, keys, label, fail) {
@@ -505,10 +599,10 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
   }
 
   exactKeys(record, [
-    'schemaVersion', 'decision', 'release', 'deploymentOrder', 'economics', 'operations',
+    'schemaVersion', 'decision', 'localReview', 'release', 'deploymentOrder', 'economics', 'operations',
     'provider', 'gates', 'review', 'spendAuthorization',
   ], 'record', failSchema);
-  if (record.schemaVersion !== 2) failSchema('schemaVersion must be 2.');
+  if (record.schemaVersion !== 3) failSchema('schemaVersion must be 3.');
   if (!['GO', 'NO_GO'].includes(record.decision)) failSchema('decision must be GO or NO_GO.');
 
   const evidencePath = (value, label, required = false) => {
@@ -562,6 +656,149 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
       return null;
     }
   };
+
+  const localReview = record.localReview;
+  let localSourceCommit = null;
+  let localEvidenceCommit = null;
+  let localManifestEntries = null;
+  if (localReview === null) {
+    if (isGo) fail('localReview is required before GO.');
+  } else if (exactKeys(localReview, [
+    'baseCommit', 'sourceCommit', 'evidenceCommit', 'readinessPath',
+    'evidenceDirectory', 'manifestPath', 'manifestEntryCount',
+  ], 'localReview', failSchema)) {
+    for (const key of ['baseCommit', 'sourceCommit', 'evidenceCommit']) {
+      const value = localReview[key];
+      if (!COMMIT.test(value || '')) failSchema(`localReview.${key} must be a full 40-character commit SHA.`);
+      else if (!commitExists(root, value)) failIntegrity(`localReview.${key} does not exist in this repository: ${value}.`);
+    }
+    localSourceCommit = COMMIT.test(localReview.sourceCommit || '') && commitExists(root, localReview.sourceCommit)
+      ? localReview.sourceCommit : null;
+    localEvidenceCommit = COMMIT.test(localReview.evidenceCommit || '') && commitExists(root, localReview.evidenceCommit)
+      ? localReview.evidenceCommit : null;
+    if (COMMIT.test(localReview.baseCommit || '') && localSourceCommit &&
+        !commitIsAncestor(root, localReview.baseCommit, localSourceCommit)) {
+      failIntegrity('localReview.baseCommit must be an ancestor of localReview.sourceCommit.');
+    }
+    if (localSourceCommit && localEvidenceCommit &&
+        !commitIsAncestor(root, localSourceCommit, localEvidenceCommit)) {
+      failIntegrity('localReview.sourceCommit must be an ancestor of localReview.evidenceCommit.');
+    }
+    if (localSourceCommit && localEvidenceCommit &&
+        resolveGitRef(root, `${localEvidenceCommit}^`) !== localSourceCommit) {
+      failIntegrity('localReview.evidenceCommit must be the direct successor of localReview.sourceCommit.');
+    }
+    if (localEvidenceCommit && !commitIsAncestorOfHead(root, localEvidenceCommit)) {
+      failIntegrity('localReview.evidenceCommit must be an ancestor of HEAD.');
+    }
+    for (const [key, value] of [
+      ['readinessPath', localReview.readinessPath],
+      ['evidenceDirectory', localReview.evidenceDirectory],
+      ['manifestPath', localReview.manifestPath],
+    ]) {
+      if (!safeRelativePath(value || '')) failSchema(`localReview.${key} must be a normalized repository-relative path.`);
+    }
+    if (!Number.isInteger(localReview.manifestEntryCount) || localReview.manifestEntryCount <= 0) {
+      failSchema('localReview.manifestEntryCount must be a positive integer.');
+    }
+
+    const readinessFile = resolveRepositoryFile(root, localReview.readinessPath);
+    const manifestFile = resolveRepositoryFile(root, localReview.manifestPath);
+    const evidenceDirectory = safeRelativePath(localReview.evidenceDirectory || '')
+      ? path.resolve(root, localReview.evidenceDirectory) : null;
+    if (!readinessFile) failIntegrity(`localReview.readinessPath does not resolve: ${localReview.readinessPath}.`);
+    if (!manifestFile) failIntegrity(`localReview.manifestPath does not resolve: ${localReview.manifestPath}.`);
+    if (evidenceDirectory) {
+      try {
+        const stat = fs.lstatSync(evidenceDirectory);
+        if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('not a real directory');
+      } catch {
+        failIntegrity(`localReview.evidenceDirectory does not resolve to a real directory: ${localReview.evidenceDirectory}.`);
+      }
+    }
+    if (options.recordPath) {
+      const suppliedRecordPath = path.relative(root, path.resolve(options.recordPath)).replaceAll(path.sep, '/');
+      if (suppliedRecordPath !== localReview.readinessPath) {
+        failIntegrity('The evaluated readiness file must equal localReview.readinessPath.');
+      }
+    }
+
+    if (manifestFile) {
+      localManifestEntries = new Map();
+      const lines = fs.readFileSync(manifestFile, 'utf8').split(/\r?\n/).filter(Boolean);
+      for (const [index, line] of lines.entries()) {
+        const match = line.match(/^([0-9a-f]{64})  ([^\0\r\n]+)$/);
+        if (!match || !safeRelativePath(match?.[2] || '')) {
+          failIntegrity(`Local review manifest line ${index + 1} is malformed.`);
+          continue;
+        }
+        if (localManifestEntries.has(match[2])) {
+          failIntegrity(`Local review manifest lists ${match[2]} more than once.`);
+          continue;
+        }
+        localManifestEntries.set(match[2], match[1]);
+      }
+      if (localManifestEntries.size !== localReview.manifestEntryCount) {
+        failIntegrity(`Local review manifest must contain exactly ${localReview.manifestEntryCount} entries; found ${localManifestEntries.size}.`);
+      }
+    }
+
+    if (COMMIT.test(localReview.baseCommit || '') && localEvidenceCommit && localManifestEntries) {
+      const expectedChanged = changedTrackedPaths(root, localReview.baseCommit, localEvidenceCommit, []);
+      if (!expectedChanged) {
+        failIntegrity('Could not enumerate the local review commit range.');
+      } else {
+        expectedChanged.delete(localReview.manifestPath);
+        expectedChanged.delete(localReview.readinessPath);
+        const expectedPaths = [...expectedChanged].sort();
+        const manifestPaths = [...localManifestEntries.keys()].sort();
+        if (!sameStringArray(manifestPaths, expectedPaths)) {
+          const omitted = expectedPaths.filter(item => !localManifestEntries.has(item));
+          const unexpected = manifestPaths.filter(item => !expectedChanged.has(item));
+          failIntegrity(`Local review manifest must exactly cover the committed candidate diff${omitted.length ? `; omitted ${omitted.join(', ')}` : ''}${unexpected.length ? `; unexpected ${unexpected.join(', ')}` : ''}.`);
+        }
+      }
+      const committedEvidenceFiles = regularTrackedFilesAtCommit(
+        root,
+        localEvidenceCommit,
+        [...localManifestEntries.keys(), localReview.manifestPath],
+      );
+      for (const [relativePath, expectedHash] of localManifestEntries) {
+        if (!committedEvidenceFiles?.has(relativePath)) {
+          failIntegrity(`Local review manifest entry is not a regular file at evidenceCommit: ${relativePath}.`);
+        }
+        const currentFile = resolveRepositoryFile(root, relativePath);
+        if (!currentFile || sha256File(currentFile) !== expectedHash) {
+          failIntegrity(`Local review manifest entry has drifted from evidenceCommit: ${relativePath}.`);
+        }
+      }
+
+      const evidenceChanges = localSourceCommit
+        ? changedTrackedPaths(root, localSourceCommit, localEvidenceCommit, []) : null;
+      if (evidenceChanges && evidenceDirectory) {
+        const directoryPrefix = `${localReview.evidenceDirectory.replace(/\/$/, '')}/`;
+        for (const relativePath of evidenceChanges) {
+          if (relativePath !== localReview.manifestPath && !relativePath.startsWith(directoryPrefix)) {
+            failIntegrity(`Only local review evidence may change after localReview.sourceCommit; found ${relativePath}.`);
+          }
+        }
+      }
+
+      const headParent = resolveGitRef(root, 'HEAD^');
+      const afterEvidence = changedTrackedPaths(root, localEvidenceCommit, 'HEAD', []);
+      if (headParent !== localEvidenceCommit || !afterEvidence ||
+          !sameStringArray([...afterEvidence].sort(), [localReview.readinessPath])) {
+        failIntegrity('HEAD must be one readiness-only commit directly after localReview.evidenceCommit.');
+      }
+      if (manifestFile && (!committedEvidenceFiles?.has(localReview.manifestPath) ||
+          afterEvidence?.has(localReview.manifestPath))) {
+        failIntegrity('localReview.manifestPath must be committed at evidenceCommit and unchanged at HEAD.');
+      }
+    }
+    const status = repositoryStatus(root);
+    if (status === null) failIntegrity('Could not inspect repository status for the local review handoff.');
+    else if (status) failIntegrity('The local review handoff requires a completely clean tracked and untracked worktree.');
+  }
 
   const release = record.release;
   exactKeys(release, [
@@ -638,7 +875,13 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
       failSchema(`deploymentOrder.sharedFunctionFiles must equal the conservative shared-source inventory: ${EXPECTED_SHARED_FUNCTION_FILES.join(', ')}.`);
     }
   }
-  if (isGo && COMMIT.test(release?.sourceCommit || '') && commitExists(root, release.sourceCommit)) {
+  if (isGo && localSourceCommit && release?.sourceCommit !== localSourceCommit) {
+    failIntegrity('For GO, release.sourceCommit must equal localReview.sourceCommit.');
+  }
+  const sourceIntegrityCommit = localSourceCommit ||
+    (isGo && COMMIT.test(release?.sourceCommit || '') && commitExists(root, release.sourceCommit)
+      ? release.sourceCommit : null);
+  if (sourceIntegrityCommit) {
     const requiredSourcePaths = [
       ...EXPECTED_MIGRATIONS.map(file => [`supabase/migrations/${file}`, `migration ${file}`]),
       ...[...EXPECTED_CORE_FUNCTIONS, ...EXPECTED_SEPARATE_FUNCTIONS]
@@ -646,9 +889,9 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
       ...EXPECTED_SHARED_FUNCTION_FILES.map(relativePath => [relativePath, `shared Edge Function source ${relativePath}`]),
     ];
     const relativePaths = requiredSourcePaths.map(([relativePath]) => relativePath);
-    const sourceFiles = regularTrackedFilesAtCommit(root, release.sourceCommit, relativePaths);
+    const sourceFiles = regularTrackedFilesAtCommit(root, sourceIntegrityCommit, relativePaths);
     const headFiles = regularTrackedFilesAtCommit(root, resolveGitRef(root, 'HEAD'), relativePaths);
-    const committedDrift = changedTrackedPaths(root, release.sourceCommit, 'HEAD', relativePaths);
+    const committedDrift = changedTrackedPaths(root, sourceIntegrityCommit, 'HEAD', relativePaths);
     const worktreeDrift = changedTrackedPaths(root, 'HEAD', null, relativePaths);
     for (const [relativePath, label] of requiredSourcePaths) {
       const resolved = resolveRepositoryFile(root, relativePath);
@@ -657,13 +900,30 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
         continue;
       }
       if (!sourceFiles?.has(relativePath)) {
-        failIntegrity(`Required ${label} is absent from release.sourceCommit: ${relativePath}.`);
+        failIntegrity(`Required ${label} is absent from the reviewed source commit: ${relativePath}.`);
       } else if (!committedDrift || committedDrift.has(relativePath)) {
-        failIntegrity(`Required ${label} changed after release.sourceCommit: ${relativePath}.`);
+        failIntegrity(`Required ${label} changed after the reviewed source commit: ${relativePath}.`);
       }
       if (!worktreeDrift || worktreeDrift.has(relativePath)) {
         failIntegrity(`Required ${label} has uncommitted source drift: ${relativePath}.`);
       }
+    }
+
+    const criticalCommittedDrift = changedTrackedPaths(
+      root, sourceIntegrityCommit, 'HEAD', [...RELEASE_CRITICAL_PATHS],
+    );
+    const criticalWorktreeDrift = changedTrackedPaths(
+      root, 'HEAD', null, [...RELEASE_CRITICAL_PATHS],
+    );
+    if (!criticalCommittedDrift) {
+      failIntegrity('Could not inspect committed release-critical drift.');
+    } else if (criticalCommittedDrift.size > 0) {
+      failIntegrity(`Release-critical files changed after the reviewed source commit: ${[...criticalCommittedDrift].sort().join(', ')}.`);
+    }
+    if (!criticalWorktreeDrift) {
+      failIntegrity('Could not inspect uncommitted release-critical drift.');
+    } else if (criticalWorktreeDrift.size > 0) {
+      failIntegrity(`Release-critical files have uncommitted drift: ${[...criticalWorktreeDrift].sort().join(', ')}.`);
     }
   }
   const migrationsAppliedAt = timestamp(deploymentOrder?.migrationsAppliedAt, 'deploymentOrder.migrationsAppliedAt', isGo);
@@ -729,6 +989,31 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
 
   const operations = record.operations;
   let trustedCfReceiptFile = null;
+  const operationalReceipt = (value, label, control) => {
+    const file = evidencePath(value, label, isGo);
+    const receipt = parseReceipt(file, label);
+    if (!receipt) return file;
+    const keys = [
+      'schemaVersion', 'kind', 'control', 'result', 'sourceCommit', 'capturedAt',
+      'productionUrl',
+    ];
+    if (!exactKeys(receipt, keys, `${label} receipt`, failIntegrity)) return file;
+    if (receipt.schemaVersion !== 1 || receipt.kind !== 'paid-acquisition-operational-evidence' ||
+        receipt.control !== control || receipt.result !== 'PASS') {
+      failIntegrity(`${label} must be a typed ${control} receipt with result PASS.`);
+    }
+    if (!COMMIT.test(receipt.sourceCommit || '') || receipt.sourceCommit !== release?.sourceCommit) {
+      failIntegrity(`${label} sourceCommit must match release.sourceCommit.`);
+    }
+    if (receipt.productionUrl !== release?.productionUrl) {
+      failIntegrity(`${label} productionUrl must match release.productionUrl.`);
+    }
+    const capturedAt = timestamp(receipt.capturedAt, `${label} capturedAt`, isGo);
+    if (capturedAt !== null && frontendDeployedAt !== null && capturedAt <= frontendDeployedAt) {
+      fail(`${label} must be captured after the frontend deployment.`);
+    }
+    return file;
+  };
   exactKeys(operations, [
     'weeklyCaseCapacity', 'maximumMediaLossCad', 'maximumSpendWithoutLeadCad',
     'maximumSpendWithoutPurchaseCad', 'maximumMediaLossApprovedBy',
@@ -749,9 +1034,9 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
     }
     if (!nonEmpty(operations.maximumMediaLossApprovedBy) || !ACTOR_ID.test(operations.maximumMediaLossApprovedById || '')) fail('The maximum media loss requires an approving actor name and stable actor ID.');
     if (operations.noCrossPlatformOverlapStageOne !== true) fail('operations.noCrossPlatformOverlapStageOne must be true.');
-    evidencePath(operations.phoneTestEvidence, 'operations.phoneTestEvidence', isGo);
-    evidencePath(operations.notificationTestEvidence, 'operations.notificationTestEvidence', isGo);
-    evidencePath(operations.stripeBrandingEvidence, 'operations.stripeBrandingEvidence', isGo);
+    operationalReceipt(operations.phoneTestEvidence, 'operations.phoneTestEvidence', 'phone-route');
+    operationalReceipt(operations.notificationTestEvidence, 'operations.notificationTestEvidence', 'notification-delivery');
+    operationalReceipt(operations.stripeBrandingEvidence, 'operations.stripeBrandingEvidence', 'stripe-branding');
     trustedCfReceiptFile = evidencePath(operations.trustedCfConnectingIpEvidence, 'operations.trustedCfConnectingIpEvidence', isGo);
   }
   const maximumMediaLossApprovedAt = timestamp(operations?.maximumMediaLossApprovedAt, 'operations.maximumMediaLossApprovedAt', isGo);
@@ -773,6 +1058,12 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
     if (!Array.isArray(provider.adIds) || provider.adIds.length === 0 || provider.adIds.some(id => !PROVIDER_ID.test(id)) || new Set(provider.adIds).size !== provider.adIds.length) fail('provider.adIds must contain unique provider identifiers.');
     if (!nonEmpty(provider.objective)) fail('provider.objective is required.');
     if (!nonEmpty(provider.optimizationGoal)) fail('provider.optimizationGoal is required.');
+    const reviewedGoals = Object.prototype.hasOwnProperty.call(REVIEWED_PROVIDER_OPTIMIZATION, provider.platform)
+      ? REVIEWED_PROVIDER_OPTIMIZATION[provider.platform]?.[provider.objective]
+      : null;
+    if (!Array.isArray(reviewedGoals) || !reviewedGoals.includes(provider.optimizationGoal)) {
+      fail(`provider objective/optimizationGoal must use the reviewed ${provider.platform || 'platform'} acquisition contract.`);
+    }
     if (!['RESTRICTED', 'UNRESTRICTED', 'NOT_APPLICABLE'].includes(provider.datasetRestriction)) fail('provider.datasetRestriction must be RESTRICTED, UNRESTRICTED or NOT_APPLICABLE.');
     if (provider.optimizationEligibility !== 'ELIGIBLE') fail('provider.optimizationEligibility must be ELIGIBLE for the recorded objective and dataset restriction.');
     if (provider.platform === 'meta') {
@@ -815,6 +1106,9 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
     providerReceiptFile = evidencePath(provider.readbackEvidencePath, 'provider.readbackEvidencePath', isGo);
   }
   const providerReadBackAt = timestamp(provider?.readBackAt, 'provider.readBackAt', isGo);
+  if (providerReadBackAt !== null && frontendDeployedAt !== null && providerReadBackAt <= frontendDeployedAt) {
+    fail('provider.readBackAt must occur after the frontend deployment.');
+  }
 
   const gates = Array.isArray(record.gates) ? record.gates : [];
   if (!Array.isArray(record.gates)) failSchema('gates must be an array.');
@@ -845,6 +1139,18 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
       `gates[${index}].evidence[${evidenceIndex}]`,
       gate.status === 'PASS',
     ));
+    if (gate.status === 'PASS') {
+      for (let evidenceIndex = 1; evidenceIndex < evidenceFiles.length; evidenceIndex += 1) {
+        const supportFile = evidenceFiles[evidenceIndex];
+        if (!supportFile || path.extname(supportFile).toLowerCase() !== '.json') continue;
+        const support = parseReceipt(supportFile, `Gate ${gate.id} support ${evidenceIndex}`);
+        if (!support) continue;
+        const negative = explicitNegativeEvidence(support);
+        if (negative) {
+          failIntegrity(`Gate ${gate.id} supporting evidence contains an explicit negative verdict at ${negative}.`);
+        }
+      }
+    }
     if (gate.status === 'PASS' && gate.evidence.length > 0) {
       const receiptPath = gate.evidence[0];
       if (gateReceiptPaths.has(receiptPath)) {
@@ -875,12 +1181,20 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
             failIntegrity(`Gate ${gate.id} receipt artifactPaths must exactly list the unique supporting artifacts after its receipt path.`);
           }
           const capturedAt = timestamp(receipt.capturedAt, `Gate ${gate.id} receipt capturedAt`, true);
-          if (capturedAt !== null) gateEvidenceTimes.push([gate.id, capturedAt]);
+          if (capturedAt !== null) {
+            gateEvidenceTimes.push([gate.id, capturedAt]);
+            if (frontendDeployedAt !== null && capturedAt <= frontendDeployedAt) {
+              fail(`Gate ${gate.id} PASS evidence must be captured after the frontend deployment.`);
+            }
+          }
         }
       }
     }
   }
   for (const id of REQUIRED_GATES) if (!seen.has(id)) failSchema(`Gate ${id} is missing.`);
+  if (localReview === null && referencedEvidence.length > 0) {
+    failIntegrity('Repository-backed evidence requires a pinned localReview handoff.');
+  }
 
   const review = record.review;
   exactKeys(review, [
@@ -974,7 +1288,6 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
   if (nonEmpty(manifestPath)) {
     const manifestFile = resolveRepositoryFile(root, manifestPath);
     if (manifestFile) {
-      if (isGo && !trackedFileMatchesHead(root, manifestPath)) failIntegrity('release.evidenceManifestPath must be committed and unchanged from HEAD before it can support GO.');
       manifestEntries = new Map();
       const lines = fs.readFileSync(manifestFile, 'utf8').split(/\r?\n/).filter(Boolean);
       for (const [index, line] of lines.entries()) {
@@ -988,7 +1301,6 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
         const listedFile = resolveRepositoryFile(root, match[2]);
         if (!listedFile) failIntegrity(`Evidence manifest entry does not resolve: ${match[2]}.`);
         else {
-          if (isGo && !trackedFileMatchesHead(root, match[2])) failIntegrity(`Evidence manifest entry is not committed and unchanged from HEAD: ${match[2]}.`);
           if (evidenceDirectoryResolved) {
             const relativeToEvidence = path.relative(evidenceDirectoryResolved, fs.realpathSync(listedFile));
             if (relativeToEvidence.startsWith('..') || path.isAbsolute(relativeToEvidence)) failIntegrity(`Evidence manifest entry is outside release.evidenceDirectory: ${match[2]}.`);
@@ -996,15 +1308,48 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
           if (sha256File(listedFile) !== match[1]) failIntegrity(`Evidence manifest hash drift for ${match[2]}.`);
         }
       }
+      const manifestTrackedPaths = [manifestPath, ...manifestEntries.keys()];
+      const headCommit = resolveGitRef(root, 'HEAD');
+      const committedManifestFiles = headCommit
+        ? regularTrackedFilesAtCommit(root, headCommit, manifestTrackedPaths) : null;
+      const manifestWorktreeDrift = changedTrackedPaths(root, 'HEAD', null, manifestTrackedPaths);
+      for (const relativePath of manifestTrackedPaths) {
+        if (!committedManifestFiles?.has(relativePath) || !manifestWorktreeDrift || manifestWorktreeDrift.has(relativePath)) {
+          failIntegrity(`Evidence manifest file is not committed and unchanged from HEAD: ${relativePath}.`);
+        }
+      }
+      if (evidenceDirectoryResolved) {
+        const inventory = regularFilesRecursively(root, evidenceDirectoryResolved);
+        if (inventory.invalid.length) {
+          failIntegrity(`release.evidenceDirectory contains symlink or special-file entries: ${inventory.invalid.join(', ')}.`);
+        }
+        const expectedFiles = inventory.files.filter(relativePath => relativePath !== manifestPath);
+        const manifestFiles = [...manifestEntries.keys()].sort();
+        if (!sameStringArray(manifestFiles, expectedFiles)) {
+          const omitted = expectedFiles.filter(item => !manifestEntries.has(item));
+          const unexpected = manifestFiles.filter(item => !expectedFiles.includes(item));
+          failIntegrity(`Evidence manifest must exactly cover release.evidenceDirectory except itself${omitted.length ? `; omitted ${omitted.join(', ')}` : ''}${unexpected.length ? `; unexpected ${unexpected.join(', ')}` : ''}.`);
+        }
+      }
+    }
+  }
+  const referencedPaths = referencedEvidence.map(item => item.relativePath);
+  if (referencedPaths.length > 0) {
+    const headCommit = resolveGitRef(root, 'HEAD');
+    const committedReferencedFiles = headCommit
+      ? regularTrackedFilesAtCommit(root, headCommit, referencedPaths) : null;
+    const referencedWorktreeDrift = changedTrackedPaths(root, 'HEAD', null, referencedPaths);
+    for (const item of referencedEvidence) {
+      if (!committedReferencedFiles?.has(item.relativePath) ||
+          !referencedWorktreeDrift || referencedWorktreeDrift.has(item.relativePath)) {
+        failIntegrity(`${item.label} must be committed and unchanged from HEAD.`);
+      }
     }
   }
   if (isGo) {
     if (!manifestEntries) fail('A readable evidence manifest is required for GO.');
     for (const item of referencedEvidence) {
       if (item.relativePath === manifestPath) continue;
-      if (!trackedFileMatchesHead(root, item.relativePath)) {
-        failIntegrity(`${item.label} must be committed and unchanged from HEAD before it can support GO.`);
-      }
       const realFile = fs.realpathSync(item.resolved);
       const relativeToEvidence = evidenceDirectoryResolved ? path.relative(evidenceDirectoryResolved, realFile) : '..';
       if (!evidenceDirectoryResolved || relativeToEvidence.startsWith('..') || path.isAbsolute(relativeToEvidence)) {
@@ -1079,8 +1424,8 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
         if (environment.name !== expectedEnvironmentNames[index]) {
           failIntegrity(`Trusted proxy receipt environment ${index + 1} must be ${expectedEnvironmentNames[index]}.`);
         }
-        if (!PROVIDER_ID.test(environment.projectRef || '')) {
-          failIntegrity(`${label}.projectRef must be a provider identifier.`);
+        if (!SUPABASE_PROJECT_REF.test(environment.projectRef || '')) {
+          failIntegrity(`${label}.projectRef must be a 20-character Supabase project reference.`);
         } else {
           projectRefs.push(environment.projectRef);
         }
@@ -1090,6 +1435,10 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
           const originUrl = new URL(environment.endpointOrigin);
           if (originUrl.href !== `${originUrl.origin}/`) {
             failIntegrity(`${label}.endpointOrigin must be an origin without a path, query or fragment.`);
+          }
+          if (SUPABASE_PROJECT_REF.test(environment.projectRef || '') &&
+              originUrl.hostname !== `${environment.projectRef}.supabase.co`) {
+            failIntegrity(`${label}.endpointOrigin must be the Supabase origin for its exact projectRef.`);
           }
           endpointOrigins.push(originUrl.origin);
         }
@@ -1151,7 +1500,7 @@ if (invokedPath === import.meta.url) {
   const file = path.resolve(ROOT, supplied);
   try {
     const record = parseJsonWithoutDuplicateKeys(fs.readFileSync(file, 'utf8'));
-    const result = evaluatePaidAcquisitionReadiness(record, { root: ROOT });
+    const result = evaluatePaidAcquisitionReadiness(record, { root: ROOT, recordPath: file });
     printResult(path.relative(ROOT, file), result, ciMode);
     if (ciMode ? !result.ciValid : !result.ready) process.exitCode = 1;
   } catch (error) {

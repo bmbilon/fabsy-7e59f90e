@@ -58,7 +58,13 @@ function createFixture(platform = 'meta') {
   git(root, 'init', '--quiet');
   git(root, 'config', 'user.email', 'fixture@fabsy.invalid');
   git(root, 'config', 'user.name', 'Fabsy fixture');
+  fs.writeFileSync(path.join(root, 'base.txt'), 'fixture review base\n');
+  git(root, 'add', 'base.txt');
+  git(root, 'commit', '--quiet', '-m', 'fixture base');
+  const baseCommit = git(root, 'rev-parse', 'HEAD');
   fs.writeFileSync(path.join(root, 'source.txt'), 'deployed source\n');
+  fs.mkdirSync(path.join(root, 'src'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'src', 'App.tsx'), 'export default function App() { return null; }\n');
   for (const migration of EXPECTED_MIGRATIONS) {
     const migrationPath = path.join(root, 'supabase', 'migrations', migration);
     fs.mkdirSync(path.dirname(migrationPath), { recursive: true });
@@ -74,7 +80,7 @@ function createFixture(platform = 'meta') {
     fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
     fs.writeFileSync(sharedPath, `// fixture ${path.basename(sharedFile)}\n`);
   }
-  git(root, 'add', 'source.txt', 'supabase');
+  git(root, 'add', 'source.txt', 'src', 'supabase');
   git(root, 'commit', '--quiet', '-m', 'fixture source');
   const sourceCommit = git(root, 'rev-parse', 'HEAD');
   const deployedGitRef = 'refs/tags/paid-acquisition-fixture';
@@ -103,9 +109,21 @@ function createFixture(platform = 'meta') {
     });
     gateEvidence.set(gateId, [receiptRelative, ...artifacts]);
   }
-  writeJson(path.join(evidenceDir, 'phone.json'), { kind: 'phone-test', result: 'PASS' });
-  writeJson(path.join(evidenceDir, 'notifications.json'), { kind: 'notification-test', result: 'PASS' });
-  writeJson(path.join(evidenceDir, 'stripe.json'), { kind: 'stripe-branding', result: 'PASS' });
+  for (const [file, control, capturedAt] of [
+    ['phone.json', 'phone-route', '2026-09-04T13:25:00Z'],
+    ['notifications.json', 'notification-delivery', '2026-09-04T13:26:00Z'],
+    ['stripe.json', 'stripe-branding', '2026-09-04T13:27:00Z'],
+  ]) {
+    writeJson(path.join(evidenceDir, file), {
+      schemaVersion: 1,
+      kind: 'paid-acquisition-operational-evidence',
+      control,
+      result: 'PASS',
+      sourceCommit,
+      capturedAt,
+      productionUrl: 'https://fabsy.ca/rapid-resolution',
+    });
+  }
   writeJson(path.join(evidenceDir, 'trusted-edge-ip.json'), {
     schemaVersion: 1,
     kind: 'trusted-cf-connecting-ip-verification',
@@ -116,8 +134,8 @@ function createFixture(platform = 'meta') {
     environments: [
       {
         name: 'staging',
-        projectRef: 'fabsy-staging',
-        endpointOrigin: 'https://fabsy-staging.supabase.co',
+        projectRef: 'stagingprojectref001',
+        endpointOrigin: 'https://stagingprojectref001.supabase.co',
         testedAt: '2026-09-04T13:35:00Z',
         trustedHeaderObserved: true,
         xForwardedForIgnored: true,
@@ -127,8 +145,8 @@ function createFixture(platform = 'meta') {
       },
       {
         name: 'production',
-        projectRef: 'fabsy-production',
-        endpointOrigin: 'https://fabsy-production.supabase.co',
+        projectRef: 'prodprojectref000001',
+        endpointOrigin: 'https://prodprojectref000001.supabase.co',
         testedAt: '2026-09-04T13:40:00Z',
         trustedHeaderObserved: true,
         xForwardedForIgnored: true,
@@ -229,6 +247,7 @@ function createFixture(platform = 'meta') {
     'evidence/provider.json',
     'evidence/stripe.json',
     'evidence/trusted-edge-ip.json',
+    'evidence/unlisted.json',
   ];
   fs.writeFileSync(path.join(evidenceDir, 'manifest.sha256'), `${manifestFiles
     .map(relative => `${sha256(path.join(root, relative))}  ${relative}`)
@@ -236,6 +255,19 @@ function createFixture(platform = 'meta') {
 
   git(root, 'add', 'evidence');
   git(root, 'commit', '--quiet', '-m', 'fixture evidence');
+  const candidateManifestPath = 'candidate-manifest.sha256';
+  const readinessPath = 'readiness.json';
+  const candidatePaths = git(root, 'diff', '--name-only', baseCommit, 'HEAD')
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .filter(relative => relative !== candidateManifestPath && relative !== readinessPath)
+    .sort();
+  fs.writeFileSync(path.join(root, candidateManifestPath), `${candidatePaths
+    .map(relative => `${sha256(path.join(root, relative))}  ${relative}`)
+    .join('\n')}\n`);
+  git(root, 'add', candidateManifestPath);
+  git(root, 'commit', '--amend', '--quiet', '--no-edit');
+  const evidenceCommit = git(root, 'rev-parse', 'HEAD');
 
   const economics = {
     priceCad: 198,
@@ -254,8 +286,17 @@ function createFixture(platform = 'meta') {
   const limits = calculateAcquisitionLimits(economics);
   assert.ok(limits);
   const record = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     decision: 'GO',
+    localReview: {
+      baseCommit,
+      sourceCommit,
+      evidenceCommit,
+      readinessPath,
+      evidenceDirectory: 'evidence',
+      manifestPath: candidateManifestPath,
+      manifestEntryCount: candidatePaths.length,
+    },
     release: {
       sourceCommit,
       deployedGitRef,
@@ -321,6 +362,9 @@ function createFixture(platform = 'meta') {
       authorizedAt: '2026-09-04T14:30:00Z',
     },
   };
+  writeJson(path.join(root, readinessPath), record);
+  git(root, 'add', readinessPath);
+  git(root, 'commit', '--quiet', '-m', 'fixture readiness handoff');
   return { root, record };
 }
 
@@ -372,8 +416,35 @@ blocked('gate receipt omits its supporting artifact', candidate => {
   writeJson(receiptPath, receipt);
   return () => fs.writeFileSync(receiptPath, original);
 }, 'artifactPaths must exactly list');
+blocked('gate support artifact explicitly reports FAIL', candidate => {
+  const supportPath = path.join(root, candidate.gates[0].evidence[1]);
+  const original = fs.readFileSync(supportPath);
+  const support = parseJsonWithoutDuplicateKeys(fs.readFileSync(supportPath, 'utf8'));
+  support.result = 'FAIL';
+  writeJson(supportPath, support);
+  return () => fs.writeFileSync(supportPath, original);
+}, 'explicit negative verdict');
+blocked('gate support artifact explicitly reports hyphenated NO-GO', candidate => {
+  const supportPath = path.join(root, candidate.gates[0].evidence[1]);
+  const original = fs.readFileSync(supportPath);
+  const support = parseJsonWithoutDuplicateKeys(fs.readFileSync(supportPath, 'utf8'));
+  support.status = 'NO-GO';
+  writeJson(supportPath, support);
+  return () => fs.writeFileSync(supportPath, original);
+}, 'explicit negative verdict');
+blocked('gate receipt predates frontend deployment', candidate => {
+  const receiptPath = path.join(root, candidate.gates[0].evidence[0]);
+  const original = fs.readFileSync(receiptPath);
+  const receipt = parseJsonWithoutDuplicateKeys(fs.readFileSync(receiptPath, 'utf8'));
+  receipt.capturedAt = '2026-09-04T13:00:00Z';
+  writeJson(receiptPath, receipt);
+  return () => fs.writeFileSync(receiptPath, original);
+}, 'must be captured after the frontend deployment');
 blocked('unlisted evidence', candidate => {
-  candidate.gates[0].evidence = ['evidence/unlisted.json'];
+  const relativePath = 'evidence/late-unlisted.json';
+  fs.writeFileSync(path.join(root, relativePath), '{"result":"PASS"}\n');
+  candidate.gates[0].evidence = [relativePath];
+  return () => fs.rmSync(path.join(root, relativePath), { force: true });
 }, 'not listed');
 blocked('evidence prose instead of a path', candidate => {
   candidate.gates[0].evidence = ['verified in production (no artifact)'];
@@ -384,6 +455,24 @@ blocked('path traversal', candidate => {
 blocked('fake commit', candidate => {
   candidate.release.sourceCommit = 'a'.repeat(40);
 }, 'does not exist in this repository');
+blocked('fake local evidence commit', candidate => {
+  candidate.localReview.evidenceCommit = 'b'.repeat(40);
+}, 'localReview.evidenceCommit does not exist');
+blocked('local evidence commit is not the direct successor of source', candidate => {
+  candidate.localReview.sourceCommit = candidate.localReview.baseCommit;
+}, 'must be the direct successor');
+blocked('incomplete local candidate manifest', candidate => {
+  const manifestPath = path.join(root, candidate.localReview.manifestPath);
+  const original = fs.readFileSync(manifestPath);
+  const lines = fs.readFileSync(manifestPath, 'utf8').trimEnd().split(/\r?\n/);
+  fs.writeFileSync(manifestPath, `${lines.slice(0, -1).join('\n')}\n`);
+  return () => fs.writeFileSync(manifestPath, original);
+}, 'must contain exactly');
+blocked('broken symlink inside evidence directory', candidate => {
+  const symlinkPath = path.join(root, 'evidence', 'broken-link');
+  fs.symlinkSync('missing-target', symlinkPath);
+  return () => fs.rmSync(symlinkPath, { force: true });
+}, 'symlink or special-file entries');
 blocked('fake deployed ref', candidate => {
   candidate.release.deployedGitRef = 'refs/tags/paid-acquisition-does-not-exist';
 }, 'does not resolve');
@@ -491,7 +580,7 @@ blocked('required shared source changed after release tag', candidate => {
   git(root, 'add', '--', sharedFile);
   git(root, 'commit', '--quiet', '-m', 'unreviewed shared source drift');
   return () => git(root, 'reset', '--hard', originalHead);
-}, 'changed after release.sourceCommit');
+}, 'changed after the reviewed source commit');
 blocked('required shared source has uncommitted drift', candidate => {
   const sharedPath = path.join(root, EXPECTED_SHARED_FUNCTION_FILES[1]);
   const original = fs.readFileSync(sharedPath);
@@ -507,6 +596,20 @@ blocked('unknown provider platform fails closed', candidate => {
 blocked('missing objective', candidate => {
   candidate.provider.objective = null;
 }, 'provider.objective');
+blocked('invented Meta objective and optimization goal', candidate => {
+  candidate.provider.objective = 'BANANAS';
+  candidate.provider.optimizationGoal = 'IMPRESSIONS';
+  const providerPath = path.join(root, candidate.provider.readbackEvidencePath);
+  const original = fs.readFileSync(providerPath);
+  const receipt = parseJsonWithoutDuplicateKeys(fs.readFileSync(providerPath, 'utf8'));
+  receipt.objective = candidate.provider.objective;
+  receipt.optimizationGoal = candidate.provider.optimizationGoal;
+  writeJson(providerPath, receipt);
+  return () => fs.writeFileSync(providerPath, original);
+}, 'reviewed meta acquisition contract');
+blocked('provider readback predates frontend deployment', candidate => {
+  candidate.provider.readBackAt = '2026-09-04T13:00:00Z';
+}, 'must occur after the frontend deployment');
 blocked('missing Meta dataset restriction', candidate => {
   candidate.provider.datasetRestriction = 'NOT_APPLICABLE';
 }, 'actual dataset restriction');
@@ -524,6 +627,37 @@ blocked('trusted proxy missing production proof', candidate => {
   writeJson(receiptPath, receipt);
   return () => fs.writeFileSync(receiptPath, original);
 }, 'exactly staging and production');
+blocked('trusted proxy uses placeholder project origins', candidate => {
+  const receiptPath = path.join(root, candidate.operations.trustedCfConnectingIpEvidence);
+  const original = fs.readFileSync(receiptPath);
+  const receipt = parseJsonWithoutDuplicateKeys(fs.readFileSync(receiptPath, 'utf8'));
+  receipt.environments[0].projectRef = 'example-invalid';
+  receipt.environments[0].endpointOrigin = 'https://staging.example.invalid';
+  writeJson(receiptPath, receipt);
+  return () => fs.writeFileSync(receiptPath, original);
+}, '20-character Supabase project reference');
+blocked('phone evidence explicitly reports FAIL', candidate => {
+  const receiptPath = path.join(root, candidate.operations.phoneTestEvidence);
+  const original = fs.readFileSync(receiptPath);
+  const receipt = parseJsonWithoutDuplicateKeys(fs.readFileSync(receiptPath, 'utf8'));
+  receipt.result = 'FAIL';
+  writeJson(receiptPath, receipt);
+  return () => fs.writeFileSync(receiptPath, original);
+}, 'typed phone-route receipt with result PASS');
+blocked('frontend has uncommitted drift', candidate => {
+  const frontendPath = path.join(root, 'src/App.tsx');
+  const original = fs.readFileSync(frontendPath);
+  fs.appendFileSync(frontendPath, '// unreviewed landing drift\n');
+  return () => fs.writeFileSync(frontendPath, original);
+}, 'Release-critical files have uncommitted drift');
+blocked('frontend changed after reviewed source commit', candidate => {
+  const originalHead = git(root, 'rev-parse', 'HEAD');
+  const frontendPath = 'src/App.tsx';
+  fs.appendFileSync(path.join(root, frontendPath), '// committed landing drift\n');
+  git(root, 'add', '--', frontendPath);
+  git(root, 'commit', '--quiet', '-m', 'unreviewed landing drift');
+  return () => git(root, 'reset', '--hard', originalHead);
+}, 'Release-critical files changed after the reviewed source commit');
 blocked('unexpected schema field', candidate => {
   candidate.release.unreviewed = true;
 }, 'unexpected unreviewed');
@@ -535,6 +669,19 @@ noGo.spendAuthorization = null;
 const noGoResult = evaluate(noGo);
 assert.equal(noGoResult.ready, false);
 assert.equal(noGoResult.ciValid, true, noGoResult.failures.join('\n'));
+{
+  const evidencePath = path.join(root, noGo.gates[0].evidence[1]);
+  const original = fs.readFileSync(evidencePath);
+  fs.appendFileSync(evidencePath, '\n');
+  try {
+    const dirtyNoGo = evaluate(noGo);
+    assert.equal(dirtyNoGo.ciValid, false, 'Dirty tracked evidence must invalidate an honest NO_GO handoff.');
+    assert.ok(dirtyNoGo.integrityFailures.some(message => message.includes('committed and unchanged')),
+      dirtyNoGo.failures.join('\n'));
+  } finally {
+    fs.writeFileSync(evidencePath, original);
+  }
+}
 
 const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 assert.deepEqual(
@@ -548,7 +695,54 @@ const committedNoGo = parseJsonWithoutDuplicateKeys(fs.readFileSync(
 ));
 const committedNoGoResult = evaluatePaidAcquisitionReadiness(committedNoGo, { root: projectRoot, now: NOW });
 assert.equal(committedNoGoResult.ready, false);
-assert.equal(committedNoGoResult.ciValid, true, committedNoGoResult.failures.join('\n'));
+const committedNoGoReferencesRepositoryEvidence = [
+  ...committedNoGo.gates.flatMap(gate => gate.evidence),
+  committedNoGo.release.bundleEvidencePath,
+  committedNoGo.release.deploymentEvidencePath,
+  committedNoGo.release.evidenceManifestPath,
+  committedNoGo.operations.phoneTestEvidence,
+  committedNoGo.operations.notificationTestEvidence,
+  committedNoGo.operations.stripeBrandingEvidence,
+  committedNoGo.operations.trustedCfConnectingIpEvidence,
+  committedNoGo.provider.identityEvidencePath,
+  committedNoGo.provider.objectiveEvidencePath,
+  committedNoGo.provider.datasetRestrictionEvidencePath,
+  committedNoGo.provider.readbackEvidencePath,
+].some(value => typeof value === 'string' && value.trim().length > 0);
+if (committedNoGo.localReview === null && committedNoGoReferencesRepositoryEvidence) {
+  assert.equal(committedNoGoResult.ciValid, false, 'An evidence-bearing NO_GO without a pinned handoff must fail CI.');
+  assert.ok(committedNoGoResult.integrityFailures.some(message => message.includes('pinned localReview handoff')),
+    committedNoGoResult.failures.join('\n'));
+} else {
+  assert.equal(committedNoGoResult.ciValid, true, committedNoGoResult.failures.join('\n'));
+}
+
+const evidenceFreePredeploymentNoGo = structuredClone(committedNoGo);
+evidenceFreePredeploymentNoGo.localReview = null;
+for (const gate of evidenceFreePredeploymentNoGo.gates) {
+  gate.evidence = [];
+  if (gate.status === 'LOCAL_PASS_PRODUCTION_OPEN') gate.status = 'PRODUCTION_OPEN';
+}
+for (const field of [
+  'phoneTestEvidence', 'notificationTestEvidence', 'stripeBrandingEvidence', 'trustedCfConnectingIpEvidence',
+]) evidenceFreePredeploymentNoGo.operations[field] = null;
+for (const field of [
+  'identityEvidencePath', 'objectiveEvidencePath', 'datasetRestrictionEvidencePath', 'readbackEvidencePath',
+]) evidenceFreePredeploymentNoGo.provider[field] = null;
+for (const field of [
+  'bundleEvidencePath', 'deploymentEvidencePath', 'evidenceDirectory', 'evidenceManifestPath',
+]) evidenceFreePredeploymentNoGo.release[field] = null;
+const evidenceFreePredeploymentResult = evaluatePaidAcquisitionReadiness(
+  evidenceFreePredeploymentNoGo,
+  { root: projectRoot, now: NOW },
+);
+assert.equal(evidenceFreePredeploymentResult.ready, false);
+assert.equal(evidenceFreePredeploymentResult.schemaFailures.length, 0,
+  evidenceFreePredeploymentResult.failures.join('\n'));
+assert.equal(evidenceFreePredeploymentResult.integrityFailures.length, 0,
+  evidenceFreePredeploymentResult.failures.join('\n'));
+assert.equal(evidenceFreePredeploymentResult.ciValid, true,
+  evidenceFreePredeploymentResult.failures.join('\n'));
 
 const { root: googleRoot, record: validGoogle } = createFixture('google');
 const evaluateGoogle = candidate => evaluatePaidAcquisitionReadiness(candidate, { root: googleRoot, now: NOW });

@@ -8,6 +8,7 @@
     "contrast:guard": "node scripts/contrast-guard.cjs",
     "prebuild": "npm run validate:browser-config && npm run test:i18n && npm run test:measurement && npm run test:ticket-upload && npm run test:seo && node scripts/contrast-guard.cjs && node scripts/test-published-content-guardrails.mjs && node scripts/test-supabase-generated-content-guardrails.mjs && node scripts/test-rapid-resolution-content-normalizer.cjs && node scripts/test-snapshot-offer-guardrails.cjs && node scripts/test-photo-radar-content.cjs && node scripts/test-pro-referral-snapshots.mjs && node scripts/test-public-offer-snapshot-guardrails.mjs && node scripts/test-homepage-visual-snapshot-guardrails.mjs && node scripts/test-snapshot-runtime-hygiene.mjs && node scripts/sync-pages-from-db.js && node scripts/normalize-rapid-resolution-content.cjs && node scripts/generate-jsonld.js && node scripts/generate-sitemap-from-db.js && node scripts/generate-routes.js && node scripts/generate-static-snapshots.cjs && node scripts/generate-localized-snapshots.mjs && node scripts/validate-snapshot-guardrails.cjs",
     "build": "vite build",
+    "build:evidence": "node scripts/build-paid-acquisition-evidence.mjs",
     "postbuild": "node scripts/copy-prerendered.js",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
