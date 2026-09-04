@@ -5,6 +5,7 @@ import { parseTicketClassification, ProductRequestError } from "../_shared/photo
 import { ELIGIBLE_PRO_CLASSES, normalizedLicenceClass } from "../_shared/pro-pricing.ts";
 import { attachReferralAttribution, recordReferralDeclaredPlate } from "../_shared/referrals.ts";
 import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
+import { DraftRequestError, parseDraftAccessToken } from "../_shared/ticket-intake-draft.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -48,6 +49,7 @@ interface SubmissionData {
   phone: string;
   address: string;
   city: string;
+  province: string;
   postalCode: string;
   dateOfBirth?: string;
   smsOptIn: boolean;
@@ -64,6 +66,24 @@ interface SubmissionData {
   insuranceCompany?: string;
   file?: { contentType?: string; size?: number };
   sourceAssessment?: { submissionId?: string; accessToken?: string };
+  draftId?: unknown;
+  draftAccessToken?: unknown;
+}
+
+interface IntakeDraftRow {
+  id: string;
+  access_token_hash: string;
+  email: string | null;
+  phone: string | null;
+  preferred_locale: string;
+  status: "active" | "converted" | "expired";
+  expires_at: string;
+  ticket_document_path: string;
+  ticket_document_content_type: string;
+  ticket_document_size_bytes: number;
+  ticket_uploaded_at: string | null;
+  converted_submission_id: string | null;
+  client_id: string | null;
 }
 
 class RequestError extends Error {
@@ -99,6 +119,12 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed." }), {
+      status: 405,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 
   try {
     // Rate limiting by IP address
@@ -112,7 +138,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (tracker) {
       if (now < tracker.resetAt) {
         if (tracker.count >= MAX_SUBMISSIONS_PER_HOUR) {
-          console.warn(`[Submit Ticket] Rate limit exceeded for IP: ${clientIP.substring(0, 10)}...`);
+          console.warn("[Submit Ticket] Rate limit exceeded");
           return new Response(
             JSON.stringify({ error: "Too many submissions. Please try again later." }),
             {
@@ -149,8 +175,12 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("[Submit Ticket] Processing submission");
 
     // Comprehensive input validation with length limits
-    if (!formData.driversLicense || !formData.firstName || !formData.lastName || 
-        !formData.email || !formData.phone || !formData.ticketNumber) {
+    const requiredTextValues = [
+      formData.driversLicense, formData.firstName, formData.lastName,
+      formData.email, formData.phone, formData.province,
+      formData.ticketNumber, formData.violation, formData.fineAmount,
+    ];
+    if (requiredTextValues.some((value) => typeof value !== "string" || !value.trim())) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         {
@@ -159,12 +189,23 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     }
+    if (typeof formData.smsOptIn !== "boolean") throw new RequestError("SMS preference is invalid.");
+
+    const optionalTextValues = [
+      formData.address, formData.city, formData.postalCode, formData.dateOfBirth,
+      formData.violationDate, formData.courtLocation, formData.courtDate,
+      formData.defenseStrategy, formData.additionalNotes, formData.insuranceCompany,
+    ];
+    if (optionalTextValues.some((value) => value !== undefined && typeof value !== "string")) {
+      throw new RequestError("One or more intake fields are invalid.");
+    }
 
     // Length validation to prevent DoS
     if (formData.firstName.length > 100 || formData.lastName.length > 100 ||
         formData.email.length > 255 || formData.phone.length > 30 ||
         formData.driversLicense.length > 50 || formData.ticketNumber.length > 50 ||
         formData.violation.length > 500 || formData.fineAmount.length > 20 ||
+        formData.province.length > 100 ||
         (formData.address && formData.address.length > 500) ||
         (formData.city && formData.city.length > 100) ||
         (formData.postalCode && formData.postalCode.length > 20) ||
@@ -195,6 +236,80 @@ const handler = async (req: Request): Promise<Response> => {
 
     const normalizedEmail = formData.email.trim().toLowerCase();
     const normalizedPhone = normalizePhone(formData.phone);
+
+    let intakeDraft: IntakeDraftRow | null = null;
+    let draftAccessToken: string | null = null;
+    if (formData.draftAccessToken !== undefined) {
+      draftAccessToken = parseDraftAccessToken(formData.draftAccessToken);
+      const draftAccessTokenHash = await sha256(draftAccessToken);
+      let draftQuery = supabase
+        .from("ticket_intake_drafts")
+        .select("id,access_token_hash,email,phone,preferred_locale,status,expires_at,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,converted_submission_id,client_id")
+        .eq("access_token_hash", draftAccessTokenHash);
+      if (formData.draftId !== undefined) {
+        if (typeof formData.draftId !== "string" || !UUID_PATTERN.test(formData.draftId)) {
+          throw new RequestError("The saved intake is not available.", 403);
+        }
+        draftQuery = draftQuery.eq("id", formData.draftId.toLowerCase());
+      }
+      const { data: savedDraft, error: savedDraftError } = await draftQuery.maybeSingle();
+      if (savedDraftError) throw new Error("The saved intake could not be verified.");
+      if (!savedDraft) throw new RequestError("The saved intake is not available.", 403);
+      const verifiedDraft = savedDraft as IntakeDraftRow;
+      intakeDraft = verifiedDraft;
+
+      if (Date.parse(verifiedDraft.expires_at) <= Date.now()) {
+        throw new RequestError("This saved intake has expired.", 410);
+      }
+
+      // A retry after the atomic conversion returns the already-linked case;
+      // the caller still had to present the original draft capability.
+      if (verifiedDraft.status === "converted") {
+        const { data: convertedSubmission, error: convertedError } = await supabase
+          .from("ticket_submissions")
+          .select("id,client_id,preferred_locale,representation_access_token_hash")
+          .eq("id", verifiedDraft.converted_submission_id || verifiedDraft.id)
+          .eq("representation_access_token_hash", verifiedDraft.access_token_hash)
+          .maybeSingle();
+        if (convertedError) throw new Error("The submitted intake could not be verified.");
+        if (!convertedSubmission) throw new RequestError("This intake has already been submitted.", 409);
+        return new Response(JSON.stringify({
+          success: true,
+          submissionId: convertedSubmission.id,
+          clientId: convertedSubmission.client_id,
+          reused: true,
+          preferred_locale: convertedSubmission.preferred_locale,
+          accessToken: draftAccessToken,
+          upload: null,
+          referralAttached: false,
+        }), { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } });
+      }
+      if (verifiedDraft.status !== "active") {
+        throw new RequestError("This saved intake has expired.", 410);
+      }
+      if (!verifiedDraft.ticket_uploaded_at || !verifiedDraft.ticket_document_path) {
+        throw new RequestError("Upload and confirm the ticket before continuing.", 409);
+      }
+      if (verifiedDraft.email && verifiedDraft.email !== normalizedEmail) {
+        throw new RequestError("The saved intake contact does not match this submission.", 403);
+      }
+      if (verifiedDraft.phone && verifiedDraft.phone !== normalizedPhone) {
+        throw new RequestError("The saved intake contact does not match this submission.", 403);
+      }
+      if (verifiedDraft.preferred_locale !== preferredLocale) {
+        throw new RequestError("The saved intake language changed. Reload the saved intake before continuing.", 409);
+      }
+      if (formData.sourceAssessment) {
+        throw new RequestError("A saved draft cannot also consume a ticket-review capability.");
+      }
+      if (formData.file !== undefined) {
+        const finalFile = uploadMetadata(formData.file);
+        if (finalFile.contentType !== verifiedDraft.ticket_document_content_type ||
+            formData.file?.size !== verifiedDraft.ticket_document_size_bytes) {
+          throw new RequestError("The submitted ticket metadata does not match the confirmed private upload.", 409);
+        }
+      }
+    }
 
     let sourceAssessment: {
       id: string;
@@ -249,9 +364,9 @@ const handler = async (req: Request): Promise<Response> => {
         assessment_ticket_path: source.assessment_ticket_path,
       };
     }
-    const directUpload = sourceAssessment ? null : uploadMetadata(formData.file);
-    const representationAccessToken = `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll("-", "");
-    const representationAccessTokenHash = await sha256(representationAccessToken);
+    const directUpload = sourceAssessment || intakeDraft ? null : uploadMetadata(formData.file);
+    const representationAccessToken = draftAccessToken || `${crypto.randomUUID()}${crypto.randomUUID()}`.replaceAll("-", "");
+    const representationAccessTokenHash = intakeDraft?.access_token_hash || await sha256(representationAccessToken);
 
     // Step 1: Check if client exists
     let clientId: string;
@@ -263,7 +378,7 @@ const handler = async (req: Request): Promise<Response> => {
       .maybeSingle();
     
     if (clientLookupError) {
-      console.error('[Submit Ticket] Client lookup error:', clientLookupError);
+      console.error('[Submit Ticket] Client lookup failed');
       throw new Error('Failed to check existing client');
     }
 
@@ -305,7 +420,7 @@ const handler = async (req: Request): Promise<Response> => {
         .single();
 
       if (createClientError || !newClient) {
-        console.error('[Submit Ticket] Client creation error:', createClientError);
+        console.error('[Submit Ticket] Client creation failed');
         throw new Error('Failed to create client record');
       }
       
@@ -341,122 +456,77 @@ const handler = async (req: Request): Promise<Response> => {
       service_type: 'representation',
       source_assessment_id: sourceAssessment?.id || null,
       representation_includes_assessment: Boolean(sourceAssessment) && classification.ticket_type !== "photo_radar",
-      ticket_document_path: sourceAssessment?.assessment_ticket_path || null,
+      ticket_document_path: sourceAssessment?.assessment_ticket_path || intakeDraft?.ticket_document_path || null,
       representation_access_token_hash: representationAccessTokenHash,
     };
 
-    // Reuse an unpaid submission so browser retries cannot create duplicate cases.
-    const { data: existingSubmission, error: existingSubmissionError } = await supabase
-      .from('ticket_submissions')
-      .select('id,consent_form_path')
-      .eq('client_id', clientId)
-      .eq('ticket_number', formData.ticketNumber)
-      .eq('status', 'awaiting_payment')
-      .limit(1)
-      .maybeSingle();
-
-    if (existingSubmissionError) {
-      console.error('[Submit Ticket] Existing submission lookup error:', existingSubmissionError);
-      throw new Error('Failed to check existing ticket submission');
-    }
-
-    if (existingSubmission) {
-      const { data: activeCheckoutIntent, error: activeCheckoutError } = await supabase
-        .from("idr_checkout_intents")
-        .select("id,status")
-        .eq("ticket_submission_id", existingSubmission.id)
-        .in("checkout_kind", ["ticket_only", "ticket_with_addon", "photo_radar"])
-        .in("status", ["creating", "open", "paid"])
+    // Identity fields alone are not authority to overwrite an unpaid case.
+    // Draft-backed retries use the draft UUID and capability instead.
+    if (!intakeDraft) {
+      const { data: existingSubmission, error: existingSubmissionError } = await supabase
+        .from('ticket_submissions')
+        .select('id')
+        .eq('client_id', clientId)
+        .eq('ticket_number', formData.ticketNumber)
+        .eq('status', 'awaiting_payment')
         .limit(1)
         .maybeSingle();
-      if (activeCheckoutError) throw activeCheckoutError;
-      if (activeCheckoutIntent) {
+      if (existingSubmissionError) throw new Error('Failed to check existing ticket submission');
+      if (existingSubmission) {
         throw new RequestError(
-          activeCheckoutIntent.status === "paid"
-            ? "This representation checkout has already been paid."
-            : "A representation checkout is already open for this ticket. Use that checkout or let it expire before changing the intake.",
+          "An unpaid intake already exists for this ticket. Resume it from the original browser or contact Fabsy.",
           409,
         );
       }
-      const ticketDocumentPath = sourceAssessment?.assessment_ticket_path ||
-        `${existingSubmission.id}/representation-ticket.${directUpload!.extension}`;
-      const { data: refreshedSubmission, error: refreshError } = await supabase
-        .from('ticket_submissions')
-        .update({
-          ...submissionPayload,
-          ticket_document_path: ticketDocumentPath,
-          consent_form_path: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existingSubmission.id)
-        .eq('status', 'awaiting_payment')
-        .select('id')
-        .maybeSingle();
-
-      if (refreshError || !refreshedSubmission) {
-        console.error('[Submit Ticket] Existing submission refresh error:', refreshError);
-        if (refreshError?.message?.includes("REPRESENTATION_CHECKOUT_IMMUTABLE")) {
-          throw new RequestError("This representation checkout is already open and its signed intake can no longer be changed.", 409);
-        }
-        throw refreshError || new RequestError('The ticket intake changed elsewhere. Please try again.', 409);
-      }
-      if (existingSubmission.consent_form_path) {
-        const { error: staleConsentError } = await supabase.storage
-          .from("consent-forms")
-          .remove([existingSubmission.consent_form_path]);
-        if (staleConsentError) console.error("[Submit Ticket] Stale consent cleanup failed");
-      }
-
-      let upload = null;
-      if (directUpload) {
-        const { data: signedUpload, error: signedUploadError } = await supabase.storage
-          .from("assessment-tickets")
-          .createSignedUploadUrl(ticketDocumentPath, { upsert: true });
-        if (signedUploadError || !signedUpload?.token) throw signedUploadError || new Error("Private ticket upload could not be prepared.");
-        upload = { path: ticketDocumentPath, token: signedUpload.token, contentType: directUpload.contentType };
-      }
-
-      const referralResult = await attachReferralAttribution(supabase, existingSubmission.id, {
-        refCode: formData.refCode, refAttributionToken: formData.refAttributionToken,
-      });
-      await recordReferralDeclaredPlate(supabase, existingSubmission.id, formData.plateNumber);
-      return new Response(JSON.stringify({
-        success: true,
-        submissionId: existingSubmission.id,
-        clientId,
-        reused: true,
-        preferred_locale: preferredLocale,
-        accessToken: representationAccessToken,
-        upload,
-        referralAttached: referralResult.attached,
-      }), {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
     }
 
     // Step 2: Create a payment-pending ticket submission.
     console.log('[Submit Ticket] Creating ticket submission');
     const { data: submissionData, error: submissionError } = await supabase
       .from('ticket_submissions')
-      .insert(submissionPayload)
+      .insert(intakeDraft ? { id: intakeDraft.id, ...submissionPayload } : submissionPayload)
       .select('id')
       .single();
 
     if (submissionError || !submissionData) {
-      console.error('[Submit Ticket] Submission error:', submissionError);
+      if (intakeDraft && submissionError?.code === "23505") {
+        const { data: concurrentSubmission } = await supabase
+          .from("ticket_submissions")
+          .select("id,client_id,preferred_locale,representation_access_token_hash")
+          .eq("id", intakeDraft.id)
+          .eq("representation_access_token_hash", representationAccessTokenHash)
+          .maybeSingle();
+        if (concurrentSubmission) {
+          return new Response(JSON.stringify({
+            success: true,
+            submissionId: concurrentSubmission.id,
+            clientId: concurrentSubmission.client_id,
+            reused: true,
+            preferred_locale: concurrentSubmission.preferred_locale,
+            accessToken: representationAccessToken,
+            upload: null,
+            referralAttached: false,
+          }), { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } });
+        }
+      }
+      console.error('[Submit Ticket] Submission insert failed');
+      if (submissionError?.message?.includes("TICKET_INTAKE_CONVERSION_INVALID")) {
+        throw new RequestError("The saved intake changed or expired before it could be submitted. Reload it and try again.", 409);
+      }
       throw new Error('Failed to create ticket submission');
     }
 
     console.log('[Submit Ticket] Submission created successfully');
 
-    const ticketDocumentPath = sourceAssessment?.assessment_ticket_path ||
+    const ticketDocumentPath = sourceAssessment?.assessment_ticket_path || intakeDraft?.ticket_document_path ||
       `${submissionData.id}/representation-ticket.${directUpload!.extension}`;
-    const { error: pathUpdateError } = await supabase
-      .from("ticket_submissions")
-      .update({ ticket_document_path: ticketDocumentPath })
-      .eq("id", submissionData.id);
-    if (pathUpdateError) throw pathUpdateError;
+    if (!intakeDraft) {
+      const { error: pathUpdateError } = await supabase
+        .from("ticket_submissions")
+        .update({ ticket_document_path: ticketDocumentPath })
+        .eq("id", submissionData.id);
+      if (pathUpdateError) throw pathUpdateError;
+    }
 
     let upload = null;
     if (directUpload) {
@@ -487,11 +557,11 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: unknown) {
-    console.error("[Submit Ticket] Error:", error);
-    const status = error instanceof RequestError || error instanceof LocaleRequestError || error instanceof ProductRequestError ? error.status : 500;
+    const status = error instanceof RequestError || error instanceof DraftRequestError || error instanceof LocaleRequestError || error instanceof ProductRequestError ? error.status : 500;
+    if (status >= 500) console.error("[Submit Ticket] Internal failure");
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Submission failed",
+        error: status >= 500 ? "Submission failed" : (error as Error).message,
         ...(error instanceof LocaleRequestError ? { error_code: error.code } : {}),
       }),
       {
