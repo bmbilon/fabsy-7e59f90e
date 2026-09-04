@@ -41,9 +41,9 @@ try {
   const photoControls = renderPhotoRadar().replace('<main', `<header>${browserFragments.photoHeaderCta}</header><main`)
     .replace('</body>', `${browserFragments.photoCallBar}</body>`);
   accepted(photoControls, '/photo-radar', 'Actual captured header and mobile CTAs retain the complete owner-notice offer context');
-  for (const [from, to] of [['Start · $79 + GST', 'Start · $80 + GST'], ['Start · $79 + GST', 'Start · $79 including GST'],
-    ['Start Photo Radar · $79 + GST', 'Start Photo Radar · $49 + GST'], ['bottom-0', 'top-0'],
-    ['Start · $79 + GST', 'Start · $79 + GST. The statutory fine is $79.']]) {
+  for (const [from, to] of [['Start · $79 CAD + GST', 'Start · $80 CAD + GST'], ['Start · $79 CAD + GST', 'Start · $79 CAD including GST'],
+    ['Start online · $79 CAD + GST', 'Start online · $49 CAD + GST'], ['bottom-0', 'top-0'],
+    ['Start · $79 CAD + GST', 'Start · $79 CAD + GST. The statutory fine is $79.']]) {
     rejected(photoControls.replace(from, to), '/photo-radar', `Captured navigation mutation ${from} -> ${to}`);
   }
   const servicesCard = `<main><section aria-labelledby="ticket-types-heading">${browserFragments.servicesPhotoCard}</section></main>`;

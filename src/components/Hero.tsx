@@ -20,11 +20,10 @@ const Hero = () => (
           Alberta traffic ticket help
         </p>
         <h1 id="homepage-hero-heading" className="mt-5 text-[2.4rem] font-bold leading-[1.08] tracking-[-0.045em] text-white sm:text-5xl lg:text-[3.5rem] xl:text-[4rem]">
-          We get your ticket reduced<br className="hidden md:block" />{" "}
-          or thrown out, <span className="text-blue-300">or you don’t pay.</span>
+          {HOMEPAGE_REFUND_COPY.headline}
         </h1>
         <p className="mt-5 text-lg font-semibold text-blue-200 sm:text-xl">
-          {HOMEPAGE_REFUND_COPY.headline}
+          {HOMEPAGE_REFUND_COPY.heroSupport}
         </p>
         <p className="mt-4 text-sm text-slate-200">
           <strong className="font-semibold text-white">${RAPID_RESOLUTION.priceCad} CAD + GST</strong>
@@ -35,6 +34,8 @@ const Hero = () => (
           <Button asChild size="lg" className="min-h-12 w-full bg-primary-dark px-6 text-base font-bold text-white hover:bg-blue-700 sm:w-auto">
             <Link
               to={RAPID_RESOLUTION.intakePath}
+              data-funnel-action="primary_cta"
+              data-funnel-position="hero"
               onClick={() =>
                 trackAssessmentEvent(
                   "assessment_cta_click",

@@ -403,21 +403,23 @@ function redactExactPhotoControls(document, route) {
   if (route === '/photo-radar' || PHOTO_GUIDE_ROUTES.has(route)) {
     const headerSource = sourceText('src/components/Header.tsx');
     if (headerSource.includes('const activeOffer = photoContext ? PHOTO_RADAR : RAPID_RESOLUTION;') &&
-        headerSource.includes("Start · $${activeOffer.priceCad}${photoContext ? ' + GST' : ''}")) {
+        headerSource.includes('const activePriceLabel = `$${activeOffer.priceCad} CAD + GST`;') &&
+        headerSource.includes('`Start · ${activePriceLabel}`')) {
       for (const link of document.querySelectorAll('header a')) {
         if (link.getAttribute('href') === offers.photoRadar.intakePath && safeElement(link) &&
-            ['Start · $79 + GST', 'Start Photo Radar · $79 + GST'].some(copy => exact(link.textContent, copy))) {
+            ['Start · $79 CAD + GST', 'Start online · $79 CAD + GST'].some(copy => exact(link.textContent, copy))) {
           link.textContent = '[exact source-scoped owner-notice header CTA]';
         }
       }
     }
     const callBarSource = sourceText('src/components/CallBar.tsx');
     if (route === '/photo-radar' && callBarSource.includes('const photoContext = location.pathname === PHOTO_RADAR.slug;') &&
-        callBarSource.includes("Start {photoContext ? 'Photo Radar' : 'Rapid Resolution'} · ${activeOffer.priceCad}{photoContext ? ' + GST' : ''}")) {
+        callBarSource.includes('const priceLabel = `$${activeOffer.priceCad} CAD + GST`;') &&
+        callBarSource.includes('Start online · {priceLabel}')) {
       for (const link of document.querySelectorAll('div.fixed.bottom-0 a')) {
         const block = link.parentElement;
         if (block.children.length !== 1 || !block.classList.contains('md:hidden') ||
-            link.getAttribute('href') !== offers.photoRadar.intakePath || !exact(link.textContent, 'Start Photo Radar · $79 + GST') ||
+            link.getAttribute('href') !== offers.photoRadar.intakePath || !exact(link.textContent, 'Start online · $79 CAD + GST') ||
             !exact(block.textContent, link.textContent)) continue;
         const safe = link.cloneNode(true);
         const icons = Array.from(safe.querySelectorAll('svg[aria-hidden="true"]'));

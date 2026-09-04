@@ -33,6 +33,7 @@ const Header = () => {
   const isFleet = location.pathname === '/fleet';
   const photoContext = isFleet || location.pathname === PHOTO_RADAR.slug || isPhotoRadarContentSlug(location.pathname.replace('/content/', '')) || new URLSearchParams(location.search).get('ticket_type') === 'photo_radar';
   const activeOffer = photoContext ? PHOTO_RADAR : RAPID_RESOLUTION;
+  const activePriceLabel = `$${activeOffer.priceCad} CAD + GST`;
   // The intake owns the current product selection, which may differ from its entry URL.
   const isIntake = ['/submit-ticket', '/ticket-form'].includes(location.pathname);
   const isEnglishEditorial = Boolean(englishEditorialReturnPath(location.pathname));
@@ -84,7 +85,7 @@ const Header = () => {
           {/* Desktop CTA */}
           <div className="hidden xl:flex items-center gap-3">
             <Button asChild variant="outline" className="hidden h-auto min-h-12 gap-2 border-primary py-1.5 text-primary hover:bg-primary/10 transition-smooth 2xl:inline-flex">
-              <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
+              <a href={PHONE_HREF} data-funnel-action="phone" data-funnel-position="header" aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
                 <Phone className="h-4 w-4" aria-hidden="true" />
                 <span className="flex flex-col gap-0.5 leading-tight">
                   <span>{PHONE_DISPLAY}</span>
@@ -93,7 +94,7 @@ const Header = () => {
               </a>
             </Button>
             {!isIntake && <Button asChild className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-              <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath}>{isFleet ? 'Fleet account' : `Start · $${activeOffer.priceCad}${photoContext ? ' + GST' : ''}`}</Link>
+              <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} data-funnel-action={isFleet ? undefined : "primary_cta"} data-funnel-position={isFleet ? undefined : "header"}>{isFleet ? 'Fleet account' : `Start · ${activePriceLabel}`}</Link>
             </Button>}
           </div>
 
@@ -150,7 +151,7 @@ const Header = () => {
                     variant="outline"
                     className="h-auto min-h-12 w-full gap-2 border-primary py-1.5 text-primary hover:bg-primary/10 transition-smooth"
                   >
-                    <a href={PHONE_HREF} onClick={() => setIsOpen(false)} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
+                    <a href={PHONE_HREF} data-funnel-action="phone" data-funnel-position="header" onClick={() => setIsOpen(false)} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
                       <Phone className="h-4 w-4" aria-hidden="true" />
                       <span className="flex flex-col gap-0.5 leading-tight">
                         <span>Call {PHONE_DISPLAY}</span>
@@ -159,8 +160,8 @@ const Header = () => {
                     </a>
                   </Button>
                   {!isIntake && <Button asChild className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                    <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} onClick={() => setIsOpen(false)}>
-                      {isFleet ? 'Start one fleet intake' : `Start ${photoContext ? 'Photo Radar' : 'Rapid Resolution'} · $${activeOffer.priceCad}${photoContext ? ' + GST' : ''}`}
+                    <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} data-funnel-action={isFleet ? undefined : "primary_cta"} data-funnel-position={isFleet ? undefined : "header"} onClick={() => setIsOpen(false)}>
+                      {isFleet ? 'Start one fleet intake' : `Start online · ${activePriceLabel}`}
                     </Link>
                   </Button>}
                 </div>

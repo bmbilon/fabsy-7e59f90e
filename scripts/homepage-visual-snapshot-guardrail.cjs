@@ -1,8 +1,8 @@
 /**
- * Exact admission for the reviewed English homepage presentation. The stronger
- * headline is allowed only with its visible policy, upfront price, Crown-rejection
- * trigger, declined-offer boundary and published terms link on the same page.
- * This is not a general exception for guarantees, prices or outcome claims.
+ * Exact admission for the reviewed English homepage presentation. The hero uses
+ * the policy's service-fee-refund headline and keeps the upfront price,
+ * Crown-rejection trigger, declined-offer boundary and published terms link on
+ * the same page. This is not a general exception for prices or outcome claims.
  */
 const fs = require('node:fs');
 const path = require('node:path');
@@ -12,16 +12,17 @@ const feeRefund = require('../src/config/feeRefund.json');
 const ROOT = path.resolve(__dirname, '..');
 const compact = value => String(value ?? '').replace(/\s+/g, '');
 const qualification = 'We can’t guarantee a court outcome. Our guarantee covers the service fee you paid.';
+const heroSupport = 'Fabsy negotiates for a lower fine, fewer demerits or withdrawal. No legal outcome is guaranteed.';
 const successDefinition = 'A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.';
 const refundScope = `${feeRefund.scope} The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. A standalone insurance report is not covered by this outcome-based guarantee. Trial representation, court charges and third-party costs are separate.`;
-const heroHeading = 'We get your ticket reduced or thrown out, or you don’t pay.';
+const heroHeading = feeRefund.headline;
 const price = `$${offers.rapidResolution.priceCad} CAD + GST · Paid upfront; refunded if the policy applies`;
 const policyAnchor = '#money-back-guarantee';
 
 const SOURCE_BINDINGS = {
   'src/pages/Index.tsx': ['<Hero />', '<HomepageOutcomeExplorer />', '<RapidResolutionGuarantee />', '<AssessmentHomepageJourney />'],
-  'src/content/homepageRefundCopy.ts': ['refundCondition: FEE_REFUND.condition', 'declinedOfferDisclaimer: FEE_REFUND.declinedOfferText', 'paymentTiming: FEE_REFUND.payment', 'termsPath: FEE_REFUND.termsPath'],
-  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}', '{HOMEPAGE_REFUND_COPY.refundCondition}', 'to={RAPID_RESOLUTION.intakePath}'],
+  'src/content/homepageRefundCopy.ts': ['headline: FEE_REFUND.headline', `heroSupport: "${heroSupport}"`, 'refundCondition: FEE_REFUND.condition', 'declinedOfferDisclaimer: FEE_REFUND.declinedOfferText', 'paymentTiming: FEE_REFUND.payment', 'termsPath: FEE_REFUND.termsPath'],
+  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.heroSupport}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}', '{HOMEPAGE_REFUND_COPY.refundCondition}', 'to={RAPID_RESOLUTION.intakePath}', 'data-funnel-action="primary_cta"', 'data-funnel-position="hero"'],
   'src/components/RapidResolutionGuarantee.tsx': ['id="money-back-guarantee"', '{HOMEPAGE_REFUND_COPY.successDefinition}', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '{HOMEPAGE_REFUND_COPY.paymentTiming}', '{HOMEPAGE_REFUND_COPY.refundScope}', 'to={HOMEPAGE_REFUND_COPY.termsPath}'],
   'src/components/HomepageOutcomeExplorer.tsx': ['aria-labelledby="homepage-outcomes-heading"', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}'],
   'src/components/AssessmentHomepageJourney.tsx': ['aria-labelledby="homepage-pricing-heading"', '{RAPID_RESOLUTION.speedDisclaimer}', '<InsuranceContextSection />', '<ProDriverSection />', '<HomepageDriverSection />'],
@@ -60,7 +61,7 @@ function safeCopyField(element, links = []) {
   }
   const attributes = {
     H1: ['class', 'id'], H2: ['class', 'id'], H3: ['class', 'id'], P: ['class', 'id'],
-    SPAN: ['class'], STRONG: ['class'], BR: ['class'], A: ['class', 'href'],
+    SPAN: ['class'], STRONG: ['class'], BR: ['class'], A: ['class', 'href', 'data-funnel-action', 'data-funnel-position'],
     TD: ['class'], DIV: ['class'],
     BUTTON: ['class', 'type', 'id', 'aria-controls', 'aria-expanded', 'data-state', 'data-orientation', 'data-radix-collection-item'],
   };
@@ -118,7 +119,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   }
 
   field(hero, 'h1#homepage-hero-heading', heroHeading, 'reviewed hero headline');
-  field(hero, 'p', 'Success guaranteed or your money back.', 'qualified supporting headline');
+  field(hero, 'p', heroSupport, 'qualified supporting headline');
   field(hero, 'p', `${qualification} ${feeRefund.condition}`, 'hero outcome qualification and Crown-rejection trigger');
   field(hero, 'p', price, 'Rapid Resolution upfront price and GST');
   field(hero, 'p', 'For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the money-back guarantee works',
