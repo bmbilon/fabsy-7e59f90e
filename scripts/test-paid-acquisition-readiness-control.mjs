@@ -39,7 +39,10 @@ const valid = {
   },
   operations: {
     weeklyCaseCapacity: 100,
-    maximumMediaLossCad: 150,
+    maximumMediaLossCad: 130,
+    maximumSpendWithoutLeadCad: 40,
+    maximumSpendWithoutPurchaseCad: 130,
+    noCrossPlatformOverlapStageOne: true,
     phoneTestEvidence: 'docs/paid-acquisition/evidence/phone.json',
     notificationTestEvidence: 'docs/paid-acquisition/evidence/notifications.json',
     stripeBrandingEvidence: 'docs/paid-acquisition/evidence/stripe.json',
@@ -57,7 +60,7 @@ const valid = {
   spendAuthorization: {
     platform: 'meta',
     dailyCapCad: 25,
-    totalCapCad: 150,
+    totalCapCad: 130,
     startAt: '2026-09-05T09:00:00-06:00',
     endAt: '2026-09-12T09:00:00-06:00',
     taxesAdditional: true,
@@ -89,5 +92,19 @@ assert.equal(duplicateResult.ready, false);
 assert.ok(duplicateResult.failures.some(message => message.includes('appears more than once')));
 assert.ok(duplicateResult.failures.some(message => message.includes('Gate 21 is missing')));
 
-console.log('Paid-acquisition readiness control: valid GO passes; missing economics, evidence, separation of duties and spend authorization fail closed.');
+const excessiveSpend = structuredClone(valid);
+excessiveSpend.spendAuthorization.totalCapCad = 150;
+const excessiveSpendResult = evaluatePaidAcquisitionReadiness(excessiveSpend);
+assert.equal(excessiveSpendResult.ready, false);
+assert.ok(excessiveSpendResult.failures.some(message => message.includes('maximum media loss')));
 
+const excessiveCacMultiple = structuredClone(valid);
+excessiveCacMultiple.operations.maximumMediaLossCad = 500;
+excessiveCacMultiple.operations.maximumSpendWithoutLeadCad = 100;
+excessiveCacMultiple.operations.maximumSpendWithoutPurchaseCad = 300;
+excessiveCacMultiple.spendAuthorization.totalCapCad = 400;
+const excessiveCacResult = evaluatePaidAcquisitionReadiness(excessiveCacMultiple);
+assert.equal(excessiveCacResult.ready, false);
+assert.ok(excessiveCacResult.failures.some(message => message.includes('three times')));
+
+console.log('Paid-acquisition readiness control: valid GO passes; missing evidence, excessive spend, mixed platforms and authorization gaps fail closed.');

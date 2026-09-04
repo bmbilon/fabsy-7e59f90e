@@ -118,7 +118,28 @@ export function evaluatePaidAcquisitionReadiness(record) {
     if (!finiteNumber(operations.weeklyCaseCapacity) || operations.weeklyCaseCapacity <= 0) {
       fail('operations.weeklyCaseCapacity must be supplied and positive.');
     }
-    if (!nonNegative(operations.maximumMediaLossCad)) fail('operations.maximumMediaLossCad is required.');
+    if (!finiteNumber(operations.maximumMediaLossCad) || operations.maximumMediaLossCad <= 0) {
+      fail('operations.maximumMediaLossCad must be supplied and positive.');
+    }
+    if (!finiteNumber(operations.maximumSpendWithoutLeadCad) || operations.maximumSpendWithoutLeadCad <= 0) {
+      fail('operations.maximumSpendWithoutLeadCad must be supplied and positive.');
+    }
+    if (!finiteNumber(operations.maximumSpendWithoutPurchaseCad) || operations.maximumSpendWithoutPurchaseCad <= 0) {
+      fail('operations.maximumSpendWithoutPurchaseCad must be supplied and positive.');
+    }
+    if (calculations && finiteNumber(operations.maximumMediaLossCad)) {
+      const leadCeiling = Math.min(operations.maximumMediaLossCad, 3 * calculations.maximumCplCad);
+      const purchaseCeiling = Math.min(operations.maximumMediaLossCad, 3 * calculations.maximumCacCad);
+      if (!finiteNumber(operations.maximumSpendWithoutLeadCad) || operations.maximumSpendWithoutLeadCad > leadCeiling + MONEY_TOLERANCE) {
+        fail(`maximumSpendWithoutLeadCad cannot exceed min(maximum loss, 3 x maximum CPL), currently CA$${leadCeiling.toFixed(2)}.`);
+      }
+      if (!finiteNumber(operations.maximumSpendWithoutPurchaseCad) || operations.maximumSpendWithoutPurchaseCad > purchaseCeiling + MONEY_TOLERANCE) {
+        fail(`maximumSpendWithoutPurchaseCad cannot exceed min(maximum loss, 3 x maximum CAC), currently CA$${purchaseCeiling.toFixed(2)}.`);
+      }
+    }
+    if (operations.noCrossPlatformOverlapStageOne !== true) {
+      fail('operations.noCrossPlatformOverlapStageOne must be true.');
+    }
     if (!nonEmpty(operations.phoneTestEvidence)) fail('operations.phoneTestEvidence is required.');
     if (!nonEmpty(operations.notificationTestEvidence)) fail('operations.notificationTestEvidence is required.');
     if (!nonEmpty(operations.stripeBrandingEvidence)) fail('operations.stripeBrandingEvidence is required.');
@@ -167,12 +188,28 @@ export function evaluatePaidAcquisitionReadiness(record) {
     if (finiteNumber(spend.dailyCapCad) && finiteNumber(spend.totalCapCad) && spend.dailyCapCad > spend.totalCapCad) {
       fail('The daily cap cannot exceed the total cap.');
     }
+    if (operations && finiteNumber(operations.maximumMediaLossCad) && finiteNumber(spend.totalCapCad) &&
+        spend.totalCapCad > operations.maximumMediaLossCad + MONEY_TOLERANCE) {
+      fail('The authorized total cap cannot exceed the approved maximum media loss.');
+    }
+    if (calculations && finiteNumber(spend.totalCapCad) &&
+        spend.totalCapCad > 3 * calculations.maximumCacCad + MONEY_TOLERANCE) {
+      fail('The stage-one total cap cannot exceed three times the approved maximum CAC.');
+    }
     if (!validTimestamp(spend.startAt) || !validTimestamp(spend.endAt) || Date.parse(spend.endAt) <= Date.parse(spend.startAt)) {
       fail('spendAuthorization requires a valid startAt before endAt.');
     }
     if (typeof spend.taxesAdditional !== 'boolean') fail('spendAuthorization.taxesAdditional must be explicit.');
     if (!nonEmpty(spend.authorizedBy) || !validTimestamp(spend.authorizedAt)) {
       fail('Spend requires a separate owner and timestamp.');
+    }
+    if (validTimestamp(spend.authorizedAt) && review && validTimestamp(review.goApprovedAt) &&
+        Date.parse(spend.authorizedAt) < Date.parse(review.goApprovedAt)) {
+      fail('Spend authorization must occur after the written GO decision.');
+    }
+    if (validTimestamp(spend.startAt) && validTimestamp(spend.authorizedAt) &&
+        Date.parse(spend.startAt) < Date.parse(spend.authorizedAt)) {
+      fail('The campaign cannot start before its spend authorization.');
     }
   }
 
@@ -208,4 +245,3 @@ if (invokedPath === import.meta.url) {
     process.exitCode = 1;
   }
 }
-

@@ -28,6 +28,9 @@
   "operations": {
     "weeklyCaseCapacity": null,
     "maximumMediaLossCad": null,
+    "maximumSpendWithoutLeadCad": null,
+    "maximumSpendWithoutPurchaseCad": null,
+    "noCrossPlatformOverlapStageOne": true,
     "phoneTestEvidence": null,
     "notificationTestEvidence": null,
     "stripeBrandingEvidence": null
