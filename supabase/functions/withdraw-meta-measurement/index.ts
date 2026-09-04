@@ -72,7 +72,7 @@ serve(async (request) => {
       const stillSending: string[] = [];
       for (const handle of pending) {
         const { data: funnelWithdrawn, error: funnelError } = await admin.rpc(
-          "withdraw_paid_funnel_checkout",
+          "withdraw_known_paid_funnel_checkout",
           { p_checkout_session_hash: handle },
         );
         if (funnelError || funnelWithdrawn !== true) throw new Error("funnel_withdrawal");

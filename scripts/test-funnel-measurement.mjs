@@ -419,6 +419,7 @@ test('server parser accepts only the exact no-PII contract', async () => {
 
 test('database and edge contracts store no raw click ID, IP, user agent or form value', async () => {
   const migration = await fs.readFile(path.join(root, 'supabase/migrations/20260903170000_paid_funnel_measurement.sql'), 'utf8');
+  const withdrawalFence = await fs.readFile(path.join(root, 'supabase/migrations/20260903183000_paid_funnel_checkout_withdrawal_fence.sql'), 'utf8');
   const edge = await fs.readFile(path.join(root, 'supabase/functions/record-funnel-event/index.ts'), 'utf8');
   assert.match(migration, /click_id_hash text/);
   assert.doesNotMatch(migration, /\b(click_id_value|email|phone|ticket_number|user_agent|ip_address)\b/i);
@@ -427,6 +428,13 @@ test('database and edge contracts store no raw click ID, IP, user agent or form 
   assert.match(migration, /record_verified_paid_funnel_purchase/);
   assert.match(migration, /record_paid_funnel_checkout/);
   assert.match(migration, /withdraw_paid_funnel_checkout/);
+  assert.match(withdrawalFence, /paid_funnel_checkout_withdrawals/);
+  assert.match(withdrawalFence, /withdraw_known_paid_funnel_checkout/);
+  assert.doesNotMatch(withdrawalFence, /revoked_at\s*=\s*null/i);
+  assert.ok(
+    (withdrawalFence.match(/pg_advisory_xact_lock/g) ?? []).length >= 4,
+    'record, both withdrawal paths and verified purchase must serialize on the checkout hash',
+  );
   assert.match(edge, /sha256\(`\$\{event\.clickIdKind\}:\$\{event\.clickIdValue\}`\)/);
   const client = await fs.readFile(path.join(root, 'src/lib/funnelMeasurement.ts'), 'utf8');
   assert.match(client, /keepalive: true/);
@@ -438,6 +446,7 @@ test('database and edge contracts store no raw click ID, IP, user agent or form 
   const withdrawal = await fs.readFile(path.join(root, 'supabase/functions/withdraw-meta-measurement/index.ts'), 'utf8');
   assert.match(createPayment, /recordPaidFunnelCheckoutAttribution/);
   assert.match(createPayment, /record_paid_funnel_checkout/);
+  assert.match(createPayment, /withdraw_paid_funnel_checkout/);
   assert.equal(
     createPayment.match(/measurementAttributionScopes/g)?.length,
     4,
@@ -447,5 +456,6 @@ test('database and edge contracts store no raw click ID, IP, user agent or form 
   assert.match(paymentStep, /getFabsyFunnelConsentChoice/);
   assert.match(webhook, /recordCurrentPaidFunnelPurchaseIfEligible/);
   assert.match(webhook, /record_verified_paid_funnel_purchase/);
-  assert.match(withdrawal, /withdraw_paid_funnel_checkout/);
+  assert.match(withdrawal, /withdraw_known_paid_funnel_checkout/);
+  assert.doesNotMatch(withdrawal, /["']withdraw_paid_funnel_checkout["']/);
 });

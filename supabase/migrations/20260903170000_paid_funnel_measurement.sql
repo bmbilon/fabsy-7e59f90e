@@ -182,7 +182,7 @@ revoke all on function public.record_paid_funnel_event(
   uuid,uuid,text,timestamptz,text,smallint,text,text,text,text,text,text,text,text,text,text,timestamptz
 ) from public, anon, authenticated;
 grant execute on function public.record_paid_funnel_event(
-  uuid,uuid,text,timestamptz,text,smallint,text,text,text,text,text,text,text,text,text,text,text,timestamptz
+  uuid,uuid,text,timestamptz,text,smallint,text,text,text,text,text,text,text,text,text,text,timestamptz
 ) to service_role;
 
 create or replace function public.record_paid_funnel_checkout(
