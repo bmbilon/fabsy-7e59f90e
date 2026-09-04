@@ -59,6 +59,11 @@ verify_jwt = false
 [functions.ticket-intake-draft]
 verify_jwt = false
 
+[functions.cleanup-ticket-intake-drafts]
+# The scheduled caller is authenticated inside the function with an exact,
+# constant-time service-role bearer comparison.
+verify_jwt = false
+
 [functions.verify-pro-licence]
 verify_jwt = false
 

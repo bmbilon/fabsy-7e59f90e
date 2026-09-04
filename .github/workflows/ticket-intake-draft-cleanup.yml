@@ -1,0 +1,47 @@
+name: Ticket intake draft cleanup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '43 * * * *'
+
+concurrency:
+  group: ticket-intake-draft-cleanup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete queued and expired private ticket intake objects
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          response="$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            --header "Content-Type: application/json" \
+            --data '{"limit":25}' \
+            "$SUPABASE_URL/functions/v1/cleanup-ticket-intake-drafts")"
+          echo "$response" | jq -e '
+            type == "object" and
+            (.ok == true) and
+            ((.claimed // -1) | type == "number") and
+            ((.claimed // -1) >= 0) and
+            ((.claimed // 51) <= 50) and
+            ((.limitPerQueue // -1) == 25) and
+            ((.maxClaims // -1) == 50) and
+            ((.deleted // -1) | type == "number") and
+            ((.deleted // -1) >= 0) and
+            ((.deleted // 26) <= (.claimed // -1)) and
+            ((.deferred // -1) == 0) and
+            ((.objectDeletions.claimed // -1) | type == "number") and
+            ((.expiredDrafts.claimed // -1) | type == "number")
+          ' >/dev/null

@@ -409,8 +409,9 @@ async function removeStorageObjectsBestEffort(
   try {
     await admin.storage.from(STORAGE_BUCKET).remove(paths);
   } catch {
-    // Never expose or log private object paths. The database reference has
-    // already moved, so a later retention sweep can remove an orphan.
+    // Never expose or log private object paths. Every path passed here was
+    // durably queued by the same database transaction that moved its reference,
+    // so the scheduled cleanup worker will retry this exact path.
   }
 }
 

@@ -9,14 +9,19 @@ import {
   constantTimeBearerMatch,
   parseTicketIntakeCleanupBatch,
   processTicketIntakeCleanupClaims,
+  processTicketIntakeObjectDeletionClaims,
+  queuedObjectPath,
   type TicketIntakeCleanupClaim,
+  ticketIntakeCleanupQueueLimits,
   TicketIntakeCleanupRequestError,
+  type TicketIntakeObjectDeletionClaim,
 } from "./ticket-intake-draft-cleanup.ts";
 
 const DRAFT_ID = "00000000-0000-4000-8000-000000000501";
 const CLAIM_ID = "00000000-0000-4000-8000-000000000601";
 const CURRENT = `${DRAFT_ID}/representation-ticket-r1.pdf`;
 const PENDING = `${DRAFT_ID}/representation-ticket-r2.jpg`;
+const DELETION_ID = "00000000-0000-4000-8000-000000000701";
 
 function claim(
   overrides: Partial<TicketIntakeCleanupClaim> = {},
@@ -26,6 +31,18 @@ function claim(
     claim_id: CLAIM_ID,
     current_path: CURRENT,
     pending_path: PENDING,
+    ...overrides,
+  };
+}
+
+function objectClaim(
+  overrides: Partial<TicketIntakeObjectDeletionClaim> = {},
+): TicketIntakeObjectDeletionClaim {
+  return {
+    deletion_id: DELETION_ID,
+    draft_id: DRAFT_ID,
+    claim_id: CLAIM_ID,
+    object_path: CURRENT,
     ...overrides,
   };
 }
@@ -43,6 +60,19 @@ Deno.test("cleanup batch is defaulted and bounded to 25", () => {
     () => parseTicketIntakeCleanupBatch({ limit: 1, contact: "secret" }),
     TicketIntakeCleanupRequestError,
   );
+});
+
+Deno.test("both queues retain bounded capacity when either queue is full", () => {
+  assertEquals(ticketIntakeCleanupQueueLimits(25), {
+    objectDeletions: 25,
+    expiredDrafts: 25,
+    maxClaims: 50,
+  });
+  assertEquals(ticketIntakeCleanupQueueLimits(1), {
+    objectDeletions: 1,
+    expiredDrafts: 1,
+    maxClaims: 2,
+  });
 });
 
 Deno.test("cleanup accepts only exact current and pending draft object paths", () => {
@@ -69,6 +99,103 @@ Deno.test("cleanup accepts only exact current and pending draft object paths", (
     cleanupObjectPaths(claim(), "00000000-0000-4000-8000-000000000699"),
     null,
   );
+});
+
+Deno.test("queued deletion accepts only its exact claimed draft object path", () => {
+  assertEquals(queuedObjectPath(objectClaim(), CLAIM_ID), CURRENT);
+  assertEquals(
+    queuedObjectPath(
+      objectClaim({ object_path: `${DRAFT_ID}/unbounded-private.pdf` }),
+      CLAIM_ID,
+    ),
+    null,
+  );
+  assertEquals(
+    queuedObjectPath(
+      objectClaim({ deletion_id: "not-a-uuid" }),
+      CLAIM_ID,
+    ),
+    null,
+  );
+  assertEquals(
+    queuedObjectPath(
+      objectClaim(),
+      "00000000-0000-4000-8000-000000000699",
+    ),
+    null,
+  );
+});
+
+Deno.test("known-path Storage failure stays queued and a later retry finalizes", async () => {
+  const events: string[] = [];
+  let storageAttempts = 0;
+  let finalized = 0;
+  let released = 0;
+  const dependencies = {
+    removeObjects: async (paths: string[]) => {
+      storageAttempts += 1;
+      events.push(`remove:${storageAttempts}`);
+      assertEquals(paths, [CURRENT]);
+      return {
+        error: storageAttempts === 1
+          ? new Error("ambiguous storage failure")
+          : null,
+      };
+    },
+    finalize: async () => {
+      finalized += 1;
+      events.push("finalize");
+      return true;
+    },
+    release: async () => {
+      released += 1;
+      return true;
+    },
+  };
+
+  const first = await processTicketIntakeObjectDeletionClaims(
+    [objectClaim()],
+    CLAIM_ID,
+    dependencies,
+  );
+  assertEquals(first, { claimed: 1, deleted: 0, deferred: 1 });
+  assertEquals(finalized, 0);
+  assertEquals(released, 0);
+
+  const nextClaimId = "00000000-0000-4000-8000-000000000602";
+  const retry = await processTicketIntakeObjectDeletionClaims(
+    [objectClaim({ claim_id: nextClaimId })],
+    nextClaimId,
+    dependencies,
+  );
+  assertEquals(retry, { claimed: 1, deleted: 1, deferred: 0 });
+  assertEquals(events, ["remove:1", "remove:2", "finalize"]);
+  assertEquals(finalized, 1);
+  assertEquals(released, 0);
+});
+
+Deno.test("malformed known-path claim releases without a Storage call", async () => {
+  let removed = false;
+  let released = false;
+  const result = await processTicketIntakeObjectDeletionClaims(
+    [objectClaim({ object_path: "unexpected/private-ticket.pdf" })],
+    CLAIM_ID,
+    {
+      removeObjects: async () => {
+        removed = true;
+      },
+      finalize: async () => true,
+      release: async (deletionId, claimId) => {
+        assertEquals(deletionId, DELETION_ID);
+        assertEquals(claimId, CLAIM_ID);
+        released = true;
+        return true;
+      },
+    },
+  );
+  assert(!removed);
+  assert(released);
+  assertEquals(result, { claimed: 1, deleted: 0, deferred: 1 });
 });
 
 Deno.test("Storage objects are removed before database finalization", async () => {

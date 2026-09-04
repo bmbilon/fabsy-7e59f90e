@@ -4,8 +4,12 @@ import {
   constantTimeBearerMatch,
   parseTicketIntakeCleanupBatch,
   processTicketIntakeCleanupClaims,
+  processTicketIntakeObjectDeletionClaims,
   type TicketIntakeCleanupClaim,
+  ticketIntakeCleanupQueueLimits,
   TicketIntakeCleanupRequestError,
+  type TicketIntakeCleanupSummary,
+  type TicketIntakeObjectDeletionClaim,
 } from "../_shared/ticket-intake-draft-cleanup.ts";
 
 const STORAGE_BUCKET = "assessment-tickets";
@@ -57,25 +61,80 @@ serve(async (request) => {
       throw new TicketIntakeCleanupRequestError("body_invalid");
     }
     const limit = parseTicketIntakeCleanupBatch(body);
-    const claimId = crypto.randomUUID();
+    const queueLimits = ticketIntakeCleanupQueueLimits(limit);
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const claimResult = await supabase.rpc(
-      "claim_expired_ticket_intake_drafts",
-      { p_claim_id: claimId, p_limit: limit },
+    // Give each queue independent bounded capacity so a sustained stream of
+    // superseded paths cannot starve expired draft/PII cleanup. Total claims
+    // across both queues never exceed twice the caller's per-queue limit.
+    const objectClaimId = crypto.randomUUID();
+    const objectClaimResult = await supabase.rpc(
+      "claim_ticket_intake_draft_object_deletions",
+      { p_claim_id: objectClaimId, p_limit: queueLimits.objectDeletions },
     );
-    if (claimResult.error || !Array.isArray(claimResult.data)) {
+    if (
+      objectClaimResult.error || !Array.isArray(objectClaimResult.data)
+    ) {
       throw new Error("cleanup_claim_failed");
     }
-    if (claimResult.data.length > limit) {
+    if (objectClaimResult.data.length > queueLimits.objectDeletions) {
       throw new Error("cleanup_claim_overflow");
     }
 
-    const summary = await processTicketIntakeCleanupClaims(
-      claimResult.data as TicketIntakeCleanupClaim[],
-      claimId,
+    const objectSummary = await processTicketIntakeObjectDeletionClaims(
+      objectClaimResult.data as TicketIntakeObjectDeletionClaim[],
+      objectClaimId,
+      {
+        removeObjects: async (paths) => {
+          const { error } = await supabase.storage.from(STORAGE_BUCKET).remove(
+            paths,
+          );
+          return { error };
+        },
+        finalize: async (deletionId, cleanupClaimId) => {
+          const { data, error } = await supabase.rpc(
+            "finalize_ticket_intake_draft_object_deletion",
+            {
+              p_id: deletionId,
+              p_claim_id: cleanupClaimId,
+            },
+          );
+          if (error) throw new Error("cleanup_finalize_failed");
+          return data === true;
+        },
+        release: async (deletionId, cleanupClaimId) => {
+          const { data, error } = await supabase.rpc(
+            "release_ticket_intake_draft_object_deletion",
+            { p_id: deletionId, p_claim_id: cleanupClaimId },
+          );
+          if (error) throw new Error("cleanup_release_failed");
+          return data === true;
+        },
+      },
+    );
+
+    let draftSummary: TicketIntakeCleanupSummary = {
+      claimed: 0,
+      deleted: 0,
+      deferred: 0,
+    };
+    const draftClaimId = crypto.randomUUID();
+    const draftClaimResult = await supabase.rpc(
+      "claim_expired_ticket_intake_drafts",
+      { p_claim_id: draftClaimId, p_limit: queueLimits.expiredDrafts },
+    );
+    if (draftClaimResult.error || !Array.isArray(draftClaimResult.data)) {
+      throw new Error("cleanup_claim_failed");
+    }
+    if (draftClaimResult.data.length > queueLimits.expiredDrafts) {
+      throw new Error("cleanup_claim_overflow");
+    }
+
+    draftSummary = await processTicketIntakeCleanupClaims(
+      draftClaimResult.data as TicketIntakeCleanupClaim[],
+      draftClaimId,
       {
         recordTombstones: async (draftId, cleanupClaimId, pathHashes) => {
           const { data, error } = await supabase.rpc(
@@ -114,7 +173,16 @@ serve(async (request) => {
       },
     );
 
-    return jsonResponse(200, summary);
+    return jsonResponse(200, {
+      ok: true,
+      limitPerQueue: limit,
+      maxClaims: queueLimits.maxClaims,
+      claimed: objectSummary.claimed + draftSummary.claimed,
+      deleted: objectSummary.deleted + draftSummary.deleted,
+      deferred: objectSummary.deferred + draftSummary.deferred,
+      objectDeletions: objectSummary,
+      expiredDrafts: draftSummary,
+    });
   } catch (error) {
     if (error instanceof TicketIntakeCleanupRequestError) {
       return jsonResponse(error.status, { error: error.code });

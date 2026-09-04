@@ -24,10 +24,23 @@ export interface TicketIntakeCleanupClaim {
   pending_path: string | null;
 }
 
+export interface TicketIntakeObjectDeletionClaim {
+  deletion_id: string;
+  draft_id: string;
+  claim_id: string;
+  object_path: string;
+}
+
 export interface TicketIntakeCleanupSummary {
   claimed: number;
   deleted: number;
   deferred: number;
+}
+
+export interface TicketIntakeCleanupQueueLimits {
+  objectDeletions: number;
+  expiredDrafts: number;
+  maxClaims: number;
 }
 
 export interface TicketIntakeCleanupDependencies {
@@ -41,6 +54,14 @@ export interface TicketIntakeCleanupDependencies {
   ) => Promise<{ error: unknown | null } | void>;
   finalize: (draftId: string, claimId: string) => Promise<boolean>;
   release: (draftId: string, claimId: string) => Promise<boolean>;
+}
+
+export interface TicketIntakeObjectDeletionDependencies {
+  removeObjects: (
+    paths: string[],
+  ) => Promise<{ error: unknown | null } | void>;
+  finalize: (deletionId: string, claimId: string) => Promise<boolean>;
+  release: (deletionId: string, claimId: string) => Promise<boolean>;
 }
 
 export function parseTicketIntakeCleanupBatch(body: unknown): number {
@@ -63,12 +84,46 @@ export function parseTicketIntakeCleanupBatch(body: unknown): number {
   return limit;
 }
 
+export function ticketIntakeCleanupQueueLimits(
+  perQueueLimit: number,
+): TicketIntakeCleanupQueueLimits {
+  if (
+    !Number.isInteger(perQueueLimit) || perQueueLimit < 1 ||
+    perQueueLimit > MAX_TICKET_INTAKE_CLEANUP_BATCH
+  ) {
+    throw new TicketIntakeCleanupRequestError("limit_invalid");
+  }
+  // Each independently bounded queue always receives capacity. A full stream
+  // of superseded objects therefore cannot starve expired draft/PII cleanup.
+  return {
+    objectDeletions: perQueueLimit,
+    expiredDrafts: perQueueLimit,
+    maxClaims: perQueueLimit * 2,
+  };
+}
+
 function isTicketPathForDraft(path: unknown, draftId: string): path is string {
   if (typeof path !== "string") return false;
   const prefix = `${draftId}/`;
   return path.startsWith(prefix) &&
     path.indexOf("/") === prefix.length - 1 &&
     TICKET_OBJECT_SUFFIX.test(path.slice(prefix.length));
+}
+
+export function queuedObjectPath(
+  claim: TicketIntakeObjectDeletionClaim,
+  expectedClaimId: string,
+): string | null {
+  if (
+    !UUID_PATTERN.test(claim.deletion_id) ||
+    !UUID_PATTERN.test(claim.draft_id) ||
+    !UUID_PATTERN.test(claim.claim_id) ||
+    claim.claim_id !== expectedClaimId ||
+    !isTicketPathForDraft(claim.object_path, claim.draft_id)
+  ) {
+    return null;
+  }
+  return claim.object_path;
 }
 
 export function cleanupObjectPaths(
@@ -172,6 +227,60 @@ export async function processTicketIntakeCleanupClaims(
     } catch {
       // Files are already absent. Retaining the lease lets a later worker
       // repeat the idempotent Storage delete before finalizing the row.
+      summary.deferred += 1;
+    }
+  }
+
+  return summary;
+}
+
+export async function processTicketIntakeObjectDeletionClaims(
+  claims: TicketIntakeObjectDeletionClaim[],
+  expectedClaimId: string,
+  dependencies: TicketIntakeObjectDeletionDependencies,
+): Promise<TicketIntakeCleanupSummary> {
+  const summary: TicketIntakeCleanupSummary = {
+    claimed: claims.length,
+    deleted: 0,
+    deferred: 0,
+  };
+
+  for (const claim of claims) {
+    const path = queuedObjectPath(claim, expectedClaimId);
+    if (!path) {
+      // No Storage request has happened. Only the owner of this exact malformed
+      // claim may release it for a later, well-formed retry.
+      try {
+        await dependencies.release(claim.deletion_id, claim.claim_id);
+      } catch {
+        // A retained lease is reclaimed after expiry.
+      }
+      summary.deferred += 1;
+      continue;
+    }
+
+    let removed = false;
+    try {
+      const result = await dependencies.removeObjects([path]);
+      removed = !result || !result.error;
+    } catch {
+      removed = false;
+    }
+
+    if (!removed) {
+      // Storage failures are outcome-ambiguous. Keep the durable queue row and
+      // lease so a later claimant repeats the idempotent exact-path deletion.
+      summary.deferred += 1;
+      continue;
+    }
+
+    try {
+      if (await dependencies.finalize(claim.deletion_id, claim.claim_id)) {
+        summary.deleted += 1;
+      } else {
+        summary.deferred += 1;
+      }
+    } catch {
       summary.deferred += 1;
     }
   }
