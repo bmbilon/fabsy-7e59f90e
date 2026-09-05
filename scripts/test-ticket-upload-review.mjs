@@ -426,6 +426,49 @@ test("a fresh intake presents capture first and waits for the current OCR scan b
   app.continueEnabled();
 });
 
+for (const rotateOnSave of [false, true]) {
+  test(`autosave stops after a saved response and uses the latest capability on the next edit (rotation ${rotateOnSave})`, async t => {
+    const app = await runtime(t, {}, { resumeDraft: rotateOnSave, rotateOnSave });
+    if (rotateOnSave) {
+      await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved intake to restore");
+    } else {
+      await app.choose(app.file());
+      await app.waitForScan(1);
+      await app.finish(0);
+      await app.saveLead();
+    }
+    const saves = () => app.draftRequests.filter(request => request.action === "save");
+    // Flush React after each debounce interval: one long act() would defer the
+    // response-triggered effect until its end and conceal a feedback loop.
+    const debounce = async () => {
+      await app.api.act(async () => { await new Promise(resolveTick => setTimeout(resolveTick, 750)); });
+      await app.flush();
+    };
+    await debounce();
+    assert.equal(saves().length, 1, "the initial saved/restored form may synchronize once");
+    const firstSave = saves()[0];
+    const expectedToken = rotateOnSave ? firstSave.replacementAccessToken : firstSave.accessToken;
+    assert.equal(app.activeDraftToken(), expectedToken);
+    assert.equal(JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1")).accessToken, expectedToken);
+    assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"), null);
+    for (let interval = 0; interval < 3; interval += 1) {
+      await debounce();
+      assert.equal(saves().length, 1, "a capability/expiry response must not trigger another unchanged save");
+      app.continueEnabled();
+    }
+
+    await app.edit("fineAmount", "375");
+    await debounce();
+    assert.equal(saves().length, 2, "a genuine field edit must still autosave exactly once");
+    assert.equal(saves()[1].draftData.fineAmount, "375");
+    assert.equal(saves()[1].accessToken, expectedToken, "the next save must read the latest capability, including rotation");
+    assert.equal(saves()[1].revision, firstSave.revision + 1);
+    await debounce();
+    assert.equal(saves().length, 2, "the edited save response must also become quiescent");
+    app.continueEnabled();
+  });
+}
+
 test("a released localized intake saves the lead and then autosaves later fields", async t => {
   const app = await runtime(t, {}, { locale: "es" });
   await app.choose(app.file("localized-ticket.pdf", "application/pdf"));

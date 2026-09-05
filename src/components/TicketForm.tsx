@@ -343,7 +343,10 @@ const TicketForm = ({
       }
     },
   });
-  const intakeDraftCapability = intakeDraft.capability;
+  // Save responses refresh the capability object (and can rotate its token).
+  // Only switching drafts should restart autosave; save() reads the latest
+  // capability from its ref when queued work runs.
+  const intakeDraftId = intakeDraft.capability?.draftId;
   const intakeDraftRecordStatus = intakeDraft.record?.status;
   const convertedIntake = intakeDraftRecordStatus === "converted";
   const saveIntakeDraft = intakeDraft.save;
@@ -617,7 +620,7 @@ const TicketForm = ({
   };
 
   useEffect(() => {
-    if (!leadSaved || !intakeDraftCapability || intakeDraftRecordStatus === "converted" || replacementTicketFile) return;
+    if (!leadSaved || !intakeDraftId || intakeDraftRecordStatus === "converted" || replacementTicketFile) return;
     autosaveTimer.current = window.setTimeout(() => {
       autosaveTimer.current = null;
       void saveIntakeDraft(
@@ -635,7 +638,7 @@ const TicketForm = ({
         autosaveTimer.current = null;
       }
     };
-  }, [formData, currentStep, leadSaved, intakeDraftCapability, intakeDraftRecordStatus, replacementTicketFile, saveIntakeDraft]);
+  }, [formData, currentStep, leadSaved, intakeDraftId, intakeDraftRecordStatus, replacementTicketFile, saveIntakeDraft]);
 
   const copyResumeLink = async () => {
     const url = intakeDraft.getResumeUrl();
