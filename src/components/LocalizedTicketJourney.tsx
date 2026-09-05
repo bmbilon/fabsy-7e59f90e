@@ -112,7 +112,6 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
       if (!leadReady || !await onSaveLead()) return;
     }
     nextStep();
-    headingRef.current?.focus();
   };
 
   // Same existing English-ticket OCR endpoint. Preview mode never uploads a
@@ -287,7 +286,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
         : <PaymentStep formData={formData} updateFormData={update} intakeDraft={intakeDraft} />)}
       {resumeAccess}
       <div className="flex items-center justify-between gap-3 border-t pt-6">
-        <Button type="button" variant="outline" disabled={currentStep === 1 || scanning} onClick={() => { setErrors({}); prevStep(); headingRef.current?.focus(); }}><ArrowLeft className="me-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" />{t('common.back')}</Button>
+        <Button type="button" variant="outline" disabled={currentStep === 1 || scanning} onClick={() => { setErrors({}); prevStep(); }}><ArrowLeft className="me-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" />{t('common.back')}</Button>
         {currentStep < 6 && <Button type="button" disabled={scanning || leadSaving} onClick={() => void moveNext()}>{leadSaving ? t('common.loading') : t('common.next')}<ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180" aria-hidden="true" /></Button>}
       </div>
     </Card>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -317,6 +317,7 @@ const TicketForm = ({
   const replacementTicketSnapshot = useRef<FormData | null>(null);
   const ticketDraftRevision = useRef(0);
   const formStartSent = useRef(false);
+  const formScrollPending = useRef(false);
   const autosaveTimer = useRef<number | null>(null);
   const cacheLoadStarted = useRef(false);
   const intakeDraft = useTicketIntakeDraft({
@@ -463,6 +464,7 @@ const TicketForm = ({
     if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") return false;
     try {
       const saved = await intakeDraft.createOrUpload(formData.ticketImage, formData as unknown as Record<string, unknown>);
+      formScrollPending.current = true;
       setLeadSaved(true);
       // The confirmed private object is now the source of truth. Dropping the
       // browser File prevents the review screen from presenting that same file
@@ -473,7 +475,6 @@ const TicketForm = ({
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
       window.dispatchEvent(new CustomEvent("fabsy:intake-lead-saved"));
       toast({ title: "Your intake is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
-      scrollToForm();
       return true;
     } catch (failure) {
       toast({
@@ -485,12 +486,17 @@ const TicketForm = ({
     }
   };
 
-  const scrollToForm = () => {
-    const formElement = document.getElementById('ticket-form-container');
-    if (formElement) {
-      formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+  // Step buttons live near the bottom of long mobile screens. Scroll only
+  // after React commits the replacement step so Safari cannot retain the old
+  // step's scroll offset while the page height changes underneath it.
+  useLayoutEffect(() => {
+    if (!formScrollPending.current) return;
+    formScrollPending.current = false;
+    document.getElementById('ticket-form-container')?.scrollIntoView({
+      behavior: 'auto',
+      block: 'start',
+    });
+  }, [currentStep, leadSaved]);
 
   const handleTicketFileSelection = (file: File | null) => {
     if (file) {
@@ -565,6 +571,7 @@ const TicketForm = ({
     ticketDraftRevision.current += 1;
     formStartSent.current = false;
     setReplacementTicketFile(null);
+    formScrollPending.current = true;
     setLeadSaved(false);
     setCaptureState("empty");
     setCompletedTicketFile(null);
@@ -576,7 +583,6 @@ const TicketForm = ({
       ? applyTicketType(fresh, initialTicketType, "entry")
       : fresh);
     setCurrentStep(1);
-    scrollToForm();
     toast({ title: "New intake ready", description: "Add the next ticket when you’re ready." });
   };
 
@@ -607,15 +613,15 @@ const TicketForm = ({
         }
       }
       window.dispatchEvent(new CustomEvent("fabsy:intake-step-completed", { detail: { step: currentStep } }));
+      formScrollPending.current = true;
       setCurrentStep(currentStep + 1);
-      scrollToForm();
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1 && intakeDraft.record?.status !== "converted") {
+      formScrollPending.current = true;
       setCurrentStep(currentStep - 1);
-      scrollToForm();
     }
   };
 
