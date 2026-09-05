@@ -23,9 +23,10 @@ import { parseReferralAttribution } from "@/lib/referrals/attribution";
 interface ReviewStepProps {
   formData: FormData;
   onSubmit: () => void;
+  hasStoredTicket?: boolean;
 }
 
-const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
+const ReviewStep = ({ formData, onSubmit, hasStoredTicket = false }: ReviewStepProps) => {
   const isPhotoRadar = formData.ticketType === "photo_radar";
   const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const hasProDeclaration = !isPhotoRadar && isProLicenceClass(formData.licenceClass);
@@ -134,7 +135,7 @@ const ReviewStep = ({ formData, onSubmit }: ReviewStepProps) => {
               <span className="font-medium">Court Date</span>
               <div className="bg-muted/30 p-2 rounded mt-1">{formData.courtDate ? format(formData.courtDate, "MMM dd, yyyy") : "Not scheduled"}</div>
             </div>
-            <div><span className="font-medium">Ticket Image:</span> {formData.ticketImage ? "Uploaded" : "Not uploaded"}</div>
+            <div><span className="font-medium">Ticket Image:</span> {formData.ticketImage || hasStoredTicket ? "Uploaded" : "Not uploaded"}</div>
           </div>
         </div>
       </Card>

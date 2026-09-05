@@ -751,7 +751,7 @@ const TicketForm = ({
       case 4:
         return <ConsentStep formData={formData} updateFormData={updateFormData} />;
       case 5:
-        return <ReviewStep formData={formData} onSubmit={nextStep} />;
+        return <ReviewStep formData={formData} onSubmit={nextStep} hasStoredTicket={intakeDraft.hasUploadedTicket} />;
       case 6:
         return hasPendingTicketUpload
           ? <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm">Keep your last confirmed ticket or finish its replacement before checkout.</p>

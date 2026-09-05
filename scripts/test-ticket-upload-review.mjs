@@ -103,7 +103,7 @@ const compiled = await build({
       }
       // These later screens are outside this flow's coverage. Keep the actual
       // wizard navigation mounted, including its Continue/Previous validation.
-      bundler.onResolve({ filter: /(?:^|\/)(PersonalInfoStep|DefenseStep|ConsentStep|PaymentStep|ReviewStep|InstantTicketAnalyzer)$/ }, () => ({ path: "later-step", namespace: "offline-review" }));
+      bundler.onResolve({ filter: /(?:^|\/)(PersonalInfoStep|DefenseStep|ConsentStep|PaymentStep|InstantTicketAnalyzer)$/ }, () => ({ path: "later-step", namespace: "offline-review" }));
       bundler.onLoad({ filter: /.*/, namespace: "offline-review" }, ({ path }) => ({
         contents: modules[path] ?? "export default function LaterStepBoundary() { return null; }",
         loader: "js",
@@ -128,7 +128,7 @@ const completeTicket = {
   courtDate: null,
 };
 
-async function runtime(t, props = {}, { cacheKey, resumeDraft = false, convertedDraft = false, unuploadedDraft = false, pendingUpload = false, deliveryStatus = "sent", deliveryChannel = "email", deliveryMode = "automatic", rotateOnSave = false, loseSaveResponseAfterCommit = false, deferRecoveryUntilReload = false, storageWriteFails = false, locale = "en" } = {}) {
+async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeStep = 1, convertedDraft = false, unuploadedDraft = false, missingTicketPath = false, pendingUpload = false, deliveryStatus = "sent", deliveryChannel = "email", deliveryMode = "automatic", rotateOnSave = false, loseSaveResponseAfterCommit = false, deferRecoveryUntilReload = false, storageWriteFails = false, locale = "en" } = {}) {
   const domErrors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on("jsdomError", error => domErrors.push(error));
@@ -174,7 +174,7 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
   let activeDraftToken = draftToken;
   let recoveryReadsBlocked = false;
   let saveCommitted = false;
-  let serverCurrentStep = 1;
+  let serverCurrentStep = resumeStep;
   let serverCompletedStep = 0;
   let serverDraftData = {
     ...completeTicket,
@@ -198,7 +198,7 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
     currentStep: serverCurrentStep,
     completedStep: serverCompletedStep,
     draftData: serverDraftData,
-    ticketDocumentPath: `${draftId}/representation-ticket-r1.png`,
+    ticketDocumentPath: missingTicketPath ? "" : `${draftId}/representation-ticket-r1.png`,
     ticketUploadedAt: null, status: "active",
     hasPendingTicketUpload: false,
     resumeDelivery: resumeDelivery(),
@@ -397,6 +397,47 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, converted
   };
   return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit, saveLead, reloadAfterLostResponse, activeDraftToken: () => activeDraftToken };
 }
+
+function reviewAttachmentStatus(app) {
+  const label = [...app.document.querySelectorAll("span")]
+    .find(node => node.textContent === "Ticket Image:");
+  assert.ok(label, "The real Review screen must show the ticket attachment status");
+  return label.parentElement.textContent.replace("Ticket Image:", "").trim();
+}
+
+test("Review recognizes a confirmed stored ticket after resume clears the browser File", async t => {
+  const app = await runtime(t, {}, { resumeDraft: true, resumeStep: 5 });
+  await app.until(() => app.document.body.textContent.includes("Review Your Application"), "Expected the saved review step to restore");
+  assert.equal(reviewAttachmentStatus(app), "Uploaded");
+  assert.equal(app.uploadRequests.length, 0, "Restoring a stored ticket must not require uploading it again");
+  assert.deepEqual(app.draftRequests.map(request => request.action), ["read"]);
+});
+
+for (const missingProof of [{ unuploadedDraft: true }, { missingTicketPath: true }]) {
+  test(`Review does not claim an upload when the saved draft lacks ${missingProof.unuploadedDraft ? "confirmation" : "a document path"}`, async t => {
+    const app = await runtime(t, {}, { resumeDraft: true, resumeStep: 5, ...missingProof });
+    await app.until(() => app.document.body.textContent.includes("Review Your Application"), "Expected the saved review step to restore");
+    assert.equal(reviewAttachmentStatus(app), "Not uploaded");
+  });
+}
+
+test("Review still recognizes an attached browser File", async t => {
+  const app = await runtime(t, {
+    initialStep: 5,
+    initialTicketImage: new File(["SYNTHETIC TEST CONTENT"], "synthetic-ticket.png", { type: "image/png" }),
+  });
+  assert.equal(reviewAttachmentStatus(app), "Uploaded");
+});
+
+test("Review reports an absent attachment without treating an assessment reference as upload proof", async t => {
+  const app = await runtime(t, {
+    initialStep: 5,
+    sourceAssessment: { submissionId: "synthetic-assessment", accessToken: "synthetic-access-token" },
+  });
+  assert.equal(reviewAttachmentStatus(app), "Not uploaded");
+  assert.deepEqual(app.draftRequests, []);
+  assert.deepEqual(app.uploadRequests, []);
+});
 
 test("a fresh intake presents capture first and waits for the current OCR scan before showing details", async t => {
   const app = await runtime(t);
