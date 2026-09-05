@@ -144,6 +144,7 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
   const draftRequests = [];
   const uploadRequests = [];
   const cacheRequests = [];
+  const scrollIntoViewCalls = [];
   const forbidden = [];
   const channels = [];
   const deferredRequest = (queue, metadata) => new Promise((resolveRequest, rejectRequest) => {
@@ -157,7 +158,9 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
   window.XMLHttpRequest = class { constructor() { blockNetwork(); } };
   window.navigator.sendBeacon = blockNetwork;
   window.scrollTo = () => {};
-  window.HTMLElement.prototype.scrollIntoView = () => {};
+  window.HTMLElement.prototype.scrollIntoView = function scrollIntoView(options) {
+    scrollIntoViewCalls.push({ target: this, options });
+  };
   window.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
   window.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
   window.MessageChannel = class {
@@ -395,7 +398,7 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
     await api.mount(props);
     await flush();
   };
-  return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit, saveLead, reloadAfterLostResponse, activeDraftToken: () => activeDraftToken };
+  return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, scrollIntoViewCalls, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit, saveLead, reloadAfterLostResponse, activeDraftToken: () => activeDraftToken };
 }
 
 function reviewAttachmentStatus(app) {
@@ -478,6 +481,27 @@ test("an optional manual offence description accepts free text without a section
   await app.edit("offenceDescription", description);
   assert.equal(app.field("offenceDescription").value, description);
   app.continueEnabled();
+});
+
+test("a wizard transition scrolls to the new step only after it renders", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file());
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.saveLead();
+  app.scrollIntoViewCalls.length = 0;
+  await app.until(() => app.buttons("Continue").length > 0 && app.buttons("Continue").every(node => !node.disabled),
+    "Expected the saved ticket to become ready for step 2");
+
+  await app.api.click(app.button("Continue"));
+  await app.until(() => app.document.body.textContent.includes("Step 2 of 6"), "Expected step 2 to render");
+
+  assert.equal(app.scrollIntoViewCalls.length, 1, "the completed transition must perform one deterministic scroll");
+  assert.equal(app.scrollIntoViewCalls[0].target.id, "ticket-form-container");
+  assert.equal(app.scrollIntoViewCalls[0].options.behavior, "auto");
+  assert.equal(app.scrollIntoViewCalls[0].options.block, "start");
+  assert.match(app.scrollIntoViewCalls[0].target.textContent, /Personal Info/,
+    "the scroll must run against the newly rendered step, not the outgoing step");
 });
 
 for (const rotateOnSave of [false, true]) {
