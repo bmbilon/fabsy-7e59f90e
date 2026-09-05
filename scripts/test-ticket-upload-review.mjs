@@ -467,6 +467,19 @@ test("a fresh intake presents capture first and waits for the current OCR scan b
   app.continueEnabled();
 });
 
+test("an optional manual offence description accepts free text without a section selection", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file());
+  await app.waitForScan(1);
+  await app.finish(0);
+  await app.saveLead();
+
+  const description = "Unlisted ticket wording for Fabsy review";
+  await app.edit("offenceDescription", description);
+  assert.equal(app.field("offenceDescription").value, description);
+  app.continueEnabled();
+});
+
 for (const rotateOnSave of [false, true]) {
   test(`autosave stops after a saved response and uses the latest capability on the next edit (rotation ${rotateOnSave})`, async t => {
     const app = await runtime(t, {}, { resumeDraft: rotateOnSave, rotateOnSave });

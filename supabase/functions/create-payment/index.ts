@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import StripeCheckout from "https://esm.sh/stripe@19.1.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { LocaleRequestError, localizedPublicPath, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
 import { PHOTO_RADAR_PRODUCT, ProductRequestError, ticketCheckoutProduct } from "../_shared/photo-radar.ts";
@@ -872,7 +873,7 @@ serve(async (req) => {
     // The report portal is still English. Only translated public return pages
     // receive a prefix; inventing a localized portal URL would break checkout.
     const successUrl = includeIdrAddon ? `${siteUrl}/insurance-damage-report/intake?checkout=success&order_id=${idrOrderId}&session_id={CHECKOUT_SESSION_ID}` : `${siteUrl}${localizedPublicPath(preferredLocale, "/thank-you")}?session_id={CHECKOUT_SESSION_ID}`;
-    const params: Stripe.Checkout.SessionCreateParams = {
+    const params = {
       customer_email: customerEmail,
       client_reference_id: submissionId,
       line_items: lineItems,
@@ -887,10 +888,32 @@ serve(async (req) => {
       cancel_url: `${siteUrl}${localizedPublicPath(preferredLocale, "/payment-canceled")}${draftId ? `?draft=${encodeURIComponent(draftId)}` : ""}`,
       metadata,
       payment_intent_data: { metadata },
-    };
-    const session = await stripe.checkout.sessions.create(params, {
+    } satisfies Stripe.Checkout.SessionCreateParams;
+    const checkoutOptions = {
       idempotencyKey: `ticket-checkout:${checkoutIntentId}:${reservation.attempt}`,
-    });
+    };
+    let session: Stripe.Checkout.Session | StripeCheckout.Checkout.Session;
+    if (product.isPhotoRadar) {
+      // Photo Radar retains its existing API and hosted-checkout behavior.
+      session = await stripe.checkout.sessions.create(params, checkoutOptions);
+    } else {
+      // Per-session branding is supported by Clover. Scope it to new Rapid
+      // Resolution sessions so other Execom products keep their own identity.
+      const checkoutCreator = new StripeCheckout(stripeSecretKey, {
+        apiVersion: "2025-09-30.clover",
+      });
+      session = await checkoutCreator.checkout.sessions.create({
+        ...params,
+        branding_settings: {
+          display_name: "Fabsy, a division of Execom Inc.",
+          icon: { type: "url", url: "https://fabsy.ca/apple-touch-icon.png?v=4" },
+          background_color: "#FFFFFF",
+          button_color: "#0F172A",
+          font_family: "inter",
+          border_style: "rounded",
+        },
+      }, checkoutOptions);
+    }
     createdStripeSessionId = session.id;
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL.");

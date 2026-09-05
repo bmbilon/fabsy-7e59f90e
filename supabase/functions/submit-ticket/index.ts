@@ -6,6 +6,7 @@ import { ELIGIBLE_PRO_CLASSES, normalizedLicenceClass } from "../_shared/pro-pri
 import { attachReferralAttribution, recordReferralDeclaredPlate } from "../_shared/referrals.ts";
 import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
 import { DraftRequestError, parseDraftAccessToken, requestAddress } from "../_shared/ticket-intake-draft.ts";
+import { normalizeSubmissionViolation } from "../_shared/submission-violation.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -56,7 +57,7 @@ interface SubmissionData {
   
   // Ticket info
   ticketNumber: string;
-  violation: string;
+  violation?: unknown;
   fineAmount: string;
   violationDate?: string;
   courtLocation?: string;
@@ -176,7 +177,7 @@ const handler = async (req: Request): Promise<Response> => {
     const requiredTextValues = [
       formData.driversLicense, formData.firstName, formData.lastName,
       formData.email, formData.phone, formData.province,
-      formData.ticketNumber, formData.violation, formData.fineAmount,
+      formData.ticketNumber, formData.fineAmount,
     ];
     if (requiredTextValues.some((value) => typeof value !== "string" || !value.trim())) {
       return new Response(
@@ -188,6 +189,9 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
     if (typeof formData.smsOptIn !== "boolean") throw new RequestError("SMS preference is invalid.");
+
+    const normalizedViolation = normalizeSubmissionViolation(formData.violation);
+    if (!normalizedViolation.ok) throw new RequestError(normalizedViolation.error);
 
     const optionalTextValues = [
       formData.address, formData.city, formData.postalCode, formData.dateOfBirth,
@@ -202,7 +206,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (formData.firstName.length > 100 || formData.lastName.length > 100 ||
         formData.email.length > 255 || formData.phone.length > 30 ||
         formData.driversLicense.length > 50 || formData.ticketNumber.length > 50 ||
-        formData.violation.length > 500 || formData.fineAmount.length > 20 ||
+        formData.fineAmount.length > 20 ||
         formData.province.length > 100 ||
         (formData.address && formData.address.length > 500) ||
         (formData.city && formData.city.length > 100) ||
@@ -441,7 +445,7 @@ const handler = async (req: Request): Promise<Response> => {
       date_of_birth: formData.dateOfBirth,
       drivers_license: formData.driversLicense,
       ticket_number: formData.ticketNumber,
-      violation: formData.violation,
+      violation: normalizedViolation.value,
       fine_amount: formData.fineAmount,
       violation_date: formData.violationDate,
       court_location: formData.courtLocation,

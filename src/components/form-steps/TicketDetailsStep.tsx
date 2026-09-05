@@ -658,7 +658,7 @@ const TicketDetailsStep = ({
         <div className="space-y-2">
           <Label htmlFor="offenceDescription">Offence Description</Label>
           <Select
-            value={formData.offenceDescription}
+            value={availableDescriptions.includes(formData.offenceDescription) ? formData.offenceDescription : ""}
             onValueChange={(value) => handleFieldUpdate("offenceDescription", value)}
             disabled={!formData.offenceSection}
           >
