@@ -7,6 +7,7 @@ import { attachReferralAttribution, recordReferralDeclaredPlate } from "../_shar
 import { requireEnglishProductLocale } from "../_shared/product-locale.ts";
 import { DraftRequestError, parseDraftAccessToken, requestAddress } from "../_shared/ticket-intake-draft.ts";
 import { normalizeSubmissionViolation } from "../_shared/submission-violation.ts";
+import { canRefreshUnclaimedClientContact } from "../_shared/returning-client.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -375,7 +376,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { data: existingClient, error: clientLookupError } = await supabase
       .from('clients')
-      .select('id,email')
+      .select('id,email,auth_user_id,last_name,address,city,postal_code,date_of_birth')
       .eq('drivers_license', formData.driversLicense.trim())
       .maybeSingle();
     
@@ -385,21 +386,50 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (existingClient) {
-      // Public intake must never replace the identity or contact details on an
-      // existing client record. Portal ownership is verified through email.
       if (existingClient.email?.trim().toLowerCase() !== normalizedEmail) {
-        return new Response(
-          JSON.stringify({
-            error: "This licence is already connected to a client record. Use the existing email or contact support.",
-          }),
-          {
-            status: 409,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          },
-        );
+        // The private uploaded-ticket draft and five matching stable identity
+        // fields let an unclaimed legacy customer correct stale contact details.
+        // A portal-bound record or any mismatch stays fail-closed.
+        const contactRefreshAllowed = Boolean(intakeDraft) && canRefreshUnclaimedClientContact(existingClient, {
+          lastName: formData.lastName,
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          dateOfBirth: formData.dateOfBirth,
+        });
+        if (!contactRefreshAllowed) {
+          return new Response(
+            JSON.stringify({
+              error: "This licence is already connected to a client record. Use the existing email or contact support.",
+            }),
+            {
+              status: 409,
+              headers: { "Content-Type": "application/json", ...corsHeaders },
+            },
+          );
+        }
+
+        const { data: refreshedClient, error: refreshError } = await supabase
+          .from('clients')
+          .update({
+            email: normalizedEmail,
+            phone: normalizedPhone,
+            sms_opt_in: Boolean(formData.smsOptIn),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingClient.id)
+          .is('auth_user_id', null)
+          .eq('email', existingClient.email)
+          .select('id')
+          .maybeSingle();
+        if (refreshError || !refreshedClient) {
+          console.error('[Submit Ticket] Returning client contact refresh failed');
+          throw new RequestError("This client record changed while the intake was submitted. Reload and try again.", 409);
+        }
+        console.log('[Submit Ticket] Refreshed unclaimed returning client contact');
       }
 
-      console.log('[Submit Ticket] Reusing verified-email client');
+      console.log('[Submit Ticket] Reusing client');
       clientId = existingClient.id;
     } else {
       // Create new client (using service role key, bypasses RLS)
