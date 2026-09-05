@@ -44,22 +44,27 @@ const handler = async (req: Request): Promise<Response> => {
             <style>
               body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .header { background: #0F172A; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
               .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px; }
               .footer { text-align: center; margin-top: 30px; padding: 20px; color: #6b7280; font-size: 14px; }
-              .highlight { background: #f3f4f6; padding: 15px; border-left: 4px solid #667eea; margin: 20px 0; }
-              .button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+              .highlight { background: #EFF6FF; padding: 15px; border-left: 4px solid #3B82F6; margin: 20px 0; }
+              .button { display: inline-block; background: #2563EB; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
             </style>
           </head>
           <body>
             <div class="container">
-              <div class="header">
-                <h1 style="margin: 0;">Fabsy Traffic Ticket Services</h1>
+              <div class="header" style="background-color: #0F172A; color: #FFFFFF; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto; border-collapse: collapse;">
+                  <tr>
+                    <td valign="middle" style="padding-right: 12px;"><img src="https://fabsy.ca/apple-touch-icon.png?v=4" width="48" height="48" alt="Fabsy" style="display: block; width: 48px; height: 48px; border: 0; border-radius: 8px;" /></td>
+                    <td valign="middle"><h1 style="margin: 0; color: #FFFFFF; font-family: Arial, sans-serif; font-size: 32px; line-height: 1.2; font-weight: 700;">Fabsy</h1></td>
+                  </tr>
+                </table>
                 <p style="margin: 10px 0 0 0; opacity: 0.9;">Traffic ticket agent services for Alberta drivers</p>
               </div>
               
               <div class="content">
-                <h2 style="color: #667eea; margin-top: 0;">Thank you for contacting us, ${name}!</h2>
+                <h2 style="color: #1D4ED8; margin-top: 0;">Thank you for contacting us, ${name}!</h2>
                 
                 <p>We've received your message. A member of our team will review it and respond using the contact information you provided.</p>
                 
@@ -75,16 +80,16 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
                 
-                <h3 style="color: #667eea;">Ready to Submit Your Ticket?</h3>
+                <h3 style="color: #1D4ED8;">Ready to Submit Your Ticket?</h3>
                 <p>If you have an Alberta traffic ticket, you can submit it online for assessment. Fabsy will review the ticket and confirm whether agent representation is permitted for the matter and court location.</p>
                 
                 <center>
-                  <a href="https://fabsy.ca/${isFleet ? "fleet" : "submit-ticket"}" class="button">${isFleet ? "Review Fleet Service" : "Submit Your Ticket Now"}</a>
+                  <a href="https://fabsy.ca/${isFleet ? "fleet" : "submit-ticket"}" class="button" style="display: inline-block; background-color: #2563EB; color: #FFFFFF; padding: 12px 30px; text-decoration: none; border-radius: 5px;">${isFleet ? "Review Fleet Service" : "Submit Your Ticket Now"}</a>
                 </center>
                 
-                <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                  <strong style="color: #92400e;">Pricing</strong><br>
-                  <span style="color: #92400e;">${isFleet ? "Photo radar and red-light owner notices cost $79 + 5% GST ($82.95 total) per ticket. Account pricing at 5+ tickets per month and monthly QuickBooks invoicing are confirmed before work begins. No trial and no success fee. You approve every deal. This enquiry does not retain Fabsy or pause a deadline." : "Rapid Resolution costs $198 CAD plus GST for eligible Alberta pre-trial matters. Photo radar and red-light owner notices cost $79 + 5% GST ($82.95 total). Trial and government fines are separate."}</span>
+                <div style="background: #EFF6FF; border: 1px solid #BFDBFE; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                  <strong style="color: #1E3A8A;">Pricing</strong><br>
+                  <span style="color: #1E3A8A;">${isFleet ? "Photo radar and red-light owner notices cost $79 + 5% GST ($82.95 total) per ticket. Account pricing at 5+ tickets per month and monthly QuickBooks invoicing are confirmed before work begins. No trial and no success fee. You approve every deal. This enquiry does not retain Fabsy or pause a deadline." : "Rapid Resolution costs $198 CAD plus GST for eligible Alberta pre-trial matters. Photo radar and red-light owner notices cost $79 + 5% GST ($82.95 total). Trial and government fines are separate."}</span>
                 </div>
                 
                 <p style="margin-top: 30px;">Have questions? Simply reply to this email or call us during business hours.</p>
@@ -121,10 +126,10 @@ const handler = async (req: Request): Promise<Response> => {
             <style>
               body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: #1f2937; color: white; padding: 20px; border-radius: 5px 5px 0 0; }
+              .header { background: #0F172A; color: white; padding: 20px; border-radius: 5px 5px 0 0; }
               .content { background: #ffffff; padding: 20px; border: 1px solid #e5e7eb; border-top: none; }
-              .field { margin: 15px 0; padding: 10px; background: #f9fafb; border-left: 3px solid #667eea; }
-              .label { font-weight: bold; color: #667eea; }
+              .field { margin: 15px 0; padding: 10px; background: #EFF6FF; border-left: 3px solid #3B82F6; }
+              .label { font-weight: bold; color: #1D4ED8; }
             </style>
           </head>
           <body>
