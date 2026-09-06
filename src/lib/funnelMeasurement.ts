@@ -12,9 +12,21 @@ export {
 
 export const FUNNEL_EVENT_NAMES = [
   'landing_view',
+  'primary_cta_viewed',
   'primary_cta_click',
   'phone_click',
+  'engaged_10s',
+  'engaged_30s',
+  'engaged_60s',
+  'scroll_25',
+  'scroll_50',
+  'scroll_75',
+  'scroll_90',
   'intake_started',
+  'intake_step_viewed',
+  'intake_validation_blocked',
+  'ticket_upload_started',
+  'ticket_upload_failed',
   'ticket_uploaded',
   'lead_saved',
   'intake_step_completed',
@@ -181,21 +193,31 @@ function safeAttribution(): Pick<FunnelEventPayload, 'attribution' | 'clickId'> 
 }
 
 function validStep(eventName: FunnelEventName, step: number | undefined): boolean {
-  if (eventName !== 'intake_step_completed') return step === undefined;
+  if (!['intake_step_viewed', 'intake_validation_blocked', 'intake_step_completed'].includes(eventName)) {
+    return step === undefined;
+  }
   return Number.isInteger(step) && step! >= 1 && step! <= 6;
 }
 
 function validPosition(eventName: FunnelEventName, position: FunnelActionPosition | undefined): boolean {
   if (position === undefined) return true;
-  return (eventName === 'primary_cta_click' || eventName === 'phone_click') &&
+  return (eventName === 'primary_cta_viewed' || eventName === 'primary_cta_click' || eventName === 'phone_click') &&
     ['hero', 'header', 'sticky', 'section', 'footer'].includes(position);
 }
 
 function validEventPage(eventName: FunnelEventName, pageKey: FunnelPageKey): boolean {
-  if (['landing_view', 'primary_cta_click', 'phone_click'].includes(eventName)) {
+  if ([
+    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click',
+    'engaged_10s', 'engaged_30s', 'engaged_60s',
+    'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90',
+  ].includes(eventName)) {
     return pageKey === 'rapid_resolution';
   }
-  if (['intake_started', 'ticket_uploaded', 'lead_saved', 'intake_step_completed', 'checkout_started'].includes(eventName)) {
+  if ([
+    'intake_started', 'intake_step_viewed', 'intake_validation_blocked',
+    'ticket_upload_started', 'ticket_upload_failed', 'ticket_uploaded',
+    'lead_saved', 'intake_step_completed', 'checkout_started',
+  ].includes(eventName)) {
     return pageKey === 'intake';
   }
   if (eventName === 'checkout_canceled') return pageKey === 'payment_canceled';
