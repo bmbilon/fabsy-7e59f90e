@@ -17,7 +17,7 @@ import { albertaCourts } from "@/data/albertaCourts";
 import InstantTicketAnalyzer from "../InstantTicketAnalyzer";
 import TicketCapture, { type TicketOcrData } from "../TicketCapture";
 import TicketTypeFields from "../TicketTypeFields";
-import { detectTicketType, resetTicketTypeForUpload, ticketDateAsLocalDate, ticketDateFromExtraction } from "@/lib/ticket/ticketType";
+import { resetTicketTypeForUpload, ticketDateAsLocalDate, ticketDateFromExtraction } from "@/lib/ticket/ticketType";
 import { FormData } from "../TicketForm";
 import type { TicketCaptureState } from "@/lib/ticket/ticketCapture";
 import { hasTicketReviewData, ticketFieldNeedsReview, type TicketReviewField } from "@/lib/ticket/ticketReview";
@@ -154,13 +154,10 @@ const TicketDetailsStep = ({
     if (!updates.offenceSection && typeof extracted.section === "string") updates.offenceSection = extracted.section;
     if (!updates.offenceSubSection && typeof extracted.subsection === "string") updates.offenceSubSection = extracted.subsection;
     if (!updates.offenceDescription && typeof extracted.offenseDescription === "string") updates.offenceDescription = extracted.offenseDescription;
-    const detected = detectTicketType(extracted);
     updateFormData(current => {
-      const ticketType = current.ticketTypeSource === "manual" ? current.ticketType : detected ?? current.ticketType;
-      const date = ticketDateFromExtraction(extracted, ticketType, ticketType === current.ticketType ? manuallyEditedDate.current : undefined);
+      const date = ticketDateFromExtraction(extracted, current.ticketType, manuallyEditedDate.current);
       return {
         ...updates,
-        ...(detected ? { ticketType: detected, ticketTypeSource: "upload" as const } : {}),
         issueDate: ticketDateAsLocalDate(date),
       };
     });

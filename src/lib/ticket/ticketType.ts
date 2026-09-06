@@ -53,8 +53,8 @@ export function ticketDateFromExtraction(value: unknown, ticketType: TicketType,
   return "";
 }
 
-/** Keep a date-only value on the same calendar day in Alberta and other time zones. */
-export function ticketDateAsLocalDate(value: unknown): Date | undefined {
+/** Keep a date-only value on the same local calendar day in every time zone. */
+export function calendarDateAsLocalDate(value: unknown): Date | undefined {
   const text = calendarDate(value);
   if (!text) return undefined;
   const [year, month, day] = text.split("-").map(Number);
@@ -63,6 +63,8 @@ export function ticketDateAsLocalDate(value: unknown): Date | undefined {
   date.setHours(12, 0, 0, 0);
   return date;
 }
+
+export const ticketDateAsLocalDate = calendarDateAsLocalDate;
 
 /** A hint for the intake, never the server's eligibility or price authority. */
 export function detectTicketType(value: unknown): TicketType | null {

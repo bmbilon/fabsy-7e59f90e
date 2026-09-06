@@ -184,7 +184,7 @@ function resumeDeliveryMessage(delivery?: IntakeDraftResumeDelivery, hasUploaded
 }
 
 function mergeCachedTicketData(current: FormData, raw: Record<string, unknown>): FormData {
-  const merged = applyDetectedTicketType({
+  const merged = {
     ...current,
     ...raw,
     ticketType: current.ticketType,
@@ -193,7 +193,7 @@ function mergeCachedTicketData(current: FormData, raw: Record<string, unknown>):
     licenceClass: current.licenceClass,
     driversLicenseImage: current.driversLicenseImage,
     courtDate: ticketDateAsLocalDate(raw.courtDate),
-  }, raw);
+  } as FormData;
   const preserveManualDate = current.ticketDateManuallyEdited && merged.ticketType === current.ticketType;
   return {
     ...merged,

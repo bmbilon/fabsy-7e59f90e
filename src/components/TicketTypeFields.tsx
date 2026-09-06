@@ -30,7 +30,9 @@ export default function TicketTypeFields({ ticketType, ticketTypeSource, registe
           ))}
         </div>
         <p id={`${id}-type-help`} className="mt-3 text-xs text-muted-foreground" aria-live="polite">
-          {ticketTypeSource === "upload" ? "The upload suggested this ticket type. Check it and change it if needed." : "We look for registered-owner wording, section 160(1) and the mailed notice format in your upload. You can correct the selection."}
+          {ticketTypeSource === "upload"
+            ? "This ticket type was saved earlier. Check it and change it if needed."
+            : "Officer-issued is selected by default. Choose photo radar only for an automated notice mailed to the registered owner."}
         </p>
       </fieldset>
       {isPhotoRadar ? (
