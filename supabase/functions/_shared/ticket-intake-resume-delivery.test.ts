@@ -16,6 +16,7 @@ import {
   ticketIntakeResumeUrl,
   twilioRecipient,
 } from "./ticket-intake-resume-delivery.ts";
+import { paymentCheckoutUrl } from "./payment-checkout-link.ts";
 
 const draftId = "00000000-0000-4000-8000-000000000301";
 const accessToken = "a".repeat(64);
@@ -44,20 +45,18 @@ Deno.test("resume capability appears only in a localized URL fragment", () => {
   assertEquals(punjabi.hash, `#resume=${accessToken}`);
 });
 
-Deno.test("payment-pending SMS carries a private continuation link without a query capability", () => {
-  const resumeUrl = ticketIntakeResumeUrl(
-    "https://fabsy.ca",
-    "en",
-    accessToken,
-  );
-  const message = renderPaymentPendingResumeSms(" Brett ", resumeUrl);
+Deno.test("payment-pending SMS fits one segment with a branded checkout link", () => {
+  const code = "AbCdEfGhIjKlMnOpQrStUv";
+  const checkoutUrl = paymentCheckoutUrl("https://fabsy.ca", code);
+  const message = renderPaymentPendingResumeSms(" Brett ", checkoutUrl);
 
   assertStringIncludes(message, "Hi Brett!");
-  assertStringIncludes(message, "Continue to secure checkout:");
-  assertStringIncludes(message, `/submit-ticket#resume=${accessToken}`);
+  assertStringIncludes(message, "Complete your Fabsy payment:");
+  assertStringIncludes(message, `/pay/${code}`);
   assertStringIncludes(message, "Service begins after payment.");
   assertStringIncludes(message, "Private link; do not forward.");
-  assert(!message.includes("?resume="));
+  assert(message.length <= 160);
+  assert(!message.includes("checkout.stripe.com"));
 });
 
 Deno.test("payment continuation requires the same live converted draft and capability", () => {

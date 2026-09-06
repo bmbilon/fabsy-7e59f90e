@@ -18,6 +18,9 @@ verify_jwt = false
 [functions.create-payment]
 verify_jwt = false
 
+[functions.resolve-payment-link]
+verify_jwt = false
+
 [functions.get-checkout-session]
 verify_jwt = false
 

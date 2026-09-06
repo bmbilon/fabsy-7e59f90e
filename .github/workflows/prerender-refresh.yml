@@ -42,6 +42,7 @@ jobs:
             supabase/functions/_shared/meta-purchase.ts \
             supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
+            supabase/functions/resolve-payment-link/index.ts \
             supabase/functions/idr-payment-webhook/index.ts \
             supabase/functions/meta-capi-worker/index.ts \
             supabase/functions/ticket-intake-draft/index.ts \

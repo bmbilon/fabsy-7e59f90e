@@ -247,11 +247,6 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
         throw new CheckoutFailure(detail.message, detail.code === 'consent_character_not_supported' ? 'intake.validation.consentCharacter' : undefined);
       }
 
-      const { error: notificationError } = await supabase.functions.invoke("send-notification", {
-        body: { submissionId, accessToken: representationAccessToken },
-      });
-      if (notificationError) console.error("Submission notification failed", notificationError);
-
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("create-payment", {
         body: {
           formData: { email: formData.email, firstName: formData.firstName, lastName: formData.lastName, ticketNumber: formData.ticketNumber },
@@ -287,6 +282,16 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
           }
         }
       }
+      const { error: notificationError } = await supabase.functions.invoke("send-notification", {
+        body: {
+          submissionId,
+          accessToken: representationAccessToken,
+          ...(typeof checkout.paymentLinkCode === "string"
+            ? { paymentLinkCode: checkout.paymentLinkCode }
+            : {}),
+        },
+      });
+      if (notificationError) console.error("Submission notification failed", notificationError);
       window.dispatchEvent(new CustomEvent("fabsy:intake-checkout-started"));
       window.location.assign(checkout.url);
     } catch (error) {

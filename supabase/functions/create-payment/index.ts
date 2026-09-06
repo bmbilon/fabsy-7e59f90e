@@ -12,6 +12,7 @@ import {
   sha256CheckoutSessionId,
 } from "../_shared/meta-capi.ts";
 import { parsePaidFunnelCheckoutContext } from "../_shared/funnel-checkout.ts";
+import { generatePaymentLinkCode } from "../_shared/payment-checkout-link.ts";
 
 const TICKET_BASE_CENTS = 19800;
 const IDR_ADDON_CENTS = 3100;
@@ -26,6 +27,47 @@ const siteUrl = (Deno.env.get("SITE_URL") || "https://fabsy.ca").replace(
 const admin = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
+
+async function ensureTicketCheckoutLink(
+  checkoutIntentId: string,
+  submissionId: string,
+  stripeExpiresAt: number | null,
+): Promise<string | null> {
+  if (!stripeExpiresAt || stripeExpiresAt * 1000 <= Date.now()) return null;
+  try {
+    const { data: existing, error: existingError } = await admin
+      .from("ticket_checkout_links")
+      .select("code,expires_at")
+      .eq("checkout_intent_id", checkoutIntentId)
+      .maybeSingle();
+    if (existingError) throw existingError;
+    if (existing?.code && Date.parse(existing.expires_at) > Date.now()) {
+      return existing.code;
+    }
+
+    const expiresAt = new Date(stripeExpiresAt * 1000).toISOString();
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const code = generatePaymentLinkCode();
+      const query = existing
+        ? admin.from("ticket_checkout_links").update({ code, expires_at: expiresAt })
+            .eq("checkout_intent_id", checkoutIntentId)
+        : admin.from("ticket_checkout_links").insert({
+            checkout_intent_id: checkoutIntentId,
+            submission_id: submissionId,
+            code,
+            expires_at: expiresAt,
+          });
+      const { error } = await query;
+      if (!error) return code;
+      if (error.code !== "23505") throw error;
+    }
+  } catch {
+    // A checkout link is a recovery aid. Never block or expire a valid Stripe
+    // Checkout because the short-link table is temporarily unavailable.
+    console.error("create-payment short checkout link unavailable");
+  }
+  return null;
+}
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -447,6 +489,7 @@ async function reserveTicketCheckout(
         attempt,
         url: existingSession.url,
         sessionId: existingSession.id,
+        sessionExpiresAt: existingSession.expires_at,
       };
     }
     if (existingSession.status === "complete") {
@@ -493,6 +536,7 @@ async function reserveTicketCheckout(
     attempt,
     url: null as string | null,
     sessionId: null as string | null,
+    sessionExpiresAt: null as number | null,
   };
 }
 
@@ -753,11 +797,17 @@ serve(async (req) => {
         meta: Boolean(metaAttributionHandle),
         funnel: Boolean(funnelAttributionHandle),
       };
+      const paymentLinkCode = await ensureTicketCheckoutLink(
+        reservation.orderId,
+        submissionId,
+        reservation.sessionExpiresAt,
+      );
       return json(req, {
         url: reservation.url,
         checkoutIntentId: reservation.orderId,
         idrOrderId: includeIdrAddon ? reservation.orderId : null,
         reused: true,
+        ...(paymentLinkCode ? { paymentLinkCode } : {}),
         ...(measurementAttributionHandle
           ? {
             // Keep the legacy alias during a rolling deployment. New clients
@@ -979,10 +1029,16 @@ serve(async (req) => {
       meta: Boolean(metaAttributionHandle),
       funnel: Boolean(funnelAttributionHandle),
     };
+    const paymentLinkCode = await ensureTicketCheckoutLink(
+      checkoutIntentId,
+      submissionId,
+      session.expires_at,
+    );
     return json(req, {
       url: session.url,
       checkoutIntentId,
       idrOrderId,
+      ...(paymentLinkCode ? { paymentLinkCode } : {}),
       ...(measurementAttributionHandle
         ? {
           metaAttributionHandle: measurementAttributionHandle,

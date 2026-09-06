@@ -65,6 +65,7 @@ export const EXPECTED_MIGRATIONS = Object.freeze([
   '20260903192000_ticket_intake_delivery_abuse_controls.sql',
   '20260903193000_ticket_submission_notification_idempotency.sql',
   '20260903194000_ticket_intake_staff_follow_up.sql',
+  '20260905213500_ticket_checkout_links.sql',
 ]);
 export const EXPECTED_CORE_FUNCTIONS = Object.freeze([
   'cache-ticket-data',
@@ -75,6 +76,7 @@ export const EXPECTED_CORE_FUNCTIONS = Object.freeze([
   'record-funnel-event',
   'paid-funnel-report',
   'send-notification',
+  'resolve-payment-link',
 ]);
 export const EXPECTED_SEPARATE_FUNCTIONS = Object.freeze([
   'idr-payment-webhook',
@@ -90,6 +92,7 @@ export const EXPECTED_SHARED_FUNCTION_FILES = Object.freeze([
   'supabase/functions/_shared/meta-purchase.ts',
   'supabase/functions/_shared/notification-locale.ts',
   'supabase/functions/_shared/paid-payment-ledger.ts',
+  'supabase/functions/_shared/payment-checkout-link.ts',
   'supabase/functions/_shared/photo-radar.ts',
   'supabase/functions/_shared/pro-licence.ts',
   'supabase/functions/_shared/pro-pricing.ts',
