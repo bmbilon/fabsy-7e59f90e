@@ -4,6 +4,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { renderTicketAdminEmailHtml, renderTicketClientEmailHtml, type TicketNotification } from "../_shared/ticket-notification-html.ts";
 import { parsePreferredLocale } from "../_shared/locale-policy.ts";
 import { notificationLocale, prepareClientEmail, prepareClientSms } from "../_shared/notification-locale.ts";
+import {
+  isPaymentPendingResumeDraft,
+  renderPaymentPendingResumeSms,
+  ticketIntakeResumeUrl,
+} from "../_shared/ticket-intake-resume-delivery.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -118,6 +123,29 @@ const handler = async (req: Request): Promise<Response> => {
     const localeContext = { preferredLocale: ticketData.preferredLocale, template: "ticket_received" as const };
     const configuredSiteUrl = Deno.env.get("SITE_URL") || "https://fabsy.ca";
     const siteOrigin = new URL(configuredSiteUrl).origin;
+    let paymentResumeUrl: string | null = null;
+    if (ticketData.smsOptIn) {
+      // Only expose the bearer capability when this submission was converted
+      // from the same still-live draft. Legacy/direct submissions receive the
+      // existing link-free confirmation rather than a dead or unsafe link.
+      const { data: convertedDraft, error: convertedDraftError } = await supabase
+        .from("ticket_intake_drafts")
+        .select("id,status,converted_submission_id,access_token_hash,expires_at")
+        .eq("converted_submission_id", submissionId)
+        .maybeSingle();
+      if (convertedDraftError) throw convertedDraftError;
+      if (isPaymentPendingResumeDraft(
+        convertedDraft,
+        submissionId,
+        accessTokenHash,
+      )) {
+        paymentResumeUrl = ticketIntakeResumeUrl(
+          configuredSiteUrl,
+          ticketData.preferredLocale,
+          accessToken,
+        );
+      }
+    }
 
     dispatchClaimId = crypto.randomUUID();
     const { data: rawClaim, error: claimError } = await supabase.rpc(
@@ -306,7 +334,10 @@ const handler = async (req: Request): Promise<Response> => {
     let clientSmsResponse = null;
     if (ticketData.smsOptIn) {
       try {
-        const clientSmsMessage = prepareClientSms(`Hi ${ticketData.firstName}! Your ticket submission has been received. Complete Stripe Checkout before service begins. We've emailed copies of your forms and consent agreement. - Fabsy`, localeContext);
+        const englishClientSms = paymentResumeUrl
+          ? renderPaymentPendingResumeSms(ticketData.firstName, paymentResumeUrl)
+          : `Hi ${ticketData.firstName}! Your ticket submission has been received. Complete Stripe Checkout before service begins. We've emailed copies of your forms and consent agreement. - Fabsy`;
+        const clientSmsMessage = prepareClientSms(englishClientSms, localeContext);
         
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
         const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
@@ -325,12 +356,17 @@ const handler = async (req: Request): Promise<Response> => {
         });
 
         if (!clientSmsResult.ok) {
-          const errorText = await clientSmsResult.text();
-          console.error("Client Twilio SMS error:", errorText);
+          // The provider response can echo request data. Never log the message
+          // body because it contains the private resume capability.
+          console.error("Client Twilio SMS rejected with status:", clientSmsResult.status);
           providerDeliveryFailures.push("client_sms_rejected");
         } else {
-          clientSmsResponse = await clientSmsResult.json();
-          console.log("Client SMS sent successfully:", clientSmsResponse);
+          const providerResponse = await clientSmsResult.json() as Record<string, unknown>;
+          clientSmsResponse = {
+            sid: typeof providerResponse.sid === "string" ? providerResponse.sid : null,
+            status: typeof providerResponse.status === "string" ? providerResponse.status : null,
+          };
+          console.log("Client SMS accepted by provider:", clientSmsResponse);
         }
       } catch (smsError: unknown) {
         console.error("Error sending client SMS:", getErrorMessage(smsError));

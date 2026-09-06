@@ -7,8 +7,10 @@ import {
 } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import {
   deliverTicketIntakeResume,
+  isPaymentPendingResumeDraft,
   preserveConfirmedDraftOnDeliveryFailure,
   publicResumeDeliveryState,
+  renderPaymentPendingResumeSms,
   resumeDeliveryEnabled,
   safeResumeDeliveryAttempt,
   ticketIntakeResumeUrl,
@@ -40,6 +42,55 @@ Deno.test("resume capability appears only in a localized URL fragment", () => {
   assertEquals(punjabi.pathname, "/pa/submit-ticket");
   assertEquals(punjabi.search, "");
   assertEquals(punjabi.hash, `#resume=${accessToken}`);
+});
+
+Deno.test("payment-pending SMS carries a private continuation link without a query capability", () => {
+  const resumeUrl = ticketIntakeResumeUrl(
+    "https://fabsy.ca",
+    "en",
+    accessToken,
+  );
+  const message = renderPaymentPendingResumeSms(" Brett ", resumeUrl);
+
+  assertStringIncludes(message, "Hi Brett!");
+  assertStringIncludes(message, "Continue to secure checkout:");
+  assertStringIncludes(message, `/submit-ticket#resume=${accessToken}`);
+  assertStringIncludes(message, "Service begins after payment.");
+  assertStringIncludes(message, "Private link; do not forward.");
+  assert(!message.includes("?resume="));
+});
+
+Deno.test("payment continuation requires the same live converted draft and capability", () => {
+  const submissionId = "00000000-0000-4000-8000-000000000302";
+  const accessTokenHash = "b".repeat(64);
+  const now = Date.parse("2026-09-05T20:00:00Z");
+  const draft = {
+    id: submissionId,
+    status: "converted",
+    converted_submission_id: submissionId,
+    access_token_hash: accessTokenHash,
+    expires_at: "2026-09-06T20:00:00Z",
+  };
+
+  assert(isPaymentPendingResumeDraft(draft, submissionId, accessTokenHash, now));
+  assert(!isPaymentPendingResumeDraft(
+    { ...draft, converted_submission_id: draftId },
+    submissionId,
+    accessTokenHash,
+    now,
+  ));
+  assert(!isPaymentPendingResumeDraft(
+    { ...draft, access_token_hash: "c".repeat(64) },
+    submissionId,
+    accessTokenHash,
+    now,
+  ));
+  assert(!isPaymentPendingResumeDraft(
+    { ...draft, expires_at: "2026-09-05T20:00:00Z" },
+    submissionId,
+    accessTokenHash,
+    now,
+  ));
 });
 
 Deno.test("resume URL rejects unsafe site origins and malformed capabilities", async () => {
