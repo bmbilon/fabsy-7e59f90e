@@ -461,7 +461,11 @@ const TicketForm = ({
   );
 
   const saveLead = async () => {
-    if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") return false;
+    if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") {
+      if (!isLeadValid) window.dispatchEvent(new CustomEvent("fabsy:intake-validation-blocked", { detail: { step: 1 } }));
+      return false;
+    }
+    window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-started"));
     try {
       const saved = await intakeDraft.createOrUpload(formData.ticketImage, formData as unknown as Record<string, unknown>);
       formScrollPending.current = true;
@@ -477,6 +481,7 @@ const TicketForm = ({
       toast({ title: "Your intake is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
       return true;
     } catch (failure) {
+      window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-failed"));
       toast({
         title: "We could not finish saving",
         description: failure instanceof Error ? failure.message : "Try saving the intake again.",
@@ -519,8 +524,14 @@ const TicketForm = ({
   };
 
   const saveReplacementTicket = async () => {
-    if (!replacementTicketFile || !replacementSaveReady || intakeDraft.status === "saving") return;
+    if (!replacementTicketFile || !replacementSaveReady || intakeDraft.status === "saving") {
+      if (replacementTicketFile && !replacementSaveReady) {
+        window.dispatchEvent(new CustomEvent("fabsy:intake-validation-blocked", { detail: { step: 1 } }));
+      }
+      return;
+    }
     const previous = replacementTicketSnapshot.current;
+    window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-started"));
     try {
       await intakeDraft.createOrUpload(
         replacementTicketFile,
@@ -537,6 +548,7 @@ const TicketForm = ({
         description: "The new private ticket file and the details you reviewed are now linked to this intake.",
       });
     } catch (failure) {
+      window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-failed"));
       replacementTicketSnapshot.current = null;
       setReplacementTicketFile(null);
       if (previous) {
@@ -589,6 +601,7 @@ const TicketForm = ({
   const nextStep = async () => {
     if (currentStep < steps.length) {
       if (intakeDraft.record?.hasPendingTicketUpload) {
+        window.dispatchEvent(new CustomEvent("fabsy:intake-validation-blocked", { detail: { step: currentStep } }));
         toast({
           title: "Finish the ticket replacement first",
           description: "Retry the upload or keep your last confirmed ticket before continuing.",
@@ -855,6 +868,13 @@ const TicketForm = ({
   };
 
   const progress = (currentStep / steps.length) * 100;
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("fabsy:intake-step-viewed", { detail: { step: currentStep } }));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [currentStep]);
+
   // Ensure page starts at top when this component mounts
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });

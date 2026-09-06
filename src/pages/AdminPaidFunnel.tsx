@@ -10,9 +10,21 @@ import { useToast } from '@/hooks/use-toast';
 
 type FunnelEventName =
   | 'landing_view'
+  | 'primary_cta_viewed'
   | 'primary_cta_click'
   | 'phone_click'
+  | 'engaged_10s'
+  | 'engaged_30s'
+  | 'engaged_60s'
+  | 'scroll_25'
+  | 'scroll_50'
+  | 'scroll_75'
+  | 'scroll_90'
   | 'intake_started'
+  | 'intake_step_viewed'
+  | 'intake_validation_blocked'
+  | 'ticket_upload_started'
+  | 'ticket_upload_failed'
   | 'ticket_uploaded'
   | 'lead_saved'
   | 'intake_step_completed'
@@ -42,6 +54,31 @@ interface CampaignTotal {
   purchase_sessions: number;
 }
 
+interface BehaviorCampaignTotal {
+  source: string;
+  medium: string;
+  campaign: string;
+  content: string;
+  cta_viewed_sessions: number;
+  engaged_10s_sessions: number;
+  engaged_30s_sessions: number;
+  engaged_60s_sessions: number;
+  scroll_25_sessions: number;
+  scroll_50_sessions: number;
+  scroll_75_sessions: number;
+  scroll_90_sessions: number;
+  upload_started_sessions: number;
+  upload_failed_sessions: number;
+  validation_blocked_sessions: number;
+}
+
+interface BehaviorStepTotal {
+  step: number;
+  viewed_sessions: number;
+  blocked_sessions: number;
+  completed_sessions: number;
+}
+
 interface FunnelReport {
   generated_at: string;
   since: string;
@@ -50,6 +87,10 @@ interface FunnelReport {
   events: EventTotal[];
   campaigns: CampaignTotal[];
   daily: Array<{ day: string; landing_sessions: number; lead_sessions: number; purchase_sessions: number }>;
+  behavior?: {
+    campaigns: BehaviorCampaignTotal[];
+    steps: BehaviorStepTotal[];
+  };
   financials?: {
     scope: 'all_customer_purchases_from_signed_stripe_webhooks';
     amount_basis: 'gross_customer_cash_including_tax';
@@ -112,6 +153,31 @@ function normalizeReport(value: FunnelReport): FunnelReport {
         }))
       : [],
     daily: Array.isArray(value.daily) ? value.daily : [],
+    behavior: value.behavior ? {
+      campaigns: Array.isArray(value.behavior.campaigns)
+        ? value.behavior.campaigns.map(campaign => ({
+            ...campaign,
+            cta_viewed_sessions: numberValue(campaign.cta_viewed_sessions),
+            engaged_10s_sessions: numberValue(campaign.engaged_10s_sessions),
+            engaged_30s_sessions: numberValue(campaign.engaged_30s_sessions),
+            engaged_60s_sessions: numberValue(campaign.engaged_60s_sessions),
+            scroll_25_sessions: numberValue(campaign.scroll_25_sessions),
+            scroll_50_sessions: numberValue(campaign.scroll_50_sessions),
+            scroll_75_sessions: numberValue(campaign.scroll_75_sessions),
+            scroll_90_sessions: numberValue(campaign.scroll_90_sessions),
+            upload_started_sessions: numberValue(campaign.upload_started_sessions),
+            upload_failed_sessions: numberValue(campaign.upload_failed_sessions),
+            validation_blocked_sessions: numberValue(campaign.validation_blocked_sessions),
+          })) : [],
+      steps: Array.isArray(value.behavior.steps)
+        ? value.behavior.steps.map(step => ({
+            ...step,
+            step: numberValue(step.step),
+            viewed_sessions: numberValue(step.viewed_sessions),
+            blocked_sessions: numberValue(step.blocked_sessions),
+            completed_sessions: numberValue(step.completed_sessions),
+          })) : [],
+    } : undefined,
     financials: value.financials ? {
       ...value.financials,
       purchase_count: numberValue(value.financials.purchase_count),
@@ -262,6 +328,56 @@ export default function AdminPaidFunnel() {
 
         <Card>
           <CardHeader>
+            <CardTitle>Landing-page behavior</CardTitle>
+            <CardDescription>Anonymous checkpoints from consented, visible browsing time. They show where visitors stop without recording replays, form values or identity.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ['primary_cta_viewed', 'Saw a primary CTA'],
+                ['engaged_10s', 'Visible for 10 seconds'],
+                ['engaged_30s', 'Visible for 30 seconds'],
+                ['engaged_60s', 'Visible for 60 seconds'],
+                ['scroll_25', 'Reached 25%'],
+                ['scroll_50', 'Reached 50%'],
+                ['scroll_75', 'Reached 75%'],
+                ['scroll_90', 'Reached 90%'],
+              ].map(([event, label]) => {
+                const count = eventSessions.get(event as FunnelEventName) || 0;
+                return <div key={event} className="rounded-lg border p-4">
+                  <div className="text-sm text-muted-foreground">{label}</div>
+                  <div className="mt-1 flex items-baseline justify-between gap-3"><span className="text-2xl font-bold">{loading ? '…' : count}</span><Badge variant="outline">{loading ? '…' : percent(count, landingSessions)}</Badge></div>
+                </div>;
+              })}
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Upload attempts</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : eventSessions.get('ticket_upload_started') || 0}</div></div>
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Upload failures</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : eventSessions.get('ticket_upload_failed') || 0}</div></div>
+              <div className="rounded-lg border p-4"><div className="text-sm text-muted-foreground">Sessions blocked by validation</div><div className="mt-1 text-2xl font-bold">{loading ? '…' : eventSessions.get('intake_validation_blocked') || 0}</div></div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Intake steps</CardTitle>
+            <CardDescription>Unique consented sessions that viewed, completed or encountered a validation block on each step.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[520px] text-left text-sm">
+                <thead className="border-b text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-3 py-3">Step</th><th className="px-3 py-3">Viewed</th><th className="px-3 py-3">Completed</th><th className="px-3 py-3">Blocked</th></tr></thead>
+                <tbody>
+                  {(report?.behavior?.steps || []).map(step => <tr key={step.step} className="border-b last:border-0"><td className="px-3 py-3 font-medium">Step {step.step}</td><td className="px-3 py-3">{step.viewed_sessions}</td><td className="px-3 py-3">{step.completed_sessions}</td><td className="px-3 py-3">{step.blocked_sessions}</td></tr>)}
+                  {!loading && !report?.behavior?.steps.length ? <tr><td colSpan={4} className="px-3 py-10 text-center text-muted-foreground">No step diagnostics in this window.</td></tr> : null}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Verified payment and refund cash facts</CardTitle>
             <CardDescription>
               All-customer, order-level facts from signed Stripe webhooks. Amounts include tax and are separate from the consented-session funnel above. Refund facts are never sent to Google or Meta.
@@ -281,6 +397,27 @@ export default function AdminPaidFunnel() {
             {report?.financials?.unmatched_succeeded_refund_count ? <p className="text-sm font-medium text-amber-700">
               {report.financials.unmatched_succeeded_refund_count} succeeded refund(s), totaling {cad(report.financials.unmatched_succeeded_refund_amount_cents)}, are not yet matched to a supported paid-acquisition product.
             </p> : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Behavior by campaign and creative</CardTitle>
+            <CardDescription>Unique consented sessions at each diagnostic checkpoint.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1050px] text-left text-sm">
+                <thead className="border-b text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-3 py-3">Source / campaign / content</th><th className="px-3 py-3">CTA seen</th><th className="px-3 py-3">10s</th><th className="px-3 py-3">30s</th><th className="px-3 py-3">60s</th><th className="px-3 py-3">Scroll 50%</th><th className="px-3 py-3">Scroll 90%</th><th className="px-3 py-3">Upload try</th><th className="px-3 py-3">Upload fail</th><th className="px-3 py-3">Blocked</th></tr></thead>
+                <tbody>
+                  {(report?.behavior?.campaigns || []).map((campaign, index) => <tr key={`${campaign.source}:${campaign.campaign}:${campaign.content}:${index}`} className="border-b last:border-0">
+                    <td className="px-3 py-3"><div className="font-medium">{campaign.source} · {campaign.campaign}</div><div className="text-xs text-muted-foreground">{campaign.medium} · {campaign.content}</div></td>
+                    <td className="px-3 py-3">{campaign.cta_viewed_sessions}</td><td className="px-3 py-3">{campaign.engaged_10s_sessions}</td><td className="px-3 py-3">{campaign.engaged_30s_sessions}</td><td className="px-3 py-3">{campaign.engaged_60s_sessions}</td><td className="px-3 py-3">{campaign.scroll_50_sessions}</td><td className="px-3 py-3">{campaign.scroll_90_sessions}</td><td className="px-3 py-3">{campaign.upload_started_sessions}</td><td className="px-3 py-3">{campaign.upload_failed_sessions}</td><td className="px-3 py-3">{campaign.validation_blocked_sessions}</td>
+                  </tr>)}
+                  {!loading && !report?.behavior?.campaigns.length ? <tr><td colSpan={10} className="px-3 py-10 text-center text-muted-foreground">No behavior diagnostics in this window.</td></tr> : null}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
 

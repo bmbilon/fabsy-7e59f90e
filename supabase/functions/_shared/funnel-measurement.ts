@@ -1,8 +1,20 @@
 export const FUNNEL_EVENT_NAMES = [
   'landing_view',
+  'primary_cta_viewed',
   'primary_cta_click',
   'phone_click',
+  'engaged_10s',
+  'engaged_30s',
+  'engaged_60s',
+  'scroll_25',
+  'scroll_50',
+  'scroll_75',
+  'scroll_90',
   'intake_started',
+  'intake_step_viewed',
+  'intake_validation_blocked',
+  'ticket_upload_started',
+  'ticket_upload_failed',
   'ticket_uploaded',
   'lead_saved',
   'intake_step_completed',
@@ -82,8 +94,16 @@ function optionalUtm(value: unknown): string | null {
 }
 
 function eventMatchesPage(eventName: FunnelEventName, pageKey: FunnelPageKey): boolean {
-  if (['landing_view', 'primary_cta_click', 'phone_click'].includes(eventName)) return pageKey === 'rapid_resolution';
-  if (['intake_started', 'ticket_uploaded', 'lead_saved', 'intake_step_completed', 'checkout_started'].includes(eventName)) {
+  if ([
+    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click',
+    'engaged_10s', 'engaged_30s', 'engaged_60s',
+    'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90',
+  ].includes(eventName)) return pageKey === 'rapid_resolution';
+  if ([
+    'intake_started', 'intake_step_viewed', 'intake_validation_blocked',
+    'ticket_upload_started', 'ticket_upload_failed', 'ticket_uploaded',
+    'lead_saved', 'intake_step_completed', 'checkout_started',
+  ].includes(eventName)) {
     return pageKey === 'intake';
   }
   if (eventName === 'checkout_canceled') return pageKey === 'payment_canceled';
@@ -118,7 +138,7 @@ export function parseFunnelEventRequest(value: unknown, now = Date.now()): Parse
     throw new FunnelRequestError('consented_at_invalid');
   }
   const step = body.step === undefined ? null : body.step;
-  if (eventName === 'intake_step_completed') {
+  if (['intake_step_viewed', 'intake_validation_blocked', 'intake_step_completed'].includes(eventName)) {
     if (!Number.isInteger(step) || (step as number) < 1 || (step as number) > 6) {
       throw new FunnelRequestError('step_invalid');
     }
@@ -127,7 +147,7 @@ export function parseFunnelEventRequest(value: unknown, now = Date.now()): Parse
   if (product !== null) throw new FunnelRequestError('product_invalid');
   const position = body.position === undefined ? null : body.position;
   if (position !== null && (typeof position !== 'string' || !actionPositions.has(position as FunnelActionPosition) ||
-      (eventName !== 'primary_cta_click' && eventName !== 'phone_click'))) {
+      (eventName !== 'primary_cta_viewed' && eventName !== 'primary_cta_click' && eventName !== 'phone_click'))) {
     throw new FunnelRequestError('position_invalid');
   }
 

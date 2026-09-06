@@ -67,12 +67,15 @@ serve(async request => {
     const days = parseFunnelReportWindow(JSON.parse(text));
     const until = new Date();
     const since = new Date(until.getTime() - days * 24 * 60 * 60 * 1000);
-    const { data, error } = await admin.rpc('paid_funnel_report', {
-      p_since: since.toISOString(),
-      p_until: until.toISOString(),
-    });
-    if (error || !data) return json(origin, 503, { error: 'report_unavailable' });
-    return json(origin, 200, data);
+    const reportWindow = { p_since: since.toISOString(), p_until: until.toISOString() };
+    const [funnelResult, behaviorResult] = await Promise.all([
+      admin.rpc('paid_funnel_report', reportWindow),
+      admin.rpc('paid_funnel_behavior_report', reportWindow),
+    ]);
+    if (funnelResult.error || !funnelResult.data || behaviorResult.error || !behaviorResult.data) {
+      return json(origin, 503, { error: 'report_unavailable' });
+    }
+    return json(origin, 200, { ...funnelResult.data, behavior: behaviorResult.data });
   } catch (error) {
     const status = error instanceof FunnelReportRequestError ? error.status : 400;
     const code = error instanceof FunnelReportRequestError ? error.code : 'request_invalid';

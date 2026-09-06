@@ -470,6 +470,8 @@ test('client rejects event/page and step mismatches before transport', async () 
     assert.equal(await r.api.recordFunnelEvent('lead_saved'), false);
     assert.equal(await r.api.recordFunnelEvent('intake_step_completed', { step: 7 }), false);
     assert.equal(await r.api.recordFunnelEvent('landing_view', { position: 'hero' }), false);
+    assert.equal(await r.api.recordFunnelEvent('intake_step_viewed', { step: 2 }), false);
+    assert.equal(await r.api.recordFunnelEvent('ticket_upload_started'), false);
     assert.equal(await r.api.recordFunnelEvent('purchase', { product: 'rapid_resolution' }), false);
     assert.equal(r.calls.length, 0);
     assert.equal(r.api.funnelMeasurementEnabled(enabledEnv, 'https://fabsy.ca'), true);
@@ -552,6 +554,23 @@ test('server parser accepts only the exact no-PII contract', async () => {
     position: 'hero',
   }, now);
   assert.equal(cta.position, 'hero');
+  const ctaViewed = parseFunnelEventRequest({
+    ...base,
+    eventName: 'primary_cta_viewed',
+    pageKey: 'rapid_resolution',
+    step: undefined,
+    position: 'sticky',
+  }, now);
+  assert.equal(ctaViewed.position, 'sticky');
+  const engaged = parseFunnelEventRequest({
+    ...base,
+    eventName: 'engaged_30s',
+    pageKey: 'rapid_resolution',
+    step: undefined,
+  }, now);
+  assert.equal(engaged.eventName, 'engaged_30s');
+  const stepViewed = parseFunnelEventRequest({ ...base, eventName: 'intake_step_viewed', step: 4 }, now);
+  assert.equal(stepViewed.step, 4);
   for (const invalid of [
     { ...base, email: 'person@example.invalid' },
     { ...base, eventName: 'lead_saved', step: 2 },
@@ -559,6 +578,8 @@ test('server parser accepts only the exact no-PII contract', async () => {
     { ...base, consentVersion: 'google-v1' },
     { ...base, position: 'hero' },
     { ...base, eventName: 'primary_cta_click', pageKey: 'rapid_resolution', step: undefined, position: 'modal' },
+    { ...base, eventName: 'engaged_10s', pageKey: 'intake', step: undefined },
+    { ...base, eventName: 'ticket_upload_failed', step: 1 },
     { ...base, clickId: { kind: 'fbclid', value: 'person@example.invalid' } },
     { ...base, eventName: 'purchase', pageKey: 'thank_you', step: undefined, product: 'rapid_resolution' },
   ]) assert.throws(() => parseFunnelEventRequest(invalid, now), FunnelRequestError);
@@ -566,6 +587,7 @@ test('server parser accepts only the exact no-PII contract', async () => {
 
 test('database and edge contracts store no raw click ID, IP, user agent or form value', async () => {
   const migration = await fs.readFile(path.join(root, 'supabase/migrations/20260903170000_paid_funnel_measurement.sql'), 'utf8');
+  const behaviorMigration = await fs.readFile(path.join(root, 'supabase/migrations/20260906170000_paid_funnel_behavior_diagnostics.sql'), 'utf8');
   const withdrawalFence = await fs.readFile(path.join(root, 'supabase/migrations/20260903183000_paid_funnel_checkout_withdrawal_fence.sql'), 'utf8');
   const edge = await fs.readFile(path.join(root, 'supabase/functions/record-funnel-event/index.ts'), 'utf8');
   assert.match(migration, /click_id_hash text/);
@@ -575,6 +597,12 @@ test('database and edge contracts store no raw click ID, IP, user agent or form 
   assert.match(migration, /record_verified_paid_funnel_purchase/);
   assert.match(migration, /record_paid_funnel_checkout/);
   assert.match(migration, /withdraw_paid_funnel_checkout/);
+  assert.match(behaviorMigration, /primary_cta_viewed/);
+  assert.match(behaviorMigration, /engaged_10s/);
+  assert.match(behaviorMigration, /ticket_upload_started/);
+  assert.match(behaviorMigration, /intake_validation_blocked/);
+  assert.match(behaviorMigration, /paid_funnel_behavior_report/);
+  assert.doesNotMatch(behaviorMigration, /\b(email|phone_number|ticket_number|user_agent|ip_address)\b/i);
   assert.match(withdrawalFence, /paid_funnel_checkout_withdrawals/);
   assert.match(withdrawalFence, /withdraw_known_paid_funnel_checkout/);
   assert.doesNotMatch(withdrawalFence, /revoked_at\s*=\s*null/i);
