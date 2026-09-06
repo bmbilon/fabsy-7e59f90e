@@ -19,7 +19,7 @@ import { chromium } from 'playwright';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const origin = 'https://fabsy.ca';
-const defaults = { ga4: 'G-26G8CMWTKY', ads: 'AW-18419256057' };
+const defaults = { ga4: 'G-YRP61S5TPF', ads: 'AW-18419256057' };
 const purchaseLabels = new Set(['MyAbCPiLj-scEPmV_s5E', 'TEo-CJH0kescEPmV_s5E']);
 const consentStorageKey = 'fabsy:google-measurement-consent:v1';
 // Deliberately narrower than the production policy: these are the only public

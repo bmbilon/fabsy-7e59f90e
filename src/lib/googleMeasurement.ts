@@ -32,7 +32,7 @@ interface MeasurementEnvironment {
 export function googleMeasurementConfig(env: MeasurementEnvironment, origin: string): PaidPurchaseConfig {
   if (!env.PROD || env.VITE_GOOGLE_MEASUREMENT_ENABLED !== 'true' ||
       !['https://fabsy.ca', 'https://www.fabsy.ca'].includes(origin)) return {};
-  const ga4Id = env.VITE_GA4_MEASUREMENT_ID || 'G-26G8CMWTKY';
+  const ga4Id = env.VITE_GA4_MEASUREMENT_ID || 'G-YRP61S5TPF';
   return {
     ga4Id: /^G-[A-Z0-9]+$/.test(ga4Id) && !/\s/.test(ga4Id) ? ga4Id : undefined,
     adsId: /^AW-\d+$/.test(env.VITE_GADS_ID || '') && !/\s/.test(env.VITE_GADS_ID || '') ? env.VITE_GADS_ID : undefined,
