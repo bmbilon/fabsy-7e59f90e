@@ -31,7 +31,8 @@
       "20260903191000_ticket_intake_converted_retention.sql",
       "20260903192000_ticket_intake_delivery_abuse_controls.sql",
       "20260903193000_ticket_submission_notification_idempotency.sql",
-      "20260903194000_ticket_intake_staff_follow_up.sql"
+      "20260903194000_ticket_intake_staff_follow_up.sql",
+      "20260905213500_ticket_checkout_links.sql"
     ],
     "coreFunctions": [
       "cache-ticket-data",
@@ -41,7 +42,8 @@
       "withdraw-meta-measurement",
       "record-funnel-event",
       "paid-funnel-report",
-      "send-notification"
+      "send-notification",
+      "resolve-payment-link"
     ],
     "sharedFunctionFiles": [
       "supabase/functions/_shared/email-signature.ts",
@@ -53,6 +55,7 @@
       "supabase/functions/_shared/meta-purchase.ts",
       "supabase/functions/_shared/notification-locale.ts",
       "supabase/functions/_shared/paid-payment-ledger.ts",
+      "supabase/functions/_shared/payment-checkout-link.ts",
       "supabase/functions/_shared/photo-radar.ts",
       "supabase/functions/_shared/pro-licence.ts",
       "supabase/functions/_shared/pro-pricing.ts",

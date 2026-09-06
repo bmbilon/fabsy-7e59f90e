@@ -12,6 +12,7 @@ import About from "./pages/About";
 import Services from "./pages/Services";
 import TestimonialsPage from "./pages/TestimonialsPage";
 import PaymentCanceled from "./pages/PaymentCanceled";
+import PaymentLinkRedirect from "./pages/PaymentLinkRedirect";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import TermsOfPurchase from "./pages/TermsOfPurchase";
@@ -82,7 +83,7 @@ const queryClient = new QueryClient();
 
 const RouteAnalytics = () => {
   const location = useLocation();
-  if (location.pathname === "/representation-consent") return null;
+  if (location.pathname === "/representation-consent" || location.pathname.startsWith("/pay/")) return null;
   return (
     <>
       <AcquisitionTracker />
@@ -132,6 +133,7 @@ const App = () => (
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/payment-success" element={<Navigate to="/submit-ticket" replace />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
+          <Route path="/pay/:code" element={<PaymentLinkRedirect />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/terms-of-purchase" element={<TermsOfPurchase />} />

@@ -186,10 +186,10 @@ export function renderTicketIntakeResumeSms(resumeUrl: string): string {
 
 export function renderPaymentPendingResumeSms(
   firstName: string,
-  resumeUrl: string,
+  paymentUrl: string,
 ): string {
   const greeting = firstName.trim() ? `Hi ${firstName.trim()}! ` : "";
-  return `${greeting}Your Fabsy ticket is saved. Continue to secure checkout: ${resumeUrl} Service begins after payment. Private link; do not forward. - Fabsy`;
+  return `${greeting}Complete your Fabsy payment: ${paymentUrl} Service begins after payment. Private link; do not forward. - Fabsy`;
 }
 
 export function isPaymentPendingResumeDraft(

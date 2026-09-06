@@ -16,6 +16,7 @@ const CallBar = () => {
   const { locale } = useLocale();
   // A translated page does not imply phone staffing in that language.
   if (locale !== "en") return null;
+  if (location.pathname.startsWith("/pay/")) return null;
   if (location.pathname === RAPID_RESOLUTION.intakePath || location.pathname === "/traffic-ticket-assessment/confirmation") {
     return null;
   }

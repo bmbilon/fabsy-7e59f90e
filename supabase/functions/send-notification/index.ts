@@ -9,6 +9,10 @@ import {
   renderPaymentPendingResumeSms,
   ticketIntakeResumeUrl,
 } from "../_shared/ticket-intake-resume-delivery.ts";
+import {
+  paymentCheckoutUrl,
+  PAYMENT_LINK_CODE_PATTERN,
+} from "../_shared/payment-checkout-link.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -44,6 +48,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 interface NotificationRequest {
   submissionId: string;
   accessToken: string;
+  paymentLinkCode?: string;
 }
 
 interface NotificationClaim {
@@ -86,8 +91,14 @@ const handler = async (req: Request): Promise<Response> => {
     const request = await req.json() as Partial<NotificationRequest>;
     const submissionId = requiredText(request.submissionId, "Submission", 36).toLowerCase();
     const accessToken = requiredText(request.accessToken, "Submission access token", 200);
+    const paymentLinkCode = request.paymentLinkCode === undefined
+      ? null
+      : requiredText(request.paymentLinkCode, "Payment link", 22);
     if (!UUID_PATTERN.test(submissionId) || accessToken.length < 32) {
       throw new RequestError("Submission authorization is invalid.", 403);
+    }
+    if (paymentLinkCode && !PAYMENT_LINK_CODE_PATTERN.test(paymentLinkCode)) {
+      throw new RequestError("Payment link is invalid.", 403);
     }
     const accessTokenHash = await sha256(accessToken);
     const { data: submission, error: submissionError } = await supabase
@@ -125,25 +136,39 @@ const handler = async (req: Request): Promise<Response> => {
     const siteOrigin = new URL(configuredSiteUrl).origin;
     let paymentResumeUrl: string | null = null;
     if (ticketData.smsOptIn) {
+      if (paymentLinkCode) {
+        const { data: checkoutLink, error: checkoutLinkError } = await supabase
+          .from("ticket_checkout_links")
+          .select("submission_id,expires_at")
+          .eq("code", paymentLinkCode)
+          .eq("submission_id", submissionId)
+          .maybeSingle();
+        if (checkoutLinkError) throw checkoutLinkError;
+        if (checkoutLink && Date.parse(checkoutLink.expires_at) > Date.now()) {
+          paymentResumeUrl = paymentCheckoutUrl(configuredSiteUrl, paymentLinkCode);
+        }
+      }
       // Only expose the bearer capability when this submission was converted
       // from the same still-live draft. Legacy/direct submissions receive the
       // existing link-free confirmation rather than a dead or unsafe link.
-      const { data: convertedDraft, error: convertedDraftError } = await supabase
-        .from("ticket_intake_drafts")
-        .select("id,status,converted_submission_id,access_token_hash,expires_at")
-        .eq("converted_submission_id", submissionId)
-        .maybeSingle();
-      if (convertedDraftError) throw convertedDraftError;
-      if (isPaymentPendingResumeDraft(
-        convertedDraft,
-        submissionId,
-        accessTokenHash,
-      )) {
-        paymentResumeUrl = ticketIntakeResumeUrl(
-          configuredSiteUrl,
-          ticketData.preferredLocale,
-          accessToken,
-        );
+      if (!paymentResumeUrl) {
+        const { data: convertedDraft, error: convertedDraftError } = await supabase
+          .from("ticket_intake_drafts")
+          .select("id,status,converted_submission_id,access_token_hash,expires_at")
+          .eq("converted_submission_id", submissionId)
+          .maybeSingle();
+        if (convertedDraftError) throw convertedDraftError;
+        if (isPaymentPendingResumeDraft(
+          convertedDraft,
+          submissionId,
+          accessTokenHash,
+        )) {
+          paymentResumeUrl = ticketIntakeResumeUrl(
+            configuredSiteUrl,
+            ticketData.preferredLocale,
+            accessToken,
+          );
+        }
       }
     }
 
