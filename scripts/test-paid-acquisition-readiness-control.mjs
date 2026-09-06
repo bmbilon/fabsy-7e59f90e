@@ -326,7 +326,7 @@ function createFixture(platform = 'meta') {
       maximumMediaLossApprovedBy: 'Economics Owner',
       maximumMediaLossApprovedById: 'owner.brett',
       maximumMediaLossApprovedAt: '2026-09-04T11:05:00Z',
-      noCrossPlatformOverlapStageOne: true,
+      crossPlatformOverlapApproved: true,
       phoneTestEvidence: 'evidence/phone.json',
       notificationTestEvidence: 'evidence/notifications.json',
       stripeBrandingEvidence: 'evidence/stripe.json',

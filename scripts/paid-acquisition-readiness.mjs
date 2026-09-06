@@ -1023,7 +1023,7 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
     'weeklyCaseCapacity', 'maximumMediaLossCad', 'maximumSpendWithoutLeadCad',
     'maximumSpendWithoutPurchaseCad', 'maximumMediaLossApprovedBy',
     'maximumMediaLossApprovedById', 'maximumMediaLossApprovedAt',
-    'noCrossPlatformOverlapStageOne', 'phoneTestEvidence', 'notificationTestEvidence',
+    'crossPlatformOverlapApproved', 'phoneTestEvidence', 'notificationTestEvidence',
     'stripeBrandingEvidence', 'trustedCfConnectingIpEvidence',
   ], 'operations', failSchema);
   if (isPlainObject(operations)) {
@@ -1038,7 +1038,7 @@ export function evaluatePaidAcquisitionReadiness(record, options = {}) {
       if (!finiteNumber(operations.maximumSpendWithoutPurchaseCad) || operations.maximumSpendWithoutPurchaseCad > purchaseCeiling + MONEY_TOLERANCE) fail(`maximumSpendWithoutPurchaseCad cannot exceed min(maximum loss, 3 x maximum CAC), currently CA$${purchaseCeiling.toFixed(2)}.`);
     }
     if (!nonEmpty(operations.maximumMediaLossApprovedBy) || !ACTOR_ID.test(operations.maximumMediaLossApprovedById || '')) fail('The maximum media loss requires an approving actor name and stable actor ID.');
-    if (operations.noCrossPlatformOverlapStageOne !== true) fail('operations.noCrossPlatformOverlapStageOne must be true.');
+    if (operations.crossPlatformOverlapApproved !== true) fail('operations.crossPlatformOverlapApproved must document explicit owner approval.');
     operationalReceipt(operations.phoneTestEvidence, 'operations.phoneTestEvidence', 'phone-route');
     operationalReceipt(operations.notificationTestEvidence, 'operations.notificationTestEvidence', 'notification-delivery');
     operationalReceipt(operations.stripeBrandingEvidence, 'operations.stripeBrandingEvidence', 'stripe-branding');
