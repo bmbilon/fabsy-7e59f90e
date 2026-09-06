@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { calendarDateAsLocalDate } from "@/lib/ticket/ticketType";
 
 export const INTAKE_DRAFT_STORAGE_KEY = "fabsy.ticket-intake-capability.v1";
 export const INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY =
@@ -107,8 +108,7 @@ export function hydrateIntakeDraftData(raw: Record<string, unknown>): Record<str
   for (const key of ["dateOfBirth", "issueDate", "courtDate"] as const) {
     const value = hydrated[key];
     if (typeof value !== "string" || !value) continue;
-    const date = new Date(value);
-    hydrated[key] = Number.isFinite(date.getTime()) ? date : undefined;
+    hydrated[key] = calendarDateAsLocalDate(value);
   }
   // A saved authorization is never restored. The customer must review and sign
   // the current consent text in the current session.

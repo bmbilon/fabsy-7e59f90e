@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { isProLicenceClass, licenceClassHint, licencePhotoAsDataUrl, validateProLicenceFile, type LicenceClass } from "@/lib/pro-drivers/intake";
 import { TICKET_CAPTURE_PHOTO_ACCEPT, validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
+import { calendarDateAsLocalDate } from "@/lib/ticket/ticketType";
 
 const personalInfoSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -186,8 +187,8 @@ const PersonalInfoStep = ({ formData, updateFormData }: PersonalInfoStepProps) =
           handleFieldUpdate('postalCode', extracted.postalCode);
         }
         if (extracted.dateOfBirth) {
-          const date = new Date(extracted.dateOfBirth);
-          if (Number.isFinite(date.getTime())) {
+          const date = calendarDateAsLocalDate(extracted.dateOfBirth);
+          if (date) {
             handleFieldUpdate('dateOfBirth', date);
             setDobYear(date.getFullYear().toString());
             setDobMonth((date.getMonth() + 1).toString());

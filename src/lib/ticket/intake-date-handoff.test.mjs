@@ -88,8 +88,8 @@ try {
 
   for (const key of ["eligibility-ocr-data", "eligibility-ocr-data-backup"]) {
     const view = await mount({}, { storage: { [key]: JSON.stringify({ ticket_type: "photo_radar", issueDate: "2026-08-25", offence_date: "2026-08-02" }) } });
-    assert.equal(view.test.details.formData.ticketType, "photo_radar");
-    assert.equal(day(view.test.details.formData.issueDate), "2026-08-02", `${key} uses the explicit offence date`);
+    assert.equal(view.test.details.formData.ticketType, "officer_issued", `${key} must not silently change the default product`);
+    assert.equal(day(view.test.details.formData.issueDate), "2026-08-25", `${key} retains the officer-ticket date mapping`);
     await view.close();
   }
 

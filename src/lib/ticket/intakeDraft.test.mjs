@@ -59,6 +59,7 @@ test("serializes only the server allowlist and excludes sensitive browser state"
 test("hydrates saved dates and always requires fresh representation consent", () => {
   const hydrated = draft.hydrateIntakeDraftData({
     firstName: "Test",
+    dateOfBirth: "1979-05-09",
     issueDate: "2026-08-14T18:00:00.000Z",
     courtDate: "not-a-date",
     consentGiven: true,
@@ -66,6 +67,11 @@ test("hydrates saved dates and always requires fresh representation consent", ()
   });
   assert.equal(hydrated.firstName, "Test");
   assert.ok(hydrated.issueDate instanceof Date);
+  assert.deepEqual(
+    [hydrated.dateOfBirth.getFullYear(), hydrated.dateOfBirth.getMonth() + 1, hydrated.dateOfBirth.getDate()],
+    [1979, 5, 9],
+    "a date-only birthday must not move back one day in Alberta",
+  );
   assert.equal(hydrated.courtDate, undefined);
   assert.equal(hydrated.consentGiven, false);
   assert.equal(hydrated.digitalSignature, "");

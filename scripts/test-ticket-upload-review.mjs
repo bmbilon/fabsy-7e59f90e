@@ -987,12 +987,14 @@ test("an invalid first attachment does not reveal review fields or enable Contin
   assert.match(app.document.body.textContent, /not accepted/i);
 });
 
-test("photo radar review still requires the owner's answer after OCR completes", async t => {
+test("OCR keeps the officer default and a deliberate photo-radar choice requires the owner's answer", async t => {
   const app = await runtime(t);
   await app.choose(app.file("synthetic-owner-notice.png"));
   await app.waitForScan(1);
   await app.finish(0, { ...completeTicket, ticketType: "photo_radar", offenceDate: "2026-05-28" });
   await app.saveLead();
+  assert.equal(app.document.querySelector('input[type="radio"][value="officer_issued"]').checked, true, "OCR must not silently switch the product");
+  await app.api.click(app.document.querySelector('input[type="radio"][value="photo_radar"]'));
   assert.match(app.document.body.textContent, /Was this vehicle registered to you on the offence date/);
   assert.equal(app.document.getElementById("vehicleSeized"), null);
   app.continueBlocked();
