@@ -129,7 +129,7 @@ export default function FunnelMeasurement() {
   }, [location.pathname]);
 
   useEffect(() => {
-    const onClick = (event: MouseEvent) => {
+    const onAction = (event: Event) => {
       const target = event.target instanceof Element
         ? event.target.closest<HTMLElement>('[data-funnel-action]')
         : null;
@@ -144,8 +144,15 @@ export default function FunnelMeasurement() {
         dedupeKey: `phone_click:${position || 'unknown'}`,
       });
     };
-    document.addEventListener('click', onClick, true);
-    return () => document.removeEventListener('click', onClick, true);
+    // Pointer activation is captured before a link can navigate away. Click is
+    // retained for keyboard activation; the shared dedupe key prevents double
+    // counting when a pointer produces both events.
+    document.addEventListener('pointerdown', onAction, true);
+    document.addEventListener('click', onAction, true);
+    return () => {
+      document.removeEventListener('pointerdown', onAction, true);
+      document.removeEventListener('click', onAction, true);
+    };
   }, []);
 
   useEffect(() => {
