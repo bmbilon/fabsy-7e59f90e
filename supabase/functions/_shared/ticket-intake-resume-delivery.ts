@@ -61,6 +61,14 @@ export interface ResumeDeliveryAttempt {
   fetcher?: typeof fetch;
 }
 
+export interface PaymentPendingResumeDraft {
+  id?: unknown;
+  status?: unknown;
+  converted_submission_id?: unknown;
+  access_token_hash?: unknown;
+  expires_at?: unknown;
+}
+
 export function resumeDeliveryEnabled(value: string | undefined): boolean {
   return value === "true";
 }
@@ -174,6 +182,30 @@ export function renderTicketIntakeResumeEmail(resumeUrl: string): string {
 
 export function renderTicketIntakeResumeSms(resumeUrl: string): string {
   return `Fabsy: Your Alberta ticket upload is saved. Continue your private intake: ${resumeUrl} Do not forward this link. This is not authorization for Fabsy to act.`;
+}
+
+export function renderPaymentPendingResumeSms(
+  firstName: string,
+  resumeUrl: string,
+): string {
+  const greeting = firstName.trim() ? `Hi ${firstName.trim()}! ` : "";
+  return `${greeting}Your Fabsy ticket is saved. Continue to secure checkout: ${resumeUrl} Service begins after payment. Private link; do not forward. - Fabsy`;
+}
+
+export function isPaymentPendingResumeDraft(
+  draft: PaymentPendingResumeDraft | null,
+  submissionId: string,
+  accessTokenHash: string,
+  now = Date.now(),
+): boolean {
+  return Boolean(
+    draft?.id === submissionId &&
+      draft.status === "converted" &&
+      draft.converted_submission_id === submissionId &&
+      draft.access_token_hash === accessTokenHash &&
+      typeof draft.expires_at === "string" &&
+      Date.parse(draft.expires_at) > now,
+  );
 }
 
 export function twilioRecipient(phone: string): string {
