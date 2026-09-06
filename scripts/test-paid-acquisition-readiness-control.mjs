@@ -693,7 +693,7 @@ const committedNoGo = parseJsonWithoutDuplicateKeys(fs.readFileSync(
   path.join(projectRoot, 'docs/paid-acquisition/2026-09-03-restart-readiness.json'),
   'utf8',
 ));
-const committedNoGoResult = evaluatePaidAcquisitionReadiness(committedNoGo, { root: projectRoot, now: NOW });
+const committedNoGoResult = evaluatePaidAcquisitionReadiness(committedNoGo, { root: projectRoot });
 assert.equal(committedNoGoResult.ready, false);
 const committedNoGoReferencesRepositoryEvidence = [
   ...committedNoGo.gates.flatMap(gate => gate.evidence),
@@ -734,7 +734,7 @@ for (const field of [
 ]) evidenceFreePredeploymentNoGo.release[field] = null;
 const evidenceFreePredeploymentResult = evaluatePaidAcquisitionReadiness(
   evidenceFreePredeploymentNoGo,
-  { root: projectRoot, now: NOW },
+  { root: projectRoot },
 );
 assert.equal(evidenceFreePredeploymentResult.ready, false);
 assert.equal(evidenceFreePredeploymentResult.schemaFailures.length, 0,
