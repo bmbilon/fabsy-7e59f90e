@@ -1,6 +1,6 @@
 set request.jwt.claim.role='service_role';
 create function pg_temp.assert(ok boolean,message text) returns void language plpgsql as $$ begin if ok is not true then raise exception 'Assertion failed: %',message; end if; end $$;
-create function pg_temp.event(message_id text,ticket text default 'E23045035A',confirmed text default '2026-09-09T01:00:00Z',parse_error text default null) returns jsonb language sql as $$
+create function pg_temp.event(message_id text,ticket text default 'T12345678Z',confirmed text default '2026-09-09T01:00:00Z',parse_error text default null) returns jsonb language sql as $$
   select jsonb_build_object('source_message_id',message_id,'sender','noreply@gov.ab.ca','ticket_number',ticket,'confirmed_at',confirmed,
     'timeframe_text','Disclosure can take between 6 and 10 weeks.','body_excerpt','Synthetic fixture only','authentication_result','mx1.improvmx.com; dkim=pass header.d=gov.ab.ca','parse_error',parse_error)
 $$;
@@ -14,16 +14,16 @@ select pg_temp.assert((select status='duplicate' from public.disclosure_confirma
 
 select public.ingest_disclosure_confirmation(pg_temp.event('unknown','E99999999A'));
 select pg_temp.assert((select status='needs_review' from public.disclosure_confirmations where source_message_id='unknown'),'unknown ticket needs review');
-select public.ingest_disclosure_confirmation(pg_temp.event('unverified','E23045035A','2026-09-10T12:00:00Z','sender_authentication_unverified'));
+select public.ingest_disclosure_confirmation(pg_temp.event('unverified','T12345678Z','2026-09-10T12:00:00Z','sender_authentication_unverified'));
 select pg_temp.assert((select status='needs_review' from public.disclosure_confirmations where source_message_id='unverified'),'authentication fail cannot send');
-insert into public.ticket_submissions(id,client_id,ticket_number,representation_paid_at) values('30000000-0000-4000-8000-000000000002','20000000-0000-4000-8000-000000000001','E23045035A',now());
-select public.ingest_disclosure_confirmation(pg_temp.event('ambiguous','E23045035A','2026-09-11T12:00:00Z'));
+insert into public.ticket_submissions(id,client_id,ticket_number,representation_paid_at) values('30000000-0000-4000-8000-000000000002','20000000-0000-4000-8000-000000000001','T12345678Z',now());
+select public.ingest_disclosure_confirmation(pg_temp.event('ambiguous','T12345678Z','2026-09-11T12:00:00Z'));
 select pg_temp.assert((select status='needs_review' from public.disclosure_confirmations where source_message_id='ambiguous'),'duplicate case identity requires review');
-update public.ticket_submissions set ticket_number='E23045036A',representation_paid_at=null where id='30000000-0000-4000-8000-000000000002';
-select public.ingest_disclosure_confirmation(pg_temp.event('unpaid','E23045036A','2026-09-11T12:00:00Z'));
+update public.ticket_submissions set ticket_number='T12345679Z',representation_paid_at=null where id='30000000-0000-4000-8000-000000000002';
+select public.ingest_disclosure_confirmation(pg_temp.event('unpaid','T12345679Z','2026-09-11T12:00:00Z'));
 select pg_temp.assert((select status='needs_review' from public.disclosure_confirmations where source_message_id='unpaid'),'unpaid case cannot auto notify');
 update public.ticket_submissions set status='completed',representation_paid_at=now() where id='30000000-0000-4000-8000-000000000002';
-select public.ingest_disclosure_confirmation(pg_temp.event('closed','E23045036A','2026-09-11T12:00:00Z'));
+select public.ingest_disclosure_confirmation(pg_temp.event('closed','T12345679Z','2026-09-11T12:00:00Z'));
 select pg_temp.assert((select status='needs_review' from public.disclosure_confirmations where source_message_id='closed'),'closed case cannot auto notify');
 
 select pg_temp.assert((select count(*)=0 from public.claim_disclosure_notices()),'delivery circuit defaults off');

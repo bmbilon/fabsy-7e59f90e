@@ -10,4 +10,4 @@ create table public.clients(id uuid primary key,first_name text,email text,auth_
 create table public.ticket_submissions(id uuid primary key,client_id uuid references public.clients(id),ticket_number text,service_type text default 'representation',status text default 'pending',case_outcome text,representation_paid_at timestamptz);
 create table public.idr_checkout_intents(ticket_submission_id uuid,client_id uuid,status text,checkout_kind text);
 insert into public.clients values('20000000-0000-4000-8000-000000000001','Fixture','client@example.test','20000000-0000-4000-8000-000000000002');
-insert into public.ticket_submissions(id,client_id,ticket_number,representation_paid_at) values('30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','E23045035A',now());
+insert into public.ticket_submissions(id,client_id,ticket_number,representation_paid_at) values('30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','T12345678Z',now());

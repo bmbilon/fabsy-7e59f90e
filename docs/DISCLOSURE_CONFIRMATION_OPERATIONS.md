@@ -45,7 +45,7 @@ The feature's client notice is transactional: confirmation date, ticket referenc
 - Ten deterministic parser/delivery tests pass, including the provided 6–10 week estimate versus the separate five-week follow-up wording, alternate HTML estimates, spoofed/forwarded messages, invalid dates, escaping and retry payload stability.
 - Isolated Postgres tests pass for replay, same-case/day deduplication, ambiguous/unpaid/closed cases, atomic matching/outbox, lease exclusion, bounded retries and client/staff/anonymous access.
 - Both new live endpoints reject unauthenticated requests. Authenticated unrelated mail is ignored without a notice. A synthetic unverified confirmation was durably captured once across a replay and then removed; no client message was sent.
-- The real email was exported locally for parser validation: ticket E23045035A, September 9, 2026 at 07:03:34 MDT, stated estimate between 6 and 10 weeks; ImprovMX recorded passing Crown DKIM/DMARC. Its case was not backfilled by this verification.
+- The real email was exported locally for parser validation: September 9, 2026 at 07:03:34 MDT, stated estimate between 6 and 10 weeks; ImprovMX recorded passing Crown DKIM/DMARC. Its case was not backfilled by this verification.
 - Frontend type checking, component lint, Vite production build and existing snapshot-copy verification pass. Production release uses the current main branch to preserve existing intake functionality absent from the older working-tree copy.
 - Supabase migrations, both functions and the minute cron are installed. Worker heartbeat succeeds. Delivery remains paused until routing activation is verified.
 

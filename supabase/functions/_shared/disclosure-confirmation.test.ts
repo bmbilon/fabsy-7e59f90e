@@ -9,18 +9,18 @@ const sample: ImprovEmail = {
   subject: "Disclosure Request Submitted", "message-id": "synthetic-confirmation@example.test",
   date: "Wed, 09 Sep 2026 07:03:00 -0600",
   headers: { "Authentication-Results": ["mx1.improvmx.com; dkim=pass header.d=gov.ab.ca; dmarc=pass header.from=gov.ab.ca"] },
-  text: "Your request for disclosure has been received. A disclosure request for ticket E23045035A was submitted using the Traffic Tickets Digital Service. You will be notified at this email address once disclosure is available. Please note that disclosure can take between 6 and 10 weeks. If you have not received a response within five weeks of your submission, please go to traffictickets.alberta.ca to check the status of the request.",
+  text: "Your request for disclosure has been received. A disclosure request for ticket T12345678Z was submitted using the Traffic Tickets Digital Service. You will be notified at this email address once disclosure is available. Please note that disclosure can take between 6 and 10 weeks. If you have not received a response within five weeks of your submission, please go to traffictickets.alberta.ca to check the status of the request.",
 };
 
 Deno.test("sample uses Crown estimate, not separate follow-up period", async () => {
   const parsed = await parseConfirmation(sample, now);
-  assertEquals(parsed?.ticket_number, "E23045035A");
+  assertEquals(parsed?.ticket_number, "T12345678Z");
   assertEquals(parsed?.confirmed_at, "2026-09-09T13:03:00.000Z");
   assertEquals(parsed?.timeframe_text, "Please note that disclosure can take between 6 and 10 weeks.");
   assertEquals(parsed?.parse_error, null);
 });
 Deno.test("HTML-only and changed estimates are extracted", async () => {
-  const parsed = await parseConfirmation({ ...sample, text: "", html: `<h1>Your request for disclosure has been received</h1><p>A disclosure request for ticket <b>E23045035A</b> was submitted.</p><p>Disclosure may take up to <b>12</b>&nbsp;weeks.</p>` }, now);
+  const parsed = await parseConfirmation({ ...sample, text: "", html: `<h1>Your request for disclosure has been received</h1><p>A disclosure request for ticket <b>T12345678Z</b> was submitted.</p><p>Disclosure may take up to <b>12</b>&nbsp;weeks.</p>` }, now);
   assertEquals(parsed?.timeframe_text, "Disclosure may take up to 12 weeks.");
   assertEquals(parsed?.parse_error, null);
 });
@@ -41,7 +41,7 @@ Deno.test("missing or ambiguous information is retained for review", async () =>
     { headers: {} }, { to: [{ email: "other@fabsy.ca" }] }, { "message-id": "" },
     { text: sample.text!.replace("Please note that disclosure can take between 6 and 10 weeks.", "") },
     { text: sample.text + " Disclosure may take up to 12 weeks." },
-    { text: sample.text + " A disclosure request for ticket E23045036A was submitted." },
+    { text: sample.text + " A disclosure request for ticket T12345679Z was submitted." },
   ]) assert((await parseConfirmation({ ...sample, ...change }, now))?.parse_error);
   const first = await parseConfirmation({ ...sample, "message-id": "" }, now);
   const replay = await parseConfirmation({ ...sample, "message-id": "" }, now);
@@ -49,7 +49,7 @@ Deno.test("missing or ambiguous information is retained for review", async () =>
 });
 Deno.test("notice escapes source content, uses dated confirmation and contains no marketing", () => {
   const email = disclosureNotice({ recipient: "client@example.test", first_name: '<img src=x onerror="boom">',
-    ticket_number: "E23045035A", confirmed_on: "2026-09-09", timeframe_text: "Disclosure may take <12> weeks.",
+    ticket_number: "T12345678Z", confirmed_on: "2026-09-09", timeframe_text: "Disclosure may take <12> weeks.",
     submission_id: "30000000-0000-4000-8000-000000000001" });
   assert(email.html.includes("September 9, 2026"));
   assert(email.html.includes("&lt;12&gt;"));
@@ -70,7 +70,7 @@ Deno.test("webhook and cron secrets cannot be empty or short", async () => {
 });
 
 Deno.test("worker preserves frozen payload/key after provider or receipt failure", async () => {
-  const snapshot = { recipient: "client@example.test", first_name: "Fixture", ticket_number: "E23045035A", confirmed_on: "2026-09-09", timeframe_text: "Disclosure can take 8 weeks.", submission_id: "30000000-0000-4000-8000-000000000001" };
+  const snapshot = { recipient: "client@example.test", first_name: "Fixture", ticket_number: "T12345678Z", confirmed_on: "2026-09-09", timeframe_text: "Disclosure can take 8 weeks.", submission_id: "30000000-0000-4000-8000-000000000001" };
   let available = true; let frozen: unknown = null; let first = true;
   const calls: { payload: unknown; key: string }[] = [];
   const db = { rpc: (name: string, args: Record<string, unknown>) => {

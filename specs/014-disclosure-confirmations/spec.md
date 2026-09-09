@@ -17,7 +17,7 @@ Use existing ImprovMX inbound routing, Supabase persistence and Resend delivery.
 - Schedule processing in Supabase, independent of Codex, an open browser, or the user's computer. Lease concurrent jobs and retry with the same frozen payload/idempotency key. Stop ambiguous retries before Resend's 24-hour idempotency expiry and expose them to staff.
 - Provide staff visibility of unmatched confirmations, notification failures and worker health. Permit staff to retry exact matching after correcting the underlying case.
 
-Clarifications resolved from request/repository: email is the client notice channel; existing portal identity and staff roles control access; this request expressly authorizes automatic transactional notices for this event. Historical email backfill is not enabled by default. ImprovMX account sign-in is needed to configure routing. No recurring Codex task is needed for an application-level worker.
+Clarifications resolved from request/repository: email is the client notice channel; existing portal identity and staff roles control access; this request expressly authorizes automatic transactional notices for this event. Historical email backfill is not enabled by default. ImprovMX sign-in is available in Firefox; the account must enable Premium before it will accept a webhook destination. No recurring Codex task is needed for an application-level worker.
 
 ## Technical plan
 
@@ -30,10 +30,10 @@ Clarifications resolved from request/repository: email is the client notice chan
 
 ## Tasks and consistency analysis
 
-- [ ] Parser, authentication and rendering tests cover sample, alternate timeframe, malformed/forwarded mail, spoofed sender, dates and HTML escaping.
-- [ ] SQL tests cover replay, concurrent lease, exact/ambiguous/unpaid/closed matching, atomic outbox, retry expiry and role isolation.
-- [ ] Webhook and worker implement the tested contracts.
-- [ ] Admin and client surfaces use persisted records with appropriate access.
+- [x] Parser, authentication and rendering tests cover sample, alternate timeframe, malformed/forwarded mail, spoofed sender, dates and HTML escaping.
+- [x] SQL tests cover replay, concurrent lease, exact/ambiguous/unpaid/closed matching, atomic outbox, retry expiry and role isolation.
+- [x] Webhook and worker implement the tested contracts.
+- [x] Admin and client surfaces use persisted records with appropriate access.
 - [ ] Deploy and verify database/functions/scheduler and portal release.
 - [ ] Configure and verify ImprovMX routing; document any access blocker.
 
