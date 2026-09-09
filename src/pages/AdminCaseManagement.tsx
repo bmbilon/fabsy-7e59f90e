@@ -79,6 +79,7 @@ export default function AdminCaseManagement() {
   const [intakeLeadError, setIntakeLeadError] = useState<string | null>(null);
   const [intakeLeadView, setIntakeLeadView] = useState<IntakeLeadView>("outstanding");
   const [updatingIntakeLeadIds, setUpdatingIntakeLeadIds] = useState<string[]>([]);
+  const [openingIntakeLeadId, setOpeningIntakeLeadId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -220,14 +221,21 @@ export default function AdminCaseManagement() {
   };
 
   const openLeadTicket = async (lead: IntakeLead) => {
-    const { data, error } = await supabase.storage
-      .from('assessment-tickets')
-      .createSignedUrl(lead.ticket_document_path, 60);
-    if (error || !data?.signedUrl) {
+    if (openingIntakeLeadId) return;
+    setOpeningIntakeLeadId(lead.id);
+    try {
+      const { data, error } = await supabase.storage
+        .from('assessment-tickets')
+        .createSignedUrl(lead.ticket_document_path, 60);
+      if (error || !data?.signedUrl) throw error || new Error('Ticket link unavailable.');
+      // Signing is asynchronous: opening a new tab here can lose the original
+      // tap's user activation on mobile. Same-tab navigation needs no popup.
+      window.location.assign(data.signedUrl);
+    } catch {
       toast({ title: "Ticket unavailable", description: "The private ticket file could not be opened.", variant: "destructive" });
-      return;
+    } finally {
+      setOpeningIntakeLeadId(null);
     }
-    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
   };
 
   const updateIntakeLeadStatus = async (
@@ -381,8 +389,8 @@ export default function AdminCaseManagement() {
                   ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant="outline" onClick={() => void openLeadTicket(lead)}>
-                    <FileText className="mr-2 h-4 w-4" aria-hidden="true" />Open ticket
+                  <Button type="button" variant="outline" disabled={openingIntakeLeadId !== null} aria-busy={openingIntakeLeadId === lead.id} onClick={() => void openLeadTicket(lead)}>
+                    <FileText className="mr-2 h-4 w-4" aria-hidden="true" />{openingIntakeLeadId === lead.id ? "Opening…" : "Open ticket"}
                   </Button>
                   {lead.converted_submission_id ? <Button type="button" onClick={() => navigate(`/admin/submissions/${lead.converted_submission_id}`)}>Open checkout case</Button> : null}
                   {lead.staff_follow_up_status === "open" ? (
