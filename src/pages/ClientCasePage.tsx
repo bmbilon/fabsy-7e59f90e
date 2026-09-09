@@ -1,3 +1,4 @@
+import { DisclosureConfirmations } from "@/components/DisclosureConfirmations";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FileSearch, ShieldCheck } from "lucide-react";
@@ -111,6 +112,7 @@ function CaseContent({ caseId }: { caseId: string }) {
   return (
     <main className="container mx-auto max-w-4xl px-4 py-12">
       <Button asChild variant="outline" className="mb-6"><Link to="/portal/cases">Back to cases</Link></Button>
+      <DisclosureConfirmations submissionId={caseRecord.id} />
       <Card className="overflow-hidden">
         <div className="bg-slate-950 p-7 text-white">
           <Badge className="mb-3 bg-black/20 text-white">Ticket {caseRecord.ticket_number}</Badge>

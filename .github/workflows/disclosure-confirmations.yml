@@ -1,0 +1,42 @@
+name: Disclosure confirmation checks
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/**disclosure*/**'
+      - 'supabase/functions/_shared/disclosure-*.ts'
+      - 'supabase/migrations/*disclosure*.sql'
+      - 'supabase/tests/disclosure-*'
+      - 'scripts/test-disclosure-database.mjs'
+      - '.github/workflows/disclosure-confirmations.yml'
+      - 'deno.lock'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/**disclosure*/**'
+      - 'supabase/functions/_shared/disclosure-*.ts'
+      - 'supabase/migrations/*disclosure*.sql'
+      - 'supabase/tests/disclosure-*'
+      - 'scripts/test-disclosure-database.mjs'
+      - '.github/workflows/disclosure-confirmations.yml'
+      - 'deno.lock'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno check --frozen supabase/functions/disclosure-confirmation-webhook/index.ts supabase/functions/process-disclosure-notices/index.ts
+      - run: deno test --frozen supabase/functions/_shared/disclosure-confirmation.test.ts
+      - name: Verify migration, transactions and RLS in an isolated database
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql
+          export DISCLOSURE_TEST_PG_BIN="$(pg_config --bindir)"
+          node scripts/test-disclosure-database.mjs

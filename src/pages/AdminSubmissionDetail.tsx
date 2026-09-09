@@ -1,3 +1,4 @@
+import { DisclosureConfirmations } from "@/components/DisclosureConfirmations";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -379,6 +380,7 @@ export default function AdminSubmissionDetail() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        <DisclosureConfirmations submissionId={submission.id} staff />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Personal Info */}
           <div className="lg:col-span-1 space-y-6">

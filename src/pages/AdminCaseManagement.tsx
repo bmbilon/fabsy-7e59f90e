@@ -1,3 +1,4 @@
+import { DisclosureAutomationPanel } from "@/components/DisclosureConfirmations";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -322,6 +323,7 @@ export default function AdminCaseManagement() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <DisclosureAutomationPanel />
         <AtePilotMetrics />
         <Card className="mb-8 border-amber-300/70">
           <CardHeader>
