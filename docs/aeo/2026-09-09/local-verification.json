@@ -1,0 +1,171 @@
+{
+  "checkedAt": "2026-09-09T14:47:59.312Z",
+  "h1": "How to fight a traffic ticket in Alberta",
+  "errors": [],
+  "desktopOverflow": false,
+  "mobileOverflow": false,
+  "articleWordCount": 729,
+  "links": [
+    {
+      "label": "Alberta Court of Justice: Traffic Court",
+      "href": "https://albertacourts.ca/cj/areas-of-law/traffic"
+    },
+    {
+      "label": "Alberta ticket response options",
+      "href": "https://www.alberta.ca/fine-payment"
+    },
+    {
+      "label": "official Traffic Tickets Digital Service",
+      "href": "https://traffictickets.alberta.ca/"
+    },
+    {
+      "label": "Alberta’s TTDS overview",
+      "href": "https://www.alberta.ca/fine-payment"
+    },
+    {
+      "label": "Review Rapid Resolution",
+      "href": "/rapid-resolution"
+    },
+    {
+      "label": "Review Photo Radar support",
+      "href": "/photo-radar"
+    },
+    {
+      "label": "Alberta Traffic Tickets Service",
+      "href": "https://traffictickets.alberta.ca/"
+    },
+    {
+      "label": "Alberta fine payment information",
+      "href": "https://www.alberta.ca/fine-payment"
+    },
+    {
+      "label": "Alberta Court of Justice: Traffic Court",
+      "href": "https://albertacourts.ca/cj/areas-of-law/traffic"
+    },
+    {
+      "label": "Ticket response options and deadlines",
+      "href": "/hubs/court-options-and-deadlines"
+    },
+    {
+      "label": "Photo radar and officer-issued tickets compared",
+      "href": "/hubs/photo-radar-vs-officer-issued"
+    },
+    {
+      "label": "Demerits and insurance questions",
+      "href": "/hubs/demerits-and-insurance"
+    },
+    {
+      "label": "Speeding Ticket, Calgary",
+      "href": "/content/fight-speeding-ticket-calgary"
+    },
+    {
+      "label": "Distracted Driving, Edmonton",
+      "href": "/content/fight-distracted-ticket-edmonton"
+    },
+    {
+      "label": "Red Light Ticket, Red Deer",
+      "href": "/content/fight-red-light-ticket-red-deer"
+    },
+    {
+      "label": "Speeding Ticket, Lethbridge",
+      "href": "/content/fight-speeding-ticket-lethbridge"
+    },
+    {
+      "label": "Speeding Ticket, Medicine Hat",
+      "href": "/content/fight-speeding-ticket-medicine-hat"
+    }
+  ],
+  "schema": {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "How to fight a traffic ticket in Alberta",
+    "url": "https://fabsy.ca/hubs/alberta-tickets-101",
+    "description": "Alberta ticket response steps, official resources, disclosure preparation and permitted ticket administration agent support.",
+    "dateModified": "2026-09-09",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Fabsy Traffic Ticket Services",
+      "url": "https://fabsy.ca"
+    },
+    "citation": [
+      "https://www.alberta.ca/fine-payment",
+      "https://albertacourts.ca/cj/areas-of-law/traffic",
+      "https://traffictickets.alberta.ca/"
+    ],
+    "hasPart": [
+      {
+        "@type": "ItemList",
+        "name": "Top City Pages",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "WebPage",
+              "url": "https://fabsy.ca/content/fight-speeding-ticket-calgary",
+              "name": "Speeding Ticket, Calgary"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "WebPage",
+              "url": "https://fabsy.ca/content/fight-distracted-ticket-edmonton",
+              "name": "Distracted Driving, Edmonton"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "WebPage",
+              "url": "https://fabsy.ca/content/fight-red-light-ticket-red-deer",
+              "name": "Red Light Ticket, Red Deer"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@type": "WebPage",
+              "url": "https://fabsy.ca/content/fight-speeding-ticket-lethbridge",
+              "name": "Speeding Ticket, Lethbridge"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 5,
+            "item": {
+              "@type": "WebPage",
+              "url": "https://fabsy.ca/content/fight-speeding-ticket-medicine-hat",
+              "name": "Speeding Ticket, Medicine Hat"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "snapshot": {
+    "path": "public/prerendered/hubs/alberta-tickets-101/index.html",
+    "canonical": "https://fabsy.ca/hubs/alberta-tickets-101",
+    "articleMatchesBrowser": true,
+    "jsonLdValid": true,
+    "headContractPassed": true
+  },
+  "internalLinkSnapshotCoverage": {
+    "checked": [
+      "/rapid-resolution",
+      "/photo-radar",
+      "/hubs/court-options-and-deadlines",
+      "/hubs/photo-radar-vs-officer-issued",
+      "/hubs/demerits-and-insurance",
+      "/content/fight-speeding-ticket-calgary",
+      "/content/fight-distracted-ticket-edmonton",
+      "/content/fight-red-light-ticket-red-deer",
+      "/content/fight-speeding-ticket-lethbridge",
+      "/content/fight-speeding-ticket-medicine-hat"
+    ],
+    "allPresent": true
+  }
+}

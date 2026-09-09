@@ -59,10 +59,10 @@ export interface LinkTarget {
 export const internalLinkingConfig: InternalLinkingConfig = {
   hub_pages: [
     {
-      slug: "/content/alberta-tickets-101",
+      slug: "/hubs/alberta-tickets-101",
       role: "foundation",
       anchors: [
-        "How Alberta traffic tickets actually work",
+        "How to fight a traffic ticket in Alberta",
         "Alberta tickets explained in 5 minutes"
       ]
     },
