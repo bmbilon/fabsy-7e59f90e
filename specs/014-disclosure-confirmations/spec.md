@@ -17,7 +17,7 @@ Use existing ImprovMX inbound routing, Supabase persistence and Resend delivery.
 - Schedule processing in Supabase, independent of Codex, an open browser, or the user's computer. Lease concurrent jobs and retry with the same frozen payload/idempotency key. Stop ambiguous retries before Resend's 24-hour idempotency expiry and expose them to staff.
 - Provide staff visibility of unmatched confirmations, notification failures and worker health. Permit staff to retry exact matching after correcting the underlying case.
 
-Clarifications resolved from request/repository: email is the client notice channel; existing portal identity and staff roles control access; this request expressly authorizes automatic transactional notices for this event. Historical email backfill is not enabled by default. ImprovMX sign-in is available in Firefox; the account must enable Premium before it will accept a webhook destination. No recurring Codex task is needed for an application-level worker.
+Clarifications resolved from request/repository: email is the client notice channel; existing portal identity and staff roles control access; this request expressly authorizes automatic transactional notices for this event. Historical email backfill is not enabled by default. ImprovMX sign-in is available in Firefox; Premium is active and Brett explicitly approved the exact Crown-only routing and automatic notices. No recurring Codex task is needed for an application-level worker.
 
 ## Technical plan
 
@@ -26,7 +26,7 @@ Clarifications resolved from request/repository: email is the client notice chan
 3. Authenticated webhook and separately authenticated cron worker with bounded request sizes/timeouts.
 4. Case confirmation card in admin/client portals and staff exception/health panel in case management.
 5. Local parser/worker/SQL/RLS tests; TypeScript, build and UI review. Apply only this migration and deploy only new functions after checks. Verify unauthenticated rejection, persistence, leases and cron without sending client test mail.
-6. Add webhook destination to the existing ImprovMX hello alias after account access is available; verify preserved inbox routing. Record deployment and operational limitations.
+6. Configure an exact Crown sender/recipient/subject CEL rule in ImprovMX, preserving the original inbox as both the matching copy destination and unmatched fallback. Verify routing with harmless technical emails, disable the test rule, then enable client sending. Record deployment and operational limitations.
 
 ## Tasks and consistency analysis
 
@@ -34,7 +34,8 @@ Clarifications resolved from request/repository: email is the client notice chan
 - [x] SQL tests cover replay, concurrent lease, exact/ambiguous/unpaid/closed matching, atomic outbox, retry expiry and role isolation.
 - [x] Webhook and worker implement the tested contracts.
 - [x] Admin and client surfaces use persisted records with appropriate access.
-- [ ] Deploy and verify database/functions/scheduler and portal release.
-- [ ] Configure and verify ImprovMX routing; document any access blocker.
+- [x] Deploy database/functions/scheduler and portal assets; verify backend health, build checks and active Cloudflare deployment.
+- [x] Inspect authenticated production portal in Firefox: disclosure panel, paused state, worker heartbeat and existing intake queue verified.
+- [x] Configure and verify ImprovMX Crown-only routing, inbox fallback and disabled test rule; enable client sending and verify the next scheduled worker.
 
-Coverage check before implementation: each requirement maps to a task above. No public SEO content or metadata is added because these are private case records. No provider migration is needed; incoming webhook activation requires ImprovMX Premium. Delivery success means Resend accepted the email, not a guarantee of inbox placement. ImprovMX only retries failed webhooks twice; provider logs/inbox remain the recovery source for a prolonged ingestion outage.
+Coverage check before implementation: each requirement maps to a task above. No public SEO content or metadata is added because these are private case records. No provider migration is needed; incoming webhook routing uses the activated ImprovMX Premium account. Delivery success means Resend accepted the email, not a guarantee of inbox placement. ImprovMX only retries failed webhooks twice; provider logs/inbox remain the recovery source for a prolonged ingestion outage.
