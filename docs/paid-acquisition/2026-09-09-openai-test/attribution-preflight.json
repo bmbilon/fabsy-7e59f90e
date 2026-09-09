@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-09-09T15:06:28.035Z",
+  "sourceCommit": "1ca3148c9e6fccd42a5738a4c5775139c3007ae3",
+  "destination": "https://fabsy.ca/rapid-resolution?utm_source=openai&utm_medium=cpc&utm_campaign=rr_alberta_pilot_202609&utm_content=admin_198",
+  "approvedPublicUrl": true,
+  "cleanPageContext": {
+    "page_location": "https://fabsy.ca/rapid-resolution",
+    "page_referrer": "",
+    "page_title": "Fabsy"
+  },
+  "method": "Pure compiled source functions in an isolated Node VM. No tracking scripts executed and no network events sent. Consent, real referrer, purchase correlation and OpenAI conversion reporting remain unverified."
+}

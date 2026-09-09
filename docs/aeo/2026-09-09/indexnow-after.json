@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-09-09T15:13:07.880Z",
+  "keyHttpStatus": 200,
+  "publicKeyMatches": true,
+  "keyCheck": "Simulated Bing user agent only",
+  "url": "https://fabsy.ca/hubs/alberta-tickets-101",
+  "accepted": false,
+  "error": "IndexNow returned 403 (key verification failed): {\"errorCode\":\"UserForbiddedToAccessSite\",\"message\":\"User is unauthorized to access the site. Please verify the site using the key and try again\",\"details\":null}"
+}

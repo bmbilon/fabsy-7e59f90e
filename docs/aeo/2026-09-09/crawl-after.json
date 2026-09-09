@@ -1,0 +1,2548 @@
+{
+  "checkedAt": "2026-09-09T15:12:25.301Z",
+  "methodology": "Unauthenticated HTTP GETs from the local machine, without JavaScript execution. User-agent simulation only; not evidence of verified OpenAI crawler access or ChatGPT ranking.",
+  "robots": {
+    "status": 200,
+    "text": "User-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ChatGPT-User\nAllow: /\n\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: Claude-SearchBot\nAllow: /\n\nUser-agent: Claude-User\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: *\nAllow: /\n\nSitemap: https://fabsy.ca/sitemap.xml\n"
+  },
+  "pages": [
+    {
+      "route": "/",
+      "agent": "browser",
+      "url": "https://fabsy.ca/",
+      "finalUrl": "https://fabsy.ca/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/",
+      "finalUrl": "https://fabsy.ca/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Help | $198 CAD",
+      "h1": [
+        "Fine or demerits reduced—or your fee refunded"
+      ],
+      "mainWordCount": 1275,
+      "excerpt": "Alberta traffic ticket helpFine or demerits reduced—or your fee refundedFabsy negotiates for a lower fine, fewer demerits or withdrawal. No legal outcome is guaranteed.$198 CAD + GST · Paid upfront; refunded if the policy appliesGet help with my ticketSee the Fabsy differenceWe can’t guarantee a court outcome. Our guarantee covers the service fee you paid. If the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection.For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the service-fee refund worksStart from your phoneSecure, simple online intakePut experience on your sideEvidence analysis with qualified reviewStay in controlYou approve any available resolutionThe Fabsy differenceRemove the uncertainty and get local expertise on your sideThe ticket is stressful enough. Understanding y",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "sameAs": [
+              "https://www.instagram.com/fabsy.alberta"
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "Rapid Resolution",
+            "description": "Rapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits.",
+            "url": "https://fabsy.ca/rapid-resolution",
+            "brand": {
+              "@type": "Brand",
+              "name": "Fabsy"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": "https://fabsy.ca/submit-ticket",
+              "price": "198.00",
+              "priceCurrency": "CAD",
+              "availability": "https://schema.org/InStock",
+              "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "price": "198.00",
+                "priceCurrency": "CAD",
+                "valueAddedTaxIncluded": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/hubs/alberta-tickets-101",
+      "agent": "browser",
+      "url": "https://fabsy.ca/hubs/alberta-tickets-101",
+      "finalUrl": "https://fabsy.ca/hubs/alberta-tickets-101",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/hubs/alberta-tickets-101",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/hubs/alberta-tickets-101",
+      "finalUrl": "https://fabsy.ca/hubs/alberta-tickets-101",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/hubs/alberta-tickets-101",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "How to Fight a Traffic Ticket in Alberta | Fabsy",
+      "h1": [
+        "How to fight a traffic ticket in Alberta"
+      ],
+      "mainWordCount": 763,
+      "excerpt": "How to fight a traffic ticket in AlbertaTo fight a traffic ticket in Alberta, follow its dispute instructions before the printed deadline. For supported tickets, use Alberta’s Traffic Tickets Digital Service to plead not guilty, request a trial date or request prosecutor review. Gather the available evidence, keep your confirmations and follow any remaining court instructions.If the allegation is speeding, start with our guide to fighting a speeding ticket in Alberta. If you are considering trial, also review what Alberta traffic-trial evidence rules can require.Sources checked September 9, 2026 · By Fabsy Traffic Ticket Services · General information, not legal adviceStart with the right type of noticeRead the charge, issuing authority, response date and any mandatory-appearance instruction. Municipal bylaw tickets, including parking tickets, follow the instructions on that notice. Immediate Roadside Sanctions and Notices of Administrative Penalty use the SafeRoads Alberta process.Sou",
+      "officialLinks": [
+        "https://albertacourts.ca/cj/areas-of-law/traffic",
+        "https://www.alberta.ca/fine-payment",
+        "https://traffictickets.alberta.ca/"
+      ],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "sameAs": [
+              "https://www.instagram.com/fabsy.alberta"
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "How to fight a traffic ticket in Alberta",
+            "url": "https://fabsy.ca/hubs/alberta-tickets-101",
+            "description": "Alberta ticket response steps, official resources, disclosure preparation and permitted ticket administration agent support.",
+            "dateModified": "2026-09-09",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Fabsy Traffic Ticket Services",
+              "url": "https://fabsy.ca"
+            },
+            "citation": [
+              "https://www.alberta.ca/fine-payment",
+              "https://albertacourts.ca/cj/areas-of-law/traffic",
+              "https://traffictickets.alberta.ca/"
+            ],
+            "hasPart": [
+              {
+                "@type": "ItemList",
+                "name": "Top City Pages",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-speeding-ticket-calgary",
+                      "name": "Speeding Ticket, Calgary"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-distracted-ticket-edmonton",
+                      "name": "Distracted Driving, Edmonton"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-red-light-ticket-red-deer",
+                      "name": "Red Light Ticket, Red Deer"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 4,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-speeding-ticket-lethbridge",
+                      "name": "Speeding Ticket, Lethbridge"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 5,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-speeding-ticket-medicine-hat",
+                      "name": "Speeding Ticket, Medicine Hat"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "route": "/hubs/court-options-and-deadlines",
+      "agent": "browser",
+      "url": "https://fabsy.ca/hubs/court-options-and-deadlines",
+      "finalUrl": "https://fabsy.ca/hubs/court-options-and-deadlines",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/hubs/court-options-and-deadlines",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/hubs/court-options-and-deadlines",
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "route": "/hubs/photo-radar-vs-officer-issued",
+      "agent": "browser",
+      "url": "https://fabsy.ca/hubs/photo-radar-vs-officer-issued",
+      "finalUrl": "https://fabsy.ca/hubs/photo-radar-vs-officer-issued",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/hubs/photo-radar-vs-officer-issued",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/hubs/photo-radar-vs-officer-issued",
+      "finalUrl": "https://fabsy.ca/hubs/photo-radar-vs-officer-issued",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/hubs/photo-radar-vs-officer-issued",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Photo Radar and Officer Tickets | Fabsy",
+      "h1": [
+        "How Are Photo Radar and Officer-Issued Tickets Different in Alberta?"
+      ],
+      "mainWordCount": 192,
+      "excerpt": "How Are Photo Radar and Officer-Issued Tickets Different in Alberta?A photo-radar notice is generally issued to the registered owner rather than identifying a driver, while an officer-issued ticket identifies the driver who was stopped. That distinction affects demerits, driving-record treatment, available evidence, and the questions worth asking before responding.Sources checked August 23, 2026 · Check the notice and current official Alberta rulesNeed the distinction applied to your ticket?Rapid Resolution handles secure intake, disclosure review, prosecutor review, file updates and your final decision for an eligible pre-trial matter.See Rapid Resolution - $198Core differencesA photo radar notice is issued to the registered owner. Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. That does not promise how an insurer will underwrite, price, or treat a particular record. An Insurance Impact Report is not included.An offic",
+      "officialLinks": [
+        "https://www.alberta.ca/photo-radar-alberta",
+        "https://www.alberta.ca/demerit-driving-suspension"
+      ],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "sameAs": [
+              "https://www.instagram.com/fabsy.alberta"
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "How photo radar and officer-issued tickets differ in Alberta",
+            "url": "https://fabsy.ca/hubs/photo-radar-vs-officer-issued",
+            "description": "A cautious overview of how Alberta photo radar notices and officer-issued traffic tickets differ.",
+            "dateModified": "2026-08-23",
+            "hasPart": [
+              {
+                "@type": "ItemList",
+                "name": "Top City Pages",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-photo-radar-ticket-calgary",
+                      "name": "Photo Radar, Calgary"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-red-light-ticket-edmonton",
+                      "name": "Red Light Ticket, Edmonton"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-speeding-ticket-red-deer",
+                      "name": "Speeding, Red Deer"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 4,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-speeding-ticket-lethbridge",
+                      "name": "Speeding, Lethbridge"
+                    }
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 5,
+                    "item": {
+                      "@type": "WebPage",
+                      "url": "https://fabsy.ca/content/fight-speeding-ticket-medicine-hat",
+                      "name": "Speeding, Medicine Hat"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "route": "/content/alberta-tickets-101",
+      "agent": "browser",
+      "url": "https://fabsy.ca/content/alberta-tickets-101",
+      "finalUrl": "https://fabsy.ca/content/alberta-tickets-101",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/content/alberta-tickets-101",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/content/alberta-tickets-101",
+      "finalUrl": "https://fabsy.ca/content/alberta-tickets-101",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": "noindex, nofollow",
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/content/speeding-ticket-alberta",
+      "agent": "browser",
+      "url": "https://fabsy.ca/content/speeding-ticket-alberta",
+      "finalUrl": "https://fabsy.ca/content/speeding-ticket-alberta",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/content/speeding-ticket-alberta",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/content/speeding-ticket-alberta",
+      "finalUrl": "https://fabsy.ca/content/speeding-ticket-alberta",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/content/speeding-ticket-alberta",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "How to Fight a Speeding Ticket in Alberta | Fabsy",
+      "h1": [
+        "How to Fight a Speeding Ticket in Alberta"
+      ],
+      "mainWordCount": 2039,
+      "excerpt": "How to Fight a Speeding Ticket in Alberta To fight a speeding ticket in Alberta, act by the response date and time printed on the ticket. For an eligible provincial ticket, you can request a prosecutor review or plead not guilty and request a trial, but first obtain and assess the available disclosure. Published by Fabsy Traffic Ticket Services · Sources checked August 31, 2026 · General information, not legal advice. Key facts Read the notice and protect the exact response deadline printed on it. Identify whether it is an officer-issued ticket, registered-owner notice, summons, bylaw ticket, or administrative penalty. Request the available disclosure and compare it with the allegation and your own records. Choose prosecutor review or trial deliberately; no particular result is promised. How do you fight a speeding ticket in Alberta?Start by reading the ticket and acting before the response date and time printed on it. For an eligible provincial ticket, Alberta's Traffic Tickets Digita",
+      "officialLinks": [
+        "https://traffictickets.alberta.ca/",
+        "https://kings-printer.alberta.ca/documents/Regs/2002_331.pdf",
+        "https://kings-printer.alberta.ca/documents/Acts/T06.pdf",
+        "https://kings-printer.alberta.ca/documents/Regs/2017_063.pdf",
+        "https://kings-printer.alberta.ca/documents/Acts/P34.pdf",
+        "https://www.alberta.ca/fine-payment",
+        "https://albertacourts.ca/cj/areas-of-law/traffic",
+        "https://www.alberta.ca/speeding-fines-in-alberta",
+        "https://www.alberta.ca/demerit-driving-suspension",
+        "https://www.alberta.ca/photo-radar-alberta"
+      ],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Can you fight a speeding ticket in Alberta?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Follow the response instructions before the deadline printed on the ticket. For an eligible provincial ticket, the available choices can include prosecutor review or pleading not guilty and requesting a trial. A dispute does not guarantee that the ticket will be withdrawn or reduced."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How do you plead not guilty to an Alberta speeding ticket?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Use the instructions on the notice. Alberta's Traffic Tickets Digital Service can accept a not-guilty plea and trial request for eligible provincial tickets, but some summonses, municipal matters, registered-owner notices, and administrative penalties use a different process."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Should you request disclosure before deciding about trial?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "After you or an authorized representative requests disclosure, the prosecutor must provide relevant, non-privileged material in the prosecution's possession or control. The package varies by file. The prosecutor and police do not act for you or give legal advice, and disclosure does not automatically become evidence at trial."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do Alberta photo radar speeding notices carry demerit points?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Registered-owner automated-enforcement notices are not the same as officer-issued driver tickets and do not carry demerit points against the driver's licence. Confirm the ticket type shown on the notice."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What happens when an Alberta speeding allegation is in the highest band?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Alberta's published speeding schedule assigns six demerit points for 51 km/h or more over the limit and requires a court appearance. On conviction, the court may order a licence suspension for up to three months. The allegation alone does not create an automatic roadside suspension or vehicle impoundment."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does requesting a prosecutor review cancel the ticket?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. A prosecutor review is not a trial and does not itself cancel the ticket. The prosecutor may maintain the charge, offer a different resolution, or take another lawful step. No particular result is guaranteed."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://fabsy.ca/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "How to Fight a Speeding Ticket in Alberta",
+                "item": "https://fabsy.ca/content/speeding-ticket-alberta"
+              }
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "areaServed": {
+              "@type": "AdministrativeArea",
+              "name": "Alberta, Canada"
+            },
+            "description": "Traffic ticket agent service for Alberta drivers. Fabsy is not a law firm. Free Ticket Check; Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total) for eligible Alberta registered-owner automated enforcement notices, with no success fee. Rapid Resolution costs $198 CAD plus applicable GST for other eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or Rapid Resolution and the report cost $229 CAD plus applicable GST. Trial representation is quoted separately; government fines and out-of-scope matters are separate.",
+            "offers": {
+              "@type": "Offer",
+              "description": "Free Ticket Check; Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total) for eligible Alberta registered-owner automated enforcement notices, with no success fee. Rapid Resolution costs $198 CAD plus applicable GST for other eligible Alberta pre-trial matters. The Insurance Impact & Renewal Planning Report costs $49 CAD plus applicable GST, or Rapid Resolution and the report cost $229 CAD plus applicable GST. Trial representation is quoted separately; government fines and out-of-scope matters are separate."
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": "How to Fight a Speeding Ticket in Alberta",
+            "description": "How to dispute an Alberta speeding ticket: check the deadline, identify the ticket type, request disclosure, and compare resolution with trial.",
+            "url": "https://fabsy.ca/content/speeding-ticket-alberta",
+            "dateModified": "2026-08-31",
+            "author": {
+              "@type": "Organization",
+              "name": "Fabsy Traffic Ticket Services",
+              "url": "https://fabsy.ca/about"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "@id": "https://fabsy.ca/#organization",
+              "name": "Fabsy Traffic Ticket Services",
+              "url": "https://fabsy.ca"
+            },
+            "citation": [
+              "https://traffictickets.alberta.ca/",
+              "https://www.alberta.ca/fine-payment",
+              "https://albertacourts.ca/cj/areas-of-law/traffic",
+              "https://www.alberta.ca/speeding-fines-in-alberta",
+              "https://www.alberta.ca/demerit-driving-suspension",
+              "https://www.alberta.ca/photo-radar-alberta",
+              "https://kings-printer.alberta.ca/documents/Acts/T06.pdf",
+              "https://kings-printer.alberta.ca/documents/Regs/2002_331.pdf",
+              "https://kings-printer.alberta.ca/documents/Acts/P34.pdf",
+              "https://kings-printer.alberta.ca/documents/Regs/2017_063.pdf"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "route": "/rapid-resolution",
+      "agent": "browser",
+      "url": "https://fabsy.ca/rapid-resolution",
+      "finalUrl": "https://fabsy.ca/rapid-resolution",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/rapid-resolution",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/rapid-resolution",
+      "finalUrl": "https://fabsy.ca/rapid-resolution",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/rapid-resolution",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Ticket Help | $198 CAD",
+      "h1": [
+        "Got an Alberta traffic ticket?"
+      ],
+      "mainWordCount": 612,
+      "excerpt": "Got an Alberta traffic ticket?Fabsy negotiates your ticket for a lower fine, fewer demerits, or withdrawal.If the Crown rejects those efforts and no fine or demerit reduction or withdrawal is obtained, your service fee is refunded. Refund terms. No legal outcome is guaranteed.Rapid Resolution$198 CAD + GSTPaid upfrontUpload your ticketCallRapid Resolution$198CAD + GSTOne flat service fee. No percentage-based success fee.Secure digital ticket intakeEligibility and deadline reviewDigital consent and authorizationDisclosure request and document trackingTechnology-assisted disclosure analysis with qualified reviewFact-specific prosecutor-review submissionUpload your ticketFine or demerits reduced—or your fee refundedIf the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection.If the Crown offers a lower fine, fewer demerits, or both",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "sameAs": [
+              "https://www.instagram.com/fabsy.alberta"
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "Rapid Resolution",
+            "description": "Rapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits.",
+            "url": "https://fabsy.ca/rapid-resolution",
+            "areaServed": {
+              "@type": "AdministrativeArea",
+              "name": "Alberta, Canada"
+            },
+            "provider": {
+              "@type": "Organization",
+              "name": "Fabsy",
+              "url": "https://fabsy.ca"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": "https://fabsy.ca/submit-ticket",
+              "price": "198.00",
+              "priceCurrency": "CAD",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What does the $198 fee cover?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "It covers secure intake, eligibility and deadline review, digital authorization, disclosure request and tracking, disclosure analysis with qualified review, a fact-specific prosecutor-review submission, status notifications, and explanation of an available Crown response. Applicable GST is extra."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is the matter resolved within 48 hours?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The 48-hour clock begins only after complete, readable disclosure is received and matched to the file. It covers Fabsy's review and next authorized action, not Crown response time or the date of a final outcome."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does requesting disclosure extend my deadline?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. A disclosure request does not itself extend the response date or a scheduled trial date. Follow the deadline instructions Fabsy provides and the dates shown on the ticket, portal, or court notice."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does Rapid Resolution include a trial?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Rapid Resolution is a pre-trial service. Trial representation, appeals, reopenings, government charges, and out-of-scope matters are separate. If you want to continue to trial, Fabsy can explain whether a separate quote or referral is available."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Will Fabsy accept a Crown response for me?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Only after you give file-specific instructions. Fabsy explains the original ticket and the Crown response so you can decide; an offer is never accepted automatically."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is a withdrawal or reduction promised?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed. If the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection."
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "route": "/photo-radar",
+      "agent": "browser",
+      "url": "https://fabsy.ca/photo-radar",
+      "finalUrl": "https://fabsy.ca/photo-radar",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/photo-radar",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/photo-radar",
+      "finalUrl": "https://fabsy.ca/photo-radar",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/photo-radar",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Photo Radar & Red-Light Ticket Help Alberta | $79 | Fabsy",
+      "h1": [
+        "Photo radar ticket in the mail? $79 flat."
+      ],
+      "mainWordCount": 755,
+      "excerpt": "Alberta photo radar & red-light camerasPhoto radar ticket in the mail? $79 flat.Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. That does not promise how an insurer will underwrite, price, or treat a particular record. An Insurance Impact Report is not included.Fabsy enters your not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal.Fine reduced or ticket dismissed—or your fee refundedIf the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points.If the Crown offers a lower fine, fewer demerits, or both and you decline it, you do not qualify for a refund under this guarantee. Refu",
+      "officialLinks": [
+        "https://www.alberta.ca/photo-radar-alberta"
+      ],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "sameAs": [
+              "https://www.instagram.com/fabsy.alberta"
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "Rapid Resolution: Photo Radar",
+            "description": "For eligible Alberta photo radar and red-light camera notices mailed to a registered owner under Traffic Safety Act s.160(1). Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal.",
+            "url": "https://fabsy.ca/photo-radar",
+            "serviceType": "Registered-owner automated traffic enforcement notice review",
+            "areaServed": {
+              "@type": "AdministrativeArea",
+              "name": "Alberta, Canada"
+            },
+            "provider": {
+              "@type": "Organization",
+              "name": "Fabsy",
+              "url": "https://fabsy.ca"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "79",
+              "priceCurrency": "CAD",
+              "url": "https://fabsy.ca/submit-ticket?ticket_type=photo_radar",
+              "availability": "https://schema.org/InStock"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Which tickets qualify for Rapid Resolution: Photo Radar?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "This product is for Alberta automated enforcement notices mailed to a registered owner under Traffic Safety Act s.160(1), including photo radar speeding and red-light camera notices. We confirm the notice, ownership and response deadline during intake. Tell us if the vehicle was sold before the offence or stolen; those facts need review and supporting records. A ticket issued to you as the driver uses a different service."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does photo radar affect insurance in Alberta?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. That does not promise how an insurer will underwrite, price, or treat a particular record. An Insurance Impact Report is not included. A separate ticket issued to an identified driver is different."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does the $79 fee cover?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total). The service fee is paid upfront. It covers the authorized not-guilty plea, disclosure request and review, pursuit of a Crown reduction or withdrawal, file updates and explanation of any offer for your approval. Government fines are separate."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How does the Photo Radar fee refund guarantee work?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed. If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. You approve any deal. Trial representation is not included, and there is no success surcharge. Government fines are separate. See the fee refund guarantee in our Terms of Service for details."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "When does the 48-hour commitment start?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Only after complete, readable disclosure is received and matched to your file. Within 48 hours, Fabsy reviews it and prepares or takes the next authorized Crown step. This is not a promise of a Crown reply or a completed outcome within 48 hours. Uploading a ticket or requesting disclosure does not itself extend a response or court deadline."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can Fabsy accept a Crown offer without asking me?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. We explain the offer and you approve any deal through the client reply and offer flow. Nothing is accepted automatically. If there is no acceptable offer, we explain your remaining options and deadlines; continuing to trial is outside this service."
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "route": "/ai-info",
+      "agent": "browser",
+      "url": "https://fabsy.ca/ai-info",
+      "finalUrl": "https://fabsy.ca/ai-info",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/ai-info",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/ai-info",
+      "finalUrl": "https://fabsy.ca/ai-info",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/ai-info",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Fabsy Rapid Resolution Facts, Pricing & Alberta Sources",
+      "h1": [
+        "Rapid Resolution for eligible Alberta traffic tickets"
+      ],
+      "mainWordCount": 504,
+      "excerpt": "Canonical Fabsy service factsRapid Resolution for eligible Alberta traffic ticketsRapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits. Fabsy is an Alberta traffic-ticket agent service, not a law firm.Start Rapid ResolutionReview the complete scopeDirect answerWhat does Rapid Resolution include?It includes secure intake, eligibility and deadline review, digital authorization, disclosure request and tracking, technology-assisted disclosure analysis with qualified review, a fact-specific prosecutor-review submission, prompt notifications, a comparison of the original ticket and any Crown response, and the client's final instruction. Trial is separate.Three transparent choicesTicket service, insurance planning, or both.$198 CAD plus GSTRapid ResolutionEligible pre-trial ticket service covering secure intake, disclosure,",
+      "officialLinks": [
+        "https://traffictickets.alberta.ca/",
+        "https://www.alberta.ca/demerit-points",
+        "https://www.alberta.ca/demerit-driving-suspension"
+      ],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "sameAs": [
+              "https://www.instagram.com/fabsy.alberta"
+            ]
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "Rapid Resolution",
+            "description": "Rapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits.",
+            "url": "https://fabsy.ca/rapid-resolution",
+            "areaServed": {
+              "@type": "AdministrativeArea",
+              "name": "Alberta, Canada"
+            },
+            "provider": {
+              "@type": "Organization",
+              "name": "Fabsy Traffic Ticket Services",
+              "url": "https://fabsy.ca",
+              "email": "hello@fabsy.ca",
+              "telephone": "+1-825-793-2279"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "198.00",
+              "priceCurrency": "CAD",
+              "url": "https://fabsy.ca/submit-ticket",
+              "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "price": "198.00",
+                "priceCurrency": "CAD",
+                "valueAddedTaxIncluded": false
+              }
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Fabsy Rapid Resolution facts and Alberta traffic-ticket sources",
+            "url": "https://fabsy.ca/ai-info",
+            "description": "Canonical facts about Rapid Resolution, current Fabsy pricing, service limits and official Alberta sources.",
+            "dateModified": "2026-08-31",
+            "about": {
+              "@type": "Organization",
+              "name": "Fabsy Traffic Ticket Services",
+              "url": "https://fabsy.ca"
+            },
+            "mainEntity": {
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": "Rapid Resolution",
+              "description": "Rapid Resolution starts immediately and, once complete disclosure arrives, analyzes and advances your eligible Alberta ticket within 48 hours, pursuing a withdrawal or a reduced charge that may lower the fine and/or demerits.",
+              "url": "https://fabsy.ca/rapid-resolution",
+              "areaServed": {
+                "@type": "AdministrativeArea",
+                "name": "Alberta, Canada"
+              },
+              "provider": {
+                "@type": "Organization",
+                "name": "Fabsy Traffic Ticket Services",
+                "url": "https://fabsy.ca",
+                "email": "hello@fabsy.ca",
+                "telephone": "+1-825-793-2279"
+              },
+              "offers": {
+                "@type": "Offer",
+                "price": "198.00",
+                "priceCurrency": "CAD",
+                "url": "https://fabsy.ca/submit-ticket",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "valueAddedTaxIncluded": false
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/founder",
+      "agent": "browser",
+      "url": "https://fabsy.ca/founder",
+      "finalUrl": "https://fabsy.ca/founder",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": null,
+      "robotsHeader": null,
+      "canonical": null,
+      "selfCanonical": false,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Rapid Resolution | Alberta Traffic Ticket Service | $198",
+      "h1": [],
+      "mainWordCount": 0,
+      "excerpt": "",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "route": "/founder",
+      "agent": "simulatedSearchBot",
+      "url": "https://fabsy.ca/founder",
+      "finalUrl": "https://fabsy.ca/founder",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "prerendered": "true",
+      "robotsHeader": "index, follow",
+      "canonical": "https://fabsy.ca/founder",
+      "selfCanonical": true,
+      "robots": [
+        "index, follow"
+      ],
+      "title": "Lauren Bilon, Fabsy Founder | Alberta Agent Service",
+      "h1": [
+        "Meet Lauren Bilon"
+      ],
+      "mainWordCount": 166,
+      "excerpt": "Skip to main contentMeet Lauren BilonFounder at Fabsy Traffic Ticket ServicesAbout LaurenLauren Bilon is the founder of Fabsy Traffic Ticket Services, an Alberta traffic ticket agent service.Fabsy is not a law firm and does not provide legal advice. It provides traffic ticket agent services where permitted and available.Fabsy's MissionFabsy's mission is to make Alberta traffic ticket agent services easier to understand and access. The service begins with a review of the ticket information submitted by the client.Availability and scope depend on the matter, the court location, and whether agent representation is permitted.Ready to Submit Your Ticket?Send Fabsy the ticket information for review. Submission does not mean the matter has been accepted.Start Free Ticket ReviewLearn the ProcessCall (825) 793-2279Privacy choicesFabsy, Google and Meta measurement are off until you choose.Your privacy choicesAllow Fabsy’s first-party funnel measurement and Google Analytics, Google Ads and Meta P",
+      "officialLinks": [],
+      "schemas": [
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "@id": "https://fabsy.ca/#business",
+            "name": "Fabsy Traffic Ticket Services",
+            "description": "Rapid Resolution is Fabsy's $198 CAD plus GST digital pre-trial ticket service for eligible Alberta matters. Fabsy is not a law firm.",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "areaServed": {
+              "@type": "State",
+              "name": "Alberta",
+              "addressCountry": "CA"
+            },
+            "serviceType": "Traffic Ticket Agent Representation",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Fabsy Traffic Ticket Services",
+              "itemListElement": [
+                {
+                  "@type": "Offer",
+                  "price": "79",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/photo-radar",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "79",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution: Photo Radar",
+                    "description": "Alberta automated enforcement owner notices under TSA 160(1). Not-guilty plea, disclosure and pursuit of a Crown reduction or withdrawal. No trial or success fee. The client approves any deal."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "price": "198.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/submit-ticket",
+                  "priceSpecification": {
+                    "@type": "UnitPriceSpecification",
+                    "price": "198.00",
+                    "priceCurrency": "CAD",
+                    "valueAddedTaxIncluded": false
+                  },
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Rapid Resolution",
+                    "alternateName": "Eligible Alberta Pre-Trial Ticket Resolution",
+                    "description": "Secure intake, disclosure request and review, prosecutor-review submission, immediate status notifications and a client-directed decision. Trial and government fines are separate."
+                  }
+                },
+                {
+                  "@type": "Offer",
+                  "itemOffered": {
+                    "@type": "Service",
+                    "name": "Insurance Impact & Renewal Planning Report",
+                    "description": "A source-backed consumer planning report, not an insurer quote or licensed broker recommendation."
+                  },
+                  "price": "49.00",
+                  "priceCurrency": "CAD",
+                  "url": "https://fabsy.ca/insurance-damage-report"
+                }
+              ]
+            },
+            "priceRange": "$49–$229 CAD plus applicable GST",
+            "telephone": "(825) 793-2279",
+            "email": "hello@fabsy.ca",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "(825) 793-2279",
+              "contactType": "customer service",
+              "areaServed": "CA-AB",
+              "availableLanguage": "English"
+            }
+          }
+        },
+        {
+          "valid": true,
+          "data": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Fabsy Traffic Ticket Services",
+            "url": "https://fabsy.ca",
+            "logo": "https://fabsy.ca/favicon.svg",
+            "sameAs": [
+              "https://www.instagram.com/fabsy.alberta"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

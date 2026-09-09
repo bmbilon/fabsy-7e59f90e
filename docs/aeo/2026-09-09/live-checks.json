@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-09-09T15:13:45.994Z",
+  "guideCrawlerCheck": {
+    "status": 200,
+    "canonical": "https://fabsy.ca/hubs/alberta-tickets-101",
+    "h1": [
+      "How to fight a traffic ticket in Alberta"
+    ],
+    "price": true,
+    "role": true,
+    "trialLink": true,
+    "officialSourceLinks": 3
+  },
+  "method": "HTTP user-agent simulation only; actual OpenAI bot access and indexing not established.",
+  "deadlineRouteRetry": {
+    "status": 200,
+    "h1": "What Are Your Options and Deadlines After an Alberta Traffic Ticket?",
+    "canonical": "https://fabsy.ca/hubs/court-options-and-deadlines"
+  }
+}

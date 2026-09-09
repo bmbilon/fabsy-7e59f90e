@@ -1,0 +1,20 @@
+{
+  "source_commit": "1ca3148c9e6fccd42a5738a4c5775139c3007ae3",
+  "base_commit": "c56941788af360ef8cae258aef3cf449af38e2e6",
+  "previous_production_source": "eceba2bfb5b36eee24c0c249b825b4772823e77e",
+  "previous_production_deployment": "742fd050-cac1-451e-8e50-19c1f5774be3",
+  "backend_functions_workflows_changed": false,
+  "local_full_build": "passed",
+  "full_tree_snapshot_guardrails": "passed, 1242 snapshots",
+  "targeted_lint": "passed",
+  "browser_verification": {
+    "interface": "Codex in-app browser",
+    "approved_pricing_visible": true,
+    "existing_trial_evidence_link_retained": true,
+    "canonical": "https://fabsy.ca/hubs/alberta-tickets-101",
+    "mobile_width": 390,
+    "horizontal_overflow": false
+  },
+  "ci_run": 34367122656,
+  "note": "An initial release-preview assertion hit a stale compiled bundle; compilation was rerun and the final guide was verified in the in-app browser. Initial screenshots are earlier draft evidence, not the final production release."
+}

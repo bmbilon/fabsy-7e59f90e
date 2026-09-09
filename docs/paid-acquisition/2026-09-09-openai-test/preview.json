@@ -1,0 +1,45 @@
+{
+  "status": "preview_only_not_running",
+  "account_access": "Existing OpenAI account sign-in reached Ads onboarding",
+  "advertiser": "Fabsy Traffic Ticket Services",
+  "title": "Alberta Traffic Ticket Help",
+  "subtext": "Pre-trial ticket administration. $198 CAD + GST.",
+  "destination": "https://fabsy.ca/rapid-resolution?utm_source=openai&utm_medium=cpc&utm_campaign=rr_alberta_pilot_202609&utm_content=admin_198",
+  "objective": "Clicks",
+  "location_in_preview": "Canada",
+  "alberta_only_targeting": "Not yet verified; required before recommending launch",
+  "budget_type": "Campaign total",
+  "budget_currency": "USD",
+  "account_billing_currency": "Unverified; USD is the onboarding preview label",
+  "proposed_budget": 100,
+  "proposed_maximum_cpc": 1,
+  "budget_authorized": false,
+  "terms_accepted_by_agent": false,
+  "campaign_created": false,
+  "ad_submitted_for_policy_review": false,
+  "payment_details_added": false,
+  "ad_spend_started": false,
+  "category_eligibility": "Unconfirmed; a generated ad preview does not constitute policy approval",
+  "pending": [
+    "User-selected spend cap",
+    "Authorization to accept Advertising Tool Terms",
+    "Verify actual account/business setup",
+    "Verify Alberta targeting",
+    "Verify product landing page and measurement",
+    "Submit for policy review only after approved setup"
+  ],
+  "notes": [
+    "Preview initially defaulted to United States and USD 100 per day; it was changed to Canada and a proposed USD 100 total budget. This is not spending authorization.",
+    "Subtext limit shown by the UI is 52 characters.",
+    "No customer or ticket data was uploaded."
+  ],
+  "landing_page_observation": {
+    "url": "https://fabsy.ca/rapid-resolution",
+    "title": "Rapid Resolution | Alberta Ticket Help | $198 CAD",
+    "canonical": "https://fabsy.ca/rapid-resolution",
+    "h1": "Got an Alberta traffic ticket?",
+    "price_and_agent_scope_visible": true,
+    "primary_intake_link": "/submit-ticket",
+    "method": "Read-only Codex browser inspection; no form submitted and no measurement consent granted."
+  }
+}

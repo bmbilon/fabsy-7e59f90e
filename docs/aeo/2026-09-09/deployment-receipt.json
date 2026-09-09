@@ -1,0 +1,30 @@
+{
+  "deployed_at_utc": "2026-09-09T15:11:43Z",
+  "aeo_commit": "1ca3148c9e6fccd42a5738a4c5775139c3007ae3",
+  "production_commit": "26e699e0d91166359a29fa92c6dfa9d019c9cc07",
+  "production_commit_note": "Includes the AEO release plus a subsequent disclosure-operations documentation update. Application, backend and workflow files are identical to the tested AEO source.",
+  "ci_url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/34367913179",
+  "ci_conclusion": "success",
+  "backend_first_gate": "passed; backend files unchanged from the preceding production deployment",
+  "cloudflare_project": "fabsy",
+  "cloudflare_deployment_id": "c204bc8c-b938-4640-a14f-11b35479498c",
+  "cloudflare_deployment_url": "https://c204bc8c.fabsy-9qa.pages.dev",
+  "live_guide": "https://fabsy.ca/hubs/alberta-tickets-101",
+  "browser_checks": {
+    "title": "How to Fight a Traffic Ticket in Alberta | Fabsy",
+    "h1": "How to fight a traffic ticket in Alberta",
+    "self_canonical": true,
+    "canonical_pricing_visible": true,
+    "ticket_administration_agent_scope_visible": true,
+    "official_sources_linked": 3,
+    "existing_trial_evidence_link_retained": true,
+    "desktop_width": 1280,
+    "desktop_scroll_width": 1265,
+    "mobile_width": 390,
+    "mobile_scroll_width": 375,
+    "horizontal_overflow": false
+  },
+  "indexnow": "Rejected with HTTP 403 key verification failure in CI and one focused retry. Public key file returned HTTP 200 and matched expected contents. CI treats this optional step as continue-on-error.",
+  "chatgpt_ranking": "Not measured; deployment and simulated crawler accessibility do not establish citation ranking.",
+  "ads": "Preview only. No terms accepted, campaign created, billing added or spend started."
+}

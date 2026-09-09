@@ -1,5 +1,11 @@
 # Fabsy AEO work — September 9, 2026
 
+## Production release
+
+The guide is live at [fabsy.ca/hubs/alberta-tickets-101](https://fabsy.ca/hubs/alberta-tickets-101). AEO commit `1ca3148c` shipped in production commit `26e699e0` through [the successful gated release workflow](https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/34367913179). The intervening commit changed disclosure-operations documentation only. See `deployment-receipt.json`, `crawl-after.json` and `live-checks.json` for production evidence. Browser checks at 1280 px and 390 px confirmed the new guide, pricing, agent scope, retained links and no horizontal overflow.
+
+IndexNow notification did **not** succeed: its optional workflow step returned HTTP 403 for key verification. The public verification file was reachable with the expected contents, but one focused submission retry also failed. See `indexnow-after.json`. Publication succeeded; accelerated index notification remains unresolved. No ChatGPT citation or ranking result is claimed.
+
 ## Decision
 
 Prioritize organic discovery for “how to fight ticket Alberta,” supported by a useful procedural guide, accurate business facts, real evidence of service experience and measured citations/conversions. Fabsy provides ticket administration and permitted agent representation. Do not present Fabsy as a law firm or a provider of legal advice.
@@ -18,7 +24,7 @@ Paid placement does not change organic answers. [OpenAI’s explanation](https:/
 - Updated the [ChatGPT benchmark](../../chatgpt-visibility-benchmark.md) to version 2, replacing retired Ticket Triage pricing and adding role accuracy. The [capture sheet](benchmark-capture.csv) contains 12 unrun prompts, including 10 organic discovery prompts and two brand fact checks. This is not an observed ChatGPT ranking baseline.
 - Added a repeatable, read-only [HTTP audit](../../../scripts/audit-chatgpt-crawl.mjs) and saved 20 observations in [crawl-baseline.json](crawl-baseline.json).
 
-Initial preparation was local. On September 9, Brett authorized pushing and deploying these AEO changes, followed by preparing a ChatGPT Ads test. The release is isolated from the original workspace’s unrelated uncommitted work. Ad spend remains subject to the selected test budget, and no external inquiry has been sent.
+Changes are local and have not been published. The repository already contained extensive uncommitted work; no broad build lifecycle, database sync, deployment, ad submission or external outreach was run.
 
 ## What the live HTTP audit found
 
@@ -50,9 +56,9 @@ Google’s [generative AI search guidance](https://developers.google.com/search/
 
 The goal for the first month is a trustworthy baseline plus demonstrably better source pages and attribution. Do not forecast a citation share or claim “domination” before observing comparable runs. Repeat the same benchmark protocol weekly; scheduling has not been set up.
 
-### Measurement issue to resolve before using GA4 totals
+### Measurement verification before using GA4 totals
 
-`src/lib/marketingAttribution.ts` already captures ChatGPT UTM/referrer signals, but capture is not proof of end-to-end reporting. `src/lib/googleMeasurement.ts` currently restricts initialization to URLs with only approved click identifiers; UTM-bearing URLs may be ineligible under that gate. Verify the actual capture/cleanup/initialization flow before assuming GA4 counts all ChatGPT sessions. Preserve the existing protections against ticket IDs, checkout tokens and private referrers when addressing this. No analytics settings or protections were changed in this work.
+The initial concern about all UTM-bearing URLs being ineligible came from the older working checkout. The release source explicitly permits validated UTM parameters on `/rapid-resolution`, and the proposed OpenAI paid link passes the pure URL/context checks recorded in `../../paid-acquisition/2026-09-09-openai-test/attribution-preflight.json`. Other paths have narrower rules. Attribution capture is consent-aware. Real referrers, consent transitions, intake and purchase correlation still need end-to-end verification before treating GA4 as a complete count. Preserve protections against ticket IDs, checkout tokens and private referrers. No analytics settings or protections were changed in this work.
 
 ## OpenAI classification inquiry — draft for Brett
 
@@ -60,12 +66,12 @@ Fabsy provides ticket administration and permitted agent representation for elig
 
 Can this service advertise to adults in Alberta through ChatGPT Ads? Please confirm how OpenAI classifies ticket administration agents under the current policy, including the references to representation and document preparation. Our proposed landing page is https://fabsy.ca/rapid-resolution.
 
-This inquiry has not been sent. No account or campaign was created.
+This inquiry has not been sent. The existing OpenAI login reached Ads onboarding and an ad preview was prepared; no advertising terms were accepted, no campaign was created, and no spend started. See `../../paid-acquisition/2026-09-09-openai-test/README.md`.
 
 ## Validation
 
 - Targeted ESLint and JavaScript syntax checks passed.
-- Initial Vite compilation passed. For the authorized release, the complete npm build lifecycle also passed in an isolated checkout, including source synchronization, content validation and snapshot copying. Full-tree validation passed for 1,242 snapshots. The existing large-chunk warning remains.
+- Vite production compilation passed in a temporary output directory. The existing large-chunk warning remains; the database-connected npm prebuild/postbuild pipeline was not run.
 - Browser and crawler-snapshot verification evidence is recorded in `local-verification.json`; screenshots show the desktop and mobile layout.
 - Desktop (1280 px) and mobile (390 px) checks found no horizontal overflow or page runtime errors. All 10 internal article-link targets have local snapshots; the updated crawler snapshot passes canonical/head checks and JSON-LD parsing. The scoped whitespace check passed.
 - Re-run the read-only audit after a release: `node scripts/audit-chatgpt-crawl.mjs docs/aeo/<date>/crawl-after.json`.
