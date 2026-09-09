@@ -17,7 +17,7 @@ Brett explicitly requests automatic email notifications whenever a ticket is upl
 - [x] Email template, private worker, recipient verification
 - [x] PostgreSQL and Deno tests
 - [x] Deploy migration, worker and minute schedule
-- [x] Catch-up notification, provider acceptance and duplicate suppression verified; recipient inbox not accessible
+- [x] Catch-up notification, provider acceptance, recipient inbox arrival and duplicate suppression verified
 - [x] Commit and preserve release evidence in `docs/TICKET_UPLOAD_ALERTS.md`
 
 Requirements map directly to the upload trigger (early notification), unique object key and stable provider key (deduplication), minute schedule/retries (delivery), verified admin guard (recipient), and caught worker failures outside intake requests (upload availability). No customer outreach or campaign changes are in scope.
