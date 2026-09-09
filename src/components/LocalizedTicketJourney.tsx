@@ -17,6 +17,7 @@ import { TICKET_CAPTURE_BROWSE_ACCEPT, validateTicketCaptureFile } from '@/lib/t
 import { resetTicketTypeForUpload } from '@/lib/ticket/ticketType';
 import type { IntakeDraftCapability } from '@/lib/ticket/intakeDraft';
 import { supabase } from '@/integrations/supabase/client';
+import { TicketPhotoCheck, TicketPhotoGuide } from './TicketPhotoGuide';
 
 const stepKeys = ['ticket', 'personal', 'account', 'consent', 'review', 'payment'];
 type UpdateFormData = (updates: Partial<FormData>) => void;
@@ -163,6 +164,8 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
     }
   };
 
+  const selectedFileType = formData.ticketImage ? validateTicketCaptureFile(formData.ticketImage) : null;
+
   return <section className="mx-auto max-w-4xl space-y-6 py-8 text-slate-900" id="ticket-form-container">
     <div className="space-y-4 rounded-2xl bg-white p-6 sm:p-8">
       <h1 className="text-3xl font-bold sm:text-4xl">{t('intake.title')}</h1><p className="leading-relaxed text-slate-600">{t('intake.description')}</p>
@@ -178,6 +181,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
     <Card className="space-y-6 p-5 sm:p-8">
       <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-bold outline-none">{t(`intake.steps.${stepKeys[currentStep - 1]}`)}</h2>
       {currentStep === 1 && <>
+        {(!hasStoredTicket || allowReplacement) && <TicketPhotoGuide />}
         <div className="space-y-3 rounded-xl border border-dashed border-slate-300 p-5">
           {hasStoredTicket ? <><p className="font-medium">{t('intake.fields.ticketImage')}</p><p className="text-sm text-slate-600" lang="en" dir="ltr">Your ticket is stored privately and linked to this intake.</p>{allowReplacement ? <div className="space-y-3" lang="en" dir="ltr">
             <Label htmlFor="localized-ticketImage">Replace the saved ticket PDF or clear image</Label>
@@ -226,6 +230,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
           }} /></>}
           <p className="text-xs text-slate-500" dir="ltr">PDF · JPG · PNG · WebP · HEIC · HEIF · ≤ 10 MB</p>
           {formData.ticketImage && <p className="break-all text-sm" dir="auto">{formData.ticketImage.name}</p>}
+          {selectedFileType?.valid && selectedFileType.kind === 'image' ? <TicketPhotoCheck /> : null}
           {errors.ticketImage && <p id="localized-ticketImage-error" className="text-sm text-red-700">{t(errors.ticketImage)}</p>}
           {isReleased && (!hasStoredTicket || Boolean(formData.ticketImage)) && <Button type="button" variant="outline" onClick={scanTicket} disabled={!formData.ticketImage || scanning} className="h-auto whitespace-normal py-2">
             {scanning ? <Loader2 className="me-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <FileSearch className="me-2 h-4 w-4" aria-hidden="true" />}{t(scanning ? 'common.loading' : 'intake.scanTicket')}

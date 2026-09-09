@@ -3,6 +3,7 @@ import { Camera, CheckCircle2, FileText, Loader2, Upload, X } from "lucide-react
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { TicketPhotoCheck, TicketPhotoGuide } from "@/components/TicketPhotoGuide";
 import { supabase } from "@/integrations/supabase/client";
 import {
   TICKET_CAPTURE_BROWSE_ACCEPT,
@@ -194,6 +195,8 @@ export default function TicketCapture({
     setStatus({ kind: "idle" });
   };
 
+  const selectedFileType = file ? validateTicketCaptureFile(file) : null;
+
   return (
     <fieldset
       className="space-y-3"
@@ -203,6 +206,8 @@ export default function TicketCapture({
       <legend className="text-sm font-medium text-foreground">
         {label}{required ? <span className="text-destructive"> *</span> : null}
       </legend>
+
+      <TicketPhotoGuide />
 
       <div className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-5 sm:p-6">
         <div className="flex flex-col items-center gap-4 text-center">
@@ -256,6 +261,8 @@ export default function TicketCapture({
           </div>
         </div>
       </div>
+
+      {selectedFileType?.valid && selectedFileType.kind === "image" ? <TicketPhotoCheck /> : null}
 
       <input
         ref={browseInputRef}

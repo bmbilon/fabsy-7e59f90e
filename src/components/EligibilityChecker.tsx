@@ -15,6 +15,7 @@ import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config
 import TicketTypeFields from "./TicketTypeFields";
 import { applyTicketType, detectTicketType, ticketDateFromExtraction, type TicketTypeState } from "@/lib/ticket/ticketType";
 import { TICKET_CAPTURE_BROWSE_ACCEPT, TICKET_CAPTURE_PHOTO_ACCEPT, validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
+import { TicketPhotoCheck, TicketPhotoGuide } from "@/components/TicketPhotoGuide";
 import { supabase } from "@/integrations/supabase/client";
 import { useTicketCache } from "@/hooks/useTicketCache";
 import { toast } from "sonner";
@@ -284,6 +285,7 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
 
         {!showSummary ? (
           <div className="space-y-5">
+            <TicketPhotoGuide />
             <div className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center sm:p-8">
               <input
                 ref={fileInputRef}
@@ -334,8 +336,9 @@ export function EligibilityChecker({ open, onOpenChange }: EligibilityCheckerPro
             </div>
 
             {imagePreview ? (
-              <div className="overflow-hidden rounded-xl border bg-muted/30 p-3">
+              <div className="space-y-3 overflow-hidden rounded-xl border bg-muted/30 p-3">
                 <img src={imagePreview} alt="Uploaded traffic ticket preview" className="mx-auto max-h-64 rounded-lg object-contain" />
+                <TicketPhotoCheck />
               </div>
             ) : null}
 
