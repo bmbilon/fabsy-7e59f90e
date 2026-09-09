@@ -42,4 +42,12 @@ select jobid, jobname, schedule, active from cron.job where jobname='fabsy-ticke
 
 `sent` means the provider accepted the message and returned its ID. Confirm actual delivery from Resend delivery status or the recipient mailbox; do not equate provider acceptance with inbox arrival. Only Brett's internal alert was authorized; this feature does not enable or send customer resume messages.
 
+### Production release — September 9, 2026
+
+- Deployed `process-ticket-upload-alerts` from commit `dbeb0486` to project `gcasbisxfrssonllpqrw`.
+- Applied only migration `20260909230000` and registered it in migration history. Verified the upload trigger is enabled, the minute schedule is active, and the recipient secret is configured.
+- The scheduled invocation returned HTTP 200 and sent the one authorized catch-up alert at 23:03 UTC (5:03 p.m. Edmonton). The outbox recorded one attempt, a provider email ID, and no failures. Re-enqueuing that same upload returned null and the outbox remained one sent row.
+- An unauthenticated live request returned HTTP 401. The local historical service-role token also returned 401; the configured private cron credential was verified by the successful scheduled send. Operators should use the scheduled invocation or the current worker credential, not assume a local `.env` token matches.
+- PostgreSQL integration checks and all 12 Deno tests passed. The signed-in Resend dashboard and connected Gmail mailbox did not expose this message, so inbox placement was not independently verified; provider acceptance is the confirmed delivery boundary.
+
 To pause delivery while investigating, unschedule only `fabsy-ticket-upload-alerts` or remove the configured recipient secret. Confirmed uploads continue to enqueue for later handling. Do not remove the outbox or its duplicate fences.
