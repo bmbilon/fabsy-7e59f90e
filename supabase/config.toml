@@ -147,3 +147,7 @@ verify_jwt = false
 
 [functions.process-disclosure-notices]
 verify_jwt = false
+
+[functions.process-ticket-upload-alerts]
+# Private cron/service-role authentication is enforced inside the worker.
+verify_jwt = false
