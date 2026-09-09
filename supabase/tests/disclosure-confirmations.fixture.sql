@@ -1,0 +1,13 @@
+create role anon;
+create role authenticated;
+create role service_role bypassrls;
+create schema auth;
+create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+create function auth.role() returns text language sql stable as $$ select current_setting('request.jwt.claim.role',true) $$;
+grant usage on schema public,auth to anon,authenticated,service_role;
+create function public.is_idr_staff() returns boolean language sql stable as $$ select auth.uid()='10000000-0000-4000-8000-000000000001'::uuid $$;
+create table public.clients(id uuid primary key,first_name text,email text,auth_user_id uuid);
+create table public.ticket_submissions(id uuid primary key,client_id uuid references public.clients(id),ticket_number text,service_type text default 'representation',status text default 'pending',case_outcome text,representation_paid_at timestamptz);
+create table public.idr_checkout_intents(ticket_submission_id uuid,client_id uuid,status text,checkout_kind text);
+insert into public.clients values('20000000-0000-4000-8000-000000000001','Fixture','client@example.test','20000000-0000-4000-8000-000000000002');
+insert into public.ticket_submissions(id,client_id,ticket_number,representation_paid_at) values('30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','E23045035A',now());

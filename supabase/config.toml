@@ -141,3 +141,9 @@ verify_jwt = false
 
 [functions.send-assessment-result]
 verify_jwt = true
+
+[functions.disclosure-confirmation-webhook]
+verify_jwt = false
+
+[functions.process-disclosure-notices]
+verify_jwt = false
