@@ -37,4 +37,4 @@ Clarifications resolved from request/repository: email is the client notice chan
 - [ ] Deploy and verify database/functions/scheduler and portal release.
 - [ ] Configure and verify ImprovMX routing; document any access blocker.
 
-Coverage check before implementation: each requirement maps to a task above. No public SEO content or metadata is added because these are private case records. Dependencies already exist in production; no provider migration or new subscription is required. Delivery success means Resend accepted the email, not a guarantee of inbox placement. ImprovMX only retries failed webhooks twice; provider logs/inbox remain the recovery source for a prolonged ingestion outage.
+Coverage check before implementation: each requirement maps to a task above. No public SEO content or metadata is added because these are private case records. No provider migration is needed; incoming webhook activation requires ImprovMX Premium. Delivery success means Resend accepted the email, not a guarantee of inbox placement. ImprovMX only retries failed webhooks twice; provider logs/inbox remain the recovery source for a prolonged ingestion outage.
