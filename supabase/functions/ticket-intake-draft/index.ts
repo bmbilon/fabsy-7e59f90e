@@ -44,6 +44,10 @@ import {
   type ResumeDeliveryStatus,
   safeResumeDeliveryAttempt,
 } from "../_shared/ticket-intake-resume-delivery.ts";
+import {
+  deliverMetaLeadBestEffort,
+  parseMetaLeadContext,
+} from "../_shared/meta-lead.ts";
 
 const STORAGE_BUCKET = "assessment-tickets";
 const FUNCTION_ALLOWED_ORIGINS =
@@ -185,6 +189,10 @@ type AdminDatabase = {
   };
 };
 type SupabaseAdmin = ReturnType<typeof createClient<AdminDatabase>>;
+
+declare const EdgeRuntime: {
+  waitUntil(promise: Promise<unknown>): void;
+} | undefined;
 
 class DraftStateError extends DraftRequestError {}
 
@@ -504,6 +512,7 @@ async function attemptResumeDelivery(
       preferredLocale: claimed.preferred_locale as Parameters<
         typeof deliverTicketIntakeResume
       >[0]["preferredLocale"],
+      ticketUploaded: Boolean(claimed.ticket_uploaded_at),
       configuration: {
         siteUrl: Deno.env.get("SITE_URL"),
         resendApiKey: Deno.env.get("RESEND_API_KEY"),
@@ -581,6 +590,7 @@ async function createDraft(
     "completedStep",
     "draftData",
     "file",
+    "metaMeasurement",
   ]);
   if (body.albertaConfirmed !== true) {
     throw new DraftRequestError(
@@ -609,7 +619,14 @@ async function createDraft(
     sanitizeDraftData(body.draftData),
     contact,
   );
-  const file = parseTicketFileMetadata(body.file);
+  // Contact-first drafts reserve a valid private path but do not expose an
+  // upload capability until the visitor deliberately selects a ticket. This
+  // preserves the existing database invariant while allowing the recoverable
+  // lead checkpoint to precede the document wall.
+  const hasFile = body.file !== undefined;
+  const file = hasFile
+    ? parseTicketFileMetadata(body.file)
+    : { contentType: "application/pdf", extension: "pdf", size: 1 };
   const id = crypto.randomUUID();
   const accessToken = createDraftAccessToken();
   const accessTokenHash = await sha256Hex(accessToken);
@@ -635,7 +652,37 @@ async function createDraft(
   });
   if (error) mapDatabaseFailure(error);
   const row = rowFromResult(data);
+  const metaContext = parseMetaLeadContext(body.metaMeasurement);
+  if (metaContext) {
+    const delivery = deliverMetaLeadBestEffort({
+      enabled: Deno.env.get("META_CAPI_ENABLED"),
+      pixelId: Deno.env.get("META_CAPI_PIXEL_ID"),
+      accessToken: Deno.env.get("META_CAPI_ACCESS_TOKEN"),
+    }, {
+      draftId: row.id,
+      context: metaContext,
+      clientUserAgent: req.headers.get("user-agent") || "",
+    }).then((sent) => {
+      if (!sent) console.warn("[ticket-intake-draft] meta_lead_not_sent");
+    }).catch(() => {
+      console.warn("[ticket-intake-draft] meta_lead_not_sent");
+    });
+    if (typeof EdgeRuntime !== "undefined") EdgeRuntime.waitUntil(delivery);
+  }
   try {
+    if (!hasFile) {
+      const delivered = await safeAttemptResumeDelivery(
+        admin,
+        row,
+        accessToken,
+        accessTokenHash,
+        false,
+      );
+      return {
+        ...responseForDraft(delivered),
+        accessToken,
+      };
+    }
     return {
       ...responseForDraft(row),
       accessToken,
@@ -886,13 +933,6 @@ async function retryResumeDelivery(
   assertAllowedKeys(body, ["action", "draftId", "accessToken"]);
   const { row, accessToken, accessTokenHash } = await activeDraft(admin, body);
   requireMutable(row);
-  if (!row.ticket_uploaded_at) {
-    throw new DraftStateError(
-      "Upload the ticket before sending a resume link.",
-      409,
-      "draft_delivery_not_ready",
-    );
-  }
   const automaticEnabled = resumeDeliveryEnabled(
     Deno.env.get("TICKET_INTAKE_RESUME_DELIVERY_ENABLED"),
   );

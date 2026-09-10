@@ -398,6 +398,44 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     }
   }, [applyRecord, preferredLocale, record?.hasPendingTicketUpload, saveWithRotation]);
 
+  const createContact = useCallback(async (
+    formData: Record<string, unknown>,
+    metaMeasurement?: Record<string, unknown> | null,
+  ) => {
+    if (capabilityRef.current) return record;
+    setStatus("saving");
+    setError("");
+    try {
+      const created = await invokeIntakeDraft({
+        action: "create",
+        contact: {
+          email: String(formData.email || ""),
+          phone: String(formData.phone || ""),
+        },
+        albertaConfirmed: formData.albertaConfirmed === true,
+        contactPermission: formData.contactPermission === true,
+        preferredLocale,
+        currentStep: 1,
+        completedStep: 0,
+        draftData: serializeIntakeDraftData(formData),
+        ...(metaMeasurement ? { metaMeasurement } : {}),
+      });
+      if (!created.accessToken) {
+        throw new Error("The secure resume token was not returned.");
+      }
+      applyRecord(created, created.accessToken);
+      setStatus("saved");
+      return created;
+    } catch (failure) {
+      const message = failure instanceof Error
+        ? failure.message
+        : "Your contact details could not be saved.";
+      setError(message);
+      setStatus("error");
+      throw failure;
+    }
+  }, [applyRecord, preferredLocale, record]);
+
   const save = useCallback((formData: Record<string, unknown>, currentStep: number, completedStep: number) => {
     const snapshot = serializeIntakeDraftData(formData);
     const operation = saveQueue.current
@@ -475,6 +513,7 @@ export function useTicketIntakeDraft({ preferredLocale, onRestore }: {
     status,
     error,
     hasUploadedTicket: Boolean(record?.ticketUploadedAt && record.ticketDocumentPath),
+    createContact,
     createOrUpload,
     save,
     retryDelivery,

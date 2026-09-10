@@ -26,7 +26,7 @@ try {
   const mocks = {
     "@/i18n/locale-context": `export const useLocale = () => ({ locale: "en", setIntakeHandoff: globalThis.__intakeDateTest.setIntakeHandoff });`,
     "@/hooks/use-toast": `export const useToast = () => ({ toast: globalThis.__intakeDateTest.toast });`,
-    "@/hooks/useTicketIntakeDraft": `export const useTicketIntakeDraft = () => ({ capability: null, record: null, status: "idle", error: "", hasUploadedTicket: false, createOrUpload: async () => null, save: async () => null, getResumeUrl: () => null });`,
+    "@/hooks/useTicketIntakeDraft": `export const useTicketIntakeDraft = () => ({ capability: null, record: null, status: "idle", error: "", hasUploadedTicket: false, createContact: async () => null, createOrUpload: async () => null, save: async () => null, getResumeUrl: () => null });`,
     "@/lib/referrals/capture": `export const readActiveReferral = () => null; export const captureReferralFromLocation = async () => null; export const captureReferralCode = async () => null; export const clearReferralAttribution = () => {}; export const REFERRAL_ATTRIBUTION_EVENT = "test-referral-event";`,
     "./form-steps/TicketDetailsStep": `export default function TicketDetailsStep(props) { globalThis.__intakeDateTest.details = props; return null; }`,
     ...Object.fromEntries(["PersonalInfoStep", "DefenseStep", "ConsentStep", "PaymentStep", "ReviewStep"].map(name => [`./form-steps/${name}`, "export default function TestStep() { return null; }"])),
@@ -61,7 +61,10 @@ try {
     const container = document.createElement("div");
     document.body.append(container);
     const root = createRoot(container);
-    await act(async () => root.render(createElement(MemoryRouter, { future: { v7_startTransition: true, v7_relativeSplatPath: true } }, createElement(TicketForm, props))));
+    const mountedProps = props.sourceAssessment === undefined
+      ? { ...props, sourceAssessment: { submissionId: "synthetic-date-test", accessToken: "synthetic-date-access" } }
+      : props;
+    await act(async () => root.render(createElement(MemoryRouter, { future: { v7_startTransition: true, v7_relativeSplatPath: true } }, createElement(TicketForm, mountedProps))));
     return {
       test, container,
       update: async values => act(async () => test.details.updateFormData(values)),

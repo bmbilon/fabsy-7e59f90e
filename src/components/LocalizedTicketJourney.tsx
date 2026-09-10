@@ -58,7 +58,7 @@ function LocalizedCheck({ name, data, update, label }: { name: keyof FormData; d
   </label>;
 }
 
-export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false, hasPendingTicketUpload = false, allowReplacement = false, onTicketFileSelection, replacementReady = false, replacementSaving = false, onSaveReplacement, resumeAccess = null, leadSaved, leadReady, leadSaving, leadError, onSaveLead }: {
+export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false, hasPendingTicketUpload = false, allowReplacement = false, onTicketFileSelection, replacementReady = false, replacementSaving = false, onSaveReplacement, resumeAccess = null, leadSaved, leadReady, leadSaving, leadError, onSaveLead, ticketReady, onSaveTicket }: {
   formData: FormData; updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void; currentStep: number; nextStep: () => void; prevStep: () => void; intakeDraft?: IntakeDraftCapability | null; hasStoredTicket?: boolean;
   hasPendingTicketUpload?: boolean;
   allowReplacement?: boolean;
@@ -72,6 +72,8 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
   leadSaving: boolean;
   leadError?: string;
   onSaveLead: () => Promise<boolean>;
+  ticketReady: boolean;
+  onSaveTicket: () => Promise<boolean>;
 }) {
   const { t } = useTranslation();
   const { isReleased, locale, href } = useLocale();
@@ -97,6 +99,12 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
     return <div key={key} className="min-w-0 rounded-lg bg-slate-50 p-4"><dt className="text-xs text-slate-500">{t(`intake.fields.${key}`)}</dt><dd className="mt-1 whitespace-pre-wrap break-words text-sm" dir="auto">{text}</dd></div>;
   })}</dl>;
   const moveNext = async () => {
+    if (currentStep === 1 && !leadSaved) {
+      setLeadValidationAttempted(true);
+      if (!leadReady || !await onSaveLead()) return;
+      setLeadValidationAttempted(false);
+      return;
+    }
     if (currentStep === 1 && (hasPendingTicketUpload || (hasStoredTicket && formData.ticketImage))) {
       setReplacementMessage('Save or remove the replacement ticket before continuing.');
       return;
@@ -108,9 +116,8 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
       document.getElementById(`localized-${Object.keys(nextErrors)[0]}`)?.focus();
       return;
     }
-    if (currentStep === 1 && !leadSaved) {
-      setLeadValidationAttempted(true);
-      if (!leadReady || !await onSaveLead()) return;
+    if (currentStep === 1 && !hasStoredTicket) {
+      if (!ticketReady || !await onSaveTicket()) return;
     }
     nextStep();
   };
@@ -180,7 +187,18 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
     </div>
     <Card className="space-y-6 p-5 sm:p-8">
       <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-bold outline-none">{t(`intake.steps.${stepKeys[currentStep - 1]}`)}</h2>
-      {currentStep === 1 && <>
+      {currentStep === 1 && !leadSaved && <div>
+        <p className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
+          {t('language.englishControls')}
+        </p>
+        <div lang="en" dir="ltr">
+          <LeadCaptureFields formData={formData} updateFormData={update} error={leadError} />
+          {leadValidationAttempted && !leadReady ? <p className="mt-3 text-sm text-red-700" role="alert">
+            Add a valid email or phone number and select both confirmations before saving.
+          </p> : null}
+        </div>
+      </div>}
+      {currentStep === 1 && leadSaved && <>
         {(!hasStoredTicket || allowReplacement) && <TicketPhotoGuide />}
         <div className="space-y-3 rounded-xl border border-dashed border-slate-300 p-5">
           {hasStoredTicket ? <><p className="font-medium">{t('intake.fields.ticketImage')}</p><p className="text-sm text-slate-600" lang="en" dir="ltr">Your ticket is stored privately and linked to this intake.</p>{allowReplacement ? <div className="space-y-3" lang="en" dir="ltr">
@@ -238,17 +256,6 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
           {scanMessage && <p role="status" className="text-sm leading-relaxed">{t(scanMessage)}</p>}
           {replacementMessage && <p role="alert" className="text-sm leading-relaxed text-red-700" lang="en" dir="ltr">{replacementMessage}</p>}
         </div>
-        {!leadSaved && <div>
-          <p className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
-            {t('language.englishControls')}
-          </p>
-          <div lang="en" dir="ltr">
-            <LeadCaptureFields formData={formData} updateFormData={update} error={leadError} />
-            {leadValidationAttempted && !leadReady ? <p className="mt-3 text-sm text-red-700" role="alert">
-              Add a valid email or phone number and select both confirmations before saving.
-            </p> : null}
-          </div>
-        </div>}
         <div className="grid gap-5 sm:grid-cols-2">
           {field('ticketNumber', { required: true })}{field('issueDate', { required: true, type: 'date' })}
           {field('location', { required: true })}{field('fineAmount', { required: true })}

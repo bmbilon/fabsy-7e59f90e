@@ -44,7 +44,7 @@ interface IntakeLead {
   ticket_document_path: string;
   ticket_document_content_type: string;
   ticket_document_size_bytes: number;
-  ticket_uploaded_at: string;
+  ticket_uploaded_at: string | null;
   resume_delivery_status: "pending" | "sending" | "sent" | "failed";
   resume_delivery_channel: "email" | "sms" | null;
   resume_delivery_sent_at: string | null;
@@ -161,7 +161,6 @@ export default function AdminCaseManagement() {
         supabase.from('ticket_intake_drafts')
           .select('id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,expires_at,updated_at')
           .in('status', ['active', 'converted'])
-          .not('ticket_uploaded_at', 'is', null)
           .order('updated_at', { ascending: false }),
       ]);
 
@@ -194,7 +193,6 @@ export default function AdminCaseManagement() {
       } else {
         const managedCaseIds = new Set(transformedData.filter(sub => sub.deleted_at || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)).map(submission => submission.id));
         setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
-          Boolean(lead.ticket_uploaded_at) &&
           (Boolean(lead.deleted_at) || lead.expires_at > new Date().toISOString()) &&
           (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
         ));
@@ -328,7 +326,7 @@ export default function AdminCaseManagement() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <CardTitle>Incomplete ticket intakes</CardTitle>
-                <CardDescription>Uploaded tickets whose customers have allowed intake follow-up but have not completed payment.</CardDescription>
+                <CardDescription>Customers who allowed intake follow-up but have not completed payment, including contacts saved before upload.</CardDescription>
               </div>
               <Badge variant={intakeLeadError ? "destructive" : "outline"}>
                 {intakeLeadError ? "Queue unavailable" : `${outstandingIntakeLeads.length} outstanding`}
@@ -344,7 +342,7 @@ export default function AdminCaseManagement() {
                   Retry lead queue
                 </Button>
               </div>
-            ) : intakeLeads.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">No incomplete uploaded intakes.</p> : <div className="space-y-4">
+            ) : intakeLeads.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">No incomplete intakes.</p> : <div className="space-y-4">
               <div className="flex flex-wrap gap-2" aria-label="Incomplete intake queue filter">
                 <Button type="button" size="sm" variant={intakeLeadView === "outstanding" ? "default" : "outline"} onClick={() => setIntakeLeadView("outstanding")}>
                   Outstanding ({outstandingIntakeLeads.length})
@@ -371,7 +369,7 @@ export default function AdminCaseManagement() {
                     {lead.email ? <a href={`mailto:${lead.email}`} className="flex min-w-0 items-center gap-2 font-medium text-primary underline underline-offset-4"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /><span className="break-all">{lead.email}</span></a> : null}
                     {lead.phone ? <a href={`tel:${lead.phone.replace(/[^+\d]/g, '')}`} className="flex items-center gap-2 font-medium text-primary underline underline-offset-4"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" />{lead.phone}</a> : null}
                   </div>
-                  <p className="text-xs text-muted-foreground">Locale: {lead.preferred_locale} · Ticket {(lead.ticket_document_size_bytes / 1024).toFixed(0)} KB · Resume access expires {new Date(lead.expires_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-muted-foreground">Locale: {lead.preferred_locale} · {lead.ticket_uploaded_at ? `Ticket ${(lead.ticket_document_size_bytes / 1024).toFixed(0)} KB` : "Ticket not uploaded"} · Resume access expires {new Date(lead.expires_at).toLocaleDateString()}</p>
                   <p className={`text-xs ${lead.resume_delivery_status === "failed" ? "font-medium text-destructive" : "text-muted-foreground"}`}>
                     Follow-up status: {resumeDeliveryStatusText(lead)}
                     {lead.resume_delivery_sent_at ? ` · sent ${formatDistanceToNow(new Date(lead.resume_delivery_sent_at), { addSuffix: true })}` : ""}
@@ -382,9 +380,9 @@ export default function AdminCaseManagement() {
                   ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant="outline" disabled={openingIntakeLeadId !== null} aria-busy={openingIntakeLeadId === lead.id} onClick={() => void openLeadTicket(lead)}>
+                  {lead.ticket_uploaded_at ? <Button type="button" variant="outline" disabled={openingIntakeLeadId !== null} aria-busy={openingIntakeLeadId === lead.id} onClick={() => void openLeadTicket(lead)}>
                     <FileText className="mr-2 h-4 w-4" aria-hidden="true" />{openingIntakeLeadId === lead.id ? "Opening…" : "Open ticket"}
-                  </Button>
+                  </Button> : null}
                   {lead.converted_submission_id ? <Button type="button" onClick={() => navigate(`/admin/submissions/${lead.converted_submission_id}`)}>Open checkout case</Button> : null}
                   {lead.staff_follow_up_status === "open" ? (
                     <Button type="button" variant="secondary" disabled={Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "contacted")}>Mark contacted</Button>

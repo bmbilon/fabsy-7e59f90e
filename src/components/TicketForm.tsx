@@ -28,6 +28,7 @@ import { latestReferralAttribution, normalizeReferralCode, ReferralCaptureError,
 import { captureReferralCode, captureReferralFromLocation, clearReferralAttribution, readActiveReferral, REFERRAL_ATTRIBUTION_EVENT } from "@/lib/referrals/capture";
 import { useTicketIntakeDraft } from "@/hooks/useTicketIntakeDraft";
 import type { IntakeDraftResumeDelivery } from "@/lib/ticket/intakeDraft";
+import { currentMetaCheckoutContext } from "@/lib/metaMeasurement";
 
 export interface FormData {
   // Unified intake handoff
@@ -171,7 +172,17 @@ const steps = [
 ];
 
 function resumeDeliveryMessage(delivery?: IntakeDraftResumeDelivery, hasUploadedTicket = true) {
-  if (!hasUploadedTicket) return "Your intake is saved, but the private ticket upload still needs to finish. Copy the secure link so you can return.";
+  if (!hasUploadedTicket) {
+    if (delivery?.status === "sent") {
+      return delivery.channel === "sms"
+        ? "We texted your secure resume link. Your ticket still needs to be uploaded."
+        : "We emailed your secure resume link. Your ticket still needs to be uploaded.";
+    }
+    if (delivery?.mode === "manual") return "Your contact details are saved. Copy the secure link so you can return and upload your ticket.";
+    if (delivery?.status === "failed") return "Your contact details are saved, but we could not send the secure resume link. Retry or copy it below.";
+    if (delivery?.status === "sending") return "Your contact details are saved, but we could not confirm whether the secure resume link was sent. Copy it below now.";
+    return "Your contact details are saved. Send or copy the secure link, then upload your ticket.";
+  }
   if (delivery?.status === "sent") {
     return delivery.channel === "sms"
       ? "We texted your secure resume link. You can also copy it below."
@@ -341,8 +352,8 @@ const TicketForm = ({
       setCurrentStep(record.status === "converted"
         ? 4
         : Math.max(1, Math.min(record.currentStep || 1, steps.length)));
+      setLeadSaved(true);
       if (record.ticketUploadedAt && record.ticketDocumentPath) {
-        setLeadSaved(true);
         setCaptureState("complete");
         setCompletedTicketFile(null);
       }
@@ -361,7 +372,10 @@ const TicketForm = ({
     : replacementReviewReady
       || intakeDraft.hasUploadedTicket
       || (!formData.ticketImage && (Boolean(formData.sourceAssessmentId) || hasTicketReviewData(formData)));
-  const captureOnly = currentStep === 1 && !leadSaved;
+  const contactOnly = currentStep === 1 && !leadSaved;
+  const ticketCaptureOnly = currentStep === 1 && leadSaved &&
+    !intakeDraft.hasUploadedTicket && !formData.sourceAssessmentId;
+  const checkpointOnly = contactOnly || ticketCaptureOnly;
   const handleCaptureStateChange = (state: TicketCaptureState) => {
     setCaptureState(state);
     if (state === "complete" || state === "manual") setCompletedTicketFile(formData.ticketImage);
@@ -459,36 +473,68 @@ const TicketForm = ({
     ? Boolean(replacementTicketFile) && localizedTicketReady
     : replacementReviewReady;
   const isLeadValid = Boolean(
-    formData.ticketImage && (ticketReviewReady || localizedTicketReady) &&
     (leadEmail || leadPhone) && leadEmailValid && leadPhoneValid &&
     formData.albertaConfirmed && formData.contactPermission
   );
+  const ticketSaveReady = Boolean(
+    formData.ticketImage && (ticketReviewReady || localizedTicketReady)
+  );
 
   const saveLead = async () => {
-    if (!isLeadValid || !formData.ticketImage || intakeDraft.status === "saving") {
+    if (!isLeadValid || intakeDraft.status === "saving") {
       if (!isLeadValid) window.dispatchEvent(new CustomEvent("fabsy:intake-validation-blocked", { detail: { step: 1 } }));
       return false;
     }
-    window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-started"));
     try {
-      const saved = await intakeDraft.createOrUpload(formData.ticketImage, formData as unknown as Record<string, unknown>);
+      const saved = await intakeDraft.createContact(
+        formData as unknown as Record<string, unknown>,
+        currentMetaCheckoutContext() as unknown as Record<string, unknown> | null,
+      );
       formScrollPending.current = true;
       setLeadSaved(true);
-      // The confirmed private object is now the source of truth. Dropping the
-      // browser File prevents the review screen from presenting that same file
-      // as an unsaved replacement.
+      window.dispatchEvent(new CustomEvent("fabsy:intake-lead-saved"));
+      toast({
+        title: "Your contact details are saved",
+        description: resumeDeliveryMessage(saved?.resumeDelivery, false),
+      });
+      return true;
+    } catch (failure) {
+      toast({
+        title: "We could not save your contact details",
+        description: failure instanceof Error ? failure.message : "Try saving again.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const saveTicket = async () => {
+    if (!ticketSaveReady || !formData.ticketImage || intakeDraft.status === "saving") {
+      if (!ticketSaveReady) window.dispatchEvent(new CustomEvent("fabsy:intake-validation-blocked", { detail: { step: 1 } }));
+      return false;
+    }
+    if (autosaveTimer.current !== null) {
+      window.clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = null;
+    }
+    window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-started"));
+    try {
+      const saved = await intakeDraft.createOrUpload(
+        formData.ticketImage,
+        formData as unknown as Record<string, unknown>,
+      );
+      formScrollPending.current = true;
       setFormData(current => ({ ...current, ticketImage: null }));
       setCompletedTicketFile(null);
       setCaptureState("complete");
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
-      window.dispatchEvent(new CustomEvent("fabsy:intake-lead-saved"));
-      toast({ title: "Your intake is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
+      toast({ title: "Your ticket is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
       return true;
     } catch (failure) {
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-failed"));
       toast({
-        title: "We could not finish saving",
-        description: failure instanceof Error ? failure.message : "Try saving the intake again.",
+        title: "We could not finish the ticket upload",
+        description: failure instanceof Error ? failure.message : "Try uploading the ticket again.",
         variant: "destructive",
       });
       return false;
@@ -643,7 +689,7 @@ const TicketForm = ({
   };
 
   useEffect(() => {
-    if (!leadSaved || !intakeDraftId || intakeDraftRecordStatus === "converted" || replacementTicketFile) return;
+    if (!leadSaved || !intakeDraft.hasUploadedTicket || !intakeDraftId || intakeDraftRecordStatus === "converted" || replacementTicketFile) return;
     autosaveTimer.current = window.setTimeout(() => {
       autosaveTimer.current = null;
       void saveIntakeDraft(
@@ -661,7 +707,7 @@ const TicketForm = ({
         autosaveTimer.current = null;
       }
     };
-  }, [formData, currentStep, leadSaved, intakeDraftId, intakeDraftRecordStatus, replacementTicketFile, saveIntakeDraft]);
+  }, [formData, currentStep, leadSaved, intakeDraft.hasUploadedTicket, intakeDraftId, intakeDraftRecordStatus, replacementTicketFile, saveIntakeDraft]);
 
   const copyResumeLink = async () => {
     const url = intakeDraft.getResumeUrl();
@@ -681,7 +727,7 @@ const TicketForm = ({
       toast({
         title: sent ? "Secure resume link sent" : "Resume link was not sent",
         description: sent
-          ? resumeDeliveryMessage(updated.resumeDelivery)
+          ? resumeDeliveryMessage(updated.resumeDelivery, intakeDraft.hasUploadedTicket)
           : "Your intake remains saved. Copy the secure link below and try delivery again later.",
         ...(sent ? {} : { variant: "destructive" as const }),
       });
@@ -738,6 +784,13 @@ const TicketForm = ({
   const renderStep = () => {
     switch (currentStep) {
       case 1:
+        if (contactOnly) {
+          return <LeadCaptureFields
+            formData={formData}
+            updateFormData={updateFormData}
+            error={intakeDraft.error}
+          />;
+        }
         return <>
           <TicketDetailsStep
             formData={formData}
@@ -745,16 +798,15 @@ const TicketForm = ({
             reviewReady={ticketReviewReady}
             skipInitialScan={ticketReviewReady && completedTicketFile === formData.ticketImage}
             onCaptureStateChange={handleCaptureStateChange}
-            mode={captureOnly ? "capture" : "details"}
+            mode={ticketCaptureOnly ? "capture" : "details"}
             hasStoredTicket={intakeDraft.hasUploadedTicket}
-            allowReplacement={!captureOnly && !convertedIntake && intakeDraft.hasUploadedTicket}
-            onTicketFileSelection={!captureOnly && !convertedIntake ? handleTicketFileSelection : undefined}
+            allowReplacement={!ticketCaptureOnly && !convertedIntake && intakeDraft.hasUploadedTicket}
+            onTicketFileSelection={!ticketCaptureOnly && !convertedIntake ? handleTicketFileSelection : undefined}
             replacementReady={replacementReviewReady}
             replacementSaving={intakeDraft.status === "saving"}
             onSaveReplacement={() => void saveReplacementTicket()}
           />
-          {captureOnly ? <LeadCaptureFields formData={formData} updateFormData={updateFormData} error={intakeDraft.error} /> : null}
-          {!captureOnly && ticketReviewReady && !isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
+          {!ticketCaptureOnly && ticketReviewReady && !isPhotoRadar && <div className="mt-8 space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-5">
             <Label htmlFor="pro-licence-class" className="text-base font-semibold">Alberta licence class</Label>
             <Select value={formData.licenceClass} onValueChange={value => updateFormData({ licenceClass: normalizeLicenceClass(value) })}>
               <SelectTrigger id="pro-licence-class" aria-describedby="pro-licence-class-help"><SelectValue /></SelectTrigger>
@@ -899,21 +951,27 @@ const TicketForm = ({
     replacementReady={replacementSaveReady} replacementSaving={intakeDraft.status === "saving"}
     onSaveReplacement={() => void saveReplacementTicket()} resumeAccess={resumeAccess}
     leadSaved={leadSaved} leadReady={isLeadValid} leadSaving={intakeDraft.status === "saving"} leadError={intakeDraft.error}
-    onSaveLead={saveLead} />;
+    onSaveLead={saveLead} ticketReady={ticketSaveReady} onSaveTicket={saveTicket} />;
 
   return (
-    <section className={`${captureOnly ? "py-4 sm:py-8" : "py-10 sm:py-16"} bg-gradient-soft min-h-screen`}>
+    <section className={`${checkpointOnly ? "py-4 sm:py-8" : "py-10 sm:py-16"} bg-gradient-soft min-h-screen`}>
       <div id="ticket-form-container" className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
-        <div className={`text-center ${captureOnly ? "mb-6 sm:mb-8" : "mb-10"}`}>
+        <div className={`text-center ${checkpointOnly ? "mb-6 sm:mb-8" : "mb-10"}`}>
           {currentStep > 1 && <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
             {offer.name}
           </Badge>}
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
-            {currentStep === 1 ? (captureOnly ? "Let’s start with your ticket." : "Check your ticket details.") : <>Start your <span className="text-gradient-primary">{isPhotoRadar ? "photo radar resolution" : "pre-trial resolution"}</span></>}
+            {currentStep === 1
+              ? contactOnly
+                ? "First, tell us where to follow up."
+                : ticketCaptureOnly
+                ? "Now add your ticket."
+                : "Check your ticket details."
+              : <>Start your <span className="text-gradient-primary">{isPhotoRadar ? "photo radar resolution" : "pre-trial resolution"}</span></>}
           </h1>
-          <p className={`${captureOnly ? "text-base sm:text-lg" : "text-lg"} text-muted-foreground max-w-3xl mx-auto`}>
-            {currentStep === 1 ? (captureOnly ? "Take a clear photo or upload your ticket. We’ll fill in what we can for you to review." : "Review what we captured, fill in any missing details, then continue.") : isPhotoRadar ? <>Upload your Alberta registered-owner notice, confirm ownership and sign the authorization. {PHOTO_RADAR_PRICE_LABEL}. {PHOTO_RADAR.insuranceDisclaimer} Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee.</> : <>Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
+          <p className={`${checkpointOnly ? "text-base sm:text-lg" : "text-lg"} text-muted-foreground max-w-3xl mx-auto`}>
+            {currentStep === 1 ? (contactOnly ? "We’ll save a secure return link before asking you to upload anything." : ticketCaptureOnly ? "Take a clear photo or upload the PDF. We’ll fill in what we can for you to review." : "Review what we captured, fill in any missing details, then continue.") : isPhotoRadar ? <>Upload your Alberta registered-owner notice, confirm ownership and sign the authorization. {PHOTO_RADAR_PRICE_LABEL}. {PHOTO_RADAR.insuranceDisclaimer} Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee.</> : <>Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
             and continue to the transparent ${RAPID_RESOLUTION.priceCad} CAD plus GST checkout. Want the insurance report by itself?{" "}
             <Link to="/insurance-damage-report" className="font-semibold text-primary underline underline-offset-4">
               See the Insurance Impact &amp; Renewal Planning Report.
@@ -997,15 +1055,14 @@ const TicketForm = ({
           {resumeAccess}
 
           {/* Navigation - Bottom */}
-          {captureOnly && <div className="mt-8 border-t pt-6">
+          {contactOnly && <div className="mt-8 border-t pt-6">
             <Button type="button" className="h-auto min-h-12 w-full whitespace-normal bg-gradient-primary py-3 hover:opacity-90"
               onClick={() => void saveLead()} disabled={!isLeadValid || intakeDraft.status === "saving" || intakeDraft.status === "loading"}>
-              {intakeDraft.status === "saving" ? "Saving your ticket securely…" : "Save ticket and review details"}
+              {intakeDraft.status === "saving" ? "Saving your contact details…" : "Save and continue to ticket"}
               {intakeDraft.status !== "saving" ? <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /> : null}
             </Button>
             {!isLeadValid ? <p className="mt-3 text-right text-sm text-muted-foreground">
               Still needed: {[
-                !formData.ticketImage || !ticketReviewReady ? "ticket PDF or photo" : "",
                 !(leadEmail || leadPhone) ? "email or phone" : "",
                 !leadEmailValid ? "valid email" : "",
                 !leadPhoneValid ? "valid phone" : "",
@@ -1014,7 +1071,17 @@ const TicketForm = ({
               ].filter(Boolean).join(", ")}
             </p> : null}
           </div>}
-          {!captureOnly && <div className="flex justify-between mt-8 pt-6 border-t">
+          {ticketCaptureOnly && <div className="mt-8 border-t pt-6">
+            <Button type="button" className="h-auto min-h-12 w-full whitespace-normal bg-gradient-primary py-3 hover:opacity-90"
+              onClick={() => void saveTicket()} disabled={!ticketSaveReady || intakeDraft.status === "saving" || intakeDraft.status === "loading"}>
+              {intakeDraft.status === "saving" ? "Saving your ticket securely…" : "Save ticket and review details"}
+              {intakeDraft.status !== "saving" ? <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /> : null}
+            </Button>
+            {!ticketSaveReady ? <p className="mt-3 text-right text-sm text-muted-foreground">
+              Still needed: ticket PDF or clear photo
+            </p> : null}
+          </div>}
+          {!checkpointOnly && <div className="flex justify-between mt-8 pt-6 border-t">
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
@@ -1037,7 +1104,7 @@ const TicketForm = ({
           </div>}
 
           {/* Why Continue is disabled */}
-          {!captureOnly && currentStep < 5 && !isStepValid() && missingFields().length > 0 && (
+          {!checkpointOnly && currentStep < 5 && !isStepValid() && missingFields().length > 0 && (
             <p className="text-sm text-muted-foreground text-right mt-3">
               Still needed: {missingFields().join(", ")}
             </p>

@@ -235,17 +235,20 @@ const PrivacyPolicy = () => {
               phone numbers for matching.
             </p>
             <p className="mt-4">
-              Google and Meta provider measurement stay off ticket intake, contact and fleet forms,
-              other personal-information forms, client portals, admin pages, and representation
-              authorization and document-verification flows. We do not include names, email
-              addresses, phone numbers, licence or plate details, ticket numbers, uploaded files,
-              free-text answers, assessment results, private access tokens or case identifiers in
-              Google or Meta measurement events. Fabsy's separate, consented first-party funnel
-              events on ticket intake contain only the named progress step described above and no
-              form contents. Meta automatic events and advanced matching are disabled; we do not
-              send Meta Lead or form events. No Meta retargeting audience is configured for this
-              release. Google personalized advertising, Google signals and enhanced conversions
-              remain disabled.
+              Google provider measurement and Meta browser scripts stay off ticket intake, contact
+              and fleet forms, other personal-information forms, client portals, admin pages, and
+              representation authorization and document-verification flows. After you separately
+              allow Meta measurement and successfully save contact details in ticket intake, Fabsy
+              may send a standard Lead event through Meta Conversions API. That event contains only
+              its time, the ticket-intake page URL, an opaque event reference, browser user agent,
+              and valid Meta browser or ad-click identifiers (_fbp and _fbc) when present. We do not
+              include names, email addresses, phone numbers, licence or plate details, ticket
+              numbers, uploaded files, free-text answers, assessment results, private access tokens
+              or case identifiers in Google or Meta measurement events. Fabsy's separate, consented
+              first-party funnel events on ticket intake contain only the named progress step
+              described above and no form contents. Meta automatic events and advanced matching are
+              disabled. No Meta retargeting audience is configured for this release. Google
+              personalized advertising, Google signals and enhanced conversions remain disabled.
             </p>
             <p className="mt-4">
               Learn more about these providers in the{' '}

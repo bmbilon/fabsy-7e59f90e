@@ -228,6 +228,32 @@ Deno.test("email delivery uses one stable key per draft capability generation", 
   assertEquals(result, { outcome: "sent", failureCode: null });
 });
 
+Deno.test("contact-first delivery asks for the ticket without claiming an upload", async () => {
+  let html = "";
+  const result = await deliverTicketIntakeResume({
+    draftId,
+    generation: 1,
+    accessToken,
+    channel: "email",
+    recipient: "lead@example.com",
+    preferredLocale: "en",
+    ticketUploaded: false,
+    configuration: { resendApiKey: "test-key", siteUrl: "https://fabsy.ca" },
+    fetcher: async (_input, init) => {
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      html = String(body.html);
+      return new Response(JSON.stringify({ id: "email_contact_first" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+  });
+  assertStringIncludes(html, "Your Fabsy intake is saved");
+  assertStringIncludes(html, "add your ticket");
+  assert(!html.includes("Your ticket upload is saved"));
+  assertEquals(result, { outcome: "sent", failureCode: null });
+});
+
 Deno.test("a rotated capability delivers with a distinct second-generation email key", async () => {
   const rotatedToken = "b".repeat(64);
   let idempotencyKey = "";
