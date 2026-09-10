@@ -1,7 +1,7 @@
 # Alberta ticket photo examples
 
 ## Purpose and clarified request
-Replace the abstract photo-guide diagram with recognizable yellow paper and white printed Alberta violation-ticket samples. Use fictional John Doe details, a common speeding section and fine, and a scannable QR code linking to https://fabsy.ca in the barcode position. The user's later clean white image is the base for the white sample.
+Replace the abstract photo-guide diagram with recognizable yellow paper and white printed Alberta violation-ticket samples. Use fictional John Doe details, a common speeding section and fine, and a scannable QR code linking to https://fabsy.ca in the white ticket barcode position. The yellow ticket retains its standard sample barcode, following the user's final correction. The user's later clean white image is the base for the white sample.
 
 ## Implementation
 Preserve the short checklist and disclosure. Show two responsive figures with clear labels, descriptive alternatives and full-size image links. Reuse the guide across existing upload entry points. Use sample markings and substitute personal/ticket/officer details throughout. Do not publish customer reference images. No upload, OCR, consent, payment or notification changes.
@@ -16,12 +16,12 @@ Example data: Traffic Safety Act section 115(2)(p), 100 km/h in an 80 km/h zone,
 ## Tasks
 - [x] Generate yellow and white samples with the built-in image tool
 - [x] Replace diagram with two accessible, responsive figures
-- [x] Ensure both finished QR codes decode to https://fabsy.ca
+- [x] Ensure the white QR code decodes to https://fabsy.ca and the yellow sample has no QR code
 - [x] Verify upload regressions and desktop/mobile rendering, including larger-image links
 - [ ] Publish through the existing frontend workflow and verify live assets
 
 ## Generation prompts
-Mode: built-in image_gen. The QR source was encoded deterministically with OpenCV at high error correction; the source decoded correctly. The image model changed the QR modules, so finished-image decoding failed. The user explicitly authorized direct script placement of the verified QR codes. The final PNGs were composited with nearest-neighbour QR scaling and both decoded to https://fabsy.ca using OpenCV. Optimized WebP previews total approximately 310 KB; full-resolution PNGs are linked for enlargement.
+Mode: built-in image_gen. The QR source was encoded deterministically with OpenCV at high error correction; the source decoded correctly. The image model changed the QR modules, so finished-image decoding failed. The user explicitly authorized direct script placement of verified QR codes, then clarified that yellow tickets must have no QR; only the white sample receives the QR. The white PNG was composited with nearest-neighbour QR scaling and decoded to https://fabsy.ca using OpenCV. The yellow PNG uses the original generated standard-barcode version; no QR is detected. Optimized WebP previews total approximately 310 KB; full-resolution PNGs are linked for enlargement.
 
 ### yellowTicketGen
 
@@ -29,10 +29,6 @@ Use case: scientific-educational. Create a high-resolution, realistic Alberta vi
 ALL personal and ticket-specific details must be fictional and replaced everywhere. No original ticket number, name, address, officer, badge, date, signature, barcode or QR data may survive. Exact example data: name "DOE, JOHN"; address "123 SAMPLE STREET, EDMONTON, AB T0T 0T0"; offence date "SEPTEMBER 1, 2026"; offence "SPEEDING — EXCEED MAXIMUM SPEED LIMIT"; section "115(2)(p)" of "TRAFFIC SAFETY ACT"; posted speed "80 km/h"; ticketed speed "100 km/h"; location "EXAMPLE ROAD, EDMONTON, AB"; issuing officer "A. SAMPLE"; badge "0000"; agency "SAMPLE AGENCY"; response deadline "OCTOBER 15, 2026 — 9:30 A.M."; court "ALBERTA COURT OF JUSTICE TRAFFIC, EDMONTON"; fine / voluntary payment amount "$228.00". All these values must be sharp, accurate and legible.
 A clear visible top banner must say "SAMPLE — NOT A VALID TICKET" and footer must say "Fictional details • Photo guidance only • Follow the instructions on your own ticket." Use a subtle diagonal SAMPLE watermark that does not obscure the important fields. Replace barcode with decorative bars labelled SAMPLE; do not reproduce scannable barcode or QR codes. No advertising, promotional marks, crossed-out fines, logos invented from the reference, or Fabsy phone number. Preserve actual ticket structure and print density, but any small-print explanatory area can say it is a photo-guidance sample instead of giving detailed legal or payment advice. This is an instructional fictional prop, never a valid document.
 Variant: YELLOW PAPER TICKET. Tall narrow pale warm yellow paper in the exact form style of the reference, approximately 1024 by 2048 pixel output. Keep the top-left "PART 3 / OFFENCE NOTICE", centered "VIOLATION TICKET / CANADA / Province of Alberta", top-right decorative sample barcode with ticket number "A00000000X". Use clear, dark, neat handwritten entries for the example name, address, dates, speeding section, speed and fine, with crisp printed form labels. Top personal-details rows, section and Traffic Safety Act checkbox, offence notice block, lower offence details and response deadline/court box, speed and prominent voluntary-payment fine box near lower portion, followed by response options areas, all in recognizable Alberta yellow-ticket arrangement. Repeat "A00000000X" only where the ticket ID appears again at the bottom. Show every edge and the entire bottom section. The yellow color must clearly distinguish this from a white printed ticket.
-
-### yellowTicketQR
-
-Edit target: image 1 is the finished yellow Alberta ticket SAMPLE. Supporting insert: image 2 is an EXACT real QR code encoding https://fabsy.ca. Replace the linear barcode in the TOP RIGHT of the yellow sample with this exact QR code. Preserve the QR module pattern pixel-for-pixel and preserve its white square quiet zone; composite the supplied QR, DO NOT redraw or invent a QR pattern. It must be functional when scanned. Give it sufficient space in the header, approximately 140 pixels square at this image's current size; keep all nearby text clear, minimally adjust the top-right header spacing if needed. Under the QR write "fabsy.ca" and retain the fictional ticket number "A00000000X" nearby. The QR must link to Fabsy, not payment. Keep all other document content, fake John Doe details, 115(2)(p), 80/100 km/h, $228.00, sample watermark, pale yellow color, sharp legibility, paper edges and dark backdrop unchanged. This is still explicitly SAMPLE — NOT A VALID TICKET. No real customer data.
 
 ### whiteTicketQR
 
