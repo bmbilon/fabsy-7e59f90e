@@ -40,6 +40,7 @@ import CityQuirks from "./pages/hubs/CityQuirks";
 import ThankYou from "./pages/ThankYou";
 import Founder from "./pages/Founder";
 import Analytics from "./components/Analytics";
+import LiveVisitorTracker from "./components/LiveVisitorTracker";
 import GoogleConsent from "./components/GoogleConsent";
 import MeasurementRouter from "./components/MeasurementRouter";
 import AcquisitionTracker from "./components/AcquisitionTracker";
@@ -74,6 +75,7 @@ const Refer = lazy(() => import("./pages/Refer"));
 const ReferralPortal = lazy(() => import("./pages/ReferralPortal"));
 const ProDiscountPortal = lazy(() => import("./pages/ProDiscountPortal"));
 const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
+const AdminLiveView = lazy(() => import("./pages/AdminLiveView"));
 
 function RouteSuspense({ children }: PropsWithChildren) {
   return <Suspense fallback={<div className="min-h-screen" aria-busy="true" />}>{children}</Suspense>;
@@ -90,6 +92,7 @@ const RouteAnalytics = () => {
       <FunnelMeasurement />
       <ReferralAttribution />
       <Analytics />
+      <LiveVisitorTracker />
     </>
   );
 };
@@ -165,6 +168,7 @@ const App = () => (
            {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/live" element={<RouteSuspense><AdminLiveView /></RouteSuspense>} />
           <Route path="/admin/cases" element={<AdminCaseManagement />} />
           <Route path="/admin/acquisition" element={<AdminPaidFunnel />} />
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />

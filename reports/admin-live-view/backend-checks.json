@@ -1,0 +1,20 @@
+{
+  "verified_at": "2026-09-10T00:58:46.367Z",
+  "checks": [
+    {
+      "checks": {
+        "anon_ingest": false,
+        "anon_read": false,
+        "anon_snapshot": false,
+        "authenticated_direct_read": false,
+        "migration": "admin_live_view",
+        "retention_job": {
+          "active": true,
+          "id": 7,
+          "schedule": "17 * * * *"
+        },
+        "table_exists": true
+      }
+    }
+  ]
+}

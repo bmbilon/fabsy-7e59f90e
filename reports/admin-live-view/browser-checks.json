@@ -1,0 +1,19 @@
+{
+  "fixture_data_only": true,
+  "checks": [
+    "Signed-out users see sign-in and make no snapshot request",
+    "desktop layout: no horizontal page overflow",
+    "mobile layout: no horizontal page overflow",
+    "Globe/world map toggle and rotation controls work",
+    "Visitor filtering and no-match state work",
+    "Pause stops polling; resume restores 15-second updates",
+    "Connection loss retains last snapshot with explicit stale status",
+    "Connected empty state is distinct from unavailable",
+    "Non-admin API denial exposes no visitor data",
+    "No browser runtime errors"
+  ],
+  "screenshots": [
+    "reports/admin-live-view/fixture-desktop.png",
+    "reports/admin-live-view/fixture-mobile.png"
+  ]
+}

@@ -146,6 +146,18 @@ const PrivacyPolicy = () => {
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
+            <p className="mb-4">
+              With your permission for Fabsy's first-party measurement, our internal Live View shows current
+              website activity using a random browser-session identifier, public page paths, broad intake stages,
+              device category, referring-site category and approximate city or region supplied by our hosting
+              provider. The session identifier is shared across tabs and renews after 30 minutes of inactivity.
+              Live View does not collect names, contact details, ticket or form contents, query strings, private
+              portal activity or precise GPS location. Visitor records are removed after 48 hours of inactivity
+              during hourly cleanup. Temporary daily-salted network hashes used to limit abuse are removed after
+              two hours during hourly cleanup; raw IP addresses are not stored in Live View. Live View also respects
+              browser Do Not Track and Global Privacy Control signals. Declining measurement stops new collection;
+              any previously active session leaves the live count within 90 seconds.
+            </p>
             <p>
               Fabsy's first-party funnel measurement, Google Analytics 4, Google Ads measurement
               and Meta measurement are optional. Fabsy does not record an optional funnel event,

@@ -270,6 +270,10 @@ const TicketForm = ({
     const clamped = Math.max(1, Math.min(s, steps.length));
     return clamped;
   });
+  useEffect(() => {
+    // Coarse stage only: no form values, ticket details or identity.
+    window.dispatchEvent(new CustomEvent('fabsy:live-stage', { detail: currentStep >= 4 ? 'review' : 'intake' }));
+  }, [currentStep]);
   const [formData, setFormData] = useState<FormData>(() => {
     const coerceDate = (v: unknown) => {
       if (!v) return undefined as Date | undefined;
