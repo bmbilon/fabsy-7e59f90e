@@ -436,9 +436,8 @@ async function untagged(page, documentId, observationMs = 1000) {
 async function fillPrivate(page, pathname) {
   if (pathname === '/contact') { await page.locator('#name').fill(privateValues[0]); await page.locator('#email').fill(privateValues[1]); await page.locator('#message').fill(privateValues[2]); }
   else if (pathname === '/submit-ticket') {
-    // Exercise the supported upload and current early lead-capture UI while all
-    // service requests stay blocked. Never cross the lead-save boundary.
-    await page.locator('form input[type="file"][accept*="application/pdf"]').setInputFiles(syntheticTicketPdf());
+    // Exercise the contact-first lead-capture UI while all service requests
+    // stay blocked. Never cross the lead-save boundary into ticket upload.
     await page.locator('#lead-email').waitFor({ state: 'visible' });
     await page.locator('#lead-email').fill(privateValues[1]);
     await page.locator('#lead-phone').fill(privateValues[4]);
