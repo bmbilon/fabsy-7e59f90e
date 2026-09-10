@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import useSafeHead from "@/hooks/useSafeHead";
-import VisitorGlobe from "@/components/live-view/VisitorGlobe";
+import VisitorAlbertaMap from "@/components/live-view/VisitorAlbertaMap";
 import {
   locationLabel,
   type LiveSnapshot,
@@ -315,7 +315,7 @@ export default function AdminLiveView() {
           ))}
         </div>
         <div className="grid items-start gap-5 lg:grid-cols-[1.55fr_1fr]">
-          <VisitorGlobe locations={data?.locations || []} live={live} />
+          <VisitorAlbertaMap locations={data?.locations || []} live={live} />
           <div className="space-y-5">
             <Card className="rounded-xl border-slate-200/80 shadow-sm">
               <CardHeader className="pb-4">

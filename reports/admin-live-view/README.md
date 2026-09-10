@@ -1,8 +1,8 @@
 # Admin Live View — implementation and verification
 
-Release prepared on September 9, 2026, following Brett’s approval to activate Live View. The isolated release branch starts from production main; unrelated shared-workspace edits are excluded. The production migration and Cloudflare runtime secrets are configured. Frontend publishing and live verification are the remaining release steps.
+Live View was activated on September 9, 2026, with production migration, runtime credentials and live visitor checks completed. The Alberta map revision replaces the globe/world controls at Brett’s request. Release work uses an isolated branch from current production main; unrelated shared-workspace edits are excluded.
 
-The new admin tile opens `/admin/live`. The page displays anonymous active sessions, approximate locations, current public pages, referral categories, devices and intake stages, plus today's saved submissions and cases with confirmed payments. It includes a globe/world map, session activity chart, pause/resume, manual refresh, visitor search, clear connection errors and a mobile card layout.
+The new admin tile opens `/admin/live`. The page displays anonymous active sessions, approximate locations, current public pages, referral categories, devices and intake stages, plus today's saved submissions and cases with confirmed payments. It includes an Alberta map, session activity chart, pause/resume, manual refresh, visitor search, clear connection errors and a mobile card layout.
 
 ## Preview
 
@@ -16,14 +16,14 @@ Both images are labelled **SIMULATED VISITORS**. The numbers are isolated browse
 
 - 12 automated unit/integration tests covering public route exclusions, session continuity and expiry, first-source attribution, opt-in consent, withdrawal, privacy signals, hidden-tab tracking, cleanup, server-side metadata enrichment, request validation, anonymous/unauthorized access, upstream failure and rate-limit handling.
 - Isolated temporary PostgreSQL tests for real migration execution, grants/RLS, admin-role enforcement, duplicate tabs, 90-second expiry, Edmonton date boundaries, payment deduplication, 30 chart buckets, bounded visitor results with uncapped totals, rate limiting and retention scheduling.
-- Desktop (1440 px) and phone (390 px) browser checks: no page overflow, filtering, map controls, 15-second polling, pause/resume, connection loss, no visitors, denied access, no public mobile call bar and no runtime errors.
+- Desktop (1440 px) and phone (390 px) browser checks: no page overflow, filtering, Alberta markers and outside/unknown location handling, 15-second polling, pause/resume, connection loss, no visitors, denied access, no public mobile call bar and no runtime errors.
 - TypeScript application check and focused ESLint passed.
 - Cloudflare Pages Functions compiled successfully with Wrangler.
 - Full `npm run build` passed, including contrast, i18n, snapshot generation and postbuild checks. Existing large-bundle and Sass deprecation warnings remain.
 - Production database checks confirm anonymous ingestion/reads and direct authenticated reads are denied. Migration history records `20260909180000`, and the hourly retention job is active. See [backend checks](backend-checks.json).
 - Privacy-policy source fingerprints were refreshed for the additional English disclosure. Existing owner-authorized machine-translation publication status, human-review status, and translation strings were preserved.
 
-## Activation
+## Deployment procedure
 
 1. Build from current production main. The earlier contrast failure was confined to unpublished workspace changes; the isolated release passes that guard.
 2. Apply **only** `supabase/migrations/20260909180000_admin_live_view.sql` to the existing Supabase project. Do not push all pending migrations from this shared working directory. It adds private visitor tables, a service-only ingestion RPC, an admin-only snapshot RPC and the hourly `live-view-retention` cron job. The existing project must have `pg_cron` enabled, as used by its other workers.
@@ -40,7 +40,7 @@ Both images are labelled **SIMULATED VISITORS**. The numbers are isolated browse
 - “Sessions today” counts session starts since midnight America/Edmonton. The initial collection date is shown; there is no historical visitor backfill.
 - “Submissions today” counts saved `ticket_submissions` created today. “Paid cases today” counts each ticket once when `representation_paid_at` or `assessment_paid_at` is today. It does not claim revenue, net sales, distinct buyers, refund status, standalone insurance-product orders or attribution to a visitor.
 - Intake stages are coarse on-site activity, not observation of Stripe checkout. Private portal, manual representation links and receipt pages are excluded.
-- Locations come from Cloudflare request metadata, rounded to 0.1 degrees; missing locations stay unknown. The map initially faces Alberta and can rotate or show the world. Globe data is sampled from [Natural Earth land geometry](https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_land.geojson), available in the [public domain](https://www.naturalearthdata.com/about/terms-of-use/). No third-party map/geolocation calls run in visitors' browsers.
+- Locations come from Cloudflare request metadata, rounded to 0.1 degrees; missing locations stay unknown. The map shows Alberta only, with static city labels and purple live-visitor markers. Visitors outside Alberta and those without coordinates remain in the list and overall counts. Province geometry comes from [Natural Earth admin-1 boundaries](https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_50m_admin_1_states_provinces.geojson), available in the [public domain](https://www.naturalearthdata.com/about/terms-of-use/). No third-party map/geolocation calls run in visitors' browsers.
 - Snapshot detail is capped at the 200 most recently active visitors and 200 grouped locations; total counters and top-page/source aggregations include all active sessions.
 - The endpoint limits each daily-salted network hash to 180 requests/minute. Session updates are throttled to 10 seconds unless the page/stage changes. This is abuse reduction, not proof that every session is a person.
 - Visitor rows expire after 48 hours of inactivity, and temporary network hashes after two hours, on the next hourly cleanup. The visitor table has no IPs, raw URLs/referrers, query strings, client identity, documents or form answers. Standard hosting-provider request logs are separate from these application tables.
@@ -51,7 +51,7 @@ Both images are labelled **SIMULATED VISITORS**. The numbers are isolated browse
 node --test scripts/test-live-view.mjs
 node scripts/test-live-view-database.mjs
 npx tsc --noEmit -p tsconfig.app.json
-npx eslint src/lib/live-view/core.ts src/components/LiveVisitorTracker.tsx src/components/live-view/VisitorGlobe.tsx src/pages/AdminLiveView.tsx functions/api/live-view.ts
+npx eslint src/lib/live-view/core.ts src/components/LiveVisitorTracker.tsx src/components/live-view/VisitorAlbertaMap.tsx src/pages/AdminLiveView.tsx functions/api/live-view.ts
 npx wrangler pages functions build functions --outfile /tmp/fabsy-live-view-worker.js
 npx vite build --outDir /tmp/fabsy-live-view-build
 ```

@@ -63,13 +63,15 @@ try {
     results.screenshots.push(screenshot);
     results.checks.push(`${name} layout: no horizontal page overflow`);
   }
-  await page.getByRole('button', { name: 'Show world map' }).click();
-  await page.getByRole('button', { name: 'Show globe' }).waitFor();
-  assert.equal(await page.getByRole('button', { name: 'Rotate globe west' }).isDisabled(), true);
-  await page.getByRole('button', { name: 'Show globe' }).click();
-  await page.getByRole('button', { name: 'Rotate globe east' }).click();
-  await page.getByRole('button', { name: 'Center globe on Alberta' }).click();
-  results.checks.push('Globe/world map toggle and rotation controls work');
+  const map = page.getByRole('img', { name: /^Map of Alberta\./ });
+  await map.waitFor();
+  assert.match(await map.getAttribute('aria-label'), /5 visitors in Alberta, 1 outside Alberta, 1 with location unavailable/);
+  assert.equal(await map.locator('[data-live-visitor-marker]').count(), 2);
+  assert.equal(await map.locator('title').filter({ hasText: 'Vancouver' }).count(), 0);
+  assert.equal(await page.getByRole('button', { name: /Show world map|Show globe|Rotate globe/ }).count(), 0);
+  await page.getByText('5 in Alberta · 1 outside Alberta · 1 location unavailable', { exact: true }).waitFor();
+  assert.equal(await page.locator('tbody tr').count(), 7, 'Visitors outside Alberta remain in the list');
+  results.checks.push('Alberta map plots local visitors, reports outside/unknown locations, and preserves all visitors in the list');
   await page.getByRole('textbox', { name: 'Filter visitors by page, location, source or device' }).fill('Edmonton');
   assert.equal(await page.locator('tbody tr').count(), 2);
   await page.getByRole('textbox').fill('no-such-location');
@@ -93,7 +95,8 @@ try {
   mode = 'empty';
   await page.getByRole('button', { name: 'Refresh Live View' }).click();
   await page.getByText('No active visitors in the last 90 seconds.').waitFor();
-  results.checks.push('Connected empty state is distinct from unavailable');
+  assert.equal(await page.locator('[data-live-visitor-marker]').count(), 0);
+  results.checks.push('Connected empty state is distinct from unavailable; city reference dots are not visitor markers');
   mode = 'denied';
   await page.reload();
   await page.getByRole('alert').filter({ hasText: 'Administrator access is required' }).waitFor();
