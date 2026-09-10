@@ -132,6 +132,8 @@ async function prerenderRoute(browser, route) {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
     const page = await browser.newPage({ viewport: { width: 1200, height: 900 }});
     try {
+      // Captured HTML must never contain an initialized support conversation.
+      await page.addInitScript(() => { window.__FABSY_PRERENDER__ = true; });
       console.log(`→ Rendering ${url}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
       await page.waitForSelector('#root h1', { timeout: TIMEOUT });

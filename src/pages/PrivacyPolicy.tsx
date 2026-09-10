@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
         <p className="text-white/70 mb-8">
-          Last updated: September 4, 2026
+          Last updated: September 9, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -29,6 +29,7 @@ const PrivacyPolicy = () => {
               <li>Payment and billing information</li>
               <li>Referral codes and attribution dates, referral eligibility and payout history, Interac delivery email, and the referrer's legal name and address for payout administration and applicable tax reporting</li>
               <li>Communication records between you and our representatives</li>
+              <li>Website chat messages, contact details you choose to provide, and chat session, browser and public-page information processed by Tawk.to to provide live support</li>
             </ul>
           </section>
 
@@ -62,6 +63,7 @@ const PrivacyPolicy = () => {
               <li><strong>Ticket Process:</strong> With courts, prosecutors and government services as authorized and required to deliver Rapid Resolution</li>
               <li><strong>Legal Compliance:</strong> When required by law, regulation, or court order</li>
               <li><strong>Service Providers:</strong> With trusted third-party service providers who assist in our operations</li>
+              <li><strong>Website Live Chat:</strong> With Tawk.to to deliver messages, retain conversation history and let Fabsy staff respond through its dashboard and mobile apps</li>
               <li><strong>Business Transfers:</strong> In connection with any merger, sale, or transfer of company assets</li>
             </ul>
             <p className="mt-4">
@@ -146,6 +148,19 @@ const PrivacyPolicy = () => {
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
+            <p className="mb-4">
+              Our public website uses Tawk.to for live chat. Tawk.to uses cookies and browser storage
+              to maintain chat sessions and recognize returning visitors. Conversation continuity depends
+              on the same browser and device retaining that storage; private browsing, clearing cookies
+              or changing devices may start a new visitor session. Messages and contact details you
+              choose to share are available to authorized Fabsy staff in Tawk.to, including its mobile apps.
+              Tawk.to may process information outside Canada. See the{' '}
+              <a href="https://www.tawk.to/privacy-policy/" className="underline" target="_blank" rel="noreferrer">
+                Tawk.to Privacy Policy
+              </a>. Please use our secure ticket intake or client portal for ticket images, licence
+              documents, payment information and other sensitive case details. Live chat availability
+              depends on staff availability and does not guarantee an immediate reply.
+            </p>
             <p className="mb-4">
               With your permission for Fabsy's first-party measurement, our internal Live View shows current
               website activity using a random browser-session identifier, public page paths, broad intake stages,

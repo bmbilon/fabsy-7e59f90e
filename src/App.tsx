@@ -47,6 +47,8 @@ import AcquisitionTracker from "./components/AcquisitionTracker";
 import FunnelMeasurement from "./components/FunnelMeasurement";
 import ScrollToTop from "./components/ScrollToTop";
 import CallBar from "./components/CallBar";
+import LiveChat from "./components/LiveChat";
+import { chatTagMayLoadInDocument } from "./lib/measurementNavigation";
 import InsuranceDamageReport from "./pages/InsuranceDamageReport";
 import IdrCheckout from "./pages/IdrCheckout";
 import IdrIntake from "./pages/IdrIntake";
@@ -198,6 +200,7 @@ const App = () => (
         </Routes>
         </div>
         <CallBar />
+        <LiveChat documentAllowed={chatTagMayLoadInDocument} />
         <GoogleConsent />
         </LocaleProvider>
         </MeasurementRouter>

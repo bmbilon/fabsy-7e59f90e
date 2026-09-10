@@ -1,3 +1,4 @@
+import { isLiveChatUrl } from '../config/live-chat';
 import {
   Action, createBrowserHistory, createMemoryHistory, parsePath,
   type History, type Location, type To,
@@ -49,7 +50,8 @@ function hasProviderTag(win: Window, provider: MeasurementProvider, boundary?: D
 }
 
 function hasMeasurementTag(win: Window, boundary?: DocumentBoundary): boolean {
-  return hasProviderTag(win, 'google', boundary) || hasProviderTag(win, 'meta', boundary);
+  return hasProviderTag(win, 'google', boundary) || hasProviderTag(win, 'meta', boundary) ||
+    Boolean(win.document?.getElementById?.('fabsy-tawk-widget'));
 }
 
 function isPublic(url: URL, boundary: Pick<DocumentBoundary, 'origin' | 'isPublicUrl'>): boolean {
@@ -80,6 +82,7 @@ function isProviderPublic(
 }
 
 function hasProviderOutsidePolicy(win: Window, url: URL, boundary: DocumentBoundary): boolean {
+  if (win.document?.getElementById?.('fabsy-tawk-widget') && !isLiveChatUrl(url.href)) return true;
   return (['google', 'meta'] as const).some(provider =>
     hasProviderTag(win, provider, boundary) && !isProviderPublic(provider, url, boundary));
 }
@@ -137,6 +140,14 @@ export function measurementTagMayLoadInDocument(candidate?: Window): boolean {
   if (!win || !boundary || boundary.leaving || boundary.kind === 'private' ||
       (boundary.kind === 'receipt' && !boundary.receiptScrubbed)) return false;
   return isPublic(new URL(win.location.href), boundary);
+}
+
+/** Chat may never be added to a document that previously displayed private data. */
+export function chatTagMayLoadInDocument(candidate?: Window): boolean {
+  const win = browserWindow(candidate);
+  const boundary = win && documents.get(win);
+  return Boolean(win && boundary && boundary.kind === 'public' && !boundary.leaving &&
+    isLiveChatUrl(win.location.href));
 }
 
 /** Provider policy after applying any server-verified receipt authorization. */
