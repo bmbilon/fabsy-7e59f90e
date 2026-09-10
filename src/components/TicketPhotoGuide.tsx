@@ -1,5 +1,24 @@
 import { useId } from "react";
-import { Camera, ChevronDown } from "lucide-react";
+import { Camera, ChevronDown, ZoomIn } from "lucide-react";
+
+const ticketExamples = [
+  {
+    label: "Yellow paper ticket",
+    image: "/images/ticket-photo-examples/alberta-yellow-sample.png",
+    preview: "/images/ticket-photo-examples/alberta-yellow-sample-preview.webp",
+    width: 887,
+    height: 1774,
+    details: "The ticket number is near the top right. Include the offence, date and court box, and the fine near the bottom.",
+  },
+  {
+    label: "White printed ticket",
+    image: "/images/ticket-photo-examples/alberta-white-sample.png",
+    preview: "/images/ticket-photo-examples/alberta-white-sample-preview.webp",
+    width: 1086,
+    height: 1448,
+    details: "The ticket number is near the top left. Include the charge, speed details, response date and fine under Your options.",
+  },
+];
 
 export function TicketPhotoGuide() {
   const headingId = useId();
@@ -21,7 +40,7 @@ export function TicketPhotoGuide() {
       </p>
       <details className="group mt-[12px] border-t border-sky-200 pt-3">
         <summary className="flex w-fit cursor-pointer list-none items-center gap-2 rounded text-sm font-semibold text-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700 [&::-webkit-details-marker]:hidden">
-          See the steps and example
+          See the steps and ticket examples
           <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
         </summary>
         <ol className="mt-[12px] list-decimal space-y-2 pl-5 text-sm leading-relaxed marker:font-semibold marker:text-sky-800">
@@ -30,19 +49,23 @@ export function TicketPhotoGuide() {
           <li><strong>Show the whole ticket.</strong> Hold your phone directly above it with all four edges inside the photo.</li>
           <li><strong>Make the writing sharp.</strong> Tap the text to focus, hold still, then check the small print.</li>
         </ol>
-        <div className="mt-[12px] grid items-center gap-4 sm:grid-cols-[180px_minmax(0,1fr)]">
-          <div role="img" aria-label="Illustration of a flat ticket photographed directly from above. All four edges and the ticket number, offence, dates, fine and court details are visible." className="relative mx-auto w-[180px] max-w-full rounded-xl bg-slate-700 p-5">
-            <div className="absolute inset-2 rounded border-2 border-dashed border-emerald-300" aria-hidden="true" />
-            <div className="relative space-y-3 rounded-sm border border-slate-300 bg-white p-[12px] text-[10px] leading-snug text-slate-900 shadow-sm" aria-hidden="true">
-              <p className="border-b border-slate-200 pb-2 text-center font-bold tracking-wider">EXAMPLE ONLY</p>
-              <p><span className="block text-slate-500">Ticket number</span><strong>ABC 123456</strong></p>
-              <p><span className="block text-slate-500">Offence / section</span><span className="mt-[4px] block h-1.5 w-full rounded bg-slate-600" /></p>
-              <p><span className="block text-slate-500">Dates / court details</span><span className="mt-[4px] block h-1.5 w-4/5 rounded bg-slate-600" /></p>
-              <p><span className="block text-slate-500">Fine amount</span><span className="mt-[4px] block h-1.5 w-1/2 rounded bg-slate-600" /></p>
-            </div>
-          </div>
-          <p className="text-sm leading-relaxed">Leave a little space around every edge. Check both the top ticket number and the bottom section before using the photo.</p>
+        <p className="mt-[12px] text-sm leading-relaxed">Leave a little space around every edge, as shown below. Open either example to see the details at full size.</p>
+        <div className="mt-[12px] grid gap-5 sm:grid-cols-2">
+          {ticketExamples.map((example) => (
+            <figure key={example.image} className="min-w-0 space-y-3">
+              <figcaption className="text-sm font-semibold">{example.label}</figcaption>
+              <a href={example.image} target="_blank" rel="noopener noreferrer" aria-label={`Enlarge ${example.label.toLowerCase()} example (opens in a new tab)`} className="block overflow-hidden rounded-lg border border-slate-300 bg-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700">
+                <img src={example.preview} alt={`${example.label} from Alberta, with fictional John Doe details, photographed flat with all four edges visible.`} width={example.width} height={example.height} loading="lazy" decoding="async" className="h-[360px] w-full object-contain" />
+                <span className="flex min-h-11 items-center justify-center gap-2 bg-white px-3 py-2 text-sm font-semibold text-sky-800">
+                  <ZoomIn className="h-4 w-4" aria-hidden="true" />
+                  View larger <span className="sr-only">(opens in a new tab)</span>
+                </span>
+              </a>
+              <p className="text-sm leading-relaxed">{example.details}</p>
+            </figure>
+          ))}
         </div>
+        <p className="mt-[12px] text-xs leading-relaxed text-slate-600">Fictional examples for photo guidance. Your ticket may look different; follow the instructions and dates on your own ticket.</p>
         <p className="mt-[12px] text-xs leading-relaxed text-slate-600">If the original printing is faint or damaged, send the clearest photo you can and tell us in your notes.</p>
       </details>
     </aside>
