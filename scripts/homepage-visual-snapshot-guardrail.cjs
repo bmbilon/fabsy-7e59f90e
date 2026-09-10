@@ -12,13 +12,14 @@ const feeRefund = require('../src/config/feeRefund.json');
 const ROOT = path.resolve(__dirname, '..');
 const compact = value => String(value ?? '').replace(/\s+/g, '');
 const qualification = 'We can’t guarantee a court outcome. Our guarantee covers the service fee you paid.';
-const heroSupport = 'Fabsy negotiates for a lower fine, fewer demerits or withdrawal. No legal outcome is guaranteed.';
+const heroSupport = 'Fabsy negotiates for a lower fine, fewer demerits or withdrawal.';
 const successDefinition = 'A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.';
 const refundScope = `${feeRefund.scope} The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. A standalone insurance report is not covered by this outcome-based guarantee. Trial representation, court charges and third-party costs are separate.`;
 const heroHeadline = 'Fine or demerits reduced';
 const heroHeadlineAccent = 'or your money back';
 const heroHeading = `${heroHeadline} ${heroHeadlineAccent}`;
-const price = `$${offers.rapidResolution.priceCad} CAD + GST · Paid upfront; refunded if the policy applies`;
+const heroPrice = `$${offers.rapidResolution.priceCad} CAD + GST`;
+const price = `${heroPrice} · Paid upfront; refunded if the policy applies`;
 const policyAnchor = '#money-back-guarantee';
 
 const SOURCE_BINDINGS = {
@@ -121,9 +122,9 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   }
 
   field(hero, 'h1#homepage-hero-heading', heroHeading, 'reviewed hero headline');
-  field(hero, 'p', heroSupport, 'qualified supporting headline');
+  field(hero, 'p', heroSupport, 'supporting headline');
   field(hero, 'p', `${qualification} ${feeRefund.condition}`, 'hero outcome qualification and Crown-rejection trigger');
-  field(hero, 'p', price, 'Rapid Resolution upfront price and GST');
+  field(hero, 'p', heroPrice, 'Rapid Resolution price and GST');
   field(hero, 'p', 'For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the service-fee refund works',
     'hero scope and policy destination', [[policyAnchor, 'How the service-fee refund works']]);
   field(hero, 'a', 'Get help with my ticket', 'Rapid Resolution intake destination', [[offers.rapidResolution.intakePath, 'Get help with my ticket']]);

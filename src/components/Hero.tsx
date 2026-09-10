@@ -28,7 +28,6 @@ const Hero = () => (
         </p>
         <p className="mt-4 text-sm text-slate-200">
           <strong className="font-semibold text-white">${RAPID_RESOLUTION.priceCad} CAD + GST</strong>
-          {" "}· Paid upfront; refunded if the policy applies
         </p>
 
         <div className="mt-5 flex justify-center">

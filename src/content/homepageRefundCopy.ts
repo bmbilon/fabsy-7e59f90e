@@ -4,7 +4,7 @@ import { FEE_REFUND } from "@/config/feeRefund";
 export const HOMEPAGE_REFUND_COPY = {
   headline: "Fine or demerits reduced",
   headlineAccent: "or your money back",
-  heroSupport: "Fabsy negotiates for a lower fine, fewer demerits or withdrawal. No legal outcome is guaranteed.",
+  heroSupport: "Fabsy negotiates for a lower fine, fewer demerits or withdrawal.",
   outcomeQualification: "We can’t guarantee a court outcome. Our guarantee covers the service fee you paid.",
   refundCondition: FEE_REFUND.condition,
   successDefinition: "A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.",

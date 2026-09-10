@@ -47,9 +47,9 @@ try {
 
   const hero = parse(render.renderHero());
   check('hero uses the requested money-back headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Fine or demerits reduced or your money back'));
-  check('hero states the legal-outcome boundary', () => assert.match(hero.body.textContent, /No legal outcome is guaranteed\./));
+  check('hero retains the detailed refund qualification below the opener', () => assert.match(hero.body.textContent, /We can’t guarantee a court outcome\./));
   check('hero removes the superseded promises', () => assert.doesNotMatch(hero.body.textContent, /success guaranteed|you don[’']t pay/i));
-  check('hero displays the complete upfront price', () => assert.match(hero.body.textContent, new RegExp(`\\$${offers.rapidResolution.priceCad} CAD \\+ GST`)));
+  check('hero displays the price without an appended disclaimer', () => assert.equal(hero.querySelector('strong')?.parentElement?.textContent, `$${offers.rapidResolution.priceCad} CAD + GST`));
   check('hero CTA is measurable and enters intake', () => {
     const cta = hero.querySelector('a[data-funnel-action="primary_cta"]');
     assert.equal(cta?.getAttribute('href'), offers.rapidResolution.intakePath);
