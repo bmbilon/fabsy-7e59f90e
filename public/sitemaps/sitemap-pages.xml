@@ -300,6 +300,14 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/blog/gdl-speeding-ticket-alberta-learner-probationary-driver" />
   </url>
   <url>
+    <loc>https://fabsy.ca/blog/how-to-understand-your-alberta-traffic-ticket</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-09-10T13:44:02.888051+00:00</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/blog/how-to-understand-your-alberta-traffic-ticket" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/blog/how-to-understand-your-alberta-traffic-ticket" />
+  </url>
+  <url>
     <loc>https://fabsy.ca/blog/impaired-driving-beyond-public-roads-alberta</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
