@@ -12,7 +12,6 @@ import { JSDOM } from 'jsdom';
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'fabsy-homepage-conversion-'));
-const feeRefund = require('../src/config/feeRefund.json');
 const offers = require('../src/config/offers.json');
 let checks = 0;
 const check = (name, operation) => { operation(); checks += 1; };
@@ -47,7 +46,7 @@ try {
   const parse = html => new JSDOM(html).window.document;
 
   const hero = parse(render.renderHero());
-  check('hero uses the policy headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, feeRefund.headline));
+  check('hero uses the requested money-back headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Fine or demerits reduced or your money back'));
   check('hero states the legal-outcome boundary', () => assert.match(hero.body.textContent, /No legal outcome is guaranteed\./));
   check('hero removes the superseded promises', () => assert.doesNotMatch(hero.body.textContent, /success guaranteed|you don[’']t pay/i));
   check('hero displays the complete upfront price', () => assert.match(hero.body.textContent, new RegExp(`\\$${offers.rapidResolution.priceCad} CAD \\+ GST`)));
