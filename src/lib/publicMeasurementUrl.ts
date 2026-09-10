@@ -1,3 +1,4 @@
+import { isLiveChatUrl } from '../config/live-chat';
 import { publicGoogleMeasurementUrl } from './googleMeasurement';
 import { publicMetaMeasurementUrl } from './metaMeasurement';
 import type { MeasurementProvider } from './measurementNavigation';
@@ -7,7 +8,7 @@ import type { MeasurementProvider } from './measurementNavigation';
  * still applies its own narrower URL, consent and production checks.
  */
 export function publicMeasurementDocumentUrl(url: URL): boolean {
-  return publicGoogleMeasurementUrl(url) || publicMetaMeasurementUrl(url);
+  return publicGoogleMeasurementUrl(url) || publicMetaMeasurementUrl(url) || isLiveChatUrl(url.href);
 }
 
 /** The provider-specific half of the document boundary's public URL policy. */

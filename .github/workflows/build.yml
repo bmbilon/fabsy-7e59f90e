@@ -43,6 +43,9 @@ jobs:
       - name: Validate Live View privacy and session behavior
         run: node --test scripts/test-live-view.mjs
 
+      - name: Validate persistent live chat and private document boundaries
+        run: node --test scripts/test-live-chat.mjs
+
       - name: Validate paid-acquisition launch-control schema and adversarial cases
         run: |
           npm run test:ads-readiness
