@@ -1,0 +1,58 @@
+{
+  "branch": "codex/live-chat-20260909",
+  "source_commit": "b47f1d022345556be03f6f53508099cc795676ec",
+  "pull_request": "https://github.com/bmbilon/fabsy-7e59f90e/pull/32",
+  "preview": "https://fabsy-6kr8k3mm0-execom.vercel.app",
+  "preview_bundle_sha256": "5b0abde57ac53d3d4740c8dead5f871ed71df9aee59ebb5175d6aec2f48a281c",
+  "full_local_build": "passed",
+  "typescript": "passed",
+  "focused_eslint": "passed",
+  "chat_unit_tests": 7,
+  "navigation_unit_tests": 18,
+  "browser_checks": {
+    "real_widget_loaded": true,
+    "public_navigation_reuses_iframes": true,
+    "private_intake_has_no_chat_script_or_frames": true,
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "mobile_purchase_button_unobstructed": true,
+    "horizontal_overflow": false
+  },
+  "phone_push_delivery": "not verified",
+  "real_message_exchange": "not sent",
+  "baseline_production_source": "1ce31777636533b4843482a509b07b79813b0982",
+  "backend_diff_from_baseline": [],
+  "production_source_commit": "bdc5e5ac6c0076f8efe85c336a0ebe72bc944573",
+  "ci_url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/34424938445",
+  "ci_conclusion": "success",
+  "production_workflow": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/34425949218",
+  "backend_gate": "No backend changes from already deployed 1ce3177. Pin advanced only after the preceding admin release passed its deployment gate.",
+  "held_workflow": {
+    "url": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/34425433034",
+    "reason": "GitHub captured the previous release pin when the workflow started. The guard prevented deployment. A fresh run was dispatched after setting and reading back the matching pin."
+  },
+  "source_note": "Includes the already released admin ordering change and a subsequent generated snapshot refresh. Chat source is unchanged from the tested PR.",
+  "production_workflow_conclusion": "success",
+  "cloudflare_deployment_id": "ee07e247-12e4-4a6b-bc77-94ddc2f5c81e",
+  "production_url": "https://fabsy.ca",
+  "immutable_deployment_url": "https://ee07e247.fabsy-9qa.pages.dev",
+  "production_bundle": "/assets/index-bBJYNAsC.js",
+  "production_bundle_sha256": "e49b690fc4671b1aec6777477755265be4fb3fac1783f1a974135804c5d3cb98",
+  "custom_domain_matches_immutable_bundle": true,
+  "verified_at_utc": "2026-09-10T01:41:16.074486+00:00",
+  "live_browser_checks": {
+    "real_widget_loaded": true,
+    "single_embed_script": true,
+    "open_widget_survives_home_to_about": true,
+    "private_intake_has_no_chat_script_or_frames": true,
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "mobile_document_width": 375,
+    "mobile_scroll_width": 375,
+    "mobile_purchase_button_unobstructed": true
+  }
+}

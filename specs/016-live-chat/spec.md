@@ -32,7 +32,7 @@ Use the existing React/Vite app and Cloudflare production hosting. Connect the r
 - [x] Implement lifecycle, route handling and mobile positioning.
 - [x] Update privacy disclosure and staff setup notes.
 - [x] Run local checks and real-widget browser verification (desktop and 390×844 viewport, public persistence and secure intake isolation).
-- [ ] Deploy the reviewed change and verify the production widget.
+- [x] Deploy the reviewed change and verify the production widget.
 - [ ] Brett confirms mobile login, notifications and a two-way test.
 
 Coverage review: visitor messaging, history and the staff phone app are supplied by Tawk.to. The application work is the shared widget lifecycle and its placement. No database migration or new backend service is needed. Vercel Marketplace discovery returned only email for messaging; production remains on Cloudflare. Browser blocking and deleted cookies can affect widget availability/history. A widget that renders is not proof of phone notification delivery.
