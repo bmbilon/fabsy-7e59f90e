@@ -66,6 +66,7 @@ export const EXPECTED_MIGRATIONS = Object.freeze([
   '20260903193000_ticket_submission_notification_idempotency.sql',
   '20260903194000_ticket_intake_staff_follow_up.sql',
   '20260905213500_ticket_checkout_links.sql',
+  '20260910190000_contact_first_ticket_intake.sql',
 ]);
 export const EXPECTED_CORE_FUNCTIONS = Object.freeze([
   'cache-ticket-data',
@@ -89,6 +90,7 @@ export const EXPECTED_SHARED_FUNCTION_FILES = Object.freeze([
   'supabase/functions/_shared/funnel-report.ts',
   'supabase/functions/_shared/locale-policy.ts',
   'supabase/functions/_shared/meta-capi.ts',
+  'supabase/functions/_shared/meta-lead.ts',
   'supabase/functions/_shared/meta-purchase.ts',
   'supabase/functions/_shared/notification-locale.ts',
   'supabase/functions/_shared/paid-payment-ledger.ts',

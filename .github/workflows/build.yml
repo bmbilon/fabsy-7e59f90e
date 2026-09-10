@@ -63,6 +63,7 @@ jobs:
         run: |
           deno check --node-modules-dir=none --frozen \
             supabase/functions/_shared/meta-capi.ts \
+            supabase/functions/_shared/meta-lead.ts \
             supabase/functions/_shared/meta-purchase.ts \
             supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
