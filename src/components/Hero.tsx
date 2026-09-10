@@ -20,7 +20,8 @@ const Hero = () => (
           Alberta traffic ticket help
         </p>
         <h1 id="homepage-hero-heading" className="mt-5 text-[2.4rem] font-bold leading-[1.08] tracking-[-0.045em] text-white sm:text-5xl lg:text-[3.5rem] xl:text-[4rem]">
-          {HOMEPAGE_REFUND_COPY.headline}
+          <span className="block">{HOMEPAGE_REFUND_COPY.headline}</span>{" "}
+          <span className="block text-[clamp(1.5rem,7.8vw,2.4rem)] text-blue-200 sm:text-[1em]">{HOMEPAGE_REFUND_COPY.headlineAccent}</span>
         </h1>
         <p className="mt-5 text-lg font-semibold text-blue-200 sm:text-xl">
           {HOMEPAGE_REFUND_COPY.heroSupport}

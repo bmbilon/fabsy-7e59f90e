@@ -2,7 +2,8 @@ import { FEE_REFUND } from "@/config/feeRefund";
 
 // Homepage presentation of the published policy; eligibility and timing stay in FEE_REFUND.
 export const HOMEPAGE_REFUND_COPY = {
-  headline: FEE_REFUND.headline,
+  headline: "Fine or demerits reduced",
+  headlineAccent: "or your money back",
   heroSupport: "Fabsy negotiates for a lower fine, fewer demerits or withdrawal. No legal outcome is guaranteed.",
   outcomeQualification: "We can’t guarantee a court outcome. Our guarantee covers the service fee you paid.",
   refundCondition: FEE_REFUND.condition,
