@@ -43,6 +43,9 @@ jobs:
       - name: Validate Live View privacy and session behavior
         run: node --test scripts/test-live-view.mjs
 
+      - name: Validate admin ticket delete and restore
+        run: node scripts/test-admin-ticket-deletion.mjs
+
       - name: Validate persistent live chat and private document boundaries
         run: node --test scripts/test-live-chat.mjs
 

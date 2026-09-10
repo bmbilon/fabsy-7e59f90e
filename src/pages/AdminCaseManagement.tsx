@@ -1,3 +1,4 @@
+import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureAutomationPanel } from "@/components/DisclosureConfirmations";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,9 +28,11 @@ interface TicketSubmission {
   service_type: "representation" | "ticket_insurance_assessment";
   ticket_type: "photo_radar" | "officer_issued";
   created_at: string;
+  deleted_at: string | null;
 }
 
 interface IntakeLead {
+  deleted_at: string | null;
   id: string;
   email: string | null;
   phone: string | null;
@@ -54,7 +57,7 @@ interface IntakeLead {
   updated_at: string;
 }
 
-type IntakeLeadView = "outstanding" | "dismissed";
+type IntakeLeadView = "outstanding" | "dismissed" | "deleted";
 
 function resumeDeliveryStatusText(lead: IntakeLead): string {
   if (lead.resume_delivery_failure_code === "outcome_unknown") {
@@ -74,7 +77,7 @@ function resumeDeliveryStatusText(lead: IntakeLead): string {
 
 export default function AdminCaseManagement() {
   const [submissions, setSubmissions] = useState<TicketSubmission[]>([]);
-  const [filteredSubmissions, setFilteredSubmissions] = useState<TicketSubmission[]>([]);
+  const [ticketView, setTicketView] = useState<"active" | "deleted">("active");
   const [intakeLeads, setIntakeLeads] = useState<IntakeLead[]>([]);
   const [intakeLeadError, setIntakeLeadError] = useState<string | null>(null);
   const [intakeLeadView, setIntakeLeadView] = useState<IntakeLeadView>("outstanding");
@@ -118,22 +121,13 @@ export default function AdminCaseManagement() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredSubmissions(submissions);
-    } else {
-      const query = searchQuery.toLowerCase();
-      const filtered = submissions.filter(
-        (sub) =>
-          sub.first_name.toLowerCase().includes(query) ||
-          sub.last_name.toLowerCase().includes(query) ||
-          sub.email.toLowerCase().includes(query) ||
-          sub.ticket_number.toLowerCase().includes(query) ||
-          sub.violation.toLowerCase().includes(query)
-      );
-      setFilteredSubmissions(filtered);
-    }
-  }, [searchQuery, submissions]);
+  const activeSubmissions = submissions.filter(sub => !sub.deleted_at &&
+    !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status));
+  const viewSubmissions = ticketView === "deleted" ? submissions.filter(sub => sub.deleted_at) : activeSubmissions;
+  const query = searchQuery.trim().toLowerCase();
+  const filteredSubmissions = viewSubmissions.filter(sub =>
+    [sub.first_name, sub.last_name, `${sub.first_name} ${sub.last_name}`, sub.email, sub.ticket_number, sub.violation]
+      .some(value => value?.toLowerCase().includes(query)));
 
   const checkAuthAndFetchData = async () => {
     try {
@@ -163,15 +157,11 @@ export default function AdminCaseManagement() {
             drivers_license
           )
         `)
-        .neq('status', 'awaiting_payment')
-        .neq('status', 'assessment_awaiting_payment')
-        .neq('status', 'assessment_checkout_open')
         .order('created_at', { ascending: false }),
         supabase.from('ticket_intake_drafts')
-          .select('id,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,expires_at,updated_at')
+          .select('id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,expires_at,updated_at')
           .in('status', ['active', 'converted'])
           .not('ticket_uploaded_at', 'is', null)
-          .gt('expires_at', new Date().toISOString())
           .order('updated_at', { ascending: false }),
       ]);
 
@@ -180,10 +170,10 @@ export default function AdminCaseManagement() {
 
       const transformedData = data?.map((sub): TicketSubmission => ({
         id: sub.id,
-        first_name: sub.clients?.first_name || '',
-        last_name: sub.clients?.last_name || '',
-        email: sub.clients?.email || '',
-        phone: sub.clients?.phone || '',
+        first_name: sub.clients?.first_name || sub.first_name || '',
+        last_name: sub.clients?.last_name || sub.last_name || '',
+        email: sub.clients?.email || sub.email || '',
+        phone: sub.clients?.phone || sub.phone || '',
         ticket_number: sub.ticket_number,
         violation: sub.violation,
         fine_amount: sub.fine_amount,
@@ -192,19 +182,20 @@ export default function AdminCaseManagement() {
         service_type: sub.service_type === 'ticket_insurance_assessment'
           ? 'ticket_insurance_assessment'
           : 'representation',
+        deleted_at: sub.deleted_at,
         created_at: sub.created_at
       })) || [];
 
       setSubmissions(transformedData);
-      setFilteredSubmissions(transformedData);
       if (leadResult.error) {
         console.error('Incomplete ticket intake queue unavailable:', leadResult.error);
         setIntakeLeads([]);
         setIntakeLeadError('Incomplete intakes could not be loaded. Existing submitted cases remain available below.');
       } else {
-        const managedCaseIds = new Set(transformedData.map(submission => submission.id));
+        const managedCaseIds = new Set(transformedData.filter(sub => sub.deleted_at || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)).map(submission => submission.id));
         setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
           Boolean(lead.ticket_uploaded_at) &&
+          (Boolean(lead.deleted_at) || lead.expires_at > new Date().toISOString()) &&
           (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
         ));
       }
@@ -306,9 +297,10 @@ export default function AdminCaseManagement() {
     );
   }
 
-  const outstandingIntakeLeads = intakeLeads.filter(lead => lead.staff_follow_up_status !== "dismissed");
-  const dismissedIntakeLeads = intakeLeads.filter(lead => lead.staff_follow_up_status === "dismissed");
-  const visibleIntakeLeads = intakeLeadView === "dismissed" ? dismissedIntakeLeads : outstandingIntakeLeads;
+  const outstandingIntakeLeads = intakeLeads.filter(lead => !lead.deleted_at && lead.staff_follow_up_status !== "dismissed");
+  const dismissedIntakeLeads = intakeLeads.filter(lead => !lead.deleted_at && lead.staff_follow_up_status === "dismissed");
+  const deletedIntakeLeads = intakeLeads.filter(lead => lead.deleted_at);
+  const visibleIntakeLeads = intakeLeadView === "deleted" ? deletedIntakeLeads : intakeLeadView === "dismissed" ? dismissedIntakeLeads : outstandingIntakeLeads;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -360,6 +352,9 @@ export default function AdminCaseManagement() {
                 <Button type="button" size="sm" variant={intakeLeadView === "dismissed" ? "default" : "outline"} onClick={() => setIntakeLeadView("dismissed")}>
                   Dismissed ({dismissedIntakeLeads.length})
                 </Button>
+                <Button type="button" size="sm" variant={intakeLeadView === "deleted" ? "default" : "outline"} onClick={() => setIntakeLeadView("deleted")}>
+                  Deleted intakes ({deletedIntakeLeads.length})
+                </Button>
               </div>
               {visibleIntakeLeads.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">No {intakeLeadView} incomplete intakes.</p>
@@ -392,13 +387,14 @@ export default function AdminCaseManagement() {
                   </Button>
                   {lead.converted_submission_id ? <Button type="button" onClick={() => navigate(`/admin/submissions/${lead.converted_submission_id}`)}>Open checkout case</Button> : null}
                   {lead.staff_follow_up_status === "open" ? (
-                    <Button type="button" variant="secondary" disabled={updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "contacted")}>Mark contacted</Button>
+                    <Button type="button" variant="secondary" disabled={Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "contacted")}>Mark contacted</Button>
                   ) : null}
                   {lead.staff_follow_up_status !== "dismissed" ? (
-                    <Button type="button" variant="outline" disabled={updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "dismissed")}>Dismiss from queue</Button>
+                    <Button type="button" variant="outline" disabled={Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "dismissed")}>Dismiss from queue</Button>
                   ) : (
-                    <Button type="button" variant="outline" disabled={updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "open")}>Reopen</Button>
+                    <Button type="button" variant="outline" disabled={Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "open")}>Reopen</Button>
                   )}
+                  <AdminTicketDelete id={lead.id} kind="intake" label={lead.email || lead.phone || "incomplete intake"} deleted={Boolean(lead.deleted_at)} onChanged={() => void checkAuthAndFetchData()} />
                 </div>
               </div>)}
             </div>}
@@ -410,14 +406,14 @@ export default function AdminCaseManagement() {
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Total Submissions</CardDescription>
-              <CardTitle className="text-3xl">{submissions.length}</CardTitle>
+              <CardTitle className="text-3xl">{activeSubmissions.length}</CardTitle>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Pending</CardDescription>
               <CardTitle className="text-3xl">
-                {submissions.filter(s => s.status === 'pending' || s.status === 'assessment_pending').length}
+                {activeSubmissions.filter(s => s.status === 'pending' || s.status === 'assessment_pending').length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -425,7 +421,7 @@ export default function AdminCaseManagement() {
             <CardHeader className="pb-3">
               <CardDescription>In Progress</CardDescription>
               <CardTitle className="text-3xl">
-                {submissions.filter(s => s.status === 'in_progress').length}
+                {activeSubmissions.filter(s => s.status === 'in_progress').length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -433,7 +429,7 @@ export default function AdminCaseManagement() {
             <CardHeader className="pb-3">
               <CardDescription>Completed</CardDescription>
               <CardTitle className="text-3xl">
-                {submissions.filter(s => s.status === 'completed').length}
+                {activeSubmissions.filter(s => s.status === 'completed').length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -460,12 +456,16 @@ export default function AdminCaseManagement() {
         {/* Submissions List */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Submissions</CardTitle>
+            <CardTitle>{ticketView === "deleted" ? "Deleted tickets" : "Recent Submissions"}</CardTitle>
             <CardDescription>
-              Showing {filteredSubmissions.length} of {submissions.length} submissions
+              Showing {filteredSubmissions.length} of {viewSubmissions.length} submissions
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 flex flex-wrap gap-2">
+              <Button size="sm" variant={ticketView === "active" ? "default" : "outline"} onClick={() => setTicketView("active")}>Active tickets</Button>
+              <Button size="sm" variant={ticketView === "deleted" ? "default" : "outline"} onClick={() => setTicketView("deleted")}>Deleted tickets ({submissions.filter(sub => sub.deleted_at).length})</Button>
+            </div>
             <div className="space-y-4">
               {filteredSubmissions.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
@@ -480,9 +480,9 @@ export default function AdminCaseManagement() {
                     onClick={() => navigate(submission.service_type === 'ticket_insurance_assessment' ? `/admin/assessments/${submission.id}` : `/admin/submissions/${submission.id}`)}
                   >
                     <CardContent className="pt-6">
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex flex-wrap items-center gap-3 mb-2">
                             <h3 className="font-semibold text-lg">
                               {submission.first_name} {submission.last_name}
                             </h3>
@@ -503,7 +503,8 @@ export default function AdminCaseManagement() {
                           </p>
                         </div>
                         <div className="text-right text-sm text-muted-foreground">
-                          <p>{formatDistanceToNow(new Date(submission.created_at), { addSuffix: true })}</p>
+                          <p className="mb-3">{formatDistanceToNow(new Date(submission.created_at), { addSuffix: true })}</p>
+                          <AdminTicketDelete id={submission.id} label={`${submission.first_name} ${submission.last_name} · ${submission.ticket_number}`} deleted={Boolean(submission.deleted_at)} onChanged={() => void checkAuthAndFetchData()} />
                         </div>
                       </div>
                     </CardContent>
