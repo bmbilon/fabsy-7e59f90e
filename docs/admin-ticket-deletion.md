@@ -31,3 +31,12 @@ The migration also passed a transaction against the real database schema: delete
 - Eleven audit events recorded. Zero Brett submissions remain active. Hash comparisons verified that all other submissions and intakes were unchanged.
 - The cleanup retained the client profile, uploaded documents, case status/outcome and payment records. It did not send messages or issue refunds.
 - Local database tests, real React dialog tests, existing ticket-opening tests, TypeScript and full production build passed. ESLint reported only the three existing hook-dependency warnings in legacy pages.
+
+## Verified production release
+
+- PR #33 merged as `2ac5fc75a2d946a19b0d339df4b42faa551faabd` after all PR checks and Vercel preview passed.
+- Backend-first production workflow [34428242374](https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/34428242374) succeeded with that exact commit pinned before dispatch.
+- Cloudflare production deployment: `29c3c0f7-7949-4e07-b73a-48c7ca1fd63e`, [immutable release](https://29c3c0f7.fabsy-9qa.pages.dev).
+- Live admin entry loads `/assets/index-EvLvYAnP.js`. Its bytes match the immutable release and contain the deletion RPC, Deleted tickets view, and delete/restore results. SHA-256: `912b6cf62600fc2e2f7257af181983e2543f31a5322533857e01f29e604ae9a3`.
+- Browser verification of the real controls at 390 × 844 used synthetic records: confirmation fits, Delete removes the active card/count, and Restore recovers it. No live customer messages or test records were created. The production admin sign-in page loaded the new bundle; no signed-in browser session was available for live UI mutation.
+- Final database read confirmed migration applied, nine deleted Brett test submissions, two deleted linked intakes, zero remaining active Brett submissions, and eleven audit events. Anonymous HTTP invocation of the deletion RPC was denied (401 / 42501).
