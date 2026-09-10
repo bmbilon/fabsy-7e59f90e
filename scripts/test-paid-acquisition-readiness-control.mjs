@@ -807,7 +807,7 @@ assert.match(cleanupWorkflow,
   /if: github\.event_name == 'workflow_dispatch' \|\| \(github\.event_name == 'schedule' && vars\.TICKET_INTAKE_CLEANUP_SCHEDULE_ENABLED == 'true'\)/,
   'Scheduled cleanup must remain disabled until its repository gate is explicitly enabled.');
 for (const functionName of [
-  '_shared/meta-capi.ts', '_shared/meta-purchase.ts', 'create-payment', 'idr-payment-webhook',
+  '_shared/meta-capi.ts', '_shared/meta-lead.ts', '_shared/meta-purchase.ts', 'create-payment', 'idr-payment-webhook',
   'meta-capi-worker', ...EXPECTED_CORE_FUNCTIONS,
 ]) {
   assert.ok(buildWorkflow.includes(functionName), `build.yml Deno check is missing ${functionName}.`);

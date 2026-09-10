@@ -57,6 +57,7 @@ export interface ResumeDeliveryAttempt {
   channel: ResumeDeliveryChannel;
   recipient: string;
   preferredLocale: PreferredLocale;
+  ticketUploaded?: boolean;
   configuration: ResumeDeliveryConfiguration;
   fetcher?: typeof fetch;
 }
@@ -163,15 +164,24 @@ function escapeHtml(value: string): string {
     })[character] || character);
 }
 
-export function renderTicketIntakeResumeEmail(resumeUrl: string): string {
+export function renderTicketIntakeResumeEmail(
+  resumeUrl: string,
+  ticketUploaded = true,
+): string {
   const safeUrl = escapeHtml(resumeUrl);
+  const heading = ticketUploaded
+    ? "Your ticket upload is saved"
+    : "Your Fabsy intake is saved";
+  const description = ticketUploaded
+    ? "Continue your private Fabsy ticket intake using the secure link below."
+    : "Use the secure link below to add your ticket and continue your private Fabsy intake.";
   return `<!doctype html>
 <html lang="en" dir="ltr">
   <body style="margin:0;background:#f8fafc;color:#0f172a;font-family:Arial,sans-serif">
     <div style="max-width:600px;margin:0 auto;padding:32px 20px">
       <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:28px">
-        <h1 style="font-size:24px;margin:0 0 16px">Your ticket upload is saved</h1>
-        <p style="font-size:16px;line-height:1.6;margin:0 0 20px">Continue your private Fabsy ticket intake using the secure link below.</p>
+        <h1 style="font-size:24px;margin:0 0 16px">${heading}</h1>
+        <p style="font-size:16px;line-height:1.6;margin:0 0 20px">${description}</p>
         <p style="margin:0 0 20px"><a href="${safeUrl}" style="display:inline-block;background:#047857;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:8px">Continue your ticket intake</a></p>
         <p style="font-size:14px;line-height:1.6;color:#475569;margin:0">This private link expires with your saved intake. Do not forward it. Uploading a ticket or receiving this link does not authorize Fabsy to act for you.</p>
       </div>
@@ -180,8 +190,14 @@ export function renderTicketIntakeResumeEmail(resumeUrl: string): string {
 </html>`;
 }
 
-export function renderTicketIntakeResumeSms(resumeUrl: string): string {
-  return `Fabsy: Your Alberta ticket upload is saved. Continue your private intake: ${resumeUrl} Do not forward this link. This is not authorization for Fabsy to act.`;
+export function renderTicketIntakeResumeSms(
+  resumeUrl: string,
+  ticketUploaded = true,
+): string {
+  const saved = ticketUploaded
+    ? "Your Alberta ticket upload is saved."
+    : "Your Fabsy intake is saved. Add your Alberta ticket to continue.";
+  return `Fabsy: ${saved} Continue your private intake: ${resumeUrl} Do not forward this link. This is not authorization for Fabsy to act.`;
 }
 
 export function renderPaymentPendingResumeSms(
@@ -255,7 +271,10 @@ async function sendResumeEmail(
         reply_to: resendReplyTo,
         to: [attempt.recipient],
         subject: "Your secure Fabsy ticket intake link",
-        html: renderTicketIntakeResumeEmail(resumeUrl),
+        html: renderTicketIntakeResumeEmail(
+          resumeUrl,
+          attempt.ticketUploaded !== false,
+        ),
       }),
       signal: AbortSignal.timeout(10_000),
     });
@@ -298,7 +317,10 @@ async function sendResumeSms(
         body: new URLSearchParams({
           To: twilioRecipient(attempt.recipient),
           From: twilioPhoneNumber,
-          Body: renderTicketIntakeResumeSms(resumeUrl),
+          Body: renderTicketIntakeResumeSms(
+            resumeUrl,
+            attempt.ticketUploaded !== false,
+          ),
         }).toString(),
         signal: AbortSignal.timeout(10_000),
       },

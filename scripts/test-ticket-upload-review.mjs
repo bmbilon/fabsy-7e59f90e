@@ -215,7 +215,10 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
         draftRequests.push(options.body);
         if (action === "create") return Promise.resolve({ data: draftResponse({
           accessToken: draftToken,
-          upload: { bucket: "assessment-tickets", path: `${draftId}/representation-ticket-r1.png`, token: "signed-upload", contentType: options.body.file.contentType, maxBytes: options.body.file.size },
+          resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
+          ...(options.body.file ? {
+            upload: { bucket: "assessment-tickets", path: `${draftId}/representation-ticket-r1.png`, token: "signed-upload", contentType: options.body.file.contentType, maxBytes: options.body.file.size },
+          } : {}),
         }), error: null });
         if (action === "prepare_upload") {
           draftRevision += 1;
@@ -355,7 +358,20 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
     assert.equal(document.getElementById("pro-licence-class"), null, "Licence-class questions must wait for capture");
   };
   const file = (name = "synthetic-ticket.png", mime = "image/png") => new window.File(["SYNTHETIC TEST CONTENT — NOT A REAL TICKET"], name, { type: mime });
+  const saveContact = async (email = "driver@example.test") => {
+    await edit("lead-email", email);
+    await api.click(field("alberta-confirmed"));
+    await api.click(field("contact-permission"));
+    await api.click(button("Save and continue to ticket"));
+    await until(
+      () => Boolean(document.querySelector('input[type="file"][accept*="application/pdf"]')),
+      "Expected ticket capture after contact was saved",
+    );
+  };
   const choose = async selectedFile => {
+    if (!document.querySelector('input[type="file"][accept*="application/pdf"]') && document.getElementById("lead-email")) {
+      await saveContact();
+    }
     const browse = document.querySelector('input[type="file"][accept*="application/pdf"]');
     assert.ok(browse, "The file picker must continue to accept PDFs and images");
     await api.chooseFile(browse, selectedFile);
@@ -385,9 +401,6 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
     await flush();
   };
   const saveLead = async () => {
-    await edit("lead-email", "driver@example.test");
-    await api.click(field("alberta-confirmed"));
-    await api.click(field("contact-permission"));
     await api.click(button("Save ticket and review details"));
     await until(() => document.getElementById("ticketNumber"), "Expected ticket review after the minimum lead was saved");
   };
@@ -398,7 +411,7 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
     await api.mount(props);
     await flush();
   };
-  return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, scrollIntoViewCalls, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, flagged, edit, saveLead, reloadAfterLostResponse, activeDraftToken: () => activeDraftToken };
+  return { window, document, api, requests, draftRequests, uploadRequests, cacheRequests, scrollIntoViewCalls, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, saveContact, choose, waitForScan, finish, field, flagged, edit, saveLead, reloadAfterLostResponse, activeDraftToken: () => activeDraftToken };
 }
 
 function reviewAttachmentStatus(app) {
@@ -442,11 +455,18 @@ test("Review reports an absent attachment without treating an assessment referen
   assert.deepEqual(app.uploadRequests, []);
 });
 
-test("a fresh intake presents capture first and waits for the current OCR scan before showing details", async t => {
+test("a fresh intake saves contact before capture and waits for the current OCR scan before showing details", async t => {
   const app = await runtime(t);
   app.hiddenDetails();
   app.continueBlocked();
+  assert.ok(app.field("lead-email"), "Contact details are collected before any ticket upload is requested");
+  assert.match(app.document.body.textContent, /permission to send me a secure resume link/i);
+  assert.match(app.document.body.textContent, /anyone with the link can open my saved intake/i);
+  assert.equal(app.document.querySelector('input[type="file"]'), null, "The ticket upload wall must follow contact capture");
+  await app.saveContact();
   assert.ok(app.button("Take photo"));
+  assert.match(app.document.body.textContent, /emailed your secure resume link/i);
+  assert.ok(app.button("Copy resume link"), "A copy-link fallback is available before ticket upload");
   assert.equal(app.document.querySelector('input[type="radio"]'), null, "Ticket-type questions must wait until after capture");
 
   await app.choose(app.file());
@@ -457,14 +477,11 @@ test("a fresh intake presents capture first and waits for the current OCR scan b
 
   await app.finish(0);
   app.hiddenDetails();
-  assert.ok(app.field("lead-email"), "Contact details are collected before the full ticket form");
-  assert.match(app.document.body.textContent, /permission to send me a secure resume link/i);
-  assert.match(app.document.body.textContent, /anyone with the link can open my saved intake/i);
   await app.saveLead();
   assert.equal(app.field("ticketNumber").value, completeTicket.ticketNumber);
   assert.equal(app.field("fineAmount").value, "200");
   assert.equal(app.uploadRequests.length, 1, "The ticket is uploaded once through a signed private URL");
-  assert.deepEqual(app.draftRequests.map(request => request.action).slice(0, 2), ["create", "confirm_upload"]);
+  assert.deepEqual(app.draftRequests.map(request => request.action).slice(0, 4), ["create", "save", "prepare_upload", "confirm_upload"]);
   assert.match(app.document.body.textContent, /emailed your secure resume link/i);
   assert.ok(app.button("Copy resume link"), "A copy-link fallback remains available after delivery");
   app.continueEnabled();
@@ -523,38 +540,33 @@ for (const rotateOnSave of [false, true]) {
       await app.flush();
     };
     await debounce();
-    assert.equal(saves().length, 1, "the initial saved/restored form may synchronize once");
-    const firstSave = saves()[0];
+    const baselineSaveCount = rotateOnSave ? 1 : 2;
+    assert.equal(saves().length, baselineSaveCount, "upload synchronization and the first stable autosave must be bounded");
+    const firstSave = saves().at(-1);
     const expectedToken = rotateOnSave ? firstSave.replacementAccessToken : firstSave.accessToken;
     assert.equal(app.activeDraftToken(), expectedToken);
     assert.equal(JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1")).accessToken, expectedToken);
     assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"), null);
     for (let interval = 0; interval < 3; interval += 1) {
       await debounce();
-      assert.equal(saves().length, 1, "a capability/expiry response must not trigger another unchanged save");
+      assert.equal(saves().length, baselineSaveCount, "a capability/expiry response must not trigger another unchanged save");
       app.continueEnabled();
     }
 
     await app.edit("fineAmount", "375");
     await debounce();
-    assert.equal(saves().length, 2, "a genuine field edit must still autosave exactly once");
-    assert.equal(saves()[1].draftData.fineAmount, "375");
-    assert.equal(saves()[1].accessToken, expectedToken, "the next save must read the latest capability, including rotation");
-    assert.equal(saves()[1].revision, firstSave.revision + 1);
+    assert.equal(saves().length, baselineSaveCount + 1, "a genuine field edit must still autosave exactly once");
+    assert.equal(saves().at(-1).draftData.fineAmount, "375");
+    assert.equal(saves().at(-1).accessToken, expectedToken, "the next save must read the latest capability, including rotation");
+    assert.equal(saves().at(-1).revision, firstSave.revision + 1);
     await debounce();
-    assert.equal(saves().length, 2, "the edited save response must also become quiescent");
+    assert.equal(saves().length, baselineSaveCount + 1, "the edited save response must also become quiescent");
     app.continueEnabled();
   });
 }
 
 test("a released localized intake saves the lead and then autosaves later fields", async t => {
   const app = await runtime(t, {}, { locale: "es" });
-  await app.choose(app.file("localized-ticket.pdf", "application/pdf"));
-  await app.edit("localized-ticketNumber", "LOCALIZED-TEST-1");
-  await app.edit("localized-issueDate", "2026-06-01");
-  await app.edit("localized-location", "Calgary");
-  await app.edit("localized-fineAmount", "198");
-  await app.edit("localized-offenceDescription", "Synthetic offline fixture");
   await app.edit("lead-email", "localized@example.test");
   await app.api.click(app.field("alberta-confirmed"));
   await app.api.click(app.field("contact-permission"));
@@ -569,10 +581,19 @@ test("a released localized intake saves the lead and then autosaves later fields
   assert.equal(app.field("lead-email").closest('[lang]')?.getAttribute('lang'), 'en',
     "the untranslated lead consent fields must remain explicitly marked as English fallback content");
   await app.api.click(app.button("Continue"));
+  await app.until(() => Boolean(app.document.getElementById("localized-ticketImage")),
+    "the localized ticket upload should appear after contact is saved");
+  await app.choose(app.file("localized-ticket.pdf", "application/pdf"));
+  await app.edit("localized-ticketNumber", "LOCALIZED-TEST-1");
+  await app.edit("localized-issueDate", "2026-06-01");
+  await app.edit("localized-location", "Calgary");
+  await app.edit("localized-fineAmount", "198");
+  await app.edit("localized-offenceDescription", "Synthetic offline fixture");
+  await app.api.click(app.button("Continue"));
   await app.until(() => app.document.getElementById("localized-firstName"),
     "the localized journey should advance only after its private draft is saved");
 
-  assert.deepEqual(app.draftRequests.slice(0, 2).map(request => request.action), ["create", "confirm_upload"]);
+  assert.deepEqual(app.draftRequests.slice(0, 4).map(request => request.action), ["create", "save", "prepare_upload", "confirm_upload"]);
   assert.equal(app.draftRequests[0].preferredLocale, "es");
   assert.equal(app.draftRequests[0].albertaConfirmed, true);
   assert.equal(app.draftRequests[0].contactPermission, true);
@@ -648,7 +669,7 @@ test("a definite delivery failure stays visible, retryable and keeps the copy-li
   assert.ok(app.button("Copy resume link"));
   await app.api.click(app.button("Retry sending"));
   await app.until(() => /emailed your secure resume link/i.test(app.document.body.textContent), "Expected a successful explicit delivery retry");
-  assert.deepEqual(app.draftRequests.map(request => request.action), ["create", "confirm_upload", "retry_delivery"]);
+  assert.deepEqual(app.draftRequests.map(request => request.action), ["create", "save", "prepare_upload", "confirm_upload", "retry_delivery"]);
   assert.equal(app.buttons("Retry sending").length, 0, "A sent link cannot be retried from the intake");
 });
 
@@ -765,8 +786,8 @@ test("a response-loss-recovered capability remains usable when browser storage r
 
 test("a draft whose first upload failed can retry without losing its synchronized contact", async t => {
   const app = await runtime(t, {}, { resumeDraft: true, unuploadedDraft: true });
-  await app.until(() => app.document.getElementById("lead-email"), "Expected the incomplete lead screen to restore");
-  assert.equal(app.field("lead-email").value, "driver@example.test");
+  await app.until(() => app.buttons("Take photo").length > 0, "Expected ticket capture to restore after the saved contact checkpoint");
+  assert.equal(app.document.getElementById("lead-email"), null, "Saved contact is not requested again before an upload retry");
   await app.choose(app.file("synthetic-retry.png"));
   await app.waitForScan(1);
   await app.finish(0);
@@ -790,7 +811,7 @@ test("a converted intake resumes at fresh consent after a reload or canceled che
     revision: 1,
   }));
   await app.api.click(app.button("Start a new intake"));
-  await app.until(() => app.buttons("Take photo").length > 0, "Expected a clean capture screen for another ticket");
+  await app.until(() => Boolean(app.document.getElementById("lead-email")), "Expected a clean contact checkpoint for another ticket");
   assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1"), null);
   assert.equal(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"), null);
   assert.doesNotMatch(app.document.body.textContent, /already has a checkout/i);
@@ -841,9 +862,6 @@ test("a saved lead can replace the wrong private ticket before continuing", asyn
 
 test("lead contact validation is exposed to assistive technology", async t => {
   const app = await runtime(t);
-  await app.choose(app.file());
-  await app.waitForScan(1);
-  await app.finish(0);
   await app.edit("lead-email", "not-an-email");
   await app.edit("lead-phone", "123");
   assert.equal(app.field("lead-email").getAttribute("aria-invalid"), "true");
