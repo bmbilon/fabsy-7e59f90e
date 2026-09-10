@@ -280,6 +280,8 @@ export type Database = {
       }
       ticket_intake_drafts: {
         Row: {
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
           access_token_hash: string
           email: string | null
@@ -329,6 +331,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           access_token_hash: string
           email?: string | null
@@ -378,6 +382,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           access_token_hash?: string
           email?: string | null
@@ -513,6 +519,8 @@ export type Database = {
       }
       ticket_submissions: {
         Row: {
+          deleted_at: string | null
+          deleted_by: string | null
           ticket_type: "photo_radar" | "officer_issued"
           ticket_type_source: "upload" | "manual" | "entry" | "default"
           registered_owner_on_offence_date: "yes" | "sold_before" | "stolen" | null
@@ -596,6 +604,8 @@ export type Database = {
           violation_time: string | null
         }
         Insert: {
+          deleted_at?: string | null
+          deleted_by?: string | null
           ticket_type?: "photo_radar" | "officer_issued"
           ticket_type_source?: "upload" | "manual" | "entry" | "default"
           registered_owner_on_offence_date?: "yes" | "sold_before" | "stolen" | null
@@ -679,6 +689,8 @@ export type Database = {
           violation_time?: string | null
         }
         Update: {
+          deleted_at?: string | null
+          deleted_by?: string | null
           ticket_type?: "photo_radar" | "officer_issued"
           ticket_type_source?: "upload" | "manual" | "entry" | "default"
           registered_owner_on_offence_date?: "yes" | "sold_before" | "stolen" | null
@@ -813,6 +825,10 @@ export type Database = {
       }
     }
     Functions: {
+      set_admin_ticket_deleted: {
+        Args: { p_id: string; p_kind: string; p_deleted: boolean }
+        Returns: undefined
+      }
       claim_expired_ticket_intake_drafts: {
         Args: { p_claim_id: string; p_limit?: number }
         Returns: {

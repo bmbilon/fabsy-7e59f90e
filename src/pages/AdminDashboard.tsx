@@ -138,7 +138,7 @@ export default function AdminDashboard() {
 
       // Fetch stats
       const [submissionsResult, blogResult] = await Promise.all([
-        supabase.from('ticket_submissions').select('id, status', { count: 'exact' }),
+        supabase.from('ticket_submissions').select('id, status', { count: 'exact' }).is('deleted_at', null),
         supabase.from('blog_posts').select('id, status', { count: 'exact' })
       ]);
 

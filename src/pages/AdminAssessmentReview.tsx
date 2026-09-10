@@ -1,3 +1,4 @@
+import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Download, FileCheck2, Save, Send, ShieldAlert } from "lucide-react";
@@ -53,6 +54,7 @@ interface ReviewConsent {
 
 interface AssessmentRow {
   id: string;
+  deleted_at: string | null;
   ticket_number: string;
   violation: string;
   status: string;
@@ -135,7 +137,7 @@ export default function AdminAssessmentReview() {
         return;
       }
       const { data, error } = await idrDb.from("ticket_submissions")
-        .select("id,ticket_number,violation,status,service_type,assessment_intake,assessment_result,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at,assessment_delivered_at,representation_credit_eligible,created_at,clients(first_name,last_name,email,phone)")
+        .select("id,deleted_at,ticket_number,violation,status,service_type,assessment_intake,assessment_result,assessment_ticket_path,assessment_policy_paths,review_consent,assessment_paid_at,assessment_delivered_at,representation_credit_eligible,created_at,clients(first_name,last_name,email,phone)")
         .eq("id", id).single();
       if (error || !data || data.service_type !== "ticket_insurance_assessment") {
         toast({ title: "Legacy Ticket Triage not found", description: "This case is not a historical $149 Ticket Triage order.", variant: "destructive" });
@@ -254,12 +256,20 @@ export default function AdminAssessmentReview() {
   const locked = Boolean(assessment.assessment_delivered_at);
   const policyPaths = assessment.assessment_policy_paths || [];
 
+  if (assessment.deleted_at) return <main className="container mx-auto space-y-4 px-4 py-10">
+    <h1 className="text-2xl font-bold">Deleted ticket</h1>
+    <p>Ticket #{assessment.ticket_number} is in Deleted tickets. Restore it before making changes.</p>
+    <AdminTicketDelete id={assessment.id} label={assessment.ticket_number} deleted onChanged={() => navigate("/admin/cases")} />
+    <Button className="ml-3" variant="outline" onClick={() => navigate("/admin/cases")}>Back to cases</Button>
+  </main>;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-5">
           <Button variant="ghost" onClick={() => navigate("/admin/cases")}><ArrowLeft className="mr-2 h-4 w-4" />Back to cases</Button>
           <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
+            <AdminTicketDelete id={assessment.id} label={assessment.ticket_number} onChanged={() => navigate("/admin/cases")} />
             <div>
               <div className="flex flex-wrap items-center gap-2"><Badge>Legacy Ticket Triage · $149</Badge><Badge variant={locked ? "default" : "outline"}>{assessment.status.replace(/_/g, " ")}</Badge></div>
               <h1 className="mt-3 text-3xl font-bold">{client.first_name} {client.last_name}</h1>

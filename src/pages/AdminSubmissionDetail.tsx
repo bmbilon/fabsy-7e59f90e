@@ -1,3 +1,4 @@
+import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureConfirmations } from "@/components/DisclosureConfirmations";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,6 +21,7 @@ interface TicketSubmission {
   ticket_type: "photo_radar" | "officer_issued";
   registered_owner_on_offence_date: "yes" | "sold_before" | "stolen" | null;
   id: string;
+  deleted_at: string | null;
   first_name: string;
   last_name: string;
   email: string;
@@ -340,6 +342,13 @@ export default function AdminSubmissionDetail() {
     );
   }
 
+  if (submission.deleted_at) return <main className="container mx-auto space-y-4 px-4 py-10">
+    <h1 className="text-2xl font-bold">Deleted ticket</h1>
+    <p>Ticket #{submission.ticket_number} is in Deleted tickets. Restore it before making changes.</p>
+    <AdminTicketDelete id={submission.id} label={submission.ticket_number} deleted onChanged={() => navigate("/admin/cases")} />
+    <Button className="ml-3" variant="outline" onClick={() => navigate("/admin/cases")}>Back to cases</Button>
+  </main>;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Header */}
@@ -353,7 +362,7 @@ export default function AdminSubmissionDetail() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
           </Button>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">
                 {submission.first_name} {submission.last_name}
@@ -362,7 +371,8 @@ export default function AdminSubmissionDetail() {
                 Ticket #{submission.ticket_number}
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <AdminTicketDelete id={submission.id} label={submission.ticket_number} onChanged={() => navigate("/admin/cases")} />
               <Select value={submission.status} onValueChange={updateStatus} disabled={isUpdating}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
