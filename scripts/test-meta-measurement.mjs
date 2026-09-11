@@ -128,16 +128,18 @@ test('Meta production gate requires the exact flag, Pixel ID and production orig
   } finally { r.close(); }
 });
 
-test('Meta URL policy admits safe English RR campaigns without a hard-coded campaign name; receipts require verification', async () => {
+test('Meta URL policy admits released-language RR campaigns; receipts require verification', async () => {
   const r = await runtime();
   try {
-    for (const content of ['rr_relief_v1', 'rr_flat_fee_v1', 'rr_client_control_v1']) {
+    for (const path of ['/rapid-resolution', '/rapid-resolution/', '/en/rapid-resolution', '/pa/rapid-resolution', '/tl/rapid-resolution', '/zh-hans/rapid-resolution', '/zh-hant/rapid-resolution', '/ar/rapid-resolution', '/hi/rapid-resolution', '/es/rapid-resolution/']) {
+    for (const content of ['rr_relief_v1', 'rr_flat_fee_v1', 'rr_client_control_v1', 'pa_rr_v1']) {
       for (const extra of ['', '&fbclid=IwZXh0bgNhZW0_SYNTHETIC-123']) {
-        const url = new URL(`https://fabsy.ca/rapid-resolution${campaign(content)}${extra}`);
+        const url = new URL(`https://fabsy.ca${path}${campaign(content)}${extra}`);
         assert.equal(r.api.publicMetaMeasurementUrl(url), true, url.href);
         assert.equal(r.api.publicMeasurementDocumentUrl(url), true, url.href);
         assert.equal(r.api.publicGoogleMeasurementUrl(url), true, 'consented GA4 may measure approved Meta landing traffic');
       }
+    }
     }
     for (const suffix of [
       '?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_creative_v2&utm_content=rr_easy_v2',
@@ -151,8 +153,8 @@ test('Meta URL policy admits safe English RR campaigns without a hard-coded camp
     }
     for (const href of [
       'https://fabsy.ca/rapid-resolution',
-      `https://fabsy.ca/es/rapid-resolution${campaign('rr_relief_v1')}`,
-      `https://fabsy.ca/rapid-resolution/${campaign('rr_relief_v1')}`,
+      `https://fabsy.ca/fr/rapid-resolution${campaign('rr_relief_v1')}`,
+      `https://fabsy.ca/pa/submit-ticket${campaign('rr_relief_v1')}`,
       `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}&fbclid=ONE&fbclid=TWO`,
       `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}#private`,
       `https://fabsy.ca/rapid-resolution${campaign('rr_relief_v1')}&email=person%40example.invalid`,
@@ -563,4 +565,49 @@ test('Meta source contains no noscript fallback and exposes no Lead/form event p
   assert.equal(/createElement\(['"]noscript/.test(source), false);
   assert.equal(/['"]Lead['"]/.test(source), false);
   assert.equal(/FormSubmit|Contact|CompleteRegistration/.test(source), false);
+});
+
+
+test('Punjabi campaign emits one consented PageView and isolates the private upload document', async () => {
+  const href = 'https://fabsy.ca/pa/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_ab_multilingual_20260906&utm_content=pa_rr_v1&fbclid=SYNTHETIC_CLICK';
+  const r = await runtime(href);
+  try {
+    r.api.initializeMetaMeasurement();
+    assert.equal(r.win.fbq, undefined);
+    r.api.setMetaConsentChoice('accepted');
+    r.api.initializeMetaMeasurement();
+    const script = r.win.document.getElementById('fabsy-meta-pixel');
+    assert.ok(script);
+    script.onload();
+    r.api.initializeMetaMeasurement();
+    assert.deepEqual(plain(r.win.fbq.queue.filter(c => c[2] === 'PageView')), [['trackSingle', expectedPixelId, 'PageView']]);
+    assert.equal(r.api.currentMetaPageContext().page_location, 'https://fabsy.ca/pa/rapid-resolution');
+    const navigations = [];
+    const router = r.api.createMeasurementHistory({
+      window: r.win, isPublicUrl: r.api.publicMeasurementDocumentUrl,
+      isProviderPublicUrl: r.api.publicProviderMeasurementUrl,
+      navigateDocument: url => navigations.push(url.href),
+    });
+    const unlisten = router.listen(() => undefined);
+    try {
+      router.navigator.push('/pa/submit-ticket');
+      assert.deepEqual(navigations, ['https://fabsy.ca/pa/submit-ticket']);
+      assert.equal(r.win.location.href, href);
+      assert.equal(r.api.dispatchMetaMeasurement('PageView'), false);
+    } finally { unlisten(); }
+    assert.deepEqual(r.network, []);
+  } finally { r.close(); }
+});
+
+test('another reviewed campaign on the same path gets one new Meta PageView', async () => {
+  const r = await runtime();
+  try {
+    r.api.setMetaConsentChoice('accepted');
+    r.api.initializeMetaMeasurement();
+    r.win.document.getElementById('fabsy-meta-pixel').onload();
+    r.win.history.replaceState(null, '', '/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=second&utm_content=two');
+    r.api.initializeMetaMeasurement();
+    r.api.initializeMetaMeasurement();
+    assert.equal(r.win.fbq.queue.filter(c => c[2] === 'PageView').length, 2);
+  } finally { r.close(); }
 });

@@ -110,6 +110,10 @@ jobs:
       - name: Verify private document navigation in Chromium
         run: node scripts/test-measurement-navigation-browser.mjs
 
+      - name: Verify multilingual ad attribution with inert provider fixtures
+        if: vars.VITE_GOOGLE_MEASUREMENT_ENABLED == 'true' && vars.VITE_META_MEASUREMENT_ENABLED == 'true'
+        run: node scripts/test-attribution-plumbing-browser.mjs
+
       - name: Verify enabled measurement with inert Google fixtures
         if: github.ref == 'refs/heads/main' && vars.VITE_GOOGLE_MEASUREMENT_ENABLED == 'true'
         run: node scripts/test-google-measurement-network.mjs --offline --pending-navigation-guardian --artifact-dir "${{ runner.temp }}/fabsy-google-measurement"

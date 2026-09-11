@@ -142,7 +142,7 @@ function LocalizedContent() {
               <p className="max-w-2xl text-lg leading-relaxed text-slate-200">{t(`${prefix}.description`)}</p>
               <FeeRefundNotice tone="dark" />
               <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" className="h-auto min-h-12 whitespace-normal py-3"><Link to={href('/submit-ticket')}>{t('home.primaryCta')}<ArrowRight className="ms-2 h-5 w-5 shrink-0 rtl:rotate-180" aria-hidden="true" /></Link></Button>
+                <Button asChild size="lg" className="h-auto min-h-12 whitespace-normal py-3"><Link to={href('/submit-ticket')} data-funnel-action="primary_cta" data-funnel-position="hero">{t('home.primaryCta')}<ArrowRight className="ms-2 h-5 w-5 shrink-0 rtl:rotate-180" aria-hidden="true" /></Link></Button>
                 <Button asChild size="lg" variant="outline" className="h-auto min-h-12 whitespace-normal border-slate-500 bg-transparent py-3 text-white hover:bg-slate-800 hover:text-white"><Link to={href('/how-it-works')}>{t('home.secondaryCta')}</Link></Button>
               </div>
               <p className="text-sm leading-relaxed text-slate-300">{t('home.scope')}</p>

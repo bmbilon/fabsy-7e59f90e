@@ -1,5 +1,6 @@
 import { CLICK_ID_KEYS, UTM_KEYS, validClickId, validUtmValue } from './acquisitionParameters';
 import { getFabsyFunnelConsentChoice, getFabsyFunnelConsentGrant } from './fabsyFunnelConsent';
+import { clearFunnelSessionState } from './funnelSessionStorage';
 
 export const MARKETING_STORAGE_KEY = 'fabsy_marketing_v3';
 export const RETIRED_MARKETING_STORAGE_KEYS = ['fabsy_marketing_v2', 'fabsy_marketing'] as const;
@@ -200,11 +201,13 @@ export function captureMarketingAttribution(search: string, pathname: string, re
 
   for (const key of MARKETING_ATTRIBUTION_KEYS.slice(0, 9)) {
     const value = params.get(key)?.trim();
-    if (!value) continue;
+    if (!value || params.getAll(key).length !== 1) continue;
     const safe = (CLICK_ID_KEYS as readonly string[]).includes(key)
       ? validClickId(value)
       : (UTM_KEYS as readonly string[]).includes(key) && validUtmValue(value);
-    if (safe) captured[key] = value.slice(0, 250);
+    // Click IDs are opaque identifiers, not display text. Truncation breaks
+    // joins even when both the browser and server accept the original length.
+    if (safe) captured[key] = value;
   }
   if (llmSource) captured.llm_source = llmSource;
   if (referrerHost) captured.referrer_host = referrerHost;
@@ -215,11 +218,20 @@ export function captureMarketingAttribution(search: string, pathname: string, re
   );
   if (!hasAcquisitionSignal || !safeLandingPage(pathname)) return existing;
 
+  const sameAcquisition = existing.first_touch_at && [...CLICK_ID_KEYS, ...UTM_KEYS]
+    .every(key => existing[key] === captured[key]);
+  if (sameAcquisition) return existing;
+
   captured.landing_page = pathname;
   captured.first_touch_at = new Date().toISOString();
   if (!accepted || !grant) {
     pendingAttribution = captured;
     return captured;
+  }
+  // A different explicit ad touch starts a new journey. Otherwise the old
+  // landing dedupe marker and earliest campaign would win the checkout join.
+  if (existing.first_touch_at && hasCampaignParameter) {
+    try { clearFunnelSessionState(window.sessionStorage); } catch { /* Storage is optional. */ }
   }
   return storeConsentedAttribution(captured, grant.savedAt);
 }

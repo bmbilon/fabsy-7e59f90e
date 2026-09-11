@@ -56,6 +56,7 @@ const eligiblePurchaseValues: Record<string, ReadonlySet<number>> = {
   rapid_resolution_bundle: new Set([183.2, 229]),
 };
 const metaThankYouPath = /^\/(?:en\/|pa\/|tl\/|zh-hans\/|zh-hant\/|ar\/|hi\/|es\/)?thank-you\/?$/;
+const metaLandingPath = /^\/(?:en\/|pa\/|tl\/|zh-hans\/|zh-hant\/|ar\/|hi\/|es\/)?rapid-resolution\/?$/;
 
 export function metaMeasurementConfig(env: MetaMeasurementEnvironment, origin: string): MetaMeasurementConfig {
   return env.PROD && env.VITE_META_MEASUREMENT_ENABLED === 'true' &&
@@ -114,10 +115,10 @@ function approvedRapidResolutionCampaign(url: URL): boolean {
   return true;
 }
 
-/** Meta starts only on the three reviewed ad landings. Receipt access is dynamic. */
+/** The same reviewed RR campaign policy applies to every released language. */
 export function publicMetaMeasurementUrl(url: URL): boolean {
   if (url.username || url.password || url.hash) return false;
-  return url.pathname === '/rapid-resolution' && approvedRapidResolutionCampaign(url);
+  return metaLandingPath.test(url.pathname) && approvedRapidResolutionCampaign(url);
 }
 
 function safeMetaContext(
@@ -223,8 +224,10 @@ export function dispatchMetaMeasurement(
 
 export function sendMetaPageView(): void {
   const context = currentMetaPageContext();
-  if (!context || lastPageLocation === context.page_location) return;
-  if (dispatchMetaMeasurement('PageView')) lastPageLocation = context.page_location;
+  if (!context) return;
+  const pageKey = `${context.page_location}${window.location.search}`;
+  if (lastPageLocation === pageKey) return;
+  if (dispatchMetaMeasurement('PageView')) lastPageLocation = pageKey;
 }
 
 function deleteMetaCookies(): void {

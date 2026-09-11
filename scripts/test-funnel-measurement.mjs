@@ -634,3 +634,71 @@ test('database and edge contracts store no raw click ID, IP, user agent or form 
   assert.match(withdrawal, /withdraw_known_paid_funnel_checkout/);
   assert.doesNotMatch(withdrawal, /["']withdraw_paid_funnel_checkout["']/);
 });
+
+
+test('long ad click IDs survive consent, reload and the server parser without truncation', async () => {
+  const click = 'SYNTHETIC_' + 'a'.repeat(450);
+  const r = await runtime('https://fabsy.ca/pa/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_test&utm_content=pa_test&fbclid=' + click);
+  try {
+    r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    r.api.persistPendingMarketingAttribution();
+    assert.equal(r.api.readMarketingAttribution().fbclid, click);
+    assert.equal(JSON.parse(r.win.localStorage.getItem(r.api.MARKETING_STORAGE_KEY)).attribution.fbclid, click);
+    assert.equal(await r.api.recordFunnelEvent('landing_view'), true);
+    const payload = JSON.parse(r.calls[0].options.body);
+    assert.equal(payload.clickId.value, click);
+    const { parseFunnelEventRequest } = await import('../supabase/functions/_shared/funnel-measurement.ts');
+    assert.equal(parseFunnelEventRequest(payload).clickIdValue, click);
+  } finally { r.close(); }
+});
+
+test('a new ad touch gets its own funnel journey while language changes preserve the original touch', async () => {
+  const r = await runtime();
+  try {
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    const first = r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+    await r.api.recordFunnelEvent('landing_view', { dedupeKey: 'landing_view' });
+    const firstSession = r.api.currentFunnelSessionId();
+    r.win.history.replaceState(null, '', '/pa/rapid-resolution' + r.win.location.search);
+    const same = r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+    assert.equal(same.first_touch_at, first.first_touch_at);
+    assert.equal(same.landing_page, first.landing_page);
+    assert.equal(r.api.currentFunnelSessionId(), firstSession);
+    r.win.history.replaceState(null, '', '/pa/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=second_campaign&utm_content=pa_control&fbclid=SECOND_CLICK');
+    r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+    await r.api.recordFunnelEvent('landing_view', { dedupeKey: 'landing_view' });
+    const secondSession = r.api.currentFunnelSessionId();
+    assert.notEqual(secondSession, firstSession);
+    assert.equal(r.calls.length, 2);
+    assert.equal(JSON.parse(r.calls[1].options.body).attribution.utm_campaign, 'second_campaign');
+    r.win.history.replaceState(null, '', '/pa/submit-ticket');
+    await r.api.recordFunnelEvent('lead_saved');
+    const lead = JSON.parse(r.calls[2].options.body);
+    assert.equal(lead.sessionId, secondSession);
+    assert.equal(lead.attribution.utm_content, 'pa_control');
+    assert.equal(r.api.currentFunnelCheckoutContext().sessionId, secondSession);
+  } finally { r.close(); }
+});
+
+test('an in-flight event from the previous ad cannot suppress the new ad landing', async () => {
+  const r = await runtime();
+  try {
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+    let resolveFirst;
+    let calls = 0;
+    r.win.fetch = async () => {
+      calls++;
+      if (calls === 1) await new Promise(resolve => { resolveFirst = resolve; });
+      return { status: 202, json: async () => ({ accepted: true }) };
+    };
+    const first = r.api.recordFunnelEvent('landing_view', { dedupeKey: 'landing_view' });
+    r.win.history.replaceState(null, '', '/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=second&utm_content=second');
+    r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+    assert.equal(await r.api.recordFunnelEvent('landing_view', { dedupeKey: 'landing_view' }), true);
+    assert.equal(calls, 2);
+    resolveFirst();
+    assert.equal(await first, false);
+  } finally { r.close(); }
+});

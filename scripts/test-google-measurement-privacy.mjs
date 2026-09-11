@@ -900,3 +900,38 @@ test('the persistent guardian expires foreground consent even while document nav
     }
   }
 });
+
+
+test('GA4 keeps reviewed campaign attribution while URLs and Google Ads stay scrubbed', async () => {
+  const href = 'https://fabsy.ca/pa/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_ab_multilingual_20260906&utm_content=pa_rr_v1&fbclid=SYNTHETIC_CLICK';
+  const { api, browser } = await runtime(enabledEnv, { href });
+  api.initializeGoogleMeasurement();
+  const ga = browser.commands().find(c => c[0] === 'config' && c[1] === enabledEnv.VITE_GA4_MEASUREMENT_ID);
+  assert.equal(ga[2].campaign_source, 'meta');
+  assert.equal(ga[2].campaign_medium, 'paid_social');
+  assert.equal(ga[2].campaign_name, 'rr_ab_multilingual_20260906');
+  assert.equal(ga[2].campaign_content, 'pa_rr_v1');
+  assert.equal(ga[2].page_location, 'https://fabsy.ca/pa/rapid-resolution');
+  assert.equal(ga[2].fbclid, undefined);
+  const ads = browser.commands().find(c => c[0] === 'config' && c[1] === enabledEnv.VITE_GADS_ID);
+  assert.equal(ads[2].campaign_source, undefined);
+  browser.scripts[0].script.onload();
+  const page = browser.commands().find(c => c[0] === 'event' && c[1] === 'page_view');
+  assert.equal(page[2].campaign_content, 'pa_rr_v1');
+  assert.equal(JSON.stringify(browser.commands()).includes('SYNTHETIC_CLICK'), false);
+  for (const invalid of [href + '&email=private%40example.invalid', href + '&utm_source=other', href + '#private', href.replace('/pa/rapid-resolution', '/pa/submit-ticket')]) {
+    assert.deepEqual(plain(api.googleCampaignParameters(invalid)), {});
+  }
+});
+
+test('another campaign on the same public path emits a new attributed GA4 page view', async () => {
+  const href = 'https://fabsy.ca/pa/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=first&utm_content=one';
+  const { api, browser } = await runtime(enabledEnv, { href });
+  api.initializeGoogleMeasurement();
+  browser.scripts[0].script.onload();
+  browser.navigate(href.replace('utm_campaign=first', 'utm_campaign=second'));
+  api.initializeGoogleMeasurement();
+  api.initializeGoogleMeasurement();
+  const views = browser.commands().filter(c => c[0] === 'event' && c[1] === 'page_view');
+  assert.deepEqual(views.map(c => c[2].campaign_name), ['first', 'second']);
+});
