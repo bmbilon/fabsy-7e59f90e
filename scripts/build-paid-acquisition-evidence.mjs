@@ -30,6 +30,7 @@ const evidenceEnvironment = {
   VITE_FABSY_FUNNEL_MEASUREMENT_ENABLED: 'false',
   VITE_GOOGLE_MEASUREMENT_ENABLED: 'false',
   VITE_META_MEASUREMENT_ENABLED: 'false',
+  VITE_OPENAI_ADS_MEASUREMENT_ENABLED: 'false',
   VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_paid_acquisition_evidence_only',
   VITE_SUPABASE_URL: 'https://abcdefghijklmnopqrst.supabase.co',
 };

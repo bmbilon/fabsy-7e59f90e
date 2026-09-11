@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
         <p className="text-white/70 mb-8">
-          Last updated: September 9, 2026
+          Last updated: September 11, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -174,12 +174,12 @@ const PrivacyPolicy = () => {
               any previously active session leaves the live count within 90 seconds.
             </p>
             <p>
-              Fabsy's first-party funnel measurement, Google Analytics 4, Google Ads measurement
-              and Meta measurement are optional. Fabsy does not record an optional funnel event,
-              and the Google or Meta scripts do not load, before you choose Allow measurement.
-              Fabsy, Google and Meta permissions are stored separately, so an earlier provider
+              Fabsy's first-party funnel measurement, Google Analytics 4, Google Ads measurement,
+              Meta measurement and OpenAI Ads measurement are optional. Fabsy does not record an
+              optional funnel event, and the Google, Meta or OpenAI Ads scripts do not load, before
+              you choose Allow measurement. Fabsy, Google, Meta and OpenAI Ads permissions are stored separately, so an earlier provider
               choice does not silently authorize a newly introduced measurement purpose. The
-              current Privacy choices control lets you allow or decline all three together. You
+              current Privacy choices control lets you allow or decline all four together. You
               can revisit it at any time. We remember each choice in this browser for up to 180
               days; clearing browser storage or using another browser may remove a choice.
             </p>
@@ -198,12 +198,26 @@ const PrivacyPolicy = () => {
             </p>
             <p className="mt-4">
               With your permission, Google measurement records visits to approved public
-              information pages and completed purchases confirmed by our server. Google may
+              information pages, a generic ticket-upload completion on a clean public bridge,
+              and completed purchases confirmed by our server. Google may
               use cookies and similar technologies and process device and browser information,
               approximate location derived from your IP address, public page information and
               advertising click identifiers. Purchase events include the service, purchase
               value, currency, tax and an opaque transaction reference used to prevent
               duplicate counting.
+            </p>
+            <p className="mt-4">
+              With your separate permission, the OpenAI Ads Measurement Pixel loads on an approved
+              Rapid Resolution ad landing when OpenAI's privacy-preserving <code>oppref</code> click
+              identifier is present, and on a query-free public confirmation bridge after our server
+              has accepted a ticket upload. The Pixel stores <code>oppref</code> in a first-party cookie
+              so the later upload can be attributed to the ad click. It sends the standard{' '}
+              <code>lead_created</code> event with a $50 CAD measurement value and opts that event out
+              of future user-level personalization. The bridge contains no ticket, contact, form,
+              case, payment or private access data. The Pixel is not loaded on ticket intake, contact
+              forms, client portals, admin pages or other private documents.
+              Fabsy does not provide OpenAI Ads with names, email addresses, phone numbers, uploaded
+              files, ticket details or other form contents for this event.
             </p>
             <p className="mt-4">
               Separately from optional browser analytics, after Stripe verifies a payment or
@@ -235,7 +249,7 @@ const PrivacyPolicy = () => {
               phone numbers for matching.
             </p>
             <p className="mt-4">
-              Google provider measurement and Meta browser scripts stay off ticket intake, contact
+              Google provider measurement, Meta browser scripts and the OpenAI Ads Pixel stay off ticket intake, contact
               and fleet forms, other personal-information forms, client portals, admin pages, and
               representation authorization and document-verification flows. After you separately
               allow Meta measurement and successfully save contact details in ticket intake, Fabsy
@@ -244,7 +258,7 @@ const PrivacyPolicy = () => {
               and valid Meta browser or ad-click identifiers (_fbp and _fbc) when present. We do not
               include names, email addresses, phone numbers, licence or plate details, ticket
               numbers, uploaded files, free-text answers, assessment results, private access tokens
-              or case identifiers in Google or Meta measurement events. Fabsy's separate, consented
+              or case identifiers in Google, Meta or OpenAI Ads measurement events. Fabsy's separate, consented
               first-party funnel events on ticket intake contain only the named progress step
               described above and no form contents. Meta automatic events and advanced matching are
               disabled. No Meta retargeting audience is configured for this release. Google
@@ -268,10 +282,19 @@ const PrivacyPolicy = () => {
                 rel="noreferrer"
               >
                 Meta Privacy Policy
+              </a>{' '}
+              and the{' '}
+              <a
+                href="https://openai.com/policies/privacy-policy/"
+                className="underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                OpenAI Privacy Policy
               </a>.
             </p>
             <p className="mt-4">
-              These choices control optional Google and Meta measurement, not every website provider.
+              These choices control optional Google, Meta and OpenAI Ads measurement, not every website provider.
               Providers needed for hosting, security, payments and case services remain
               separate. Existing Cloudflare infrastructure and performance analytics are
               also separate. Declining measurement does not turn off all cookies,

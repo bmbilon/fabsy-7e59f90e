@@ -1,6 +1,7 @@
 import { isLiveChatUrl } from '../config/live-chat';
 import { publicGoogleMeasurementUrl } from './googleMeasurement';
 import { publicMetaMeasurementUrl } from './metaMeasurement';
+import { publicOpenAIAdsMeasurementUrl } from './openAIAdsMeasurement';
 import type { MeasurementProvider } from './measurementNavigation';
 
 /**
@@ -8,10 +9,13 @@ import type { MeasurementProvider } from './measurementNavigation';
  * still applies its own narrower URL, consent and production checks.
  */
 export function publicMeasurementDocumentUrl(url: URL): boolean {
-  return publicGoogleMeasurementUrl(url) || publicMetaMeasurementUrl(url) || isLiveChatUrl(url.href);
+  return publicGoogleMeasurementUrl(url) || publicMetaMeasurementUrl(url) ||
+    publicOpenAIAdsMeasurementUrl(url) || isLiveChatUrl(url.href);
 }
 
 /** The provider-specific half of the document boundary's public URL policy. */
 export function publicProviderMeasurementUrl(provider: MeasurementProvider, url: URL): boolean {
-  return provider === 'google' ? publicGoogleMeasurementUrl(url) : publicMetaMeasurementUrl(url);
+  if (provider === 'google') return publicGoogleMeasurementUrl(url);
+  if (provider === 'meta') return publicMetaMeasurementUrl(url);
+  return publicOpenAIAdsMeasurementUrl(url);
 }

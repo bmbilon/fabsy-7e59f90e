@@ -5,12 +5,13 @@ import {
 } from '@remix-run/router';
 import {
   clearTemporaryGoogleConsent, clearTemporaryMetaConsent,
-  getGoogleConsentChoice, getMetaConsentChoice,
-  GOOGLE_CONSENT_CHANGED, META_CONSENT_CHANGED,
+  clearTemporaryOpenAIAdsConsent,
+  getGoogleConsentChoice, getMetaConsentChoice, getOpenAIAdsConsentChoice,
+  GOOGLE_CONSENT_CHANGED, META_CONSENT_CHANGED, OPENAI_ADS_CONSENT_CHANGED,
 } from './googleConsent';
 
 export type PublicMeasurementUrl = (url: URL) => boolean;
-export type MeasurementProvider = 'google' | 'meta';
+export type MeasurementProvider = 'google' | 'meta' | 'openai';
 export type ProviderMeasurementUrl = (provider: MeasurementProvider, url: URL) => boolean;
 type DocumentKind = 'public' | 'private' | 'receipt';
 type DocumentNavigation = 'assign' | 'replace';
@@ -44,14 +45,14 @@ function browserWindow(candidate?: Window): Window | undefined {
 
 function hasProviderTag(win: Window, provider: MeasurementProvider, boundary?: DocumentBoundary): boolean {
   if (boundary?.requestedTags.has(provider)) return true;
-  return provider === 'google'
-    ? Boolean(win.fabsyAnalyticsInitialized || win.document?.getElementById?.('fabsy-google-tag'))
-    : Boolean(win.fabsyMetaInitialized || win.document?.getElementById?.('fabsy-meta-pixel'));
+  if (provider === 'google') return Boolean(win.fabsyAnalyticsInitialized || win.document?.getElementById?.('fabsy-google-tag'));
+  if (provider === 'meta') return Boolean(win.fabsyMetaInitialized || win.document?.getElementById?.('fabsy-meta-pixel'));
+  return Boolean(win.fabsyOpenAIAdsInitialized || win.document?.getElementById?.('fabsy-openai-ads-pixel'));
 }
 
 function hasMeasurementTag(win: Window, boundary?: DocumentBoundary): boolean {
   return hasProviderTag(win, 'google', boundary) || hasProviderTag(win, 'meta', boundary) ||
-    Boolean(win.document?.getElementById?.('fabsy-tawk-widget'));
+    hasProviderTag(win, 'openai', boundary) || Boolean(win.document?.getElementById?.('fabsy-tawk-widget'));
 }
 
 function isPublic(url: URL, boundary: Pick<DocumentBoundary, 'origin' | 'isPublicUrl'>): boolean {
@@ -83,7 +84,7 @@ function isProviderPublic(
 
 function hasProviderOutsidePolicy(win: Window, url: URL, boundary: DocumentBoundary): boolean {
   if (win.document?.getElementById?.('fabsy-tawk-widget') && !isLiveChatUrl(url.href)) return true;
-  return (['google', 'meta'] as const).some(provider =>
+  return (['google', 'meta', 'openai'] as const).some(provider =>
     hasProviderTag(win, provider, boundary) && !isProviderPublic(provider, url, boundary));
 }
 
@@ -157,7 +158,7 @@ export function measurementProviderMayLoadInDocument(
 ): boolean {
   const win = browserWindow(candidate);
   const boundary = win && documents.get(win);
-  return Boolean(win && boundary && (provider === 'google' || provider === 'meta') &&
+  return Boolean(win && boundary && ['google', 'meta', 'openai'].includes(provider) &&
     measurementTagMayLoadInDocument(win) &&
     isProviderPublic(provider, new URL(win.location.href), boundary));
 }
@@ -166,7 +167,7 @@ export function measurementProviderMayLoadInDocument(
 export function markMeasurementTagPending(provider: MeasurementProvider, candidate?: Window): boolean {
   const win = browserWindow(candidate);
   const boundary = win && documents.get(win);
-  if (!win || !boundary || (provider !== 'google' && provider !== 'meta') ||
+  if (!win || !boundary || !['google', 'meta', 'openai'].includes(provider) ||
       !measurementProviderMayLoadInDocument(provider, win)) return false;
   boundary.requestedTags.add(provider);
   // Never clear this marker in the same document, even after an error/removal.
@@ -220,7 +221,7 @@ export function authorizeMeasurementProviderOnVerifiedReceipt(
 ): boolean {
   const win = browserWindow(candidate);
   const boundary = win && documents.get(win);
-  if (!win || !boundary || (provider !== 'google' && provider !== 'meta') ||
+  if (!win || !boundary || !['google', 'meta', 'openai'].includes(provider) ||
       boundary.kind !== 'receipt' || !boundary.receiptScrubbed || boundary.leaving ||
       !boundary.receiptCleanHref || win.location.href !== boundary.receiptCleanHref ||
       !isPublic(new URL(win.location.href), boundary)) return false;
@@ -382,14 +383,17 @@ export function createMeasurementHistory({
       if (hasMeasurementTag(win, boundary)) {
         clearTemporaryGoogleConsent();
         clearTemporaryMetaConsent();
+        clearTemporaryOpenAIAdsConsent();
         const googleInvalid = hasProviderTag(win, 'google', boundary) && getGoogleConsentChoice() !== 'accepted';
         const metaInvalid = hasProviderTag(win, 'meta', boundary) && getMetaConsentChoice() !== 'accepted';
-        if (googleInvalid || metaInvalid) {
+        const openAIInvalid = hasProviderTag(win, 'openai', boundary) && getOpenAIAdsConsentChoice() !== 'accepted';
+        if (googleInvalid || metaInvalid || openAIInvalid) {
           event.stopImmediatePropagation();
           // The Guardian's later pageshow listener is suppressed too. Notify it
           // synchronously so it retires every affected provider before leaving.
           if (googleInvalid) win.dispatchEvent(new (win as Window & typeof globalThis).Event(GOOGLE_CONSENT_CHANGED));
           if (metaInvalid) win.dispatchEvent(new (win as Window & typeof globalThis).Event(META_CONSENT_CHANGED));
+          if (openAIInvalid) win.dispatchEvent(new (win as Window & typeof globalThis).Event(OPENAI_ADS_CONSENT_CHANGED));
           leave(new URL(win.location.href), 'replace');
           return;
         }

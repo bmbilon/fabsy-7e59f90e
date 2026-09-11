@@ -38,6 +38,7 @@ import DemeritsInsurance from "./pages/hubs/DemeritsInsurance";
 import CourtOptionsDeadlines from "./pages/hubs/CourtOptionsDeadlines";
 import CityQuirks from "./pages/hubs/CityQuirks";
 import ThankYou from "./pages/ThankYou";
+import TicketUploaded from "./pages/TicketUploaded";
 import Founder from "./pages/Founder";
 import Analytics from "./components/Analytics";
 import LiveVisitorTracker from "./components/LiveVisitorTracker";
@@ -188,6 +189,7 @@ const App = () => (
           <Route path="/content/:slug" element={<WorkingContentPage />} />
           <Route path="/proof" element={<Navigate to="/testimonials" replace />} />
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/ticket-uploaded" element={<TicketUploaded />} />
           {/* Hubs */}
           <Route path="/hubs/alberta-tickets-101" element={<AlbertaTickets101 />} />
           <Route path="/hubs/photo-radar-vs-officer-issued" element={<PhotoRadarVsOfficer />} />

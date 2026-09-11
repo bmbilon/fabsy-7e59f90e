@@ -23,6 +23,7 @@ interface MeasurementEnvironment {
   VITE_GOOGLE_MEASUREMENT_ENABLED?: string;
   VITE_GA4_MEASUREMENT_ID?: string;
   VITE_GADS_ID?: string;
+  VITE_GADS_CONVERSION_LABEL?: string;
   VITE_GADS_PURCHASE_LABEL?: string;
   VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL?: string;
 }
@@ -36,6 +37,7 @@ export function googleMeasurementConfig(env: MeasurementEnvironment, origin: str
   return {
     ga4Id: /^G-[A-Z0-9]+$/.test(ga4Id) && !/\s/.test(ga4Id) ? ga4Id : undefined,
     adsId: /^AW-\d+$/.test(env.VITE_GADS_ID || '') && !/\s/.test(env.VITE_GADS_ID || '') ? env.VITE_GADS_ID : undefined,
+    leadLabel: env.VITE_GADS_CONVERSION_LABEL,
     rrLabel: env.VITE_GADS_PURCHASE_LABEL,
     photoLabel: env.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL,
   };
@@ -51,6 +53,7 @@ const publicPaths = new Set([
   '/how-it-works', '/about', '/about/comparison', '/services', '/testimonials',
   '/faq', '/founder', '/ai-info', '/privacy-policy', '/terms-of-service',
   '/terms-of-purchase', '/insurance-damage-report', '/blog', '/thank-you',
+  '/ticket-uploaded',
   '/hubs/alberta-tickets-101', '/hubs/photo-radar-vs-officer-issued',
   '/hubs/demerits-and-insurance', '/hubs/court-options-and-deadlines',
   '/hubs/city-specific-quirks',
@@ -143,6 +146,30 @@ export function dispatchGoogleMeasurement(eventName: string, params: Record<stri
   queue('event', eventName, {
     ...params, ...context,
     allow_google_signals: false, allow_ad_personalization_signals: false,
+  });
+  return true;
+}
+
+function ticketUploadAdsDestination(config: PaidPurchaseConfig): string | null {
+  if (!/^AW-\d+$/.test(config.adsId || '') || /\s/.test(config.adsId || '') ||
+      !/^[A-Za-z0-9_-]+$/.test(config.leadLabel || '') || /\s/.test(config.leadLabel || '')) return null;
+  return `${config.adsId}/${config.leadLabel}`;
+}
+
+/** Queue only the generic, consented upload-completion signal on its clean public bridge. */
+export function dispatchGoogleTicketUploadConversion(): boolean {
+  const context = currentGooglePageContext();
+  const destination = ticketUploadAdsDestination(configured);
+  if (!tagLoaded || !context || context.page_location !== `${window.location.origin}/ticket-uploaded` ||
+      !destination || !window.fabsyAnalyticsInitialized || restarting ||
+      getGoogleConsentChoice() !== 'accepted' || !googleTagMayLoadInDocument(window)) return false;
+  queue('event', 'conversion', {
+    send_to: destination,
+    value: 50,
+    currency: 'CAD',
+    ...context,
+    allow_google_signals: false,
+    allow_ad_personalization_signals: false,
   });
   return true;
 }

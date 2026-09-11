@@ -14,7 +14,7 @@
       "publication": {
         "basis": "owner_authorized_machine_translation",
         "authorizedBy": "Brett Bilon",
-        "authorizedAt": "2026-09-10T22:26:57Z",
+        "authorizedAt": "2026-09-11T11:08:34Z",
         "indexingAuthorizedBy": "Brett Bilon",
         "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
@@ -24,7 +24,7 @@
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-92707ea5",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-98f06cec",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-06562a22",
@@ -41,7 +41,7 @@
       "publication": {
         "basis": "owner_authorized_machine_translation",
         "authorizedBy": "Brett Bilon",
-        "authorizedAt": "2026-09-10T22:26:57Z",
+        "authorizedAt": "2026-09-11T11:08:34Z",
         "indexingAuthorizedBy": "Brett Bilon",
         "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
@@ -51,7 +51,7 @@
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-92707ea5",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-98f06cec",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-06562a22",
@@ -68,7 +68,7 @@
       "publication": {
         "basis": "owner_authorized_machine_translation",
         "authorizedBy": "Brett Bilon",
-        "authorizedAt": "2026-09-10T22:26:57Z",
+        "authorizedAt": "2026-09-11T11:08:34Z",
         "indexingAuthorizedBy": "Brett Bilon",
         "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
@@ -78,7 +78,7 @@
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-92707ea5",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-98f06cec",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-06562a22",
@@ -95,7 +95,7 @@
       "publication": {
         "basis": "owner_authorized_machine_translation",
         "authorizedBy": "Brett Bilon",
-        "authorizedAt": "2026-09-10T22:26:57Z",
+        "authorizedAt": "2026-09-11T11:08:34Z",
         "indexingAuthorizedBy": "Brett Bilon",
         "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
@@ -105,7 +105,7 @@
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-92707ea5",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-98f06cec",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-06562a22",
@@ -122,7 +122,7 @@
       "publication": {
         "basis": "owner_authorized_machine_translation",
         "authorizedBy": "Brett Bilon",
-        "authorizedAt": "2026-09-10T22:26:57Z",
+        "authorizedAt": "2026-09-11T11:08:34Z",
         "indexingAuthorizedBy": "Brett Bilon",
         "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
@@ -132,7 +132,7 @@
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-92707ea5",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-98f06cec",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-06562a22",
@@ -149,7 +149,7 @@
       "publication": {
         "basis": "owner_authorized_machine_translation",
         "authorizedBy": "Brett Bilon",
-        "authorizedAt": "2026-09-10T22:26:57Z",
+        "authorizedAt": "2026-09-11T11:08:34Z",
         "indexingAuthorizedBy": "Brett Bilon",
         "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
@@ -159,7 +159,7 @@
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-92707ea5",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-98f06cec",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-06562a22",
@@ -176,7 +176,7 @@
       "publication": {
         "basis": "owner_authorized_machine_translation",
         "authorizedBy": "Brett Bilon",
-        "authorizedAt": "2026-09-10T22:26:57Z",
+        "authorizedAt": "2026-09-11T11:08:34Z",
         "indexingAuthorizedBy": "Brett Bilon",
         "indexingAuthorizedAt": "2026-09-01T12:37:07Z",
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
@@ -186,7 +186,7 @@
         "src/pages/TermsOfPurchase.tsx": "fnv1a-b14339f3",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-89cd45ed",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-92707ea5",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-98f06cec",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-06562a22",

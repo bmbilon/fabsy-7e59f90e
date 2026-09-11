@@ -2,6 +2,7 @@ import { requestMetaCheckoutAttributionWithdrawal } from './metaCheckoutWithdraw
 
 export type GoogleConsentChoice = 'unknown' | 'accepted' | 'declined';
 export type MetaConsentChoice = GoogleConsentChoice;
+export type OpenAIAdsConsentChoice = GoogleConsentChoice;
 
 export const GOOGLE_CONSENT_CHANGED = 'fabsy:google-consent-changed';
 export const GOOGLE_CONSENT_STORAGE_KEY = 'fabsy:google-measurement-consent:v1';
@@ -9,6 +10,9 @@ export const GOOGLE_CONSENT_MAX_AGE_MS = 180 * 24 * 60 * 60 * 1000;
 export const META_CONSENT_CHANGED = 'fabsy:meta-consent-changed';
 export const META_CONSENT_STORAGE_KEY = 'fabsy:meta-measurement-consent:v1';
 export const META_CONSENT_MAX_AGE_MS = GOOGLE_CONSENT_MAX_AGE_MS;
+export const OPENAI_ADS_CONSENT_CHANGED = 'fabsy:openai-ads-consent-changed';
+export const OPENAI_ADS_CONSENT_STORAGE_KEY = 'fabsy:openai-ads-measurement-consent:v1';
+export const OPENAI_ADS_CONSENT_MAX_AGE_MS = GOOGLE_CONSENT_MAX_AGE_MS;
 
 interface SavedConsent {
   version: 1;
@@ -171,4 +175,74 @@ export function setMetaConsentChoice(choice: 'accepted' | 'declined'): void {
     }
   }
   window.dispatchEvent(new Event(META_CONSENT_CHANGED));
+}
+
+// OpenAI Ads has its own record. Earlier Fabsy, Google or Meta choices cannot
+// silently authorize a provider introduced later.
+let temporaryOpenAIAdsChoice: SavedConsent | null = null;
+let openAIAdsWriteProbeSequence = 0;
+
+export function parseOpenAIAdsConsent(value: string | null, now = Date.now()): OpenAIAdsConsentChoice {
+  if (!value || value.length > 512) return 'unknown';
+  try {
+    const saved: unknown = JSON.parse(value);
+    if (!saved || typeof saved !== 'object') return 'unknown';
+    const record = saved as Partial<SavedConsent>;
+    if (record.version !== 1 || !['accepted', 'declined'].includes(record.choice ?? '') ||
+        typeof record.savedAt !== 'number' || !Number.isFinite(record.savedAt) ||
+        record.savedAt > now || now - record.savedAt >= OPENAI_ADS_CONSENT_MAX_AGE_MS) return 'unknown';
+    return record.choice as 'accepted' | 'declined';
+  } catch {
+    return 'unknown';
+  }
+}
+
+function savedOpenAIAdsConsentValue(): string | null {
+  if (typeof window === 'undefined') return null;
+  if (temporaryOpenAIAdsChoice) return JSON.stringify(temporaryOpenAIAdsChoice);
+  try {
+    const value = window.localStorage.getItem(OPENAI_ADS_CONSENT_STORAGE_KEY);
+    if (parseOpenAIAdsConsent(value) === 'accepted') {
+      const probeKey = `${OPENAI_ADS_CONSENT_STORAGE_KEY}:write-check:${Date.now()}:${++openAIAdsWriteProbeSequence}:${Math.random()}`;
+      window.localStorage.setItem(probeKey, '1');
+      if (window.localStorage.getItem(probeKey) !== '1') return null;
+      window.localStorage.removeItem(probeKey);
+      if (window.localStorage.getItem(probeKey) !== null) return null;
+    }
+    return value;
+  } catch {
+    return null;
+  }
+}
+
+export function getOpenAIAdsConsentChoice(): OpenAIAdsConsentChoice {
+  return parseOpenAIAdsConsent(savedOpenAIAdsConsentValue());
+}
+
+export function openAIAdsConsentRemainingMilliseconds(now = Date.now()): number | null {
+  const value = savedOpenAIAdsConsentValue();
+  if (parseOpenAIAdsConsent(value, now) === 'unknown') return null;
+  const record = JSON.parse(value!) as SavedConsent;
+  return Math.max(0, record.savedAt + OPENAI_ADS_CONSENT_MAX_AGE_MS - now);
+}
+
+export function clearTemporaryOpenAIAdsConsent(): void {
+  temporaryOpenAIAdsChoice = null;
+}
+
+export function setOpenAIAdsConsentChoice(choice: 'accepted' | 'declined'): void {
+  if (typeof window === 'undefined' || !['accepted', 'declined'].includes(choice)) return;
+  const record: SavedConsent = { version: 1, choice, savedAt: Date.now() };
+  const value = JSON.stringify(record);
+  try {
+    window.localStorage.setItem(OPENAI_ADS_CONSENT_STORAGE_KEY, value);
+    if (window.localStorage.getItem(OPENAI_ADS_CONSENT_STORAGE_KEY) !== value) throw new Error('Consent was not saved.');
+    temporaryOpenAIAdsChoice = null;
+  } catch {
+    temporaryOpenAIAdsChoice = record;
+    if (choice === 'declined') {
+      try { window.localStorage.removeItem(OPENAI_ADS_CONSENT_STORAGE_KEY); } catch { /* Stale acceptance cannot remain authoritative. */ }
+    }
+  }
+  window.dispatchEvent(new Event(OPENAI_ADS_CONSENT_CHANGED));
 }
