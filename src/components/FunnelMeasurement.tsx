@@ -39,7 +39,7 @@ export default function FunnelMeasurement() {
     };
     window.addEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onConsent);
     return () => window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onConsent);
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     if (!isRapidResolution(location.pathname)) return;
@@ -92,7 +92,27 @@ export default function FunnelMeasurement() {
       }
       recordVisibleCtas();
     }, { threshold: 0.5 });
-    document.querySelectorAll('[data-funnel-action="primary_cta"]').forEach(element => observer.observe(element));
+    const observedCtas = new Set<Element>();
+    const observeCtas = () => {
+      for (const element of observedCtas) {
+        if (!element.isConnected) {
+          observer.unobserve(element);
+          observedCtas.delete(element);
+          visibleCtas.delete(element);
+        }
+      }
+      document.querySelectorAll('[data-funnel-action="primary_cta"]').forEach(element => {
+        if (!observedCtas.has(element)) {
+          observedCtas.add(element);
+          observer.observe(element);
+        }
+      });
+    };
+    // Localized pages are lazy-loaded after this observer mounts. Include
+    // their CTAs as well as controls inserted by later responsive navigation.
+    const mutations = new MutationObserver(observeCtas);
+    mutations.observe(document.body, { childList: true, subtree: true });
+    observeCtas();
 
     let scrollFrame: number | null = null;
     const onScroll = () => {
@@ -121,12 +141,13 @@ export default function FunnelMeasurement() {
       window.clearInterval(interval);
       if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame);
       observer.disconnect();
+      mutations.disconnect();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onConsent);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     const onAction = (event: Event) => {

@@ -242,10 +242,11 @@ export async function recordFunnelEvent(
   if (!sessionId || !eventId) return false;
   const dedupeKey = options.dedupeKey?.replace(/[^A-Za-z0-9._:-]/g, '').slice(0, 100);
   const storageKey = dedupeKey ? `${FUNNEL_EVENT_DEDUPE_PREFIX}${dedupeKey}` : null;
+  const inFlightKey = storageKey ? `${sessionId}:${storageKey}` : null;
   if (storageKey) {
     try { if (window.sessionStorage.getItem(storageKey) === '1') return true; } catch { /* Memory still deduplicates in-flight. */ }
-    if (inFlight.has(storageKey)) return true;
-    inFlight.add(storageKey);
+    if (inFlight.has(inFlightKey!)) return true;
+    inFlight.add(inFlightKey!);
   }
   const payload: FunnelEventPayload = {
     eventId,
@@ -273,6 +274,6 @@ export async function recordFunnelEvent(
   } catch {
     return false;
   } finally {
-    if (storageKey) inFlight.delete(storageKey);
+    if (inFlightKey) inFlight.delete(inFlightKey);
   }
 }

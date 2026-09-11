@@ -111,6 +111,26 @@ export function currentGooglePageContext(): PaidPurchaseContext | null {
   return safeGooglePageContext(window.location.href, document.referrer);
 }
 
+/** Preserve campaign credit when page_location deliberately omits the query. */
+export function googleCampaignParameters(href: string): Record<string, string> {
+  try {
+    const url = new URL(href);
+    if (!safeGooglePageContext(href, '')) return {};
+    const fields = {
+      utm_source: 'campaign_source', utm_medium: 'campaign_medium',
+      utm_campaign: 'campaign_name', utm_content: 'campaign_content', utm_term: 'campaign_term',
+    } as const;
+    const result: Record<string, string> = {};
+    for (const key of UTM_KEYS) {
+      const value = url.searchParams.get(key);
+      if (value) result[fields[key]] = value;
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
+
 /** Call only after the receipt component has retained its session ID in memory. */
 export function removeCheckoutTokenFromUrl(expectedSessionId: string | null): void {
   if (!expectedSessionId || typeof window === 'undefined') return;
@@ -145,6 +165,7 @@ export function dispatchGoogleMeasurement(eventName: string, params: Record<stri
   if (typeof destination !== 'string' || !allowed.includes(destination)) return false;
   queue('event', eventName, {
     ...params, ...context,
+    ...(eventName === 'page_view' ? googleCampaignParameters(window.location.href) : {}),
     allow_google_signals: false, allow_ad_personalization_signals: false,
   });
   return true;
@@ -176,8 +197,10 @@ export function dispatchGoogleTicketUploadConversion(): boolean {
 
 export function sendGooglePageView(): void {
   const context = currentGooglePageContext();
-  if (!context || !configured.ga4Id || lastPageLocation === context.page_location) return;
-  if (dispatchGoogleMeasurement('page_view', { send_to: configured.ga4Id })) lastPageLocation = context.page_location;
+  if (!context || !configured.ga4Id) return;
+  const pageKey = `${context.page_location}${window.location.search}`;
+  if (lastPageLocation === pageKey) return;
+  if (dispatchGoogleMeasurement('page_view', { send_to: configured.ga4Id })) lastPageLocation = pageKey;
 }
 
 /** A loaded script's listeners cannot be removed reliably. Retire its document. */
@@ -244,7 +267,7 @@ export function initializeGoogleMeasurement(): void {
   });
   queue('js', new Date());
   const options = { ...context, send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false };
-  if (config.ga4Id) queue('config', config.ga4Id, options);
+  if (config.ga4Id) queue('config', config.ga4Id, { ...options, ...googleCampaignParameters(window.location.href) });
   if (config.adsId) queue('config', config.adsId, options);
   window.fabsyAnalyticsInitialized = true;
   const script = document.createElement('script');
