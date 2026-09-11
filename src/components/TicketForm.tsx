@@ -764,8 +764,8 @@ const TicketForm = ({
 
   const delivery = intakeDraft.record?.resumeDelivery;
   const hasPendingTicketUpload = intakeDraft.record?.hasPendingTicketUpload === true;
-  const resumeAccess = intakeDraft.capability ? <div lang="en" className="my-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
-    <div className="min-w-0 flex-1">
+  const resumeAccess = intakeDraft.capability ? <div lang="en" className="my-6 flex flex-col items-stretch gap-4 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+    <div className="min-w-0 break-words sm:flex-1 sm:basis-64">
       <p className="font-medium">Secure return access</p>
       <p className="text-muted-foreground" aria-live="polite">{convertedIntake
         ? "A checkout was already created for this saved intake. Continue only if payment is still outstanding, or start a new intake for another ticket."
@@ -774,7 +774,7 @@ const TicketForm = ({
         : resumeDeliveryMessage(delivery, intakeDraft.hasUploadedTicket)}</p>
       {intakeDraft.error ? <p className="mt-1 text-destructive" role="alert">{intakeDraft.error}</p> : null}
     </div>
-    <div className="flex flex-wrap gap-2">
+    <div className="flex min-w-0 flex-col gap-2 [&>button]:h-auto [&>button]:min-h-11 [&>button]:whitespace-normal [&>button]:py-2 sm:flex-row sm:flex-wrap">
       {hasPendingTicketUpload ? <Button type="button" variant="outline" disabled={intakeDraft.discardingPendingUpload} onClick={() => void discardPendingUpload()}>
         {intakeDraft.discardingPendingUpload ? "Restoring…" : "Keep previous ticket"}
       </Button> : null}
@@ -961,7 +961,7 @@ const TicketForm = ({
 
   return (
     <section className={`${checkpointOnly ? "py-4 sm:py-8" : "py-10 sm:py-16"} bg-gradient-soft min-h-screen`}>
-      <div id="ticket-form-container" className="container mx-auto px-4 max-w-4xl">
+      <div id="ticket-form-container" className="container mx-auto scroll-mt-32 px-4 max-w-4xl">
         {/* Header */}
         <div className={`text-center ${checkpointOnly ? "mb-6 sm:mb-8" : "mb-10"}`}>
           {currentStep > 1 && <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
