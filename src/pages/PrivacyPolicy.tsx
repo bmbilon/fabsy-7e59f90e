@@ -30,6 +30,7 @@ const PrivacyPolicy = () => {
               <li>Referral codes and attribution dates, referral eligibility and payout history, Interac delivery email, and the referrer's legal name and address for payout administration and applicable tax reporting</li>
               <li>Communication records between you and our representatives</li>
               <li>Website chat messages, contact details you choose to provide, and chat session, browser and public-page information processed by Tawk.to to provide live support</li>
+              <li>WhatsApp messages and channel metadata, such as your phone number, profile name, message identifier, delivery status, language context and opt-out status, when you choose to contact Fabsy on WhatsApp</li>
             </ul>
           </section>
 
@@ -51,6 +52,7 @@ const PrivacyPolicy = () => {
               <li>Reconcile aggregate purchase and refund amounts and evaluate paid-acquisition economics using PII-free payment references</li>
               <li>Comply with legal obligations and court requirements</li>
               <li>Improve our services and website functionality</li>
+              <li>Respond to WhatsApp inquiries through an AI assistant and direct requests for human help to our contact form or email</li>
             </ul>
           </section>
 
@@ -64,6 +66,7 @@ const PrivacyPolicy = () => {
               <li><strong>Legal Compliance:</strong> When required by law, regulation, or court order</li>
               <li><strong>Service Providers:</strong> With trusted third-party service providers who assist in our operations</li>
               <li><strong>Website Live Chat:</strong> With Tawk.to to deliver messages, retain conversation history and let Fabsy staff respond through its dashboard and mobile apps</li>
+              <li><strong>WhatsApp Communications:</strong> With Meta/WhatsApp, Twilio and Vapi when you choose to communicate with Fabsy through WhatsApp</li>
               <li><strong>Business Transfers:</strong> In connection with any merger, sale, or transfer of company assets</li>
             </ul>
             <p className="mt-4">
@@ -311,21 +314,41 @@ const PrivacyPolicy = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Third-Party Links</h2>
+            <h2 className="text-2xl font-semibold mb-4">8. WhatsApp and AI-Assisted Messaging</h2>
+            <p>
+              When you start a WhatsApp conversation with Fabsy, your messages are transmitted through
+              Meta/WhatsApp and Twilio. Text inquiries are processed by Vapi so Fabsy's AI assistant can
+              respond. These providers may process information outside Canada, and their terms,
+              privacy practices and retention settings apply to information transmitted through their services.
+            </p>
+            <p className="mt-4">
+              The assistant is automated, may make mistakes and does not provide legal advice or make a
+              binding determination about your matter. For human help, use the website contact form,
+              email hello@fabsy.ca or call Fabsy. Reply <strong>STOP</strong> to stop automated WhatsApp replies.
+            </p>
+            <p className="mt-4">
+              Do not send ticket images, driver's-licence images, driver abstracts, payment information or
+              other sensitive documents through WhatsApp. Use Fabsy's secure ticket intake or client portal
+              when documents or sensitive information are required.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">9. Third-Party Links</h2>
             <p>
               Our website may contain links to third-party websites. We are not responsible for the privacy practices of these external sites and encourage you to review their privacy policies.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">9. Changes to This Privacy Policy</h2>
+            <h2 className="text-2xl font-semibold mb-4">10. Changes to This Privacy Policy</h2>
             <p>
               We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Contact Us</h2>
+            <h2 className="text-2xl font-semibold mb-4">11. Contact Us</h2>
             <p className="mb-4">
               If you have any questions about this Privacy Policy or our privacy practices, please contact us:
             </p>

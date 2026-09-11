@@ -15,6 +15,7 @@ import {
   RAPID_RESOLUTION,
   RAPID_RESOLUTION_BUNDLE,
 } from "@/config/offers";
+import { FABSY_WHATSAPP_URL, WHATSAPP_ENABLED } from "@/config/whatsapp";
 
 const Contact = () => {
   useSafeHead({
@@ -112,6 +113,30 @@ const Contact = () => {
                     <p className="text-sm text-muted-foreground">Monday - Friday, 9 AM - 6 PM MST</p>
                   </div>
                 </div>
+
+                {WHATSAPP_ENABLED ? (
+                  <div className="flex items-start gap-4">
+                    <MessageCircle className="h-5 w-5 shrink-0 text-primary mt-1" aria-hidden="true" />
+                    <div>
+                      <h3 className="font-semibold mb-1">WhatsApp</h3>
+                      <a
+                        href={FABSY_WHATSAPP_URL}
+                        className="font-medium text-primary underline underline-offset-4"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Message Fabsy on WhatsApp
+                      </a>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Fabsy's AI assistant answers general questions and can respond in supported languages.
+                        For human help, use the contact form or email hello@fabsy.ca.
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Please use our secure ticket intake for documents or sensitive information.
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="flex items-start gap-4">
                   <MapPin className="h-5 w-5 text-primary mt-1" />
