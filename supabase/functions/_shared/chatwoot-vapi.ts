@@ -149,6 +149,8 @@ export function parseChatwootEvent(
   }
   if (
     (c.account_id !== undefined && c.account_id !== accountId) ||
+    (object(c.account).id !== undefined &&
+      object(c.account).id !== accountId) ||
     (c.inbox_id !== undefined && c.inbox_id !== inboxId)
   ) throw new Error("wrong_scope");
   const eventAt = timestampIso(
@@ -168,7 +170,18 @@ export function parseChatwootEvent(
       if (!positiveId(value.id) || !isMessageSid(value.source_id)) {
         throw new Error("invalid_incoming");
       }
-      if (object(value.sender).type !== "contact") {
+      const sender = object(value.sender);
+      const senderAccount = object(sender.account).id;
+      // Contact#webhook_data omits `type`, unlike Contact#push_event_data
+      // used by the conversation API. Native webhooks identify the contact
+      // by its ID and account. Twilio and the native delivery route are still
+      // independently verified by the worker before any reply.
+      if (
+        !positiveId(sender.id) ||
+        (sender.type !== undefined && sender.type !== "contact") ||
+        (senderAccount !== undefined && senderAccount !== accountId) ||
+        (sender.type === undefined && senderAccount !== accountId)
+      ) {
         throw new Error("invalid_sender");
       }
       return {
@@ -201,11 +214,20 @@ export function parseChatwootEvent(
     const changed = Array.isArray(value.changed_attributes)
       ? value.changed_attributes
       : [];
-    const explicitStatus = value.event === "conversation_status_changed" &&
+    // Conversation updates carry previous_changes in native Chatwoot. The
+    // separate status_changed notification can omit changed_attributes.
+    // Require the explicit transition in either event before releasing a hold.
+    const explicitStatus =
+      ["conversation_status_changed", "conversation_updated"].includes(
+        String(value.event),
+      ) &&
       changed.some((item) => {
         const change = object(object(item).status);
         return typeof change.current_value === "string" &&
-          change.current_value === status && change.previous_value !== status;
+          change.current_value === status &&
+          ["pending", "open", "resolved", "snoozed"].includes(
+            String(change.previous_value),
+          ) && change.previous_value !== status;
       });
     const changedAt = timestampIso(c.updated_at);
     if (explicitStatus && changedAt) {

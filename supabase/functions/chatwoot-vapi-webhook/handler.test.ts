@@ -25,10 +25,17 @@ const payload = () => ({
   source_id: "SM" + "1".repeat(32),
   content: "Hi",
   created_at: new Date(now).toISOString(),
-  sender: { type: "contact" },
+  // Contact#webhook_data, not the API's push_event_data (`type: contact`).
+  sender: { id: 789, account: { id: 12 } },
   account: { id: 12 },
   inbox: { id: 34 },
-  conversation: { id: 56, account_id: 12, inbox_id: 34, status: "pending" },
+  conversation: {
+    id: 56,
+    account: { id: 12 },
+    inbox_id: 34,
+    status: "pending",
+    meta: { sender: { id: 789, type: "contact" } },
+  },
 });
 async function signed(
   value: unknown,
@@ -124,6 +131,36 @@ Deno.test("signature tampering, stale replay and future signatures fail before q
     false,
   );
 });
+Deno.test("native contact webhook and explicitly typed contact both enqueue", async () => {
+  for (const sender of [payload().sender, { id: 789, type: "contact" }]) {
+    const h = harness();
+    equal(
+      (await h.handler(await signed({ ...payload(), sender }))).status,
+      204,
+    );
+    equal(h.events[0].kind, "incoming");
+  }
+});
+Deno.test("missing, user, conflicting or unscoped incoming senders are rejected", async () => {
+  for (
+    const sender of [
+      undefined,
+      { id: 789 },
+      { account: { id: 12 } },
+      { id: 789, type: "user", account: { id: 12 } },
+      { id: 789, type: "agent_bot", account: { id: 12 } },
+      { id: 789, account: { id: 99 } },
+      { id: 789, type: "contact", account: { id: 99 } },
+    ]
+  ) {
+    const h = harness();
+    equal(
+      (await h.handler(await signed({ ...payload(), sender }))).status,
+      400,
+    );
+    equal(h.events.length, 0);
+  }
+});
 Deno.test("signed repeats derive identical delivery IDs for durable replay dedupe", async () => {
   const h = harness();
   await h.handler(await signed(payload()));
@@ -138,6 +175,9 @@ Deno.test("wrong account/inbox and conflicting nested scope are rejected", async
     }, {
       ...payload(),
       conversation: { ...payload().conversation, inbox_id: 99 },
+    }, {
+      ...payload(),
+      conversation: { ...payload().conversation, account: { id: 99 } },
     }]
   ) {
     const h = harness();
@@ -174,7 +214,7 @@ Deno.test("only explicit signed pending status transition releases human hold", 
   const value = {
     event: "conversation_status_changed",
     id: 56,
-    account_id: 12,
+    account: { id: 12 },
     inbox_id: 34,
     status: "pending",
     updated_at: now / 1000,
@@ -191,8 +231,8 @@ Deno.test("only explicit signed pending status transition releases human hold", 
       12,
       34,
       "delivery",
-    ),
-    null,
+    )?.kind,
+    "status",
   );
   equal(
     parseChatwootEvent(
@@ -203,6 +243,26 @@ Deno.test("only explicit signed pending status transition releases human hold", 
     ),
     null,
   );
+  for (const event of ["conversation_updated", "conversation_status_changed"]) {
+    for (
+      const changed_attributes of [
+        null,
+        [{ status: { current_value: "pending" } }],
+        [{ status: { previous_value: "pending", current_value: "pending" } }],
+        [{ assignee_id: { previous_value: 7, current_value: null } }],
+      ]
+    ) {
+      equal(
+        parseChatwootEvent(
+          { ...value, event, changed_attributes },
+          12,
+          34,
+          "delivery",
+        ),
+        null,
+      );
+    }
+  }
 });
 Deno.test("queue failure returns Chatwoot-retryable 500 and never wakes", async () => {
   let wake = false;

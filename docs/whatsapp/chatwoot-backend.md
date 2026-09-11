@@ -55,6 +55,8 @@ supabase functions deploy chatwoot-vapi-webhook --project-ref gcasbisxfrssonllpq
 supabase functions deploy chatwoot-vapi-worker --project-ref gcasbisxfrssonllpqrw --no-verify-jwt --use-api
 ```
 
+The receiver accepts the native Contact webhook shape, which identifies a contact by ID and account but omits the `type` field present in API responses. Explicit status transitions can arrive on `conversation_updated`; a status notification without a transition never releases a human hold. Regression fixtures cover both contracts.
+
 The public receiver uses Chatwoot HMAC signatures over `timestamp.rawBody`; the internal worker requires its independent bearer secret. Both have `verify_jwt=false` intentionally. Verify deployed source against this checkout and confirm malformed/unsigned webhook requests, oversized bodies and unauthorized worker calls are rejected before a controlled real-message test.
 
 ## Vault and recovery scheduler
