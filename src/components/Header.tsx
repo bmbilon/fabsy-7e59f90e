@@ -11,6 +11,8 @@ import { englishEditorialReturnPath } from "@/i18n/locale-policy.mjs";
 import LanguageSelector from "./LanguageSelector";
 import LanguageMessages from "./LanguageMessages";
 import { LocalizedHeader } from "./LocalizedNavigation";
+import { WHATSAPP_ENABLED } from "@/config/whatsapp";
+import HeaderContactLinks from "./HeaderContactLinks";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_VANITY = "825 79 FABSY";
@@ -84,7 +86,7 @@ const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden xl:flex items-center gap-3">
-            <Button asChild variant="outline" className="hidden h-auto min-h-12 gap-2 border-primary py-1.5 text-primary hover:bg-primary/10 transition-smooth 2xl:inline-flex">
+            {!WHATSAPP_ENABLED && <Button asChild variant="outline" className="hidden h-auto min-h-12 gap-2 border-primary py-1.5 text-primary hover:bg-primary/10 transition-smooth 2xl:inline-flex">
               <a href={PHONE_HREF} data-funnel-action="phone" data-funnel-position="header" aria-label={`Call Fabsy at ${PHONE_DISPLAY}`}>
                 <Phone className="h-4 w-4" aria-hidden="true" />
                 <span className="flex flex-col gap-0.5 leading-tight">
@@ -92,7 +94,7 @@ const Header = () => {
                   <span className="text-[11px] font-semibold tracking-[0.12em]">{PHONE_VANITY}</span>
                 </span>
               </a>
-            </Button>
+            </Button>}
             {!isIntake && <Button asChild className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
               <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} data-funnel-action={isFleet ? undefined : "primary_cta"} data-funnel-position={isFleet ? undefined : "header"}>{isFleet ? 'Fleet account' : `Start · ${activePriceLabel}`}</Link>
             </Button>}
@@ -169,6 +171,7 @@ const Header = () => {
             </SheetContent>
           </Sheet>
           </div>
+          <HeaderContactLinks />
         </div>
       </header>
       {isEnglishEditorial && <aside role="note" className="border-b border-sky-200 bg-sky-50 px-4 py-2.5 text-sm leading-relaxed text-sky-950" data-editorial-language-notice="english-only">
