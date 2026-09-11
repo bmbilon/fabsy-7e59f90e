@@ -30,7 +30,7 @@ const PrivacyPolicy = () => {
               <li>Referral codes and attribution dates, referral eligibility and payout history, Interac delivery email, and the referrer's legal name and address for payout administration and applicable tax reporting</li>
               <li>Communication records between you and our representatives</li>
               <li>Website chat messages, contact details you choose to provide, and chat session, browser and public-page information processed by Tawk.to to provide live support</li>
-              <li>WhatsApp messages and channel metadata, such as your phone number, profile name, message identifier, delivery status, language context and opt-out status, when you choose to contact Fabsy on WhatsApp</li>
+              <li>WhatsApp conversation history, including messages, staff replies and attachments you send, plus contact and channel details such as your phone number, profile name, message identifiers, delivery status, language context and opt-out status</li>
             </ul>
           </section>
 
@@ -52,7 +52,7 @@ const PrivacyPolicy = () => {
               <li>Reconcile aggregate purchase and refund amounts and evaluate paid-acquisition economics using PII-free payment references</li>
               <li>Comply with legal obligations and court requirements</li>
               <li>Improve our services and website functionality</li>
-              <li>Respond to WhatsApp inquiries through an AI assistant and direct requests for human help to our contact form or email</li>
+              <li>Respond to WhatsApp inquiries through our AI assistant or authorized Fabsy staff, retain conversation history for support, and manage requests for human help</li>
             </ul>
           </section>
 
@@ -66,7 +66,7 @@ const PrivacyPolicy = () => {
               <li><strong>Legal Compliance:</strong> When required by law, regulation, or court order</li>
               <li><strong>Service Providers:</strong> With trusted third-party service providers who assist in our operations</li>
               <li><strong>Website Live Chat:</strong> With Tawk.to to deliver messages, retain conversation history and let Fabsy staff respond through its dashboard and mobile apps</li>
-              <li><strong>WhatsApp Communications:</strong> With Meta/WhatsApp, Twilio and Vapi when you choose to communicate with Fabsy through WhatsApp</li>
+              <li><strong>WhatsApp Communications:</strong> With Meta/WhatsApp and Twilio to deliver messages, Chatwoot to retain conversation history and provide staff access through its dashboard and mobile app, and Vapi when the AI assistant responds</li>
               <li><strong>Business Transfers:</strong> In connection with any merger, sale, or transfer of company assets</li>
             </ul>
             <p className="mt-4">
@@ -316,20 +316,22 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-4">8. WhatsApp and AI-Assisted Messaging</h2>
             <p>
-              When you start a WhatsApp conversation with Fabsy, your messages are transmitted through
-              Meta/WhatsApp and Twilio. Text inquiries are processed by Vapi so Fabsy's AI assistant can
-              respond. These providers may process information outside Canada, and their terms,
-              privacy practices and retention settings apply to information transmitted through their services.
+              WhatsApp messages are delivered through Meta/WhatsApp and Twilio. Chatwoot stores conversation
+              history, contact details and attachments you send so authorized Fabsy staff can review and
+              reply through its dashboard and mobile app. Chatwoot Cloud stores this information in the
+              United States. When the AI assistant responds, Vapi processes the text and relevant conversation
+              context. These providers' terms, privacy practices and retention settings apply.
             </p>
             <p className="mt-4">
               The assistant is automated, may make mistakes and does not provide legal advice or make a
-              binding determination about your matter. For human help, use the website contact form,
-              email hello@fabsy.ca or call Fabsy. Reply <strong>STOP</strong> to stop automated WhatsApp replies.
+              binding determination about your matter. Authorized Fabsy staff may also reply in the same
+              WhatsApp conversation when available. Reply <strong>STOP</strong> to stop automated WhatsApp replies.
             </p>
             <p className="mt-4">
               Do not send ticket images, driver's-licence images, driver abstracts, payment information or
               other sensitive documents through WhatsApp. Use Fabsy's secure ticket intake or client portal
-              when documents or sensitive information are required.
+              when documents or sensitive information are required. Attachments sent through WhatsApp may
+              still be stored by the messaging providers and Chatwoot.
             </p>
           </section>
 
