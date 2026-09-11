@@ -3,6 +3,7 @@ import { paidCheckoutSummary, purchaseAdsDestination, type CheckoutReceipt } fro
 export interface PaidPurchaseConfig {
   ga4Id?: string;
   adsId?: string;
+  leadLabel?: string;
   rrLabel?: string;
   photoLabel?: string;
 }

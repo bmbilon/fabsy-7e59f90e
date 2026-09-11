@@ -19,15 +19,18 @@ function subscribeToConsent(notify: () => void) {
   const onStorage = (event: StorageEvent) => {
     if (event.key === consent.GOOGLE_CONSENT_STORAGE_KEY ||
         event.key === consent.META_CONSENT_STORAGE_KEY ||
+        event.key === consent.OPENAI_ADS_CONSENT_STORAGE_KEY ||
         event.key === FABSY_FUNNEL_CONSENT_STORAGE_KEY || event.key === null) notify();
   };
   window.addEventListener(consent.GOOGLE_CONSENT_CHANGED, notify);
   if (consent.META_CONSENT_CHANGED) window.addEventListener(consent.META_CONSENT_CHANGED, notify);
+  window.addEventListener(consent.OPENAI_ADS_CONSENT_CHANGED, notify);
   window.addEventListener(FABSY_FUNNEL_CONSENT_CHANGED, notify);
   window.addEventListener('storage', onStorage);
   return () => {
     window.removeEventListener(consent.GOOGLE_CONSENT_CHANGED, notify);
     if (consent.META_CONSENT_CHANGED) window.removeEventListener(consent.META_CONSENT_CHANGED, notify);
+    window.removeEventListener(consent.OPENAI_ADS_CONSENT_CHANGED, notify);
     window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, notify);
     window.removeEventListener('storage', onStorage);
   };
@@ -46,6 +49,7 @@ export default function GoogleConsent() {
   // In legacy/offline adapters without a Meta state, mirror Google only for
   // compatibility. Production always has the separate Meta v1 record.
   const metaChoice = useSyncExternalStore(subscribeToConsent, getMetaChoice, serverChoice);
+  const openAIChoice = useSyncExternalStore(subscribeToConsent, consent.getOpenAIAdsConsentChoice, serverChoice);
   const fabsyChoice = useSyncExternalStore(subscribeToConsent, getFabsyFunnelConsentChoice, serverChoice);
   const [settingsLocation, setSettingsLocation] = useState<string | null>(null);
   const [dismissedInitial, setDismissedInitial] = useState(false);
@@ -59,11 +63,11 @@ export default function GoogleConsent() {
   const sensitive = /(?:^|\/)representation-consent(?:\/|$)/.test(basePath) || /^\/pay\//.test(basePath);
   // A manually opened panel does not follow navigation into a form or portal.
   const settingsOpen = settingsLocation === location.key;
-  const initialBanner = (googleChoice === 'unknown' || metaChoice === 'unknown' || fabsyChoice === 'unknown') &&
+  const initialBanner = (googleChoice === 'unknown' || metaChoice === 'unknown' || openAIChoice === 'unknown' || fabsyChoice === 'unknown') &&
     !dismissedInitial && Boolean(publicMeasurementPath(location.pathname));
   const panelOpen = settingsOpen || initialBanner;
   const compactInitialBanner = initialBanner && !settingsOpen;
-  const allChoices = [googleChoice, metaChoice, fabsyChoice];
+  const allChoices = [googleChoice, metaChoice, openAIChoice, fabsyChoice];
   const status = allChoices.every(choice => choice === 'accepted')
     ? copy.acceptedStatus
     : allChoices.every(choice => choice === 'declined')
@@ -97,6 +101,7 @@ export default function GoogleConsent() {
     setFabsyFunnelConsentChoice(next);
     consent.setGoogleConsentChoice(next);
     consent.setMetaConsentChoice?.(next);
+    consent.setOpenAIAdsConsentChoice(next);
     closeSettings();
   };
 
@@ -156,7 +161,7 @@ export default function GoogleConsent() {
             {copy.allow}
           </Button>
           <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-3 py-3 text-center text-sm text-slate-900" data-google-consent-choice="declined" onClick={() => choose('declined')}>
-            {googleChoice === 'accepted' || metaChoice === 'accepted' || fabsyChoice === 'accepted' ? copy.withdraw : copy.decline}
+            {googleChoice === 'accepted' || metaChoice === 'accepted' || openAIChoice === 'accepted' || fabsyChoice === 'accepted' ? copy.withdraw : copy.decline}
           </Button>
         </div>
         <p className="mt-3 text-xs leading-relaxed text-slate-600">{copy.changeHint}{' '}

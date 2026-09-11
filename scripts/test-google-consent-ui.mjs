@@ -64,16 +64,24 @@ try {
         build.onLoad({ filter: /.*/, namespace: 'offline-consent' }, () => ({ loader: 'js', contents: `
           export const GOOGLE_CONSENT_CHANGED = 'offline:google-consent-changed';
           export const GOOGLE_CONSENT_STORAGE_KEY = 'offline:google-consent';
+          export const OPENAI_ADS_CONSENT_CHANGED = 'offline:openai-ads-consent-changed';
+          export const OPENAI_ADS_CONSENT_STORAGE_KEY = 'offline:openai-ads-consent';
           let choice = 'unknown';
+          let openAIChoice = 'unknown';
           export const choices = [];
           export const getGoogleConsentChoice = () => choice;
+          export const getOpenAIAdsConsentChoice = () => openAIChoice;
           export function setGoogleConsentChoice(next) {
             if (!['accepted', 'declined'].includes(next)) throw Error('Invalid explicit choice');
             choice = next; choices.push(next); window.dispatchEvent(new Event(GOOGLE_CONSENT_CHANGED));
           }
-          export function reset(next = 'unknown') { choice = next; choices.length = 0; }
+          export function setOpenAIAdsConsentChoice(next) {
+            if (!['accepted', 'declined'].includes(next)) throw Error('Invalid explicit choice');
+            openAIChoice = next; window.dispatchEvent(new Event(OPENAI_ADS_CONSENT_CHANGED));
+          }
+          export function reset(next = 'unknown') { choice = next; openAIChoice = next; choices.length = 0; }
           export function externalChoice(next, event = GOOGLE_CONSENT_CHANGED) {
-            choice = next; window.dispatchEvent(event === 'storage' ? new StorageEvent('storage', { key: GOOGLE_CONSENT_STORAGE_KEY }) : new Event(event));
+            choice = next; openAIChoice = next; window.dispatchEvent(event === 'storage' ? new StorageEvent('storage', { key: GOOGLE_CONSENT_STORAGE_KEY }) : new Event(event));
           }
         ` }));
       },

@@ -2,11 +2,14 @@ import { useEffect } from 'react';
 import { GOOGLE_CONTEXT_READY, recheckGoogleMeasurementConsent } from '@/lib/googleMeasurement';
 import {
   clearTemporaryGoogleConsent, clearTemporaryMetaConsent,
-  googleConsentRemainingMilliseconds, metaConsentRemainingMilliseconds,
+  clearTemporaryOpenAIAdsConsent,
+  googleConsentRemainingMilliseconds, metaConsentRemainingMilliseconds, openAIAdsConsentRemainingMilliseconds,
   GOOGLE_CONSENT_CHANGED, GOOGLE_CONSENT_STORAGE_KEY,
   META_CONSENT_CHANGED, META_CONSENT_STORAGE_KEY,
+  OPENAI_ADS_CONSENT_CHANGED, OPENAI_ADS_CONSENT_STORAGE_KEY,
 } from '@/lib/googleConsent';
 import { recheckMetaMeasurementConsent } from '@/lib/metaMeasurement';
+import { recheckOpenAIAdsMeasurementConsent } from '@/lib/openAIAdsMeasurement';
 import {
   clearTemporaryFabsyFunnelConsent,
   fabsyFunnelConsentRemainingMilliseconds,
@@ -38,6 +41,7 @@ export default function GoogleMeasurementGuardian() {
       window.clearTimeout(expiryTimer);
       recheckGoogleMeasurementConsent();
       recheckMetaMeasurementConsent();
+      recheckOpenAIAdsMeasurementConsent();
       const fabsyChoice = getFabsyFunnelConsentChoice();
       const lostAcceptedGrant = previousFabsyChoice === 'accepted' && fabsyChoice === 'unknown';
       if (fabsyChoice === 'declined' ||
@@ -67,6 +71,7 @@ export default function GoogleMeasurementGuardian() {
       const remaining = [
         googleConsentRemainingMilliseconds(),
         metaConsentRemainingMilliseconds(),
+        openAIAdsConsentRemainingMilliseconds(),
         fabsyFunnelConsentRemainingMilliseconds(),
       ]
         .filter((value): value is number => value !== null)
@@ -77,6 +82,7 @@ export default function GoogleMeasurementGuardian() {
         expiryTimer = window.setTimeout(() => {
           window.dispatchEvent(new Event(GOOGLE_CONSENT_CHANGED));
           window.dispatchEvent(new Event(META_CONSENT_CHANGED));
+          window.dispatchEvent(new Event(OPENAI_ADS_CONSENT_CHANGED));
           window.dispatchEvent(new Event(FABSY_FUNNEL_CONSENT_CHANGED));
         }, Math.min(remaining + 1, 2_147_483_647));
       }
@@ -85,16 +91,19 @@ export default function GoogleMeasurementGuardian() {
       const googleChanged = event.key === GOOGLE_CONSENT_STORAGE_KEY || event.key === null;
       const metaChanged = event.key === META_CONSENT_STORAGE_KEY || event.key === null;
       const fabsyChanged = event.key === FABSY_FUNNEL_CONSENT_STORAGE_KEY || event.key === null;
-      if (!googleChanged && !metaChanged && !fabsyChanged) return;
+      const openAIChanged = event.key === OPENAI_ADS_CONSENT_STORAGE_KEY || event.key === null;
+      if (!googleChanged && !metaChanged && !openAIChanged && !fabsyChanged) return;
 
       // Clear every affected document-only fallback before dispatching either
       // event. localStorage.clear() reports a null key, so a synchronous
       // provider recheck must never see the other provider's stale choice.
       if (googleChanged) clearTemporaryGoogleConsent();
       if (metaChanged) clearTemporaryMetaConsent();
+      if (openAIChanged) clearTemporaryOpenAIAdsConsent();
       if (fabsyChanged) clearTemporaryFabsyFunnelConsent();
       if (googleChanged) window.dispatchEvent(new Event(GOOGLE_CONSENT_CHANGED));
       if (metaChanged) window.dispatchEvent(new Event(META_CONSENT_CHANGED));
+      if (openAIChanged) window.dispatchEvent(new Event(OPENAI_ADS_CONSENT_CHANGED));
       if (fabsyChanged) window.dispatchEvent(new Event(FABSY_FUNNEL_CONSENT_CHANGED));
     };
     const onVisible = () => {
@@ -105,6 +114,7 @@ export default function GoogleMeasurementGuardian() {
     window.addEventListener(GOOGLE_CONTEXT_READY, onProviderStateChanged);
     window.addEventListener(GOOGLE_CONSENT_CHANGED, onProviderStateChanged);
     window.addEventListener(META_CONSENT_CHANGED, onProviderStateChanged);
+    window.addEventListener(OPENAI_ADS_CONSENT_CHANGED, onProviderStateChanged);
     window.addEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onFabsyConsentChanged);
     window.addEventListener('storage', onStorage);
     const onPageShow = () => recheck(false, true);
@@ -116,6 +126,7 @@ export default function GoogleMeasurementGuardian() {
       window.removeEventListener(GOOGLE_CONTEXT_READY, onProviderStateChanged);
       window.removeEventListener(GOOGLE_CONSENT_CHANGED, onProviderStateChanged);
       window.removeEventListener(META_CONSENT_CHANGED, onProviderStateChanged);
+      window.removeEventListener(OPENAI_ADS_CONSENT_CHANGED, onProviderStateChanged);
       window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onFabsyConsentChanged);
       window.removeEventListener('storage', onStorage);
       window.removeEventListener('pageshow', onPageShow);

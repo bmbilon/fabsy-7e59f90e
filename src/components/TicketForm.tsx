@@ -29,6 +29,8 @@ import { captureReferralCode, captureReferralFromLocation, clearReferralAttribut
 import { useTicketIntakeDraft } from "@/hooks/useTicketIntakeDraft";
 import type { IntakeDraftResumeDelivery } from "@/lib/ticket/intakeDraft";
 import { currentMetaCheckoutContext } from "@/lib/metaMeasurement";
+import { getGoogleConsentChoice, getOpenAIAdsConsentChoice } from "@/lib/googleConsent";
+import { beginTicketUploadMeasurementHandoff } from "@/lib/ticketUploadMeasurement";
 
 export interface FormData {
   // Unified intake handoff
@@ -529,6 +531,10 @@ const TicketForm = ({
       setCaptureState("complete");
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
       toast({ title: "Your ticket is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
+      if ((getGoogleConsentChoice() === 'accepted' || getOpenAIAdsConsentChoice() === 'accepted') &&
+          beginTicketUploadMeasurementHandoff(window.location.pathname)) {
+        window.location.assign('/ticket-uploaded');
+      }
       return true;
     } catch (failure) {
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-failed"));

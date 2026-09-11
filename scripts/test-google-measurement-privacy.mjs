@@ -14,6 +14,7 @@ const enabledEnv = {
   VITE_GOOGLE_MEASUREMENT_ENABLED: "true",
   VITE_GA4_MEASUREMENT_ID: "G-TEST123456",
   VITE_GADS_ID: "AW-123456789",
+  VITE_GADS_CONVERSION_LABEL: "LEAD_TEST_1",
   VITE_GADS_PURCHASE_LABEL: "RR_TEST_1",
   VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL: "PHOTO_TEST_1",
 };
@@ -303,6 +304,7 @@ test("only exact production origins can select valid destinations", async () => 
     assert.deepEqual(plain(api.googleMeasurementConfig(enabledEnv, origin)), {
       ga4Id: enabledEnv.VITE_GA4_MEASUREMENT_ID,
       adsId: enabledEnv.VITE_GADS_ID,
+      leadLabel: enabledEnv.VITE_GADS_CONVERSION_LABEL,
       rrLabel: enabledEnv.VITE_GADS_PURCHASE_LABEL,
       photoLabel: enabledEnv.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL,
     });
@@ -320,6 +322,7 @@ test("reviewed public routes include locale and trailing-slash variants", async 
   assert.equal(api.publicMeasurementPath("/"), "/");
   assert.equal(api.publicMeasurementPath("/photo-radar/"), "/photo-radar");
   assert.equal(api.publicMeasurementPath("/rapid-resolution"), "/rapid-resolution");
+  assert.equal(api.publicMeasurementPath("/ticket-uploaded"), "/ticket-uploaded");
   for (const locale of ["en", "pa", "tl", "zh-hans", "zh-hant", "ar", "es", "hi"]) {
     assert.equal(api.publicMeasurementPath(`/${locale}/thank-you/`), `/${locale}/thank-you`);
     assert.equal(api.publicMeasurementPath(`/${locale}`), `/${locale}`);
@@ -556,6 +559,26 @@ test("legacy raw gtag calls cannot add acquisition, form, customer or arbitrary 
   browser.window.gtag("config", "G-UNREVIEWED", { page_location: "https://fabsy.ca/portal/SYNTHETIC" });
   assert.deepEqual(browser.commands(), before);
   assert.deepEqual(browser.networkAttempts, []);
+});
+
+test("the upload bridge queues only the reviewed lead destination and generic value", async () => {
+  const { api, browser } = await runtime(enabledEnv, { href: 'https://fabsy.ca/ticket-uploaded', referrer: '' });
+  api.initializeGoogleMeasurement();
+  browser.scripts[0].script.onload();
+  assert.equal(api.dispatchGoogleTicketUploadConversion(), true);
+  assert.deepEqual(browser.commands().at(-1), ['event', 'conversion', {
+    send_to: `${enabledEnv.VITE_GADS_ID}/${enabledEnv.VITE_GADS_CONVERSION_LABEL}`,
+    value: 50,
+    currency: 'CAD',
+    page_location: 'https://fabsy.ca/ticket-uploaded',
+    page_referrer: '',
+    page_title: 'Fabsy',
+    allow_google_signals: false,
+    allow_ad_personalization_signals: false,
+  }]);
+  assert.equal(api.dispatchGoogleMeasurement('conversion', {
+    send_to: `${enabledEnv.VITE_GADS_ID}/${enabledEnv.VITE_GADS_CONVERSION_LABEL}`,
+  }), false, 'the generic dispatcher cannot forge a lead conversion');
 });
 
 test("scoped dispatch rejects unknown destinations and overrides caller URL, referrer and title", async () => {
