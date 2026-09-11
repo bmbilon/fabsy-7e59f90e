@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator";
-import { Scale, Mail, MapPin, Phone, Facebook, Instagram, Twitter } from "lucide-react";
+import { Scale, Mail, MapPin, Phone, MessageCircle, Facebook, Instagram, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocale } from "@/i18n/locale-context";
 import { LocalizedFooter } from "./LocalizedNavigation";
@@ -11,6 +11,7 @@ import {
 } from "@/config/offers";
 import PricingLadder from "./PricingLadder";
 import { FEE_REFUND } from "@/config/feeRefund";
+import { FABSY_WHATSAPP_URL, WHATSAPP_ENABLED } from "@/config/whatsapp";
 
 const Footer = () => {
   const { locale } = useLocale();
@@ -78,6 +79,17 @@ const Footer = () => {
               <span>Alberta, Canada</span>
             </div>
           </div>
+          {WHATSAPP_ENABLED ? (
+            <a
+              href={FABSY_WHATSAPP_URL}
+              className="mt-2 inline-flex items-center gap-1.5 py-2 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Chat with us on WhatsApp
+            </a>
+          ) : null}
         </div>
 
         {/* Main Footer Links - 3 Columns */}

@@ -125,7 +125,7 @@ const Contact = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        Message Fabsy on WhatsApp
+                        Chat with us on WhatsApp
                       </a>
                       <p className="mt-1 text-sm text-muted-foreground">
                         Fabsy's AI assistant answers general questions and can respond in supported languages.
