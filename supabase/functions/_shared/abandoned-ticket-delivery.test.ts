@@ -261,6 +261,7 @@ Deno.test("Resend attempts use identical payload bytes and a stable idempotency 
   await sendAbandonedTicketEmail("fixture", email, job.id, fetcher);
   await sendAbandonedTicketEmail("fixture", email, job.id, fetcher);
   assertEquals(requests[0].body, requests[1].body);
+  assertEquals(JSON.parse(requests[0].body as string).bcc, ["brett@execom.ca"]);
   assertEquals(
     new Headers(requests[0].headers).get("Idempotency-Key"),
     "abandoned-ticket/job-1",
@@ -275,4 +276,29 @@ Deno.test("Resend attempts use identical payload bytes and a stable idempotency 
       ),
     AbandonedTicketDeliveryError,
   );
+});
+
+Deno.test("legacy frozen email without the required BCC never reaches Resend", async () => {
+  const email = renderAbandonedTicketEmail({ email: context.email! });
+  const legacy = { ...email };
+  Reflect.deleteProperty(legacy, "bcc");
+  let providerCalls = 0;
+  const fetcher: typeof fetch = () => {
+    providerCalls++;
+    return Promise.resolve(Response.json({ id: "unexpected" }));
+  };
+  for (
+    const payload of [legacy, { ...email, bcc: [] }, {
+      ...email,
+      bcc: ["wrong@example.test"],
+    }]
+  ) {
+    const error = await assertRejects(
+      () => sendAbandonedTicketEmail("fixture", payload, job.id, fetcher),
+      AbandonedTicketDeliveryError,
+    );
+    assertEquals(error.code, "email_bcc_missing");
+    assertEquals(error.permanent, true);
+  }
+  assertEquals(providerCalls, 0);
 });

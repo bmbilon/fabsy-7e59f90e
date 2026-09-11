@@ -16,6 +16,7 @@
 3. Customers who have paid before sending are excluded, including a payment associated with their completed submission.
 4. Duplicate workers and delivery retries must not result in duplicate follow-ups.
 5. Send from Fabsy at `hello@fabsy.ca`, with replies going to that address.
+   BCC every follow-up to `brett@execom.ca`, as requested in the subsequent update.
 6. Use `Hi FIRST NAME,` when known, otherwise `Hi there,`.
 7. Format the subject as `Alberta TICKET TYPE TICKET NUMBER Ticket Inquiry`, omitting unavailable parts. Recognizable speeding descriptions may be normalized to `Speeding`; never invent a type or number.
 8. Use the supplied English body linking to `https://fabsy.ca/submit-ticket`, followed by the supplied Fabsy signature. Provide HTML and plain text versions.

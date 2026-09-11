@@ -74,6 +74,14 @@ export async function sendAbandonedTicketEmail(
   id: string,
   fetcher: typeof fetch = fetch,
 ): Promise<string> {
+  // Do not silently send a legacy frozen payload without the required owner copy.
+  // Mutating a previously attempted payload would break provider idempotency.
+  if (
+    !Array.isArray(email.bcc) || email.bcc.length !== 1 ||
+    email.bcc[0] !== "brett@execom.ca"
+  ) {
+    throw new AbandonedTicketDeliveryError("email_bcc_missing", true);
+  }
   if (!apiKey) {
     throw new AbandonedTicketDeliveryError("email_configuration_missing");
   }

@@ -10,6 +10,7 @@ Deno.test("abandoned ticket email preserves the supplied English body, subject, 
   const email = renderAbandonedTicketEmail({ email: "ali@example.test", firstName: "Ali", ticketType: "Speeding", ticketNumber: "E24800635T" });
   equal(email.from, "Fabsy <hello@fabsy.ca>");
   equal(email.to, ["ali@example.test"]);
+  equal(email.bcc, ["brett@execom.ca"]);
   equal(email.reply_to, "hello@fabsy.ca");
   equal(email.subject, "Alberta Speeding E24800635T Ticket Inquiry");
   const exactBody = [
@@ -52,6 +53,7 @@ Deno.test("personalization escapes HTML, removes header controls, and preserves 
     ticketType: "Arrêt\r\nBcc: injected\u0000", ticketNumber: "É１２３\u2028\t\u0085",
   });
   equal(email.to, ["fixture@example.test"]);
+  equal(email.bcc, ["brett@execom.ca"]);
   equal(email.subject, "Alberta Arrêt Bcc: injected É１２３ Ticket Inquiry");
   check(!/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/.test(email.subject), "Unsafe controls in subject");
   check(email.html.includes("Zoë &lt;img src=x onerror=alert(1)&gt; &amp; &#039;李&#039;"), "Personalization was not HTML escaped");

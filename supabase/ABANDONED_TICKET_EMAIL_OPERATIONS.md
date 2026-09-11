@@ -8,6 +8,8 @@ The private outbox rechecks database eligibility and linked Stripe Checkout sess
 
 The HTML and plain text email use the supplied English body, public submission link, and Fabsy signature. Missing first names use `Hi there,`; missing subject fields are omitted. No ticket attachments or private resume capabilities are sent.
 
+Every follow-up BCCs `brett@execom.ca`. The provider adapter refuses any frozen payload missing that BCC; it must not alter a previously attempted payload or reuse its idempotency key with different recipients. No outbox entries existed when BCC was added.
+
 ## Deploy and activate
 
 Deploy only `process-abandoned-ticket-emails`, using the existing Supabase project `gcasbisxfrssonllpqrw`. It uses existing `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, and `IDR_CRON_SECRET` secrets. No new provider or credentials are needed.

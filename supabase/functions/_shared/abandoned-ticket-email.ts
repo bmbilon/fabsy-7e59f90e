@@ -3,6 +3,7 @@ import { getFabsyEmailSignature } from "./email-signature.ts";
 export interface AbandonedTicketEmail {
   from: string;
   to: string[];
+  bcc: string[];
   reply_to: string;
   subject: string;
   html: string;
@@ -64,6 +65,7 @@ export function renderAbandonedTicketEmail(input: {
   return {
     from: "Fabsy <hello@fabsy.ca>",
     to: [input.email.trim()],
+    bcc: ["brett@execom.ca"],
     reply_to: "hello@fabsy.ca",
     subject,
     text,
