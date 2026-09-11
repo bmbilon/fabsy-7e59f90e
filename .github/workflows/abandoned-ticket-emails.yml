@@ -1,0 +1,42 @@
+name: Abandoned ticket email checks
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/process-abandoned-ticket-emails/**'
+      - 'supabase/functions/_shared/abandoned-ticket-*.ts'
+      - 'supabase/functions/_shared/email-signature.ts'
+      - 'supabase/migrations/*abandoned_ticket_emails.sql'
+      - 'supabase/tests/abandoned-ticket-emails.*.sql'
+      - 'scripts/test-abandoned-ticket-emails-db.mjs'
+      - '.github/workflows/abandoned-ticket-emails.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/process-abandoned-ticket-emails/**'
+      - 'supabase/functions/_shared/abandoned-ticket-*.ts'
+      - 'supabase/functions/_shared/email-signature.ts'
+      - 'supabase/migrations/*abandoned_ticket_emails.sql'
+      - 'supabase/tests/abandoned-ticket-emails.*.sql'
+      - 'scripts/test-abandoned-ticket-emails-db.mjs'
+      - '.github/workflows/abandoned-ticket-emails.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verify email, payment checks and worker authorization without sending
+        run: deno test --no-config --no-npm --allow-env supabase/functions/_shared/abandoned-ticket-email.test.ts supabase/functions/_shared/abandoned-ticket-delivery.test.ts supabase/functions/process-abandoned-ticket-emails/index.test.ts
+      - name: Verify timing, payment races, retry leases and private access
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql
+          export ABANDONED_TICKET_TEST_PG_BIN="$(pg_config --bindir)"
+          node scripts/test-abandoned-ticket-emails-db.mjs

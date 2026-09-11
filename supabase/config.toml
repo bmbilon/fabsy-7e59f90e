@@ -1,5 +1,8 @@
 project_id = "gcasbisxfrssonllpqrw"
 
+[functions.process-abandoned-ticket-emails]
+verify_jwt = false
+
 [auth]
 site_url = "https://fabsy.ca"
 additional_redirect_urls = [
