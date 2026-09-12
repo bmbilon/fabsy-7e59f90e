@@ -128,8 +128,8 @@ const Contact = () => {
                         Chat with us on WhatsApp
                       </a>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Fabsy's AI assistant answers general questions and can respond in supported languages.
-                        For human help, use the contact form or email hello@fabsy.ca.
+                        Fabsy's AI assistant answers general questions. Our team can also reply in the
+                        same WhatsApp conversation when available.
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         Please use our secure ticket intake for documents or sensitive information.

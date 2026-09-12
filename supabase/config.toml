@@ -158,3 +158,11 @@ verify_jwt = false
 [functions.whatsapp-vapi-webhook]
 # Twilio signatures authenticate this public WhatsApp webhook.
 verify_jwt = false
+
+[functions.chatwoot-vapi-webhook]
+# Chatwoot's signed, timestamped AgentBot webhook authenticates this endpoint.
+verify_jwt = false
+
+[functions.chatwoot-vapi-worker]
+# Internal bearer secret; never a public client key. Recovery credentials live in Vault.
+verify_jwt = false
