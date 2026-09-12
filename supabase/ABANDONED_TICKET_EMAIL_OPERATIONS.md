@@ -44,7 +44,15 @@ where jobid = (select jobid from cron.job where jobname='fabsy-abandoned-ticket-
 order by start_time desc limit 5;
 ```
 
-Cron success proves dispatch, not email delivery: also inspect the worker HTTP response and the outbox `sent`/`provider_email_id` receipt. Provider acceptance is recorded as `sent`; delivery/bounce outcomes remain in Resend. There is no new admin dashboard or automatic incident notification for this feature.
+Cron success proves dispatch, not email delivery: also inspect the worker HTTP response and the outbox `sent`/`provider_email_id` receipt. Provider acceptance is recorded as `sent`; delivery/bounce outcomes remain in Resend. There is no automatic incident notification for this feature.
+
+### Staff queue status
+
+Apply `20260911230000_ticket_intake_follow_up_channels.sql` before publishing the admin page. It backfills existing confirmed outbox receipts into `ticket_intake_drafts.follow_up_email_sent_at` and synchronizes future receipts, without sending additional messages. Staff see **Email sent** and its timestamp in the incomplete-intake queue. The queue refreshes every minute while visible, on window focus, or through **Refresh queue**.
+
+**Record email sent** records a follow-up email sent outside this automation. **Phone call made** records an already completed call. These actions use the staff-only `record_ticket_intake_follow_up` RPC, keep the first timestamp and staff actor for each channel, and mark the generic disposition contacted so a pending automatic follow-up is suppressed. Email and phone badges can coexist. The actions perform no external communication. Dismissed/deleted/expired records cannot accept new manual contact records; old generic Contacted records keep their unknown-channel history.
+
+An automatic email receipt preserves staff disposition and has no fabricated staff actor. Pending/failed outbox jobs never create an Email sent badge. **Resume link** reports the separate secure-link delivery, not this follow-up email. Table access remains restricted to staff; outbox payloads remain private.
 
 Retries preserve the same frozen payload and Resend idempotency key, and stop after 23 hours from the first attempt. Investigate `failed` and `indeterminate` rows; never reset an indeterminate row or issue a new idempotency key without checking the provider receipt, since the first send may have succeeded. Outbox records are deleted with the existing intake retention process.
 
@@ -53,6 +61,8 @@ Retries preserve the same frozen payload and Resend idempotency key, and stop af
 ```sh
 deno test --no-config --no-npm --allow-env supabase/functions/_shared/abandoned-ticket-email.test.ts supabase/functions/_shared/abandoned-ticket-delivery.test.ts supabase/functions/process-abandoned-ticket-emails/index.test.ts
 node scripts/test-abandoned-ticket-emails-db.mjs
+node scripts/test-ticket-intake-follow-up-db.mjs
+node scripts/test-intake-follow-up-status.mjs
 ```
 
 The browser preview uses synthetic recipient details and is generated locally. Automated tests do not send customer email or charge Stripe.

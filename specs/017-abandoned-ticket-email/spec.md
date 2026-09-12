@@ -52,6 +52,14 @@
 
 Consistency was checked before implementation: every requirement has an implementation task and verification path; the timing and payment rules apply to delivery, while the renderer has no delivery or database side effects. No proposed template behavior conflicts with the supplied copy or the requested signature.
 
+## Intake follow-up visibility extension
+
+The staff queue must show `Email sent` when the follow-up provider has accepted a message, and allow staff to record `Phone call made` separately. Both channels retain their own timestamps. Existing generic `Contacted` history must not be relabeled as an email without evidence. Staff can record an email sent outside this automation; recording either channel does not send email or place a call.
+
+Resolved details: preserve the existing open/contacted/dismissed queue disposition, backfill the confirmed email receipts (including the previously authorized individual send), and keep dismissed/deleted rows protected from new manual contact records. A missing or failed provider receipt must never appear as sent. The resume-link delivery status is separate from follow-up email status.
+
+Implementation plan and checks: add staff-only, audited channel columns and an atomic recording RPC; synchronize accepted outbox receipts into the email timestamp; add independent badges/actions and refresh to the existing admin page; verify permissions, stale updates, idempotency and receipt backfill in isolated Postgres, then verify real-page interactions and mobile layout with synthetic fixtures. Apply this single migration before publishing the frontend through the existing guarded release workflow. Each UI label has a persisted source, and no UI recording action performs external communication.
+
 ## Implementation verification
 
 - Implemented the pure HTML/plain text renderer and reused the matching shared signature without modifying other email templates.
@@ -62,3 +70,5 @@ Consistency was checked before implementation: every requirement has an implemen
 - Production installation starts disabled. Activation follows the isolated database test suite and authenticated live scheduler probe; deployment status is recorded in the accompanying receipt.
 - Activated in production on September 11, 2026 at 11:33:38 a.m. America/Edmonton. The one-minute scheduler is active, the deployed eligibility function matches the tested source, and the migration is registered. At activation verification the outbox contained zero historical jobs.
 - The isolated Postgres suite passed with the actual upload confirmation RPC and concurrent worker claims, including the earlier-checkout and restarted-intake payment regressions identified in independent review.
+
+- Follow-up status extension: isolated database and real-page UI suites pass, including receipt backfill, first-channel audit preservation, stale updates, concurrent email/phone actions, duplicate clicks, and queued refreshes. TypeScript and existing admin deletion checks pass. Desktop/mobile synthetic browser verification has no overflow or runtime errors. The targeted channel migration is installed and registered; the earlier authorized send matches its backfilled email timestamp.

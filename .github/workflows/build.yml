@@ -46,6 +46,9 @@ jobs:
       - name: Validate admin ticket delete and restore
         run: node scripts/test-admin-ticket-deletion.mjs
 
+      - name: Validate intake email and phone follow-up records
+        run: node scripts/test-intake-follow-up-status.mjs
+
       - name: Validate persistent live chat and private document boundaries
         run: node --test scripts/test-live-chat.mjs
 
@@ -107,6 +110,19 @@ jobs:
 
       - name: Install Playwright browsers (Chromium)
         run: npx playwright install --with-deps chromium
+
+      - name: Verify intake follow-up statuses in Chromium with synthetic contacts
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4187 --strictPort > "${{ runner.temp }}/intake-follow-up-preview.log" 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:4187/admin/cases > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          node scripts/verify-intake-follow-up-browser.mjs
 
       - name: Verify private document navigation in Chromium
         run: node scripts/test-measurement-navigation-browser.mjs

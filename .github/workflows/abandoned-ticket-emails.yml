@@ -6,6 +6,9 @@ on:
       - 'supabase/functions/_shared/abandoned-ticket-*.ts'
       - 'supabase/functions/_shared/email-signature.ts'
       - 'supabase/migrations/*abandoned_ticket_emails.sql'
+      - 'supabase/migrations/*ticket_intake_follow_up_channels.sql'
+      - 'supabase/tests/ticket-intake-follow-up.*.sql'
+      - 'scripts/test-ticket-intake-follow-up-db.mjs'
       - 'supabase/tests/abandoned-ticket-emails.*.sql'
       - 'scripts/test-abandoned-ticket-emails-db.mjs'
       - '.github/workflows/abandoned-ticket-emails.yml'
@@ -16,6 +19,9 @@ on:
       - 'supabase/functions/_shared/abandoned-ticket-*.ts'
       - 'supabase/functions/_shared/email-signature.ts'
       - 'supabase/migrations/*abandoned_ticket_emails.sql'
+      - 'supabase/migrations/*ticket_intake_follow_up_channels.sql'
+      - 'supabase/tests/ticket-intake-follow-up.*.sql'
+      - 'scripts/test-ticket-intake-follow-up-db.mjs'
       - 'supabase/tests/abandoned-ticket-emails.*.sql'
       - 'scripts/test-abandoned-ticket-emails-db.mjs'
       - '.github/workflows/abandoned-ticket-emails.yml'
@@ -40,3 +46,4 @@ jobs:
           sudo apt-get install -y postgresql
           export ABANDONED_TICKET_TEST_PG_BIN="$(pg_config --bindir)"
           node scripts/test-abandoned-ticket-emails-db.mjs
+          node scripts/test-ticket-intake-follow-up-db.mjs

@@ -1,6 +1,6 @@
 import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureAutomationPanel } from "@/components/DisclosureConfirmations";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getIdrStaffRole } from "@/hooks/useIdrAuth";
-import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle, Mail, Phone, Ticket, DollarSign, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Search, FileText, Clock, CheckCircle2, AlertCircle, Mail, Phone, RefreshCw, Ticket, DollarSign, type LucideIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { User, Session } from '@supabase/supabase-js';
 import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
@@ -53,6 +53,10 @@ interface IntakeLead {
   staff_follow_up_status: "open" | "contacted" | "dismissed";
   staff_follow_up_updated_at: string | null;
   staff_follow_up_updated_by: string | null;
+  follow_up_email_sent_at: string | null;
+  follow_up_email_sent_by: string | null;
+  follow_up_phone_called_at: string | null;
+  follow_up_phone_called_by: string | null;
   expires_at: string;
   updated_at: string;
 }
@@ -72,7 +76,7 @@ function resumeDeliveryStatusText(lead: IntakeLead): string {
   if (lead.resume_delivery_failure_code === "rate_limited") {
     return "provider rate limited delivery";
   }
-  return `resume link ${lead.resume_delivery_status}${lead.resume_delivery_channel ? ` by ${lead.resume_delivery_channel}` : ""}`;
+  return `${lead.resume_delivery_status}${lead.resume_delivery_channel ? ` by ${lead.resume_delivery_channel}` : ""}`;
 }
 
 export default function AdminCaseManagement() {
@@ -82,6 +86,10 @@ export default function AdminCaseManagement() {
   const [intakeLeadError, setIntakeLeadError] = useState<string | null>(null);
   const [intakeLeadView, setIntakeLeadView] = useState<IntakeLeadView>("outstanding");
   const [updatingIntakeLeadIds, setUpdatingIntakeLeadIds] = useState<string[]>([]);
+  const intakeUpdatesInProgress = useRef(new Set<string>());
+  const dataRefreshInProgress = useRef(false);
+  const dataRefreshRequested = useRef(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [openingIntakeLeadId, setOpeningIntakeLeadId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -121,6 +129,19 @@ export default function AdminCaseManagement() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!userRole) return;
+    const refresh = () => {
+      if (document.visibilityState === "visible") void checkAuthAndFetchData();
+    };
+    const interval = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [userRole]);
+
   const activeSubmissions = submissions.filter(sub => !sub.deleted_at &&
     !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status));
   const viewSubmissions = ticketView === "deleted" ? submissions.filter(sub => sub.deleted_at) : activeSubmissions;
@@ -130,6 +151,13 @@ export default function AdminCaseManagement() {
       .some(value => value?.toLowerCase().includes(query)));
 
   const checkAuthAndFetchData = async () => {
+    if (dataRefreshInProgress.current || intakeUpdatesInProgress.current.size > 0) {
+      dataRefreshRequested.current = true;
+      return;
+    }
+    dataRefreshRequested.current = false;
+    dataRefreshInProgress.current = true;
+    setIsRefreshing(true);
     try {
       setIntakeLeadError(null);
       const roleData = await getIdrStaffRole();
@@ -159,7 +187,7 @@ export default function AdminCaseManagement() {
         `)
         .order('created_at', { ascending: false }),
         supabase.from('ticket_intake_drafts')
-          .select('id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,expires_at,updated_at')
+          .select('id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,follow_up_email_sent_at,follow_up_email_sent_by,follow_up_phone_called_at,follow_up_phone_called_by,expires_at,updated_at')
           .in('status', ['active', 'converted'])
           .order('updated_at', { ascending: false }),
       ]);
@@ -205,7 +233,16 @@ export default function AdminCaseManagement() {
         variant: "destructive",
       });
     } finally {
+      dataRefreshInProgress.current = false;
+      setIsRefreshing(false);
       setIsLoading(false);
+      flushRequestedDataRefresh();
+    }
+  };
+
+  const flushRequestedDataRefresh = () => {
+    if (dataRefreshRequested.current && !dataRefreshInProgress.current && intakeUpdatesInProgress.current.size === 0) {
+      void checkAuthAndFetchData();
     }
   };
 
@@ -231,6 +268,8 @@ export default function AdminCaseManagement() {
     lead: IntakeLead,
     status: IntakeLead["staff_follow_up_status"],
   ) => {
+    if (dataRefreshInProgress.current || intakeUpdatesInProgress.current.has(lead.id)) return;
+    intakeUpdatesInProgress.current.add(lead.id);
     setUpdatingIntakeLeadIds(current => current.includes(lead.id) ? current : [...current, lead.id]);
     try {
       const { data, error } = await supabase.rpc('set_ticket_intake_follow_up_status', {
@@ -261,7 +300,48 @@ export default function AdminCaseManagement() {
         variant: "destructive",
       });
     } finally {
+      intakeUpdatesInProgress.current.delete(lead.id);
       setUpdatingIntakeLeadIds(current => current.filter(id => id !== lead.id));
+      flushRequestedDataRefresh();
+    }
+  };
+
+  const recordIntakeFollowUp = async (lead: IntakeLead, channel: "email" | "phone") => {
+    if (dataRefreshInProgress.current || intakeUpdatesInProgress.current.has(lead.id)) return;
+    intakeUpdatesInProgress.current.add(lead.id);
+    setUpdatingIntakeLeadIds(current => [...current, lead.id]);
+    try {
+      const { data, error } = await supabase.rpc('record_ticket_intake_follow_up', {
+        p_id: lead.id,
+        p_expected_status: lead.staff_follow_up_status,
+        p_channel: channel,
+      });
+      const updated = data?.[0];
+      if (error || !updated) throw error || new Error('No follow-up record was returned.');
+      setIntakeLeads(current => current.map(candidate => candidate.id === lead.id
+        ? {
+            ...candidate,
+            staff_follow_up_status: updated.follow_up_status as IntakeLead["staff_follow_up_status"],
+            staff_follow_up_updated_at: updated.follow_up_updated_at,
+            staff_follow_up_updated_by: updated.follow_up_updated_by,
+            follow_up_email_sent_at: updated.follow_up_email_sent_at,
+            follow_up_email_sent_by: updated.follow_up_email_sent_by,
+            follow_up_phone_called_at: updated.follow_up_phone_called_at,
+            follow_up_phone_called_by: updated.follow_up_phone_called_by,
+          }
+        : candidate));
+      toast({ title: channel === "email" ? "Email marked sent" : "Phone call recorded" });
+    } catch (error) {
+      console.error('Incomplete ticket intake follow-up could not be recorded:', error);
+      toast({
+        title: "Follow-up not recorded",
+        description: "Refresh the queue and try again. Another staff update or an expired intake may have changed this lead.",
+        variant: "destructive",
+      });
+    } finally {
+      intakeUpdatesInProgress.current.delete(lead.id);
+      setUpdatingIntakeLeadIds(current => current.filter(id => id !== lead.id));
+      flushRequestedDataRefresh();
     }
   };
 
@@ -328,9 +408,15 @@ export default function AdminCaseManagement() {
                 <CardTitle>Incomplete ticket intakes</CardTitle>
                 <CardDescription>Customers who allowed intake follow-up but have not completed payment, including contacts saved before upload.</CardDescription>
               </div>
+              <div className="flex flex-wrap items-center gap-3">
               <Badge variant={intakeLeadError ? "destructive" : "outline"}>
                 {intakeLeadError ? "Queue unavailable" : `${outstandingIntakeLeads.length} outstanding`}
               </Badge>
+              <Button type="button" variant="outline" size="sm" disabled={isRefreshing || updatingIntakeLeadIds.length > 0} onClick={() => void checkAuthAndFetchData()}>
+                <RefreshCw className={`mr-2 h-4 w-4${isRefreshing ? " animate-spin" : ""}`} aria-hidden="true" />
+                Refresh queue
+              </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -356,13 +442,15 @@ export default function AdminCaseManagement() {
               </div>
               {visibleIntakeLeads.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">No {intakeLeadView} incomplete intakes.</p>
-              ) : visibleIntakeLeads.map(lead => <div key={lead.id} className="flex flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 md:flex-row md:items-center md:justify-between">
-                <div className="min-w-0 space-y-2">
+              ) : visibleIntakeLeads.map(lead => <div key={lead.id} className="flex flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 xl:flex-row xl:items-center xl:justify-between">
+                <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline">{lead.status === "converted" ? "Checkout started" : `Step ${lead.current_step} of 6`}</Badge>
-                    <Badge variant={lead.staff_follow_up_status === "contacted" ? "secondary" : "outline"}>
+                    {(lead.staff_follow_up_status === "dismissed" || (!lead.follow_up_email_sent_at && !lead.follow_up_phone_called_at)) ? <Badge variant={lead.staff_follow_up_status === "contacted" ? "secondary" : "outline"}>
                       {lead.staff_follow_up_status === "open" ? "Follow-up open" : lead.staff_follow_up_status === "contacted" ? "Contacted" : "Dismissed"}
-                    </Badge>
+                    </Badge> : null}
+                    {lead.follow_up_email_sent_at ? <Badge variant="secondary" className="gap-1"><Mail className="h-3 w-3" aria-hidden="true" />Email sent</Badge> : null}
+                    {lead.follow_up_phone_called_at ? <Badge variant="secondary" className="gap-1"><Phone className="h-3 w-3" aria-hidden="true" />Phone call made</Badge> : null}
                     <span className="text-xs text-muted-foreground">Updated {formatDistanceToNow(new Date(lead.updated_at), { addSuffix: true })}</span>
                   </div>
                   <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
@@ -370,8 +458,10 @@ export default function AdminCaseManagement() {
                     {lead.phone ? <a href={`tel:${lead.phone.replace(/[^+\d]/g, '')}`} className="flex items-center gap-2 font-medium text-primary underline underline-offset-4"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" />{lead.phone}</a> : null}
                   </div>
                   <p className="text-xs text-muted-foreground">Locale: {lead.preferred_locale} · {lead.ticket_uploaded_at ? `Ticket ${(lead.ticket_document_size_bytes / 1024).toFixed(0)} KB` : "Ticket not uploaded"} · Resume access expires {new Date(lead.expires_at).toLocaleDateString()}</p>
+                  {lead.follow_up_email_sent_at ? <p className="text-xs text-muted-foreground">Email sent <time dateTime={lead.follow_up_email_sent_at} title={new Date(lead.follow_up_email_sent_at).toLocaleString()}>{formatDistanceToNow(new Date(lead.follow_up_email_sent_at), { addSuffix: true })}</time></p> : null}
+                  {lead.follow_up_phone_called_at ? <p className="text-xs text-muted-foreground">Phone call made <time dateTime={lead.follow_up_phone_called_at} title={new Date(lead.follow_up_phone_called_at).toLocaleString()}>{formatDistanceToNow(new Date(lead.follow_up_phone_called_at), { addSuffix: true })}</time></p> : null}
                   <p className={`text-xs ${lead.resume_delivery_status === "failed" ? "font-medium text-destructive" : "text-muted-foreground"}`}>
-                    Follow-up status: {resumeDeliveryStatusText(lead)}
+                    Resume link: {resumeDeliveryStatusText(lead)}
                     {lead.resume_delivery_sent_at ? ` · sent ${formatDistanceToNow(new Date(lead.resume_delivery_sent_at), { addSuffix: true })}` : ""}
                     {lead.resume_delivery_attempt_count > 0 ? ` · ${lead.resume_delivery_attempt_count} provider attempt${lead.resume_delivery_attempt_count === 1 ? "" : "s"}` : ""}
                   </p>
@@ -379,18 +469,21 @@ export default function AdminCaseManagement() {
                     <p className="text-xs text-muted-foreground">Queue status updated {formatDistanceToNow(new Date(lead.staff_follow_up_updated_at), { addSuffix: true })}</p>
                   ) : null}
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 xl:max-w-[52%] xl:justify-end">
                   {lead.ticket_uploaded_at ? <Button type="button" variant="outline" disabled={openingIntakeLeadId !== null} aria-busy={openingIntakeLeadId === lead.id} onClick={() => void openLeadTicket(lead)}>
                     <FileText className="mr-2 h-4 w-4" aria-hidden="true" />{openingIntakeLeadId === lead.id ? "Opening…" : "Open ticket"}
                   </Button> : null}
                   {lead.converted_submission_id ? <Button type="button" onClick={() => navigate(`/admin/submissions/${lead.converted_submission_id}`)}>Open checkout case</Button> : null}
-                  {lead.staff_follow_up_status === "open" ? (
-                    <Button type="button" variant="secondary" disabled={Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "contacted")}>Mark contacted</Button>
+                  {!lead.deleted_at && lead.staff_follow_up_status !== "dismissed" && !lead.follow_up_email_sent_at ? (
+                    <Button type="button" variant="secondary" title="Record an email you have already sent" disabled={isRefreshing || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void recordIntakeFollowUp(lead, "email")}><Mail className="mr-2 h-4 w-4" aria-hidden="true" />Record email sent</Button>
+                  ) : null}
+                  {!lead.deleted_at && lead.staff_follow_up_status !== "dismissed" && !lead.follow_up_phone_called_at ? (
+                    <Button type="button" variant="secondary" title="Record a phone call you have already made" disabled={isRefreshing || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void recordIntakeFollowUp(lead, "phone")}><Phone className="mr-2 h-4 w-4" aria-hidden="true" />Phone call made</Button>
                   ) : null}
                   {lead.staff_follow_up_status !== "dismissed" ? (
-                    <Button type="button" variant="outline" disabled={Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "dismissed")}>Dismiss from queue</Button>
+                    <Button type="button" variant="outline" disabled={isRefreshing || Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "dismissed")}>Dismiss from queue</Button>
                   ) : (
-                    <Button type="button" variant="outline" disabled={Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "open")}>Reopen</Button>
+                    <Button type="button" variant="outline" disabled={isRefreshing || Boolean(lead.deleted_at) || updatingIntakeLeadIds.includes(lead.id)} onClick={() => void updateIntakeLeadStatus(lead, "open")}>Reopen</Button>
                   )}
                   <AdminTicketDelete id={lead.id} kind="intake" label={lead.email || lead.phone || "incomplete intake"} deleted={Boolean(lead.deleted_at)} onChanged={() => void checkAuthAndFetchData()} />
                 </div>

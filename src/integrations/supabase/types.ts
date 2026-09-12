@@ -305,6 +305,10 @@ export type Database = {
           staff_follow_up_status: string
           staff_follow_up_updated_at: string | null
           staff_follow_up_updated_by: string | null
+          follow_up_email_sent_at: string | null
+          follow_up_email_sent_by: string | null
+          follow_up_phone_called_at: string | null
+          follow_up_phone_called_by: string | null
           cleanup_claim_id: string | null
           cleanup_claimed_at: string | null
           cleanup_claim_expires_at: string | null
@@ -356,6 +360,10 @@ export type Database = {
           staff_follow_up_status?: string
           staff_follow_up_updated_at?: string | null
           staff_follow_up_updated_by?: string | null
+          follow_up_email_sent_at?: string | null
+          follow_up_email_sent_by?: string | null
+          follow_up_phone_called_at?: string | null
+          follow_up_phone_called_by?: string | null
           cleanup_claim_id?: string | null
           cleanup_claimed_at?: string | null
           cleanup_claim_expires_at?: string | null
@@ -407,6 +415,10 @@ export type Database = {
           staff_follow_up_status?: string
           staff_follow_up_updated_at?: string | null
           staff_follow_up_updated_by?: string | null
+          follow_up_email_sent_at?: string | null
+          follow_up_email_sent_by?: string | null
+          follow_up_phone_called_at?: string | null
+          follow_up_phone_called_by?: string | null
           cleanup_claim_id?: string | null
           cleanup_claimed_at?: string | null
           cleanup_claim_expires_at?: string | null
@@ -896,6 +908,19 @@ export type Database = {
           p_replacement_access_token_hash: string | null
         }
         Returns: Database["public"]["Tables"]["ticket_intake_drafts"]["Row"]
+      }
+      record_ticket_intake_follow_up: {
+        Args: { p_expected_status: string; p_id: string; p_channel: string }
+        Returns: {
+          draft_id: string
+          follow_up_status: string
+          follow_up_updated_at: string | null
+          follow_up_updated_by: string | null
+          follow_up_email_sent_at: string | null
+          follow_up_email_sent_by: string | null
+          follow_up_phone_called_at: string | null
+          follow_up_phone_called_by: string | null
+        }[]
       }
       set_ticket_intake_follow_up_status: {
         Args: { p_expected_status: string; p_id: string; p_status: string }
