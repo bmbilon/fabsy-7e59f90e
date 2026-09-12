@@ -1,0 +1,21 @@
+{
+  "recorded_at": "2026-09-12T00:04:28.946524+00:00",
+  "project_ref": "gcasbisxfrssonllpqrw",
+  "migration": "20260911230000_ticket_intake_follow_up_channels.sql",
+  "migration_sha256": "31d4c745785bf1dde6f403db7e98951954db3433cd7a7e836778bb49134078b7",
+  "migration_applied": true,
+  "migration_history_registered": true,
+  "existing_authorized_email_receipt_backfilled": true,
+  "email_timestamp_matches_provider_receipt": true,
+  "owner_bcc_verified": "brett@execom.ca",
+  "new_customer_emails_sent_during_status_rollout": 0,
+  "checks": [
+    "TypeScript app check passed",
+    "20 email/worker tests passed",
+    "Isolated outbox database tests passed",
+    "Isolated follow-up channels database tests passed",
+    "Real-page recording and deferred-refresh tests passed",
+    "Existing admin deletion UI regression passed",
+    "Desktop 1440px and mobile 390px browser fixtures passed"
+  ]
+}

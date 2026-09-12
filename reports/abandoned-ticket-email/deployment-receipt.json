@@ -1,0 +1,68 @@
+{
+  "contextBodyMd5": "4e062d8d757d218808be6f8f524f62a6",
+  "cron": {
+    "active": true,
+    "jobid": 8,
+    "jobname": "fabsy-abandoned-ticket-emails",
+    "schedule": "* * * * *"
+  },
+  "migrationRegistered": true,
+  "outboxCount": 0,
+  "recentRuns": [
+    {
+      "end_time": "2026-09-11T17:34:00.213253+00:00",
+      "return_message": "1 row",
+      "start_time": "2026-09-11T17:34:00.200139+00:00",
+      "status": "succeeded"
+    },
+    {
+      "end_time": "2026-09-11T17:33:00.034456+00:00",
+      "return_message": "1 row",
+      "start_time": "2026-09-11T17:33:00.028584+00:00",
+      "status": "succeeded"
+    },
+    {
+      "end_time": "2026-09-11T17:32:00.04312+00:00",
+      "return_message": "1 row",
+      "start_time": "2026-09-11T17:32:00.039185+00:00",
+      "status": "succeeded"
+    }
+  ],
+  "settings": {
+    "activated_at": "2026-09-11T17:33:38.75263+00:00",
+    "enabled": true,
+    "singleton": true
+  },
+  "contextMatchesTestedSource": true,
+  "verifiedAt": "2026-09-11T17:34:05.785Z",
+  "disabledCronProbe": {
+    "requestId": 5672,
+    "status": 200,
+    "ok": true,
+    "claimed": 0,
+    "sent": 0
+  },
+  "publicEndpointProbes": {
+    "get": 405,
+    "post": 401
+  },
+  "tests": {
+    "denoPassed": 19,
+    "databaseSuite": "passed including concurrent claims",
+    "previewWidths": [
+      900,
+      390
+    ]
+  },
+  "activeCronProbe": {
+    "requestId": 5682,
+    "status": 200,
+    "ok": true,
+    "claimed": 0,
+    "sent": 0,
+    "retry": 0,
+    "failed": 0,
+    "suppressed": 0,
+    "recordingFailed": 0
+  }
+}

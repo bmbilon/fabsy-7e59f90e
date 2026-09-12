@@ -1,0 +1,24 @@
+{
+  "disabledCronProbe": {
+    "requestId": 5672,
+    "status": 200,
+    "ok": true,
+    "claimed": 0,
+    "sent": 0
+  },
+  "publicEndpointProbes": {
+    "get": 405,
+    "post": 401
+  },
+  "activeCronProbe": {
+    "requestId": 5682,
+    "status": 200,
+    "ok": true,
+    "claimed": 0,
+    "sent": 0,
+    "retry": 0,
+    "failed": 0,
+    "suppressed": 0,
+    "recordingFailed": 0
+  }
+}

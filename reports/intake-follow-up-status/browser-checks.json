@@ -1,0 +1,22 @@
+{
+  "fixture_data_only": true,
+  "external_requests_forwarded": 0,
+  "recorded_actions": [
+    "email",
+    "phone"
+  ],
+  "blocked_external_origins": [
+    "https://fonts.googleapis.com"
+  ],
+  "checks": [
+    "Separate channel statuses, automatic email receipt, legacy Contacted, and resume-link distinction render",
+    "desktop: all statuses and actions render without horizontal page overflow",
+    "mobile: all statuses and actions render without horizontal page overflow",
+    "Manual contact recording updates both badges and survives queue refresh without sending or calling",
+    "No browser runtime errors; all external traffic intercepted"
+  ],
+  "screenshots": [
+    "reports/intake-follow-up-status/fixture-desktop.png",
+    "reports/intake-follow-up-status/fixture-mobile.png"
+  ]
+}

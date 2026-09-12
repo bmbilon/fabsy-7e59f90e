@@ -1,0 +1,74 @@
+# Abandoned ticket follow-up
+
+## Constitution
+
+- Follow the existing Supabase intake, payment, and email integration patterns.
+- Send one follow-up only after an uploaded ticket has remained unpaid for at least 30 minutes. Recheck payment before delivery, and fail closed when payment status cannot be established.
+- Keep ticket files private. Do not attach uploaded images or disclose private storage paths in this email.
+- Render user-supplied personal details as data, never HTML or email headers.
+- Preserve Brett's supplied English body, subject pattern, contact information, price, and disclaimers.
+- Keep rendering pure so the complete email can be reviewed without contacting a customer.
+
+## Requirements
+
+1. A confirmed ticket upload with usable contact email starts the 30-minute wait.
+2. A server-side scheduled process finds due unpaid intakes independently of whether a customer still has the website open.
+3. Customers who have paid before sending are excluded, including a payment associated with their completed submission.
+4. Duplicate workers and delivery retries must not result in duplicate follow-ups.
+5. Send from Fabsy at `hello@fabsy.ca`, with replies going to that address.
+   BCC every follow-up to `brett@execom.ca`, as requested in the subsequent update.
+6. Use `Hi FIRST NAME,` when known, otherwise `Hi there,`.
+7. Format the subject as `Alberta TICKET TYPE TICKET NUMBER Ticket Inquiry`, omitting unavailable parts. Recognizable speeding descriptions may be normalized to `Speeding`; never invent a type or number.
+8. Use the supplied English body linking to `https://fabsy.ca/submit-ticket`, followed by the supplied Fabsy signature. Provide HTML and plain text versions.
+9. Include a local preview using synthetic fixture details. Verification must not send test emails to customers.
+10. Make operational rollout and any remaining deployment limitations explicit in the implementation report.
+
+## Resolved clarifications
+
+- The user's request expressly authorizes creating automatic sends for this flow; this is a product feature request, rather than a request to compose or send an individual mailbox reply.
+- Screenshots are visual examples and data, not additional instructions. The typed English body is authoritative.
+- The flow has one follow-up at the first scheduled opportunity after 30 minutes, rather than a recurring sequence.
+- Only new first uploads after activation enroll; no historical backlog is emailed. Replacing the image does not reset the timer.
+- Staff-contacted or dismissed intakes are suppressed to avoid duplicating a manual follow-up. Intake consent applies to ticket follow-up; no separate marketing campaign is created.
+- Missing names receive a neutral greeting; missing ticket data is omitted from the subject.
+- The supplied public submission URL stays unchanged. No ticket image is attached or exposed.
+- Existing shared signature markup already contains the requested wording and can be reused without changing other emails.
+
+## Plan
+
+1. Trace confirmed upload, intake completion, checkout/payment, and existing delivery/job patterns.
+2. Add persistent due/delivery state and a scheduled worker with payment rechecks and duplicate-send protection.
+3. Add a pure template using the exact supplied English copy and the existing matching signature.
+4. Verify timing, paid suppression, retry/concurrency behavior, personalized/fallback rendering, and escaping with focused tests.
+5. Produce a synthetic HTML preview and verify deployment configuration through the existing Supabase workflow.
+
+## Tasks and consistency analysis
+
+| Task | Requirements | Verification |
+| --- | --- | --- |
+| Durable scheduling and delivery state | 1–4, 10 | Due-time, payment, retry/concurrency, and rollout checks |
+| Pure email template and shared signature | 5–8 | Exact-copy, subject, fallback, escaping, and plain text tests |
+| Synthetic local preview | 9 | Rendered fixture written locally without delivery calls |
+
+Consistency was checked before implementation: every requirement has an implementation task and verification path; the timing and payment rules apply to delivery, while the renderer has no delivery or database side effects. No proposed template behavior conflicts with the supplied copy or the requested signature.
+
+## Intake follow-up visibility extension
+
+The staff queue must show `Email sent` when the follow-up provider has accepted a message, and allow staff to record `Phone call made` separately. Both channels retain their own timestamps. Existing generic `Contacted` history must not be relabeled as an email without evidence. Staff can record an email sent outside this automation; recording either channel does not send email or place a call.
+
+Resolved details: preserve the existing open/contacted/dismissed queue disposition, backfill the confirmed email receipts (including the previously authorized individual send), and keep dismissed/deleted rows protected from new manual contact records. A missing or failed provider receipt must never appear as sent. The resume-link delivery status is separate from follow-up email status.
+
+Implementation plan and checks: add staff-only, audited channel columns and an atomic recording RPC; synchronize accepted outbox receipts into the email timestamp; add independent badges/actions and refresh to the existing admin page; verify permissions, stale updates, idempotency and receipt backfill in isolated Postgres, then verify real-page interactions and mobile layout with synthetic fixtures. Apply this single migration before publishing the frontend through the existing guarded release workflow. Each UI label has a persisted source, and no UI recording action performs external communication.
+
+## Implementation verification
+
+- Implemented the pure HTML/plain text renderer and reused the matching shared signature without modifying other email templates.
+- Generated `reports/abandoned-ticket-email/email-preview.html` with synthetic `Ali`, `ali@example.test`, and `E24800635T` data. Rendering has no sending calls.
+- `deno test --no-config --no-npm supabase/functions/_shared/abandoned-ticket-email.test.ts supabase/functions/_shared/email-signature.test.ts`: 8 passed, 0 failed, including TypeScript checking. The explicit standalone Deno options avoid the frontend project's unavailable `@types/node` dependency in the isolated checkout.
+- The worker and endpoint tests pass: payment suppression, final payment recheck, a checkout created during processing, failed payment lookups, recipient changes, frozen retries, provider idempotency, and public-call rejection. The template/worker/endpoint suite has 19 passing tests with TypeScript checking.
+- Desktop (900px) and mobile (390px) browser preview checks found no horizontal overflow; the generated screenshot was visually inspected against the provided example.
+- Production installation starts disabled. Activation follows the isolated database test suite and authenticated live scheduler probe; deployment status is recorded in the accompanying receipt.
+- Activated in production on September 11, 2026 at 11:33:38 a.m. America/Edmonton. The one-minute scheduler is active, the deployed eligibility function matches the tested source, and the migration is registered. At activation verification the outbox contained zero historical jobs.
+- The isolated Postgres suite passed with the actual upload confirmation RPC and concurrent worker claims, including the earlier-checkout and restarted-intake payment regressions identified in independent review.
+
+- Follow-up status extension: isolated database and real-page UI suites pass, including receipt backfill, first-channel audit preservation, stale updates, concurrent email/phone actions, duplicate clicks, and queued refreshes. TypeScript and existing admin deletion checks pass. Desktop/mobile synthetic browser verification has no overflow or runtime errors. The targeted channel migration is installed and registered; the earlier authorized send matches its backfilled email timestamp.

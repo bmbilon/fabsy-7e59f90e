@@ -1,0 +1,13 @@
+{
+  "verifiedAt": "2026-09-11T19:13:03.603Z",
+  "function": "process-abandoned-ticket-emails",
+  "version": 2,
+  "updatedAt": 1789153952935,
+  "status": "ACTIVE",
+  "bcc": [
+    "brett@execom.ca"
+  ],
+  "testsPassed": 20,
+  "preDeploymentOutboxCount": 0,
+  "legacyIntakeFollowupSent": false
+}
