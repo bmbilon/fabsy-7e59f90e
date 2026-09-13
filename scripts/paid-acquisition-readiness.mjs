@@ -37,8 +37,12 @@ const REVIEWED_PROVIDER_DESTINATIONS = Object.freeze({
       'rr-pilot-calgary-202608': Object.freeze(['{adgroupid}_{creative}']),
       'rr-pilot-edmonton-202608': Object.freeze(['{adgroupid}_{creative}']),
       'rr-pilot-alberta-202608': Object.freeze(['{adgroupid}_{creative}']),
+      rr_google_profit_20260913: Object.freeze(['en_rsa_v1']),
     }),
     term: '{keyword}',
+    campaignTerms: Object.freeze({
+      rr_google_profit_20260913: 'traffic_ticket_defense',
+    }),
   }),
 });
 const REQUIRED_GATES = Object.freeze(Array.from({ length: 21 }, (_, index) => index + 1));
@@ -219,8 +223,9 @@ function reviewedProviderDestination(value, platform) {
   if (!allowedContent || !allowedContent.includes(content)) {
     return { error: `must use a reviewed ${platform} utm_campaign/utm_content pair` };
   }
-  if (contract.term !== null && values.get('utm_term') !== contract.term) {
-    return { error: `must use the reviewed ${platform} utm_term=${contract.term}` };
+  const reviewedTerm = contract.campaignTerms?.[campaign] ?? contract.term;
+  if (reviewedTerm !== null && values.get('utm_term') !== reviewedTerm) {
+    return { error: `must use the reviewed ${platform} utm_term=${reviewedTerm}` };
   }
   return { url, pair: `${campaign}\0${content}` };
 }

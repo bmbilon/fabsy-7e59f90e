@@ -42,6 +42,28 @@ test('paid URL reduction keeps campaign labels but never returns raw click IDs o
   assert.equal(unknownLabels.utmContent, '');
 });
 
+test('reviewed Google relaunch and multilingual labels remain attributable', async () => {
+  const module = { exports: {} };
+  runInNewContext(await bundle('src/lib/preconsentMeasurementCore.ts'), { module, URL });
+  const core = module.exports;
+
+  const english = core.preconsentMetricPayload(new URL(
+    'https://fabsy.ca/rapid-resolution?utm_source=google&utm_medium=cpc&utm_campaign=rr_google_profit_20260913&utm_content=en_rsa_v1&utm_term=traffic_ticket_defense&gclid=SYNTHETIC',
+  ), 'paid_landing');
+  assert.deepEqual(JSON.parse(JSON.stringify(english)), {
+    eventName: 'paid_landing', pageKey: 'rapid_resolution', locale: 'en',
+    utmSource: 'google', utmMedium: 'cpc', utmCampaign: 'rr_google_profit_20260913',
+    utmContent: 'en_rsa_v1', clickIdKind: 'gclid',
+  });
+
+  const punjabi = core.preconsentMetricPayload(new URL(
+    'https://fabsy.ca/pa/rapid-resolution?utm_source=google&utm_medium=cpc&utm_campaign=rr_ab_multilingual_20260906&utm_content=pa_rsa_v1',
+  ), 'paid_landing');
+  assert.equal(punjabi.utmCampaign, 'rr_ab_multilingual_20260906');
+  assert.equal(punjabi.utmContent, 'pa_rsa_v1');
+  assert.equal(punjabi.locale, 'pa');
+});
+
 test('same-origin endpoint accepts only bounded identifier-free payloads and respects privacy signals', async () => {
   const code = await bundle('functions/api/preconsent-measurement.ts');
   const calls = [];
@@ -136,6 +158,7 @@ test('browser consent action sends a reduced payload without storage or raw clic
 
 test('database and staff report retain aggregate counters only', async () => {
   const migration = await fs.readFile(path.join(root, 'supabase/migrations/20260913130000_preconsent_paid_measurement.sql'), 'utf8');
+  const campaignMigration = await fs.readFile(path.join(root, 'supabase/migrations/20260913170000_preconsent_campaign_labels.sql'), 'utf8');
   const reportEdge = await fs.readFile(path.join(root, 'supabase/functions/paid-funnel-report/index.ts'), 'utf8');
   assert.match(migration, /create table analytics_private\.preconsent_metrics_hourly/);
   assert.match(migration, /date_trunc\('hour', clock_timestamp\(\)\)/);
@@ -146,4 +169,9 @@ test('database and staff report retain aggregate counters only', async () => {
   assert.doesNotMatch(tableDefinition, /\b(?:session_id|visitor_id|user_agent|ip_address|referrer|raw_click_id)\b/i);
   assert.match(reportEdge, /preconsent_measurement_report/);
   assert.match(reportEdge, /preconsent: preconsentResult\.data/);
+  assert.match(campaignMigration, /create or replace function public\.record_preconsent_metric/);
+  assert.match(campaignMigration, /rr_google_profit_20260913/);
+  assert.match(campaignMigration, /rr_ab_multilingual_20260906/);
+  assert.match(campaignMigration, /en_rsa_v1/);
+  assert.match(campaignMigration, /pa_rsa_v1/);
 });

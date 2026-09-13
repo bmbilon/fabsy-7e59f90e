@@ -34,11 +34,32 @@ const paidSources = new Set(['meta', 'facebook', 'instagram', 'google', 'openai'
 const paidMedia = new Set(['cpc', 'ppc', 'paid', 'paid_social', 'paid-social']);
 const approvedCampaigns = new Set([
   'rr_ab_en_creative_20260831',
+  'rr_ab_multilingual_20260906',
+  'rr_google_profit_20260913',
   'rr-pilot-calgary-202608',
   'rr-pilot-edmonton-202608',
   'rr-pilot-alberta-202608',
 ]);
-const approvedContents = new Set(['rr_relief_v1', 'rr_flat_fee_v1', 'rr_client_control_v1']);
+const approvedContents = new Set([
+  'rr_relief_v1',
+  'rr_flat_fee_v1',
+  'rr_client_control_v1',
+  'en_rsa_v1',
+  'pa_rsa_v1',
+  'tl_rsa_v1',
+  'zh_hans_rsa_v1',
+  'zh_hant_rsa_v1',
+  'ar_rsa_v1',
+  'es_rsa_v1',
+  'hi_rsa_v1',
+  'pa_rr_v1',
+  'tl_rr_v1',
+  'zh_hans_rr_v1',
+  'zh_hant_rr_v1',
+  'ar_rr_v1',
+  'es_rr_v1',
+  'hi_rr_v1',
+]);
 
 function singleSafeValue(url: URL, key: string, clickId = false): string | null {
   const values = url.searchParams.getAll(key);
