@@ -187,6 +187,17 @@ const PrivacyPolicy = () => {
               days; clearing browser storage or using another browser may remove a choice.
             </p>
             <p className="mt-4">
+              Before that optional measurement choice, Fabsy counts paid-ad landing requests and
+              explicit allow, decline or dismiss actions using hourly aggregate counters on our
+              Cloudflare hosting and Supabase backend. These counters contain only a fixed public
+              page category, language, campaign labels and the kind of advertising click identifier,
+              when present. They do not store a visitor or session identifier, the raw click
+              identifier, full URL, referrer, IP address, user agent, form data or contact details,
+              and they do not write a cookie or browser-storage record. The counts are actions rather
+              than unique people or sessions, respect browser Do Not Track and Global Privacy Control
+              signals, and are retained for up to 400 days for delivery and consent diagnostics.
+            </p>
+            <p className="mt-4">
               With your permission, Fabsy records a limited sequence of named funnel steps: an
               approved Rapid Resolution landing view, primary-button or phone click, intake start,
               ticket-upload completion, saved lead, completed intake step, checkout start or

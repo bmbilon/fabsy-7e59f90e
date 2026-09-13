@@ -79,6 +79,35 @@ interface BehaviorStepTotal {
   completed_sessions: number;
 }
 
+interface PreconsentCampaignTotal {
+  source: string;
+  medium: string;
+  campaign: string;
+  content: string;
+  locale: string;
+  landing_requests: number;
+  consent_accepted: number;
+  consent_declined: number;
+  consent_dismissed: number;
+}
+
+interface PreconsentReport {
+  generated_at: string;
+  since: string;
+  until: string;
+  aggregate_only: true;
+  request_counts_not_people_or_sessions: true;
+  events: Array<{ event_name: 'paid_landing' | 'consent_accepted' | 'consent_declined' | 'consent_dismissed'; event_count: number }>;
+  campaigns: PreconsentCampaignTotal[];
+  daily: Array<{
+    day: string;
+    landing_requests: number;
+    consent_accepted: number;
+    consent_declined: number;
+    consent_dismissed: number;
+  }>;
+}
+
 interface FunnelReport {
   generated_at: string;
   since: string;
@@ -91,6 +120,7 @@ interface FunnelReport {
     campaigns: BehaviorCampaignTotal[];
     steps: BehaviorStepTotal[];
   };
+  preconsent?: PreconsentReport;
   financials?: {
     scope: 'all_customer_purchases_from_signed_stripe_webhooks';
     amount_basis: 'gross_customer_cash_including_tax';
@@ -178,6 +208,30 @@ function normalizeReport(value: FunnelReport): FunnelReport {
             completed_sessions: numberValue(step.completed_sessions),
           })) : [],
     } : undefined,
+    preconsent: value.preconsent ? {
+      ...value.preconsent,
+      events: Array.isArray(value.preconsent.events)
+        ? value.preconsent.events.map(event => ({ ...event, event_count: numberValue(event.event_count) }))
+        : [],
+      campaigns: Array.isArray(value.preconsent.campaigns)
+        ? value.preconsent.campaigns.map(campaign => ({
+            ...campaign,
+            landing_requests: numberValue(campaign.landing_requests),
+            consent_accepted: numberValue(campaign.consent_accepted),
+            consent_declined: numberValue(campaign.consent_declined),
+            consent_dismissed: numberValue(campaign.consent_dismissed),
+          }))
+        : [],
+      daily: Array.isArray(value.preconsent.daily)
+        ? value.preconsent.daily.map(day => ({
+            ...day,
+            landing_requests: numberValue(day.landing_requests),
+            consent_accepted: numberValue(day.consent_accepted),
+            consent_declined: numberValue(day.consent_declined),
+            consent_dismissed: numberValue(day.consent_dismissed),
+          }))
+        : [],
+    } : undefined,
     financials: value.financials ? {
       ...value.financials,
       purchase_count: numberValue(value.financials.purchase_count),
@@ -246,6 +300,9 @@ export default function AdminPaidFunnel() {
   const eventSessions = useMemo(() => new Map(
     (report?.events || []).map(event => [event.event_name, event.sessions]),
   ), [report]);
+  const preconsentEvents = useMemo(() => new Map(
+    (report?.preconsent?.events || []).map(event => [event.event_name, event.event_count]),
+  ), [report]);
   const landingSessions = eventSessions.get('landing_view') || 0;
   const phoneSessions = eventSessions.get('phone_click') || 0;
   const canceledSessions = eventSessions.get('checkout_canceled') || 0;
@@ -273,7 +330,41 @@ export default function AdminPaidFunnel() {
       <main className="container mx-auto space-y-6 px-4 py-8">
         <Card className="border-amber-300/70 bg-amber-50/40">
           <CardContent className="pt-6 text-sm leading-relaxed text-slate-700">
-            These counts include only visitors who explicitly allowed Fabsy funnel measurement. Reconcile them with Meta and Google clicks, spend, and consent acceptance before calculating conversion rates or changing budget.
+            The aggregate request counts below begin before optional browser measurement. The session funnel includes only visitors who explicitly allowed Fabsy funnel measurement. Reconcile them with Meta and Google clicks, spend, and consent acceptance before calculating conversion rates or changing budget.
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Paid landing visibility before consent</CardTitle>
+            <CardDescription>
+              Hourly aggregate request and consent-choice counts from Cloudflare. These are actions, not unique people or sessions, and contain no IP, user agent, raw click ID, URL or form data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ['paid_landing', 'Paid landing requests'],
+                ['consent_accepted', 'Accepted choices'],
+                ['consent_declined', 'Declined choices'],
+                ['consent_dismissed', 'Dismissed choices'],
+              ].map(([event, label]) => <div key={event} className="rounded-lg border p-4">
+                <div className="text-sm text-muted-foreground">{label}</div>
+                <div className="mt-1 text-2xl font-bold">{loading ? '…' : preconsentEvents.get(event as 'paid_landing') || 0}</div>
+              </div>)}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[820px] text-left text-sm">
+                <thead className="border-b text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-3 py-3">Source / campaign / content</th><th className="px-3 py-3">Locale</th><th className="px-3 py-3">Landing requests</th><th className="px-3 py-3">Accepted</th><th className="px-3 py-3">Declined</th><th className="px-3 py-3">Dismissed</th></tr></thead>
+                <tbody>
+                  {(report?.preconsent?.campaigns || []).map((campaign, index) => <tr key={`${campaign.source}:${campaign.campaign}:${campaign.content}:${campaign.locale}:${index}`} className="border-b last:border-0">
+                    <td className="px-3 py-3"><div className="font-medium">{campaign.source} · {campaign.campaign}</div><div className="text-xs text-muted-foreground">{campaign.medium} · {campaign.content}</div></td>
+                    <td className="px-3 py-3">{campaign.locale}</td><td className="px-3 py-3">{campaign.landing_requests}</td><td className="px-3 py-3">{campaign.consent_accepted}</td><td className="px-3 py-3">{campaign.consent_declined}</td><td className="px-3 py-3">{campaign.consent_dismissed}</td>
+                  </tr>)}
+                  {!loading && !report?.preconsent?.campaigns.length ? <tr><td colSpan={6} className="px-3 py-10 text-center text-muted-foreground">No paid landing requests in this window.</td></tr> : null}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
 

@@ -3,6 +3,15 @@
 import { localizePath, splitLocalePath } from '../src/i18n/locale-policy.mjs';
 import localeRegistry from '../src/i18n/locales.json';
 import seoRoutePolicies from '../src/config/seoRoutePolicies.json';
+import { preconsentMetricPayload } from '../src/lib/preconsentMeasurementCore';
+import {
+  recordAggregatePreconsentMetric,
+  type PreconsentMeasurementEnv,
+} from './_shared/preconsent-measurement';
+
+interface Env extends PreconsentMeasurementEnv {
+  ASSETS: Fetcher;
+}
 
 const LOCALIZED_SNAPSHOT_PATHS = new Set(localeRegistry.phase1Routes.filter(path => !['/terms-of-purchase', '/ticket-form', '/thank-you'].includes(path)));
 
@@ -72,7 +81,7 @@ function snapshotPath(pathname: string): string | null {
   return `/prerendered${clean}/`;
 }
 
-const servePage: PagesFunction = async (context) => {
+const servePage: PagesFunction<Env> = async (context) => {
   const { request, env, next } = context;
   const requestUrl = new URL(request.url);
   const pathname = requestUrl.pathname === "/" ? "/" : requestUrl.pathname.replace(/\/+$/, "");
@@ -180,8 +189,27 @@ const servePage: PagesFunction = async (context) => {
 
 // Applies to SPA, crawler, redirects and private documents. An authorization or
 // checkout URL must never become the next document's immutable HTTP referrer.
-export const onRequest: PagesFunction = async (context) => {
+export const onRequest: PagesFunction<Env> = async (context) => {
+  const requestUrl = new URL(context.request.url);
+  const userAgent = context.request.headers.get('User-Agent') || '';
+  const documentRequest = context.request.method === 'GET' &&
+    (context.request.headers.get('Sec-Fetch-Dest') === 'document' ||
+      context.request.headers.get('Accept')?.includes('text/html'));
+  const preconsentMetric = documentRequest &&
+    ['fabsy.ca', 'www.fabsy.ca'].includes(requestUrl.hostname) &&
+    context.request.headers.get('DNT') !== '1' &&
+    context.request.headers.get('Sec-GPC') !== '1' &&
+    !BOT.test(userAgent)
+    ? preconsentMetricPayload(requestUrl, 'paid_landing')
+    : null;
   const response = await servePage(context);
+  if (preconsentMetric && response.ok && response.headers.get('Content-Type')?.includes('text/html')) {
+    context.waitUntil(
+      recordAggregatePreconsentMetric(context.env, preconsentMetric)
+        .then(() => undefined)
+        .catch(() => undefined),
+    );
+  }
   const headers = new Headers(response.headers);
   headers.set('Referrer-Policy', 'no-referrer');
   return new Response(response.body, {

@@ -14,6 +14,7 @@ import {
   getFabsyFunnelConsentChoice,
   setFabsyFunnelConsentChoice,
 } from '@/lib/fabsyFunnelConsent';
+import { recordPreconsentMetric } from '@/lib/preconsentMeasurement';
 
 function subscribeToConsent(notify: () => void) {
   const onStorage = (event: StorageEvent) => {
@@ -97,7 +98,13 @@ export default function GoogleConsent() {
     if (settingsOpen) settingsButton.current?.focus({ preventScroll: true });
   };
 
+  const dismissInitialChoice = () => {
+    if (initialBanner && fabsyChoice === 'unknown') void recordPreconsentMetric('consent_dismissed');
+    closeSettings();
+  };
+
   const choose = (next: 'accepted' | 'declined') => {
+    if (fabsyChoice === 'unknown') void recordPreconsentMetric(`consent_${next}`);
     setFabsyFunnelConsentChoice(next);
     consent.setGoogleConsentChoice(next);
     consent.setMetaConsentChoice?.(next);
@@ -127,7 +134,8 @@ export default function GoogleConsent() {
       onKeyDown={event => {
         if (event.key === 'Escape') {
           event.preventDefault();
-          closeSettings();
+          if (compactInitialBanner) dismissInitialChoice();
+          else closeSettings();
         }
       }}>
       {compactInitialBanner ? <div className="grid max-h-[calc(6.5rem-1.25rem)] grid-rows-[minmax(0,1fr)_auto] gap-2 md:max-h-[calc(25vh-1.5rem)]">
@@ -143,7 +151,7 @@ export default function GoogleConsent() {
           <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal border-slate-400 px-2 py-1.5 text-center text-xs leading-4 text-slate-900" data-google-consent-choice="declined" onClick={() => choose('declined')}>
             {copy.decline}
           </Button>
-          <Button type="button" variant="ghost" size="icon" className="min-h-11 min-w-11 shrink-0" aria-label={copy.close} onClick={closeSettings}>
+          <Button type="button" variant="ghost" size="icon" className="min-h-11 min-w-11 shrink-0" aria-label={copy.close} onClick={dismissInitialChoice}>
             <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
