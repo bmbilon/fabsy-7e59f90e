@@ -68,14 +68,20 @@ serve(async request => {
     const until = new Date();
     const since = new Date(until.getTime() - days * 24 * 60 * 60 * 1000);
     const reportWindow = { p_since: since.toISOString(), p_until: until.toISOString() };
-    const [funnelResult, behaviorResult] = await Promise.all([
+    const [funnelResult, behaviorResult, preconsentResult] = await Promise.all([
       admin.rpc('paid_funnel_report', reportWindow),
       admin.rpc('paid_funnel_behavior_report', reportWindow),
+      admin.rpc('preconsent_measurement_report', reportWindow),
     ]);
-    if (funnelResult.error || !funnelResult.data || behaviorResult.error || !behaviorResult.data) {
+    if (funnelResult.error || !funnelResult.data || behaviorResult.error || !behaviorResult.data ||
+        preconsentResult.error || !preconsentResult.data) {
       return json(origin, 503, { error: 'report_unavailable' });
     }
-    return json(origin, 200, { ...funnelResult.data, behavior: behaviorResult.data });
+    return json(origin, 200, {
+      ...funnelResult.data,
+      behavior: behaviorResult.data,
+      preconsent: preconsentResult.data,
+    });
   } catch (error) {
     const status = error instanceof FunnelReportRequestError ? error.status : 400;
     const code = error instanceof FunnelReportRequestError ? error.code : 'request_invalid';
