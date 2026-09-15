@@ -23,4 +23,3 @@
           - text: If you tell me
           - strong: what ticket you got (e.g., speeding, distracted driving, careless driving)
           - text: ", I can give you a more realistic price range."
-

@@ -17,4 +17,3 @@
           - text: So, if you need a
           - strong: lawyer
           - text: ", Fabsy is not the same thing as hiring one."
-

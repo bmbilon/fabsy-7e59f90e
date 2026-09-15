@@ -34,4 +34,3 @@
           - text: If you tell me
           - strong: what the ticket says (speed alleged, speed limit, radar/laser/photo, and whether it was a construction zone)
           - text: ", I can explain the strongest potential arguments."
-

@@ -32,4 +32,3 @@
           - text: If you tell me
           - strong: what ticket you got (speeding, distracted driving, red light, etc.) and what happened
           - text: ", I can explain the best way to fight it."
-

@@ -23,4 +23,3 @@
           - text: If you tell me
           - strong: how fast you were allegedly going, the speed limit, and whether it was police or photo radar
           - text: ", I can tell you whether fighting it is likely worth it."
-

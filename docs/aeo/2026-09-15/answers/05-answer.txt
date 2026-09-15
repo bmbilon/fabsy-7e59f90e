@@ -25,4 +25,3 @@
             - button "Alberta.ca":
               - generic: A
               - generic: Alberta.ca
-

@@ -37,4 +37,3 @@
           - text: If you tell me
           - strong: what city/court is listed on your ticket
           - text: ", I can find the exact disclosure email/form and give you a ready-to-send request."
-

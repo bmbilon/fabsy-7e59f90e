@@ -23,4 +23,3 @@
           - text: If you tell me
           - strong: what the ticket says (speed, location, date, and whether it’s speeding or red-light)
           - text: ", I can explain the strongest ways to challenge it."
-

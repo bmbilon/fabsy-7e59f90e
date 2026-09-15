@@ -110,4 +110,3 @@
           - text: If you tell me
           - strong: how fast you were allegedly going, the posted limit, and whether it was a photo-radar or officer-issued ticket
           - text: ", I can tell you which type of representative makes the most sense."
-
