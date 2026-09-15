@@ -36,6 +36,30 @@ try {
     });
     assert.ok((await page.locator('main').innerText()).includes(`Sources checked ${sourceDate}`));
 
+    if (['speeding-ticket-alberta', 'fight-traffic-ticket-alberta'].includes(record.slug)) {
+      const summary = page.locator('section[aria-labelledby="reviewed-answer-heading"]');
+      assert.equal(await summary.count(), 1);
+      assert.ok((await summary.innerText()).includes(record.hook));
+      assert.equal(await page.getByText(record.hook, { exact: true }).count(), 1, 'The reviewed answer should appear once');
+      assert.equal(await summary.locator('a[href="https://traffictickets.alberta.ca/"]').count(), 1);
+      assert.equal(await summary.locator('a[href="/rapid-resolution"]').count(), 1);
+      const howToSchemas = await page.locator('script[type="application/ld+json"]').evaluateAll(scripts => scripts
+        .map(script => JSON.parse(script.textContent))
+        .filter(schema => schema['@type'] === 'HowTo'));
+      assert.deepEqual(howToSchemas, [], 'Do not retain the replaced commercial three-step HowTo');
+      const schemaFaqs = await page.locator('script[data-faq-schema]').evaluate(script => JSON.parse(script.textContent).mainEntity.map(item => ({
+        q: item.name,
+        html: new DOMParser().parseFromString(item.acceptedAnswer.text, 'text/html').body.innerHTML,
+      })));
+      const visibleFaqs = await page.locator('section[aria-label="Frequently asked questions"] h3').evaluateAll(headings => headings.map(heading => ({
+        q: heading.textContent.trim(),
+        a: heading.nextElementSibling.textContent.trim(),
+        html: heading.nextElementSibling.innerHTML,
+      })));
+      assert.deepEqual(visibleFaqs.map(({ q, a }) => ({ q, a })), record.faqs);
+      assert.deepEqual(schemaFaqs, visibleFaqs.map(({ q, html }) => ({ q, html })));
+    }
+
     if (/speeding-ticket-(?:calgary|edmonton)$/.test(record.slug)) {
       const city = record.slug.endsWith('calgary') ? 'Calgary' : 'Edmonton';
       assert.equal(await page.getByRole('heading', { name: `Where to find ${city} traffic court information`, exact: true }).count(), 1);
@@ -58,6 +82,13 @@ try {
   }
 
   assert.deepEqual(pageErrors, []);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(new URL('/content/speeding-ticket-alberta', BASE).toString(), { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#reviewed-answer-heading');
+  assert.equal(await page.getByRole('heading', { name: 'Who can help fight a speeding ticket in Alberta?', exact: true }).count(), 1);
+  assert.equal(await page.getByRole('heading', { name: 'Pay, request prosecutor review, or request a trial?', exact: true }).count(), 1);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'Mobile guide should not overflow horizontally');
 
   // An unavailable content API must not replace bundled, reviewed guides with
   // an error page. Block the real API shape and exercise fresh navigations.

@@ -56,7 +56,7 @@ assert.match(speeding.what, /24-hour vehicle-seizure power in s\. 172/);
 assert.match(speeding.what, /does not itself create an automatic roadside suspension or vehicle impoundment/);
 assert.match(speeding.what, /Procedures Regulation, Schedule, Parts 32 and 33/);
 assert.deepEqual(curatedPageIssues(speeding), [], 'the canonical speeding guide must pass crawler-snapshot guardrails');
-assert.match(speeding.how, /Should I dispute the speeding ticket\?/);
+assert.match(speeding.how, /Is it worth fighting a speeding ticket in Alberta\?/);
 assert.match(speeding.how, /Provincial Offences Procedure Act, s\. 39/);
 assert.match(fight.how, /Should I dispute it\? A decision checklist/);
 assert.match(fight.how, /Traffic Safety Act, ss\. 160 to 163/);

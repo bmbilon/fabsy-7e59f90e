@@ -95,7 +95,7 @@ const Footer = () => {
         </div>
 
         <nav aria-label="Popular traffic ticket guides" className="mx-auto mb-5 flex max-w-4xl flex-wrap justify-center gap-x-5 border-y border-gray-200 py-2 text-sm">
-          <Link to="/content/speeding-ticket-alberta" className="inline-flex min-h-11 items-center text-slate-700 underline underline-offset-4 hover:text-primary">Alberta speeding tickets</Link>
+          <Link to="/content/speeding-ticket-alberta" className="inline-flex min-h-11 items-center text-slate-700 underline underline-offset-4 hover:text-primary">Fight a speeding ticket in Alberta</Link>
           <Link to="/content/speeding-ticket-calgary" className="inline-flex min-h-11 items-center text-slate-700 underline underline-offset-4 hover:text-primary">Calgary speeding tickets</Link>
           <Link to="/content/speeding-ticket-edmonton" className="inline-flex min-h-11 items-center text-slate-700 underline underline-offset-4 hover:text-primary">Edmonton speeding tickets</Link>
           <Link to="/content/fight-stop-sign-ticket-alberta" className="inline-flex min-h-11 items-center text-slate-700 underline underline-offset-4 hover:text-primary">Stop-sign tickets</Link>
