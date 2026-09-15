@@ -495,6 +495,8 @@ const WorkingContentPage = () => {
   const offence: string = (pageData.violation
     || (pageData.h1 && (/Fight\s+(?:a|an)\s+(.+?)\s+in\s+/i.exec(pageData.h1 as string)?.[1]?.trim()))
     || 'traffic ticket');
+  const showReviewedSummary = pageData.sources.length > 0
+    && ['speeding-ticket-alberta', 'fight-traffic-ticket-alberta'].includes(pageData.slug);
 
   return (
     <main className="min-h-screen bg-background">
@@ -523,7 +525,7 @@ const WorkingContentPage = () => {
         />
       )}
       {/* HowTo for cornerstone flows */}
-      <HowToSchema
+      {!showReviewedSummary && <HowToSchema
         name={`How to fight a ${offence.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'} (3 steps)`}
         description={`Three-step process to dispute a ${offence.toLowerCase()}${cityName ? ` in ${cityName}` : ' in Alberta'}.`}
         url={currentUrl}
@@ -532,7 +534,7 @@ const WorkingContentPage = () => {
           { name: 'We check the court file', text: 'We obtain and review disclosure for errors and defenses.' },
           { name: 'Decide on the response', text: 'Fabsy explains any Crown response and acts only on your final instruction.' },
         ]}
-      />
+      />}
       <Header />
 
       {/* Hero Section with subtle background */}
@@ -571,7 +573,7 @@ const WorkingContentPage = () => {
           </p>
 
           {/* Answer Box - 60-second answer above the fold */}
-          {cityName && offence && (
+          {!showReviewedSummary && cityName && offence && (
             <AnswerBox 
               offence={offence}
               city={cityName}
@@ -580,8 +582,21 @@ const WorkingContentPage = () => {
             />
           )}
 
-          {/* Original Answer Box (60-second summary) - keeping as fallback */}
-          <div className="mb-8 rounded-xl border bg-card shadow-sm p-6">
+          {showReviewedSummary ? (
+            <section aria-labelledby="reviewed-answer-heading" className="mb-8 rounded-xl border border-sky-200 bg-sky-50 p-6 sm:p-8">
+              <h2 id="reviewed-answer-heading" className="text-lg font-semibold text-slate-950">The short answer</h2>
+              <p className="mt-3 text-base leading-relaxed text-slate-800 sm:text-lg">{pageData.hook}</p>
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-slate-700">
+                {pageData.bullets.map(bullet => <li key={bullet}>{bullet}</li>)}
+              </ul>
+              <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <a href="https://traffictickets.alberta.ca/" className="inline-flex min-h-11 items-center gap-2 font-semibold text-blue-800 underline underline-offset-4">
+                  Official Alberta online ticket service <ExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />
+                </a>
+                <Link to="/rapid-resolution" className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline underline-offset-4">Get online help from Fabsy</Link>
+              </div>
+            </section>
+          ) : <div className="mb-8 rounded-xl border bg-card shadow-sm p-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h2 className="text-lg font-semibold text-foreground mb-2">Can I dispute it?</h2>
@@ -602,7 +617,7 @@ const WorkingContentPage = () => {
                 <p className="text-foreground">{cityName || 'Alberta'} • {offence.charAt(0).toUpperCase() + offence.slice(1)}</p>
               </div>
             </div>
-          </div>
+          </div>}
 
         </div>
       </div>
@@ -625,13 +640,13 @@ const WorkingContentPage = () => {
                 prose-li:text-foreground prose-li:my-2 prose-li:leading-relaxed
                 prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline">
                 
-                {pageData.hook && (
+                {!showReviewedSummary && pageData.hook && (
                   <div className="bg-primary/10 border-l-4 border-primary p-5 rounded-r mb-8">
                     <p className="text-foreground font-medium mb-0">{pageData.hook}</p>
                   </div>
                 )}
 
-                {pageData.bullets.length > 0 && (
+                {!showReviewedSummary && pageData.bullets.length > 0 && (
                   <section className="rounded-xl border border-border bg-muted/30 p-5 mb-8">
                     <h2 className="text-2xl font-bold mt-0 mb-3">At a glance</h2>
                     <ul className="list-disc ml-6 space-y-2 mb-0">

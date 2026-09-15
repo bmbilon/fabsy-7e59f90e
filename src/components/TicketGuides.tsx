@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const guides = [
-  { path: "/content/speeding-ticket-alberta", title: "Alberta speeding tickets", description: "Fines, demerit bands and the information to check before responding." },
+  { path: "/content/speeding-ticket-alberta", title: "Fight a speeding ticket in Alberta", description: "Compare online response options, prepare your documents and decide whether to get agent help." },
   { path: "/content/speeding-ticket-calgary", title: "Calgary speeding tickets", description: "Local court information and response options for a Calgary ticket." },
   { path: "/content/speeding-ticket-edmonton", title: "Edmonton speeding tickets", description: "Find the right court information and review your next steps." },
   { path: "/content/fight-stop-sign-ticket-alberta", title: "Stop-sign tickets", description: "Understand the allegation, the evidence and your response options." },
@@ -19,7 +19,7 @@ export default function TicketGuides() {
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-700">
           Start with your ticket type or city. These guides explain what to check, where to find official information, and how to explore your options.
         </p>
-        <Link to="/hubs/alberta-tickets-101" className="mt-4 inline-flex min-h-11 items-center gap-2 font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-900">
+        <Link to="/content/fight-traffic-ticket-alberta" className="mt-4 inline-flex min-h-11 items-center gap-2 font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-900">
           How to fight a traffic ticket in Alberta <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
         </Link>
         <ul className="mt-6 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
