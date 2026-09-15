@@ -1,0 +1,16 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "Alberta Courts Traffic Court - Remote Out-Of-Custody Dispositions And Other Applications For Counsel And Commercial Legal Agents":
+        - /url: https://albertacourts.ca/docs/default-source/pc/traffic-court-practice-note.pdf?sfvrsn=24959580_8&utm_source=chatgpt.com
+        - generic: A
+        - generic: Alberta Courts
+        - strong: Traffic Court - Remote Out-Of-Custody Dispositions And Other Applications For Counsel And Commercial Legal Agents
+      - link "Law Society of Alberta Unauthorized Practice of Law - Law Society of Alberta":
+        - /url: https://www.lawsociety.ab.ca/regulation/unauthorized-practice-of-law/?utm_source=chatgpt.com
+        - generic: L
+        - generic: Law Society of Alberta
+        - strong: Unauthorized Practice of Law - Law Society of Alberta

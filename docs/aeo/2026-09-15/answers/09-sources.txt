@@ -1,0 +1,16 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "LawyerInfo How Much Does It Cost to Hire a Traffic Ticket Lawyer in Calgary?":
+        - /url: https://lawyerinfo.ca/guides/alberta/calgary/criminal-defence-calgary/traffic-tickets-calgary/how-much-does-it-cost-to-hire-a-traffic-ticket-lawyer-in-calgary/?utm_source=chatgpt.com
+        - generic: L
+        - generic: LawyerInfo
+        - strong: How Much Does It Cost to Hire a Traffic Ticket Lawyer in Calgary?
+      - link "fabsy.ca Rapid Resolution | Alberta Ticket Help | $198 CAD":
+        - /url: https://fabsy.ca/rapid-resolution?utm_source=chatgpt.com
+        - generic: F
+        - generic: fabsy.ca
+        - strong: Rapid Resolution | Alberta Ticket Help | $198 CAD

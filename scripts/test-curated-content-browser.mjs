@@ -40,6 +40,9 @@ try {
       const city = record.slug.endsWith('calgary') ? 'Calgary' : 'Edmonton';
       assert.equal(await page.getByRole('heading', { name: `Where to find ${city} traffic court information`, exact: true }).count(), 1);
       assert.equal(await page.locator('article a[href="/hubs/alberta-tickets-101"]').count(), 1);
+      assert.ok((await page.locator('article').innerText()).includes(`Fabsy does not operate a walk-in office in ${city}.`));
+      assert.ok((await page.locator('article').innerText()).includes('online ticket administration'));
+      assert.equal(await page.locator('article a[href="/about/comparison"]').count(), 1);
     }
 
     const sourceLinks = await page.locator('#official-sources-heading').locator('xpath=..').locator('li a').evaluateAll(

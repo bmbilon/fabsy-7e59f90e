@@ -1,0 +1,26 @@
+        - heading "You said:" [level=4]
+        - button "Can I fight a photo radar ticket in Alberta?":
+          - paragraph: Can I fight a photo radar ticket in Alberta?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - text: Yes.
+          - strong: You can fight a photo-radar ticket in Alberta.
+          - text: You can plead
+          - strong: not guilty and request a trial
+          - text: ", or request a"
+          - strong: review by a prosecutor
+          - text: through Alberta’s Traffic Tickets Digital Service.
+          - group "Sources":
+            - button "Alberta.ca, 2 sources":
+              - generic: A
+              - generic: Alberta.ca
+              - generic: "+1"
+        - paragraph:
+          - text: Also, photo-radar tickets generally
+          - strong: don’t result in demerit points
+          - text: because they’re issued against the registered owner rather than identifying the driver.
+        - paragraph:
+          - text: If you tell me
+          - strong: what the ticket says (speed, location, date, and whether it’s speeding or red-light)
+          - text: ", I can explain the strongest ways to challenge it."
+

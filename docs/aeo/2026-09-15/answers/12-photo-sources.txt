@@ -1,0 +1,11 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "Fabsy Traffic Ticket Services Photo Radar & Red-Light Ticket Help Alberta | $79 | Fabsy":
+        - /url: https://fabsy.ca/photo-radar?utm_source=chatgpt.com
+        - generic: F
+        - generic: Fabsy Traffic Ticket Services
+        - strong: Photo Radar & Red-Light Ticket Help Alberta | $79 | Fabsy

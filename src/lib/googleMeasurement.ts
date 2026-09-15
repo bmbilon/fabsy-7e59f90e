@@ -5,12 +5,14 @@ import {
   googleTagMayLoadInDocument, markGoogleTagPending, scrubCheckoutReceiptUrl,
 } from './measurementNavigation';
 import { CLICK_ID_KEYS, UTM_KEYS, uniqueSafeSearchValues } from './acquisitionParameters';
+import publicArticlePaths from '../config/publicArticlePaths.json';
 
 declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
     fabsyAnalyticsInitialized?: boolean;
+    fabsyGoogleAdsInitialized?: boolean;
     fabsyMeasurementReloadRequested?: boolean;
   }
 }
@@ -58,25 +60,39 @@ const publicPaths = new Set([
   '/hubs/demerits-and-insurance', '/hubs/court-options-and-deadlines',
   '/hubs/city-specific-quirks',
 ]);
+// An explicit inventory of published articles, never a wildcard for arbitrary
+// slugs or IDs. Adding an article to analytics does not authorize an Ads tag.
+const articlePaths = new Set<string>(publicArticlePaths);
+
+function baseMeasurementPath(pathname: string): string {
+  return pathname.replace(/\/$/, '')
+    .replace(/^\/(?:en|pa|tl|zh-hans|zh-hant|ar|es|hi)(?=\/|$)/, '') || '/';
+}
 
 export function publicMeasurementPath(pathname: string): string | null {
   // Unknown paths and private IDs, including localized variants, stay out.
   const path = pathname.replace(/\/$/, '') || '/';
-  const base = path.replace(/^\/(?:en|pa|tl|zh-hans|zh-hant|ar|es|hi)(?=\/|$)/, '') || '/';
-  return publicPaths.has(base) ? path : null;
+  const base = baseMeasurementPath(pathname);
+  return publicPaths.has(base) || articlePaths.has(base) ? path : null;
 }
 
-function hasOnlyApprovedAcquisitionParameters(url: URL): boolean {
+function hasOnlyApprovedAcquisitionParameters(url: URL, ads = false): boolean {
   if (url.hash) return false;
-  const basePath = url.pathname
-    .replace(/^\/(?:en|pa|tl|zh-hans|zh-hant|ar|es|hi)(?=\/|$)/, '')
-    .replace(/\/$/, '') || '/';
+  const basePath = baseMeasurementPath(url.pathname);
   const paidLanding = basePath === '/rapid-resolution';
+  const publicAcquisition = !ads && !['/thank-you', '/ticket-uploaded'].includes(basePath);
   const allowed = new Set<string>([
     ...CLICK_ID_KEYS.filter(key => paidLanding || key !== 'fbclid'),
-    ...(paidLanding ? UTM_KEYS : []),
+    ...(paidLanding || publicAcquisition ? UTM_KEYS : []),
   ]);
   return uniqueSafeSearchValues(url, allowed) !== null;
+}
+
+/** Retain the pre-existing Ads route/query policy independently of GA4. */
+export function publicGoogleAdsMeasurementUrl(url: URL): boolean {
+  return publicPaths.has(baseMeasurementPath(url.pathname)) &&
+    Boolean(publicMeasurementPath(url.pathname)) && !url.username && !url.password &&
+    hasOnlyApprovedAcquisitionParameters(url, true);
 }
 
 /** Router classification only; destination/origin and referrer gates stay separate. */
@@ -108,14 +124,24 @@ export function safeGooglePageContext(href: string, referrer: string): PaidPurch
 
 export function currentGooglePageContext(): PaidPurchaseContext | null {
   if (typeof window === 'undefined' || typeof document === 'undefined') return null;
+  if (window.fabsyGoogleAdsInitialized &&
+      !publicGoogleAdsMeasurementUrl(new URL(window.location.href))) return null;
   return safeGooglePageContext(window.location.href, document.referrer);
 }
 
-/** Preserve campaign credit when page_location deliberately omits the query. */
-export function googleCampaignParameters(href: string): Record<string, string> {
+const aiSourceAliases = new Map(Object.entries({
+  'chatgpt.com': 'chatgpt.com', 'chat.openai.com': 'chatgpt.com', chatgpt: 'chatgpt.com',
+  'perplexity.ai': 'perplexity.ai', perplexity: 'perplexity.ai',
+  'claude.ai': 'claude.ai', claude: 'claude.ai',
+  'gemini.google.com': 'gemini.google.com', 'bard.google.com': 'gemini.google.com', gemini: 'gemini.google.com',
+  'copilot.microsoft.com': 'copilot.microsoft.com', copilot: 'copilot.microsoft.com',
+}));
+
+/** Preserve campaign credit without sending a query, prompt or conversation ID. */
+export function googleCampaignParameters(href: string, referrer = ''): Record<string, string> {
   try {
     const url = new URL(href);
-    if (!safeGooglePageContext(href, '')) return {};
+    if (!safeGooglePageContext(href, referrer)) return {};
     const fields = {
       utm_source: 'campaign_source', utm_medium: 'campaign_medium',
       utm_campaign: 'campaign_name', utm_content: 'campaign_content', utm_term: 'campaign_term',
@@ -124,6 +150,25 @@ export function googleCampaignParameters(href: string): Record<string, string> {
     for (const key of UTM_KEYS) {
       const value = url.searchParams.get(key);
       if (value) result[fields[key]] = value;
+    }
+    const explicitCampaign = UTM_KEYS.some(key => url.searchParams.has(key));
+    const hasClickId = CLICK_ID_KEYS.some(key => url.searchParams.has(key));
+    const source = result.campaign_source?.toLowerCase();
+    const aiSource = source ? aiSourceAliases.get(source) : undefined;
+    // Only the automatic source-only link can acquire an inferred medium.
+    // Explicit paid media/campaigns and click IDs must keep their own credit.
+    if (aiSource && !hasClickId &&
+        UTM_KEYS.every(key => key === 'utm_source' || !url.searchParams.has(key))) {
+      result.campaign_source = aiSource;
+      result.campaign_medium = 'referral';
+    } else if (!explicitCampaign && !hasClickId && referrer) {
+      const previous = new URL(referrer);
+      const host = previous.hostname.toLowerCase().replace(/^www\./, '');
+      const referredSource = host.includes('.') && !previous.port ? aiSourceAliases.get(host) : undefined;
+      if (referredSource) {
+        result.campaign_source = referredSource;
+        result.campaign_medium = 'referral';
+      }
     }
     return result;
   } catch {
@@ -165,7 +210,7 @@ export function dispatchGoogleMeasurement(eventName: string, params: Record<stri
   if (typeof destination !== 'string' || !allowed.includes(destination)) return false;
   queue('event', eventName, {
     ...params, ...context,
-    ...(eventName === 'page_view' ? googleCampaignParameters(window.location.href) : {}),
+    ...(eventName === 'page_view' ? googleCampaignParameters(window.location.href, document.referrer) : {}),
     allow_google_signals: false, allow_ad_personalization_signals: false,
   });
   return true;
@@ -236,7 +281,9 @@ export function recheckGoogleMeasurementConsent(): void {
 /** Never copy raw acquisition fields, document titles, forms or user data. */
 export function initializeGoogleMeasurement(): void {
   const context = currentGooglePageContext();
-  const config = currentGoogleMeasurementConfig();
+  const available = currentGoogleMeasurementConfig();
+  const adsAllowed = publicGoogleAdsMeasurementUrl(new URL(window.location.href));
+  const config: PaidPurchaseConfig = adsAllowed ? available : { ga4Id: available.ga4Id };
   if (restarting || getGoogleConsentChoice() !== 'accepted' ||
       !googleTagMayLoadInDocument(window) || !context || (!config.ga4Id && !config.adsId)) return;
   if (window.fabsyAnalyticsInitialized) {
@@ -247,6 +294,9 @@ export function initializeGoogleMeasurement(): void {
   const epoch = ++loaderEpoch;
   documentTouched = true;
   configured = config;
+  // Never remove this marker in the same document: an Ads script's listeners
+  // may remain after failure/removal. Navigation must retire that document.
+  if (config.adsId) window.fabsyGoogleAdsInitialized = true;
   window.dataLayer = window.dataLayer || [];
   // Retire legacy unvalidated direct events. The scoped page-view and verified
   // receipt dispatchers are the only application event producers for this cut.
@@ -258,8 +308,8 @@ export function initializeGoogleMeasurement(): void {
   // Basic mode: nothing above is sent until this explicit visitor choice.
   // Ads measurement is permitted; personalization and enhanced data stay off.
   queue('consent', 'update', {
-    analytics_storage: 'granted', ad_storage: 'granted',
-    ad_user_data: 'granted', ad_personalization: 'denied',
+    analytics_storage: 'granted', ad_storage: config.adsId ? 'granted' : 'denied',
+    ad_user_data: config.adsId ? 'granted' : 'denied', ad_personalization: 'denied',
   });
   queue('set', {
     allow_google_signals: false, allow_ad_personalization_signals: false,
@@ -267,7 +317,7 @@ export function initializeGoogleMeasurement(): void {
   });
   queue('js', new Date());
   const options = { ...context, send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false };
-  if (config.ga4Id) queue('config', config.ga4Id, { ...options, ...googleCampaignParameters(window.location.href) });
+  if (config.ga4Id) queue('config', config.ga4Id, { ...options, ...googleCampaignParameters(window.location.href, document.referrer) });
   if (config.adsId) queue('config', config.adsId, options);
   window.fabsyAnalyticsInitialized = true;
   const script = document.createElement('script');

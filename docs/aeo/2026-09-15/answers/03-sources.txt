@@ -1,0 +1,16 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "strategiccriminaldefence.com Traffic Offences Lawyers Edmonton | Strategic Criminal Defence":
+        - /url: https://www.strategiccriminaldefence.com/edmonton/edmonton-traffic-offence-lawyers/?utm_source=chatgpt.com
+        - generic: S
+        - generic: strategiccriminaldefence.com
+        - strong: Traffic Offences Lawyers Edmonton | Strategic Criminal Defence
+      - link "edmonton.ca Traffic and Bylaw Offence Tickets | City of Edmonton":
+        - /url: https://www.edmonton.ca/programs_services/payments/traffic-and-bylaw-tickets?utm_source=chatgpt.com
+        - generic: E
+        - generic: edmonton.ca
+        - strong: Traffic and Bylaw Offence Tickets | City of Edmonton

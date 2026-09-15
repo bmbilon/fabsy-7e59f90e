@@ -1,0 +1,40 @@
+        - heading "You said:" [level=4]
+        - button "How do I request disclosure for an Alberta traffic ticket?":
+          - paragraph: How do I request disclosure for an Alberta traffic ticket?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph: "For an Alberta provincial traffic ticket:"
+        - list:
+          - paragraph:
+            - strong: Plead not guilty/dispute the ticket
+            - text: through Alberta’s Traffic Tickets Service.
+            - group "Sources":
+              - button "Alberta Courts, 2 sources":
+                - generic: A
+                - generic: Alberta Courts
+                - generic: "+1"
+          - paragraph:
+            - strong: Request disclosure from the Crown prosecutor’s office
+            - text: handling your ticket. Ask for the officer’s notes, statements, photos/video, calibration records, and other evidence.
+          - paragraph:
+            - text: The
+            - strong: court/prosecutor contact information is generally on the ticket
+            - text: ; if unclear, Court and Justice Services can help at
+            - strong: 1-855-738-4747
+            - text: .
+            - group "Sources":
+              - button "Alberta.ca":
+                - generic: A
+                - generic: Alberta.ca
+          - paragraph:
+            - text: Make the request
+            - strong: in writing and keep a copy
+            - text: . Disclosure procedures can vary by Crown office.
+            - group "Sources":
+              - button "Open Alberta":
+                - generic: O
+                - generic: Open Alberta
+        - paragraph:
+          - text: If you tell me
+          - strong: what city/court is listed on your ticket
+          - text: ", I can find the exact disclosure email/form and give you a ready-to-send request."
+

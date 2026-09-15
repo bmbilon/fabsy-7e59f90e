@@ -1,0 +1,21 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "We Defend Tickets Fight a Traffic Ticket in Calgary | We Defend Tickets":
+        - /url: https://wedefendtickets.ca/calgary/?utm_source=chatgpt.com
+        - generic: W
+        - generic: We Defend Tickets
+        - strong: Fight a Traffic Ticket in Calgary | We Defend Tickets
+      - link "Fabsy Traffic Ticket Services Compare Alberta Traffic Ticket Services | Fabsy":
+        - /url: https://fabsy.ca/about/comparison?utm_source=chatgpt.com
+        - generic: F
+        - generic: Fabsy Traffic Ticket Services
+        - strong: Compare Alberta Traffic Ticket Services | Fabsy
+      - link "albertacourts.ca Procedure/Guidelines:":
+        - /url: https://albertacourts.ca/docs/default-source/pc/traffic-court-practice-note.pdf?sfvrsn=24959580_8&utm_source=chatgpt.com
+        - generic: A
+        - generic: albertacourts.ca
+        - strong: "Procedure/Guidelines:"

@@ -30,6 +30,7 @@ async function helperBundle(env) {
       export * from './src/lib/googleMeasurement';
       export * from './src/lib/googleConsent';
       export { registerMeasurementDocument } from './src/lib/measurementNavigation';
+      export { publicProviderMeasurementUrl } from './src/lib/publicMeasurementUrl';
     ` },
     bundle: true,
     write: false,
@@ -126,7 +127,7 @@ async function runtime(env = enabledEnv, options = {}) {
   if (options.consent !== 'unknown') {
     browser.store.set(api.GOOGLE_CONSENT_STORAGE_KEY, JSON.stringify({ version: 1, choice: options.consent || 'accepted', savedAt: Date.now() }));
   }
-  api.registerMeasurementDocument(browser.window, api.publicGoogleMeasurementUrl);
+  api.registerMeasurementDocument(browser.window, api.publicGoogleMeasurementUrl, api.publicProviderMeasurementUrl);
   return { api: module.exports, browser };
 }
 
@@ -369,6 +370,86 @@ test("approved paid-landing UTMs do not silently disable Google measurement", as
     "https://fabsy.ca/rapid-resolution?utm_campaign=contains%20spaces",
     `https://fabsy.ca/rapid-resolution?utm_campaign=${"a".repeat(251)}`,
   ]) assert.equal(api.publicGoogleMeasurementUrl(new URL(href)), false, href);
+});
+
+test('AI referral landings emit one sanitized GA4 page view without widening Ads eligibility', async () => {
+  for (const path of ['/', '/about/comparison', '/hubs/alberta-tickets-101',
+    '/content/speeding-ticket-edmonton', '/content/speeding-ticket-calgary',
+    '/blog/alberta-traffic-ticket-comparison-guide', '/pa/content/speeding-ticket-alberta']) {
+    const href = `https://fabsy.ca${path}?utm_source=chatgpt.com`;
+    const { api, browser } = await runtime(enabledEnv, { href, referrer: 'https://chatgpt.com/', consent: 'unknown' });
+    assert.equal(api.publicGoogleMeasurementUrl(new URL(href)), true, path);
+    assert.equal(api.publicGoogleAdsMeasurementUrl(new URL(href)), false, path);
+    api.initializeGoogleMeasurement();
+    assert.equal(browser.scripts.length, 0, 'No tag before consent');
+    api.setGoogleConsentChoice('accepted');
+    api.recheckGoogleMeasurementConsent();
+    assert.equal(browser.scripts.length, 1);
+    browser.scripts[0].script.onload();
+    api.sendGooglePageView();
+    const commands = browser.commands();
+    assert.equal(commands.filter(c => c[0] === 'config' && c[1].startsWith('AW-')).length, 0);
+    assert.equal(browser.window.fabsyGoogleAdsInitialized, undefined);
+    const consent = commands.find(c => c[0] === 'consent' && c[1] === 'update')[2];
+    assert.equal(consent.ad_storage, 'denied');
+    assert.equal(consent.ad_user_data, 'denied');
+    const views = commands.filter(c => c[0] === 'event' && c[1] === 'page_view');
+    assert.equal(views.length, 1);
+    assert.equal(views[0][2].campaign_source, 'chatgpt.com');
+    assert.equal(views[0][2].campaign_medium, 'referral');
+    assert.equal(views[0][2].page_location, `https://fabsy.ca${path}`);
+    assert.equal(views[0][2].page_referrer, '');
+    assert.equal(views[0][2].page_title, 'Fabsy');
+    api.setGoogleConsentChoice('declined');
+    api.recheckGoogleMeasurementConsent();
+    assert.equal(browser.reloads.length, 1);
+    assert.equal(api.dispatchGoogleMeasurement('page_view', { send_to: enabledEnv.VITE_GA4_MEASUREMENT_ID }), false);
+  }
+});
+
+test('known AI root referrers retain attribution, without guessing from arbitrary hosts or paid clicks', async () => {
+  const { api } = await runtime();
+  for (const host of ['chatgpt.com', 'perplexity.ai', 'claude.ai', 'gemini.google.com', 'copilot.microsoft.com']) {
+    assert.deepEqual(plain(api.googleCampaignParameters('https://fabsy.ca/', `https://${host}/`)), {
+      campaign_source: host, campaign_medium: 'referral',
+    });
+  }
+  for (const host of ['notchatgpt.com', 'chatgpt.com.evil.invalid', 'example.invalid', 'chatgpt.com:8443', 'chatgpt', 'constructor']) {
+    assert.deepEqual(plain(api.googleCampaignParameters('https://fabsy.ca/', `https://${host}/`)), {});
+  }
+  assert.equal(api.googleCampaignParameters('https://fabsy.ca/?utm_source=constructor').campaign_medium, undefined);
+  for (const query of ['?gclid=SYNTHETIC', '?utm_campaign=explicit', '?utm_medium=cpc']) {
+    assert.equal(api.googleCampaignParameters(`https://fabsy.ca/${query}`, 'https://chatgpt.com/').campaign_source, undefined);
+  }
+  const paid = api.googleCampaignParameters('https://fabsy.ca/rapid-resolution?utm_source=chatgpt.com&utm_medium=cpc&utm_campaign=paid_test', 'https://chatgpt.com/');
+  assert.deepEqual(plain(paid), { campaign_source: 'chatgpt.com', campaign_medium: 'cpc', campaign_name: 'paid_test' });
+  assert.equal(api.googleCampaignParameters('https://fabsy.ca/rapid-resolution?utm_source=chatgpt.com&gclid=SYNTHETIC').campaign_medium, undefined);
+});
+
+test('article and attribution expansion still rejects arbitrary IDs, duplicate UTMs and sensitive referrers', async () => {
+  const { api } = await runtime();
+  for (const path of ['/content/SYNTHETIC-CASE', '/blog/SYNTHETIC-TOKEN', '/content/speeding-ticket-edmonton/private',
+    '/es/blog/unknown', '/content/%73peeding-ticket-edmonton', '/about/comparison//']) {
+    assert.equal(api.publicMeasurementPath(path), null, path);
+  }
+  for (const query of ['?utm_source=chatgpt.com&utm_source=other', '?utm_source=chatgpt.com&email=person%40example.invalid',
+    '?utm_source=chatgpt.com#SYNTHETIC', '?utm_source=chatgpt.com&session_id=cs_live_SYNTHETIC']) {
+    assert.equal(api.safeGooglePageContext(`https://fabsy.ca/about/comparison${query}`, ''), null, query);
+  }
+  assert.equal(api.safeGooglePageContext('https://fabsy.ca/about/comparison?utm_source=chatgpt.com', 'https://chatgpt.com/c/SYNTHETIC'), null);
+});
+
+test('Ads-touched documents retain the narrower provider boundary on subsequent public navigation', async () => {
+  const { api, browser } = await runtime(enabledEnv, { href: 'https://fabsy.ca/' });
+  api.initializeGoogleMeasurement();
+  assert.equal(browser.window.fabsyGoogleAdsInitialized, true);
+  const article = new URL('https://fabsy.ca/content/speeding-ticket-edmonton?utm_source=chatgpt.com');
+  assert.equal(api.publicGoogleMeasurementUrl(article), true);
+  assert.equal(api.publicProviderMeasurementUrl('google', article), false, 'Router must replace this Ads-touched document');
+  assert.equal(api.publicProviderMeasurementUrl('google', new URL('https://fabsy.ca/rapid-resolution')), true);
+  api.setGoogleConsentChoice('declined');
+  api.recheckGoogleMeasurementConsent();
+  assert.equal(browser.window.fabsyGoogleAdsInitialized, true, 'Never resurrect a formerly Ads-touched document');
 });
 
 test("unknown or sensitive query parameters, fragments and malformed click IDs fail closed", async () => {

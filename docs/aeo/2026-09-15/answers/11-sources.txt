@@ -1,0 +1,11 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "fabsy.ca About Fabsy | Alberta Traffic Ticket Agent Service":
+        - /url: https://fabsy.ca/about?utm_source=chatgpt.com
+        - generic: F
+        - generic: fabsy.ca
+        - strong: About Fabsy | Alberta Traffic Ticket Agent Service

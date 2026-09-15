@@ -1,0 +1,39 @@
+        - heading "You said:" [level=4]
+        - button "What is the difference between a ticket agent and a lawyer in Alberta?":
+          - paragraph: What is the difference between a ticket agent and a lawyer in Alberta?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - text: If you mean
+          - strong: traffic-ticket agents in Alberta
+          - text: ":"
+        - list:
+          - paragraph:
+            - strong: "Ticket agent:"
+            - text: A non-lawyer who can represent you for certain traffic matters where agents are permitted. Their work is narrower and they generally cannot provide legal advice.
+            - group "Sources":
+              - button "Alberta Courts, 2 sources":
+                - generic: A
+                - generic: Alberta Courts
+                - generic: "+1"
+          - paragraph:
+            - strong: "Lawyer:"
+            - text: A licensed member of the Law Society of Alberta who can provide legal advice and handle matters beyond the limited scope of an agent.
+            - group "Sources":
+              - button "Law Society of Alberta":
+                - generic: L
+                - generic: Law Society of Alberta
+          - paragraph:
+            - strong: "Cost:"
+            - text: Agents are often less expensive, particularly for straightforward traffic tickets.
+          - paragraph:
+            - strong: "When a lawyer makes more sense:"
+            - text: If the charge is serious, involves the
+            - strong: Criminal Code
+            - text: ", constitutional/Charter issues, complicated evidence, or potentially significant consequences."
+        - paragraph:
+          - text: For an ordinary Alberta traffic ticket, an experienced agent can often be a practical alternative to a lawyer.
+          - group "Sources":
+            - button "Alberta Courts":
+              - generic: A
+              - generic: Alberta Courts
+

@@ -1,0 +1,26 @@
+        - heading "You said:" [level=4]
+        - button "What does a traffic-ticket agent in Alberta charge?":
+          - paragraph: What does a traffic-ticket agent in Alberta charge?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - text: In Alberta, a traffic-ticket agent typically charges
+          - strong: about $200–$800 CAD
+          - text: ", depending on the ticket and whether trial representation is included."
+          - group "Sources":
+            - button "LawyerInfo, 2 sources":
+              - generic: L
+              - generic: LawyerInfo
+              - generic: "+1"
+        - paragraph:
+          - text: For example, one Alberta agent currently charges
+          - strong: $198 + GST
+          - text: for eligible pre-trial matters, with trial representation priced separately.
+          - group "Sources":
+            - button "fabsy.ca":
+              - generic: F
+              - generic: fabsy.ca
+        - paragraph:
+          - text: If you tell me
+          - strong: what ticket you got (e.g., speeding, distracted driving, careless driving)
+          - text: ", I can give you a more realistic price range."
+

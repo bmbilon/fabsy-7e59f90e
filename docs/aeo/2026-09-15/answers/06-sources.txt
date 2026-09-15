@@ -1,0 +1,21 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "Alberta Courts Traffic Court":
+        - /url: https://albertacourts.ca/cj/areas-of-law/traffic?utm_source=chatgpt.com
+        - generic: A
+        - generic: Alberta Courts
+        - strong: Traffic Court
+      - link "Alberta.ca Contact Court and Justice Services | Alberta.ca":
+        - /url: https://www.alberta.ca/contact-court-and-justice-services?utm_source=chatgpt.com
+        - generic: A
+        - generic: Alberta.ca
+        - strong: Contact Court and Justice Services | Alberta.ca
+      - link "Open Alberta Trafﬁ c Court Court What you need to know when":
+        - /url: https://open.alberta.ca/dataset/569e5b8b-f0cd-412a-a194-e6799958f79f/resource/1b6c3b7f-728d-438d-b87a-f2ec7232c7d5/download/2013-traffic-court-what-you-need-to-know-when-youve-been-charged-with-a-provincial-offence.pdf?utm_source=chatgpt.com
+        - generic: O
+        - generic: Open Alberta
+        - strong: Trafﬁ c Court Court What you need to know when

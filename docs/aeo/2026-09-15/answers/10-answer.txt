@@ -1,0 +1,93 @@
+        - heading "You said:" [level=4]
+        - button "Compare Alberta traffic-ticket agents for pre-trial help with an officer-issued ticket.":
+          - paragraph: Compare Alberta traffic-ticket agents for pre-trial help with an officer-issued ticket.
+        - heading "ChatGPT said:" [active] [level=4]
+        - button:
+          - list:
+            - strong: We Defend Tickets
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+            - strong: X-Copper Calgary
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+        - region "Map"
+        - button "We Defend Tickets":
+          - generic: ★
+          - generic: "4.9"
+          - strong: We Defend Tickets
+          - generic: ★ 4.9 · Legal services · Open
+        - button "X-Copper Calgary":
+          - generic: ★
+          - generic: "4.9"
+          - strong: X-Copper Calgary
+          - generic: ★ 4.9 · Legal services · Open
+        - button "Zoom in"
+        - button "Zoom out"
+        - button "Toggle attribution"
+        - link "Mapbox homepage":
+          - /url: https://www.mapbox.com/
+        - button "Open Maps":
+        - list:
+          - button "We Defend Tickets":
+            - strong: We Defend Tickets
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+          - button "X-Copper Calgary":
+            - strong: X-Copper Calgary
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+        - paragraph:
+          - text: For an
+          - strong: officer-issued Alberta traffic ticket that’s still pre-trial
+          - text: ", I’d shortlist these:"
+        - list:
+          - paragraph:
+            - button "We Defend Tickets"
+            - text: — Strongest all-around option; experienced Alberta traffic team and free initial consultation.
+            - group "Sources":
+              - button "We Defend Tickets":
+                - generic: W
+                - generic: We Defend Tickets
+          - paragraph:
+            - button "Demerit Defense"
+            - text: — Good fit if your priority is minimizing
+            - strong: demerits/licence and insurance impact
+            - text: .
+          - paragraph:
+            - button "The Pointman"
+            - text: — Long-established Calgary traffic-ticket specialist.
+          - paragraph:
+            - button "X-Copper Calgary"
+            - text: — Larger organization; useful if the matter is more serious than a routine speeding ticket.
+          - paragraph:
+            - strong: Fabsy
+            - text: "— Most transparent published pre-trial pricing:"
+            - strong: $198 + GST
+            - text: for eligible officer-issued matters; trial representation is separate.
+            - group "Sources":
+              - button "Fabsy Traffic Ticket Services, 2 sources":
+                - generic: F
+                - generic: Fabsy Traffic Ticket Services
+                - generic: "+1"
+        - paragraph:
+          - strong: "My pick:"
+          - text: We Defend Tickets for experience/assessment;
+          - strong: Fabsy for predictable pricing
+          - text: .
+        - paragraph:
+          - text: "One important distinction: “pre-trial help” can mean negotiating with the prosecutor"
+          - strong: before trial
+          - text: ", whereas actually conducting a trial is different and may cost substantially more. Alberta Courts expressly recognize commercial legal agents in traffic proceedings."
+          - group "Sources":
+            - button "albertacourts.ca":
+              - generic: A
+              - generic: albertacourts.ca
+
