@@ -462,6 +462,14 @@ ${faqsHtml}
     </article>
   </main>
   <footer>
+    <nav aria-label="Popular traffic ticket guides">
+      <a href="/hubs/alberta-tickets-101">How to fight a traffic ticket in Alberta</a> ·
+      <a href="/content/speeding-ticket-alberta">Alberta speeding tickets</a> ·
+      <a href="/content/speeding-ticket-calgary">Calgary speeding tickets</a> ·
+      <a href="/content/speeding-ticket-edmonton">Edmonton speeding tickets</a> ·
+      <a href="/content/fight-stop-sign-ticket-alberta">Stop-sign tickets</a> ·
+      <a href="/blog">Articles and resources</a>
+    </nav>
     <p>${BUSINESS_NAME}. ${photoRadar ? PHOTO_RADAR_PRICING_COPY : PRICING_TEXT} Fabsy is an agent service for Alberta traffic matters and is not a law firm.</p>
     <p><a href="tel:+18257932279">${TELEPHONE}</a> · <a href="mailto:${EMAIL}">${EMAIL}</a></p>
     <p><a href="/content/fight-traffic-ticket-alberta">Fight a ticket in Alberta</a> · <a href="/content/speeding-ticket-alberta">Speeding tickets</a> · <a href="/content/photo-radar-ticket-alberta">Photo radar</a> · <a href="/content/fight-traffic-ticket-calgary">Calgary</a> · <a href="/content/fight-traffic-ticket-edmonton">Edmonton</a></p>

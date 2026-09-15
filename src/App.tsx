@@ -186,6 +186,7 @@ const App = () => (
           {/* Static test route */}
           <Route path="/test-static-content" element={<WorkingContentPage />} />
           {/* Dynamic content pages - must be before catch-all */}
+          <Route path="/content/alberta-tickets-101" element={<Navigate to="/hubs/alberta-tickets-101" replace />} />
           <Route path="/content/:slug" element={<WorkingContentPage />} />
           <Route path="/proof" element={<Navigate to="/testimonials" replace />} />
           <Route path="/thank-you" element={<ThankYou />} />

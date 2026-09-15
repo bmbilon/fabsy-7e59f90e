@@ -4,6 +4,7 @@
   "outputDirectory": "dist",
   "trailingSlash": false,
   "redirects": [
+    { "source": "/content/alberta-tickets-101", "destination": "/hubs/alberta-tickets-101", "permanent": true },
     { "source": "/traffic-ticket-assessment", "destination": "/rapid-resolution", "permanent": true },
     { "source": "/traffic-ticket-assessment/examples", "destination": "/rapid-resolution", "permanent": true },
     { "source": "/traffic-ticket-assessment/start", "destination": "/submit-ticket", "permanent": true },
