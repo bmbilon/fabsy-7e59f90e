@@ -16,6 +16,7 @@ import { CANONICAL_OFFER_PRICING, OFFICER_OFFER_PRICING, PHOTO_RADAR, PHOTO_RADA
 import PhotoRadarOfferStrip from '@/components/PhotoRadarOfferStrip';
 import { isPhotoRadarContentSlug, loadPhotoRadarContent } from '@/lib/photo-radar-pages';
 import type { FAQItem } from '@/components/FAQSchema';
+import { isReviewedOutcomeFaq } from '@/lib/curated-content-policy';
 
 type PageRecord = Record<string, unknown>;
 type DisplayPage = PageRecord & {
@@ -177,6 +178,10 @@ const pricingClaimsAreComplete = (page: PageRecord): boolean => {
     ...(Array.isArray(page.faqs)
       ? page.faqs.map((faq) => {
           if (!faq || typeof faq !== 'object') return '';
+          // This exact approved answer mentions the service-fee refund. It
+          // makes no price claim, so it does not need the entire price ladder.
+          // Altered answers and questions still pass all pricing checks.
+          if (isReviewedOutcomeFaq(faq)) return '';
           const item = faq as Record<string, unknown>;
           return `${text(item.q)} ${text(item.a)}`.trim();
         })

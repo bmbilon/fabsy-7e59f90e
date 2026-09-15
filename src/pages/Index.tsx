@@ -11,13 +11,14 @@ import AssessmentHomepageJourney from "@/components/AssessmentHomepageJourney";
 import StaticJsonLd from "@/components/StaticJsonLd";
 import { RAPID_RESOLUTION } from "@/config/offers";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
+import TicketGuides from "@/components/TicketGuides";
 
 const Index = () => {
   useHashScroll();
 
   useSafeHead({
-    title: `Rapid Resolution | Alberta Traffic Ticket Help | $${RAPID_RESOLUTION.priceCad} CAD`,
-    description: "Fabsy handles your Alberta ticket intake, disclosure, review, prosecutor follow-up, and client updates through one pre-trial service.",
+    title: "Fight a Traffic Ticket in Alberta | Fabsy",
+    description: "Get help with an Alberta speeding, red-light or other traffic ticket. Explore fines, demerits and response options, or start Fabsy's pre-trial agent service.",
     canonical: "https://fabsy.ca/",
   });
 
@@ -60,6 +61,7 @@ const Index = () => {
       <HomepageOutcomeExplorer />
       <RapidResolutionGuarantee />
       <AssessmentHomepageJourney />
+      <TicketGuides />
       <Footer />
     </main>
   );

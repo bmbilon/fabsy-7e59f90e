@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = process.env.PRERENDER_BASE_URL || 'http://127.0.0.1:4173';
-const SLUGS = ['speeding-ticket-alberta', 'fight-traffic-ticket-alberta'];
+const SLUGS = ['speeding-ticket-alberta', 'fight-traffic-ticket-alberta', 'speeding-ticket-calgary', 'speeding-ticket-edmonton'];
 const records = SLUGS.map((slug) => JSON.parse(fs.readFileSync(path.join(ROOT, 'ssg-pages', `${slug}.json`), 'utf8')));
 
 let browser;
@@ -31,7 +31,16 @@ try {
     assert.equal(await page.title(), record.meta_title);
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), canonical);
     assert.match(await page.locator('main').innerText(), /General information, not legal advice/);
-    assert.match(await page.locator('main').innerText(), /Sources checked August 31, 2026/i);
+    const sourceDate = new Date(`${record.reviewed_at.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-CA', {
+      month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+    });
+    assert.ok((await page.locator('main').innerText()).includes(`Sources checked ${sourceDate}`));
+
+    if (/speeding-ticket-(?:calgary|edmonton)$/.test(record.slug)) {
+      const city = record.slug.endsWith('calgary') ? 'Calgary' : 'Edmonton';
+      assert.equal(await page.getByRole('heading', { name: `Where to find ${city} traffic court information`, exact: true }).count(), 1);
+      assert.equal(await page.locator('article a[href="/hubs/alberta-tickets-101"]').count(), 1);
+    }
 
     const sourceLinks = await page.locator('#official-sources-heading').locator('xpath=..').locator('li a').evaluateAll(
       (links) => links.map((link) => link.href),

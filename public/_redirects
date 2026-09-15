@@ -1,4 +1,5 @@
 # Permanent redirects for legacy bare content paths.
+/content/alberta-tickets-101  /hubs/alberta-tickets-101  301
 /traffic-ticket-assessment  /rapid-resolution  301
 /traffic-ticket-assessment/examples  /rapid-resolution  301
 /traffic-ticket-assessment/start  /submit-ticket  301
