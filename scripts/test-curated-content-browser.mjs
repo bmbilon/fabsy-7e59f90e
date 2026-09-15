@@ -55,7 +55,28 @@ try {
   }
 
   assert.deepEqual(pageErrors, []);
-  console.log(`Curated content browser parity passed (${records.length} authority guides).`);
+
+  // An unavailable content API must not replace bundled, reviewed guides with
+  // an error page. Block the real API shape and exercise fresh navigations.
+  const contentRequests = [];
+  await page.route('**/rest/v1/page_content*', async route => {
+    contentRequests.push(route.request().url());
+    await route.fulfill({ status: 503, contentType: 'application/json', body: '{"message":"Synthetic content outage"}' });
+  });
+  for (const record of records) {
+    await page.goto(new URL(`/content/${record.slug}`, BASE).toString(), { waitUntil: 'domcontentloaded', timeout: 60_000 });
+    await page.waitForFunction(
+      expected => document.querySelector('h1')?.textContent?.trim() === expected,
+      record.h1,
+      { timeout: 10_000 },
+    );
+    assert.equal(await page.title(), record.meta_title);
+    assert.equal(await page.locator('article').count(), 1);
+    assert.equal(await page.getByRole('heading', { name: 'Page Not Found', exact: true }).count(), 0);
+  }
+  assert.deepEqual(contentRequests, [], 'Bundled guides should not request the content database');
+  assert.deepEqual(pageErrors, []);
+  console.log(`Curated content browser parity and content-API independence passed (${records.length} authority guides).`);
 } finally {
   await browser?.close();
 }

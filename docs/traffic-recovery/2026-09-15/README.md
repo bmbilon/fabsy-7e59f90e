@@ -35,6 +35,7 @@ Page-dimensional values are evidence for prioritization; do not replace chart to
 3. **The homepage title led with an internal product name.** The title now describes the search intent and brand: “Fight a Traffic Ticket in Alberta | Fabsy”. The app-shell title, description and social metadata match the React homepage.
 4. **The obsolete `/content/alberta-tickets-101` path returned an app shell.** It now redirects permanently to `/hubs/alberta-tickets-101` in Cloudflare policy and static/Vercel configuration, and redirects during React navigation.
 5. **The city guides lacked useful local resources.** Added distinct official Calgary/Edmonton court-directory information, online/DIY response resources and contextual links to the detailed province-wide guides. Original source-check dates remain intact; the added court and response links were checked September 15. No new outcome claims, prices or credentials were introduced.
+6. **Bundled guides still required a successful content database request.** The Vercel preview exposed a “Page Not Found” failure even though the approved guide was bundled. React now loads those reviewed records directly, through the existing admission checks. Database-backed legacy pages retain their existing fetch path. Browser regression checks block the content API and confirm the four priority guides still render without making that request.
 
 ## Measurement limitation
 

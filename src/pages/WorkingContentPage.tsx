@@ -381,14 +381,20 @@ const WorkingContentPage = () => {
           setPageData(displayPage(reviewedPhotoRadarPage, parseFaqItems(reviewedPhotoRadarPage.faqs).items));
           return;
         }
-        const [pageResult, curatedSlugs, reviewedPage] = await Promise.all([
+        const reviewedPage = await loadCuratedPage(slug);
+        if (reviewedPage) {
+          // Reviewed guides ship with the app and stay readable when the
+          // database is unavailable. Keep the same content admission checks.
+          setPageData(normalizePageForDisplay(reviewedPage, true));
+          return;
+        }
+        const [pageResult, curatedSlugs] = await Promise.all([
           supabase
             .from('page_content')
             .select('*')
             .eq('slug', slug)
             .single(),
           loadCuratedSlugs(),
-          loadCuratedPage(slug),
         ]);
         const { data, error: fetchError } = pageResult;
 
@@ -396,8 +402,8 @@ const WorkingContentPage = () => {
         if (!data) throw new Error('Page not found');
 
         setPageData(normalizePageForDisplay(
-          { ...data, ...(reviewedPage || {}) },
-          Boolean(reviewedPage) || curatedSlugs.has(slug),
+          data,
+          curatedSlugs.has(slug),
         ));
       } catch (err) {
         console.error('Error fetching page:', err);
