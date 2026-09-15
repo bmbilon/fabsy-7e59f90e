@@ -14,7 +14,7 @@ The business-profile guides now describe current prices and the actual online op
 - Validated UTM parameters work on public discovery pages, including the homepage, comparison page and guides. Receipt/upload bridges keep their prior query restrictions.
 - An automatic AI source-only link receives a canonical source and `referral` medium. Exact known AI root referrers also receive source/medium credit. Explicit campaign fields, paid media and click IDs take precedence; a source string alone is not used to relabel an explicitly paid campaign as organic.
 - Page location omits queries, the title remains generic, and raw referrers are never sent. Sensitive query parameters, duplicates and fragments fail closed. External conversation paths still fail the immutable-referrer gate; no raw conversation identifiers are accepted.
-- GA4 runs on newly eligible pages without an Ads destination or ad-storage grant. The prior Ads route/query policy is separate. An Ads-touched document must be replaced before navigating to a newly eligible guide; the old tag cannot remain resident through that transition.
+- GA4 runs on newly eligible pages without an Ads destination or ad-storage grant. The prior Ads route/query and same-site referrer policies are separate. An Ads-touched document must be replaced before navigating to a newly eligible guide; the old tag cannot remain resident through that transition.
 - Consent remains required. Refusal, withdrawal and private-document isolation are unchanged. Consented first-party acquisition information survives public navigation into intake without loading vendor tags on intake.
 
 The public article inventory is intentionally explicit. Add future reviewed public articles to `src/config/publicArticlePaths.json`; do not substitute a wildcard. GA4 remains a consented observation system, not a count of all visitors.
@@ -37,7 +37,7 @@ See [per-prompt results](benchmark-capture.csv), the `answers/` evidence and [ca
 
 ## Validation
 
-- Google measurement regression: 41 tests, including unknown/refused consent, source-only AI links, exact AI hosts, paid-campaign precedence, private data, once-only page views, withdrawal and the retained Ads boundary.
+- Google measurement regression: 42 tests, including unknown/refused consent, source-only AI links, exact AI hosts, paid-campaign precedence, private data, once-only page views, withdrawal and the retained Ads boundary.
 - Full existing measurement suite passed, including purchase deduplication and verified receipt protections.
 - Inert Chromium attribution checks cover three AI landing journeys, Ads-to-guide document replacement, all eight existing paid-language journeys and persistent refusal. Every service/vendor request is intercepted; no customer record, upload or purchase is created.
 - The existing eleven-scenario Google network harness passed with inert fixtures, including blocked navigation, cross-tab withdrawal and receipt-token isolation. It forwards no Google events and does not prove production GA4 ingestion.

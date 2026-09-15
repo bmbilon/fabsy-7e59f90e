@@ -281,8 +281,11 @@ export function recheckGoogleMeasurementConsent(): void {
 /** Never copy raw acquisition fields, document titles, forms or user data. */
 export function initializeGoogleMeasurement(): void {
   const context = currentGooglePageContext();
+  if (!context) return;
   const available = currentGoogleMeasurementConfig();
-  const adsAllowed = publicGoogleAdsMeasurementUrl(new URL(window.location.href));
+  const previous = document.referrer ? new URL(document.referrer) : null;
+  const adsAllowed = publicGoogleAdsMeasurementUrl(new URL(window.location.href)) &&
+    (!previous || previous.origin !== window.location.origin || publicGoogleAdsMeasurementUrl(previous));
   const config: PaidPurchaseConfig = adsAllowed ? available : { ga4Id: available.ga4Id };
   if (restarting || getGoogleConsentChoice() !== 'accepted' ||
       !googleTagMayLoadInDocument(window) || !context || (!config.ga4Id && !config.adsId)) return;

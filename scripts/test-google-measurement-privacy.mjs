@@ -452,6 +452,16 @@ test('Ads-touched documents retain the narrower provider boundary on subsequent 
   assert.equal(browser.window.fabsyGoogleAdsInitialized, true, 'Never resurrect a formerly Ads-touched document');
 });
 
+test('newly reviewed article referrers do not widen the pre-existing Ads referrer gate', async () => {
+  const { api, browser } = await runtime(enabledEnv, {
+    href: 'https://fabsy.ca/', referrer: 'https://fabsy.ca/content/speeding-ticket-edmonton',
+  });
+  api.initializeGoogleMeasurement();
+  assert.equal(browser.scripts.length, 1, 'GA4 may measure this public arrival');
+  assert.equal(browser.window.fabsyGoogleAdsInitialized, undefined);
+  assert.equal(browser.commands().filter(c => c[0] === 'config' && c[1].startsWith('AW-')).length, 0);
+});
+
 test("unknown or sensitive query parameters, fragments and malformed click IDs fail closed", async () => {
   const { api } = await runtime();
   for (const suffix of [
