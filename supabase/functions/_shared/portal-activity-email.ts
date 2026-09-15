@@ -1,5 +1,5 @@
 import { sendWorkspaceEmail } from "./google-workspace-email.ts";
-import { internalNotificationDelivery } from "./internal-notification-recipients.ts";
+import { internalNotificationDelivery } from "./resend-email.ts";
 
 
 export interface PortalActivityEvent {

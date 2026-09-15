@@ -1,7 +1,7 @@
 import {
   FABSY_INTERNAL_NOTIFICATION_DELIVERY,
   internalNotificationDelivery,
-} from "./internal-notification-recipients.ts";
+} from "./resend-email.ts";
 
 export type UploadAlert = {
   id: string;

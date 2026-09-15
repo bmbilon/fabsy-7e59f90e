@@ -13,7 +13,7 @@ import {
   paymentCheckoutUrl,
   PAYMENT_LINK_CODE_PATTERN,
 } from "../_shared/payment-checkout-link.ts";
-import { internalNotificationDelivery } from "../_shared/internal-notification-recipients.ts";
+import { internalNotificationDelivery } from "../_shared/resend-email.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 

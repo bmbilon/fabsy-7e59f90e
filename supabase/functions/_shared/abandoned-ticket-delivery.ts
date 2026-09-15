@@ -2,7 +2,7 @@ import {
   type AbandonedTicketEmail,
   renderAbandonedTicketEmail,
 } from "./abandoned-ticket-email.ts";
-import { FABSY_INTERNAL_NOTIFICATION_DELIVERY } from "./internal-notification-recipients.ts";
+import { FABSY_INTERNAL_NOTIFICATION_DELIVERY } from "./resend-email.ts";
 
 export type AbandonedTicketJob = {
   id: string;

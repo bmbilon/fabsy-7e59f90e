@@ -4,7 +4,7 @@ import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
 import { prepareClientEmail } from "../_shared/notification-locale.ts";
 import { ContactRequestError, escapeContactHtml, parseContactRequest } from "../_shared/contact-request.ts";
-import { internalNotificationDelivery } from "../_shared/internal-notification-recipients.ts";
+import { internalNotificationDelivery } from "../_shared/resend-email.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 

@@ -3,7 +3,7 @@ import {
   FABSY_BACKUP_NOTIFICATION_EMAIL,
   FABSY_PRIMARY_NOTIFICATION_EMAIL,
   internalNotificationDelivery,
-} from "./internal-notification-recipients.ts";
+} from "./resend-email.ts";
 
 Deno.test("internal notices address Fabsy and blind-copy Execom backup", () => {
   assertEquals(FABSY_PRIMARY_NOTIFICATION_EMAIL, "hello@fabsy.ca");

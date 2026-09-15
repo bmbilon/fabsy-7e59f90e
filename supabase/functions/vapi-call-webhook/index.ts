@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
-import { internalNotificationDelivery } from "../_shared/internal-notification-recipients.ts";
+import { internalNotificationDelivery } from "../_shared/resend-email.ts";
 
 // Receives Vapi server messages. On an end-of-call report it stores the transcript,
 // recording and metadata in the call_logs table (audio copied into the

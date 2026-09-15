@@ -1,5 +1,5 @@
 import { getFabsyEmailSignature } from "./email-signature.ts";
-import { FABSY_INTERNAL_NOTIFICATION_DELIVERY } from "./internal-notification-recipients.ts";
+import { FABSY_INTERNAL_NOTIFICATION_DELIVERY } from "./resend-email.ts";
 
 export interface AbandonedTicketEmail {
   from: string;
