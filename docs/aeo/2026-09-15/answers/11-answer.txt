@@ -1,0 +1,19 @@
+        - heading "You said:" [level=4]
+        - button "What does Fabsy do, and is it a law firm?":
+          - paragraph: What does Fabsy do, and is it a law firm?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - text: Fabsy is an
+          - strong: Alberta traffic-ticket agent service
+          - text: ", not a law firm. It reviews tickets, gathers evidence, handles permitted pre-trial court/prosecutor steps, and seeks reduced fines/demerits or withdrawal. It explicitly says it"
+          - strong: does not provide legal advice
+          - text: .
+          - group "Sources":
+            - button "fabsy.ca, 2 sources":
+              - generic: F
+              - generic: fabsy.ca
+              - generic: "+1"
+        - paragraph:
+          - text: So, if you need a
+          - strong: lawyer
+          - text: ", Fabsy is not the same thing as hiring one."

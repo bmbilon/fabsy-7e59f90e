@@ -1,0 +1,34 @@
+        - heading "You said:" [level=4]
+        - button "how to fight ticket Alberta":
+          - paragraph: how to fight ticket Alberta
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - text: If you mean
+          - strong: fight/dispute a traffic ticket in Alberta
+          - text: ":"
+        - list:
+          - paragraph:
+            - strong: Do not pay the ticket
+            - text: if you want to contest it—paying generally resolves it.
+          - paragraph:
+            - text: Before the
+            - strong: “respond by” date
+            - text: on the ticket, use Alberta’s Traffic Tickets Digital Service to
+            - strong: plead not guilty and request a trial
+            - text: .
+            - group "Sources":
+              - button "Alberta.ca, 2 sources":
+                - generic: A
+                - generic: Alberta.ca
+                - generic: "+1"
+          - paragraph: At trial, the Crown must prove the offence beyond a reasonable doubt.
+          - paragraph:
+            - text: You can request
+            - strong: disclosure
+            - text: (the evidence against you) and prepare your defence.
+        - paragraph:
+          - button "Alberta Traffic Tickets Digital Service"
+        - paragraph:
+          - text: If you tell me
+          - strong: what ticket you got (speeding, distracted driving, red light, etc.) and what happened
+          - text: ", I can explain the best way to fight it."

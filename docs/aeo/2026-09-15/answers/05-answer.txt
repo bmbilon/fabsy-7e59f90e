@@ -1,0 +1,27 @@
+        - heading "You said:" [level=4]
+        - button "Can I dispute an Alberta traffic ticket online myself?":
+          - paragraph: Can I dispute an Alberta traffic ticket online myself?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - text: Yes.
+          - strong: For most Alberta traffic tickets, you can dispute the ticket yourself online
+          - text: through Alberta’s
+          - strong: Traffic Tickets Digital Service (TTDS)
+          - text: . You can plead not guilty and request a trial date or request a prosecutor review.
+          - group "Sources":
+            - button "Alberta.ca, 2 sources":
+              - generic: A
+              - generic: Alberta.ca
+              - generic: "+1"
+        - paragraph:
+          - button "Alberta Traffic Tickets Digital Service"
+        - paragraph:
+          - text: If yours is an
+          - strong: Immediate Roadside Sanction (IRS)
+          - text: "rather than a regular ticket, the process is different: you request a SafeRoads Alberta review, generally within"
+          - strong: 7 days
+          - text: ", with a $150 non-refundable fee."
+          - group "Sources":
+            - button "Alberta.ca":
+              - generic: A
+              - generic: Alberta.ca

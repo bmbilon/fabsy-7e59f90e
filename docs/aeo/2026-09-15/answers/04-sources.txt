@@ -1,0 +1,16 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "Alberta.ca Demerit driving suspension":
+        - /url: https://www.alberta.ca/demerit-driving-suspension?utm_source=chatgpt.com
+        - generic: A
+        - generic: Alberta.ca
+        - strong: Demerit driving suspension
+      - link "calgary.ca I got a Calgary bylaw ticket. Now what?":
+        - /url: https://www.calgary.ca/appeals/tickets.html?utm_source=chatgpt.com
+        - generic: C
+        - generic: calgary.ca
+        - strong: I got a Calgary bylaw ticket. Now what?

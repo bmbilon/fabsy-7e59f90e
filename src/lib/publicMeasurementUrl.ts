@@ -1,5 +1,5 @@
 import { isLiveChatUrl } from '../config/live-chat';
-import { publicGoogleMeasurementUrl } from './googleMeasurement';
+import { publicGoogleAdsMeasurementUrl, publicGoogleMeasurementUrl } from './googleMeasurement';
 import { publicMetaMeasurementUrl } from './metaMeasurement';
 import { publicOpenAIAdsMeasurementUrl } from './openAIAdsMeasurement';
 import type { MeasurementProvider } from './measurementNavigation';
@@ -15,7 +15,8 @@ export function publicMeasurementDocumentUrl(url: URL): boolean {
 
 /** The provider-specific half of the document boundary's public URL policy. */
 export function publicProviderMeasurementUrl(provider: MeasurementProvider, url: URL): boolean {
-  if (provider === 'google') return publicGoogleMeasurementUrl(url);
+  if (provider === 'google') return typeof window !== 'undefined' && window.fabsyGoogleAdsInitialized
+    ? publicGoogleAdsMeasurementUrl(url) : publicGoogleMeasurementUrl(url);
   if (provider === 'meta') return publicMetaMeasurementUrl(url);
   return publicOpenAIAdsMeasurementUrl(url);
 }

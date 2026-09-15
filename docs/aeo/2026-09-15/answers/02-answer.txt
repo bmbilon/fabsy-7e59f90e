@@ -1,0 +1,36 @@
+        - heading "You said:" [level=4]
+        - button "How do I fight a speeding ticket in Alberta?":
+          - paragraph: How do I fight a speeding ticket in Alberta?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - text: In Alberta, the usual way to fight a speeding ticket is to
+          - strong: plead not guilty and request a trial
+          - text: through the province’s Traffic Tickets Digital Service (TTDS).
+          - group "Sources":
+            - button "Alberta.ca, 2 sources":
+              - generic: A
+              - generic: Alberta.ca
+              - generic: "+1"
+        - list:
+          - paragraph:
+            - strong: Don’t pay the ticket
+            - text: if you intend to dispute it.
+          - paragraph:
+            - text: Use the
+            - button "Alberta Traffic Tickets Digital Service"
+            - text: to plead not guilty/request a trial.
+          - paragraph:
+            - text: Request
+            - strong: disclosure
+            - text: (the evidence the Crown intends to rely on), then review the officer’s notes, radar/laser evidence, calibration information, and other relevant material.
+          - paragraph: At trial, the Crown must prove the speeding offence beyond a reasonable doubt. You can challenge the officer’s observations, identification of your vehicle, speed measurement, or reliability of the evidence.
+          - paragraph:
+            - text: Missing the required response date can result in penalties, so check the date printed on your ticket.
+            - group "Sources":
+              - button "Alberta.ca":
+                - generic: A
+                - generic: Alberta.ca
+        - paragraph:
+          - text: If you tell me
+          - strong: what the ticket says (speed alleged, speed limit, radar/laser/photo, and whether it was a construction zone)
+          - text: ", I can explain the strongest potential arguments."

@@ -1,0 +1,11 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "Fabsy Traffic Ticket Services Rapid Resolution | Alberta Ticket Help | $198 CAD":
+        - /url: https://fabsy.ca/rapid-resolution?utm_source=chatgpt.com
+        - generic: F
+        - generic: Fabsy Traffic Ticket Services
+        - strong: Rapid Resolution | Alberta Ticket Help | $198 CAD

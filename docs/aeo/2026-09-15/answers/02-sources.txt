@@ -1,0 +1,11 @@
+- dialog "Sources":
+  - button "Dismiss"
+  - button "Close":
+  - article:
+    - heading "Sources" [level=2]
+    - list:
+      - link "Alberta.ca Fine payment | Alberta.ca":
+        - /url: https://www.alberta.ca/fine-payment?utm_source=chatgpt.com
+        - generic: A
+        - generic: Alberta.ca
+        - strong: Fine payment | Alberta.ca

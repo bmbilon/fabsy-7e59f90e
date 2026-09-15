@@ -1,0 +1,25 @@
+        - heading "You said:" [level=4]
+        - button "Is it worth fighting a speeding ticket in Calgary?":
+          - paragraph: Is it worth fighting a speeding ticket in Calgary?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph:
+          - strong: Yes—often, especially if the ticket is 16+ km/h over or could affect your insurance.
+          - text: Alberta speeding convictions carry
+          - strong: 2–6 demerit points
+          - text: ", and 15 points within two years can trigger a suspension."
+          - group "Sources":
+            - button "Alberta.ca, 2 sources":
+              - generic: A
+              - generic: Alberta.ca
+              - generic: "+1"
+        - paragraph:
+          - text: In Calgary, you can plead not guilty and request a trial; you can also request disclosure before deciding how to proceed.
+          - group "Sources":
+            - button "calgary.ca, 2 sources":
+              - generic: C
+              - generic: calgary.ca
+              - generic: "+1"
+        - paragraph:
+          - text: If you tell me
+          - strong: how fast you were allegedly going, the speed limit, and whether it was police or photo radar
+          - text: ", I can tell you whether fighting it is likely worth it."

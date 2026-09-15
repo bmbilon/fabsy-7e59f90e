@@ -1,0 +1,33 @@
+        - heading "You said:" [level=4]
+        - button "What does Fabsy charge for Rapid Resolution and photo radar tickets?":
+          - paragraph: What does Fabsy charge for Rapid Resolution and photo radar tickets?
+        - heading "ChatGPT said:" [active] [level=4]
+        - paragraph: "Fabsy currently charges:"
+        - list:
+          - paragraph:
+            - strong: "Rapid Resolution:"
+            - text: $198 CAD + GST (
+            - strong: $207.90 total
+            - text: ).
+            - group "Sources":
+              - button "Fabsy Traffic Ticket Services":
+                - generic: F
+                - generic: Fabsy Traffic Ticket Services
+          - paragraph:
+            - strong: "Photo radar/red-light camera:"
+            - text: $79 CAD + 5% GST (
+            - strong: $82.95 total
+            - text: ).
+            - group "Sources":
+              - button "Fabsy Traffic Ticket Services":
+                - generic: F
+                - generic: Fabsy Traffic Ticket Services
+        - paragraph:
+          - text: There’s
+          - strong: no success fee
+          - text: ", and Fabsy says the service fee is refundable if it obtains no reduction or withdrawal, subject to its terms."
+          - group "Sources":
+            - button "Fabsy Traffic Ticket Services, 2 sources":
+              - generic: F
+              - generic: Fabsy Traffic Ticket Services
+              - generic: "+1"

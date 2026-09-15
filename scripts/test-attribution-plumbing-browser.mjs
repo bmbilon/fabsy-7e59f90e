@@ -47,6 +47,58 @@ async function fixture() {
 }
 
 try {
+  for (const landingPath of ['/about/comparison', '/content/speeding-ticket-edmonton', '/content/speeding-ticket-calgary']) {
+    const f = await fixture();
+    try {
+      await f.page.goto(`https://fabsy.ca${landingPath}?utm_source=chatgpt.com`);
+      await f.page.locator('[data-google-consent-choice="accepted"]').waitFor();
+      assert.equal(f.vendorLoads.length, 0, 'AI landing is untagged before consent');
+      await f.page.locator('[data-google-consent-choice="accepted"]').click();
+      await f.page.waitForFunction(() => (window.dataLayer || []).some(c => c[0] === 'event' && c[1] === 'page_view'));
+      const google = await f.page.evaluate(() => (window.dataLayer || []).map(c => Array.from(c)));
+      const view = google.find(c => c[0] === 'event' && c[1] === 'page_view')[2];
+      assert.equal(view.campaign_source, 'chatgpt.com');
+      assert.equal(view.campaign_medium, 'referral');
+      assert.equal(view.page_location, 'https://fabsy.ca' + landingPath);
+      assert.equal(google.filter(c => c[0] === 'config' && c[1].startsWith('AW-')).length, 0);
+      assert.equal(f.vendorLoads.filter(v => v.provider === 'meta').length, 0);
+      await f.page.locator('a[href="/rapid-resolution"]:visible').first().click();
+      await f.page.waitForURL('https://fabsy.ca/rapid-resolution');
+      for (let i = 0; i < 50 && !f.events.some(e => e.eventName === 'landing_view'); i++) await new Promise(r => setTimeout(r, 20));
+      const landing = f.events.find(e => e.eventName === 'landing_view');
+      assert.equal(landing?.attribution.utm_source, 'chatgpt.com', 'First-party source survives public navigation');
+      const loadsBeforePrivate = f.vendorLoads.length;
+      await f.page.locator('main [data-funnel-action="primary_cta"][data-funnel-position="hero"]').first().click();
+      await f.page.waitForURL('https://fabsy.ca/submit-ticket');
+      await f.page.locator('main').waitFor();
+      assert.equal(f.vendorLoads.length, loadsBeforePrivate);
+      assert.equal(await f.page.locator('#fabsy-google-tag, #fabsy-meta-pixel').count(), 0);
+      const retained = await f.page.evaluate(() => JSON.parse(localStorage.getItem('fabsy_marketing_v3')));
+      assert.equal(retained.attribution.utm_source, 'chatgpt.com');
+      assert.equal(retained.attribution.landing_page, landingPath);
+      assert.ok(f.events.every(e => e.attribution?.utm_source === 'chatgpt.com'));
+      assert.ok(f.events.every(e => e.sessionId === landing.sessionId));
+      results.push({ scenario: 'ChatGPT guide to isolated intake', landingPath, status: 'pass' });
+      console.log(landingPath + ': ChatGPT attribution, consent, GA4-only landing and private intake pass');
+    } finally { await f.context.close(); }
+  }
+
+  // An Ads tag that loaded on a previously approved page must be retired when
+  // opening a newly measured guide, even though both URLs are public to GA4.
+  const boundary = await fixture();
+  try {
+    await boundary.page.goto('https://fabsy.ca/');
+    await boundary.page.locator('[data-google-consent-choice="accepted"]').click();
+    await boundary.page.waitForFunction(() => window.fabsyGoogleAdsInitialized === true);
+    await boundary.page.locator('a[href="/content/speeding-ticket-edmonton"]').first().click();
+    await boundary.page.waitForURL('https://fabsy.ca/content/speeding-ticket-edmonton');
+    await boundary.page.waitForFunction(() => window.fabsyAnalyticsInitialized === true);
+    assert.equal(await boundary.page.evaluate(() => Boolean(window.fabsyGoogleAdsInitialized)), false);
+    const google = await boundary.page.evaluate(() => (window.dataLayer || []).map(c => Array.from(c)));
+    assert.equal(google.filter(c => c[0] === 'config' && c[1].startsWith('AW-')).length, 0);
+    results.push({ scenario: 'Ads document retired before GA4-only guide', status: 'pass' });
+  } finally { await boundary.context.close(); }
+
   for (const locale of ['en', 'pa', 'tl', 'zh-hans', 'zh-hant', 'ar', 'es', 'hi']) {
     const f = await fixture();
     try {

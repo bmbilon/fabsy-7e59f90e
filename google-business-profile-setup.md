@@ -1,49 +1,19 @@
-# Google Business Profile Setup Instructions
+# Google Business Profile eligibility — Fabsy
 
-Use the details below exactly. Fabsy is a service-area business, so do not publish a physical address.
+Checked September 15, 2026. Brett confirmed that Fabsy is entirely online.
 
-## Identity and contact information
+## Current decision
 
-- Business name: `Fabsy Traffic Ticket Services`
-- Primary category: `Legal Services`
-- Secondary category, if available: `Traffic Ticket Service`
-- Phone: `(825) 793-2279`
-- Website: `https://fabsy.ca`
-- Service area: Alberta, Canada
+Fabsy's current operation does not meet Google's in-person customer-contact requirement. Google explicitly excludes online-only businesses. A hidden-address service-area profile is for a business that visits customers; it is not an exception for an online service.
 
-When Google asks whether customers visit the business location, select the service-area option and keep the physical address hidden.
+Do not follow the former setup instructions, create Calgary or Edmonton office listings, or submit fabricated location evidence. No profile was created or changed during this repair.
 
-## Business description
+If Fabsy's real operating model later changes to include in-person customer contact, reassess the then-current requirements and the offered verification method. The current decision does not prevent ordinary website indexing or organic AI citations.
 
-Copy this text exactly:
+## Sources
 
-> Traffic ticket agent services for Alberta drivers. Fabsy reviews speeding, distracted driving, red-light, careless driving, and other provincial traffic matters. Representation uses a $488 base representation fee plus 30% of any fine reduction achieved; there is no success fee if the fine is not reduced. Serving Calgary, Edmonton, Red Deer, Lethbridge, Medicine Hat, Fort McMurray, Grande Prairie, and other Alberta locations where agent representation is permitted. Fabsy is not a law firm.
+- [Google: Business eligibility and ownership guidelines](https://support.google.com/business/answer/13763036?hl=en)
+- [Google: Manage service areas](https://support.google.com/business/answer/9157481?hl=en)
+- [Google: Guidelines for representing your business](https://support.google.com/business/answer/3038177?hl=en)
 
-## Hours
-
-- Monday to Friday: 9:00 AM to 6:00 PM Mountain Time
-- Saturday: 10:00 AM to 4:00 PM Mountain Time
-- Sunday: Closed
-
-## Service areas
-
-Add Calgary, Edmonton, Red Deer, Lethbridge, Medicine Hat, Fort McMurray, and Grande Prairie. Add other Alberta locations only where agent representation is permitted.
-
-## Services
-
-- Alberta traffic ticket assessment
-- Speeding ticket agent services
-- Distracted driving ticket agent services
-- Red-light ticket agent services
-- Photo radar ticket assessment
-- Careless driving ticket agent services
-
-Use the full pricing formula in a service description if pricing is shown. Do not list $488 as the complete price by itself.
-
-## Photos
-
-Upload only authentic business assets that Fabsy has permission to use, such as its logo, current team photos, and accurate service-area graphics. Do not upload staged credentials, fabricated statistics, or altered driving records.
-
-## Verification and tracking
-
-Google controls the available verification methods. Complete the method offered to the account owner, then record the verified listing URL and date in `citation-tracking.csv`. Do not store account passwords in the repository.
+Use the [current business identity and description](business-profile-setup.md) for eligible online-business citations. Confirm live pricing against the service pages and `src/config/offers.json`; the former $488 plus 30% formula is retired.

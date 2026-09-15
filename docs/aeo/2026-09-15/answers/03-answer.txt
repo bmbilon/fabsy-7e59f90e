@@ -1,0 +1,112 @@
+        - heading "You said:" [level=4]
+        - button "Who can help me fight a speeding ticket in Edmonton?":
+          - paragraph: Who can help me fight a speeding ticket in Edmonton?
+        - heading "ChatGPT said:" [active] [level=4]
+        - button:
+          - list:
+            - strong: Alberta Traffic Defenders
+            - generic: ★ 4.8
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+            - strong: Traffic Ticket Specialist
+            - generic: ★ 4.6
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+            - strong: Pringle Law
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Criminal justice attorney
+            - generic: Open
+            - strong: Strategic Criminal Defence Edmonton
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Criminal justice attorney
+            - generic: Open
+        - region "Map"
+        - button "Alberta Traffic Defenders":
+          - generic: ★
+          - generic: "4.8"
+          - strong: Alberta Traffic Defenders
+          - generic: ★ 4.8 · Legal services · Open
+        - button "Traffic Ticket Specialist":
+          - generic: ★
+          - generic: "4.6"
+          - strong: Traffic Ticket Specialist
+          - generic: ★ 4.6 · Legal services · Open
+        - button "Pringle Law":
+          - generic: ★
+          - generic: "4.9"
+          - strong: Pringle Law
+          - generic: ★ 4.9 · Criminal justice attorney · Open
+        - button "Strategic Criminal Defence Edmonton":
+          - generic: ★
+          - generic: "4.9"
+          - strong: Strategic Criminal Defence Edmonton
+          - generic: ★ 4.9 · Criminal justice attorney · Open
+        - button "Zoom in"
+        - button "Zoom out"
+        - button "Toggle attribution"
+        - link "Mapbox homepage":
+          - /url: https://www.mapbox.com/
+        - button "Open Maps":
+        - list:
+          - button "Alberta Traffic Defenders":
+            - strong: Alberta Traffic Defenders
+            - generic: ★ 4.8
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+          - button "Traffic Ticket Specialist":
+            - strong: Traffic Ticket Specialist
+            - generic: ★ 4.6
+            - generic: •
+            - generic: Legal services
+            - generic: Open
+          - button "Pringle Law":
+            - strong: Pringle Law
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Criminal justice attorney
+            - generic: Open
+          - button "Strategic Criminal Defence Edmonton":
+            - strong: Strategic Criminal Defence Edmonton
+            - generic: ★ 4.9
+            - generic: •
+            - generic: Criminal justice attorney
+            - generic: Open
+        - paragraph:
+          - text: For a speeding ticket in Edmonton, you can use either a
+          - strong: traffic-ticket specialist/paralegal
+          - text: or a
+          - strong: lawyer
+          - text: ":"
+        - list:
+          - paragraph:
+            - button "Alberta Traffic Defenders"
+            - text: — specializes in Alberta traffic-ticket defence.
+          - paragraph:
+            - button "Traffic Ticket Specialist"
+            - text: — downtown Edmonton traffic-ticket representation.
+          - paragraph:
+            - button "Pringle Law"
+            - text: — law firm handling traffic matters.
+          - paragraph:
+            - button "Strategic Criminal Defence Edmonton"
+            - text: — lawyers handling speeding and other traffic offences.
+            - group "Sources":
+              - button "strategiccriminaldefence.com":
+                - generic: S
+                - generic: strategiccriminaldefence.com
+        - paragraph:
+          - strong: Don't pay the ticket if you intend to dispute it
+          - text: —payment generally constitutes a guilty plea.
+          - group "Sources":
+            - button "edmonton.ca":
+              - generic: E
+              - generic: edmonton.ca
+        - paragraph:
+          - text: If you tell me
+          - strong: how fast you were allegedly going, the posted limit, and whether it was a photo-radar or officer-issued ticket
+          - text: ", I can tell you which type of representative makes the most sense."
