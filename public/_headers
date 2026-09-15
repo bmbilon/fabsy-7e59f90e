@@ -6,6 +6,15 @@
 /faq
   X-Robots-Tag: index, follow
   Cache-Control: public, max-age=3600
+
+/representation-consent
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+  Cache-Control: private, no-store
+
+/admin/consent-links
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: private, no-store
   
 /prerendered/*
   X-Robots-Tag: noindex, nofollow

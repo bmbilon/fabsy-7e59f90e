@@ -35,6 +35,7 @@ import useSafeHead from "@/hooks/useSafeHead";
 import { supabase } from "@/integrations/supabase/client";
 
 type SignatureMethod = "typed" | "manual_scan";
+type DisclosureLookupType = "drivers_licence" | "licence_plate";
 type ConsentStatus = "pending" | "completed" | "document_received";
 type UnavailableReason = "missing" | "invalid" | "expired" | "revoked" | "error";
 type PageState = "loading" | "processing" | "ready" | "submitting" | "completed" | UnavailableReason;
@@ -114,6 +115,7 @@ interface ConsentResponse {
   formData?: {
     phone: string | null;
     dateOfBirth: string | null;
+    disclosureLookupType?: DisclosureLookupType | null;
     address: string | null;
     city: string | null;
     province: string | null;
@@ -153,6 +155,8 @@ class ConsentRequestError extends Error {
 interface ConsentFormData {
   phone: string;
   dateOfBirth: string;
+  disclosureLookupType: DisclosureLookupType;
+  disclosureLookupValue: string;
   address: string;
   city: string;
   province: string;
@@ -174,6 +178,8 @@ type FieldErrors = Record<string, string>;
 const INITIAL_FORM: ConsentFormData = {
   phone: "",
   dateOfBirth: "",
+  disclosureLookupType: "drivers_licence",
+  disclosureLookupValue: "",
   address: "",
   city: "",
   province: "",
@@ -202,13 +208,17 @@ function readBearerToken() {
   if (typeof window === "undefined") return "";
   const queryToken = new URLSearchParams(window.location.search).get("token")?.trim() || "";
   const fragmentToken = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("token")?.trim() || "";
-  const candidate = queryToken || fragmentToken;
+  const candidate = fragmentToken || queryToken;
   if (!candidate || candidate.length > 4096 || containsControlCharacter(candidate)) return "";
   return candidate;
 }
 
 function normalizeName(value: string) {
   return value.trim().replace(/\s+/g, " ");
+}
+
+function isDisclosureLookupType(value: unknown): value is DisclosureLookupType {
+  return value === "drivers_licence" || value === "licence_plate";
 }
 
 function localDateValue(date = new Date()) {
@@ -381,8 +391,8 @@ function PrivateFooter() {
           <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="tel:+18257932279"><Phone className="h-4 w-4" aria-hidden="true" />(825) 793-2279</a>
           <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="mailto:hello@fabsy.ca"><Mail className="h-4 w-4" aria-hidden="true" />hello@fabsy.ca</a>
           <a className="inline-flex min-h-11 items-center underline-offset-4 hover:text-primary hover:underline" href="/privacy-policy">Privacy policy</a>
-          <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="/terms-of-purchase" target="_blank" rel="noopener noreferrer">
-            Terms of purchase<span className="sr-only"> (opens in a new tab)</span><ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          <a className="inline-flex min-h-11 items-center gap-1.5 underline-offset-4 hover:text-primary hover:underline" href="/terms-of-service" target="_blank" rel="noopener noreferrer">
+            Terms of service<span className="sr-only"> (opens in a new tab)</span><ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
         </div>
       </div>
@@ -477,6 +487,7 @@ export default function RepresentationConsent() {
 
   const applyResponse = (data: ConsentResponse) => {
     if (!data.invite || !data.consent || !data.status) return false;
+    const isFinished = isFinishedStatus(data.status);
     setInvite(data.invite);
     setRepresentative(data.representative || null);
     setGovernmentForm(data.governmentForm || null);
@@ -486,6 +497,10 @@ export default function RepresentationConsent() {
       ...current,
       phone: current.phone || data.formData?.phone || data.invite?.client.phone || "",
       dateOfBirth: current.dateOfBirth || data.formData?.dateOfBirth || data.invite?.client.dateOfBirth || "",
+      disclosureLookupType: isDisclosureLookupType(data.formData?.disclosureLookupType)
+        ? data.formData.disclosureLookupType
+        : current.disclosureLookupType,
+      disclosureLookupValue: isFinished ? "" : current.disclosureLookupValue,
       address: current.address || data.formData?.address || data.invite?.client.address || "",
       city: current.city || data.formData?.city || data.invite?.client.city || "",
       province: current.province || data.formData?.province || data.invite?.client.province || "",
@@ -495,7 +510,7 @@ export default function RepresentationConsent() {
     setDownloadExpiresIn(data.signed?.pdfUrlExpiresIn || 0);
     setManualScanDownloadUrl(trustedPdfUrl(data.signed?.manualScanPdfUrl));
     setManualScanDownloadExpiresIn(data.signed?.manualScanPdfUrlExpiresIn || 0);
-    setPageState(isFinishedStatus(data.status) ? "completed" : "ready");
+    setPageState(isFinished ? "completed" : "ready");
     return true;
   };
 
@@ -598,6 +613,19 @@ export default function RepresentationConsent() {
     if (!representative?.firstName || !representative.lastName || !representative.phone) errors.representative = "Fabsy must complete the representative name and phone number before this form can be signed.";
     if (!form.dateOfBirth.trim()) errors.dateOfBirth = "Enter your date of birth.";
     else if (!/^\d{4}-\d{2}-\d{2}$/.test(form.dateOfBirth) || form.dateOfBirth < "1900-01-01" || form.dateOfBirth > localDateValue()) errors.dateOfBirth = "Enter a valid date of birth that is not in the future.";
+    if (!form.disclosureLookupValue.trim()) {
+      errors.disclosureLookupValue = form.disclosureLookupType === "drivers_licence"
+        ? "Enter your driver's licence number."
+        : "Enter the licence plate shown on this ticket.";
+    } else {
+      const lookupValue = form.disclosureLookupValue.trim();
+      const minimumLength = form.disclosureLookupType === "drivers_licence" ? 3 : 2;
+      if (lookupValue.length < minimumLength || lookupValue.length > 40 || !/^[A-Za-z0-9 .-]+$/.test(lookupValue)) {
+        errors.disclosureLookupValue = form.disclosureLookupType === "drivers_licence"
+          ? "Enter a valid driver's licence number."
+          : "Enter a valid licence plate.";
+      }
+    }
     if (!form.address.trim()) errors.address = "Enter your mailing address.";
     if (!form.city.trim()) errors.city = "Enter your city or town.";
     if (form.phone.trim()) {
@@ -661,7 +689,9 @@ export default function RepresentationConsent() {
       const signedAt = new Date().toISOString();
       const normalizedFormData = {
         phone: form.phone.trim(), dateOfBirth: form.dateOfBirth, address: form.address.trim(), city: form.city.trim(),
-        province: form.province.trim(), postalCode: form.postalCode.trim().toUpperCase(), signedAt,
+        province: form.province.trim(), postalCode: form.postalCode.trim().toUpperCase(),
+        disclosureLookupType: form.disclosureLookupType,
+        disclosureLookupValue: form.disclosureLookupValue.trim().toUpperCase(), signedAt,
       };
       const body: Record<string, unknown> = { action: "submit", signatureMethod, accepted: true, consentTextHash: consent.hash, formData: normalizedFormData };
       if (signatureMethod === "typed") body.digitalSignature = form.digitalSignature.trim();
@@ -801,6 +831,84 @@ export default function RepresentationConsent() {
           </fieldset>
         </Card>
 
+        <Card id="disclosure-lookup-details" className="p-5 shadow-fab sm:p-7">
+          <fieldset>
+            <legend className="text-xl font-bold">Ticket lookup details</legend>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Fabsy uses this information with your name and date of birth to locate the ticket in Alberta&apos;s Traffic Tickets Digital Service.
+            </p>
+            <RadioGroup
+              className="mt-5 grid gap-3 sm:grid-cols-2"
+              value={form.disclosureLookupType}
+              onValueChange={(value) => {
+                if (value !== "drivers_licence" && value !== "licence_plate") return;
+                setForm((current) => ({
+                  ...current,
+                  disclosureLookupType: value,
+                  disclosureLookupValue: "",
+                }));
+                setFieldErrors((current) => {
+                  if (!current.disclosureLookupValue) return current;
+                  const next = { ...current };
+                  delete next.disclosureLookupValue;
+                  return next;
+                });
+                setFormError("");
+              }}
+              aria-label="Ticket lookup method"
+            >
+              <Label
+                htmlFor="lookup-drivers-licence"
+                className={`flex min-h-24 cursor-pointer items-start gap-3 rounded-lg border p-4 font-normal transition-colors ${form.disclosureLookupType === "drivers_licence" ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:bg-muted/40"}`}
+              >
+                <RadioGroupItem id="lookup-drivers-licence" value="drivers_licence" className="mt-1 h-5 w-5 shrink-0" />
+                <span>
+                  <span className="block font-semibold text-foreground">Driver&apos;s licence number</span>
+                  <span className="mt-1 block text-sm leading-5 text-muted-foreground">Use the Alberta driver&apos;s licence connected to the ticket.</span>
+                </span>
+              </Label>
+              <Label
+                htmlFor="lookup-licence-plate"
+                className={`flex min-h-24 cursor-pointer items-start gap-3 rounded-lg border p-4 font-normal transition-colors ${form.disclosureLookupType === "licence_plate" ? "border-primary bg-primary/5 ring-1 ring-primary" : "hover:bg-muted/40"}`}
+              >
+                <RadioGroupItem id="lookup-licence-plate" value="licence_plate" className="mt-1 h-5 w-5 shrink-0" />
+                <span>
+                  <span className="block font-semibold text-foreground">Licence plate</span>
+                  <span className="mt-1 block text-sm leading-5 text-muted-foreground">Use the plate shown on the ticket if the driver&apos;s licence search is not appropriate.</span>
+                </span>
+              </Label>
+            </RadioGroup>
+            <div className="mt-5 space-y-2">
+              <Label htmlFor="consent-lookup-value">
+                {form.disclosureLookupType === "drivers_licence" ? "Driver's licence number" : "Licence plate"} <span aria-hidden="true">*</span>
+              </Label>
+              <Input
+                id="consent-lookup-value"
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                minLength={form.disclosureLookupType === "drivers_licence" ? 3 : 2}
+                maxLength={40}
+                required
+                aria-required="true"
+                aria-invalid={Boolean(fieldErrors.disclosureLookupValue)}
+                aria-describedby={fieldErrors.disclosureLookupValue ? "consent-lookup-value-error" : "consent-lookup-value-help"}
+                placeholder={form.disclosureLookupType === "drivers_licence" ? "Enter licence number" : "Enter plate number"}
+                value={form.disclosureLookupValue}
+                onChange={(event) => updateField("disclosureLookupValue", event.target.value.toUpperCase())}
+              />
+              <p id="consent-lookup-value-help" className="text-xs text-muted-foreground">
+                Enter it exactly as shown, including any letters. Spaces and hyphens are accepted.
+              </p>
+              <InlineError id="consent-lookup-value-error" message={fieldErrors.disclosureLookupValue} />
+            </div>
+            <p className="mt-5 flex items-start gap-2 text-xs leading-5 text-muted-foreground">
+              <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              This private identifier is saved with your consent and is not displayed again after submission.
+            </p>
+          </fieldset>
+        </Card>
+
         <Card id="representative-details" className="p-5 shadow-fab sm:p-7">
           <section aria-labelledby="representative-heading">
             <p className="text-sm font-semibold uppercase tracking-wide text-primary">Fixed by Fabsy</p><h2 id="representative-heading" className="mt-1 text-xl font-bold">Your named representative</h2>
@@ -912,7 +1020,7 @@ export default function RepresentationConsent() {
               <AlertDescription>
                 <p>{formError}</p>
                 {Object.entries(fieldErrors).length ? <ul className="mt-2 list-disc space-y-1 pl-5">{Object.entries(fieldErrors).map(([field, message]) => {
-                  const targets: Record<string, string> = { clientIdentity: "government-details", ticketNumbers: "consent-ticket-numbers", representative: "representative-details", dateOfBirth: "consent-dob", phone: "consent-phone", address: "consent-address", city: "consent-city", postalCode: "consent-postal", digitalSignature: "consent-signature", manualSignedName: "manual-signed-name", manualSignedDate: "manual-signed-date", manualFile: "manual-file-section", accepted: "consent-accepted" };
+                  const targets: Record<string, string> = { clientIdentity: "government-details", ticketNumbers: "consent-ticket-numbers", representative: "representative-details", dateOfBirth: "consent-dob", disclosureLookupValue: "consent-lookup-value", phone: "consent-phone", address: "consent-address", city: "consent-city", postalCode: "consent-postal", digitalSignature: "consent-signature", manualSignedName: "manual-signed-name", manualSignedDate: "manual-signed-date", manualFile: "manual-file-section", accepted: "consent-accepted" };
                   return <li key={field}><a className="underline" href={`#${targets[field] || "government-details"}`}>{message}</a></li>;
                 })}</ul> : null}
               </AlertDescription>

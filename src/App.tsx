@@ -79,6 +79,7 @@ const ReferralPortal = lazy(() => import("./pages/ReferralPortal"));
 const ProDiscountPortal = lazy(() => import("./pages/ProDiscountPortal"));
 const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
 const AdminLiveView = lazy(() => import("./pages/AdminLiveView"));
+const AdminManualRepresentationLinks = lazy(() => import("./pages/AdminManualRepresentationLinks"));
 
 function RouteSuspense({ children }: PropsWithChildren) {
   return <Suspense fallback={<div className="min-h-screen" aria-busy="true" />}>{children}</Suspense>;
@@ -129,6 +130,8 @@ const App = () => (
           <Route path="/portal/pro-discount" element={<RouteSuspense><ProDiscountPortal /></RouteSuspense>} />
           <Route path="/portal/pro-discount/:submissionId" element={<RouteSuspense><ProDiscountPortal /></RouteSuspense>} />
           <Route path="/admin/referrals" element={<RouteSuspense><AdminReferrals /></RouteSuspense>} />
+          <Route path="/admin/consent-links" element={<RouteSuspense><AdminManualRepresentationLinks /></RouteSuspense>} />
+          <Route path="/admin/emailed-ticket-links" element={<Navigate to="/admin/consent-links" replace />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />
           <Route path="/ticket-form" element={<TicketFormPage />} />
           <Route path="/representation-consent" element={<RepresentationConsent />} />

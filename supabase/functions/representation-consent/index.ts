@@ -94,6 +94,10 @@ type AdminDatabase = {
         Args: JsonRecord;
         Returns: JsonRecord | null;
       };
+      claim_representation_consent_invite_v3: {
+        Args: JsonRecord;
+        Returns: JsonRecord | null;
+      };
       finalize_representation_consent_invite_v2: {
         Args: JsonRecord;
         Returns: JsonRecord | null;
@@ -138,6 +142,8 @@ interface InviteRow extends JsonRecord, ConsentAccessRecord {
   client_province: string | null;
   client_postal_code: string | null;
   client_drivers_license: string | null;
+  disclosure_lookup_type: "drivers_licence" | "licence_plate" | null;
+  disclosure_lookup_value: string | null;
   ticket_number: string;
   ticket_numbers: string[];
   charge_description: string;
@@ -302,9 +308,8 @@ interface ValidatedClientFormData {
   city: string;
   province: string;
   postalCode: string;
-  // Preserved as an empty audit field for backward-compatible database RPCs.
-  // Driver's licence is not an APTO13348 consent field and is not collected.
-  driversLicense: string;
+  disclosureLookupType: "drivers_licence" | "licence_plate";
+  disclosureLookupValue: string;
   signedAt: string;
 }
 
@@ -404,6 +409,34 @@ function validateClientFormData(value: unknown): ValidatedClientFormData {
       "invalid_client_details",
     );
   }
+  const disclosureLookupType = form.disclosureLookupType;
+  if (
+    disclosureLookupType !== "drivers_licence" &&
+    disclosureLookupType !== "licence_plate"
+  ) {
+    throw new RequestError(
+      "Choose a driver's licence number or licence plate.",
+      400,
+      "invalid_client_details",
+    );
+  }
+  const disclosureLookupValue = requiredClientText(
+    form.disclosureLookupValue,
+    disclosureLookupType === "drivers_licence"
+      ? "Driver's licence number"
+      : "Licence plate",
+    disclosureLookupType === "drivers_licence" ? 3 : 2,
+    40,
+  ).toUpperCase();
+  if (!/^[A-Z0-9 .-]{2,40}$/.test(disclosureLookupValue)) {
+    throw new RequestError(
+      disclosureLookupType === "drivers_licence"
+        ? "Driver's licence number is invalid."
+        : "Licence plate is invalid.",
+      400,
+      "invalid_client_details",
+    );
+  }
   const signedAtValue = typeof form.signedAt === "string" ? form.signedAt : "";
   const signedAtDate = new Date(signedAtValue);
   const now = Date.now();
@@ -427,7 +460,8 @@ function validateClientFormData(value: unknown): ValidatedClientFormData {
     city,
     province,
     postalCode,
-    driversLicense: "",
+    disclosureLookupType,
+    disclosureLookupValue,
     signedAt: signedAtDate.toISOString(),
   };
 }
@@ -682,6 +716,10 @@ function publicFormData(invite: InviteRow) {
     postalCode: optionalLine(
       completed ? invite.signed_client_postal_code : invite.client_postal_code,
     ),
+    disclosureLookupType: optionalLine(invite.disclosure_lookup_type),
+    // The bearer never needs the stored lookup identifier echoed back. Keeping
+    // it write-only also avoids placing a driver licence or plate in UI state.
+    disclosureLookupValue: null,
     signedAt: completed ? invite.client_reported_signed_at : null,
   };
 }
@@ -1282,7 +1320,7 @@ async function handleSubmit(
   }
 
   const { data: claimData, error: claimError } = await admin.rpc(
-    "claim_representation_consent_invite_v2",
+    "claim_representation_consent_invite_v3",
     {
       p_token_hash: tokenHash,
       p_claim_id: claimId,
@@ -1309,7 +1347,8 @@ async function handleSubmit(
       p_client_city: formData.city,
       p_client_province: formData.province,
       p_client_postal_code: formData.postalCode,
-      p_client_drivers_license: formData.driversLicense,
+      p_disclosure_lookup_type: formData.disclosureLookupType,
+      p_disclosure_lookup_value: formData.disclosureLookupValue,
       p_client_reported_signed_at: formData.signedAt,
       p_signing_ip: clientIp(req),
       p_signing_user_agent: safeUserAgent(req),
