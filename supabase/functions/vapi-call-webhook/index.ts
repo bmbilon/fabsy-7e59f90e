@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
+import { internalNotificationDelivery } from "../_shared/resend-email.ts";
 
 // Receives Vapi server messages. On an end-of-call report it stores the transcript,
 // recording and metadata in the call_logs table (audio copied into the
@@ -12,7 +13,6 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-const NOTIFY_TO = "hello@fabsy.ca";
 const EMAIL_FROM = "Fabsy Calls <hello@fabsy.ca>";
 const RECORDINGS_BUCKET = "call-recordings";
 
@@ -160,7 +160,13 @@ serve(async (req: Request): Promise<Response> => {
         ${getFabsyEmailSignature ? getFabsyEmailSignature() : ""}
       </div>`;
 
-    await resend.emails.send({ from: EMAIL_FROM, to: [NOTIFY_TO], subject, html });
+    await resend.emails.send({
+      from: EMAIL_FROM,
+      reply_to: "hello@fabsy.ca",
+      ...internalNotificationDelivery(),
+      subject,
+      html,
+    });
   } catch (e) {
     console.error("email send failed", (e as Error).message);
   }

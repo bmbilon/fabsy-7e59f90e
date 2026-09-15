@@ -4,6 +4,7 @@ import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
 import { prepareClientEmail } from "../_shared/notification-locale.ts";
 import { ContactRequestError, escapeContactHtml, parseContactRequest } from "../_shared/contact-request.ts";
+import { internalNotificationDelivery } from "../_shared/resend-email.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -34,7 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send confirmation email to the user
     const userEmailResponse = await resend.emails.send(prepareClientEmail({
       from: "Fabsy <hello@fabsy.ca>",
-      reply_to: "brett@execom.ca",
+      reply_to: "hello@fabsy.ca",
       to: [email],
       subject: isFleet ? "We've Received Your Fleet Enquiry - Fabsy" : "We've Received Your Message - Fabsy",
       html: `
@@ -117,7 +118,7 @@ const handler = async (req: Request): Promise<Response> => {
     const adminEmailResponse = await resend.emails.send({
       from: "Fabsy Notifications <hello@fabsy.ca>",
       reply_to: email, // Set reply-to as the user's email so admin can reply directly
-      to: ["brett@execom.ca"],
+      ...internalNotificationDelivery(),
       subject: `${isFleet ? "Fleet Account Enquiry" : "New Contact Form Submission"} from ${request.name}`,
       html: `
         <!DOCTYPE html>

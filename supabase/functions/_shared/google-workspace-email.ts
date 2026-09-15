@@ -17,6 +17,7 @@ export interface WorkspaceEmailAttachment {
 export interface WorkspaceEmailPayload {
   from: string;
   to: string[];
+  bcc?: string[];
   subject: string;
   html: string;
   text?: string;
@@ -223,6 +224,12 @@ export async function buildWorkspaceMime(
     throw new Error("INVALID_EMAIL_RECIPIENTS");
   }
   const to = source.to.map((value) => assertAddress(value, "recipient"));
+  if (source.bcc && (!Array.isArray(source.bcc) || source.bcc.length > 50)) {
+    throw new Error("INVALID_EMAIL_BCC_RECIPIENTS");
+  }
+  const bcc = (source.bcc || []).map((value) =>
+    assertAddress(value, "bcc_recipient")
+  );
   const subject = assertHeader(source.subject, "subject");
   const from = assertHeader(source.from, "from");
   const replyTo = source.reply_to
@@ -231,7 +238,7 @@ export async function buildWorkspaceMime(
   const headers = Object.entries(source.headers || {}).map(([name, value]) => {
     if (
       !/^[A-Za-z0-9-]{1,78}$/.test(name) ||
-      /^(?:from|to|subject|reply-to|date|message-id|mime-version|content-type)$/i
+      /^(?:from|to|bcc|subject|reply-to|date|message-id|mime-version|content-type)$/i
         .test(name)
     ) {
       throw new Error("INVALID_EMAIL_CUSTOM_HEADER");
@@ -244,6 +251,7 @@ export async function buildWorkspaceMime(
   const common = [
     `From: ${encodeHeader(from)}`,
     `To: ${to.join(", ")}`,
+    ...(bcc.length ? [`Bcc: ${bcc.join(", ")}`] : []),
     `Subject: ${encodeHeader(subject)}`,
     ...(replyTo ? [`Reply-To: ${replyTo}`] : []),
     `Date: ${new Date().toUTCString()}`,

@@ -1,6 +1,6 @@
 import { sendWorkspaceEmail } from "./google-workspace-email.ts";
+import { internalNotificationDelivery } from "./resend-email.ts";
 
-export const PORTAL_ACTIVITY_RECIPIENT = "brett@execom.ca";
 
 export interface PortalActivityEvent {
   id: string;
@@ -146,10 +146,11 @@ export async function sendPortalActivityEmail(
   siteUrl: string,
   attachments: EmailAttachment[] = [],
 ) {
+  const delivery = internalNotificationDelivery();
   const result = await sendWorkspaceEmail({
     from: "Fabsy Portal <hello@fabsy.ca>",
     reply_to: "hello@fabsy.ca",
-    to: [PORTAL_ACTIVITY_RECIPIENT],
+    ...delivery,
     subject: portalActivitySubject(event),
     html: renderPortalActivityHtml(event, siteUrl),
     attachments,

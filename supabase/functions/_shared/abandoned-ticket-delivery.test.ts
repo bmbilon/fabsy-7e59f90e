@@ -261,7 +261,10 @@ Deno.test("Resend attempts use identical payload bytes and a stable idempotency 
   await sendAbandonedTicketEmail("fixture", email, job.id, fetcher);
   await sendAbandonedTicketEmail("fixture", email, job.id, fetcher);
   assertEquals(requests[0].body, requests[1].body);
-  assertEquals(JSON.parse(requests[0].body as string).bcc, ["brett@execom.ca"]);
+  assertEquals(JSON.parse(requests[0].body as string).bcc, [
+    "hello@fabsy.ca",
+    "brett@execom.ca",
+  ]);
   assertEquals(
     new Headers(requests[0].headers).get("Idempotency-Key"),
     "abandoned-ticket/job-1",

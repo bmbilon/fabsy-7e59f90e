@@ -2,6 +2,7 @@ import {
   type AbandonedTicketEmail,
   renderAbandonedTicketEmail,
 } from "./abandoned-ticket-email.ts";
+import { FABSY_INTERNAL_NOTIFICATION_DELIVERY } from "./resend-email.ts";
 
 export type AbandonedTicketJob = {
   id: string;
@@ -76,9 +77,13 @@ export async function sendAbandonedTicketEmail(
 ): Promise<string> {
   // Do not silently send a legacy frozen payload without the required owner copy.
   // Mutating a previously attempted payload would break provider idempotency.
+  const requiredCopies = [
+    ...FABSY_INTERNAL_NOTIFICATION_DELIVERY.to,
+    ...FABSY_INTERNAL_NOTIFICATION_DELIVERY.bcc,
+  ];
   if (
-    !Array.isArray(email.bcc) || email.bcc.length !== 1 ||
-    email.bcc[0] !== "brett@execom.ca"
+    !Array.isArray(email.bcc) || email.bcc.length !== requiredCopies.length ||
+    email.bcc.some((recipient, index) => recipient !== requiredCopies[index])
   ) {
     throw new AbandonedTicketDeliveryError("email_bcc_missing", true);
   }

@@ -31,11 +31,9 @@ export async function handler(req: Request): Promise<Response> {
     return json({ error: "unauthorized" }, 401);
   }
 
-  const recipient = (Deno.env.get("TICKET_UPLOAD_ALERT_TO") || "").trim()
-    .toLowerCase();
   const apiKey = Deno.env.get("RESEND_API_KEY") || "";
   const url = Deno.env.get("SUPABASE_URL") || "";
-  if (!recipient || !apiKey || !url || !serviceKey) {
+  if (!apiKey || !url || !serviceKey) {
     return json({ error: "upload_alert_configuration_missing" }, 503);
   }
 
@@ -48,22 +46,6 @@ export async function handler(req: Request): Promise<Response> {
   });
   try {
     const result = await processTicketUploadAlerts({
-      recipient,
-      verifyRecipient: async () => {
-        const { data: roles, error } = await db.from("user_roles").select(
-          "user_id",
-        ).eq("role", "admin");
-        if (error) throw error;
-        for (const role of roles || []) {
-          const { data, error } = await db.auth.admin.getUserById(role.user_id);
-          if (error) throw error;
-          if (
-            data.user?.email?.toLowerCase() === recipient &&
-            data.user.email_confirmed_at
-          ) return true;
-        }
-        return false;
-      },
       claim: async () => {
         const { data, error } = await db.rpc("claim_ticket_upload_alerts", {
           p_limit: 10,

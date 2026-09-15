@@ -1,4 +1,5 @@
 import { getFabsyEmailSignature } from "./email-signature.ts";
+import { FABSY_INTERNAL_NOTIFICATION_DELIVERY } from "./resend-email.ts";
 
 export interface AbandonedTicketEmail {
   from: string;
@@ -65,7 +66,10 @@ export function renderAbandonedTicketEmail(input: {
   return {
     from: "Fabsy <hello@fabsy.ca>",
     to: [input.email.trim()],
-    bcc: ["brett@execom.ca"],
+    bcc: [
+      ...FABSY_INTERNAL_NOTIFICATION_DELIVERY.to,
+      ...FABSY_INTERNAL_NOTIFICATION_DELIVERY.bcc,
+    ],
     reply_to: "hello@fabsy.ca",
     subject,
     text,

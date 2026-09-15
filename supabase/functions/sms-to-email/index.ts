@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { internalNotificationDelivery } from "../_shared/resend-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,12 +44,6 @@ serve(async (req) => {
       if (data[key]) mediaUrls.push(data[key]);
     }
 
-    // Destination(s): configurable; fallback to admin emails
-    const forwardTo = (Deno.env.get("FORWARD_SMS_EMAIL_TO") || "brett@execom.ca,hello@fabsy.ca")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
     const html = `
       <!DOCTYPE html>
       <html>
@@ -71,7 +66,8 @@ serve(async (req) => {
     } else {
       await resend.emails.send({
         from: "Fabsy SMS <hello@fabsy.ca>",
-        to: forwardTo,
+        reply_to: "hello@fabsy.ca",
+        ...internalNotificationDelivery(),
         subject: `SMS → Email: ${from} → ${to}`,
         html,
       });
