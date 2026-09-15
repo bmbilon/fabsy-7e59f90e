@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getIdrStaffRole } from "@/hooks/useIdrAuth";
-import { LogOut, Users, FileText, Shield, BarChart3, FileSearch, Radio, type LucideIcon } from "lucide-react";
+import { LogOut, Users, FileText, Shield, BarChart3, FileSearch, MailCheck, Radio, type LucideIcon } from "lucide-react";
 import type { User, Session } from '@supabase/supabase-js';
 
 interface DashboardTile {
@@ -38,6 +38,13 @@ export default function AdminDashboard() {
       path: "/admin/live",
       color: "from-teal-500 to-emerald-600"
     }] : []),
+    {
+      title: "Consent Invitations",
+      description: "Create private consent links to email or text and review their status",
+      icon: MailCheck,
+      path: "/admin/consent-links",
+      color: "from-emerald-500 to-green-600"
+    },
     {
       title: "Client Case Management",
       description: "View and manage ticket submissions and client cases",

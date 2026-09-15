@@ -59,6 +59,12 @@ static_files = [
 [functions.representation-consent]
 verify_jwt = false
 
+[functions.consent-invite-admin]
+verify_jwt = true
+
+[functions.process-portal-activity]
+verify_jwt = false
+
 [functions.submit-ticket]
 verify_jwt = false
 

@@ -22,6 +22,8 @@ export interface SignedConsentPdfInvite {
   pending_client_city: unknown;
   pending_client_province: unknown;
   pending_client_postal_code: unknown;
+  disclosure_lookup_type: unknown;
+  disclosure_lookup_value: unknown;
   pending_manual_signed_date: unknown;
   pending_manual_scan_source_sha256: unknown;
   pending_manual_scan_pdf_sha256: unknown;
@@ -111,12 +113,19 @@ export async function createSignedConsentPdf(
     city: pdfSafe(invite.pending_client_city),
     province: pdfSafe(invite.pending_client_province),
     postalCode: pdfSafe(invite.pending_client_postal_code),
+    disclosureLookupType: pdfSafe(invite.disclosure_lookup_type),
+    disclosureLookupValue: pdfSafe(invite.disclosure_lookup_value),
   };
   if (
     !consentText || !consentVersion || !SHA256_PATTERN.test(consentHash) ||
     !["typed", "manual_scan"].includes(signatureMethod) || !signature ||
     !signedAt || !clientReportedSignedAt || !signedClientDetails.dateOfBirth ||
-    !signedClientDetails.address || !signedClientDetails.city
+    !signedClientDetails.address || !signedClientDetails.city ||
+    !["drivers_licence", "licence_plate"].includes(
+      signedClientDetails.disclosureLookupType,
+    ) || !/^[A-Z0-9 .-]{2,40}$/.test(
+      signedClientDetails.disclosureLookupValue,
+    )
   ) {
     throw new Error("Claimed consent audit data is incomplete.");
   }
@@ -237,6 +246,14 @@ export async function createSignedConsentPdf(
       gapAfter: 6,
     });
   }
+  drawParagraph(
+    `${
+      signedClientDetails.disclosureLookupType === "drivers_licence"
+        ? "Driver's licence number"
+        : "Licence plate"
+    }: ${signedClientDetails.disclosureLookupValue}`,
+    { size: 7.8, gapAfter: 6 },
+  );
 
   for (const rawLine of consentText.split("\n")) {
     const line = rawLine.trim();
