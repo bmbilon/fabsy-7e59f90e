@@ -18,7 +18,7 @@ const Index = () => {
 
   useSafeHead({
     title: "Fight a Traffic Ticket in Alberta | Fabsy",
-    description: "Get help with an Alberta speeding, red-light or other traffic ticket. Explore fines, demerits and response options, or start Fabsy's pre-trial agent service.",
+    description: "Alberta traffic ticket help from Fabsy. Read about speeding fines, demerits and response options, or get help with an eligible pre-trial matter.",
     canonical: "https://fabsy.ca/",
   });
 
