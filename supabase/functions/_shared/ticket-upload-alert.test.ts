@@ -26,10 +26,11 @@ const alert: UploadAlert = {
     preferredLocale: "pa",
   },
 };
-const email = renderUploadAlertEmail(alert, "brett@execom.ca");
+const email = renderUploadAlertEmail(alert);
 
 Deno.test("upload email is actionable, escaped and has no customer capability or attachment", () => {
-  assertEquals(email.to, ["brett@execom.ca"]);
+  assertEquals(email.to, ["hello@fabsy.ca"]);
+  assertEquals(email.bcc, ["brett@execom.ca"]);
   assertEquals(email.from, "Fabsy <hello@fabsy.ca>");
   assert(email.html.includes("https://fabsy.ca/admin/cases"));
   assert(
@@ -42,7 +43,7 @@ Deno.test("upload email is actionable, escaped and has no customer capability or
       !email.html.includes("#resume="),
   );
   assert(!("attachments" in email));
-  assertEquals(Object.keys(email).sort(), ["from", "html", "subject", "to"]);
+  assertEquals(Object.keys(email).sort(), ["bcc", "from", "html", "subject", "to"]);
 });
 
 Deno.test("email sends immutable bytes with the same provider idempotency key", async () => {
@@ -98,8 +99,6 @@ function dependencies(overrides: Partial<UploadAlertDependencies> = {}) {
   const finishes: unknown[][] = [];
   const sent: UploadAlertEmail[] = [];
   const deps: UploadAlertDependencies = {
-    recipient: "brett@execom.ca",
-    verifyRecipient: () => Promise.resolve(true),
     claim: () => Promise.resolve([alert]),
     freeze: (_alert, payload) => Promise.resolve(payload),
     send: (payload) => {
@@ -115,18 +114,6 @@ function dependencies(overrides: Partial<UploadAlertDependencies> = {}) {
   return { deps, finishes, sent };
 }
 
-Deno.test("unverified recipients cannot claim or send a notice", async () => {
-  let claimed = false;
-  const { deps } = dependencies({
-    verifyRecipient: () => Promise.resolve(false),
-    claim: () => {
-      claimed = true;
-      return Promise.resolve([]);
-    },
-  });
-  await assertRejects(() => processTicketUploadAlerts(deps));
-  assertEquals(claimed, false);
-});
 Deno.test("successful sends record provider IDs", async () => {
   const { deps, finishes } = dependencies();
   assertEquals(await processTicketUploadAlerts(deps), {
@@ -149,6 +136,15 @@ Deno.test("reclaimed notice uses frozen payload despite changed contact/template
 Deno.test("recipient changes cannot send a frozen email to the old recipient", async () => {
   const { deps, sent, finishes } = dependencies({
     freeze: () => Promise.resolve({ ...email, to: ["old@example.com"] }),
+  });
+  const result = await processTicketUploadAlerts(deps);
+  assertEquals(result.failed, 1);
+  assertEquals(sent.length, 0);
+  assertEquals(finishes[0][3], "frozen_recipient_changed");
+});
+Deno.test("missing backup copy cannot send a frozen email", async () => {
+  const { deps, sent, finishes } = dependencies({
+    freeze: () => Promise.resolve({ ...email, bcc: [] }),
   });
   const result = await processTicketUploadAlerts(deps);
   assertEquals(result.failed, 1);

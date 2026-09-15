@@ -1,3 +1,8 @@
+import {
+  FABSY_INTERNAL_NOTIFICATION_DELIVERY,
+  internalNotificationDelivery,
+} from "./internal-notification-recipients.ts";
+
 export type UploadAlert = {
   id: string;
   draft_id: string;
@@ -15,6 +20,7 @@ export type UploadAlert = {
 export type UploadAlertEmail = {
   from: string;
   to: string[];
+  bcc: string[];
   subject: string;
   html: string;
 };
@@ -30,7 +36,6 @@ const escapeHtml = (value: unknown) =>
 
 export function renderUploadAlertEmail(
   alert: UploadAlert,
-  recipient: string,
 ): UploadAlertEmail {
   const contact = alert.contact_snapshot;
   const name = [contact.firstName, contact.lastName].filter(Boolean).join(" ")
@@ -46,7 +51,7 @@ export function renderUploadAlertEmail(
     }</td></tr>`;
   return {
     from: "Fabsy <hello@fabsy.ca>",
-    to: [recipient],
+    ...internalNotificationDelivery(),
     subject: `Ticket uploaded — intake ${alert.draft_id.slice(0, 8)}`,
     html:
       `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#172033;line-height:1.5"><main style="max-width:620px;margin:24px auto;padding:24px">
@@ -110,8 +115,6 @@ export async function sendUploadAlertEmail(
 }
 
 export type UploadAlertDependencies = {
-  recipient: string;
-  verifyRecipient: () => Promise<boolean>;
   claim: () => Promise<UploadAlert[]>;
   freeze: (
     alert: UploadAlert,
@@ -127,9 +130,6 @@ export type UploadAlertDependencies = {
 };
 
 export async function processTicketUploadAlerts(deps: UploadAlertDependencies) {
-  if (!deps.recipient || !await deps.verifyRecipient()) {
-    throw new Error("upload_alert_recipient_not_verified_admin");
-  }
   const result = {
     claimed: 0,
     sent: 0,
@@ -146,10 +146,21 @@ export async function processTicketUploadAlerts(deps: UploadAlertDependencies) {
     try {
       const payload = await deps.freeze(
         alert,
-        renderUploadAlertEmail(alert, deps.recipient),
+        renderUploadAlertEmail(alert),
       );
-      // Do not resume a frozen email to an old/revoked recipient after config changes.
-      if (payload.to.length !== 1 || payload.to[0] !== deps.recipient) {
+      // Do not resume a frozen email to an old/revoked recipient after policy changes.
+      if (
+        !Array.isArray(payload.to) ||
+        payload.to.length !== FABSY_INTERNAL_NOTIFICATION_DELIVERY.to.length ||
+        payload.to.some((recipient, index) =>
+          recipient !== FABSY_INTERNAL_NOTIFICATION_DELIVERY.to[index]
+        ) ||
+        !Array.isArray(payload.bcc) ||
+        payload.bcc.length !== FABSY_INTERNAL_NOTIFICATION_DELIVERY.bcc.length ||
+        payload.bcc.some((recipient, index) =>
+          recipient !== FABSY_INTERNAL_NOTIFICATION_DELIVERY.bcc[index]
+        )
+      ) {
         throw new UploadAlertSendError("frozen_recipient_changed", true);
       }
       providerId = await deps.send(payload, alert.id);

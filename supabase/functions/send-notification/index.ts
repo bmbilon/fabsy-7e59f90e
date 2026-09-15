@@ -13,6 +13,7 @@ import {
   paymentCheckoutUrl,
   PAYMENT_LINK_CODE_PATTERN,
 } from "../_shared/payment-checkout-link.ts";
+import { internalNotificationDelivery } from "../_shared/internal-notification-recipients.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -197,46 +198,16 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
-    // SECURITY: Fetch admin users from database to ensure only authorized users receive client data
-    const { data: adminUsers, error: adminError } = await supabase
-      .from('user_roles')
-      .select('user_id')
-      .eq('role', 'admin');
-
-    if (adminError || !adminUsers || adminUsers.length === 0) {
-      console.error("Failed to fetch admin users:", adminError);
-      throw new Error("No admin users found to send notifications to");
-    }
-
-    // Fetch email addresses for admin users
-    const { data: adminProfiles, error: profileError } = await supabase.auth.admin.listUsers();
-    
-    if (profileError) {
-      console.error("Failed to fetch admin emails:", profileError);
-      throw new Error("Failed to retrieve admin email addresses");
-    }
-
-    const adminUserIds = adminUsers.map(u => u.user_id);
-    const adminEmails = adminProfiles.users
-      .filter(user => adminUserIds.includes(user.id))
-      .map(user => user.email)
-      .filter((email): email is string => email !== undefined);
-
-    if (adminEmails.length === 0) {
-      throw new Error("No valid admin email addresses found");
-    }
-
-    console.log(`Sending admin notification to ${adminEmails.length} admin(s)`);
-
-    // SECURITY: This email contains ALL client data and should ONLY go to verified admin users
+    // SECURITY: This email contains all client data. Delivery is deliberately
+    // restricted to Fabsy's canonical mailbox and Execom's blind backup copy.
     // Mark the dispatch outcome as ambiguous before the first provider call.
     // A network error can happen after a provider accepts a message, so an
     // automatic retry from this point could duplicate client/admin delivery.
     providerRequestStarted = true;
     const emailResponse = await resend.emails.send({
       from: "Fabsy <hello@fabsy.ca>",
-      reply_to: "brett@execom.ca",
-      to: adminEmails,
+      reply_to: "hello@fabsy.ca",
+      ...internalNotificationDelivery(),
       subject: `Payment Pending - ${ticketData.firstName} ${ticketData.lastName}`,
       html: renderTicketAdminEmailHtml(ticketData, siteOrigin),
     });
@@ -302,7 +273,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Client should NEVER receive other clients' information or admin-only data
     const clientEmailResponse = await resend.emails.send(prepareClientEmail({
       from: "Fabsy <hello@fabsy.ca>",
-      reply_to: "brett@execom.ca",
+      reply_to: "hello@fabsy.ca",
       to: [ticketData.email],
       subject: "Your Ticket Submission Confirmation",
       html: renderTicketClientEmailHtml(ticketData),

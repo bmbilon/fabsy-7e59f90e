@@ -1,8 +1,8 @@
 # Ticket upload alerts
 
-Confirmed ticket uploads enqueue an internal email to the configured, verified admin before the customer completes the intake, consent or payment. This fills the gap between upload-first drafts and existing completed-submission notifications.
+Confirmed ticket uploads enqueue an internal email before the customer completes the intake, consent or payment. This fills the gap between upload-first drafts and existing completed-submission notifications.
 
-- Recipient secret: `TICKET_UPLOAD_ALERT_TO`, currently `brett@execom.ca`. The worker verifies this exact address is a confirmed Supabase Auth user with the admin role before claiming work.
+- Delivery: `hello@fabsy.ca` is the sole primary recipient; `brett@execom.ca` receives a blind backup copy. These addresses are fixed in the shared notification policy rather than controlled by a deploy secret.
 - Sender: `Fabsy <hello@fabsy.ca>`, through the existing Resend account.
 - Content: available name, email, phone, language, upload time and intake reference, with a sign-in link to `https://fabsy.ca/admin/cases`. No ticket attachments, legal details or customer resume capabilities are included.
 - Timing: Supabase job `fabsy-ticket-upload-alerts` calls `process-ticket-upload-alerts` every minute with the existing vaulted IDR cron credential. Normal delivery begins on the next minute tick, subject to provider latency.
@@ -18,7 +18,7 @@ The outbox is service-only and inaccessible to browser users. Its contact snapsh
 
 ## Release and checks
 
-Apply migration `20260909230000_ticket_upload_alerts.sql` and register that version in Supabase migration history. Deploy only `process-ticket-upload-alerts`, set its recipient secret, and verify the cron job exists and is active. The migration schedules only when the existing pg_cron, pg_net and vault prerequisites are present; production release verification must fail if the schedule is absent.
+Apply migration `20260909230000_ticket_upload_alerts.sql` and register that version in Supabase migration history. Deploy only `process-ticket-upload-alerts` and verify the cron job exists and is active. The migration schedules only when the existing pg_cron, pg_net and vault prerequisites are present; production release verification must fail if the schedule is absent.
 
 Run:
 
@@ -27,7 +27,7 @@ node scripts/test-ticket-upload-alerts-db.mjs
 deno test --allow-env supabase/functions/_shared/ticket-upload-alert.test.ts supabase/functions/process-ticket-upload-alerts/index.test.ts
 ```
 
-The database suite runs in a temporary local PostgreSQL cluster and exercises the actual existing confirmation RPC, initial/replacement upload triggers, replay deduplication, private privileges, leased claims, frozen payloads, retry delays, the expiry fence and retention cleanup. Deno tests cover safe email rendering, provider idempotency/errors, verified recipients, immutable retry payloads, send-acknowledgement loss, no-send on payload-save failure, and worker authorization.
+The database suite runs in a temporary local PostgreSQL cluster and exercises the actual existing confirmation RPC, initial/replacement upload triggers, replay deduplication, private privileges, leased claims, frozen payloads, retry delays, the expiry fence and retention cleanup. Deno tests cover safe email rendering, canonical primary/backup recipients, provider idempotency/errors, immutable retry payloads, send-acknowledgement loss, no-send on payload-save failure, and worker authorization.
 
 For a known missed upload, a privileged operator can call `enqueue_ticket_upload_alert` for that specific draft. It is safe to repeat and returns null if already queued or ineligible. Do not backfill an entire historical test population.
 
@@ -50,4 +50,4 @@ select jobid, jobname, schedule, active from cron.job where jobname='fabsy-ticke
 - An unauthenticated live request returned HTTP 401. The local historical service-role token also returned 401; the configured private cron credential was verified by the successful scheduled send. Operators should use the scheduled invocation or the current worker credential, not assume a local `.env` token matches.
 - PostgreSQL integration checks and all 12 Deno tests passed. Independently verified the exact catch-up subject in the browser's authenticated `brett@execom.ca` Gmail account: exactly one matching message, labeled Inbox, received at 5:03 p.m. It was left unread. The separately connected Gmail account and signed-in Resend dashboard were different accounts and were not used as delivery evidence.
 
-To pause delivery while investigating, unschedule only `fabsy-ticket-upload-alerts` or remove the configured recipient secret. Confirmed uploads continue to enqueue for later handling. Do not remove the outbox or its duplicate fences.
+To pause delivery while investigating, unschedule only `fabsy-ticket-upload-alerts`. Confirmed uploads continue to enqueue for later handling. Do not remove the outbox or its duplicate fences.

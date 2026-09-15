@@ -3,6 +3,7 @@ import { Resend } from "npm:resend@2.0.0";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
 import { prepareClientEmail } from "../_shared/notification-locale.ts";
+import { internalNotificationDelivery } from "../_shared/internal-notification-recipients.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -33,7 +34,8 @@ serve(async (req) => {
 
     // Send confirmation email to user
     const userEmailResponse = await resend.emails.send(prepareClientEmail({
-      from: "Fabsy <onboarding@resend.dev>",
+      from: "Fabsy <hello@fabsy.ca>",
+      reply_to: "hello@fabsy.ca",
       to: [email],
       subject: "Your Free Eligibility Check is Being Reviewed",
       html: `
@@ -79,10 +81,10 @@ serve(async (req) => {
     console.log("User confirmation email sent:", userEmailResponse);
 
     // Send notification to admin
-    const adminEmail = "admin@fabsy.ca"; // Replace with actual admin email
     const adminEmailResponse = await resend.emails.send({
-      from: "Fabsy Leads <onboarding@resend.dev>",
-      to: [adminEmail],
+      from: "Fabsy Leads <hello@fabsy.ca>",
+      reply_to: "hello@fabsy.ca",
+      ...internalNotificationDelivery(),
       subject: `New AI Lead: ${name} - ${ticketType}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

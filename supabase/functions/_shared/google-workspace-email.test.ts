@@ -10,12 +10,14 @@ Deno.test("Workspace MIME pins the visible sender and carries deterministic repl
     from: "Fabsy Portal <hello@fabsy.ca>",
     reply_to: "hello@fabsy.ca",
     to: ["client@example.test"],
+    bcc: ["backup@example.test"],
     subject: "Your Fabsy file is in progress",
     html: "<p>Hello &amp; welcome</p>",
     headers: { "X-Fabsy-Test": "fixture" },
   }, "case/status/fixture");
   assertStringIncludes(mime, "From: Fabsy Portal <hello@fabsy.ca>");
   assertStringIncludes(mime, "Reply-To: hello@fabsy.ca");
+  assertStringIncludes(mime, "Bcc: backup@example.test");
   assertStringIncludes(mime, "X-Fabsy-Idempotency-Key:");
   assertStringIncludes(mime, "Message-ID:");
   assertStringIncludes(mime, "Content-Type: multipart/alternative");
