@@ -24,7 +24,7 @@ export const FUNNEL_EVENT_NAMES = [
 ] as const;
 
 export type FunnelEventName = (typeof FUNNEL_EVENT_NAMES)[number];
-export type FunnelPageKey = 'rapid_resolution' | 'intake' | 'payment_canceled' | 'thank_you';
+export type FunnelPageKey = 'rapid_resolution' | 'photo_radar' | 'intake' | 'payment_canceled' | 'thank_you';
 export type FunnelActionPosition = 'hero' | 'header' | 'sticky' | 'section' | 'footer';
 
 export interface ParsedFunnelEvent {
@@ -59,7 +59,7 @@ export class FunnelRequestError extends Error {
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const safeUtmPattern = /^[A-Za-z0-9._~-]{1,250}$/;
 const clickIdPattern = /^[A-Za-z0-9_-]{1,512}$/;
-const pageKeys = new Set<FunnelPageKey>(['rapid_resolution', 'intake', 'payment_canceled', 'thank_you']);
+const pageKeys = new Set<FunnelPageKey>(['rapid_resolution', 'photo_radar', 'intake', 'payment_canceled', 'thank_you']);
 const productKeys = new Set(['rapid_resolution', 'rapid_resolution_bundle', 'photo_radar']);
 const clickIdKinds = new Set(['gclid', 'gbraid', 'wbraid', 'fbclid']);
 const actionPositions = new Set<FunnelActionPosition>(['hero', 'header', 'sticky', 'section', 'footer']);
@@ -98,7 +98,7 @@ function eventMatchesPage(eventName: FunnelEventName, pageKey: FunnelPageKey): b
     'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click',
     'engaged_10s', 'engaged_30s', 'engaged_60s',
     'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90',
-  ].includes(eventName)) return pageKey === 'rapid_resolution';
+  ].includes(eventName)) return pageKey === 'rapid_resolution' || pageKey === 'photo_radar';
   if ([
     'intake_started', 'intake_step_viewed', 'intake_validation_blocked',
     'ticket_upload_started', 'ticket_upload_failed', 'ticket_uploaded',

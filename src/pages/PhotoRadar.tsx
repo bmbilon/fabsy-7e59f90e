@@ -73,7 +73,7 @@ const PhotoRadar = () => {
                 <FeeRefundNotice photoRadar tone="dark" className="mt-6" />
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Button asChild size="lg" className="min-h-12 px-7 text-base font-bold shadow-glow">
-                    <Link to={PHOTO_RADAR.intakePath}>
+                    <Link to={PHOTO_RADAR.intakePath} data-funnel-action="primary_cta" data-funnel-position="hero">
                       Start photo radar review
                       <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                     </Link>
@@ -111,7 +111,7 @@ const PhotoRadar = () => {
                     ))}
                   </ul>
                   <Button asChild size="lg" className="mt-7 w-full font-bold">
-                    <Link to={PHOTO_RADAR.intakePath}>Upload your notice</Link>
+                    <Link to={PHOTO_RADAR.intakePath} data-funnel-action="primary_cta" data-funnel-position="section">Upload your notice</Link>
                   </Button>
                   <p className="mt-4 text-xs leading-relaxed text-slate-600">
                     Government fines are separate. The service fee is paid upfront and covered by our fee refund guarantee.{" "}
@@ -226,7 +226,7 @@ const PhotoRadar = () => {
               <p className="mt-2 text-sm text-slate-400">Multiple vehicles? <Link to="/fleet" className="text-slate-200 underline underline-offset-4">See fleet ticket support</Link>.</p>
             </div>
             <Button asChild size="lg" className="min-h-12 shrink-0 px-7 font-bold">
-              <Link to={PHOTO_RADAR.intakePath}>Start for ${PHOTO_RADAR.priceCad} + GST <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" /></Link>
+              <Link to={PHOTO_RADAR.intakePath} data-funnel-action="primary_cta" data-funnel-position="footer">Start for ${PHOTO_RADAR.priceCad} + GST <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" /></Link>
             </Button>
           </div>
         </section>

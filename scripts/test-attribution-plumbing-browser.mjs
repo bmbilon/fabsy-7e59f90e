@@ -47,6 +47,70 @@ async function fixture() {
 }
 
 try {
+  for (const choice of ['accepted', 'declined']) {
+    const f = await fixture();
+    try {
+      const photoCampaign = '?utm_source=google&utm_medium=cpc&utm_campaign=rr_google_profit_20260913&utm_content=en_rsa_v1&utm_term=photo_radar';
+      await f.page.goto('https://fabsy.ca/photo-radar' + photoCampaign);
+      await f.page.locator('[data-google-consent-choice="accepted"]').waitFor();
+      assert.equal(f.events.length, 0, 'Photo Radar sends no consented funnel events before a choice');
+      assert.equal(f.vendorLoads.length, 0, 'Photo Radar loads no vendors before a choice');
+      if (choice === 'accepted') await f.page.goto('https://fabsy.ca/rapid-resolution' + photoCampaign);
+      await f.page.locator(`[data-google-consent-choice="${choice}"]`).click();
+      if (choice === 'accepted') {
+        const rrHero = f.page.locator('main [data-funnel-action="primary_cta"][data-funnel-position="hero"]').first();
+        await rrHero.scrollIntoViewIfNeeded();
+        for (let i = 0; i < 50 && !f.events.some(e => e.eventName === 'primary_cta_viewed' && e.pageKey === 'rapid_resolution' && e.position === 'hero'); i++) await new Promise(r => setTimeout(r, 20));
+        assert.ok(f.events.some(e => e.eventName === 'landing_view' && e.pageKey === 'rapid_resolution'));
+        assert.ok(f.events.some(e => e.eventName === 'primary_cta_viewed' && e.pageKey === 'rapid_resolution' && e.position === 'hero'));
+        await f.page.goto('https://fabsy.ca/photo-radar');
+      }
+      const hero = f.page.locator('main [data-funnel-action="primary_cta"][data-funnel-position="hero"]');
+      await hero.scrollIntoViewIfNeeded();
+      if (choice === 'accepted') {
+        for (let i = 0; i < 50 && !f.events.some(e => e.eventName === 'primary_cta_viewed' && e.pageKey === 'photo_radar' && e.position === 'hero'); i++) await new Promise(r => setTimeout(r, 20));
+        assert.ok(f.events.some(e => e.eventName === 'primary_cta_viewed' && e.pageKey === 'photo_radar' && e.position === 'hero'));
+        // Use the actual visible-time timer; this fixture never sends real events.
+        for (let i = 0; i < 240 && !f.events.some(e => e.eventName === 'engaged_10s' && e.pageKey === 'photo_radar'); i++) await new Promise(r => setTimeout(r, 50));
+        assert.ok(f.events.some(e => e.eventName === 'engaged_10s' && e.pageKey === 'photo_radar'));
+        const footer = f.page.locator('main [data-funnel-action="primary_cta"][data-funnel-position="footer"]');
+        await footer.scrollIntoViewIfNeeded();
+        for (let i = 0; i < 50 && !f.events.some(e => e.eventName === 'scroll_75' && e.pageKey === 'photo_radar'); i++) await new Promise(r => setTimeout(r, 20));
+        assert.ok(f.events.some(e => e.eventName === 'scroll_75' && e.pageKey === 'photo_radar'));
+        const firstLanding = f.events.find(e => e.eventName === 'landing_view' && e.pageKey === 'photo_radar');
+        assert.equal(firstLanding?.pageKey, 'photo_radar');
+        assert.equal(firstLanding.attribution.utm_campaign, 'rr_google_profit_20260913');
+        // The same journey can review both offers without losing either landing.
+        await f.page.goto('https://fabsy.ca/rapid-resolution');
+        await f.page.locator('main [data-funnel-action="primary_cta"][data-funnel-position="hero"]').first().waitFor();
+        for (let i = 0; i < 50 && !f.events.some(e => e.eventName === 'landing_view' && e.pageKey === 'rapid_resolution'); i++) await new Promise(r => setTimeout(r, 20));
+        assert.ok(f.events.some(e => e.eventName === 'landing_view' && e.pageKey === 'rapid_resolution' && e.sessionId === firstLanding.sessionId));
+        assert.equal(f.events.filter(e => e.eventName === 'landing_view' && e.pageKey === 'rapid_resolution').length, 1, 'RR return is deduplicated');
+        await f.page.goto('https://fabsy.ca/photo-radar');
+        await hero.waitFor();
+        assert.equal(f.events.filter(e => e.eventName === 'landing_view' && e.pageKey === 'photo_radar').length, 1, 'Photo Radar reload is deduplicated');
+      }
+      const loadsBeforePrivate = f.vendorLoads.length;
+      await hero.click();
+      await f.page.waitForURL('https://fabsy.ca/submit-ticket?ticket_type=photo_radar');
+      await f.page.locator('#lead-email').waitFor();
+      assert.equal(f.vendorLoads.length, loadsBeforePrivate, 'No new vendor loads in private camera intake');
+      assert.equal(await f.page.locator('#fabsy-google-tag, #fabsy-meta-pixel').count(), 0);
+      if (choice === 'accepted') {
+        const landing = f.events.find(e => e.eventName === 'landing_view');
+        assert.equal(f.events.filter(e => e.eventName === 'primary_cta_click' && e.pageKey === 'photo_radar' && e.position === 'hero').length, 1, 'Pointer and click share one CTA receipt');
+        assert.ok(f.events.every(e => e.sessionId === landing.sessionId));
+        assert.ok(f.events.every(e => e.attribution?.utm_campaign === 'rr_google_profit_20260913'));
+      } else {
+        assert.equal(f.events.length, 0, 'Refused camera journey sends no consented events');
+        assert.equal(f.vendorLoads.length, 0);
+        assert.equal(await f.page.evaluate(() => sessionStorage.getItem('fabsy:funnel-session:v1')), null);
+      }
+      results.push({ scenario: `Photo Radar consent ${choice}`, status: 'pass', eventNames: [...new Set(f.events.map(e => e.eventName))] });
+      console.log(`Photo Radar ${choice}: landing, engagement, CTA, consent and isolated intake pass`);
+    } finally { await f.context.close(); }
+  }
+
   for (const landingPath of ['/about/comparison', '/content/speeding-ticket-edmonton', '/content/speeding-ticket-calgary']) {
     const f = await fixture();
     try {
@@ -116,6 +180,10 @@ try {
       assert.equal(landing.attribution?.utm_medium, expectedMedium);
       assert.equal(landing.attribution?.utm_campaign, undefined, 'click IDs cannot identify a campaign label');
       assert.deepEqual(landing.clickId, { kind, value: 'SYNTHETIC_CLICK_ONLY' });
+      // The funnel receipt can arrive before the consented public tag request.
+      // Await that request before checking the private-document load boundary.
+      for (let i = 0; i < 50 && !f.vendorLoads.some(v => v.provider === 'google'); i++) await new Promise(r => setTimeout(r, 20));
+      assert.ok(f.vendorLoads.some(v => v.provider === 'google' && new URL(v.page).pathname === '/rapid-resolution'), kind + ': Google loaded on the public landing');
       const loadsBeforePrivate = f.vendorLoads.length;
       await f.page.locator('main [data-funnel-action="primary_cta"][data-funnel-position="hero"]').first().click();
       await f.page.waitForURL('https://fabsy.ca/submit-ticket');

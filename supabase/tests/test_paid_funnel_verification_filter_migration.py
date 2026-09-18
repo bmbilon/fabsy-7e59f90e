@@ -1,4 +1,4 @@
-"""Exercise verification exclusions and signed cash totals in disposable Postgres.
+"""Exercise funnel page contracts, verification exclusions and cash totals locally.
 
 Run: python3 supabase/tests/test_paid_funnel_verification_filter_migration.py
 Requires local initdb/pg_ctl/psql. It opens no network listener, reads no
@@ -74,11 +74,13 @@ def run() -> None:
                 ROOT / "supabase/migrations/20260903185000_paid_payment_reporting.sql",
                 ROOT / "supabase/migrations/20260906170000_paid_funnel_behavior_diagnostics.sql",
                 ROOT / "supabase/migrations/20260918170000_paid_funnel_verification_filter.sql",
+                ROOT / "supabase/migrations/20260918180000_paid_funnel_photo_radar.sql",
             ]:
                 command([*connection, "-f", str(migration)])
             for test in [
                 "paid-payment-refund-ledger.test.sql",
                 "paid-funnel-verification-filter.test.sql",
+                "paid-funnel-photo-radar.test.sql",
             ]:
                 result = command([*connection, "-f", str(Path(__file__).with_name(test))])
                 print(result.stdout.strip())
