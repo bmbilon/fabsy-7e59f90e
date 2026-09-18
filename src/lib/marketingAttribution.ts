@@ -66,6 +66,20 @@ function exactKeys(value: Record<string, unknown>, allowed: ReadonlySet<string>)
   return Object.keys(value).every(key => allowed.has(key));
 }
 
+function inferClickSource(attribution: MarketingAttribution): void {
+  // Auto-tagged Google landings need no UTMs. Preserve explicit source/medium
+  // labels and avoid guessing when identifiers from multiple providers coexist.
+  if (attribution.utm_source) return;
+  const googleClick = attribution.gclid || attribution.gbraid || attribution.wbraid;
+  if (googleClick && !attribution.fbclid) {
+    attribution.utm_source = 'google';
+    attribution.utm_medium ??= 'cpc';
+  } else if (attribution.fbclid && !googleClick) {
+    // Facebook also adds click IDs to organic links; the source alone is known.
+    attribution.utm_source = 'meta';
+  }
+}
+
 function validateAttribution(value: unknown, consentSavedAt: number, now = Date.now()): MarketingAttribution | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const candidate = value as Record<string, unknown>;
@@ -105,6 +119,7 @@ function validateAttribution(value: unknown, consentSavedAt: number, now = Date.
     safe.gclid || safe.gbraid || safe.wbraid || safe.fbclid || safe.utm_source ||
     safe.referrer_host || safe.llm_source,
   );
+  inferClickSource(safe);
   return hasAcquisitionSignal ? safe : null;
 }
 
@@ -211,6 +226,7 @@ export function captureMarketingAttribution(search: string, pathname: string, re
   }
   if (llmSource) captured.llm_source = llmSource;
   if (referrerHost) captured.referrer_host = referrerHost;
+  inferClickSource(captured);
 
   const hasAcquisitionSignal = Boolean(
     captured.gclid || captured.gbraid || captured.wbraid || captured.fbclid ||

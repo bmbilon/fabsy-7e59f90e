@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BarChart3, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -113,6 +113,7 @@ interface FunnelReport {
   since: string;
   until: string;
   consented_sessions_only: true;
+  verification_traffic_excluded?: boolean;
   events: EventTotal[];
   campaigns: CampaignTotal[];
   daily: Array<{ day: string; landing_sessions: number; lead_sessions: number; purchase_sessions: number }>;
@@ -165,6 +166,7 @@ function numberValue(value: unknown): number {
 function normalizeReport(value: FunnelReport): FunnelReport {
   return {
     ...value,
+    verification_traffic_excluded: value.verification_traffic_excluded === true,
     events: Array.isArray(value.events)
       ? value.events.map(event => ({ ...event, event_count: numberValue(event.event_count), sessions: numberValue(event.sessions) }))
       : [],
@@ -265,37 +267,51 @@ function cad(cents: number): string {
 
 export default function AdminPaidFunnel() {
   const [days, setDays] = useState<(typeof windows)[number]>(7);
-  const [report, setReport] = useState<FunnelReport | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState<{
+    days: (typeof windows)[number];
+    status: 'loading' | 'ready' | 'failed';
+    report: FunnelReport | null;
+  }>({ days: 7, status: 'loading', report: null });
+  const requestNumber = useRef(0);
+  const loading = result.days !== days || result.status === 'loading';
+  const failed = result.days === days && result.status === 'failed';
+  const report = result.days === days && result.status === 'ready' ? result.report : null;
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const load = useCallback(async (windowDays = days) => {
-    setLoading(true);
+  const load = useCallback(async (windowDays: (typeof windows)[number]) => {
+    const request = ++requestNumber.current;
+    setResult({ days: windowDays, status: 'loading', report: null });
     try {
       const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session || !await getIdrStaffRole()) {
+      const staffRole = sessionData.session ? await getIdrStaffRole() : null;
+      if (request !== requestNumber.current) return;
+      if (!sessionData.session || !staffRole) {
         navigate('/admin');
         return;
       }
       const { data, error } = await supabase.functions.invoke<FunnelReport>('paid-funnel-report', {
         body: { days: windowDays },
       });
+      if (request !== requestNumber.current) return;
       if (error || !data || data.consented_sessions_only !== true) throw error || new Error('Invalid funnel report');
-      setReport(normalizeReport(data));
+      setResult({ days: windowDays, status: 'ready', report: normalizeReport(data) });
     } catch (error) {
+      if (request !== requestNumber.current) return;
       console.error('Unable to load paid funnel report', error);
+      setResult({ days: windowDays, status: 'failed', report: null });
       toast({
         title: 'Funnel report unavailable',
         description: 'No campaign decision should be made until the report can be read back.',
         variant: 'destructive',
       });
-    } finally {
-      setLoading(false);
     }
-  }, [days, navigate, toast]);
+  }, [navigate, toast]);
 
-  useEffect(() => { void load(days); }, [days, load]);
+  useEffect(() => {
+    void load(days);
+    return () => { requestNumber.current += 1; };
+  }, [days, load]);
 
   const eventSessions = useMemo(() => new Map(
     (report?.events || []).map(event => [event.event_name, event.sessions]),
@@ -331,9 +347,32 @@ export default function AdminPaidFunnel() {
         <Card className="border-amber-300/70 bg-amber-50/40">
           <CardContent className="pt-6 text-sm leading-relaxed text-slate-700">
             The aggregate request counts below begin before optional browser measurement. The session funnel includes only visitors who explicitly allowed Fabsy funnel measurement. Reconcile them with Meta and Google clicks, spend, and consent acceptance before calculating conversion rates or changing budget.
+            {report?.verification_traffic_excluded ? <p className="mt-2">Tagged verification traffic is excluded from the session funnel. Payment totals include all signed live purchases.</p> : null}
           </CardContent>
         </Card>
 
+        <div className="flex flex-wrap gap-2" aria-label="Reporting window">
+          {windows.map(windowDays => (
+            <Button
+              key={windowDays}
+              type="button"
+              size="sm"
+              variant={days === windowDays ? 'default' : 'outline'}
+              onClick={() => setDays(windowDays)}
+              aria-pressed={days === windowDays}
+            >
+              {windowDays === 1 ? '24 hours' : `${windowDays} days`}
+            </Button>
+          ))}
+        </div>
+
+        {loading ? <p role="status" className="rounded-lg border bg-background p-6 text-sm text-muted-foreground">Loading acquisition report…</p> : null}
+        {failed ? <div role="alert" className="rounded-lg border border-destructive/50 bg-background p-6">
+          <p className="font-semibold">Acquisition report unavailable</p>
+          <p className="mt-2 text-sm text-muted-foreground">Counts could not be loaded for the selected window. Refresh to retry before making campaign decisions.</p>
+        </div> : null}
+
+        {report ? <>
         <Card>
           <CardHeader>
             <CardTitle>Paid landing visibility before consent</CardTitle>
@@ -367,21 +406,6 @@ export default function AdminPaidFunnel() {
             </div>
           </CardContent>
         </Card>
-
-        <div className="flex flex-wrap gap-2" aria-label="Reporting window">
-          {windows.map(windowDays => (
-            <Button
-              key={windowDays}
-              type="button"
-              size="sm"
-              variant={days === windowDays ? 'default' : 'outline'}
-              onClick={() => setDays(windowDays)}
-              aria-pressed={days === windowDays}
-            >
-              {windowDays === 1 ? '24 hours' : `${windowDays} days`}
-            </Button>
-          ))}
-        </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
@@ -515,7 +539,7 @@ export default function AdminPaidFunnel() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2"><BarChart3 className="h-5 w-5 text-primary" aria-hidden="true" /><CardTitle>Campaign and creative breakdown</CardTitle></div>
-            <CardDescription>UTM-based unique sessions. “Direct” means no paid attribution was present or retained.</CardDescription>
+            <CardDescription>UTM-based unique sessions. “Direct” means no retained source or click-ID evidence.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -543,6 +567,7 @@ export default function AdminPaidFunnel() {
         </Card>
 
         {report ? <p className="text-xs text-muted-foreground">Generated {new Date(report.generated_at).toLocaleString()} · Window begins {new Date(report.since).toLocaleString()}</p> : null}
+        </> : null}
       </main>
     </div>
   );

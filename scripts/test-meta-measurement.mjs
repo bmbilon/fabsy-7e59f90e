@@ -335,6 +335,27 @@ test('checkout handoff returns only approved consent and Meta browser identifier
   } finally { r.close(); }
 });
 
+test('Meta checkout preserves full validated click IDs without widening browser IDs', async () => {
+  const r = await runtime();
+  try {
+    r.api.setMetaConsentChoice('accepted');
+    for (const length of [200, 201, 460, 512]) {
+      const fbc = 'fb.1.1788300000000.' + 'a'.repeat(length);
+      r.win.document.cookie = `_fbc=${fbc}; Path=/`;
+      assert.equal(r.api.currentMetaCheckoutContext().fbc, fbc, String(length));
+    }
+    r.win.document.cookie = '_fbp=fb.1.1788300000000.' + 'a'.repeat(201) + '; Path=/';
+    assert.equal(r.api.currentMetaCheckoutContext().fbp, undefined);
+    for (const value of ['fb.1.1788300000000.' + 'a'.repeat(513), 'fb.1.1788300000000.bad%20click']) {
+      r.win.document.cookie = `_fbc=${value}; Path=/`;
+      assert.equal(r.api.currentMetaCheckoutContext().fbc, undefined);
+    }
+    r.win.document.cookie = '_fbc=fb.1.1788300000000.valid; Path=/';
+    r.win.document.cookie = '_fbc=fb.1.1788300000000.other; Path=/rapid-resolution';
+    assert.equal(r.api.currentMetaCheckoutContext().fbc, undefined, 'duplicate cookies remain rejected');
+  } finally { r.close(); }
+});
+
 test('opaque checkout handles persist until acknowledged and withdraw without exposing a Stripe session', async () => {
   const r = await runtime();
   try {

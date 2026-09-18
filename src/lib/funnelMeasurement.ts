@@ -182,6 +182,11 @@ function safeAttribution(): Pick<FunnelEventPayload, 'attribution' | 'clickId'> 
     const value = source[key];
     if (value) attribution[key] = value;
   }
+  // The event contract stores one provider click kind. Mixed-provider URLs
+  // cannot select a winner without making later source inference misleading.
+  if (source.fbclid && (source.gclid || source.gbraid || source.wbraid)) {
+    return Object.keys(attribution).length ? { attribution } : {};
+  }
   for (const kind of ['fbclid', 'gclid', 'gbraid', 'wbraid'] as const) {
     const value = source[kind];
     if (value) return {

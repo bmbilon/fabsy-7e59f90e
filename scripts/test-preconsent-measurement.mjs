@@ -129,6 +129,49 @@ test('Cloudflare middleware counts successful paid HTML requests in waitUntil on
   assert.ok(!calls[0].body.includes('opaque-click'));
 });
 
+test('paid landing counts exclude automated and speculative requests and surface failed writes without request data', async () => {
+  const code = await bundle('functions/_middleware.ts');
+  const calls = [];
+  const warnings = [];
+  let failWrites = false;
+  const module = { exports: {} };
+  runInNewContext(code, {
+    module, Request, Response, Headers, URL, TextEncoder, AbortSignal,
+    console: { warn: value => warnings.push(value) },
+    fetch: async (url, init) => {
+      calls.push({ url, ...init });
+      return new Response(failWrites ? 'unavailable' : 'true', { status: failWrites ? 503 : 200 });
+    },
+  });
+  const invoke = async headers => {
+    const background = [];
+    const response = await module.exports.onRequest({
+      request: new Request('https://fabsy.ca/rapid-resolution?gclid=SYNTHETIC_ONLY', {
+        headers: { Accept: 'text/html', 'User-Agent': 'Mozilla/5.0', ...headers },
+      }),
+      env: { SUPABASE_SERVICE_ROLE_KEY: 'server-secret', ASSETS: { fetch: () => new Response(null, { status: 404 }) } },
+      next: () => new Response('<!doctype html><title>Fabsy</title>', { headers: { 'Content-Type': 'text/html' } }),
+      waitUntil: promise => background.push(promise),
+    });
+    assert.equal(response.status, 200);
+    await Promise.all(background);
+  };
+  for (const headers of [
+    { 'User-Agent': '' }, { 'User-Agent': 'Mozilla/5.0 HeadlessChrome/140' },
+    { 'User-Agent': 'Lighthouse' }, { 'User-Agent': 'facebookexternalhit/1.1' },
+    { Purpose: 'prefetch' }, { 'Sec-Purpose': 'prefetch;prerender' }, { 'X-Purpose': 'preview;prefetch' },
+    { DNT: '1' }, { 'Sec-GPC': '1' },
+  ]) await invoke(headers);
+  assert.equal(calls.length, 0);
+  assert.equal(warnings.length, 0);
+  await invoke({});
+  assert.equal(calls.length, 1);
+  failWrites = true;
+  await invoke({});
+  assert.equal(calls.length, 2);
+  assert.deepEqual(warnings, ['preconsent_landing_write_failed']);
+});
+
 test('browser consent action sends a reduced payload without storage or raw click identifiers', async () => {
   const output = await build({
     absWorkingDir: root,

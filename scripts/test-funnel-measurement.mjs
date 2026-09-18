@@ -636,6 +636,90 @@ test('database and edge contracts store no raw click ID, IP, user agent or form 
 });
 
 
+test('Google auto-tagged landings retain paid source through consent, intake and checkout', async () => {
+  for (const kind of ['gclid', 'gbraid', 'wbraid']) {
+    const r = await runtime(`https://fabsy.ca/rapid-resolution?${kind}=SYNTHETIC_GOOGLE`);
+    try {
+      const pending = r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+      assert.equal(pending.utm_source, 'google');
+      assert.equal(pending.utm_medium, 'cpc');
+      assert.equal(r.win.localStorage.getItem(r.api.MARKETING_STORAGE_KEY), null);
+      r.api.setFabsyFunnelConsentChoice('accepted');
+      r.api.persistPendingMarketingAttribution();
+      await r.api.recordFunnelEvent('landing_view');
+      const sessionId = r.api.currentFunnelSessionId();
+      r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+      assert.equal(r.api.currentFunnelSessionId(), sessionId, 'same auto-tagged touch does not rotate');
+      r.win.history.replaceState(null, '', '/submit-ticket');
+      await r.api.recordFunnelEvent('lead_saved');
+      for (const request of r.calls) {
+        const payload = JSON.parse(request.options.body);
+        assert.equal(payload.attribution.utm_source, 'google');
+        assert.equal(payload.attribution.utm_medium, 'cpc');
+        assert.equal(payload.attribution.utm_campaign, undefined, 'a click ID cannot reveal a campaign name');
+        assert.equal(payload.clickId.kind, kind);
+        assert.equal(payload.sessionId, sessionId);
+      }
+      assert.equal(r.api.currentFunnelCheckoutContext().sessionId, sessionId);
+    } finally { r.close(); }
+  }
+});
+
+test('click source inference respects explicit labels, ambiguity and organic Meta links', async () => {
+  for (const [search, source, medium] of [
+    ['?gclid=VALID&utm_source=partner&utm_medium=referral', 'partner', 'referral'],
+    ['?wbraid=VALID&utm_medium=paid_search', 'google', 'paid_search'],
+    ['?gclid=VALID&fbclid=ALSO_VALID', undefined, undefined],
+    ['?gclid=bad%20click', undefined, undefined],
+    ['?gclid=ONE&gclid=TWO', undefined, undefined],
+    ['?fbclid=VALID', 'meta', undefined],
+    ['', undefined, undefined],
+  ]) {
+    const r = await runtime(`https://fabsy.ca/rapid-resolution${search}`);
+    try {
+      const captured = r.api.captureMarketingAttribution(search, '/rapid-resolution', '');
+      assert.equal(captured.utm_source, source, search);
+      assert.equal(captured.utm_medium, medium, search);
+    } finally { r.close(); }
+  }
+});
+
+test('previously saved Google click-only attribution gains source without losing its original touch', async () => {
+  const r = await runtime();
+  try {
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    const grant = r.api.getFabsyFunnelConsentGrant();
+    const original = {
+      gclid: 'SYNTHETIC_STORED', landing_page: '/rapid-resolution',
+      first_touch_at: new Date(grant.savedAt).toISOString(),
+    };
+    r.win.localStorage.setItem(r.api.MARKETING_STORAGE_KEY, JSON.stringify({
+      version: 3, consentSavedAt: grant.savedAt, attribution: original,
+    }));
+    assert.deepEqual(JSON.parse(JSON.stringify(r.api.readMarketingAttribution())), {
+      ...original, utm_source: 'google', utm_medium: 'cpc',
+    });
+  } finally { r.close(); }
+});
+
+test('mixed-provider clicks never become a single-provider event while explicit campaign labels survive', async () => {
+  for (const kind of ['gclid', 'gbraid', 'wbraid']) {
+    for (const campaign of ['', '&utm_source=partner&utm_medium=referral&utm_campaign=reviewed_campaign']) {
+      const r = await runtime(`https://fabsy.ca/rapid-resolution?${kind}=GOOGLE&fbclid=META${campaign}`);
+      try {
+        r.api.setFabsyFunnelConsentChoice('accepted');
+        r.api.captureMarketingAttribution(r.win.location.search, r.win.location.pathname, '');
+        assert.equal(await r.api.recordFunnelEvent('landing_view'), true);
+        const payload = JSON.parse(r.calls[0].options.body);
+        assert.equal(payload.clickId, undefined, 'a one-kind event cannot express conflicting providers');
+        assert.deepEqual(payload.attribution, campaign ? {
+          utm_source: 'partner', utm_medium: 'referral', utm_campaign: 'reviewed_campaign',
+        } : undefined);
+      } finally { r.close(); }
+    }
+  }
+});
+
 test('long ad click IDs survive consent, reload and the server parser without truncation', async () => {
   const click = 'SYNTHETIC_' + 'a'.repeat(450);
   const r = await runtime('https://fabsy.ca/pa/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_test&utm_content=pa_test&fbclid=' + click);

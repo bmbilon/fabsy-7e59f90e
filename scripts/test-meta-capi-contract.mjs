@@ -62,6 +62,14 @@ assert.deepEqual([...meta.META_CAPI_CONTENT_IDS], [
 assertions += 7;
 
 const validFbp = "fb.1.1788350000000.1234567890";
+const longestFbc = "fb.123.1788350000000000." + "a".repeat(512);
+assert.equal(longestFbc.length, 536);
+assert.equal(meta.sanitizeMetaClickId(longestFbc), longestFbc);
+assert.equal(meta.sanitizeMetaClickId(longestFbc + "a"), null);
+assert.equal(meta.sanitizeMetaBrowserId(longestFbc), null);
+assert.equal(meta.sanitizeMetaBrowserId("fb.1.1788350000000." + "a".repeat(201)), null);
+assert.equal(meta.sanitizeMetaClickId("fb.1.1788350000000.bad click"), null);
+assertions += 6;
 const nowIso = new Date().toISOString();
 const calls = [];
 const recordResult = await meta.recordMetaCheckoutAttributionBestEffort(
@@ -88,6 +96,26 @@ assert.equal(calls[0].args.p_fbc, null);
 assert.equal(calls[0].args.p_client_user_agent, "Server Derived Agent/1.0");
 assert.ok(!JSON.stringify(calls[0].args).includes(sessionId));
 assertions += 8;
+
+const longClickCalls = [];
+const longClickResult = await meta.recordMetaCheckoutAttributionBestEffort(
+  rpcClient(async (name, args) => {
+    longClickCalls.push({ name, args });
+    return { data: true, error: null };
+  }),
+  {
+    checkoutSessionId: sessionId,
+    consentGranted: true,
+    consentVersion: "meta-measurement-v1",
+    consentedAt: nowIso,
+    fbc: longestFbc,
+    clientUserAgent: "Synthetic Browser/1.0",
+  },
+);
+assert.equal(longClickResult.recorded, true);
+assert.equal(longClickCalls[0].args.p_fbc, longestFbc);
+assert.equal(longClickCalls[0].args.p_fbp, null);
+assertions += 3;
 
 let clearCalls = 0;
 const withdrawn = await meta.recordMetaCheckoutAttributionBestEffort(
@@ -332,6 +360,12 @@ assert.deepEqual(meta.parseMetaPurchaseLease(claimRow), {
 assert.equal(meta.parseMetaPurchaseLease({ ...claimRow, lease_token: "invalid" }), null);
 const claim = meta.parseMetaPurchaseClaim(claimRow);
 assert.ok(claim);
+const longClickClaim = meta.parseMetaPurchaseClaim({ ...claimRow, fbp: null, fbc: longestFbc });
+assert.ok(longClickClaim);
+assert.equal(meta.buildMetaPurchasePayload(longClickClaim).data[0].user_data.fbc, longestFbc);
+assert.equal(meta.parseMetaPurchaseClaim({ ...claimRow, fbc: longestFbc + "a" }), null);
+assert.equal(meta.parseMetaPurchaseClaim({ ...claimRow, fbp: longestFbc }), null);
+assertions += 4;
 const payload = meta.buildMetaPurchasePayload(claim);
 assert.deepEqual(payload, {
   data: [{
