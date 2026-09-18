@@ -4,6 +4,7 @@ import { localizePath, splitLocalePath } from '../src/i18n/locale-policy.mjs';
 import localeRegistry from '../src/i18n/locales.json';
 import seoRoutePolicies from '../src/config/seoRoutePolicies.json';
 import { preconsentMetricPayload } from '../src/lib/preconsentMeasurementCore';
+import { isBot } from '../src/lib/live-view/core';
 import {
   recordAggregatePreconsentMetric,
   type PreconsentMeasurementEnv,
@@ -195,19 +196,28 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   const documentRequest = context.request.method === 'GET' &&
     (context.request.headers.get('Sec-Fetch-Dest') === 'document' ||
       context.request.headers.get('Accept')?.includes('text/html'));
+  const speculativeRequest = /prefetch|prerender/i.test([
+    context.request.headers.get('Purpose'),
+    context.request.headers.get('Sec-Purpose'),
+    context.request.headers.get('X-Purpose'),
+  ].filter(Boolean).join(' '));
   const preconsentMetric = documentRequest &&
     ['fabsy.ca', 'www.fabsy.ca'].includes(requestUrl.hostname) &&
     context.request.headers.get('DNT') !== '1' &&
     context.request.headers.get('Sec-GPC') !== '1' &&
-    !BOT.test(userAgent)
+    !speculativeRequest && !isBot(userAgent) && !BOT.test(userAgent)
     ? preconsentMetricPayload(requestUrl, 'paid_landing')
     : null;
   const response = await servePage(context);
   if (preconsentMetric && response.ok && response.headers.get('Content-Type')?.includes('text/html')) {
     context.waitUntil(
       recordAggregatePreconsentMetric(context.env, preconsentMetric)
-        .then(() => undefined)
-        .catch(() => undefined),
+        .then(recorded => {
+          if (!recorded && context.env.PRECONSENT_MEASUREMENT_ENABLED !== 'false') {
+            console.warn('preconsent_landing_write_failed');
+          }
+        })
+        .catch(() => { console.warn('preconsent_landing_write_failed'); }),
     );
   }
   const headers = new Headers(response.headers);

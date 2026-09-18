@@ -15,6 +15,7 @@ const SESSION_HASH_PATTERN = /^[0-9a-f]{64}$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const CONSENT_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/;
 const META_BROWSER_ID_PATTERN = /^fb\.[0-9]{1,3}\.[0-9]{10,16}\.[A-Za-z0-9_-]{1,200}$/;
+const META_CLICK_ID_PATTERN = /^fb\.[0-9]{1,3}\.[0-9]{10,16}\.[A-Za-z0-9_-]{1,512}$/;
 const MIN_MEASUREMENT_TIME_MS = Date.UTC(2024, 0, 1);
 const MAX_CLOCK_SKEW_MS = 5 * 60 * 1000;
 const CONSENT_MAX_AGE_MS = 180 * 24 * 60 * 60 * 1000;
@@ -172,6 +173,13 @@ export function sanitizeMetaBrowserId(value: unknown): string | null {
   return META_BROWSER_ID_PATTERN.test(normalized) ? normalized : null;
 }
 
+/** _fbc carries an opaque fbclid; preserve the landing policy's full 512 bytes. */
+export function sanitizeMetaClickId(value: unknown): string | null {
+  if (typeof value !== "string" || value.length > 536) return null;
+  const normalized = value.trim();
+  return META_CLICK_ID_PATTERN.test(normalized) ? normalized : null;
+}
+
 export function sanitizeMetaUserAgent(value: unknown): string | null {
   if (typeof value !== "string" || value.length > 4096) return null;
   let printable = "";
@@ -281,7 +289,7 @@ export async function recordMetaCheckoutAttributionBestEffort(
 
   try {
     const fbp = sanitizeMetaBrowserId(input.fbp);
-    const fbc = sanitizeMetaBrowserId(input.fbc);
+    const fbc = sanitizeMetaClickId(input.fbc);
     if (!fbp && !fbc) {
       await clearMetaAttribution(client, sessionHash);
       return {
@@ -392,7 +400,7 @@ export function parseMetaPurchaseClaim(value: unknown): MetaPurchaseClaim | null
   const attemptCount = readInteger(row.attempt_count);
   const leaseExpiresEpoch = readInteger(row.lease_expires_epoch);
   const fbp = row.fbp === null ? null : sanitizeMetaBrowserId(row.fbp);
-  const fbc = row.fbc === null ? null : sanitizeMetaBrowserId(row.fbc);
+  const fbc = row.fbc === null ? null : sanitizeMetaClickId(row.fbc);
   const userAgent = sanitizeMetaUserAgent(row.client_user_agent);
   if (
     typeof row.outbox_id !== "string" || !UUID_PATTERN.test(row.outbox_id) ||

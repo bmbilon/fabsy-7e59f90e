@@ -2,6 +2,7 @@ import {
   META_CAPI_EXPECTED_PIXEL_ID,
   META_CAPI_GRAPH_VERSION,
   sanitizeMetaBrowserId,
+  sanitizeMetaClickId,
   sanitizeMetaUserAgent,
 } from "./meta-capi.ts";
 
@@ -51,7 +52,7 @@ export function parseMetaLeadContext(value: unknown): MetaLeadContext | null {
   const consentedAt = validConsentTime(candidate.consentedAt);
   if (!consentedAt) return null;
   const fbp = sanitizeMetaBrowserId(candidate.fbp);
-  const fbc = sanitizeMetaBrowserId(candidate.fbc);
+  const fbc = sanitizeMetaClickId(candidate.fbc);
   if (!fbp && !fbc) return null;
   if ((candidate.fbp !== undefined && !fbp) ||
       (candidate.fbc !== undefined && !fbc)) return null;
@@ -67,6 +68,7 @@ function validEnvironment(environment: MetaLeadEnvironment): environment is Requ
   const token = environment.accessToken || "";
   return environment.enabled === "true" &&
     environment.pixelId === META_CAPI_EXPECTED_PIXEL_ID &&
+    // eslint-disable-next-line no-control-regex -- Reject control bytes in the outbound authorization token.
     token.length >= 20 && token.length <= 4096 && !/[\s\u0000-\u001f\u007f-\u009f]/.test(token);
 }
 

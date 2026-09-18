@@ -4,6 +4,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { MessageChannel } from 'node:worker_threads';
+import { build } from 'esbuild';
+import { JSDOM, VirtualConsole } from 'jsdom';
 
 const thisFile = fileURLToPath(import.meta.url);
 if (!process.execArgv.includes('--experimental-strip-types')) {
@@ -76,5 +79,119 @@ test('behavior checkpoints remain bounded, consent gated and free of captured co
   assert.match(intake, /fabsy:intake-step-viewed/);
   for (const forbidden of ['formData.', 'ticketNumber', 'dateOfBirth', 'driversLicense', 'offenceDescription']) {
     assert.equal(component.includes(forbidden), false, forbidden);
+  }
+});
+
+test('report failures and overlapping window requests cannot appear as zero or stale traffic', async () => {
+  const output = await build({
+    absWorkingDir: root, bundle: true, platform: 'browser', format: 'iife', write: false,
+    jsx: 'automatic', alias: { '@': path.join(root, 'src') }, logLevel: 'silent',
+    define: { 'process.env.NODE_ENV': '"development"' },
+    plugins: [{
+      name: 'offline-funnel-report',
+      setup(builder) {
+        builder.onResolve({ filter: /^@\/(?:integrations\/supabase\/client|hooks\/useIdrAuth|hooks\/use-toast)$/ }, args => ({
+          path: args.path, namespace: 'offline-report',
+        }));
+        builder.onLoad({ filter: /.*/, namespace: 'offline-report' }, args => ({
+          loader: 'js',
+          contents: args.path.endsWith('/client') ? `
+            export const supabase = {
+              auth: { getSession: async () => ({ data: { session: {} } }) },
+              functions: { invoke: (_, options) => new Promise(resolve => {
+                window.reportRequests.push({ days: options.body.days, resolve });
+              }) },
+            };
+          ` : args.path.endsWith('/useIdrAuth')
+            ? 'export const getIdrStaffRole = async () => "admin";'
+            : 'const toast = () => {}; export const useToast = () => ({ toast });',
+        }));
+      },
+    }],
+    stdin: {
+      loader: 'tsx', resolveDir: root, sourcefile: 'offline-funnel-report.tsx',
+      contents: `
+        import React, { act } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { MemoryRouter } from 'react-router-dom';
+        import AdminPaidFunnel from './src/pages/AdminPaidFunnel';
+        const root = createRoot(document.getElementById('root'));
+        window.reportTest = {
+          mount: () => act(async () => root.render(<MemoryRouter><AdminPaidFunnel /></MemoryRouter>)),
+          click: label => act(async () => {
+            const button = Array.from(document.querySelectorAll('button')).find(item => item.textContent === label);
+            if (!button) throw new Error('Button missing: ' + label);
+            button.click();
+          }),
+          resolve: (index, response) => act(async () => window.reportRequests[index].resolve(response)),
+          unmount: () => act(async () => root.unmount()),
+        };
+      `,
+    },
+  });
+  const dom = new JSDOM('<!doctype html><div id="root"></div>', {
+    url: 'https://offline-fabsy.invalid/admin/acquisition', runScripts: 'outside-only',
+    pretendToBeVisual: true, virtualConsole: new VirtualConsole(),
+  });
+  dom.window.IS_REACT_ACT_ENVIRONMENT = true;
+  const channels = [];
+  dom.window.MessageChannel = class extends MessageChannel {
+    constructor() { super(); channels.push(this); }
+  };
+  dom.window.reportRequests = [];
+  dom.window.fetch = () => { throw new Error('Unexpected network request'); };
+  dom.window.eval(output.outputFiles[0].text);
+  const fixture = dom.window.reportTest;
+  const text = () => dom.window.document.body.textContent;
+  const payload = (marker, count = 17) => ({ data: {
+    generated_at: '2026-09-18T12:00:00Z', since: '2026-09-11T12:00:00Z', until: '2026-09-18T12:00:00Z',
+    consented_sessions_only: true, events: [], campaigns: [], daily: [],
+    preconsent: { events: [{ event_name: 'paid_landing', event_count: count }], campaigns: [{
+      source: 'google', campaign: marker, medium: 'cpc', content: 'en_rsa_v1', locale: 'en',
+      landing_requests: count, consent_accepted: 0, consent_declined: 0, consent_dismissed: 0,
+    }], daily: [] },
+  }, error: null });
+  const failure = { data: null, error: { message: 'Report unavailable' } };
+  try {
+    await fixture.mount();
+    assert.match(text(), /Loading acquisition report/);
+    assert.doesNotMatch(text(), /No paid landing requests|Paid landing requests/);
+    await fixture.resolve(0, failure);
+    assert.match(dom.window.document.querySelector('[role="alert"]').textContent, /Acquisition report unavailable/);
+    assert.doesNotMatch(text(), /No paid landing requests|Paid landing requests/);
+
+    await fixture.click('Refresh');
+    await fixture.resolve(1, payload('seven_day_campaign'));
+    assert.match(text(), /seven_day_campaign/);
+    assert.doesNotMatch(text(), /Tagged verification traffic is excluded/);
+    assert.equal(dom.window.document.querySelector('[role="alert"]'), null);
+
+    await fixture.click('14 days');
+    assert.doesNotMatch(text(), /seven_day_campaign/);
+    await fixture.click('30 days');
+    assert.deepEqual(Array.from(dom.window.reportRequests, request => request.days), [7, 7, 14, 30]);
+    const verifiedReport = payload('thirty_day_campaign');
+    verifiedReport.data.verification_traffic_excluded = true;
+    await fixture.resolve(3, verifiedReport);
+    await fixture.resolve(2, payload('stale_fourteen_day_campaign'));
+    assert.match(text(), /thirty_day_campaign/);
+    assert.match(text(), /Tagged verification traffic is excluded from the session funnel/);
+    assert.match(text(), /Payment totals include all signed live purchases/);
+    assert.doesNotMatch(text(), /stale_fourteen_day_campaign/);
+
+    await fixture.click('24 hours');
+    await fixture.resolve(4, failure);
+    assert.match(text(), /Acquisition report unavailable/);
+    assert.doesNotMatch(text(), /thirty_day_campaign|No paid landing requests|Paid landing requests/);
+    await fixture.click('Refresh');
+    const empty = payload('');
+    empty.data.preconsent = { events: [], campaigns: [], daily: [] };
+    await fixture.resolve(5, empty);
+    assert.match(text(), /No paid landing requests in this window/);
+    assert.equal(dom.window.document.querySelector('[role="alert"]'), null);
+  } finally {
+    await fixture.unmount();
+    dom.window.close();
+    for (const channel of channels) { channel.port1.close(); channel.port2.close(); }
   }
 });

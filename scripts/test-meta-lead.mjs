@@ -30,6 +30,14 @@ const draftId = "550e8400-e29b-41d4-a716-446655440000";
 const eventTime = Math.floor(Date.now() / 1000) - 1;
 
 assert.deepEqual(lead.parseMetaLeadContext(context), context);
+const longFbc = "fb.1.1788350000000." + "a".repeat(512);
+assert.equal(lead.parseMetaLeadContext({ ...context, fbc: longFbc }).fbc, longFbc);
+assert.equal(lead.parseMetaLeadContext({ ...context, fbc: longFbc + "a" }), null);
+assert.equal(lead.parseMetaLeadContext({ ...context, fbp: longFbc }), null);
+const longClickPayload = await lead.buildMetaLeadPayload({
+  draftId, context: { ...context, fbc: longFbc }, clientUserAgent: "Synthetic Browser/1.0",
+});
+assert.equal(longClickPayload.data[0].user_data.fbc, longFbc);
 for (const invalid of [
   null,
   {},

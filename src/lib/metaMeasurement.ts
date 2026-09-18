@@ -80,7 +80,12 @@ function approvedCookie(name: '_fbp' | '_fbc'): string | undefined {
     }
     if (matches.length !== 1) return undefined;
     const value = matches[0];
-    return value.length <= 255 && /^fb\.[0-9]{1,3}\.[0-9]{10,16}\.[A-Za-z0-9_-]{1,200}$/.test(value)
+    // _fbc embeds the complete opaque fbclid, which our landing policy permits
+    // up to 512 characters. _fbp keeps its existing, narrower browser-ID bound.
+    const valid = name === '_fbc'
+      ? value.length <= 536 && /^fb\.[0-9]{1,3}\.[0-9]{10,16}\.[A-Za-z0-9_-]{1,512}$/.test(value)
+      : value.length <= 255 && /^fb\.[0-9]{1,3}\.[0-9]{10,16}\.[A-Za-z0-9_-]{1,200}$/.test(value);
+    return valid
       ? value
       : undefined;
   } catch {

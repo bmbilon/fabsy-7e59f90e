@@ -99,6 +99,41 @@ try {
     results.push({ scenario: 'Ads document retired before GA4-only guide', status: 'pass' });
   } finally { await boundary.context.close(); }
 
+  for (const kind of ['gclid', 'gbraid', 'wbraid', 'fbclid']) {
+    const f = await fixture();
+    try {
+      const expectedSource = kind === 'fbclid' ? 'meta' : 'google';
+      const expectedMedium = kind === 'fbclid' ? undefined : 'cpc';
+      await f.page.goto(`https://fabsy.ca/rapid-resolution?${kind}=SYNTHETIC_CLICK_ONLY`);
+      await f.page.locator('[data-google-consent-choice="accepted"]').waitFor();
+      assert.equal(f.events.length, 0, kind + ': no first-party events before consent');
+      assert.equal(await f.page.evaluate(() => localStorage.getItem('fabsy_marketing_v3')), null);
+      await f.page.locator('[data-google-consent-choice="accepted"]').click();
+      for (let i = 0; i < 50 && !f.events.some(e => e.eventName === 'landing_view'); i++) await new Promise(r => setTimeout(r, 20));
+      const landing = f.events.find(e => e.eventName === 'landing_view');
+      assert.ok(landing, kind + ': landing recorded');
+      assert.equal(landing.attribution?.utm_source, expectedSource);
+      assert.equal(landing.attribution?.utm_medium, expectedMedium);
+      assert.equal(landing.attribution?.utm_campaign, undefined, 'click IDs cannot identify a campaign label');
+      assert.deepEqual(landing.clickId, { kind, value: 'SYNTHETIC_CLICK_ONLY' });
+      const loadsBeforePrivate = f.vendorLoads.length;
+      await f.page.locator('main [data-funnel-action="primary_cta"][data-funnel-position="hero"]').first().click();
+      await f.page.waitForURL('https://fabsy.ca/submit-ticket');
+      await f.page.locator('main').waitFor();
+      const retained = await f.page.evaluate(() => JSON.parse(localStorage.getItem('fabsy_marketing_v3')));
+      assert.equal(retained.attribution.utm_source, expectedSource);
+      assert.equal(retained.attribution.utm_medium, expectedMedium);
+      assert.equal(retained.attribution[kind], 'SYNTHETIC_CLICK_ONLY');
+      assert.ok(f.events.every(e => e.sessionId === landing.sessionId));
+      assert.ok(f.events.every(e => e.attribution?.utm_source === expectedSource));
+      assert.equal(f.vendorLoads.length, loadsBeforePrivate, kind + ': no new vendor in private intake');
+      assert.equal(await f.page.locator('#fabsy-meta-pixel, #fabsy-google-tag').count(), 0);
+      if (kind === 'fbclid') assert.equal(f.vendorLoads.filter(v => v.provider === 'meta').length, 0, 'source inference cannot widen Meta tag eligibility');
+      results.push({ scenario: 'Click-only landing to isolated intake', kind, source: expectedSource, medium: expectedMedium ?? null, status: 'pass' });
+      console.log(kind + ': consent, inferred source, retained click and isolated intake pass');
+    } finally { await f.context.close(); }
+  }
+
   for (const locale of ['en', 'pa', 'tl', 'zh-hans', 'zh-hant', 'ar', 'es', 'hi']) {
     const f = await fixture();
     try {
