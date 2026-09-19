@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Check, ChevronDown, RotateCcw, Sparkles, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TicketCapture, { type TicketOcrData } from "@/components/TicketCapture";
@@ -18,6 +18,11 @@ const control = "mt-1.5 h-11 w-full min-w-0 rounded-lg border border-slate-300 b
 const labelClass = "block text-sm font-semibold text-slate-700";
 
 export default function InstantTicketAssessment() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  // Unknown query parameters are private under every existing provider policy.
+  // Enter that fresh, untagged document before accepting ticket information.
+  const privateAssessment = new URLSearchParams(location.search).get("assessment") === "1";
   const [ticketType, setTicketType] = useState<TicketType>("officer_issued");
   const [offence, setOffence] = useState<AssessmentOffence | "">("");
   const [fine, setFine] = useState("");
@@ -35,6 +40,26 @@ export default function InstantTicketAssessment() {
   const scanning = captureState === "processing";
 
   useEffect(() => { if (result) resultHeading.current?.focus(); }, [result]);
+
+  useEffect(() => {
+    if (!privateAssessment) return;
+    const target = location.hash.slice(1);
+    if (!/^assessment-(?:offence|fine|demerits|record|premium|upload)$/.test(target)) return;
+    const element = document.getElementById(target);
+    if (target === "assessment-upload") element?.closest("details")?.setAttribute("open", "");
+    document.getElementById("instant-ticket-assessment")?.scrollIntoView?.({ block: "start" });
+    element?.focus({ preventScroll: true });
+  }, [privateAssessment, location.hash]);
+
+  function enterPrivateAssessment(event: SyntheticEvent<HTMLElement>) {
+    if (privateAssessment) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const element = (event.target as HTMLElement).closest<HTMLElement>("[id^='assessment-']");
+    const target = element && /^assessment-(?:offence|fine|demerits|record|premium|upload)$/.test(element.id)
+      ? element.id : "assessment-offence";
+    navigate(`/?assessment=1#${target}`);
+  }
 
   function changeFile(next: File | null) {
     setFile(next);
@@ -59,6 +84,7 @@ export default function InstantTicketAssessment() {
 
   function assess(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!privateAssessment) { enterPrivateAssessment(event); return; }
     if (!offence || scanning) return;
     setResult(calculateInstantEstimate({
       ticketType, offence, fineAmount: Number(fine), demerits: camera || demerits === "unknown" ? null : Number(demerits),
@@ -133,15 +159,17 @@ export default function InstantTicketAssessment() {
           <button type="button" className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600" onClick={() => setResult(null)}><RotateCcw className="h-4 w-4" aria-hidden="true" /> Edit ticket details</button>
         </div>
       ) : (
-        <form onSubmit={assess}>
+        <form onSubmit={assess} onPointerDownCapture={enterPrivateAssessment} onFocusCapture={enterPrivateAssessment} onClickCapture={enterPrivateAssessment} onChangeCapture={enterPrivateAssessment} autoComplete="off">
           <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-[1.75rem]">See what you could save.</h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">Add your ticket or enter the basics. Get your estimate instantly.</p>
           <details className="group mt-5 rounded-xl border border-slate-200 bg-slate-50">
-            <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 [&::-webkit-details-marker]:hidden">
+            <summary id="assessment-upload" className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 [&::-webkit-details-marker]:hidden">
               <Upload className="h-5 w-5" aria-hidden="true" /> {file ? "Review uploaded ticket" : "Upload a ticket"}
               <span className="ml-auto text-xs font-normal text-slate-500">Photo or PDF</span><ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden="true" />
             </summary>
-            <div className="border-t border-slate-200 p-3"><TicketCapture file={file} onFileChange={changeFile} onOcrData={applyScan} onCaptureStateChange={setCaptureState} skipInitialScan={captureState === "complete" || captureState === "manual"} compact label="Upload to fill in the basics" /></div>
+            <div className="border-t border-slate-200 p-3">{privateAssessment
+              ? <TicketCapture file={file} onFileChange={changeFile} onOcrData={applyScan} onCaptureStateChange={setCaptureState} skipInitialScan={captureState === "complete" || captureState === "manual"} compact label="Upload to fill in the basics" />
+              : <p className="text-sm text-slate-600">Choose a photo or PDF to fill in the basics.</p>}</div>
           </details>
           {file && <p className="mt-2 text-xs text-slate-600" role="status">{scanning ? "Reading your ticket…" : "Check the details below and complete anything the scan missed."}</p>}
           <fieldset disabled={scanning} className="mt-5 space-y-4">
@@ -165,7 +193,7 @@ export default function InstantTicketAssessment() {
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className={labelClass} htmlFor="assessment-fine">Fine amount (CAD)
-                <input id="assessment-fine" className={control} required type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" placeholder="e.g. 300" value={fine} onChange={event => setFine(event.target.value)} />
+                <input id="assessment-fine" className={control} required readOnly={!privateAssessment} type="number" inputMode="decimal" min="0.01" max="1000000" step="0.01" placeholder="e.g. 300" value={fine} onChange={event => setFine(event.target.value)} />
               </label>
               <label className={labelClass} htmlFor="assessment-demerits">Demerit points
                 <select id="assessment-demerits" className={control} required={!camera} disabled={camera} value={camera ? "0" : demerits} onChange={event => setDemerits(event.target.value)}>
@@ -183,7 +211,7 @@ export default function InstantTicketAssessment() {
               <details open={premiumOpen} onToggle={event => setPremiumOpen(event.currentTarget.open)} className="text-xs text-slate-600">
                 <summary className="cursor-pointer rounded-sm py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">Insurance estimate uses {formatEstimateMoney(Math.round((Number(premium) || 0) * 100))}/year · change</summary>
                 <label htmlFor="assessment-premium" className={`${labelClass} mt-2`}>Your annual insurance premium (CAD)
-                  <input id="assessment-premium" className={control} type="number" inputMode="decimal" required min="0" max="1000000" step="0.01" value={premium} onInvalid={() => setPremiumOpen(true)} onChange={event => setPremium(event.target.value)} />
+                  <input id="assessment-premium" className={control} type="number" inputMode="decimal" required readOnly={!privateAssessment} min="0" max="1000000" step="0.01" value={premium} onInvalid={() => setPremiumOpen(true)} onChange={event => setPremium(event.target.value)} />
                 </label>
                 <p className="mt-2">Use your premium for a closer estimate. The $1,800 default is an illustrative baseline.</p>
               </details>

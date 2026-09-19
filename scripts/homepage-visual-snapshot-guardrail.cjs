@@ -132,8 +132,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
     // Only admit the exact empty calculator form. User-specific result ranges
     // are never a crawler snapshot and cannot inherit this admission.
     const expected = `Free ticket assessmentSee what you could save.Add your ticket or enter the basics. Get your estimate instantly.
-      Upload a ticketPhoto or PDFUpload to fill in the basicsAdd a ticket filePDF, JPG, PNG, WebP, HEIC or HEIF · maximum 10 MB
-      Browse filesTake photoImages are scanned to help fill the form. PDFs are attached for manual review and are not sent to OCR.
+      Upload a ticketPhoto or PDFChoose a photo or PDF to fill in the basics.
       Ticket basicsHow was the ticket issued?By an officer$${offers.rapidResolution.priceCad} + GST serviceBy a camera$${offers.photoRadar.priceCad} + GST service
       OffenceSelect your offenceSpeeding (under 30 km/h over)Speeding (30+ km/h over)Distracted drivingRed light, stop sign or failing to yieldCareless drivingOther traffic offence
       Fine amount (CAD)Demerit pointsSelectNot sure0123456789101112131415Clean driving record?Select your recordYes — no convictions in the last 3 yearsNo — I have previous convictions

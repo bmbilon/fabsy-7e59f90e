@@ -16,13 +16,14 @@ const bundle = await build({
       import { MemoryRouter, useLocation } from 'react-router-dom';
       import InstantTicketAssessment from './src/components/InstantTicketAssessment';
       export * from './src/lib/assessment/instantEstimate';
+      export { publicMeasurementDocumentUrl } from './src/lib/publicMeasurementUrl';
       export { act };
       let root, routeSnapshot;
       function Probe() { routeSnapshot = useLocation(); return routeSnapshot.pathname === '/' ? <InstantTicketAssessment /> : <p>Intake handoff</p>; }
       export function handoff() { return routeSnapshot; }
-      export async function mount() {
+      export async function mount(entry = '/?assessment=1') {
         root = createRoot(document.getElementById('root'));
-        await act(async () => root.render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Probe /></MemoryRouter>));
+        await act(async () => root.render(<MemoryRouter initialEntries={[entry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Probe /></MemoryRouter>));
       }
       export async function unmount() { await act(async () => root.unmount()); }
       export async function edit(node, value) {
@@ -50,7 +51,7 @@ const bundle = await build({
   } }],
 });
 
-async function runtime(t, mount = true) {
+async function runtime(t, mount = true, entry = '/?assessment=1') {
   const errors = [], forbidden = [], requests = [], channels = [];
   const console = new VirtualConsole();
   console.on('jsdomError', error => errors.push(error.message));
@@ -76,7 +77,7 @@ async function runtime(t, mount = true) {
     assert.deepEqual(errors, []);
     assert.deepEqual(forbidden, []);
   });
-  if (mount) await api.mount();
+  if (mount) await api.mount(entry);
   const field = name => {
     const el = window.document.getElementById(`assessment-${name}`);
     assert.ok(el, `Expected ${name} field`);
@@ -102,6 +103,19 @@ async function runtime(t, mount = true) {
 
 const base = { ticketType: 'officer_issued', offence: 'lowSpeeding', fineAmount: 300, demerits: 3, cleanRecord: true, annualPremium: 1800 };
 const plain = value => JSON.parse(JSON.stringify(value));
+
+test('first interaction enters the private assessment before accepting ticket data', async t => {
+  const { api, window, field } = await runtime(t, true, '/');
+  assert.equal(window.document.querySelector('input[type="file"]'), null);
+  assert.equal(field('fine').readOnly, true);
+  assert.equal(api.publicMeasurementDocumentUrl(new window.URL('https://fabsy.ca/?assessment=1#assessment-fine')), false);
+  await api.click(field('fine'));
+  assert.equal(api.handoff().search, '?assessment=1');
+  assert.equal(api.handoff().hash, '#assessment-fine');
+  assert.equal(field('fine').readOnly, false);
+  assert.equal(field('fine').value, '');
+  assert.ok(window.document.querySelector('input[type="file"]'));
+});
 
 test('officer estimate sums both benefits, deducts $198 once, and separates GST', async t => {
   const { api } = await runtime(t, false);

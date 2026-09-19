@@ -473,6 +473,27 @@ try {
     return { documentId: initial.id, livePageViewRequired: options.live };
   });
   const main = contexts[0]; const page = main.page;
+  await checkpoint('homepage-assessment-enters-untagged-document-before-ticket-input', async () => {
+    const scope = await isolatedContext(); const assessment = await scope.context.newPage();
+    await go(assessment, '/'); await choose(assessment, scope, 'accepted');
+    const previous = await tagged(assessment);
+    assert.equal(await assessment.locator('#instant-ticket-assessment input[type="file"]').count(), 0, 'Public homepage must not mount ticket file inputs');
+    await assessment.locator('#assessment-fine').click();
+    await assessment.waitForURL(url => url.searchParams.get('assessment') === '1');
+    const current = await ready(assessment, '/');
+    assert.notEqual(current.id, previous.id, 'Assessment data requires a fresh document');
+    await assessment.locator('#assessment-upload').click();
+    await assessment.locator('input[type="file"][accept*="application/pdf"]').setInputFiles(syntheticTicketPdf());
+    await assessment.locator('#assessment-offence').selectOption('lowSpeeding');
+    await assessment.locator('#assessment-fine').fill('4321.99');
+    await assessment.locator('#assessment-demerits').selectOption('3');
+    await assessment.locator('#assessment-record').selectOption('yes');
+    await untagged(assessment, current.id);
+    safeOldDocument(previous.id, '/?assessment=1');
+    assert.equal(await assessment.locator('#fabsy-meta-pixel, #fabsy-openai-ads-pixel, #fabsy-tawk-widget').count(), 0, 'Assessment must exclude every third-party tag');
+    await assessment.close();
+    return { oldDocumentId: previous.id, assessmentDocumentId: current.id, privateFieldsEntered: true };
+  });
   for (const target of ['/contact', '/submit-ticket', '/fleet']) {
     await checkpoint(`loaded-public-to-${target.slice(1)}-and-back`, async () => {
       const previous = await tagged(page); const privateDoc = await actualLink(page, target);
