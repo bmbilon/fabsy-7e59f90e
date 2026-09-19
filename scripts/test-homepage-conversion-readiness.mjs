@@ -51,7 +51,7 @@ try {
 
   const hero = parse(render.renderHero());
   check('hero uses the requested money-back headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Fine or demerits reduced or your money back'));
-  check('hero retains the detailed refund qualification below the opener', () => assert.match(hero.body.textContent, /We can’t guarantee a court outcome\./));
+  check('hero omits the repeated court-outcome disclaimer', () => assert.doesNotMatch(hero.body.textContent, /We can’t guarantee a court outcome\./));
   check('hero removes the superseded promises', () => assert.doesNotMatch(hero.body.textContent, /success guaranteed|you don[’']t pay/i));
   check('hero displays the price without an appended disclaimer', () => assert.equal(hero.querySelector('strong')?.parentElement?.textContent, `$${offers.rapidResolution.priceCad} CAD + GST`));
   check('hero CTA is measurable and calculates the assessment', () => {
