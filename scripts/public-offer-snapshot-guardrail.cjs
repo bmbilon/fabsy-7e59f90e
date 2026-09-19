@@ -402,9 +402,10 @@ function redactExactPhotoStrip(document, route) {
 function redactExactPhotoControls(document, route) {
   if (route === '/photo-radar' || PHOTO_GUIDE_ROUTES.has(route)) {
     const headerSource = sourceText('src/components/Header.tsx');
-    if (headerSource.includes('const activeOffer = photoContext ? PHOTO_RADAR : RAPID_RESOLUTION;') &&
-        headerSource.includes('const activePriceLabel = `$${activeOffer.priceCad} CAD + GST`;') &&
-        headerSource.includes('`Start · ${activePriceLabel}`')) {
+    // Retain only the exact previous camera CTA while checked-in crawler
+    // snapshots are refreshed to the generic, price-free registration link.
+    if (headerSource.includes("to={isFleet ? '/fleet#fleet-intake' : '/submit-ticket'}") &&
+        headerSource.includes("'Fight Ticket Now'")) {
       for (const link of document.querySelectorAll('header a')) {
         if (link.getAttribute('href') === offers.photoRadar.intakePath && safeElement(link) &&
             ['Start · $79 CAD + GST', 'Start online · $79 CAD + GST'].some(copy => exact(link.textContent, copy))) {
