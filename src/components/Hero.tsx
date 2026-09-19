@@ -42,7 +42,7 @@ const Hero = () => (
             />
           </figure>
           <div className="mx-auto mt-6 max-w-sm text-center">
-            <h2 className="text-xl font-bold text-white">A clear plan. Help at every step.</h2>
+            <h2 className="text-xl font-bold text-white">Register once, we handle everything after that</h2>
             <p className="mt-3 text-sm text-slate-200"><strong className="font-semibold text-white">${RAPID_RESOLUTION.priceCad} CAD + GST</strong></p>
             <p className="mt-3 text-sm leading-relaxed text-slate-300">We review your ticket, pursue a reduction or withdrawal, and explain your options. You approve any available resolution.</p>
             <a href="#fabsy-difference" className="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-sm text-sm font-semibold text-blue-200 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
