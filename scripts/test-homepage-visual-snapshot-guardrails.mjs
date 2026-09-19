@@ -115,6 +115,15 @@ try {
       const node = document.querySelector('section[aria-labelledby="homepage-hero-heading"] strong');
       node.textContent = '$199 CAD + GST';
     }],
+    ['wrong assessment price', document => {
+      const label = document.querySelector('#instant-ticket-assessment input[value="photo_radar"]').parentElement;
+      label.innerHTML = label.innerHTML.replace('$79', '$179');
+    }],
+    ['personalized assessment snapshot', document => { document.querySelector('#assessment-fine').value = '300'; document.querySelector('#assessment-fine').setAttribute('value', '300'); }],
+    ['wrong assessment baseline', document => document.querySelector('#assessment-premium').setAttribute('value', '9999')],
+    ['hidden assessment submit', document => document.querySelector('#instant-ticket-assessment button[type="submit"]').hidden = true],
+    ['missing assessment record', document => document.querySelector('#assessment-record').remove()],
+    ['new assessment claim', document => document.querySelector('#instant-ticket-assessment').append(' Guaranteed insurance savings of $800.')],
     ['wrong driver tax treatment', document => {
       const node = [...document.querySelectorAll('#back-to-your-day p')].find(node => node.textContent.includes('CAD + GST'));
       node.textContent = node.textContent.replace('CAD + GST', 'CAD including GST');

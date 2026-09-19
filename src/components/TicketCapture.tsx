@@ -23,6 +23,7 @@ export interface TicketCaptureProps {
   required?: boolean;
   skipInitialScan?: boolean;
   selectionOnly?: boolean;
+  compact?: boolean;
   onCaptureStateChange?: (state: TicketCaptureState) => void;
 }
 
@@ -69,6 +70,7 @@ export default function TicketCapture({
   required = false,
   skipInitialScan = false,
   selectionOnly = false,
+  compact = false,
   onCaptureStateChange,
 }: TicketCaptureProps) {
   const reactId = useId();
@@ -217,20 +219,20 @@ export default function TicketCapture({
         {label}{required ? <span className="text-destructive"> *</span> : null}
       </legend>
 
-      <TicketPhotoGuide />
+      {!compact && <TicketPhotoGuide />}
 
-      <div className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-5 sm:p-6">
-        <div className="flex flex-col items-center gap-4 text-center">
-          {status.kind === "processing" ? (
+      <div className={`rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 ${compact ? "p-3" : "p-5 sm:p-6"}`}>
+        <div className={`flex flex-col items-center text-center ${compact ? "gap-2" : "gap-4"}`}>
+          {!compact && (status.kind === "processing" ? (
             <Loader2 className="h-9 w-9 animate-spin text-primary" aria-hidden="true" />
           ) : file ? (
             <FileText className="h-9 w-9 text-primary" aria-hidden="true" />
           ) : (
             <Upload className="h-9 w-9 text-primary" aria-hidden="true" />
-          )}
+          ))}
 
           <div className="min-w-0 max-w-full">
-            <p className="font-semibold text-foreground">
+            <p className={compact ? "sr-only" : "font-semibold text-foreground"}>
               {file ? "Ticket file selected" : "Add a ticket file"}
             </p>
             <p className="mt-1 max-w-full break-all text-sm text-muted-foreground">
@@ -238,7 +240,7 @@ export default function TicketCapture({
             </p>
           </div>
 
-          <div className="flex w-full flex-col justify-center gap-3 sm:flex-row">
+          <div className={`flex w-full justify-center gap-3 ${compact ? "flex-wrap" : "flex-col sm:flex-row"}`}>
             <Button
               type="button"
               variant="outline"
