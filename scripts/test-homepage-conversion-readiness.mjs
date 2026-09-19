@@ -86,8 +86,10 @@ try {
   });
 
   const headerSource = fs.readFileSync(path.join(ROOT, 'src/components/Header.tsx'), 'utf8');
-  check('header CTAs expose full CAD and GST context', () => {
-    assert.match(headerSource, /activePriceLabel = `\$\$\{activeOffer\.priceCad\} CAD \+ GST`/);
+  check('desktop and mobile header CTAs start registration without choosing a service', () => {
+    assert.equal((headerSource.match(/'Fight Ticket Now'/g) || []).length, 2);
+    assert.equal((headerSource.match(/to=\{isFleet \? '\/fleet#fleet-intake' : '\/submit-ticket'\}/g) || []).length, 2);
+    assert.doesNotMatch(headerSource, /activePriceLabel|activeOffer|ticket_type=/);
     assert.match(headerSource, /data-funnel-action=\{isFleet \? undefined : "primary_cta"\}/);
     assert.match(headerSource, /data-funnel-position=\{isFleet \? undefined : "header"\}/);
   });

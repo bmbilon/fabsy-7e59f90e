@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Scale, Phone } from "lucide-react";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
-import { PHOTO_RADAR, RAPID_RESOLUTION } from "@/config/offers";
-import { isPhotoRadarContentSlug } from "@/lib/photo-radar-pages";
+import { RAPID_RESOLUTION } from "@/config/offers";
 import { useLocale } from "@/i18n/locale-context";
 import { englishEditorialReturnPath } from "@/i18n/locale-policy.mjs";
 import LanguageSelector from "./LanguageSelector";
@@ -33,9 +32,6 @@ const Header = () => {
   const location = useLocation();
   const { locale } = useLocale();
   const isFleet = location.pathname === '/fleet';
-  const photoContext = isFleet || location.pathname === PHOTO_RADAR.slug || isPhotoRadarContentSlug(location.pathname.replace('/content/', '')) || new URLSearchParams(location.search).get('ticket_type') === 'photo_radar';
-  const activeOffer = photoContext ? PHOTO_RADAR : RAPID_RESOLUTION;
-  const activePriceLabel = `$${activeOffer.priceCad} CAD + GST`;
   // The intake owns the current product selection, which may differ from its entry URL.
   const isIntake = ['/submit-ticket', '/ticket-form'].includes(location.pathname);
   const isEnglishEditorial = Boolean(englishEditorialReturnPath(location.pathname));
@@ -96,7 +92,7 @@ const Header = () => {
               </a>
             </Button>}
             {!isIntake && <Button asChild className="bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-              <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} data-funnel-action={isFleet ? undefined : "primary_cta"} data-funnel-position={isFleet ? undefined : "header"}>{isFleet ? 'Fleet account' : `Start · ${activePriceLabel}`}</Link>
+              <Link to={isFleet ? '/fleet#fleet-intake' : '/submit-ticket'} data-funnel-action={isFleet ? undefined : "primary_cta"} data-funnel-position={isFleet ? undefined : "header"}>{isFleet ? 'Fleet account' : 'Fight Ticket Now'}</Link>
             </Button>}
           </div>
 
@@ -162,8 +158,8 @@ const Header = () => {
                     </a>
                   </Button>
                   {!isIntake && <Button asChild className="w-full bg-gradient-button hover:opacity-90 transition-smooth shadow-glow border-0">
-                    <Link to={isFleet ? '/fleet#fleet-intake' : activeOffer.intakePath} data-funnel-action={isFleet ? undefined : "primary_cta"} data-funnel-position={isFleet ? undefined : "header"} onClick={() => setIsOpen(false)}>
-                      {isFleet ? 'Start one fleet intake' : `Start online · ${activePriceLabel}`}
+                    <Link to={isFleet ? '/fleet#fleet-intake' : '/submit-ticket'} data-funnel-action={isFleet ? undefined : "primary_cta"} data-funnel-position={isFleet ? undefined : "header"} onClick={() => setIsOpen(false)}>
+                      {isFleet ? 'Start one fleet intake' : 'Fight Ticket Now'}
                     </Link>
                   </Button>}
                 </div>
