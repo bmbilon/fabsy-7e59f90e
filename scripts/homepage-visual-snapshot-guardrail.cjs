@@ -25,7 +25,7 @@ const policyAnchor = '#money-back-guarantee';
 const SOURCE_BINDINGS = {
   'src/pages/Index.tsx': ['<Hero />', '<HomepageOutcomeExplorer />', '<RapidResolutionGuarantee />', '<AssessmentHomepageJourney />'],
   'src/content/homepageRefundCopy.ts': [`headline: "${heroHeadline}"`, `headlineAccent: "${heroHeadlineAccent}"`, `heroSupport: "${heroSupport}"`, 'refundCondition: FEE_REFUND.condition', 'declinedOfferDisclaimer: FEE_REFUND.declinedOfferText', 'paymentTiming: FEE_REFUND.payment', 'termsPath: FEE_REFUND.termsPath'],
-  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.headlineAccent}', '{HOMEPAGE_REFUND_COPY.heroSupport}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '<InstantTicketAssessment />'],
+  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.headlineAccent}', '{HOMEPAGE_REFUND_COPY.heroSupport}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '<InstantTicketAssessment />'],
   'src/components/RapidResolutionGuarantee.tsx': ['id="money-back-guarantee"', '{HOMEPAGE_REFUND_COPY.successDefinition}', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '{HOMEPAGE_REFUND_COPY.paymentTiming}', '{HOMEPAGE_REFUND_COPY.refundScope}', 'to={HOMEPAGE_REFUND_COPY.termsPath}'],
   'src/components/HomepageOutcomeExplorer.tsx': ['aria-labelledby="homepage-outcomes-heading"', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}'],
   'src/components/AssessmentHomepageJourney.tsx': ['aria-labelledby="homepage-pricing-heading"', '{RAPID_RESOLUTION.speedDisclaimer}', '<InsuranceContextSection />', '<ProDriverSection />', '<HomepageDriverSection />'],
@@ -123,7 +123,11 @@ function redactHomepageVisualSnapshot(document, route, issues) {
 
   field(hero, 'h1#homepage-hero-heading', heroHeading, 'reviewed hero headline');
   field(hero, 'p', heroSupport, 'supporting headline');
-  field(hero, 'p', `${qualification} ${feeRefund.condition}`, 'hero outcome qualification and Crown-rejection trigger');
+  // The qualification remains in the policy section. Admit the previous exact
+  // hero copy while a build replaces its committed crawler snapshot.
+  const heroCondition = [...hero.querySelectorAll('p')].some(node => compact(node.textContent) === compact(feeRefund.condition))
+    ? feeRefund.condition : `${qualification} ${feeRefund.condition}`;
+  field(hero, 'p', heroCondition, 'hero Crown-rejection trigger');
   field(hero, 'p', heroPrice, 'Rapid Resolution price and GST');
   field(hero, 'p', 'For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the service-fee refund works',
     'hero scope and policy destination', [[policyAnchor, 'How the service-fee refund works']]);

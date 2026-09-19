@@ -49,7 +49,7 @@ const Hero = () => (
               See the Fabsy difference <ArrowDown className="h-4 w-4" aria-hidden="true" />
             </a>
             <div className="mt-5 border-t border-slate-800 pt-5 text-xs leading-relaxed text-slate-400">
-              <p>{HOMEPAGE_REFUND_COPY.outcomeQualification} {HOMEPAGE_REFUND_COPY.refundCondition}</p>
+              <p>{HOMEPAGE_REFUND_COPY.refundCondition}</p>
               <p className="mt-2">For eligible Alberta pre-trial matters. Government fines and trial representation are separate.{" "}<a href="#money-back-guarantee" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-blue-200 underline underline-offset-4 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">How the service-fee refund works</a></p>
             </div>
           </div>
