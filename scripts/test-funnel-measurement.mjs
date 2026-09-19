@@ -434,6 +434,51 @@ test('client funnel payload is consent gated, deduplicated and PII free', async 
   } finally { r.close(); }
 });
 
+test('photo radar landing events require consent and satisfy the server contract', async () => {
+  const { parseFunnelEventRequest, FunnelRequestError } = await import(
+    pathToFileURL(path.join(root, 'supabase/functions/_shared/funnel-measurement.ts')).href
+  );
+  const r = await runtime('https://fabsy.ca/photo-radar?utm_source=google&utm_medium=cpc&utm_campaign=rr_google_profit_20260913&utm_content=en_rsa_v1&utm_term=photo_radar');
+  const events = [
+    ['landing_view', {}],
+    ['primary_cta_viewed', { position: 'hero' }],
+    ['primary_cta_click', { position: 'hero' }],
+    ['phone_click', { position: 'header' }],
+    ...['engaged_10s', 'engaged_30s', 'engaged_60s', 'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90'].map(name => [name, {}]),
+  ];
+  try {
+    r.api.captureMarketingAttribution(r.win.location.search, '/photo-radar', '');
+    for (const choice of ['unknown', 'declined']) {
+      if (choice === 'declined') r.api.setFabsyFunnelConsentChoice(choice);
+      for (const [name, options] of events) assert.equal(await r.api.recordFunnelEvent(name, options), false, `${choice}: ${name}`);
+      assert.equal(r.calls.length, 0);
+      assert.equal(r.win.sessionStorage.getItem(r.api.FUNNEL_SESSION_STORAGE_KEY), null);
+    }
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    for (const [name, options] of events) {
+      assert.equal(await r.api.recordFunnelEvent(name, options), true, name);
+      const body = JSON.parse(r.calls.at(-1).options.body);
+      assert.equal(body.pageKey, 'photo_radar');
+      assert.equal(parseFunnelEventRequest(body).pageKey, 'photo_radar', name);
+      assert.equal(body.product, undefined, 'Only verified purchases carry a product');
+      for (const invalid of [
+        { ...body, consentVersion: 'unknown' },
+        { ...body, pageKey: 'intake' },
+        { ...body, pageKey: 'photo_radar/private' },
+      ]) assert.throws(() => parseFunnelEventRequest(invalid), FunnelRequestError, name);
+    }
+    const callCount = r.calls.length;
+    for (const name of ['intake_started', 'lead_saved', 'ticket_uploaded', 'checkout_started', 'purchase']) {
+      assert.equal(await r.api.recordFunnelEvent(name), false, name);
+    }
+    for (const pathname of ['/admin/photo-radar', '/portal/photo-radar', '/photo-radar/private', '/submit-ticket']) {
+      r.win.history.replaceState(null, '', pathname);
+      assert.equal(await r.api.recordFunnelEvent('landing_view'), false, pathname);
+    }
+    assert.equal(r.calls.length, callCount, 'Private routes and mismatched events produce no requests');
+  } finally { r.close(); }
+});
+
 test('consent withdrawal during a deferred funnel request cannot restore its dedupe marker', async () => {
   const r = await runtime();
   try {

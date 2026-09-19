@@ -58,7 +58,7 @@ function LocalizedCheck({ name, data, update, label }: { name: keyof FormData; d
   </label>;
 }
 
-export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false, hasPendingTicketUpload = false, allowReplacement = false, onTicketFileSelection, replacementReady = false, replacementSaving = false, onSaveReplacement, resumeAccess = null, leadSaved, leadReady, leadSaving, leadError, onSaveLead, ticketReady, onSaveTicket }: {
+export default function LocalizedTicketJourney({ formData, updateFormData, currentStep, nextStep, prevStep, intakeDraft = null, hasStoredTicket = false, hasPendingTicketUpload = false, allowReplacement = false, onTicketFileSelection, replacementReady = false, replacementSaving = false, onSaveReplacement, resumeAccess = null, localTicketSelection, leadSaved, leadReady, leadSaving, leadError, onSaveLead, ticketReady, onSaveTicket }: {
   formData: FormData; updateFormData: (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void; currentStep: number; nextStep: () => void; prevStep: () => void; intakeDraft?: IntakeDraftCapability | null; hasStoredTicket?: boolean;
   hasPendingTicketUpload?: boolean;
   allowReplacement?: boolean;
@@ -68,6 +68,7 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
   onSaveReplacement?: () => void;
   resumeAccess?: ReactNode;
   leadSaved: boolean;
+  localTicketSelection: ReactNode;
   leadReady: boolean;
   leadSaving: boolean;
   leadError?: string;
@@ -191,10 +192,11 @@ export default function LocalizedTicketJourney({ formData, updateFormData, curre
         <p className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
           {t('language.englishControls')}
         </p>
-        <div lang="en" dir="ltr">
-          <LeadCaptureFields formData={formData} updateFormData={update} error={leadError} />
+        <div lang="en" dir="ltr" className="space-y-6">
+          {localTicketSelection}
+          {formData.ticketImage && <LeadCaptureFields formData={formData} updateFormData={update} error={leadError} />}
           {leadValidationAttempted && !leadReady ? <p className="mt-3 text-sm text-red-700" role="alert">
-            Add a valid email or phone number and select both confirmations before saving.
+            Choose a ticket file, add a valid email or phone number and select both confirmations before saving.
           </p> : null}
         </div>
       </div>}

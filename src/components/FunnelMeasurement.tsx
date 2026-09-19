@@ -4,7 +4,7 @@ import {
   FABSY_FUNNEL_CONSENT_CHANGED,
   getFabsyFunnelConsentChoice,
 } from '@/lib/fabsyFunnelConsent';
-import { recordFunnelEvent } from '@/lib/funnelMeasurement';
+import { funnelPageKey, recordFunnelEvent } from '@/lib/funnelMeasurement';
 
 const intakeEvents = new Map<string, Parameters<typeof recordFunnelEvent>[0]>([
   ['fabsy:intake-form-start', 'intake_started'],
@@ -18,8 +18,9 @@ const intakeEvents = new Map<string, Parameters<typeof recordFunnelEvent>[0]>([
 const engagementCheckpoints = [10, 30, 60] as const;
 const scrollCheckpoints = [25, 50, 75, 90] as const;
 
-function isRapidResolution(pathname: string): boolean {
-  return pathname.replace(/\/$/, '').endsWith('/rapid-resolution');
+function landingPageKey(pathname: string): 'rapid_resolution' | 'photo_radar' | null {
+  const pageKey = funnelPageKey(pathname);
+  return pageKey === 'rapid_resolution' || pageKey === 'photo_radar' ? pageKey : null;
 }
 
 export default function FunnelMeasurement() {
@@ -27,8 +28,9 @@ export default function FunnelMeasurement() {
 
   useEffect(() => {
     const recordPage = () => {
-      if (isRapidResolution(location.pathname)) {
-        void recordFunnelEvent('landing_view', { dedupeKey: 'landing_view' });
+      const pageKey = landingPageKey(location.pathname);
+      if (pageKey) {
+        void recordFunnelEvent('landing_view', { dedupeKey: `landing_view:${pageKey}` });
       } else if (location.pathname.replace(/\/$/, '').endsWith('/payment-canceled')) {
         void recordFunnelEvent('checkout_canceled', { dedupeKey: 'checkout_canceled' });
       }
@@ -42,7 +44,8 @@ export default function FunnelMeasurement() {
   }, [location.pathname, location.search]);
 
   useEffect(() => {
-    if (!isRapidResolution(location.pathname)) return;
+    const pageKey = landingPageKey(location.pathname);
+    if (!pageKey) return;
 
     let visibleElapsedMs = 0;
     let previousTick = performance.now();
@@ -53,7 +56,7 @@ export default function FunnelMeasurement() {
       for (const position of visibleCtas.values()) {
         void recordFunnelEvent('primary_cta_viewed', {
           position: position as 'hero' | 'header' | 'sticky' | 'section' | 'footer',
-          dedupeKey: `primary_cta_viewed:${position}`,
+          dedupeKey: `primary_cta_viewed:${pageKey}:${position}`,
         });
       }
     };
@@ -66,7 +69,7 @@ export default function FunnelMeasurement() {
         : 0;
       for (const checkpoint of scrollCheckpoints) {
         if (reached >= checkpoint) void recordFunnelEvent(`scroll_${checkpoint}` as const, {
-          dedupeKey: `scroll_${checkpoint}`,
+          dedupeKey: `scroll_${checkpoint}:${pageKey}`,
         });
       }
     };
@@ -79,7 +82,7 @@ export default function FunnelMeasurement() {
       visibleElapsedMs += delta;
       for (const checkpoint of engagementCheckpoints) {
         if (visibleElapsedMs >= checkpoint * 1000) void recordFunnelEvent(`engaged_${checkpoint}s` as const, {
-          dedupeKey: `engaged_${checkpoint}s`,
+          dedupeKey: `engaged_${checkpoint}s:${pageKey}`,
         });
       }
     };
@@ -151,6 +154,8 @@ export default function FunnelMeasurement() {
 
   useEffect(() => {
     const onAction = (event: Event) => {
+      const pageKey = landingPageKey(window.location.pathname);
+      if (!pageKey) return;
       const target = event.target instanceof Element
         ? event.target.closest<HTMLElement>('[data-funnel-action]')
         : null;
@@ -158,11 +163,11 @@ export default function FunnelMeasurement() {
       const position = target?.dataset.funnelPosition as 'hero' | 'header' | 'sticky' | 'section' | 'footer' | undefined;
       if (action === 'primary_cta') void recordFunnelEvent('primary_cta_click', {
         position,
-        dedupeKey: `primary_cta_click:${position || 'unknown'}`,
+        dedupeKey: `primary_cta_click:${pageKey}:${position || 'unknown'}`,
       });
       if (action === 'phone') void recordFunnelEvent('phone_click', {
         position,
-        dedupeKey: `phone_click:${position || 'unknown'}`,
+        dedupeKey: `phone_click:${pageKey}:${position || 'unknown'}`,
       });
     };
     // Pointer activation is captured before a link can navigate away. Click is

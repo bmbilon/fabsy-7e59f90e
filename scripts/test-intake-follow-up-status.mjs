@@ -44,6 +44,7 @@ const fixture = globalThis.__intakeFollowUpTest = {
   toast: value => notifications.push(value),
   query: (table, fields) => queries.push({ table, fields }),
   holdLeadQuery: false,
+  alertStatusError: false,
   read: table => {
     const result = { data: table === 'ticket_intake_drafts' ? structuredClone(fixture.leads) : [], error: null };
     if (table === 'ticket_intake_drafts' && fixture.holdLeadQuery) {
@@ -54,6 +55,13 @@ const fixture = globalThis.__intakeFollowUpTest = {
   },
   forbidden: (...args) => { deliveryCalls.push(args); throw new Error('Contact recording must not send, call, or access storage'); },
   rpc: (name, args) => {
+    if (name === 'get_ticket_upload_alert_statuses') return Promise.resolve(fixture.alertStatusError
+      ? { data: null, error: { message: 'status RPC unavailable' } }
+      : { data: [
+        { draft_id: 'open', email_status: 'sent', sms_status: 'accepted' },
+        { draft_id: 'email-only', email_status: 'retry', sms_status: 'indeterminate' },
+        { draft_id: 'legacy', email_status: 'sent', sms_status: null },
+      ], error: null });
     rpcCalls.push({ name, args });
     assert.equal(name, 'record_ticket_intake_follow_up', 'Contact actions use the recording RPC only');
     return new Promise(resolve => { resolveRpc = resolve; });
@@ -165,6 +173,9 @@ try {
   assert.equal(badge(row('open'), 'Email sent'), undefined, 'Resume email delivery is not a follow-up email');
   assert.match(row('open').textContent, /Resume link:/, 'Resume-link delivery has a separate label');
   assert.doesNotMatch(row('open').textContent, /Follow-up status: resume link/);
+  assert.match(row('open').textContent, /Owner upload alerts: email provider accepted \(delivery unconfirmed\) · SMS provider accepted \(delivery unconfirmed\)/);
+  assert.match(row('email-only').textContent, /SMS outcome unknown; review before resending/);
+  assert.match(row('legacy').textContent, /SMS not scheduled for this earlier upload/);
   assert.ok(badge(row('email-only'), 'Email sent'), 'Automatic email delivery is visible even while queue status remains open');
   assert.equal(button(row('email-only'), 'Record email sent'), undefined);
   assert.ok(button(row('email-only'), 'Phone call made'));
@@ -224,6 +235,11 @@ try {
   await act(async () => resolveLeadQuery());
   assert.equal(leadQueryCount(), beforeDeferredFetchRefresh + 2, 'Queued refresh runs after the stale fetch finishes');
   assert.ok(row('arrived-during-refresh'), 'Latest queue state appears after the deferred refresh');
+  fixture.alertStatusError = true;
+  await click(document, 'Refresh queue');
+  assert.match(row('open').textContent, /Owner upload alerts: status unavailable/, 'Unavailable notification status does not hide the intake');
+  assert.ok(badge(row('open'), 'Email sent') && badge(row('open'), 'Phone call made'), 'Owner alert lookup failures preserve existing follow-up records');
+  fixture.alertStatusError = false;
 
   await click(document, 'Dismissed (1)');
   assert.equal(button(row('dismissed'), 'Record email sent'), undefined);

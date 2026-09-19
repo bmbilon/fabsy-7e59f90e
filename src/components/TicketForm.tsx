@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import PersonalInfoStep from "./form-steps/PersonalInfoStep";
 import TicketDetailsStep from "./form-steps/TicketDetailsStep";
-import type { TicketCaptureState } from "@/lib/ticket/ticketCapture";
+import TicketCapture from "./TicketCapture";
+import { validateTicketCaptureFile, type TicketCaptureState } from "@/lib/ticket/ticketCapture";
 import { hasTicketReviewData, missingRequiredTicketFields } from "@/lib/ticket/ticketReview";
 import DefenseStep from "./form-steps/DefenseStep";
 import ConsentStep from "./form-steps/ConsentStep";
@@ -22,7 +23,7 @@ import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config
 import { useLocale } from "@/i18n/locale-context";
 import { validateLocalizedIntakeStep } from "@/i18n/intake-validation";
 import LocalizedTicketJourney from "./LocalizedTicketJourney";
-import { applyDetectedTicketType, applyTicketType, ticketDateAsLocalDate, ticketDateFromExtraction, type RegisteredOwnerAnswer, type TicketType, type TicketTypeSource } from "@/lib/ticket/ticketType";
+import { applyDetectedTicketType, applyTicketType, resetTicketTypeForUpload, ticketDateAsLocalDate, ticketDateFromExtraction, type RegisteredOwnerAnswer, type TicketType, type TicketTypeSource } from "@/lib/ticket/ticketType";
 import { isProLicenceClass, LICENCE_CLASS_OPTIONS, normalizeLicenceClass, type LicenceClass } from "@/lib/pro-drivers/intake";
 import { latestReferralAttribution, normalizeReferralCode, ReferralCaptureError, type ReferralAttribution } from "@/lib/referrals/attribution";
 import { captureReferralCode, captureReferralFromLocation, clearReferralAttribution, readActiveReferral, REFERRAL_ATTRIBUTION_EVENT } from "@/lib/referrals/capture";
@@ -173,6 +174,13 @@ const steps = [
   { id: 6, title: "Payment", description: "Secure payment processing" }
 ];
 
+function restoredStep(step: number, ticketType: unknown) {
+  const clamped = Math.max(1, Math.min(step, steps.length));
+  // Preserve the stored/API step IDs while omitting the optional camera
+  // narrative screen, including drafts saved on that screen before this change.
+  return ticketType === "photo_radar" && clamped === 3 ? 4 : clamped;
+}
+
 function resumeDeliveryMessage(delivery?: IntakeDraftResumeDelivery, hasUploadedTicket = true) {
   if (!hasUploadedTicket) {
     if (delivery?.status === "sent") {
@@ -280,8 +288,8 @@ const TicketForm = ({
   const { locale, setIntakeHandoff } = useLocale();
   const [currentStep, setCurrentStep] = useState<number>(() => {
     const s = typeof initialStep === 'number' ? initialStep : 1;
-    const clamped = Math.max(1, Math.min(s, steps.length));
-    return clamped;
+    return restoredStep(s, initialPrefill?.ticketTypeSource === "manual"
+      ? initialPrefill.ticketType : initialTicketType ?? applyDetectedTicketType(initialFormData, initialPrefill).ticketType);
   });
   useEffect(() => {
     // Coarse stage only: no form values, ticket details or identity.
@@ -326,10 +334,15 @@ const TicketForm = ({
     };
   });
   const isPhotoRadar = formData.ticketType === "photo_radar";
+  const visibleSteps = isPhotoRadar ? steps.filter(step => step.id !== 3) : steps;
+  const stepIndex = visibleSteps.findIndex(step => step.id === currentStep);
+  const previousStepId = visibleSteps[stepIndex - 1]?.id ?? 0;
+  const nextStepId = visibleSteps[stepIndex + 1]?.id;
   const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const [captureState, setCaptureState] = useState<TicketCaptureState>(() => hasTicketReviewData(formData) ? "complete" : "empty");
   const [completedTicketFile, setCompletedTicketFile] = useState<File | null>(() => hasTicketReviewData(formData) ? formData.ticketImage : null);
   const [leadSaved, setLeadSaved] = useState(Boolean(sourceAssessment));
+  const leadSaveInFlight = useRef(false);
   const [replacementTicketFile, setReplacementTicketFile] = useState<File | null>(null);
   const replacementTicketSnapshot = useRef<FormData | null>(null);
   const ticketDraftRevision = useRef(0);
@@ -353,7 +366,7 @@ const TicketForm = ({
       // prior signature never has to be persisted in the resumable draft.
       setCurrentStep(record.status === "converted"
         ? 4
-        : Math.max(1, Math.min(record.currentStep || 1, steps.length)));
+        : restoredStep(record.currentStep || 1, values.ticketType));
       setLeadSaved(true);
       if (record.ticketUploadedAt && record.ticketDocumentPath) {
         setCaptureState("complete");
@@ -475,6 +488,7 @@ const TicketForm = ({
     ? Boolean(replacementTicketFile) && localizedTicketReady
     : replacementReviewReady;
   const isLeadValid = Boolean(
+    formData.ticketImage && validateTicketCaptureFile(formData.ticketImage).valid &&
     (leadEmail || leadPhone) && leadEmailValid && leadPhoneValid &&
     formData.albertaConfirmed && formData.contactPermission
   );
@@ -483,10 +497,11 @@ const TicketForm = ({
   );
 
   const saveLead = async () => {
-    if (!isLeadValid || intakeDraft.status === "saving") {
+    if (!isLeadValid || leadSaveInFlight.current || intakeDraft.status === "saving") {
       if (!isLeadValid) window.dispatchEvent(new CustomEvent("fabsy:intake-validation-blocked", { detail: { step: 1 } }));
       return false;
     }
+    leadSaveInFlight.current = true;
     try {
       const saved = await intakeDraft.createContact(
         formData as unknown as Record<string, unknown>,
@@ -507,6 +522,8 @@ const TicketForm = ({
         variant: "destructive",
       });
       return false;
+    } finally {
+      leadSaveInFlight.current = false;
     }
   };
 
@@ -655,7 +672,7 @@ const TicketForm = ({
   };
 
   const nextStep = async () => {
-    if (currentStep < steps.length) {
+    if (nextStepId) {
       if (intakeDraft.record?.hasPendingTicketUpload) {
         window.dispatchEvent(new CustomEvent("fabsy:intake-validation-blocked", { detail: { step: currentStep } }));
         toast({
@@ -671,7 +688,7 @@ const TicketForm = ({
       }
       if (intakeDraft.capability && intakeDraft.record?.status !== "converted") {
         try {
-          await intakeDraft.save(formData as unknown as Record<string, unknown>, currentStep + 1, currentStep);
+          await intakeDraft.save(formData as unknown as Record<string, unknown>, nextStepId, currentStep);
         } catch (failure) {
           toast({
             title: "Your latest changes are not saved yet",
@@ -683,14 +700,14 @@ const TicketForm = ({
       }
       window.dispatchEvent(new CustomEvent("fabsy:intake-step-completed", { detail: { step: currentStep } }));
       formScrollPending.current = true;
-      setCurrentStep(currentStep + 1);
+      setCurrentStep(nextStepId);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1 && intakeDraft.record?.status !== "converted") {
       formScrollPending.current = true;
-      setCurrentStep(currentStep - 1);
+      setCurrentStep(previousStepId || 1);
     }
   };
 
@@ -701,7 +718,7 @@ const TicketForm = ({
       void saveIntakeDraft(
         formData as unknown as Record<string, unknown>,
         currentStep,
-        Math.max(0, currentStep - 1),
+        previousStepId,
       ).catch(() => {
         // The visible save status and the next explicit Continue retry carry
         // this error; do not interrupt typing with repeated toast messages.
@@ -713,7 +730,7 @@ const TicketForm = ({
         autosaveTimer.current = null;
       }
     };
-  }, [formData, currentStep, leadSaved, intakeDraft.hasUploadedTicket, intakeDraftId, intakeDraftRecordStatus, replacementTicketFile, saveIntakeDraft]);
+  }, [formData, currentStep, previousStepId, leadSaved, intakeDraft.hasUploadedTicket, intakeDraftId, intakeDraftRecordStatus, replacementTicketFile, saveIntakeDraft]);
 
   const copyResumeLink = async () => {
     const url = intakeDraft.getResumeUrl();
@@ -787,15 +804,36 @@ const TicketForm = ({
     </div>
   </div> : null;
 
+  const localTicketSelection = <TicketCapture
+    file={formData.ticketImage}
+    selectionOnly
+    required
+    disabled={intakeDraft.status === "saving" || intakeDraft.status === "loading"}
+    onOcrData={() => {}}
+    onFileChange={ticketImage => {
+      setCaptureState("empty");
+      setCompletedTicketFile(null);
+      updateFormData(current => ({
+        ...resetTicketTypeForUpload(current),
+        ticketImage,
+        ticketNumber: "", plateNumber: "", issueDate: undefined,
+        location: "", officer: "", officerBadge: "", offenceSection: "",
+        offenceSubSection: "", offenceDescription: "", violation: "", fineAmount: "",
+        courtDate: undefined, courtJurisdiction: "", agentRepresentationPermitted: null,
+        vehicleSeized: false, sourceAssessmentId: "", sourceAssessmentAccessToken: "",
+      }));
+    }}
+  />;
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         if (contactOnly) {
-          return <LeadCaptureFields
+          return <div className="space-y-6">{localTicketSelection}{formData.ticketImage && <LeadCaptureFields
             formData={formData}
             updateFormData={updateFormData}
             error={intakeDraft.error}
-          />;
+          />}</div>;
         }
         return <>
           <TicketDetailsStep
@@ -823,7 +861,10 @@ const TicketForm = ({
           </div>}
         </>;
       case 2:
-        return <PersonalInfoStep formData={formData} updateFormData={updateFormData} />;
+        return <>
+          <PersonalInfoStep formData={formData} updateFormData={updateFormData} />
+          {isPhotoRadar && <ReferralCodeField referral={formData.referral} onChange={referral => updateFormData({ referral })} />}
+        </>;
       case 3:
         return <>
           <DefenseStep formData={formData} updateFormData={updateFormData} />
@@ -929,7 +970,7 @@ const TicketForm = ({
     return m;
   };
 
-  const progress = (currentStep / steps.length) * 100;
+  const progress = ((stepIndex + 1) / visibleSteps.length) * 100;
   useEffect(() => {
     const timer = window.setTimeout(() => {
       window.dispatchEvent(new CustomEvent("fabsy:intake-step-viewed", { detail: { step: currentStep } }));
@@ -956,6 +997,7 @@ const TicketForm = ({
     onTicketFileSelection={!convertedIntake ? handleTicketFileSelection : undefined}
     replacementReady={replacementSaveReady} replacementSaving={intakeDraft.status === "saving"}
     onSaveReplacement={() => void saveReplacementTicket()} resumeAccess={resumeAccess}
+    localTicketSelection={localTicketSelection}
     leadSaved={leadSaved} leadReady={isLeadValid} leadSaving={intakeDraft.status === "saving"} leadError={intakeDraft.error}
     onSaveLead={saveLead} ticketReady={ticketSaveReady} onSaveTicket={saveTicket} />;
 
@@ -970,14 +1012,14 @@ const TicketForm = ({
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
             {currentStep === 1
               ? contactOnly
-                ? "First, tell us where to follow up."
+                ? formData.ticketImage ? "Your ticket is selected. Where can we reach you?" : "Start with a photo or PDF of your ticket."
                 : ticketCaptureOnly
-                ? "Now add your ticket."
+                ? "Prepare your ticket for review."
                 : "Check your ticket details."
               : <>Start your <span className="text-gradient-primary">{isPhotoRadar ? "photo radar resolution" : "pre-trial resolution"}</span></>}
           </h1>
           <p className={`${checkpointOnly ? "text-base sm:text-lg" : "text-lg"} text-muted-foreground max-w-3xl mx-auto`}>
-            {currentStep === 1 ? (contactOnly ? "We’ll save a secure return link before asking you to upload anything." : ticketCaptureOnly ? "Take a clear photo or upload the PDF. We’ll fill in what we can for you to review." : "Review what we captured, fill in any missing details, then continue.") : isPhotoRadar ? <>Upload your Alberta registered-owner notice, confirm ownership and sign the authorization. {PHOTO_RADAR_PRICE_LABEL}. {PHOTO_RADAR.insuranceDisclaimer} Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee.</> : <>Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
+            {currentStep === 1 ? (contactOnly ? "Choose your ticket first. It stays on your device until you save your contact details and permission. Payment comes after review and authorization." : ticketCaptureOnly ? "We’ll fill in what we can. Save the ticket securely, then review its details." : "Review what we captured, fill in any missing details, then continue.") : isPhotoRadar ? <>Upload your Alberta registered-owner notice, confirm ownership and sign the authorization. {PHOTO_RADAR_PRICE_LABEL}. {PHOTO_RADAR.insuranceDisclaimer} Fabsy enters a not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal. No trial. No success fee.</> : <>Upload the ticket, provide the details needed for disclosure, sign the digital authorization,
             and continue to the transparent ${RAPID_RESOLUTION.priceCad} CAD plus GST checkout. Want the insurance report by itself?{" "}
             <Link to="/insurance-damage-report" className="font-semibold text-primary underline underline-offset-4">
               See the Insurance Impact &amp; Renewal Planning Report.
@@ -990,7 +1032,7 @@ const TicketForm = ({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-muted-foreground">
-                Step {currentStep} of {steps.length}
+                Step {stepIndex + 1} of {visibleSteps.length}
               </span>
               <span className="text-sm font-medium text-primary">
                 {Math.round(progress)}% Complete
@@ -999,8 +1041,8 @@ const TicketForm = ({
             
             <Progress value={progress} className="h-2" />
             
-            <div className="grid grid-cols-6 gap-2">
-              {steps.map((step) => (
+            <div className={`grid gap-2 ${isPhotoRadar ? "grid-cols-5" : "grid-cols-6"}`}>
+              {visibleSteps.map((step, index) => (
                 <div key={step.id} className="text-center">
                   <div className={`w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-medium transition-smooth ${
                     currentStep > step.id 
@@ -1009,7 +1051,7 @@ const TicketForm = ({
                         ? 'bg-primary/20 text-primary border-2 border-primary' 
                         : 'bg-muted text-muted-foreground'
                   }`}>
-                    {currentStep > step.id ? <Check className="h-4 w-4" /> : step.id}
+                    {currentStep > step.id ? <Check className="h-4 w-4" /> : index + 1}
                   </div>
                   <div className="text-xs font-medium">{step.title}</div>
                 </div>
@@ -1030,7 +1072,7 @@ const TicketForm = ({
         <Card className="p-4 sm:p-8 bg-gradient-card shadow-elevated border-primary/10">
           {currentStep > 1 && <div className="mb-8">
             <h2 className="text-2xl font-bold mb-2">{steps[currentStep - 1].title}</h2>
-            <p className="text-muted-foreground">{steps[currentStep - 1].description}</p>
+            <p className="text-muted-foreground">{currentStep === 4 && isPhotoRadar ? "Authorization for the Photo Radar service" : steps[currentStep - 1].description}</p>
           </div>}
 
           {/* Navigation - Top */}
@@ -1061,10 +1103,10 @@ const TicketForm = ({
           {resumeAccess}
 
           {/* Navigation - Bottom */}
-          {contactOnly && <div className="mt-8 border-t pt-6">
+          {contactOnly && formData.ticketImage && <div className="mt-8 border-t pt-6">
             <Button type="button" className="h-auto min-h-12 w-full whitespace-normal bg-gradient-primary py-3 hover:opacity-90"
               onClick={() => void saveLead()} disabled={!isLeadValid || intakeDraft.status === "saving" || intakeDraft.status === "loading"}>
-              {intakeDraft.status === "saving" ? "Saving your contact details…" : "Save and continue to ticket"}
+              {intakeDraft.status === "saving" ? "Saving your contact details…" : "Save contact and prepare ticket"}
               {intakeDraft.status !== "saving" ? <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /> : null}
             </Button>
             {!isLeadValid ? <p className="mt-3 text-right text-sm text-muted-foreground">

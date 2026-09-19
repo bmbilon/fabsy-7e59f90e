@@ -29,7 +29,9 @@ const fixture = globalThis.__ticketDeletionTest = {
     signingCalls.push({ bucket, objectPath, expiresIn });
     return new Promise((resolve, reject) => { resolveSigning = resolve; rejectSigning = reject; });
   },
-  rpc: (name, args) => { rpcCalls.push({ name, args }); return new Promise(resolve => { finishRpc = result => {
+  rpc: (name, args) => {
+    if (name === 'get_ticket_upload_alert_statuses') return Promise.resolve({ data: [], error: null });
+    rpcCalls.push({ name, args }); return new Promise(resolve => { finishRpc = result => {
     if (!result.error) {
       const target = args.p_kind === 'intake' ? fixture.lead : fixture.ticket;
       target.deleted_at = args.p_deleted ? new Date().toISOString() : null;

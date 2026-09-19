@@ -1,7 +1,7 @@
-import { ArrowRight, Check, Clock3, FileSearch, Landmark, MessageCircle } from "lucide-react";
+import { ArrowRight, Clock3, FileSearch, Landmark, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RAPID_RESOLUTION } from "@/config/offers";
-import { VERIFIED_CLIENT_TESTIMONIALS } from "@/content/clientTestimonials";
+import ClientReviewsMarquee from "@/components/ClientReviewsMarquee";
 
 const differences = [
   { icon: FileSearch, challenge: "Research, paperwork and follow-ups", answer: "Your ticket reviewed. A clear next step.", detail: "Start online. We request the evidence, review your ticket, and keep you updated." },
@@ -9,9 +9,6 @@ const differences = [
   { icon: Clock3, challenge: "Inconvenient deadlines", answer: "Know what needs your attention.", detail: "We track your file and explain the deadlines and actions you still need to follow." },
   { icon: MessageCircle, challenge: "Unpredictable outcomes", answer: "You see the options. You make the call.", detail: "We explain the prosecutor’s response in plain language. You choose whether to accept an available resolution." },
 ] as const;
-
-const featuredClient = VERIFIED_CLIENT_TESTIMONIALS.find((testimonial) => testimonial.name === "Sam");
-const featuredExcerpt = "Excellent communication and responsiveness the whole time.";
 
 export default function HomepageComparison() {
   return (
@@ -54,27 +51,7 @@ export default function HomepageComparison() {
         </div>
       </section>
 
-      {featuredClient?.quote.includes(featuredExcerpt) && (
-        <aside className="border-y border-blue-100 bg-blue-50 px-5 py-8 sm:px-8 sm:py-10" aria-label="Client feedback">
-          <div className="container mx-auto flex max-w-6xl flex-col gap-5 px-0 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
-            <div className="max-w-3xl">
-              <p className="mb-3 flex items-center gap-2 text-xs font-semibold text-primary-dark">
-                <Check className="h-4 w-4" aria-hidden="true" />
-                A real client experience · Shared with permission
-              </p>
-              <blockquote className="text-xl font-semibold leading-relaxed tracking-tight text-slate-950 sm:text-2xl">
-                “{featuredExcerpt}”
-              </blockquote>
-              <p className="mt-3 text-sm text-slate-600">{featuredClient.name}, {featuredClient.location} · {featuredClient.matter}</p>
-              <p className="mt-1 text-xs text-slate-500">An excerpt from one client’s experience, not a promised result.</p>
-            </div>
-            <Link to="/testimonials" className="inline-flex min-h-11 shrink-0 items-center gap-2 self-start rounded-sm text-sm font-bold text-primary-dark underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:self-center">
-              Read client stories
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </aside>
-      )}
+      <ClientReviewsMarquee />
     </>
   );
 }

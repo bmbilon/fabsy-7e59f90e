@@ -85,6 +85,11 @@ insert into analytics_private.paid_funnel_checkouts (
                 "-f",
                 str(ROOT / "supabase/migrations/20260903183000_paid_funnel_checkout_withdrawal_fence.sql"),
             ])
+            for migration in [
+                "20260906170000_paid_funnel_behavior_diagnostics.sql",
+                "20260918180000_paid_funnel_photo_radar.sql",
+            ]:
+                command([*connection, "-f", str(ROOT / "supabase/migrations" / migration)])
             result = command([
                 *connection,
                 "-f",

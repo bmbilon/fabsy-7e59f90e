@@ -1,0 +1,44 @@
+name: Ticket upload owner alert checks
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/process-ticket-upload-alerts/**'
+      - 'supabase/functions/_shared/ticket-upload-*.ts'
+      - 'supabase/functions/_shared/resend-email.ts'
+      - 'supabase/config.toml'
+      - 'supabase/migrations/*ticket_upload*alerts.sql'
+      - 'supabase/tests/ticket-upload-*'
+      - 'scripts/test-ticket-upload-alerts-db.mjs'
+      - '.github/workflows/ticket-upload-alerts.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/process-ticket-upload-alerts/**'
+      - 'supabase/functions/_shared/ticket-upload-*.ts'
+      - 'supabase/functions/_shared/resend-email.ts'
+      - 'supabase/config.toml'
+      - 'supabase/migrations/*ticket_upload*alerts.sql'
+      - 'supabase/tests/ticket-upload-*'
+      - 'scripts/test-ticket-upload-alerts-db.mjs'
+      - '.github/workflows/ticket-upload-alerts.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verify owner routing, provider uncertainty and worker authentication without sending
+        run: deno test --no-config --no-npm --allow-env --allow-read=supabase/config.toml supabase/functions/_shared/ticket-upload-alert.test.ts supabase/functions/_shared/ticket-upload-sms.test.ts supabase/functions/process-ticket-upload-alerts/index.test.ts
+      - name: Verify actual upload confirmation, replay dedupe, one-shot SMS leases and staff access
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql
+          export TICKET_UPLOAD_TEST_PG_BIN="$(pg_config --bindir)"
+          node scripts/test-ticket-upload-alerts-db.mjs

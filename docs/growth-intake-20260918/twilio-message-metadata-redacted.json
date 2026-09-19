@@ -1,0 +1,41 @@
+{
+  "captured_at": "2026-09-19T00:11:40.159980+00:00",
+  "window_since": "2026-08-20T00:11:40.159980+00:00",
+  "query_date_filter": "2026-08-20",
+  "limit_per_direction": 15,
+  "body_fields_requested": false,
+  "metadata_rows": [
+    {
+      "direction": "inbound",
+      "from": "***5353",
+      "to": "***2279",
+      "status": "received",
+      "errorCode": "null",
+      "dateSent": "Sep 11 2026 13:42:26 GMT-0600",
+      "dateCreated": "Sep 11 2026 13:42:23 GMT-0600"
+    },
+    {
+      "direction": "outbound-reply",
+      "from": "***2279",
+      "to": "***5353",
+      "status": "delivered",
+      "errorCode": "null",
+      "dateSent": "Sep 11 2026 13:42:26 GMT-0600",
+      "dateCreated": "Sep 11 2026 13:42:26 GMT-0600"
+    },
+    {
+      "direction": "outbound-api",
+      "from": "***2279",
+      "to": "***5353",
+      "status": "delivered",
+      "errorCode": "null",
+      "dateSent": "Sep 05 2026 12:14:10 GMT-0600",
+      "dateCreated": "Sep 05 2026 12:14:10 GMT-0600"
+    }
+  ],
+  "counts": {
+    "inbound/received": 1,
+    "outbound-reply/delivered": 1,
+    "outbound-api/delivered": 1
+  }
+}

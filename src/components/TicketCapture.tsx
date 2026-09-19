@@ -22,6 +22,7 @@ export interface TicketCaptureProps {
   label?: string;
   required?: boolean;
   skipInitialScan?: boolean;
+  selectionOnly?: boolean;
   onCaptureStateChange?: (state: TicketCaptureState) => void;
 }
 
@@ -67,6 +68,7 @@ export default function TicketCapture({
   label = "Ticket PDF or clear image",
   required = false,
   skipInitialScan = false,
+  selectionOnly = false,
   onCaptureStateChange,
 }: TicketCaptureProps) {
   const reactId = useId();
@@ -110,6 +112,14 @@ export default function TicketCapture({
     }
 
     latestOcrHandler.current(null);
+
+    // The first intake checkpoint selects a local file. Contact permission
+    // must be saved before either OCR or private storage receives its bytes.
+    if (selectionOnly) {
+      setStatus({ kind: "success", title: "Ticket selected", message: "This file is still on your device. Save your contact details and permission below before we scan or upload it." });
+      latestStateHandler.current?.("empty");
+      return;
+    }
 
     if (alreadyCapturedFile.current === file) {
       setStatus({ kind: "success", title: "Ticket attached", message: "Your captured details are ready below. Review them before continuing." });
@@ -166,7 +176,7 @@ export default function TicketCapture({
     return () => {
       requestId.current += 1;
     };
-  }, [file]);
+  }, [file, selectionOnly]);
 
   const selectFile = (selectedFile: File | undefined, input: HTMLInputElement) => {
     input.value = "";

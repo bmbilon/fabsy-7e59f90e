@@ -1,0 +1,40 @@
+{
+  "project": "gcasbisxfrssonllpqrw",
+  "verified_at_utc": "2026-09-19T00:15:37.661997+00:00",
+  "frontend_deployed": false,
+  "migrations": [
+    {
+      "version": "20260918180000",
+      "sha256": "20fd3061ac61774737b4f260266db7bfc8aafdb1c42ad981a6aab58d39dad5c5"
+    },
+    {
+      "version": "20260918210000",
+      "sha256": "c4bd75546e2cd2e93fcbc18807d5d9574e2a295ae5f550d67a01f1d739accea2"
+    }
+  ],
+  "functions_deployed": [
+    "record-funnel-event",
+    "process-ticket-upload-alerts"
+  ],
+  "voice_code_redeployed": false,
+  "sender_configuration": {
+    "TICKET_UPLOAD_ALERT_SMS_FROM": "verified main number ending2279",
+    "TWILIO_PHONE_NUMBER": "corrected to verified main number ending2279",
+    "owner_destination": "existing number ending5353"
+  },
+  "readiness_request_id": 52802,
+  "readiness_http_status": 200,
+  "readiness": {
+    "ok": true,
+    "dryRun": true,
+    "emailConfigured": true,
+    "sms": {
+      "ready": true,
+      "code": null
+    }
+  },
+  "readiness_sends_messages": false,
+  "historical_sms_backfill": false,
+  "handset_delivery_tested": false,
+  "independent_live_voice_migration_preserved": "20260918190000"
+}
