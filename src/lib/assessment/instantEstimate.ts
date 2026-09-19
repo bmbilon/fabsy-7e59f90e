@@ -51,8 +51,18 @@ export function calculateInstantEstimate(input: InstantEstimateInput) {
   const gst = Math.round(fee * PHOTO_RADAR.gstRate);
   const combinedValue = { min: fineReduction.min + insuranceImpact.min, max: fineReduction.max + insuranceImpact.max };
   const netSavings = { min: combinedValue.min - fee, max: combinedValue.max - fee };
+  // Requested presentation: an "up to" amount and a 70%-of-fine to 80%-of-max
+  // planning band. Preserve the underlying arithmetic; never display a loss as
+  // savings or let a small estimate produce a reversed range.
+  const maxEstimatedSavings = Math.max(0, netSavings.max);
+  const expectedUpper = Math.round(maxEstimatedSavings * 0.8);
+  const expectedSavings = {
+    min: Math.min(Math.round(fineCents * 0.7), expectedUpper),
+    max: expectedUpper,
+  };
   return {
     fineReduction, insuranceImpact, combinedValue, netSavings, fee, gst,
+    maxEstimatedSavings, expectedSavings,
     netAfterGst: { min: netSavings.min - gst, max: netSavings.max - gst },
     reductionRate, insuranceRate: camera ? 0 : scenario.insuranceRate,
     annualPremium: premiumCents,
