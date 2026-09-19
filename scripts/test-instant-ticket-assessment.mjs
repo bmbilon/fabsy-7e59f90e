@@ -125,12 +125,14 @@ test('officer estimate sums both benefits, deducts $198 once, and separates GST'
   assert.deepEqual(plain(result.netSavings), { min: -19800, max: 76200 });
   assert.deepEqual(plain(result.netAfterGst), { min: -20790, max: 75210 });
   assert.equal(result.gst, 990);
+  assert.equal(result.maxEstimatedSavings, 76200);
+  assert.deepEqual(plain(result.expectedSavings), { min: 21000, max: 60960 });
   assert.equal(api.calculateInstantEstimate({ ...base, cleanRecord: false }).fineReduction.max, 12000);
   assert.equal(api.calculateInstantEstimate({ ...base, annualPremium: 0 }).insuranceImpact.max, 0);
   assert.equal(api.calculateInstantEstimate({ ...base, demerits: 0 }).insuranceImpact.max, result.insuranceImpact.max, 'points must not manufacture insurance savings');
 });
 
-test('camera rules always use $79 with no insurance or demerits and preserve negative savings', async t => {
+test('camera rules use $79 with no insurance or demerits and display no negative savings', async t => {
   const { api } = await runtime(t, false);
   const result = api.calculateInstantEstimate({ ...base, ticketType: 'photo_radar', fineAmount: 200, demerits: 6, annualPremium: 9999, cleanRecord: false });
   assert.equal(result.fee, 7900);
@@ -138,6 +140,30 @@ test('camera rules always use $79 with no insurance or demerits and preserve neg
   assert.equal(result.demerits, 0);
   assert.deepEqual(plain(result.insuranceImpact), { min: 0, max: 0 });
   assert.deepEqual(plain(result.netSavings), { min: -7900, max: -5900 });
+  assert.equal(result.maxEstimatedSavings, 0);
+  assert.deepEqual(plain(result.expectedSavings), { min: 0, max: 0 });
+});
+
+test('expected savings stay non-negative and ordered when the fee consumes most or all benefits', async t => {
+  const { api } = await runtime(t, false);
+  const screenshot = api.calculateInstantEstimate({ ...base, offence: 'highSpeeding', fineAmount: 465 });
+  assert.equal(screenshot.maxEstimatedSavings, 126825);
+  assert.deepEqual(plain(screenshot.expectedSavings), { min: 32550, max: 101460 });
+  const small = api.calculateInstantEstimate({ ...base, fineAmount: 400, annualPremium: 0 });
+  assert.equal(small.maxEstimatedSavings, 200);
+  assert.deepEqual(plain(small.expectedSavings), { min: 160, max: 160 });
+  for (const ticketType of ['officer_issued', 'photo_radar']) {
+    for (const fineAmount of [0.01, 79, 198, 200, 465, 1000, 1000000]) {
+      for (const annualPremium of [0, 1800]) {
+        const result = api.calculateInstantEstimate({ ...base, ticketType, fineAmount, annualPremium });
+        assert.ok(result.maxEstimatedSavings >= 0);
+        assert.ok(result.expectedSavings.min >= 0);
+        assert.ok(result.expectedSavings.min <= result.expectedSavings.max);
+        assert.ok(result.expectedSavings.max <= result.maxEstimatedSavings);
+        assert.ok(Number.isInteger(result.expectedSavings.min) && Number.isInteger(result.expectedSavings.max));
+      }
+    }
+  }
 });
 
 test('currency rounds in cents and invalid inputs never produce a financial range', async t => {
@@ -157,16 +183,20 @@ test('currency rounds in cents and invalid inputs never produce a financial rang
 test('manual form validates, calculates and recalculates without stale results', async t => {
   const app = await runtime(t);
   await app.api.click(app.button('Instant Ticket Assessment'));
-  assert.doesNotMatch(app.text(), /Combined possible net savings/);
+  assert.doesNotMatch(app.text(), /Estimated savings/);
   await app.fill();
   await app.api.click(app.button('Instant Ticket Assessment'));
-  assert.match(app.text(), /-\$198 to \$762/);
+  assert.match(app.text(), /Up to \$762/);
+  assert.match(app.text(), /Expected range: \$210 to \$609.60/);
+  assert.doesNotMatch(app.text(), /[-−]\s*\$/);
   assert.match(app.window.document.activeElement.textContent, /Your possible savings/);
   await app.api.click(app.button('Edit ticket details'));
   assert.equal(app.field('fine').value, '300');
   await app.edit('fine', '400');
   await app.api.click(app.button('Instant Ticket Assessment'));
-  assert.match(app.text(), /-\$198 to \$812/);
+  assert.match(app.text(), /Up to \$812/);
+  assert.match(app.text(), /Expected range: \$280 to \$649.60/);
+  assert.doesNotMatch(app.text(), /[-−]\s*\$/);
   const link = app.window.document.querySelector('a[href="/submit-ticket"]');
   await app.api.click(link);
   assert.equal(app.api.handoff().state.prefillTicketData.fineAmount, '400');
@@ -181,7 +211,10 @@ test('camera form calculates without record answers and hands off to the camera 
   await app.edit('offence', 'lowSpeeding');
   await app.edit('fine', '200');
   await app.api.click(app.button('Instant Ticket Assessment'));
-  assert.match(app.text(), /-\$79 to -\$59/);
+  assert.match(app.text(), /Up to \$0/);
+  assert.match(app.text(), /Expected range: \$0/);
+  assert.match(app.text(), /Camera ticket service fee\$79/);
+  assert.doesNotMatch(app.text(), /[-−]\s*\$/);
   const link = app.window.document.querySelector('a[href="/submit-ticket?ticket_type=photo_radar"]');
   assert.ok(link);
   await app.api.click(link);
@@ -241,5 +274,5 @@ test('PDF and failed scans leave a working manual form and retain the selected a
   assert.match(app.text(), /scan did not finish/);
   await app.fill();
   await app.api.click(app.button('Instant Ticket Assessment'));
-  assert.match(app.text(), /Combined possible net savings/);
+  assert.match(app.text(), /Estimated savings/);
 });

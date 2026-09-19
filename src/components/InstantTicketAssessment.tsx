@@ -136,20 +136,22 @@ export default function InstantTicketAssessment() {
                 : `Potential extra premiums that could be avoided if the outcome avoids a rated conviction. Based on ${formatEstimateMoney(result.annualPremium)}/year.`}</dd>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-2 py-4 text-sm">
-              <dt>Less {camera ? "camera" : "officer"} ticket service fee</dt>
-              <dd className="font-bold">−{formatEstimateMoney(result.fee)}</dd>
+              <dt>{camera ? "Camera" : "Officer"} ticket service fee</dt>
+              <dd className="font-bold">{formatEstimateMoney(result.fee)}</dd>
             </div>
           </dl>
           <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 sm:p-5" aria-label="Combined savings calculation">
-            <p className="text-sm font-semibold text-blue-900">Combined possible net savings</p>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-blue-900 sm:text-4xl">{formatEstimateRange(result.netSavings)}</p>
-            <p className="mt-2 text-xs leading-relaxed text-blue-900">Fine reduction + insurance impact avoided − {formatEstimateMoney(result.fee)} service fee.</p>
-            <p className="mt-2 text-xs leading-relaxed text-slate-600">Before GST. After {formatEstimateMoney(result.gst)} GST: {formatEstimateRange(result.netAfterGst)}. Negative amounts mean the cost exceeds the modeled savings.</p>
+            <p className="text-sm font-semibold text-blue-900">Estimated savings</p>
+            <p className="mt-2 text-3xl font-bold tracking-tight text-blue-900 sm:text-4xl">Up to {formatEstimateMoney(result.maxEstimatedSavings)}</p>
+            <p className="mt-3 text-base font-semibold text-blue-900">Expected range: {formatEstimateRange(result.expectedSavings)}</p>
+            <p className="mt-2 text-xs leading-relaxed text-blue-900">Fine reduction and insurance impact avoided, after our {formatEstimateMoney(result.fee)} service fee.</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600">Before GST. Service-fee GST: {formatEstimateMoney(result.gst)}.</p>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-slate-600">Illustrative scenarios, not a prediction or insurer quote. No savings are guaranteed. {camera ? "A withdrawal could save more than the reduction scenario shown." : "A lower fine or fewer demerits alone may not lower insurance premiums."}</p>
           <details className="mt-3 text-xs text-slate-600">
             <summary className="cursor-pointer rounded-sm py-2 font-semibold text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">How we estimated this</summary>
-            <p className="mt-2 leading-relaxed">The fine scenario uses 0–{Math.round(result.reductionRate * 100)}% of your fine{camera ? "" : `, with ${cleanRecord === "yes" ? "a clean-record" : "a prior-conviction"} assumption`}. {camera ? "Any refund is subject to the published service-fee refund terms." : `Insurance uses 0–${Math.round(result.insuranceRate * 100)}% of your annual premium for ${INSURANCE_SCENARIO_YEARS} years. Demerit points do not set the insurance rate.`} These are Fabsy’s planning assumptions from its earlier calculator, not measured case outcomes or maximum possible changes. The combined range assumes the fine and insurance benefits can both be achieved. The fee is subtracted once, before any applicable refund.</p>
+            <p className="mt-2 leading-relaxed">The fine scenario uses 0–{Math.round(result.reductionRate * 100)}% of your fine{camera ? "" : `, with ${cleanRecord === "yes" ? "a clean-record" : "a prior-conviction"} assumption`}. {camera ? "Any refund is subject to the published service-fee refund terms." : `Insurance uses 0–${Math.round(result.insuranceRate * 100)}% of your annual premium for ${INSURANCE_SCENARIO_YEARS} years. Demerit points do not set the insurance rate.`} These are Fabsy’s planning assumptions from its earlier calculator, not measured case outcomes or maximum possible changes. The combined estimate assumes the fine and insurance benefits can both be achieved. The fee is subtracted once, before any applicable refund.</p>
+            <p className="mt-2 leading-relaxed">The expected range is an illustrative planning range: 30% below your ticket’s face value to 20% below the maximum estimated savings. For smaller estimates, the starting amount is limited to the upper amount. Savings are displayed from $0 when the estimated benefits do not cover the service fee.</p>
           </details>
           <Button asChild className="mt-4 h-auto min-h-14 w-full whitespace-normal rounded-xl bg-blue-700 px-4 py-4 text-base font-bold text-white hover:bg-blue-800 hover:text-white focus-visible:text-white">
             <Link to={offer.intakePath} data-funnel-action="primary_cta" data-funnel-position="assessment_result" state={{ ticketImage: file, prefillTicketData: prefill, startAtStep: 1 }} onClick={() => trackAssessmentEvent("assessment_cta_click", { location: "homepage_instant_assessment", destination: "ticket_intake", value: offer.priceCad })}>
