@@ -3,6 +3,7 @@ import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { internalNotificationDelivery } from "../_shared/resend-email.ts";
+import { fetchVapiRecording, recordingFileExtension, recordingNoticeHtml } from "./recording.ts";
 
 // Receives Vapi server messages. On an end-of-call report it stores the transcript,
 // recording and metadata in the call_logs table (audio copied into the
@@ -77,6 +78,7 @@ serve(async (req: Request): Promise<Response> => {
   const summary = pick<string>(analysis.summary, msg.summary) ?? "";
   const recordingUrl = pick<string>(
     artifact.recordingUrl,
+    artifact?.recording?.mono?.combinedUrl,
     artifact?.recording?.combinedUrl,
     msg.recordingUrl,
   );
@@ -86,12 +88,16 @@ serve(async (req: Request): Promise<Response> => {
   // 1) Copy the recording into Supabase Storage (best-effort).
   let recordingPath: string | null = null;
   let signedRecordingUrl: string | null = null;
-  if (recordingUrl && vapiCallId) {
+  const recordingExpected = Boolean(recordingUrl || artifact?.recording);
+  if (recordingExpected && vapiCallId) {
     try {
-      const res = await fetch(recordingUrl);
+      const res = await fetchVapiRecording({
+        callId: vapiCallId,
+        privateApiKey: Deno.env.get("VAPI_PRIVATE_API_KEY") || "",
+      });
       if (res.ok) {
         const contentType = res.headers.get("content-type") ?? "audio/wav";
-        const ext = contentType.includes("mpeg") || recordingUrl.includes(".mp3") ? "mp3" : "wav";
+        const ext = recordingFileExtension(res);
         const path = `${vapiCallId}.${ext}`;
         const bytes = new Uint8Array(await res.arrayBuffer());
         const up = await supabase.storage
@@ -141,7 +147,7 @@ serve(async (req: Request): Promise<Response> => {
   // 3) Email hello@fabsy.ca for every call.
   try {
     const mins = durationSeconds ? `${Math.floor(durationSeconds / 60)}m ${Math.round(durationSeconds % 60)}s` : "n/a";
-    const recordingLink = signedRecordingUrl || recordingUrl || "";
+    const recordingNotice = recordingNoticeHtml(signedRecordingUrl, recordingExpected);
     const subject = `New Fabsy call${fromNumber ? ` from ${fromNumber}` : ""} (${mins})`;
     const html = `
       <div style="font-family:Arial,sans-serif;font-size:14px;color:#111;line-height:1.5">
@@ -155,7 +161,7 @@ serve(async (req: Request): Promise<Response> => {
           <tr><td style="padding:2px 12px 2px 0;color:#555">Call ID</td><td>${esc(vapiCallId) || "n/a"}</td></tr>
         </table>
         ${summary ? `<h3 style="margin:16px 0 6px">Summary</h3><p>${esc(summary)}</p>` : ""}
-        ${recordingLink ? `<p style="margin:16px 0"><a href="${recordingLink}" style="color:#2563eb">Listen to the recording</a> (link valid ~30 days)</p>` : ""}
+        ${recordingNotice}
         ${transcript ? `<h3 style="margin:16px 0 6px">Transcript</h3><pre style="white-space:pre-wrap;background:#f6f7f9;padding:12px;border-radius:8px;font-family:inherit">${esc(transcript)}</pre>` : ""}
         ${getFabsyEmailSignature ? getFabsyEmailSignature() : ""}
       </div>`;

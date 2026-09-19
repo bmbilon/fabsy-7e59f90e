@@ -109,8 +109,22 @@ const Contact = () => {
                   <Phone className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-muted-foreground">(825) 793-2279</p>
+                    <a href="tel:+18257932279" className="inline-flex min-h-11 items-center font-medium text-primary underline underline-offset-4">(825) 793-2279</a>
                     <p className="text-sm text-muted-foreground">Monday - Friday, 9 AM - 6 PM MST</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <MessageCircle className="h-5 w-5 shrink-0 text-primary mt-1" aria-hidden="true" />
+                  <div>
+                    <h3 className="font-semibold mb-1">Text message</h3>
+                    <a href="sms:+18257932279" className="inline-flex min-h-11 items-center font-medium text-primary underline underline-offset-4">Text Fabsy at (825) 793-2279</a>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Our AI assistant answers general questions. Your enquiry is also available to Fabsy staff for follow-up.
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Use <Link to="/submit-ticket" className="underline underline-offset-4">secure ticket intake</Link> for documents. Reply STOP to stop automated texts or HELP for contact details.
+                    </p>
                   </div>
                 </div>
 

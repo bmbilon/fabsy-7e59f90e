@@ -837,6 +837,10 @@ export type Database = {
       }
     }
     Functions: {
+      admin_sms_intake_inbox: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       set_admin_ticket_deleted: {
         Args: { p_id: string; p_kind: string; p_deleted: boolean }
         Returns: undefined
