@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 text-white">Privacy Policy</h1>
         <p className="text-white/70 mb-8">
-          Last updated: September 11, 2026
+          Last updated: September 18, 2026
         </p>
 
         <div className="prose prose-lg max-w-none space-y-8 text-white/90">
@@ -31,6 +31,7 @@ const PrivacyPolicy = () => {
               <li>Communication records between you and our representatives</li>
               <li>Website chat messages, contact details you choose to provide, and chat session, browser and public-page information processed by Tawk.to to provide live support</li>
               <li>WhatsApp messages and channel metadata, such as your phone number, profile name, message identifier, delivery status, language context and opt-out status, when you choose to contact Fabsy on WhatsApp</li>
+              <li>SMS messages, automated replies, phone numbers, message identifiers, delivery status and opt-out preferences when you text Fabsy</li>
             </ul>
           </section>
 
@@ -53,6 +54,7 @@ const PrivacyPolicy = () => {
               <li>Comply with legal obligations and court requirements</li>
               <li>Improve our services and website functionality</li>
               <li>Respond to WhatsApp inquiries through an AI assistant and direct requests for human help to our contact form or email</li>
+              <li>Respond to SMS inquiries through an AI assistant and make recent conversations available to authorized staff for follow-up</li>
             </ul>
           </section>
 
@@ -67,6 +69,7 @@ const PrivacyPolicy = () => {
               <li><strong>Service Providers:</strong> With trusted third-party service providers who assist in our operations</li>
               <li><strong>Website Live Chat:</strong> With Tawk.to to deliver messages, retain conversation history and let Fabsy staff respond through its dashboard and mobile apps</li>
               <li><strong>WhatsApp Communications:</strong> With Meta/WhatsApp, Twilio and Vapi when you choose to communicate with Fabsy through WhatsApp</li>
+              <li><strong>SMS Communications:</strong> With Twilio for message delivery, Vapi for automated replies, Supabase for the staff inbox, and our email providers for internal enquiry notifications</li>
               <li><strong>Business Transfers:</strong> In connection with any merger, sale, or transfer of company assets</li>
             </ul>
             <p className="mt-4">
@@ -325,22 +328,36 @@ const PrivacyPolicy = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">8. WhatsApp and AI-Assisted Messaging</h2>
+            <h2 className="text-2xl font-semibold mb-4">8. WhatsApp, SMS and AI-Assisted Messaging</h2>
             <p>
               When you start a WhatsApp conversation with Fabsy, your messages are transmitted through
               Meta/WhatsApp and Twilio. Text inquiries are processed by Vapi so Fabsy's AI assistant can
-              respond. These providers may process information outside Canada, and their terms,
+              respond. SMS conversations use Twilio and Vapi. These providers may process information outside Canada, and their terms,
               privacy practices and retention settings apply to information transmitted through their services.
             </p>
             <p className="mt-4">
               The assistant is automated, may make mistakes and does not provide legal advice or make a
               binding determination about your matter. For human help, use the website contact form,
-              email hello@fabsy.ca or call Fabsy. Reply <strong>STOP</strong> to stop automated WhatsApp replies.
+              email hello@fabsy.ca or call Fabsy. Reply <strong>STOP</strong> to stop automated replies on that messaging channel.
+              For SMS, reply <strong>START</strong> to re-enable replies or <strong>HELP</strong> for contact information.
             </p>
             <p className="mt-4">
               Do not send ticket images, driver's-licence images, driver abstracts, payment information or
-              other sensitive documents through WhatsApp. Use Fabsy's secure ticket intake or client portal
+              other sensitive documents through WhatsApp or SMS. Use Fabsy's secure ticket intake or client portal
               when documents or sensitive information are required.
+            </p>
+            <p className="mt-4">
+              Recent SMS enquiries and automated replies are available in a staff-only inbox, and a new
+              enquiry can generate an internal email containing the sender's number and message.
+              Texting Fabsy does not authorize representation or submit a ticket for review.
+            </p>
+            <p className="mt-4">
+              SMS message content and stored email-notification copies are scheduled for removal from
+              the staff-inbox database after 30 days; enquiry phone numbers are removed 30 days after
+              the last message. Limited delivery and duplicate-prevention records are retained for
+              90 days, and a protected identifier may be kept to respect a STOP preference until
+              you re-enable replies. This database schedule does not delete copies already delivered
+              to staff email or held by messaging providers; those follow their respective retention policies.
             </p>
           </section>
 

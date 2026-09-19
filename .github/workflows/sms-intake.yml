@@ -1,0 +1,66 @@
+name: SMS intake bridge checks
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/sms-vapi-webhook/**'
+      - 'supabase/functions/process-sms-intake-emails/**'
+      - 'supabase/functions/_shared/sms-*.ts'
+      - 'supabase/functions/_shared/whatsapp-vapi.ts'
+      - 'supabase/functions/_shared/ticket-upload-sms.ts'
+      - 'supabase/functions/_shared/resend-email.ts'
+      - 'supabase/functions/_shared/disclosure-confirmation.ts'
+      - 'supabase/config.toml'
+      - 'supabase/migrations/*sms*.sql'
+      - 'supabase/tests/sms-*'
+      - 'src/components/SmsIntakeInbox.tsx'
+      - 'src/pages/AdminSmsIntake.tsx'
+      - 'src/pages/AdminDashboard.tsx'
+      - 'src/App.tsx'
+      - 'scripts/test-sms-*.mjs'
+      - '.github/workflows/sms-intake.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/sms-vapi-webhook/**'
+      - 'supabase/functions/process-sms-intake-emails/**'
+      - 'supabase/functions/_shared/sms-*.ts'
+      - 'supabase/functions/_shared/whatsapp-vapi.ts'
+      - 'supabase/functions/_shared/ticket-upload-sms.ts'
+      - 'supabase/functions/_shared/resend-email.ts'
+      - 'supabase/functions/_shared/disclosure-confirmation.ts'
+      - 'supabase/config.toml'
+      - 'supabase/migrations/*sms*.sql'
+      - 'supabase/tests/sms-*'
+      - 'src/components/SmsIntakeInbox.tsx'
+      - 'src/pages/AdminSmsIntake.tsx'
+      - 'src/pages/AdminDashboard.tsx'
+      - 'src/App.tsx'
+      - 'scripts/test-sms-*.mjs'
+      - '.github/workflows/sms-intake.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verify signatures, controls, read-only readiness and email uncertainty without provider network access
+        run: deno test --no-config --no-npm --allow-env --allow-read=supabase/config.toml supabase/functions/sms-vapi-webhook/handler.test.ts supabase/functions/_shared/sms-vapi-client.test.ts supabase/functions/_shared/sms-readiness.test.ts supabase/functions/_shared/sms-intake-email.test.ts supabase/functions/process-sms-intake-emails/index.test.ts
+      - name: Check both Edge Function entrypoints
+        run: deno check --no-config --no-npm supabase/functions/sms-vapi-webhook/index.ts supabase/functions/process-sms-intake-emails/index.ts
+      - name: Verify staff access, private inbox and deployed route configuration
+        run: node --test scripts/test-sms-intake-inbox.mjs
+      - name: Verify SQL dedupe, concurrency, opt-outs, leases and retention
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql
+          export SMS_INTAKE_TEST_PG_BIN="$(pg_config --bindir)"
+          node scripts/test-sms-intake-db.mjs

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getIdrStaffRole } from "@/hooks/useIdrAuth";
-import { LogOut, Users, FileText, Shield, BarChart3, FileSearch, MailCheck, Radio, type LucideIcon } from "lucide-react";
+import { LogOut, Users, FileText, Shield, BarChart3, FileSearch, MailCheck, Radio, MessageSquare, type LucideIcon } from "lucide-react";
 import type { User, Session } from '@supabase/supabase-js';
 
 interface DashboardTile {
@@ -31,6 +31,13 @@ export default function AdminDashboard() {
   const { toast } = useToast();
 
   const tiles: DashboardTile[] = [
+    {
+      title: "SMS Inquiries",
+      description: "Review text conversations and internal notification status",
+      icon: MessageSquare,
+      path: "/admin/sms",
+      color: "from-sky-500 to-blue-600"
+    },
     ...(userRole === "admin" ? [{
       title: "Live View",
       description: "See who is browsing, visitor locations and live ticket activity",

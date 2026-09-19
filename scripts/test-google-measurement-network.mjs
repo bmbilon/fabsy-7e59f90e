@@ -329,7 +329,7 @@ async function isolatedContext({ holdLoader = false, locale = 'en-CA' } = {}) {
       if (!recordedBlocked && document.querySelector('main[aria-busy="true"]')) {
         recordedBlocked = true; record({ kind: 'blocked-dom' });
       }
-      if (!recordedPrivate && document.querySelector('#lead-email, #lead-phone, #ticketNumber, #firstName, #fleet-company, form #message, form input[type="file"][accept*="application/pdf"]')) {
+      if (!recordedPrivate && document.querySelector('#lead-email, #lead-phone, #ticketNumber, #firstName, #fleet-company, form #message, input[type="file"][accept*="application/pdf"]')) {
         recordedPrivate = true; record({ kind: 'private-dom', tagPresent: Boolean(document.getElementById('fabsy-google-tag')) });
       }
     });
