@@ -59,3 +59,5 @@ The authorized release is isolated on current `origin/main` at `9ba3a9ce1`, pres
 - Focused ESLint, contrast guard and `git diff --check` passed.
 - TypeScript passes with `--lib ES2021,DOM,DOM.Iterable`. The unchanged ES2020 project setting reports existing `String.replaceAll` errors in `SmsIntakeInbox.tsx` and `AdminManualRepresentationLinks.tsx`.
 - The standard build, pull-request CI and production deployment workflow remain required release checks. The exact frontend commit is pinned only after verifying that this release contains no backend changes.
+
+The first full Chromium prerender run exposed a controlled-select serialization mismatch: browser values were empty but `page.content()` omitted the selected placeholder attributes. Snapshot capture now preserves assessment control state before serialization. All 45 snapshot checks pass, including reproduction of the original mismatch and rejection of serialized personal choices. The validator's exact form and policy requirements remain unchanged.

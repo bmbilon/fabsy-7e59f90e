@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
+import { preserveAssessmentSnapshotState } from './snapshot-assessment-state.mjs';
 
 const require = createRequire(import.meta.url);
 const { publicSnapshotGuardrailIssues } = require('./validate-snapshot-guardrails.cjs');
@@ -76,6 +77,25 @@ try {
   };
 
   check('actual homepage retains complete policy', () => assert.deepEqual(issues(html), []));
+  check('browser-selected empty placeholders survive HTML serialization', () => {
+    const serialized = edit(document => {
+      for (const select of document.querySelectorAll('#instant-ticket-assessment select')) {
+        for (const option of select.options) option.removeAttribute('selected');
+        select.value = '';
+      }
+      assert(issues(document.documentElement.outerHTML).length > 0, 'Unsynchronized browser form reproduces the serialization failure');
+      preserveAssessmentSnapshotState(document);
+    });
+    assert.deepEqual(issues(serialized), []);
+  });
+  check('browser-selected personal values remain rejected after serialization', () => {
+    const serialized = edit(document => {
+      document.querySelector('#assessment-offence').value = 'lowSpeeding';
+      document.querySelector('#assessment-record').value = 'yes';
+      preserveAssessmentSnapshotState(document);
+    });
+    assert(issues(serialized).length > 0);
+  });
   check('insurance, promotion and driver remain in their required order', () => {
     const dom = new JSDOM(html);
     const insurance = dom.window.document.querySelector('section[aria-labelledby="insurance-context-heading"]');
