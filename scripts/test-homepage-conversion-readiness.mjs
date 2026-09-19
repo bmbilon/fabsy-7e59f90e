@@ -41,6 +41,10 @@ try {
     outfile,
     logLevel: 'silent',
     loader: { '.webp': 'dataurl', '.png': 'dataurl', '.svg': 'dataurl' },
+    plugins: [{ name: 'offline-calculator', setup(bundler) {
+      bundler.onResolve({ filter: /integrations\/supabase\/client$/ }, () => ({ path: 'backend', namespace: 'offline' }));
+      bundler.onLoad({ filter: /.*/, namespace: 'offline' }, () => ({ contents: 'export const supabase = {};' }));
+    } }],
   });
   const render = require(outfile);
   const parse = html => new JSDOM(html).window.document;
@@ -50,18 +54,19 @@ try {
   check('hero retains the detailed refund qualification below the opener', () => assert.match(hero.body.textContent, /We can’t guarantee a court outcome\./));
   check('hero removes the superseded promises', () => assert.doesNotMatch(hero.body.textContent, /success guaranteed|you don[’']t pay/i));
   check('hero displays the price without an appended disclaimer', () => assert.equal(hero.querySelector('strong')?.parentElement?.textContent, `$${offers.rapidResolution.priceCad} CAD + GST`));
-  check('hero CTA is measurable and enters intake', () => {
-    const cta = hero.querySelector('a[data-funnel-action="primary_cta"]');
-    assert.equal(cta?.getAttribute('href'), offers.rapidResolution.intakePath);
+  check('hero CTA is measurable and calculates the assessment', () => {
+    const cta = hero.querySelector('button[data-funnel-action="primary_cta"]');
+    assert.equal(cta?.getAttribute('type'), 'submit');
+    assert.equal(cta?.textContent.trim(), 'Instant Ticket Assessment');
     assert.equal(cta?.getAttribute('data-funnel-position'), 'hero');
   });
 
   const homeBar = parse(render.renderCallBar('/'));
-  check('homepage sticky CTA has action and full price', () => {
+  check('homepage sticky CTA opens the instant assessment', () => {
     const cta = homeBar.querySelector('a[data-funnel-action="primary_cta"]');
-    assert.equal(cta?.getAttribute('href'), offers.rapidResolution.intakePath);
+    assert.equal(cta?.getAttribute('href'), '#instant-ticket-assessment');
     assert.equal(cta?.getAttribute('data-funnel-position'), 'sticky');
-    assert.equal(cta?.textContent?.trim(), `Start online · $${offers.rapidResolution.priceCad} CAD + GST`);
+    assert.equal(cta?.textContent?.trim(), 'Instant Ticket Assessment');
   });
   check('sticky CTA preserves a 44px-plus target', () => assert.match(homeBar.querySelector('a')?.className || '', /min-h-14/));
 

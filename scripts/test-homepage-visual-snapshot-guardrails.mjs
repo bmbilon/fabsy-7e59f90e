@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
+import { preserveAssessmentSnapshotState } from './snapshot-assessment-state.mjs';
 
 const require = createRequire(import.meta.url);
 const { publicSnapshotGuardrailIssues } = require('./validate-snapshot-guardrails.cjs');
@@ -76,6 +77,25 @@ try {
   };
 
   check('actual homepage retains complete policy', () => assert.deepEqual(issues(html), []));
+  check('browser-selected empty placeholders survive HTML serialization', () => {
+    const serialized = edit(document => {
+      for (const select of document.querySelectorAll('#instant-ticket-assessment select')) {
+        for (const option of select.options) option.removeAttribute('selected');
+        select.value = '';
+      }
+      assert(issues(document.documentElement.outerHTML).length > 0, 'Unsynchronized browser form reproduces the serialization failure');
+      preserveAssessmentSnapshotState(document);
+    });
+    assert.deepEqual(issues(serialized), []);
+  });
+  check('browser-selected personal values remain rejected after serialization', () => {
+    const serialized = edit(document => {
+      document.querySelector('#assessment-offence').value = 'lowSpeeding';
+      document.querySelector('#assessment-record').value = 'yes';
+      preserveAssessmentSnapshotState(document);
+    });
+    assert(issues(serialized).length > 0);
+  });
   check('insurance, promotion and driver remain in their required order', () => {
     const dom = new JSDOM(html);
     const insurance = dom.window.document.querySelector('section[aria-labelledby="insurance-context-heading"]');
@@ -115,6 +135,15 @@ try {
       const node = document.querySelector('section[aria-labelledby="homepage-hero-heading"] strong');
       node.textContent = '$199 CAD + GST';
     }],
+    ['wrong assessment price', document => {
+      const label = document.querySelector('#instant-ticket-assessment input[value="photo_radar"]').parentElement;
+      label.innerHTML = label.innerHTML.replace('$79', '$179');
+    }],
+    ['personalized assessment snapshot', document => { document.querySelector('#assessment-fine').value = '300'; document.querySelector('#assessment-fine').setAttribute('value', '300'); }],
+    ['wrong assessment baseline', document => document.querySelector('#assessment-premium').setAttribute('value', '9999')],
+    ['hidden assessment submit', document => document.querySelector('#instant-ticket-assessment button[type="submit"]').hidden = true],
+    ['missing assessment record', document => document.querySelector('#assessment-record').remove()],
+    ['new assessment claim', document => document.querySelector('#instant-ticket-assessment').append(' Guaranteed insurance savings of $800.')],
     ['wrong driver tax treatment', document => {
       const node = [...document.querySelectorAll('#back-to-your-day p')].find(node => node.textContent.includes('CAD + GST'));
       node.textContent = node.textContent.replace('CAD + GST', 'CAD including GST');

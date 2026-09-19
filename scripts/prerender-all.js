@@ -19,6 +19,7 @@ import dotenv from 'dotenv';
 import { assertSnapshotHead, loadLocaleSeoContext, localeSnapshotRecords, normalizeSnapshotHead, splitSnapshotRoute } from './locale-seo.mjs';
 import { assertLocalizedMainContent, generateLocalizedSnapshots } from './generate-localized-snapshots.mjs';
 import { stripCapturedTrackingScripts } from './snapshot-runtime-hygiene.mjs';
+import { preserveAssessmentSnapshotState } from './snapshot-assessment-state.mjs';
 
 dotenv.config();
 
@@ -149,6 +150,7 @@ async function prerenderRoute(browser, route) {
 
       await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(500);
+      await page.evaluate(preserveAssessmentSnapshotState);
       const original = stripCapturedTrackingScripts(await page.content()).replace(/[ \t]+$/gm, '');
       const { code, basePath } = splitSnapshotRoute(route, LOCALE_CONTEXT);
       if (code !== 'en') assertLocalizedMainContent(original, LOCALE_CONTEXT, code, basePath);

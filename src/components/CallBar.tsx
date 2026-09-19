@@ -28,7 +28,18 @@ const CallBar = () => {
 
   return (
     <div data-mobile-call-bar className="md:hidden fixed inset-x-0 bottom-0 z-40 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-white/95 backdrop-blur-sm border-t border-muted shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
-      {showAssessmentCta ? (
+      {location.pathname === "/" ? (
+        <a
+          href="#instant-ticket-assessment"
+          data-funnel-action="primary_cta"
+          data-funnel-position="sticky"
+          className="flex min-h-14 w-full items-center justify-center gap-2 rounded-lg bg-blue-700 px-3 py-3 text-base font-bold text-white shadow-glow transition-colors hover:bg-blue-800 hover:text-white focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+          onClick={() => trackAssessmentEvent("assessment_cta_click", { location: "mobile_sticky_bar", destination: "homepage_instant_assessment" })}
+        >
+          Instant Ticket Assessment
+          <ArrowRight className="h-5 w-5" aria-hidden="true" />
+        </a>
+      ) : showAssessmentCta ? (
         <Link
           to={activeOffer.intakePath}
           data-funnel-action="primary_cta"

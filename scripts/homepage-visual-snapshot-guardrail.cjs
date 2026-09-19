@@ -25,7 +25,7 @@ const policyAnchor = '#money-back-guarantee';
 const SOURCE_BINDINGS = {
   'src/pages/Index.tsx': ['<Hero />', '<HomepageOutcomeExplorer />', '<RapidResolutionGuarantee />', '<AssessmentHomepageJourney />'],
   'src/content/homepageRefundCopy.ts': [`headline: "${heroHeadline}"`, `headlineAccent: "${heroHeadlineAccent}"`, `heroSupport: "${heroSupport}"`, 'refundCondition: FEE_REFUND.condition', 'declinedOfferDisclaimer: FEE_REFUND.declinedOfferText', 'paymentTiming: FEE_REFUND.payment', 'termsPath: FEE_REFUND.termsPath'],
-  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.headlineAccent}', '{HOMEPAGE_REFUND_COPY.heroSupport}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}', '{HOMEPAGE_REFUND_COPY.refundCondition}', 'to={RAPID_RESOLUTION.intakePath}', 'data-funnel-action="primary_cta"', 'data-funnel-position="hero"'],
+  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.headlineAccent}', '{HOMEPAGE_REFUND_COPY.heroSupport}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '<InstantTicketAssessment />'],
   'src/components/RapidResolutionGuarantee.tsx': ['id="money-back-guarantee"', '{HOMEPAGE_REFUND_COPY.successDefinition}', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '{HOMEPAGE_REFUND_COPY.paymentTiming}', '{HOMEPAGE_REFUND_COPY.refundScope}', 'to={HOMEPAGE_REFUND_COPY.termsPath}'],
   'src/components/HomepageOutcomeExplorer.tsx': ['aria-labelledby="homepage-outcomes-heading"', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}'],
   'src/components/AssessmentHomepageJourney.tsx': ['aria-labelledby="homepage-pricing-heading"', '{RAPID_RESOLUTION.speedDisclaimer}', '<InsuranceContextSection />', '<ProDriverSection />', '<HomepageDriverSection />'],
@@ -127,7 +127,36 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   field(hero, 'p', heroPrice, 'Rapid Resolution price and GST');
   field(hero, 'p', 'For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the service-fee refund works',
     'hero scope and policy destination', [[policyAnchor, 'How the service-fee refund works']]);
-  field(hero, 'a', 'Get help with my ticket', 'Rapid Resolution intake destination', [[offers.rapidResolution.intakePath, 'Get help with my ticket']]);
+  const assessment = hero.querySelector('#instant-ticket-assessment');
+  if (assessment) {
+    // Only admit the exact empty calculator form. User-specific result ranges
+    // are never a crawler snapshot and cannot inherit this admission.
+    const expected = `Free ticket assessmentSee what you could save.Add your ticket or enter the basics. Get your estimate instantly.
+      Upload a ticketPhoto or PDFUpload to fill in the basicsAdd a ticket filePDF, JPG, PNG, WebP, HEIC or HEIF · maximum 10 MB
+      Browse filesTake photoImages are scanned to help fill the form. PDFs are attached for manual review and are not sent to OCR.
+      Ticket basicsHow was the ticket issued?By an officer$${offers.rapidResolution.priceCad} + GST serviceBy a camera$${offers.photoRadar.priceCad} + GST service
+      OffenceSelect your offenceSpeeding (under 30 km/h over)Speeding (30+ km/h over)Distracted drivingRed light, stop sign or failing to yieldCareless drivingOther traffic offence
+      Fine amount (CAD)Demerit pointsSelectNot sure0123456789101112131415Clean driving record?Select your recordYes — no convictions in the last 3 yearsNo — I have previous convictions
+      Insurance estimate uses $1,800/year · changeYour annual insurance premium (CAD)Use your premium for a closer estimate. The $1,800 default is an illustrative baseline.
+      Instant Ticket Assessment Free · No email or payment required`;
+    const fields = ['offence', 'fine', 'demerits', 'record', 'premium'].map(name => assessment.querySelector(`#assessment-${name}`));
+    const submit = assessment.querySelector('button[type="submit"][data-funnel-action="primary_cta"][data-funnel-position="hero"]');
+    const valid = hero.querySelectorAll('#instant-ticket-assessment').length === 1 && visible(assessment)
+      && compact(assessment.textContent) === compact(expected)
+      && fields.every(node => node && visible(node) && node.required)
+      && fields.slice(0, 4).every(node => node.value === '')
+      && fields[4].value === '1800' && fields[1].getAttribute('min') === '0.01'
+      && fields[1].getAttribute('step') === '0.01' && fields[4].getAttribute('min') === '0'
+      && assessment.querySelectorAll('input[type="radio"]').length === 2
+      && assessment.querySelector('input[value="officer_issued"]')?.checked
+      && !assessment.querySelector('input[value="photo_radar"]')?.checked
+      && submit && visible(submit) && compact(submit.textContent) === 'InstantTicketAssessment';
+    if (valid) redactions.add(assessment);
+    else issues.push('Homepage instant assessment must retain its exact empty form, configured fees and illustrative premium baseline');
+  } else {
+    // Previously generated, unpersonalized homepage snapshots remain valid.
+    field(hero, 'a', 'Get help with my ticket', 'Rapid Resolution intake destination', [[offers.rapidResolution.intakePath, 'Get help with my ticket']]);
+  }
 
   field(policy, 'h2#money-back-guarantee-heading', 'A reduction, a withdrawal, or your fee back.', 'policy heading');
   field(policy, 'p', qualification, 'court-outcome qualification');
