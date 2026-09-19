@@ -436,8 +436,12 @@ async function untagged(page, documentId, observationMs = 1000) {
 async function fillPrivate(page, pathname) {
   if (pathname === '/contact') { await page.locator('#name').fill(privateValues[0]); await page.locator('#email').fill(privateValues[1]); await page.locator('#message').fill(privateValues[2]); }
   else if (pathname === '/submit-ticket') {
-    // Exercise the contact-first lead-capture UI while all service requests
-    // stay blocked. Never cross the lead-save boundary into ticket upload.
+    // Select a local file to reveal contact capture. All service requests stay
+    // blocked; never save a lead or transfer the synthetic ticket.
+    const ticketFile = page.locator('input[type="file"][accept*="application/pdf"]');
+    await ticketFile.waitFor({ state: 'attached' });
+    assert.equal(await page.locator('#lead-email').count(), 0, 'Fresh intake starts with local file selection');
+    await ticketFile.setInputFiles(syntheticTicketPdf());
     await page.locator('#lead-email').waitFor({ state: 'visible' });
     await page.locator('#lead-email').fill(privateValues[1]);
     await page.locator('#lead-phone').fill(privateValues[4]);
