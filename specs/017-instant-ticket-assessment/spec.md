@@ -61,3 +61,9 @@ The authorized release is isolated on current `origin/main` at `9ba3a9ce1`, pres
 - The standard build, pull-request CI and production deployment workflow remain required release checks. The exact frontend commit is pinned only after verifying that this release contains no backend changes.
 
 The first full Chromium prerender run exposed a controlled-select serialization mismatch: browser values were empty but `page.content()` omitted the selected placeholder attributes. Snapshot capture now preserves assessment control state before serialization. All 45 snapshot checks pass, including reproduction of the original mismatch and rejection of serialized personal choices. The validator's exact form and policy requirements remain unchanged.
+
+## Assessment document privacy and handoff correction
+
+The production-only network suite found that mounting a ticket upload on a public, measurable homepage violated the existing private-document boundary. That same boundary would discard React Router handoff state on public-to-private navigation. The first assessment interaction now enters `/?assessment=1` before accepting details; the existing unknown-query policy makes this a fresh, permanently untagged document. The form layout is preserved, focus follows the selected control, and file controls mount only there. Moving from that private assessment to private intake now preserves the in-memory file and reviewed values.
+
+Validation: 55 assessment/upload tests, 45 snapshot guardrail checks, 11 conversion-readiness checks, focused lint and ES2021 TypeScript passed. A production-configured build passed all 12 offline Google network scenarios, including the new public-to-private assessment scenario with synthetic fields and a PDF; zero Google requests were forwarded. Existing privacy assertions were preserved. Browser verification confirmed the fresh document, restored input focus and unchanged officer calculation.
