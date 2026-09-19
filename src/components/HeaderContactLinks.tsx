@@ -1,12 +1,12 @@
 import { Phone } from "lucide-react";
 import { FABSY_WHATSAPP_URL, WHATSAPP_ENABLED } from "@/config/whatsapp";
+import TrustpilotReviewLink from "./TrustpilotReviewLink";
 
 export default function HeaderContactLinks() {
-  if (!WHATSAPP_ENABLED) return null;
-
   return (
-    <div className="border-t border-slate-100">
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 sm:flex sm:justify-end sm:gap-x-6">
+    <div className="flex flex-col items-center border-t border-slate-100 lg:flex-row lg:justify-between lg:gap-6">
+      <TrustpilotReviewLink />
+      {WHATSAPP_ENABLED && <div className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 sm:flex sm:justify-center sm:gap-x-6 lg:w-auto lg:justify-end">
         <a
           href="tel:+18257932279"
           aria-label="Call Fabsy at (825) 793-2279"
@@ -28,7 +28,7 @@ export default function HeaderContactLinks() {
           <img src="/whatsapp.svg" alt="" aria-hidden="true" width="20" height="20" className="h-5 w-5 shrink-0" />
           <span>Chat with us on WhatsApp</span>
         </a>
-      </div>
+      </div>}
     </div>
   );
 }
