@@ -62,6 +62,18 @@ interface IntakeLead {
 }
 
 type IntakeLeadView = "outstanding" | "dismissed" | "deleted";
+type UploadAlertStatus = { draft_id: string; email_status: string; sms_status: string | null };
+
+function ownerAlertStatusText(status: string | null): string {
+  if (status === "accepted" || status === "sent") return "provider accepted (delivery unconfirmed)";
+  if (status === "indeterminate") return "outcome unknown; review before resending";
+  if (status === "failed") return "failed; needs review";
+  if (status === "cancelled") return "cancelled; intake no longer available";
+  if (status === "retry") return "retry queued";
+  if (status === "sending") return "processing";
+  if (status === "pending") return "queued";
+  return "not scheduled for this earlier upload";
+}
 
 function resumeDeliveryStatusText(lead: IntakeLead): string {
   if (lead.resume_delivery_failure_code === "outcome_unknown") {
@@ -84,6 +96,7 @@ export default function AdminCaseManagement() {
   const [ticketView, setTicketView] = useState<"active" | "deleted">("active");
   const [intakeLeads, setIntakeLeads] = useState<IntakeLead[]>([]);
   const [intakeLeadError, setIntakeLeadError] = useState<string | null>(null);
+  const [uploadAlertStatuses, setUploadAlertStatuses] = useState<Record<string, UploadAlertStatus>>({});
   const [intakeLeadView, setIntakeLeadView] = useState<IntakeLeadView>("outstanding");
   const [updatingIntakeLeadIds, setUpdatingIntakeLeadIds] = useState<string[]>([]);
   const intakeUpdatesInProgress = useRef(new Set<string>());
@@ -174,7 +187,7 @@ export default function AdminCaseManagement() {
 
       setUserRole(roleData);
 
-      const [submissionResult, leadResult] = await Promise.all([
+      const [submissionResult, leadResult, alertResult] = await Promise.all([
         supabase.from('ticket_submissions').select(`
           *,
           clients (
@@ -190,7 +203,12 @@ export default function AdminCaseManagement() {
           .select('id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,follow_up_email_sent_at,follow_up_email_sent_by,follow_up_phone_called_at,follow_up_phone_called_by,expires_at,updated_at')
           .in('status', ['active', 'converted'])
           .order('updated_at', { ascending: false }),
+        supabase.rpc('get_ticket_upload_alert_statuses'),
       ]);
+      // A missing/failed alert-status rollout must never hide the operational queue.
+      setUploadAlertStatuses(alertResult.error ? {} : Object.fromEntries(
+        (alertResult.data || []).map(status => [status.draft_id, status]),
+      ));
 
       const { data, error } = submissionResult;
       if (error) throw error;
@@ -465,6 +483,11 @@ export default function AdminCaseManagement() {
                     {lead.resume_delivery_sent_at ? ` · sent ${formatDistanceToNow(new Date(lead.resume_delivery_sent_at), { addSuffix: true })}` : ""}
                     {lead.resume_delivery_attempt_count > 0 ? ` · ${lead.resume_delivery_attempt_count} provider attempt${lead.resume_delivery_attempt_count === 1 ? "" : "s"}` : ""}
                   </p>
+                  {lead.ticket_uploaded_at && !lead.deleted_at ? <p className="text-xs text-muted-foreground">
+                    Owner upload alerts: {uploadAlertStatuses[lead.id]
+                      ? `email ${ownerAlertStatusText(uploadAlertStatuses[lead.id].email_status)} · SMS ${ownerAlertStatusText(uploadAlertStatuses[lead.id].sms_status)}`
+                      : "status unavailable"}
+                  </p> : null}
                   {lead.staff_follow_up_updated_at ? (
                     <p className="text-xs text-muted-foreground">Queue status updated {formatDistanceToNow(new Date(lead.staff_follow_up_updated_at), { addSuffix: true })}</p>
                   ) : null}

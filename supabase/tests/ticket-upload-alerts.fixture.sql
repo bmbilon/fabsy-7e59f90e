@@ -8,6 +8,13 @@ create table public.ticket_intake_drafts (
  ticket_document_path text, ticket_document_content_type text, ticket_document_size_bytes integer,
  ticket_uploaded_at timestamptz, pending_ticket_document_path text,
  pending_ticket_document_content_type text, pending_ticket_document_size_bytes integer,
- revision bigint default 1, last_saved_at timestamptz
+ revision bigint default 1, last_saved_at timestamptz, deleted_at timestamptz
 );
 create table public.ticket_intake_draft_object_deletions (draft_id uuid, object_path text);
+create schema auth;
+create function auth.uid() returns uuid language sql stable as $$
+ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid;
+$$;
+create function public.is_idr_staff() returns boolean language sql stable as $$
+ select coalesce(current_setting('test.is_staff',true),'false')='true';
+$$;

@@ -58,6 +58,10 @@ try {
     '@/integrations/supabase/client': `
       const user = { id: 'synthetic-admin' };
       export const supabase = {
+        rpc: async name => {
+          if (name !== 'get_ticket_upload_alert_statuses') throw new Error('Unexpected RPC');
+          return { data: [], error: null };
+        },
         auth: {
           onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
           getSession: async () => ({ data: { session: { user } } }),

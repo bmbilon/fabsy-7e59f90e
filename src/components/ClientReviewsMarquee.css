@@ -1,0 +1,50 @@
+.client-reviews-window {
+  overflow: hidden;
+}
+
+.client-reviews-track {
+  display: flex;
+  width: max-content;
+  animation: client-reviews-scroll 48s linear infinite;
+}
+
+.client-reviews-group {
+  display: flex;
+  flex-shrink: 0;
+  gap: 1rem;
+  padding-right: 1rem;
+}
+
+.client-review {
+  width: min(19rem, 78vw);
+}
+
+.client-reviews[data-paused="true"] .client-reviews-track,
+.client-reviews:hover .client-reviews-track,
+.client-reviews:focus-within .client-reviews-track {
+  animation-play-state: paused;
+}
+
+@keyframes client-reviews-scroll {
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .client-reviews-track {
+    width: auto;
+    animation: none;
+  }
+  .client-reviews-group {
+    width: 100%;
+    flex-wrap: wrap;
+    padding-right: 0;
+  }
+  .client-review {
+    width: auto;
+    flex: 1 1 16rem;
+  }
+  .client-reviews-group[aria-hidden="true"],
+  .client-reviews .client-reviews-pause {
+    display: none;
+  }
+}

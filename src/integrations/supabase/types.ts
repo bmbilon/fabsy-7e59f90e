@@ -922,6 +922,14 @@ export type Database = {
           follow_up_phone_called_by: string | null
         }[]
       }
+      get_ticket_upload_alert_statuses: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          draft_id: string
+          email_status: string
+          sms_status: string | null
+        }[]
+      }
       set_ticket_intake_follow_up_status: {
         Args: { p_expected_status: string; p_id: string; p_status: string }
         Returns: {

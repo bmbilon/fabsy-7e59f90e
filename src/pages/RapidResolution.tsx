@@ -29,6 +29,7 @@ import {
 import useSafeHead from "@/hooks/useSafeHead";
 import FeeRefundNotice from "@/components/FeeRefundNotice";
 import { FEE_REFUND } from "@/config/feeRefund";
+import ClientReviewsMarquee from "@/components/ClientReviewsMarquee";
 
 const PHONE_DISPLAY = "(825) 793-2279";
 const PHONE_HREF = "tel:+18257932279";
@@ -191,6 +192,13 @@ const RapidResolution = () => {
                     </a>
                   </Button>
                 </div>
+                <p className="mt-3 text-xs leading-relaxed text-slate-300">
+                  Choose a ticket photo or PDF first, then add your contact details to save and continue.
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-200">
+                  Questions before you start?{" "}
+                  <Link to="/contact" className="font-semibold text-white underline underline-offset-4 hover:text-primary-light">Contact the Fabsy team</Link>.
+                </p>
               </div>
 
               <Card className="hidden overflow-hidden border-white/15 bg-white shadow-2xl lg:block" data-rapid-price-card>
@@ -230,6 +238,8 @@ const RapidResolution = () => {
             </div>
           </div>
         </section>
+
+        <ClientReviewsMarquee />
 
         <section id="how-it-works" className="scroll-mt-20 px-4 py-16 sm:py-20" aria-labelledby="rapid-process-heading">
           <div className="container mx-auto max-w-6xl">

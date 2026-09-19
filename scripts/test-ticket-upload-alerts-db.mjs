@@ -18,7 +18,7 @@ try {
  if(!confirm.includes('grant execute on function public.confirm_ticket_intake_draft_upload'))throw new Error('Actual upload confirmation function could not be extracted');
  writeFileSync(join(dir,'confirm.sql'),confirm);
  const args=['-h',dir,'-p','55447','-d','postgres','-v','ON_ERROR_STOP=1'];
- for(const file of ['supabase/tests/ticket-upload-alerts.fixture.sql',join(dir,'confirm.sql'),'supabase/migrations/20260909230000_ticket_upload_alerts.sql','supabase/tests/ticket-upload-alerts.test.sql']) {
+ for(const file of ['supabase/tests/ticket-upload-alerts.fixture.sql',join(dir,'confirm.sql'),'supabase/migrations/20260909230000_ticket_upload_alerts.sql','supabase/tests/ticket-upload-alerts.test.sql','supabase/tests/ticket-upload-sms-existing.fixture.sql','supabase/migrations/20260918210000_ticket_upload_sms_alerts.sql','supabase/tests/ticket-upload-sms.test.sql']) {
   run('psql',[...args,'-f',file]);console.log(`${file.endsWith('confirm.sql')?'Existing upload confirmation RPC':file}: passed`);
  }
 } finally {

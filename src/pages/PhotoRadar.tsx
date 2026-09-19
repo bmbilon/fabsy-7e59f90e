@@ -12,6 +12,7 @@ import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
 import { FEE_REFUND } from "@/config/feeRefund";
 import photoRadarContent from "@/config/photoRadarContent.json";
 import useSafeHead from "@/hooks/useSafeHead";
+import ClientReviewsMarquee from "@/components/ClientReviewsMarquee";
 
 const processIcons = [Upload, FileSearch, CheckCircle2];
 
@@ -74,7 +75,7 @@ const PhotoRadar = () => {
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Button asChild size="lg" className="min-h-12 px-7 text-base font-bold shadow-glow">
                     <Link to={PHOTO_RADAR.intakePath} data-funnel-action="primary_cta" data-funnel-position="hero">
-                      Start photo radar review
+                      Upload your notice
                       <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                     </Link>
                   </Button>
@@ -82,6 +83,13 @@ const PhotoRadar = () => {
                     <a href="#how-it-works">How it works</a>
                   </Button>
                 </div>
+                <p className="mt-3 text-xs leading-relaxed text-slate-300">
+                  Choose a notice photo or PDF first, then add your contact details to save and continue.
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-200">
+                  Questions before you start?{" "}
+                  <Link to="/contact" className="font-semibold text-white underline underline-offset-4 hover:text-primary-light">Contact the Fabsy team</Link>.
+                </p>
                 <p className="mt-5 text-sm leading-relaxed text-slate-300">
                   Registered-owner automated notices under Traffic Safety Act s.160(1). No trial. No success surcharge.
                 </p>
@@ -130,6 +138,8 @@ const PhotoRadar = () => {
             </div>
           </div>
         </section>
+
+        <ClientReviewsMarquee />
 
         <section id="how-it-works" className="scroll-mt-20 px-4 py-16 sm:py-20" aria-labelledby="photo-process-heading">
           <div className="container mx-auto max-w-6xl">
