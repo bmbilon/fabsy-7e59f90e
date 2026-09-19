@@ -90,10 +90,10 @@ export default function AssessmentHomepageJourney() {
           <div className="mx-auto max-w-3xl text-center">
             <Badge variant="outline">How Rapid Resolution works</Badge>
             <h2 id="homepage-process-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-              Your part is simple. We handle the follow-through.
+              Upload your ticket &amp; we handle the rest
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              A clear process, with support at every step.
+            <p className="mt-3 text-base text-muted-foreground">
+              The full intake process takes a matter of minutes.
             </p>
           </div>
           <ol className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
