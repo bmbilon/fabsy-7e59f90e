@@ -95,7 +95,7 @@ try {
   const page = await context.newPage();
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(`${origin}/admin/cases`);
-  await page.getByRole('heading', { name: 'Incomplete ticket intakes', exact: true }).waitFor();
+  await page.getByRole('heading', { name: 'Ticket intakes', exact: true }).waitFor();
   await page.getByRole('link', { name: 'new-ticket@example.test', exact: true }).waitFor();
   assert.equal(await page.locator('vite-error-overlay').count(), 0);
   const row = email => page.locator('div.rounded-lg.border').filter({ has: page.getByRole('link', { name: email, exact: true }) }).last();
