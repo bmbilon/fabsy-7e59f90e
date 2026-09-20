@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-20T14:47:20.052Z",
+  "generatedAt": "2026-09-20T14:55:32.253Z",
   "sourceVersion": "rapid-resolution-2026-08-30",
   "sourceFingerprint": "fnv1a-94f49c0b",
   "sourceDocuments": {
@@ -12,7 +12,7 @@
     "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
     "src/config/offers.ts": "fnv1a-4b290fd6",
     "src/config/feeRefund.json": "fnv1a-06562a22",
-    "supabase/functions/_shared/consent-pdf.ts": "fnv1a-88bdd3c6"
+    "supabase/functions/_shared/consent-pdf.ts": "fnv1a-deaea7b6"
   },
   "bundleFingerprints": {
     "en": "fnv1a-08c07177",
