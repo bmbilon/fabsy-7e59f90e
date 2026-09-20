@@ -265,7 +265,6 @@ Deno.test("Resend attempts use identical payload bytes and a stable idempotency 
   assertEquals(requests[0].body, requests[1].body);
   assertEquals(JSON.parse(requests[0].body as string).bcc, [
     "hello@fabsy.ca",
-    "brett@execom.ca",
   ]);
   assertEquals(
     new Headers(requests[0].headers).get("Idempotency-Key"),
@@ -283,7 +282,7 @@ Deno.test("Resend attempts use identical payload bytes and a stable idempotency 
   );
 });
 
-Deno.test("legacy frozen email without the required BCC never reaches Resend", async () => {
+Deno.test("frozen email with absent or revoked staff copies never reaches Resend", async () => {
   const email = renderAbandonedTicketEmail({ completionUrl, email: context.email! });
   const legacy = { ...email };
   Reflect.deleteProperty(legacy, "bcc");
@@ -293,7 +292,7 @@ Deno.test("legacy frozen email without the required BCC never reaches Resend", a
     return Promise.resolve(Response.json({ id: "unexpected" }));
   };
   for (
-    const payload of [legacy, { ...email, bcc: [] }, {
+    const payload of [legacy, { ...email, bcc: [] }, { ...email, bcc: ["hello@fabsy.ca", "brett@execom.ca"] }, {
       ...email,
       bcc: ["wrong@example.test"],
     }]

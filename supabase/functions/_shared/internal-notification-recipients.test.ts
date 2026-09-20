@@ -1,15 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import {
-  FABSY_BACKUP_NOTIFICATION_EMAIL,
   FABSY_PRIMARY_NOTIFICATION_EMAIL,
   internalNotificationDelivery,
 } from "./resend-email.ts";
 
-Deno.test("internal notices address Fabsy and blind-copy Execom backup", () => {
+Deno.test("internal notices use hello only, with no backup recipient", () => {
   assertEquals(FABSY_PRIMARY_NOTIFICATION_EMAIL, "hello@fabsy.ca");
-  assertEquals(FABSY_BACKUP_NOTIFICATION_EMAIL, "brett@execom.ca");
   assertEquals(internalNotificationDelivery(), {
     to: ["hello@fabsy.ca"],
-    bcc: ["brett@execom.ca"],
+    bcc: [],
   });
 });

@@ -196,7 +196,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
     // SECURITY: This email contains all client data. Delivery is deliberately
-    // restricted to Fabsy's canonical mailbox and Execom's blind backup copy.
+    // restricted to Fabsy's canonical mailbox.
     // Mark the dispatch outcome as ambiguous before the first provider call.
     // A network error can happen after a provider accepts a message, so an
     // automatic retry from this point could duplicate client/admin delivery.
@@ -302,7 +302,7 @@ const handler = async (req: Request): Promise<Response> => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({
-          To: "+14036695353", // SECURITY: Hardcoded admin phone - only brett@execom.ca
+          To: "+14036695353", // SECURITY: Hardcoded admin phone.
           From: twilioPhoneNumber || "",
           Body: adminSmsMessage,
         }).toString(),

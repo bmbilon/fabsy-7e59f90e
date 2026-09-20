@@ -30,7 +30,7 @@ const email = renderUploadAlertEmail(alert);
 
 Deno.test("upload email is actionable, escaped and has no customer capability or attachment", () => {
   assertEquals(email.to, ["hello@fabsy.ca"]);
-  assertEquals(email.bcc, ["brett@execom.ca"]);
+  assertEquals(email.bcc, []);
   assertEquals(email.from, "Fabsy <hello@fabsy.ca>");
   assert(email.html.includes("https://fabsy.ca/admin/cases"));
   assert(
@@ -142,9 +142,9 @@ Deno.test("recipient changes cannot send a frozen email to the old recipient", a
   assertEquals(sent.length, 0);
   assertEquals(finishes[0][3], "frozen_recipient_changed");
 });
-Deno.test("missing backup copy cannot send a frozen email", async () => {
+Deno.test("revoked backup recipient cannot receive a frozen email", async () => {
   const { deps, sent, finishes } = dependencies({
-    freeze: () => Promise.resolve({ ...email, bcc: [] }),
+    freeze: () => Promise.resolve({ ...email, bcc: ["brett@execom.ca"] }),
   });
   const result = await processTicketUploadAlerts(deps);
   assertEquals(result.failed, 1);
