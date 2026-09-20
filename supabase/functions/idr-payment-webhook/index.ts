@@ -15,6 +15,7 @@ import {
 } from "../_shared/meta-capi.ts";
 import { currentMetaPurchaseFromSignedCheckout } from "../_shared/meta-purchase.ts";
 import { paidFunnelProductFromSignedCheckout } from "../_shared/funnel-checkout.ts";
+import { enqueuePaymentSms } from "../_shared/payment-notification-sms.ts";
 import {
   recordPaidPurchaseLedger,
   recordPaidRefundLedger,
@@ -986,11 +987,11 @@ async function persistPaidOrder(
       throw new Error("Ticket submission does not belong to the IDR client.");
     }
     combinedRepresentation = submission;
-    if (combinedRepresentation.representation_checkout_session_id &&
+    if (checkoutKind === "ticket_with_addon" && combinedRepresentation.representation_checkout_session_id &&
         combinedRepresentation.representation_checkout_session_id !== session.id) {
       throw new Error("Paid representation add-on conflicts with the recorded payment session.");
     }
-    if (combinedRepresentation.representation_includes_assessment) {
+    if (checkoutKind === "ticket_with_addon" && combinedRepresentation.representation_includes_assessment) {
       if (
         !isUuid(combinedRepresentation.source_assessment_id || undefined) ||
         metadata.source_assessment_id !==
@@ -1210,7 +1211,7 @@ async function sendAccessEmail(
   }
 }
 
-serve(async (req: Request): Promise<Response> => {
+export async function handler(req: Request): Promise<Response> {
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
   const stripeSignature = req.headers.get("stripe-signature");
@@ -1325,6 +1326,7 @@ serve(async (req: Request): Promise<Response> => {
 
     if (session.metadata?.fabsy_checkout_kind === "photo_radar") {
       const result = await persistPaidPhotoRadarCheckout(supabase, session);
+      await enqueuePaymentSms(supabase, event, session);
       await recordRepresentationPayment(supabase, session);
       await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
       await recordCurrentPaidPaymentPurchaseIfEligible(supabase, event, session);
@@ -1332,6 +1334,7 @@ serve(async (req: Request): Promise<Response> => {
     }
     if (session.metadata?.fabsy_checkout_kind === "ticket_assessment") {
       const result = await persistPaidTicketAssessment(supabase, session);
+      await enqueuePaymentSms(supabase, event, session);
       await sendTicketAssessmentConfirmation(
         supabase,
         session.metadata.assessment_submission_id,
@@ -1341,6 +1344,7 @@ serve(async (req: Request): Promise<Response> => {
 
     if (session.metadata?.fabsy_checkout_kind === "ticket_only") {
       const result = await persistPaidTicketCheckout(supabase, session);
+      await enqueuePaymentSms(supabase, event, session);
       await recordRepresentationPayment(supabase, session);
       if (isUuid(session.metadata.source_assessment_id)) {
         const ticketBaseCents = metadataPriceCents(
@@ -1363,6 +1367,7 @@ serve(async (req: Request): Promise<Response> => {
       return json({ received: true, handled: false });
     }
     const result = await persistPaidOrder(supabase, session);
+    await enqueuePaymentSms(supabase, event, session);
     if (session.metadata?.fabsy_checkout_kind === "ticket_with_addon") {
       await recordRepresentationPayment(supabase, session);
     }
@@ -1389,4 +1394,6 @@ serve(async (req: Request): Promise<Response> => {
     console.error(`idr-payment-webhook failed for event ${event.id}`);
     return json({ error: "Paid checkout could not be recorded." }, 500);
   }
-});
+}
+
+if (import.meta.main) serve(handler);
