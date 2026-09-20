@@ -1,0 +1,36 @@
+name: Bundle consent PDF function
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/bundle-consent-function.yml'
+      - 'supabase/functions/generate-consent-form/**'
+      - 'supabase/functions/_shared/consent-*'
+      - 'supabase/functions/_shared/consent-fonts/**'
+      - 'supabase/functions/_shared/consent-harfbuzz/**'
+      - 'supabase/functions/_shared/ticket-completion*.ts'
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bundle with all existing font and shaping assets
+        run: |
+          mkdir -p consent-bundle
+          docker run --rm -e DENO_NO_PACKAGE_JSON=1 \
+            -v "$PWD:/workspace" -w /workspace \
+            public.ecr.aws/supabase/edge-runtime:v1.74.3 \
+            bundle --entrypoint /workspace/supabase/functions/generate-consent-form/index.ts \
+            --output /workspace/consent-bundle/output.eszip \
+            --static '/workspace/supabase/functions/_shared/consent-fonts/*.ttf' \
+            --static '/workspace/supabase/functions/_shared/consent-fonts/*.gz' \
+            --static '/workspace/supabase/functions/_shared/consent-harfbuzz/*.wasm'
+          git rev-parse HEAD > consent-bundle/source-commit.txt
+          sha256sum consent-bundle/output.eszip > consent-bundle/sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: consent-function-bundle
+          path: consent-bundle/
+          retention-days: 3
