@@ -1,3 +1,4 @@
+import { isCompletedStage, isTrialStage, type CaseStatus } from "../../src/lib/admin/caseStatus";
 // Synthetic loopback preview only. This module is never imported by the app.
 import type {
   DashboardOverview,
@@ -32,6 +33,7 @@ const names = [
   "Morgan Smith",
   "Drew Adams",
 ];
+const workflow = new Map<string, CaseStatus>();
 function items(): QueueItem[] {
   return names.map((name, index) => ({
     id: `20000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
@@ -43,6 +45,7 @@ function items(): QueueItem[] {
     service_type: "representation",
     ticket_type: index % 3 === 0 ? "photo_radar" : "officer_issued",
     status: "active",
+    case_stage: null, case_stage_version: 0,
     category:
       index < 2 || index === 4
         ? "partial"
@@ -60,7 +63,12 @@ function items(): QueueItem[] {
       index === 4 ? null : ago(index < 3 ? index * 10 + 3 : 1440 + index),
     paid_at: index === 2 || index === 5 ? ago(1) : null,
     follow_up_status: "open",
-  }));
+  } as QueueItem)).map(row => {
+    const state = workflow.get(row.id);
+    if (state) return { ...row, case_stage: state.stage, case_stage_version: state.version,
+      category: (state.stage === 'partial' ? 'partial' : isCompletedStage(state.stage) ? 'completed' : isTrialStage(state.stage) ? 'trial' : 'active') as QueueItem['category'] };
+    return row;
+  });
 }
 function overview(days: number): DashboardOverview {
   const day = new Date(start());
@@ -151,17 +159,29 @@ function overview(days: number): DashboardOverview {
 function result(name: string, args: Record<string, unknown>) {
   if (name === "idr_staff_role") return fixture.role;
   if (fixture.mode === "error") throw new Error("Synthetic connection outage");
+  if (name === "get_admin_ticket_case_status") return workflow.get(String(args.p_ticket_id)) || { kind: args.p_kind, ticket_id: args.p_ticket_id, stage: null, version: 0 };
+  if (name === "set_admin_ticket_case_status") {
+    if (fixture.mode === 'save_error') throw new Error('Synthetic save failure');
+    const old = workflow.get(String(args.p_ticket_id));
+    if (fixture.mode === 'conflict') {
+      workflow.set(String(args.p_ticket_id), { kind: args.p_kind as CaseStatus['kind'], ticket_id: String(args.p_ticket_id), stage: 'disclosure_requested', version: Number(args.p_expected_version) + 1 });
+      throw new Error('CASE_STATUS_CHANGED');
+    }
+    if ((old?.version || 0) !== args.p_expected_version) throw new Error('CASE_STATUS_CHANGED');
+    const next = { kind: args.p_kind, ticket_id: args.p_ticket_id, stage: args.p_stage, version: Number(args.p_expected_version) + 1 } as CaseStatus;
+    workflow.set(next.ticket_id, next); return next;
+  }
   if (name === "admin_dashboard_overview")
     return overview(Number(args.p_days || 7));
   if (name === "admin_dashboard_queue") {
     const all = fixture.mode === "empty" ? [] : items();
     const matches = (row: QueueItem, filter: string) =>
-      filter === "partial"
+      filter === "trial" ? isTrialStage(row.case_stage) : filter === "partial"
         ? row.category === "partial"
         : filter === "active"
           ? ["new", "active"].includes(row.category)
           : filter === "submitted"
-            ? row.kind === "submission"
+            ? row.kind === "submission" || !!row.case_stage
             : filter === "completed"
               ? row.category === "completed"
               : filter === "paid"
@@ -199,7 +219,7 @@ function result(name: string, args: Record<string, unknown>) {
       offset,
       page_size: 8,
       counts: Object.fromEntries(
-        ["attention", "partial", "active", "submitted", "completed"].map(
+        ["attention", "partial", "active", "submitted", "completed", "trial"].map(
           (filter) => [
             filter,
             all.filter((row) => matches(row, filter)).length,

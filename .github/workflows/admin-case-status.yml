@@ -1,0 +1,31 @@
+name: Admin case status database checks
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*admin*status*.sql'
+      - 'supabase/migrations/*admin_dashboard*.sql'
+      - 'supabase/tests/admin-*'
+      - 'scripts/test-admin-dashboard-database.mjs'
+      - '.github/workflows/admin-case-status.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/*admin*status*.sql'
+      - 'supabase/migrations/*admin_dashboard*.sql'
+      - 'supabase/tests/admin-*'
+      - 'scripts/test-admin-dashboard-database.mjs'
+      - '.github/workflows/admin-case-status.yml'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify authorization, transitions, cleanup and conversion
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql
+          export DASHBOARD_TEST_PG_BIN="$(pg_config --bindir)"
+          node scripts/test-admin-dashboard-database.mjs

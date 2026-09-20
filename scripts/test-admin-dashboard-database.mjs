@@ -29,6 +29,9 @@ try {
     "supabase/tests/admin-dashboard.fixture.sql",
     "supabase/migrations/20260920100000_admin_dashboard_overview.sql",
     "supabase/tests/admin-dashboard.test.sql",
+    "supabase/tests/admin-case-status.fixture.sql",
+    "supabase/migrations/20260920210000_admin_ticket_case_status.sql",
+    "supabase/tests/admin-case-status.test.sql",
   ]) {
     run("psql", [
       "-h",

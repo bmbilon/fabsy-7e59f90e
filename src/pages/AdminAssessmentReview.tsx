@@ -1,3 +1,4 @@
+import CaseStatusSelect from "@/components/admin/CaseStatusSelect";
 import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -275,6 +276,7 @@ export default function AdminAssessmentReview() {
               <h1 className="mt-3 text-3xl font-bold">{client.first_name} {client.last_name}</h1>
               <p className="mt-1 text-sm text-muted-foreground">{client.email} · {client.phone || "No phone supplied"} · {assessment.ticket_number}</p>
             </div>
+            <CaseStatusSelect kind="submission" ticketId={assessment.id} label={assessment.ticket_number} fallback={assessment.status.replace(/_/g, " ")} />
             <Button variant="outline" onClick={() => void downloadTicket()}><Download className="mr-2 h-4 w-4" />Download private ticket</Button>
           </div>
         </div>
