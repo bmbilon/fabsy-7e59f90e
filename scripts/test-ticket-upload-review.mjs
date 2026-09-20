@@ -234,15 +234,23 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
             upload: { bucket: "assessment-tickets", path: `${draftId}/representation-ticket-r${draftRevision}.png`, token: "signed-retry-upload", contentType: options.body.file.contentType, maxBytes: options.body.file.size },
           }), error: null });
         }
-        if (action === "confirm_upload") return Promise.resolve({ data: draftResponse({
-          ticketUploadedAt: new Date().toISOString(),
-          hasPendingTicketUpload: false,
-          resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
-        }), error: null });
-        if (action === "retry_delivery") return Promise.resolve({ data: draftResponse({
-          ticketUploadedAt: new Date().toISOString(),
-          resumeDelivery: resumeDelivery("sent", deliveryChannel),
-        }), error: null });
+        if (action === "confirm_upload") {
+          // Later autosaves must retain the server's confirmed upload state.
+          unuploadedDraft = false;
+          return Promise.resolve({ data: draftResponse({
+            ticketUploadedAt: new Date().toISOString(),
+            hasPendingTicketUpload: false,
+            resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
+          }), error: null });
+        }
+        if (action === "retry_delivery") {
+          // A successful retry changes subsequent reads/saves as well.
+          deliveryStatus = "sent";
+          return Promise.resolve({ data: draftResponse({
+            ticketUploadedAt: new Date().toISOString(),
+            resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel),
+          }), error: null });
+        }
         if (action === "read") {
           if (recoveryReadsBlocked || options.body.accessToken !== activeDraftToken) {
             return Promise.resolve({ data: null, error: new Error("Synthetic draft capability rejected") });
@@ -275,7 +283,9 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
             ticketUploadedAt: unuploadedDraft ? null : new Date().toISOString(),
             ...(rotateOnSave ? { capabilityRotated: true } : {}),
           }), error: null };
-          if (loseSaveResponseAfterCommit) {
+          // The outage belongs to the Continue transition under test. A
+          // legitimate initial autosave may finish first on a busy runner.
+          if (loseSaveResponseAfterCommit && options.body.currentStep === 2) {
             recoveryReadsBlocked = deferRecoveryUntilReload;
             return Promise.resolve({ data: null, error: new Error("Synthetic response lost after commit") });
           }
@@ -800,7 +810,9 @@ test("a definite delivery failure stays visible, retryable and keeps the copy-li
   assert.ok(app.button("Copy resume link"));
   await app.api.click(app.button("Retry sending"));
   await app.until(() => /emailed your secure resume link/i.test(app.document.body.textContent), "Expected a successful explicit delivery retry");
-  assert.deepEqual(app.draftRequests.map(request => request.action), ["create", "save", "prepare_upload", "confirm_upload", "retry_delivery"]);
+  assert.deepEqual(app.draftRequests.slice(0, 4).map(request => request.action), ["create", "save", "prepare_upload", "confirm_upload"]);
+  assert.deepEqual(app.draftRequests.slice(4).filter(request => request.action !== "save").map(request => request.action), ["retry_delivery"],
+    "the explicit delivery retry must occur exactly once, alongside any normal autosave");
   assert.equal(app.buttons("Retry sending").length, 0, "A sent link cannot be retried from the intake");
 });
 
@@ -831,9 +843,12 @@ test("the browser adopts a capability rotated by a contact-saving response", asy
   await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved ticket to restore");
   await app.api.click(app.button("Continue"));
   await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected the saved step to advance");
-  const saveRequest = app.draftRequests.find(request => request.action === "save");
+  // An initial autosave can precede Continue; assert the latest saved step's
+  // capability instead of assuming that the first save is the transition.
+  const saveRequest = app.draftRequests.findLast(request => request.action === "save" && request.currentStep === 2);
+  assert.ok(saveRequest, "Continue must save the next step before rendering it");
   assert.match(saveRequest.replacementAccessToken, /^[0-9a-f]{64}$/);
-  assert.notEqual(saveRequest.replacementAccessToken, "a".repeat(64));
+  assert.notEqual(saveRequest.replacementAccessToken, saveRequest.accessToken);
   const stored = JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-capability.v1"));
   assert.equal(stored.accessToken, saveRequest.replacementAccessToken);
   assert.equal(app.activeDraftToken(), saveRequest.replacementAccessToken);
@@ -850,14 +865,15 @@ test("a committed rotation survives response loss and reload with the retained c
   await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved draft to restore");
   await app.api.click(app.button("Continue"));
   await app.until(
-    () =>
-      app.draftRequests.filter((request) => request.action === "read").length ===
-      3,
+    () => {
+      const saveIndex = app.draftRequests.findLastIndex(request => request.action === "save" && request.currentStep === 2);
+      return saveIndex >= 0 && app.draftRequests.slice(saveIndex + 1).filter(request => request.action === "read").length === 2;
+    },
     "Expected both in-tab recovery probes to fail before reload",
   );
-  const saveRequest = app.draftRequests.find(request => request.action === "save");
+  const saveRequest = app.draftRequests.findLast(request => request.action === "save" && request.currentStep === 2);
   const retained = JSON.parse(app.window.localStorage.getItem("fabsy.ticket-intake-pending-rotation.v1"));
-  assert.equal(retained.oldAccessToken, "a".repeat(64));
+  assert.equal(retained.oldAccessToken, saveRequest.accessToken);
   assert.equal(retained.candidateAccessToken, saveRequest.replacementAccessToken);
   assert.equal(app.activeDraftToken(), retained.candidateAccessToken);
 
@@ -883,11 +899,13 @@ test("a lost save response without rotation recovers with the still-active old c
   await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved draft to restore");
   await app.api.click(app.button("Continue"));
   await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected old-capability recovery to confirm the committed save");
-  const saveRequest = app.draftRequests.find(request => request.action === "save");
-  const recoveryReads = app.draftRequests.filter(request => request.action === "read").slice(1);
+  const saveIndex = app.draftRequests.findLastIndex(request => request.action === "save" && request.currentStep === 2);
+  assert.ok(saveIndex >= 0, "Continue must commit the saved step before recovering it");
+  const saveRequest = app.draftRequests[saveIndex];
+  const recoveryReads = app.draftRequests.slice(saveIndex + 1).filter(request => request.action === "read");
   assert.equal(recoveryReads.length, 1);
-  assert.equal(recoveryReads[0].accessToken, "a".repeat(64));
-  assert.equal(app.activeDraftToken(), "a".repeat(64));
+  assert.equal(recoveryReads[0].accessToken, saveRequest.accessToken);
+  assert.equal(app.activeDraftToken(), saveRequest.accessToken);
   assert.notEqual(saveRequest.replacementAccessToken, app.activeDraftToken());
   const candidateProbe = await app.window.__ticketReviewBackend.invoke("ticket-intake-draft", {
     body: { action: "read", draftId: saveRequest.draftId, accessToken: saveRequest.replacementAccessToken },
@@ -909,9 +927,10 @@ test("a response-loss-recovered capability remains usable when browser storage r
   await app.api.click(app.button("Continue"));
   await app.until(() => /Step 2 of 6/.test(app.document.body.textContent), "Expected the saved step to advance");
   assert.match(app.document.body.textContent, /could not remember your secure return access/i);
-  const saveRequest = app.draftRequests.find(request => request.action === "save");
   await app.api.click(app.button("Retry sending"));
   assert.equal(app.draftRequests.at(-1)?.action, "retry_delivery");
+  const saveRequest = app.draftRequests.findLast(request => request.action === "save" && request.currentStep === 2);
+  assert.ok(saveRequest, "Continue must recover the saved step before delivery can retry");
   assert.equal(app.draftRequests.at(-1)?.accessToken, saveRequest.replacementAccessToken);
 });
 
@@ -924,7 +943,9 @@ test("a draft whose first upload failed can retry without losing its synchronize
   await app.finish(0);
   await app.api.click(app.button("Save ticket and review details"));
   await app.until(() => app.document.getElementById("ticketNumber"), "Expected the retried private upload to finish");
-  assert.deepEqual(app.draftRequests.map(request => request.action), ["read", "save", "prepare_upload", "confirm_upload"]);
+  assert.deepEqual(app.draftRequests.slice(0, 4).map(request => request.action), ["read", "save", "prepare_upload", "confirm_upload"]);
+  assert.ok(app.draftRequests.slice(4).every(request => request.action === "save"),
+    "only normal autosaves may follow the confirmed upload");
   assert.equal(app.uploadRequests[0]?.token, "signed-retry-upload");
 });
 

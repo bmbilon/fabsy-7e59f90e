@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-20T14:38:59.167572+00:00",
+  "projectRef": "gcasbisxfrssonllpqrw",
+  "reviewedSourceCommit": "7818856537f6a3767416380acc54a4756b60be0a",
+  "migrations": [
+    {
+      "path": "supabase/migrations/20260920140000_intake_plea_instruction.sql",
+      "sha256": "a4cde5a6f36f6abaef440012b139116c03f9c49ab1b6ff73f0fe224f459be24f",
+      "applied": true,
+      "trackedVersionVerified": true
+    },
+    {
+      "path": "supabase/migrations/20260920150000_disclosure_remote_approval.sql",
+      "sha256": "7b95e6ae648e15ab22aec6cca946b241241d5d9df88a30708b1a5cd6c653c69c",
+      "applied": true,
+      "trackedVersionVerified": true
+    }
+  ],
+  "functions": {
+    "generate-consent-form": {
+      "version": 184,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "ezbr_sha256": "41794af955d78bb767ad218b33b4e633c73b3f8a8f4610e7e86e9f6f222406cd"
+    },
+    "photo-ticket-intake": {
+      "version": 2,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "ezbr_sha256": "3bddde829c62f34c03383fcb22f07d214b5f7f1de2f858fd177d11f832a4c145"
+    },
+    "disclosure-approval": {
+      "version": 1,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "ezbr_sha256": "7f05f11aaa4e19cc486399b18780c2deacf81b78cf812502817288348a3ee65b"
+    }
+  },
+  "consentBundle": {
+    "bundleSourceCommit": "b3c861851fd46e3721fab17500048f637e85cdc1",
+    "sourceTreesMatch": true,
+    "workflowRun": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/35516704419",
+    "eszipBytes": 16715841,
+    "eszipSha256": "755c711d796c218b865b30537cc3820fa19b1fd5f60989b96d5380c9d5086f30",
+    "ezbrBytes": 14674149,
+    "ezbrSha256": "41794af955d78bb767ad218b33b4e633c73b3f8a8f4610e7e86e9f6f222406cd",
+    "method": "Official edge-runtime v1.74.3 full-asset ESZIP from existing repository GitHub workflow; CLI-compatible EZBR (Brotli quality 6) via documented Management API PATCH.",
+    "assets": [
+      {
+        "path": "supabase/functions/_shared/consent-fonts/NotoSans-Regular.ttf",
+        "bytes": 569208,
+        "sha256": "b85c38ecea8a7cfb39c24e395a4007474fa5a4fc864f6ee33309eb4948d232d5",
+        "exactBytesVerifiedInBundle": true
+      },
+      {
+        "path": "supabase/functions/_shared/consent-fonts/NotoSansGurmukhi-Regular.ttf",
+        "bytes": 53000,
+        "sha256": "bbde4d85fdfb998eff6921cb2c7a9a7924a1c95560a6aa9a06172530e4f596da",
+        "exactBytesVerifiedInBundle": true
+      },
+      {
+        "path": "supabase/functions/_shared/consent-fonts/NotoSansDevanagari-Regular.ttf",
+        "bytes": 219212,
+        "sha256": "385e78e6359a9d88a0f243d53b1209d7548361ba2194e2b9ec779bcaa7e8949d",
+        "exactBytesVerifiedInBundle": true
+      },
+      {
+        "path": "supabase/functions/_shared/consent-fonts/NotoNaskhArabic-Regular.ttf",
+        "bytes": 178388,
+        "sha256": "2f4b88e6ee50fa82c617e2d1d4ba18281cb1c6cd71c3af3ec64970c23995db4b",
+        "exactBytesVerifiedInBundle": true
+      },
+      {
+        "path": "supabase/functions/_shared/consent-fonts/NotoSansCJKsc-Regular.otf.gz",
+        "bytes": 13585906,
+        "sha256": "6a357139f4cf8122d783ac7732915df892dd517684215879a42ff59ec517ce3a",
+        "exactBytesVerifiedInBundle": true
+      },
+      {
+        "path": "supabase/functions/_shared/consent-harfbuzz/harfbuzz.wasm",
+        "bytes": 421964,
+        "sha256": "66f25d50cdf9942366498d0504d13096d567946cb1f6b5af6cdd87f392be99da",
+        "exactBytesVerifiedInBundle": true
+      }
+    ]
+  },
+  "liveEmptyConsentRequestStatus": 400,
+  "productionTestSubmissionsCreated": 0,
+  "smsSentDuringRelease": 0,
+  "frontendDeployment": "Not covered by this backend receipt; released separately after backend verification.",
+  "notes": [
+    "The GitHub PR merge checkout has identical supabase/functions and supabase/config.toml trees to the reviewed branch commit.",
+    "Every declared font and HarfBuzz WASM asset was verified byte-for-byte inside the downloaded ESZIP before upload.",
+    "Existing JWT and application authorization checks are preserved. No real consent document was regenerated for validation.",
+    "Both migration versions were read back from supabase_migrations.schema_migrations."
+  ]
+}
