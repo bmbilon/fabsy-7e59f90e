@@ -34,7 +34,8 @@ The queue, client email and staff copy share the same saved document identity. T
 - [x] Refresh staff copy identity and actual signed attachments.
 - [x] Verify required contact email and interrupted-contact behavior.
 - [x] Run focused flow, database, provider and regression checks.
-- [ ] Deploy backend, verify source/configuration/schedule, then release frontend.
+- [x] Deploy backend and verify source, configuration and schedule.
+- The frontend is released last through the explicit build workflow; the deployed commit and run are recorded in release evidence after merge.
 
 Baseline audit: all eight portal events were sent, including five representation-consent events. Five legacy submission notification bundles were sent; no pending or uncertain bundle was available to replay. Existing consents without a bundle are not proof of non-delivery and are not backfilled. The live send-notification, process-portal-activity and representation-consent sources matched the reviewed main revision. Generation and photo-intake dependency parity was checked against the existing verified backend release; the CLI cannot fully extract their large/externally bundled assets.
 
@@ -43,3 +44,13 @@ Focused checks can be rerun with `npm run test:consent-welcome`. The PostgreSQL 
 Staff consent events waiting for a valid ticket reference follow the existing bounded retry policy, then move to `needs_review`. Staff must verify the reference and explicitly requeue an unattempted event; a provider-started or uncertain event requires delivery reconciliation first.
 
 Release validation passed: 31 Deno tests across client delivery, worker HTTP boundaries and staff consent mail; seven actual legacy-handler tests; isolated PostgreSQL migration/RLS/ownership/claim/source and payment-race tests, including two concurrent claim transactions. All four changed Edge Function entrypoints type-check. No test touched live client data or sent an email.
+
+## Production backend verification — September 20, 2026
+
+Only migration `20260921020000_consent_welcome_notifications.sql` was applied, and its migration history entry was repaired to applied. The queue activated at 18:41:19.689 UTC; the minute schedule is active, and the 18:42 UTC worker recorded success with no error. No consent completed after activation during the initial verification; the new queue was empty. The five sent legacy bundles and five sent staff consent events were unchanged.
+
+The vault-authenticated no-send readiness request returned HTTP 200 and confirmed database, email and Stripe-read configuration. This checks configuration presence, not a real inbox delivery. An unauthenticated worker request returned 401. A synthetic unauthorized photo-contact request returned 403 without creating or changing a submission.
+
+Deployed notification v214, staff activity v12 and consent welcome v1 are ACTIVE, with all 27 downloaded source-file instances exactly matching reviewed source commit `c4c41d0c3`. Photo intake v3 is ACTIVE and its downloaded entrypoint and consent helper match. The CLI still refuses extraction of the bundled `src/config/feeRefund.json` path, so the photo bundle's extraction verification is explicitly partial; its unchanged dependencies were checked against the prior reviewed release and uploaded with the changed handler. No source mismatch was found.
+
+Detailed backend, function and final frontend evidence is retained in the operator's private `consent-email-release.json` release record. No historical consent email or real outbound test email was sent.
