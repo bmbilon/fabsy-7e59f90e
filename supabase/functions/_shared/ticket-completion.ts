@@ -2,13 +2,13 @@
 // not rotate the customer's current token, copy the ticket, or create a case.
 export const COMPLETION_TOKEN_PATTERN = /^c1\.[0-9a-f]{32}\.[0-9a-f]{64}\.[0-9]{10}\.[0-9a-f]{64}$/;
 export const INTAKE_ACCESS_TOKEN_PATTERN = /^(?:[0-9a-f]{64}|c1\.[0-9a-f]{32}\.[0-9a-f]{64}\.[0-9]{10}\.[0-9a-f]{64})$/;
-const encoder = new TextEncoder();
+const utf8 = (value: string) => new TextEncoder().encode(value);
 const hex = (bytes: ArrayBuffer) => [...new Uint8Array(bytes)].map(value => value.toString(16).padStart(2, "0")).join("");
-const message = (body: string) => encoder.encode(`fabsy-ticket-completion-v1:${body}`);
+const message = (body: string) => utf8(`fabsy-ticket-completion-v1:${body}`);
 
 async function signingKey(secret: string) {
   if (!secret) throw new Error("Completion signing is not configured.");
-  return await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
+  return await crypto.subtle.importKey("raw", utf8(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
 }
 
 export async function createTicketCompletionUrl(input: {
@@ -28,7 +28,7 @@ export async function createTicketCompletionUrl(input: {
 
 /** Always compare the result to the CURRENT stored hash: rotation revokes aliases. */
 export async function intakeAccessTokenHash(token: string, secret: string, expectedId?: string, now = Date.now()): Promise<string> {
-  if (!token.startsWith("c1.")) return hex(await crypto.subtle.digest("SHA-256", encoder.encode(token)));
+  if (!token.startsWith("c1.")) return hex(await crypto.subtle.digest("SHA-256", utf8(token)));
   if (!secret || !COMPLETION_TOKEN_PATTERN.test(token)) return "";
   const [, id, hash, expires, signature] = token.split(".");
   if (Number(expires) * 1000 <= now || (expectedId && id !== expectedId.toLowerCase().replaceAll("-", ""))) return "";
