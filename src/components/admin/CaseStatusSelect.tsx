@@ -3,9 +3,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CASE_STAGES, isTrialStage, type CaseStatus, type TicketKind } from '@/lib/admin/caseStatus';
 
-export default function CaseStatusSelect({ kind, ticketId, label, initial, fallback = 'Choose case status', disabled = false, onChanged }: {
+export default function CaseStatusSelect({ kind, ticketId, label, initial, fallback = 'Choose case status', disabled = false, onChanged, compact = false }: {
   kind: TicketKind; ticketId: string; label: string; initial?: CaseStatus;
-  fallback?: string; disabled?: boolean; onChanged?: () => void;
+  fallback?: string; disabled?: boolean; onChanged?: () => void; compact?: boolean;
 }) {
   const client = useQueryClient();
   const busy = useRef(false);
@@ -53,7 +53,7 @@ export default function CaseStatusSelect({ kind, ticketId, label, initial, fallb
   };
   const trial = isTrialStage(current?.stage);
   const groups = trial ? ['Trial matters', 'Case progress'] : ['Case progress', 'Trial matters'];
-  return <div className="w-full min-w-0 sm:w-72" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
+  return <div className={compact ? 'w-full min-w-0' : 'w-full min-w-0 sm:w-72'} onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
     <label className="block text-xs font-medium text-slate-600">
       Case status
       <select aria-label={`Case status for ${label}`} value={current?.stage || ''} disabled={disabled || saving || !current}
