@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import type { FormData } from "./TicketForm";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -22,6 +22,7 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
   const [error, setError] = useState("");
   const [status, setStatus] = useState<PhotoIntakeStatus | null>(null);
   const [owner, setOwner] = useState("");
+  const emailInput = useRef<HTMLInputElement>(null);
   const inFlight = useRef(false);
   const onFields = useRef(updateFormData);
   onFields.current = updateFormData;
@@ -46,7 +47,11 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
   const accept = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (inFlight.current) return;
-    if (!email.trim()) { setError("Enter your email address so we can send your consent copy and next steps."); return; }
+    if (!email.trim()) {
+      setError("Enter your email address so we can send your consent copy and next steps.");
+      emailInput.current?.focus();
+      return;
+    }
     if (phone.trim() && !/^[+\d().\s-]{7,30}$/.test(phone.trim())) { setError("Enter a valid phone number."); return; }
     inFlight.current = true; setBusy(true); setError("");
     try {
@@ -69,18 +74,23 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
 
   return <section id="ticket-form-container" className="mx-auto max-w-3xl scroll-mt-28 space-y-6 rounded-2xl bg-background p-[16px] text-foreground sm:p-[28px]">
     <div role="status" className="space-y-3 text-center">
-      <CheckCircle2 className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
-      <Heading className="text-2xl font-bold">Success, Your ticket has been received</Heading>
+      {accepted
+        ? <CheckCircle2 className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+        : <AlertCircle className="mx-auto h-10 w-10 text-destructive" aria-hidden="true" />}
+      <Heading className="text-2xl font-bold">{accepted ? "Ticket and contact details received" : "Contact information required"}</Heading>
       <p className="text-sm text-muted-foreground">Your ticket and consent are saved.</p>
     </div>
     {!accepted ? <form onSubmit={accept} className="space-y-5">
+      <p id="contact-required" role="alert" className="rounded-lg border border-destructive/40 bg-destructive/5 p-[16px] text-sm leading-6 text-destructive">
+        Your submission is incomplete. Please provide your email address. We cannot contact you or proceed with your submission without it.
+      </p>
       <fieldset disabled={busy} className="space-y-5">
-        <legend className="mb-4 text-lg font-semibold">Provide me with updates</legend>
-        <div className="space-y-2"><Label htmlFor="updates-email">Email address</Label><Input id="updates-email" type="email" required aria-describedby="consent-email-help" autoComplete="email" maxLength={255} value={email} onChange={event => setEmail(event.target.value)} /><p id="consent-email-help" className="text-sm text-muted-foreground">We’ll email your consent copy, welcome and next steps here.</p></div>
+        <legend className="mb-4 text-lg font-semibold">How can we contact you?</legend>
+        <div className="space-y-2"><Label htmlFor="updates-email">Email address</Label><Input ref={emailInput} id="updates-email" type="email" required aria-describedby="contact-required consent-email-help" autoComplete="email" maxLength={255} value={email} onChange={event => setEmail(event.target.value)} /><p id="consent-email-help" className="text-sm text-muted-foreground">We’ll email your consent copy, welcome and next steps here.</p></div>
         <div className="space-y-2"><Label htmlFor="updates-phone">Phone (optional)</Label><Input id="updates-phone" type="tel" autoComplete="tel" maxLength={30} value={phone} onChange={event => setPhone(event.target.value)} /></div>
-        <Button className="min-h-12 w-full" type="submit" disabled={busy}>{busy ? "Saving…" : "Accept"}</Button>
+        <Button className="min-h-12 w-full" type="submit" disabled={busy}>{busy ? "Saving…" : "Save contact details"}</Button>
       </fieldset>
-    </form> : <p role="status" className="text-center">Updates enabled. We’ll email your consent copy and next steps once your ticket details are confirmed.</p>}
+    </form> : <p role="status" className="text-center">We’ll email your consent copy and next steps once your ticket details are confirmed. Payment is required before we begin work.</p>}
     {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
     {needsOwner && <div className="space-y-3 rounded-xl border p-[16px]">
       <Label htmlFor="checkout-owner">Before paying for this camera notice, was the vehicle registered to you on the offence date?</Label>

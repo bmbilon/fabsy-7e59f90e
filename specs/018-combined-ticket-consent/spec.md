@@ -8,13 +8,15 @@ Above the picker, keep “How to properly capture an image of your ticket” col
 
 The homepage embeds the same upload-and-consent form in its hero, including the post-submission contact screen. The free assessment tool sits below the comparison and outcome sections. Embedded form headings use level two and preserve homepage anchor scrolling. The homepage mobile shortcut links to the upload form.
 
-Save the private ticket and affirmative consent before showing “Success, Your ticket has been received”. The success screen then presents “Provide me with updates”, an email field, a phone field and an Accept button. Either contact method, or both, is accepted. A contact-save failure must leave the ticket receipt intact and retry only the contact save.
+Save the private ticket and affirmative consent, then show “Contact information required” with a visible alert: “Your submission is incomplete. Please provide your email address. We cannot contact you or proceed with your submission without it.” Keep the current required email and optional phone fields, using “Save contact details”. Show “Ticket and contact details received” only after the contact save succeeds; payment remains required before work begins. A contact-save failure must keep the warning and ticket receipt intact and retry only the contact save.
 
 Preserve React/TypeScript, private Supabase storage, existing service prices and checkout authorization. Do not infer consent from file selection, OCR, cached data or a previous ticket. Do not invent names, licence numbers, emails, signatures or ownership answers.
 
 ## Clarifications resolved
 
 Brett explicitly removed all identity/contact questions from the upload screen and selected email and/or phone collection after a successful receipt. This supersedes the earlier implementation's required name, email, phone, ticket number and DL. No customer-entered DL or DOB is required in the new flow.
+
+The subsequent consent-welcome release requires email for delivery of the consent copy and next steps. Brett then requested an explicit warning for submissions without contact details. Contact collection stays after upload, with an immediate incomplete-submission warning until the required email is saved. Phone remains optional.
 
 The consent is the submitter's electronic acceptance for the person identified on the attached ticket. The record binds the acceptance to the submission ID, private ticket path, exact wording/version and server timestamp. It records an identity awaiting review rather than a fabricated typed signature. Existing prescribed-government-form invitations and localized typed-consent journeys remain available.
 
@@ -28,6 +30,7 @@ OCR runs after receipt, using a [Supabase background task](https://supabase.com/
 - [x] Prepare provisional records atomically with a private capability and stable retry identity.
 - [x] Save the file and accurate consent PDF before returning success; keep OCR out of the critical path.
 - [x] Collect email and/or phone on the confirmation screen without resubmitting the ticket.
+- [x] Show an incomplete-submission warning until the required email is saved, including after a failed save.
 - [x] Process readable fields in the background and mark missing/uncertain details for staff follow-up.
 - [x] Expose received unpaid photo submissions in case management, with missing-data labels.
 - [x] Preserve checkout verification and require a real ownership answer for camera notices before payment.
@@ -37,7 +40,7 @@ OCR runs after receipt, using a [Supabase background task](https://supabase.com/
 
 The short flow currently serves English. Existing localized journeys retain their reviewed-language gate. Existing manual invitations retain actual typed signatures.
 
-Consent succeeds independently of scanning, contact collection and payment. Checkout is available after extracted name, ticket number and type are ready and an email has been provided. A camera ownership question is deferred until checkout. Phone-only receipts and tickets that need manual clarification remain received cases for staff follow-up; they do not open an unverified checkout. Existing post-payment pro-driver verification remains available; its optional pre-upload fields were removed with the rest of the details section.
+Consent succeeds independently of scanning, contact collection and payment. Checkout is available after extracted name, ticket number and type are ready and an email has been provided. A camera ownership question is deferred until checkout. A phone number alone does not complete the contact step. Tickets that need manual clarification remain received cases for staff follow-up; they do not open an unverified checkout. Existing post-payment pro-driver verification remains available; its optional pre-upload fields were removed with the rest of the details section.
 
 ## Release verification — 2026-09-20
 

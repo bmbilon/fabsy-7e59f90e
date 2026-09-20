@@ -299,8 +299,8 @@ test("one click saves a photo and consent without sending invented or cached ide
   assert.equal(body.consent.accepted, true); assert.equal(body.consent.method, "checkbox");
   for (const key of ["firstName", "lastName", "email", "phone", "driversLicense", "ticketNumber", "ticket_type"]) assert.equal(body[key], undefined);
   assert.equal(app.saves[2].body.digitalSignature, undefined);
-  assert.match(app.document.body.textContent, /Success, Your ticket has been received/);
-  assert.ok(app.field("updates-email")); assert.ok(app.field("updates-phone")); assert.ok(app.button("Accept"));
+  assert.match(app.document.body.textContent, /Contact information required/);
+  assert.ok(app.field("updates-email")); assert.ok(app.field("updates-phone")); assert.ok(app.button("Save contact details"));
 });
 
 test("unchecking not guilty still accepts intake and submits explicit false", async t => {
@@ -333,34 +333,42 @@ test("PDFs can submit without names, ticket numbers, DL, DOB or a successful sca
   await app.choose(app.file("ticket.pdf", "application/pdf")); await app.accept();
   await app.api.click(app.button("Submit ticket and consent")); await app.flush();
   assert.equal(app.requests.length, 0);
-  assert.match(app.document.body.textContent, /Success, Your ticket has been received/);
+  assert.match(app.document.body.textContent, /Contact information required/);
 });
 
-test("the contact form requires email and accepts an optional phone after success", async t => {
+test("the contact form requires email and accepts an optional phone before showing success", async t => {
   for (const values of [{ email: "alex@example.test", phone: "" }, { email: "alex@example.test", phone: "4035550123" }]) {
     await t.test(JSON.stringify(values), async st => {
       const app = await runtime(st);
       await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
       if (values.email) await app.edit("updates-email", values.email);
       if (values.phone) await app.edit("updates-phone", values.phone);
-      await app.api.click(app.button("Accept")); await app.flush();
+      await app.api.click(app.button("Save contact details")); await app.flush();
       const contact = app.saves.find(x => x.name === "contact");
       assert.equal(contact.body.email, values.email); assert.equal(contact.body.phone, values.phone);
-      assert.match(app.document.body.textContent, /Updates enabled/);
+      assert.match(app.document.body.textContent, /Ticket and contact details received/);
+      assert.equal(app.document.getElementById("contact-required"), null);
+      assert.match(app.document.body.textContent, /Payment is required before we begin work/);
       assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
       assert.equal(app.saves.filter(x => x.name === "generate-consent-form").length, 1);
     });
   }
 });
 
-test("blank or phone-only contact details do not erase a completed submission", async t => {
+test("missing email immediately warns that the submission is incomplete", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
-  await app.api.click(app.button("Accept")); await app.flush();
+  const warning = app.document.getElementById("contact-required");
+  assert.equal(warning.getAttribute("role"), "alert");
+  assert.match(warning.textContent, /Your submission is incomplete/);
+  assert.match(warning.textContent, /cannot contact you or proceed with your submission without it/);
+  assert.match(app.field("updates-email").getAttribute("aria-describedby"), /contact-required/);
+  assert.doesNotMatch(app.document.body.textContent, /Success|Ticket and contact details received/);
+  await app.api.click(app.button("Save contact details")); await app.flush();
   assert.equal(app.field("updates-email").required, true);
   assert.equal(app.field("updates-email").validity.valueMissing, true);
   await app.edit("updates-phone", "4035550123");
-  await app.api.click(app.button("Accept")); await app.flush();
+  await app.api.click(app.button("Save contact details")); await app.flush();
   assert.equal(app.field("updates-email").validity.valueMissing, true);
   assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
   assert.equal(app.saves.filter(x => x.name === "contact").length, 0);
@@ -370,11 +378,13 @@ test("failed contact save keeps the receipt and retries only contact details", a
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
   await app.edit("updates-email", "alex@example.test"); app.failContact(true);
-  await app.api.click(app.button("Accept")); await app.flush();
+  await app.api.click(app.button("Save contact details")); await app.flush();
   assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
+  assert.match(app.document.body.textContent, /Contact information required/);
+  assert.doesNotMatch(app.document.body.textContent, /Ticket and contact details received/);
   assert.equal(app.field("updates-email").value, "alex@example.test");
-  app.failContact(false); await app.api.click(app.button("Accept")); await app.flush();
-  assert.match(app.document.body.textContent, /Updates enabled/);
+  app.failContact(false); await app.api.click(app.button("Save contact details")); await app.flush();
+  assert.match(app.document.body.textContent, /Ticket and contact details received/);
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
 });
 
@@ -405,7 +415,7 @@ test("failed consent never shows success and retry uses the same ticket", async 
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); app.failConsent(true);
   await app.api.click(app.button("Submit ticket and consent")); await app.flush();
-  assert.doesNotMatch(app.document.body.textContent, /Success, Your ticket has been received/);
+  assert.doesNotMatch(app.document.body.textContent, /Contact information required/);
   assert.equal(app.field("quick-consent").checked, true);
   app.failConsent(false); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
@@ -431,7 +441,7 @@ test("cached and handoff consent never precheck the box", async t => {
 test("checkout reuses the completed upload after contact details and background extraction are ready", async t => {
   const app = await runtime(t); app.readyForPayment();
   await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
-  await app.edit("updates-email", "alex@example.test"); await app.api.click(app.button("Accept")); await app.flush();
+  await app.edit("updates-email", "alex@example.test"); await app.api.click(app.button("Save contact details")); await app.flush();
   assert.equal(app.document.getElementById("payment-terms"), null);
   await app.api.click(app.button("Continue to Stripe for $198.00 CAD plus GST")); await app.flush();
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
