@@ -121,6 +121,11 @@ export function ticketIntakeResumeUrl(
   if (!DRAFT_ACCESS_TOKEN_PATTERN.test(accessToken)) {
     throw new Error("The draft access capability is invalid.");
   }
+  if (accessToken.startsWith("c1.")) {
+    const url = new URL("/complete-ticket", `${siteOrigin(configuredSiteUrl)}/`);
+    url.hash = new URLSearchParams({ access: accessToken }).toString();
+    return url.toString();
+  }
   const locale = parsePreferredLocale(preferredLocale);
   const url = new URL(
     localizedPublicPath(locale, "/submit-ticket"),

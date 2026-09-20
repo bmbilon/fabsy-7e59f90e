@@ -1,3 +1,5 @@
+import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
+import { intakeAccessTokenHash, INTAKE_ACCESS_TOKEN_PATTERN } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { decodeLicenceImage, readProLicence, sha256Pro } from "../_shared/pro-licence.ts";
@@ -49,8 +51,8 @@ serve(async (req) => {
     if (error) throw error;
     const client = Array.isArray(order?.clients) ? order.clients[0] : order?.clients;
     let authorized = false;
-    if (order && typeof body.accessToken === "string" && /^[a-f0-9]{32,128}$/i.test(body.accessToken)) {
-      authorized = await sha256Pro(body.accessToken) === order.representation_access_token_hash;
+    if (order && typeof body.accessToken === "string" && (/^[a-f0-9]{32,128}$/i.test(body.accessToken) || INTAKE_ACCESS_TOKEN_PATTERN.test(body.accessToken))) {
+      authorized = await intakeAccessTokenHash(body.accessToken, ticketCompletionSecret(), order.id) === order.representation_access_token_hash;
     }
     if (!authorized && order) {
       const bearer = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || "";

@@ -49,6 +49,8 @@ interface PaymentStepProps {
   formData: FormData;
   updateFormData: (updates: Partial<FormData>) => void;
   intakeDraft?: IntakeDraftCapability | null;
+  storedConsent?: boolean;
+  completionFlow?: boolean;
 }
 
 class CheckoutFailure extends Error {
@@ -70,7 +72,7 @@ async function functionErrorDetails(error: unknown, fallback: string): Promise<{
   return { message: error instanceof Error && error.message ? error.message : fallback };
 }
 
-export default function PaymentStep({ formData, updateFormData, intakeDraft = null }: PaymentStepProps) {
+export default function PaymentStep({ formData, updateFormData, intakeDraft = null, storedConsent = false, completionFlow = false }: PaymentStepProps) {
   const { t } = useTranslation();
   const { locale, isReleased, href } = useLocale();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -235,16 +237,18 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
           if (licencePhoto) toast({ title: "Continuing at full price", description: fullPriceNotice });
         }
       }
-      const { data: consent, error: consentError } = await supabase.functions.invoke("generate-consent-form", {
-        body: {
-          submissionId,
-          accessToken: representationAccessToken,
-          digitalSignature: formData.digitalSignature,
-        },
-      });
-      if (consentError || !consent?.success || !consent?.consentFormPath) {
-        const detail = await functionErrorDetails(consentError, "Your signed consent form could not be stored. Please try again.");
-        throw new CheckoutFailure(detail.message, detail.code === 'consent_character_not_supported' ? 'intake.validation.consentCharacter' : undefined);
+      if (!storedConsent) {
+        const { data: consent, error: consentError } = await supabase.functions.invoke("generate-consent-form", {
+          body: {
+            submissionId,
+            accessToken: representationAccessToken,
+            digitalSignature: formData.digitalSignature,
+          },
+        });
+        if (consentError || !consent?.success || !consent?.consentFormPath) {
+          const detail = await functionErrorDetails(consentError, "Your signed consent form could not be stored. Please try again.");
+          throw new CheckoutFailure(detail.message, detail.code === 'consent_character_not_supported' ? 'intake.validation.consentCharacter' : undefined);
+        }
       }
 
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("create-payment", {
@@ -255,6 +259,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
           accessToken: representationAccessToken,
           ...(intakeDraft ? { draftId: intakeDraft.draftId } : {}),
           includeIdrAddon,
+          ...(completionFlow ? { completionFlow: true } : {}),
           funnelMeasurement: currentFunnelCheckoutContext(),
           ...(!isPhotoRadar ? { metaMeasurement: currentMetaCheckoutContext() } : {}),
           ...(includeIdrAddon ? { idrOrderId } : {}),

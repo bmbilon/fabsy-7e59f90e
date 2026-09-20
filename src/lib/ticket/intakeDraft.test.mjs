@@ -196,10 +196,11 @@ test("ambiguous save recovery accepts only the exact committed next revision", (
 });
 
 test("Stripe cancellation returns only an opaque draft id, never a bearer capability", () => {
-  const cancelUrl = createPaymentSource.split("\n").find(line => line.includes("cancel_url:"));
+  const cancelUrl = createPaymentSource.match(/cancel_url:[\s\S]*?(?=\n\s*[a-z_]+:)/)?.[0];
   assert.ok(cancelUrl, "create-payment must define an explicit cancellation URL");
   assert.match(cancelUrl, /\?draft=/);
   assert.match(cancelUrl, /draftId/);
+  assert.match(cancelUrl, /complete-ticket/);
   assert.doesNotMatch(cancelUrl, /accessToken|capability|resume=/i);
 });
 

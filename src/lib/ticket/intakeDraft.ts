@@ -1,3 +1,4 @@
+import { INTAKE_ACCESS_TOKEN_PATTERN } from "../../../supabase/functions/_shared/ticket-completion";
 import { supabase } from "@/integrations/supabase/client";
 import { calendarDateAsLocalDate } from "@/lib/ticket/ticketType";
 
@@ -6,7 +7,7 @@ export const INTAKE_DRAFT_PENDING_ROTATION_STORAGE_KEY =
   "fabsy.ticket-intake-pending-rotation.v1";
 export const INTAKE_DRAFT_RESUME_PARAMETER = "resume";
 
-const ACCESS_TOKEN_PATTERN = /^[a-f0-9]{64}$/;
+const ACCESS_TOKEN_PATTERN = INTAKE_ACCESS_TOKEN_PATTERN;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PENDING_ROTATION_RECOVERY_MS = 31 * 24 * 60 * 60 * 1000;
 
@@ -60,6 +61,7 @@ export type IntakeDraftRecord = {
   hasPendingTicketUpload: boolean;
   status: string;
   expiresAt: string;
+  completion?: { paid: boolean; paymentAvailable: boolean; consentSigned: boolean };
   convertedSubmissionId?: string | null;
   clientId?: string | null;
   resumeDelivery: IntakeDraftResumeDelivery;

@@ -108,6 +108,8 @@ export const EXPECTED_SHARED_FUNCTION_FILES = Object.freeze([
   'supabase/functions/_shared/resend-email.ts',
   'supabase/functions/_shared/returning-client.ts',
   'supabase/functions/_shared/submission-violation.ts',
+  'supabase/functions/_shared/ticket-completion-secret.ts',
+  'supabase/functions/_shared/ticket-completion.ts',
   'supabase/functions/_shared/ticket-intake-draft-cleanup.ts',
   'supabase/functions/_shared/ticket-intake-draft.ts',
   'supabase/functions/_shared/ticket-intake-resume-delivery.ts',

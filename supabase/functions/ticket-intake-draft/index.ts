@@ -1,3 +1,5 @@
+import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
+import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import {
@@ -91,9 +93,23 @@ type DraftRow = {
   resume_delivery_failure_code: ResumeDeliveryFailureCode | null;
 };
 
+type CompletionSubmission = {
+  id: string; status: string; consent_form_path: string | null;
+  representation_paid_at: string | null; deleted_at: string | null;
+  representation_access_token_hash: string;
+};
+
 type AdminDatabase = {
   public: {
     Tables: {
+      idr_checkout_intents: {
+        Row: { ticket_submission_id: string; status: string; checkout_kind: string };
+        Insert: never; Update: never; Relationships: [];
+      };
+      ticket_submissions: {
+        Row: CompletionSubmission; Insert: Partial<CompletionSubmission>;
+        Update: Partial<CompletionSubmission>; Relationships: [];
+      };
       ticket_intake_drafts: {
         Row: DraftRow;
         Insert: Partial<DraftRow>;
@@ -302,13 +318,13 @@ async function activeDraft(
 ): Promise<{ row: DraftRow; accessToken: string; accessTokenHash: string }> {
   const accessToken = parseDraftAccessToken(body.accessToken);
   const draftId = parseOptionalDraftId(body.draftId);
-  const accessTokenHash = await sha256Hex(accessToken);
+  const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), typeof body.draftId === "string" ? body.draftId : undefined);
   let query = admin
     .from("ticket_intake_drafts")
     .select(
       "id,access_token_hash,email,phone,preferred_locale,alberta_confirmed,contact_permission,draft_data,current_step,completed_step,revision,status,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,pending_ticket_document_path,pending_ticket_document_content_type,pending_ticket_document_size_bytes,converted_submission_id,client_id,expires_at,resume_delivery_status,resume_delivery_generation,resume_delivery_channel,resume_delivery_claim_id,resume_delivery_claimed_at,resume_delivery_claim_expires_at,resume_delivery_attempted_at,resume_delivery_sent_at,resume_delivery_failed_at,resume_delivery_attempt_count,resume_delivery_lifetime_attempt_count,resume_delivery_failure_code",
     )
-    .eq("access_token_hash", accessTokenHash);
+    .eq("access_token_hash", accessTokenHash).is("deleted_at", null);
   if (draftId) query = query.eq("id", draftId);
   const { data, error } = await query.maybeSingle();
   if (error) throw new Error("Draft lookup failed.");
@@ -355,7 +371,7 @@ async function activeDraftForSave(
     body.replacementAccessToken,
     accessToken,
   );
-  const accessTokenHash = await sha256Hex(accessToken);
+  const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), typeof body.draftId === "string" ? body.draftId : undefined);
   const replacementAccessTokenHash = replacement.clientRetained
     ? await sha256Hex(replacement.accessToken)
     : null;
@@ -699,8 +715,23 @@ async function createDraft(
 
 async function readDraft(admin: SupabaseAdmin, body: JsonRecord) {
   assertAllowedKeys(body, ["action", "draftId", "accessToken"]);
-  const { row } = await activeDraft(admin, body);
-  return responseForDraft(row);
+  const { row, accessTokenHash } = await activeDraft(admin, body);
+  if (row.status !== "converted") return responseForDraft(row);
+  const { data: submission, error } = await admin.from("ticket_submissions")
+    .select("id,status,consent_form_path,representation_paid_at,deleted_at,representation_access_token_hash")
+    .eq("id", row.converted_submission_id || row.id)
+    .eq("representation_access_token_hash", accessTokenHash).is("deleted_at", null).maybeSingle();
+  if (error) throw new Error("The existing case could not be read.");
+  if (!submission) throw new DraftStateError("This ticket is no longer available. Contact Fabsy for help.", 404, "draft_not_found");
+  const { data: paidIntent, error: paymentError } = await admin.from("idr_checkout_intents")
+    .select("status").eq("ticket_submission_id", row.id).eq("status", "paid")
+    .in("checkout_kind", ["ticket_only", "ticket_with_addon", "photo_radar"]).limit(1).maybeSingle();
+  if (paymentError) throw new Error("The payment status could not be read.");
+  return { ...responseForDraft(row), completion: {
+    paid: Boolean(submission.representation_paid_at) || Boolean(paidIntent),
+    paymentAvailable: submission.status === "awaiting_payment" && !submission.representation_paid_at,
+    consentSigned: submission.consent_form_path === `${row.id}/consent-form-${accessTokenHash.slice(0, 16)}.pdf`,
+  } };
 }
 
 async function saveDraft(
