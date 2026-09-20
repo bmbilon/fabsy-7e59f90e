@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Hero from "@/components/Hero";
+import InstantTicketAssessment from "@/components/InstantTicketAssessment";
 import HomepageComparison from "@/components/HomepageComparison";
 import HomepageOutcomeExplorer from "@/components/HomepageOutcomeExplorer";
 import RapidResolutionGuarantee from "@/components/RapidResolutionGuarantee";
@@ -59,6 +60,9 @@ const Index = () => {
       <Hero />
       <HomepageComparison />
       <HomepageOutcomeExplorer />
+      <section aria-label="Free ticket assessment" className="bg-slate-100 px-5 py-16 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-2xl"><InstantTicketAssessment /></div>
+      </section>
       <RapidResolutionGuarantee />
       <AssessmentHomepageJourney />
       <TicketGuides />

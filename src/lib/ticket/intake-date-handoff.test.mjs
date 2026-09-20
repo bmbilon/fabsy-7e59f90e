@@ -25,10 +25,12 @@ try {
   const outfile = path.join(temporary, "TicketForm.mjs");
   const mocks = {
     "@/i18n/locale-context": `export const useLocale = () => ({ locale: "en", setIntakeHandoff: globalThis.__intakeDateTest.setIntakeHandoff });`,
+    "@/lib/ticket/intakeDraft": "export const resumeTokenFromHash = () => null;",
     "@/hooks/use-toast": `export const useToast = () => ({ toast: globalThis.__intakeDateTest.toast });`,
     "@/hooks/useTicketIntakeDraft": `export const useTicketIntakeDraft = () => ({ capability: null, record: null, status: "idle", error: "", hasUploadedTicket: false, createContact: async () => null, createOrUpload: async () => null, save: async () => null, getResumeUrl: () => null });`,
     "@/lib/referrals/capture": `export const readActiveReferral = () => null; export const captureReferralFromLocation = async () => null; export const captureReferralCode = async () => null; export const clearReferralAttribution = () => {}; export const REFERRAL_ATTRIBUTION_EVENT = "test-referral-event";`,
     "./form-steps/TicketDetailsStep": `export default function TicketDetailsStep(props) { globalThis.__intakeDateTest.details = props; return null; }`,
+    "./PhotoTicketForm": "export default function TestPhotoIntake() { return null; }",
     "./TicketCapture": "export default function TestLocalTicketSelection() { return null; }",
     ...Object.fromEntries(["PersonalInfoStep", "DefenseStep", "ConsentStep", "PaymentStep", "ReviewStep"].map(name => [`./form-steps/${name}`, "export default function TestStep() { return null; }"])),
     "./LocalizedTicketJourney": "export default function TestLocalizedStep() { return null; }",
@@ -49,7 +51,7 @@ try {
   const { act, createElement } = await import("react");
   const { createRoot } = await import("react-dom/client");
   const { MemoryRouter } = await import("react-router-dom");
-  const { default: TicketForm } = await import(pathToFileURL(outfile).href);
+  const { LegacyTicketForm: TicketForm } = await import(pathToFileURL(outfile).href);
   const day = date => date && `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   const mount = async (props = {}, fixture = {}) => {
     localStorage.clear();

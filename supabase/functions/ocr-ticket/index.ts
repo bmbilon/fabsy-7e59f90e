@@ -31,7 +31,7 @@ serve(async (req) => {
       ? imageBase64 
       : `data:image/jpeg;base64,${imageBase64}`;
 
-    console.log("Processing image with URL format:", imageUrl.substring(0, 50) + "...");
+    console.log("Processing ticket image");
 
     // Call Gemini vision model to extract ticket data
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -50,6 +50,11 @@ serve(async (req) => {
                 type: "text",
                 text: `Extract information from this traffic ticket image. Return the data in JSON format with these fields:
 - ticketNumber: the ticket or violation number
+- firstName, lastName: the charged person or registered owner's printed legal name, never the officer's name
+- driversLicense: the printed driver's licence number (not a plate number)
+- dateOfBirth: printed date of birth in YYYY-MM-DD format
+- address, city, postalCode: the charged person or registered owner's printed mailing address
+- plateNumber: printed vehicle licence plate
 - issueDate: date in YYYY-MM-DD format
 - offenceDate: the explicitly labelled offence/violation date in YYYY-MM-DD format; never substitute the issue date, certificate date, mailing date or payment deadline (return null when not visible)
 - location: location where violation occurred
@@ -64,6 +69,8 @@ serve(async (req) => {
 - ownerNoticeWording: exact visible words identifying registered-owner liability (for example "Owner of Motor Vehicle Involved in..." or "160(1)"), otherwise null
 - mailedNoticeFormat: true only when the document visibly has the mailed registered-owner notice format, otherwise null
 - automatedEnforcementNotice: true only when the document visibly identifies automated enforcement/photo radar/an intersection safety camera, otherwise null
+- officerIssuedFormat: true only when this is visibly an officer-issued violation ticket, otherwise null
+- vehicleSeized: true only when this ticket explicitly says the vehicle was seized or impounded, otherwise null
 
 Do not classify an officer-issued red-light or speeding ticket as an owner notice just because of the offence name. Copy document evidence; do not invent ownership, mailing dates or legal eligibility.
 
@@ -87,6 +94,14 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
               parameters: {
                 type: "object",
                 properties: {
+                  firstName: { type: "string", nullable: true },
+                  lastName: { type: "string", nullable: true },
+                  driversLicense: { type: "string", nullable: true },
+                  dateOfBirth: { type: "string", nullable: true },
+                  address: { type: "string", nullable: true },
+                  city: { type: "string", nullable: true },
+                  postalCode: { type: "string", nullable: true },
+                  plateNumber: { type: "string", nullable: true },
                   ticketNumber: { type: "string", nullable: true },
                   issueDate: { type: "string", nullable: true },
                   offenceDate: { type: "string", nullable: true },
@@ -102,6 +117,8 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
                   ownerNoticeWording: { type: "string", nullable: true },
                   mailedNoticeFormat: { type: "boolean", nullable: true },
                   automatedEnforcementNotice: { type: "boolean", nullable: true },
+                  officerIssuedFormat: { type: "boolean", nullable: true },
+                  vehicleSeized: { type: "boolean", nullable: true },
                 },
                 required: [],
                 additionalProperties: false,
@@ -156,7 +173,17 @@ If any field is not clearly visible, set it to null. Be as accurate as possible.
         ...detectOwnerNotice(extractedData),
         owner_notice_wording: extractedData.ownerNoticeWording ?? null,
         mailed_notice_format: extractedData.mailedNoticeFormat === true,
+        officer_issued_format: extractedData.officerIssuedFormat === true,
+        vehicle_seized: extractedData.vehicleSeized === true,
         // Canonical fields used by the form
+        firstName: extractedData.firstName ?? null,
+        lastName: extractedData.lastName ?? null,
+        driversLicense: extractedData.driversLicense ?? null,
+        dateOfBirth: extractedData.dateOfBirth ?? null,
+        address: extractedData.address ?? null,
+        city: extractedData.city ?? null,
+        postalCode: extractedData.postalCode ?? null,
+        plateNumber: extractedData.plateNumber ?? null,
         ticketNumber: extractedData.ticketNumber ?? null,
         issueDate: extractedData.issueDate ?? null,
         offenceDate: extractedData.offenceDate ?? null,

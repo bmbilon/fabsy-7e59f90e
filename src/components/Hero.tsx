@@ -1,5 +1,5 @@
 import { ArrowDown, FileCheck2, ShieldCheck, Upload } from "lucide-react";
-import InstantTicketAssessment from "@/components/InstantTicketAssessment";
+import TicketForm from "@/components/TicketForm";
 import { RAPID_RESOLUTION } from "@/config/offers";
 import { HOMEPAGE_REFUND_COPY } from "@/content/homepageRefundCopy";
 
@@ -27,7 +27,7 @@ const Hero = () => (
       </div>
 
       <div className="mx-auto mt-8 grid max-w-6xl items-start gap-10 lg:mt-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
-        <InstantTicketAssessment />
+        <div className="min-w-0"><TicketForm embedded /></div>
         <div className="min-w-0 lg:pt-7">
           <figure className="mx-auto w-full max-w-[336px] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950">
             <img

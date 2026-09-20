@@ -16,6 +16,8 @@ import { TICKET_ASSESSMENT } from "@/config/ticketAssessment";
 import { AtePilotMetrics } from "@/components/AteCaseReview";
 
 interface TicketSubmission {
+  intake_mode: string;
+  consent_form_path: string | null;
   id: string;
   first_name: string;
   last_name: string;
@@ -159,7 +161,7 @@ export default function AdminCaseManagement() {
   }, [userRole]);
 
   const activeSubmissions = submissions.filter(sub => !sub.deleted_at &&
-    !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status));
+    (sub.intake_mode === 'photo_only' && Boolean(sub.consent_form_path) || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)));
   const viewSubmissions = ticketView === "deleted" ? submissions.filter(sub => sub.deleted_at) : activeSubmissions;
   const query = searchQuery.trim().toLowerCase();
   const filteredSubmissions = viewSubmissions.filter(sub =>
@@ -218,6 +220,8 @@ export default function AdminCaseManagement() {
 
       const transformedData = data?.map((sub): TicketSubmission => ({
         id: sub.id,
+        intake_mode: sub.intake_mode,
+        consent_form_path: sub.consent_form_path,
         first_name: sub.clients?.first_name || sub.first_name || '',
         last_name: sub.clients?.last_name || sub.last_name || '',
         email: sub.clients?.email || sub.email || '',
@@ -240,7 +244,7 @@ export default function AdminCaseManagement() {
         setIntakeLeads([]);
         setIntakeLeadError('Incomplete intakes could not be loaded. Existing submitted cases remain available below.');
       } else {
-        const managedCaseIds = new Set(transformedData.filter(sub => sub.deleted_at || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)).map(submission => submission.id));
+        const managedCaseIds = new Set(transformedData.filter(sub => sub.deleted_at || (sub.intake_mode === 'photo_only' && Boolean(sub.consent_form_path) || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status))).map(submission => submission.id));
         setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
           (lead.id === selectedIntakeId || Boolean(lead.deleted_at) || lead.expires_at > new Date().toISOString()) &&
           (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
@@ -603,7 +607,7 @@ export default function AdminCaseManagement() {
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-3 mb-2">
                             <h3 className="font-semibold text-lg">
-                              {submission.first_name} {submission.last_name}
+                              {[submission.first_name, submission.last_name].filter(Boolean).join(' ') || 'Ticket awaiting review'}
                             </h3>
                             {getStatusBadge(submission.status)}
                             {submission.ticket_type === 'photo_radar' && <Badge variant="secondary">Photo Radar · $79 · ATE</Badge>}
@@ -614,7 +618,7 @@ export default function AdminCaseManagement() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
                             <p className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /> {submission.email}</p>
                             <p className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" /> {submission.phone}</p>
-                            <p className="flex items-center gap-2"><Ticket className="h-4 w-4 shrink-0" aria-hidden="true" /> Ticket: {submission.ticket_number}</p>
+                            <p className="flex items-center gap-2"><Ticket className="h-4 w-4 shrink-0" aria-hidden="true" /> Ticket: {submission.ticket_number || 'Not yet read'}</p>
                             <p className="flex items-center gap-2"><DollarSign className="h-4 w-4 shrink-0" aria-hidden="true" /> Fine: ${submission.fine_amount}</p>
                           </div>
                           <p className="text-sm mt-2">

@@ -23,9 +23,9 @@ const price = `${heroPrice} · Paid upfront; refunded if the policy applies`;
 const policyAnchor = '#money-back-guarantee';
 
 const SOURCE_BINDINGS = {
-  'src/pages/Index.tsx': ['<Hero />', '<HomepageOutcomeExplorer />', '<RapidResolutionGuarantee />', '<AssessmentHomepageJourney />'],
+  'src/pages/Index.tsx': ['<Hero />', '<HomepageOutcomeExplorer />', '<InstantTicketAssessment />', '<RapidResolutionGuarantee />', '<AssessmentHomepageJourney />'],
   'src/content/homepageRefundCopy.ts': [`headline: "${heroHeadline}"`, `headlineAccent: "${heroHeadlineAccent}"`, `heroSupport: "${heroSupport}"`, 'refundCondition: FEE_REFUND.condition', 'declinedOfferDisclaimer: FEE_REFUND.declinedOfferText', 'paymentTiming: FEE_REFUND.payment', 'termsPath: FEE_REFUND.termsPath'],
-  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.headlineAccent}', '{HOMEPAGE_REFUND_COPY.heroSupport}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '<InstantTicketAssessment />'],
+  'src/components/Hero.tsx': ['aria-labelledby="homepage-hero-heading"', '{HOMEPAGE_REFUND_COPY.headline}', '{HOMEPAGE_REFUND_COPY.headlineAccent}', '{HOMEPAGE_REFUND_COPY.heroSupport}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '<TicketForm embedded />'],
   'src/components/RapidResolutionGuarantee.tsx': ['id="money-back-guarantee"', '{HOMEPAGE_REFUND_COPY.successDefinition}', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.refundCondition}', '{HOMEPAGE_REFUND_COPY.paymentTiming}', '{HOMEPAGE_REFUND_COPY.refundScope}', 'to={HOMEPAGE_REFUND_COPY.termsPath}'],
   'src/components/HomepageOutcomeExplorer.tsx': ['aria-labelledby="homepage-outcomes-heading"', '{HOMEPAGE_REFUND_COPY.declinedOfferDisclaimer}', '{HOMEPAGE_REFUND_COPY.outcomeQualification}'],
   'src/components/AssessmentHomepageJourney.tsx': ['aria-labelledby="homepage-pricing-heading"', '{RAPID_RESOLUTION.speedDisclaimer}', '<InsuranceContextSection />', '<ProDriverSection />', '<HomepageDriverSection />'],
@@ -131,7 +131,19 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   field(hero, 'p', heroPrice, 'Rapid Resolution price and GST');
   field(hero, 'p', 'For eligible Alberta pre-trial matters. Government fines and trial representation are separate. How the service-fee refund works',
     'hero scope and policy destination', [[policyAnchor, 'How the service-fee refund works']]);
-  const assessment = hero.querySelector('#instant-ticket-assessment');
+  const upload = hero.querySelector('#ticket-form-container');
+  if (upload) {
+    const submit = upload.querySelector('button[type="submit"]');
+    const guide = upload.querySelector('details');
+    const valid = main.querySelectorAll('#ticket-form-container').length === 1 && visible(upload)
+      && compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket.'
+      && guide && !guide.open && compact(guide.querySelector('summary')?.textContent) === 'Howtoproperlycaptureanimageofyourticket'
+      && upload.querySelectorAll('input[type="file"]').length === 0
+      && upload.querySelectorAll('input:not([type="file"]),select,textarea').length === 0
+      && submit && visible(submit) && submit.disabled && compact(submit.textContent) === 'Submitticketandconsent';
+    if (!valid) issues.push('Homepage upload must retain its empty photo-only form, collapsed capture guide and disabled submit');
+  }
+  const assessment = main.querySelector('#instant-ticket-assessment');
   if (assessment) {
     // Only admit the exact empty calculator form. User-specific result ranges
     // are never a crawler snapshot and cannot inherit this admission.
@@ -144,7 +156,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
       Instant Ticket Assessment Free · No email or payment required`;
     const fields = ['offence', 'fine', 'demerits', 'record', 'premium'].map(name => assessment.querySelector(`#assessment-${name}`));
     const submit = assessment.querySelector('button[type="submit"][data-funnel-action="primary_cta"][data-funnel-position="hero"]');
-    const valid = hero.querySelectorAll('#instant-ticket-assessment').length === 1 && visible(assessment)
+    const valid = main.querySelectorAll('#instant-ticket-assessment').length === 1 && visible(assessment)
       && compact(assessment.textContent) === compact(expected)
       && fields.every(node => node && visible(node) && node.required)
       && fields.slice(0, 4).every(node => node.value === '')
@@ -156,7 +168,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
       && submit && visible(submit) && compact(submit.textContent) === 'InstantTicketAssessment';
     if (valid) redactions.add(assessment);
     else issues.push('Homepage instant assessment must retain its exact empty form, configured fees and illustrative premium baseline');
-  } else {
+  } else if (!upload) {
     // Previously generated, unpersonalized homepage snapshots remain valid.
     field(hero, 'a', 'Get help with my ticket', 'Rapid Resolution intake destination', [[offers.rapidResolution.intakePath, 'Get help with my ticket']]);
   }
