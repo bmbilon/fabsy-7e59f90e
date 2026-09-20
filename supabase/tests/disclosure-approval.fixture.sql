@@ -9,7 +9,11 @@ create table public.ticket_submissions(id uuid primary key,client_id uuid refere
   first_name text,last_name text,service_type text default 'representation',status text default 'pending',case_outcome text,
   representation_paid_at timestamptz,ticket_document_path text,consent_form_path text,defense_strategy text,
   intake_mode text,intake_review_status text,intake_consent jsonb,referral_refunded_at timestamptz,
-  referral_disputed_at timestamptz,referral_payment_intent_id text);
+  referral_disputed_at timestamptz,referral_payment_intent_id text,deleted_at timestamptz);
+create table public.ticket_intake_drafts(id uuid primary key,converted_submission_id uuid,deleted_at timestamptz,
+  status text default 'converted',expires_at timestamptz default now()-interval '3 days',cleanup_claim_id uuid);
+create table public.admin_ticket_case_status(kind text,ticket_id uuid,stage text,version integer,
+  updated_at timestamptz default clock_timestamp(),primary key(kind,ticket_id));
 create table public.idr_checkout_intents(ticket_submission_id uuid,client_id uuid,status text,checkout_kind text);
 create table public.referral_payment_holds(payment_intent_id text);
 create table public.idr_orders(ticket_submission_id uuid,stripe_payment_intent_id text);
@@ -19,3 +23,5 @@ insert into public.ticket_submissions(id,client_id,ticket_number,first_name,last
   ticket_document_path,consent_form_path,intake_mode,intake_review_status,intake_consent)
 values('30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','T12345678Z','Fixture','Client',now(),
   'fixture/ticket.pdf','fixture/consent.pdf','photo_only','ready','{"version":"photo-upload-consent-v3","accepted":true,"pleadNotGuilty":true}');
+create function public.test_assert(ok boolean, label text) returns void language plpgsql as $$
+begin if ok is distinct from true then raise exception 'FAILED: %',label; end if; end $$;

@@ -12,6 +12,7 @@ with pagination as (
     regexp_replace(upper(t.ticket_number),'[^A-Z0-9]','','g') as normalized_ticket
   from public.ticket_submissions t
   where t.service_type='representation'
+    and t.deleted_at is null
     and t.status in ('pending','in_progress') and t.case_outcome is null
   order by t.created_at,t.id
   limit (select batch_limit from pagination)
@@ -24,6 +25,12 @@ select t.id as submission_id,t.normalized_ticket as ticket_number,
   t.active_representation_count > (select batch_offset+batch_limit from pagination) as page_has_more,
   concat_ws(' ',c.first_name,c.last_name) as client_name,
   t.created_at,t.status,t.ticket_type,
+  -- Later staff stages stay visible for reconciliation, never automatic refiling.
+  -- This shared resolver includes converted-draft inheritance and version data.
+  public.disclosure_approval_staff_state(t.id) as staff_workflow,
+  (public.disclosure_approval_staff_state(t.id)->'allows_new_request'='true'::jsonb)
+    as staff_workflow_allows_new_request,
+  public.disclosure_approval_case_eligible(t.id) as approval_source_requirements_met,
   to_jsonb(t)->>'intake_mode' as intake_mode,
   to_jsonb(t)->>'intake_review_status' as intake_review_status,
   t.ticket_document_path,t.consent_form_path,

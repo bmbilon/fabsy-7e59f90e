@@ -8,15 +8,25 @@ import unittest
 
 BIN = Path(os.environ.get('DISCLOSURE_TEST_PG_BIN','/opt/homebrew/opt/postgresql@17/bin'))
 FIXTURE = '''
+create role anon;
+create role authenticated;
+create role service_role bypassrls;
+create schema auth;
+create function auth.role() returns text language sql stable as $$ select current_setting('request.jwt.claim.role',true) $$;
 create table clients(id uuid primary key,first_name text,last_name text,email text);
 create table ticket_submissions(
   id uuid primary key,client_id uuid,ticket_number text,created_at timestamptz default now(),
+  first_name text,last_name text,deleted_at timestamptz,
   service_type text default 'representation',status text default 'pending',case_outcome text,
   ticket_type text default 'officer_issued',intake_mode text,intake_review_status text,
   ticket_document_path text,consent_form_path text,defense_strategy text,intake_consent jsonb,
   representation_paid_at timestamptz,referral_refunded_at timestamptz,
   referral_disputed_at timestamptz,referral_payment_intent_id text
 );
+create table ticket_intake_drafts(id uuid primary key,converted_submission_id uuid,deleted_at timestamptz,
+  status text default 'converted',expires_at timestamptz default now()-interval '3 days',cleanup_claim_id uuid);
+create table admin_ticket_case_status(kind text,ticket_id uuid,stage text,version integer,
+  updated_at timestamptz default clock_timestamp(),primary key(kind,ticket_id));
 create table idr_checkout_intents(id uuid primary key,ticket_submission_id uuid,client_id uuid,
   status text,checkout_kind text,stripe_checkout_session_id text);
 create table referral_payment_holds(payment_intent_id text,refunded_at timestamptz,disputed_at timestamptz);
@@ -63,6 +73,10 @@ class CandidateTests(unittest.TestCase):
                        '-o',f"-k {cls.directory} -h '' -p 55479",'-w','start')
             cls.started = True
             cls.sql(FIXTURE)
+            repo = Path(__file__).resolve().parents[2]
+            for migration in ('20260920150000_disclosure_remote_approval.sql',
+                              '20260920213000_disclosure_case_status_guard.sql'):
+                cls.sql((repo/'supabase'/'migrations'/migration).read_text())
             query = Path(__file__).with_name('candidates.sql').read_text().strip().rstrip(';')
             output = cls.sql('BEGIN READ ONLY; select row_to_json(q) from (\n'+query+'\n) q; ROLLBACK;')
             cls.rows = {row['ticket_number']:row for row in map(json.loads,output.splitlines())}
@@ -142,6 +156,44 @@ class CandidateTests(unittest.TestCase):
         self.assertNotIn('Explanation: Synthetic',output)
         for field in ('drivers_license','date_of_birth','disclosure_lookup_value'):
             self.assertNotIn(field,output)
+
+    def changed_rows(self,changes):
+        query = Path(__file__).with_name('candidates.sql').read_text().strip().rstrip(';')
+        output = self.sql('BEGIN; '+changes+'; select row_to_json(q) from (\n'+query+'\n) q; ROLLBACK;')
+        return {row['ticket_number']:row for row in map(json.loads,output.splitlines())}
+
+    def test_deleted_case_is_not_returned_or_counted(self):
+        rows = self.changed_rows("update ticket_submissions set deleted_at=now() where ticket_number='E12345679T'")
+        self.assertNotIn('E12345679T',rows)
+        self.assertEqual(rows['E12345680T']['active_representation_count'],2)
+
+    def test_inherited_later_stage_is_visible_but_blocked(self):
+        rows = self.changed_rows("""
+          insert into ticket_intake_drafts(id,converted_submission_id,deleted_at) values
+            ('60000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000002',now());
+          insert into admin_ticket_case_status(kind,ticket_id,stage,version) values
+            ('draft','60000000-0000-4000-8000-000000000001','disclosure_requested',3)
+        """)
+        row = rows['E12345679T']
+        self.assertEqual(row['staff_workflow']['stage'],'disclosure_requested')
+        self.assertEqual(row['staff_workflow']['version'],3)
+        self.assertFalse(row['staff_workflow_allows_new_request'])
+        self.assertFalse(row['approval_source_requirements_met'])
+
+    def test_canonical_paid_stage_does_not_invent_payment(self):
+        rows = self.changed_rows("""
+          insert into ticket_intake_drafts(id,converted_submission_id,deleted_at) values
+            ('60000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000002',null);
+          insert into admin_ticket_case_status(kind,ticket_id,stage,version) values
+            ('draft','60000000-0000-4000-8000-000000000001','trial_date_set',3),
+            ('submission','20000000-0000-4000-8000-000000000002','paid',4)
+        """)
+        row = rows['E12345679T']
+        self.assertTrue(row['staff_workflow_allows_new_request'])
+        self.assertEqual(row['staff_workflow']['stage'],'paid')
+        self.assertEqual(row['staff_workflow']['sources'][0]['kind'],'submission')
+        self.assertFalse(row['representation_payment_recorded'])
+        self.assertFalse(row['approval_source_requirements_met'])
 
 
 if __name__ == '__main__':

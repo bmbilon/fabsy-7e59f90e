@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-20T15:09:20.701654+00:00",
+  "projectRef": "gcasbisxfrssonllpqrw",
+  "guardSourceCommit": "fd70066e01b635abf597633020dac11d7aa809f7",
+  "migration": {
+    "path": "supabase/migrations/20260920213000_disclosure_case_status_guard.sql",
+    "sha256": "b5d376f746240dbdbe9cf7094cb040ff6e0a1572467c608e33e1569a3978b749",
+    "applied": true,
+    "trackedVersionVerified": true
+  },
+  "readbackVerified": {
+    "deletedEligibility": true,
+    "staffSnapshot": true,
+    "staffConsumeLock": true,
+    "inheritedStaffPurgeRetention": true,
+    "privatePermissions": true
+  },
+  "tests": {
+    "isolatedApprovalSql": "passed",
+    "candidateTests": 9,
+    "peerReview": "passed"
+  },
+  "frontend": {
+    "commit": "1b9e2efa4ecf5c97aab3e2ac1af78f24972ac444",
+    "deploymentId": "dabc90bf-bf52-4140-b0b9-b2300e8be8d0",
+    "workflowRun": "https://github.com/bmbilon/fabsy-7e59f90e/actions/runs/35517844090",
+    "phonePageVerified": true,
+    "privateHeadersVerified": true,
+    "checkboxCheckedAndCanUncheck": true
+  },
+  "productionTestSubmissionsCreated": 0,
+  "smsSentDuringVerification": 0
+}
