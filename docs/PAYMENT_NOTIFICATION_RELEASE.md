@@ -33,8 +33,8 @@ Every newly verified live paid checkout should enqueue an SMS to +14036695353. I
 - [x] Payment producer, outbox, worker and focused identity/deduplication tests.
 - [x] Review live source differences; SMS configuration readiness is part of deployment verification.
 - [x] Validate exact amount, full ticket, fixed recipient, replay handling and uncertain-send behavior.
-- [ ] Deploy affected backend components and confirm active schedule/source parity.
-- [ ] Record deployment evidence and any review holds.
+- [x] Deploy affected backend components and confirm active schedule/source parity.
+- [x] Record deployment evidence and any review holds.
 
 The recipient work and new SMS worker are independent. Existing client recipients are preserved. New payment events produce one outbox record; worker retries cannot create a second possibly accepted message. There is no reason to replay historical payments to demonstrate this feature.
 
@@ -44,8 +44,16 @@ The nine internal-email functions were deployed and then downloaded again: all a
 
 Email checks passed: 43 focused Deno tests, 20 contact/locale/branding tests, five legacy Twilio override tests, the Vapi recording handler integration, and type checks for all nine affected entrypoints. Existing signed-payment measurement, 23 funnel, eight payment/refund ledger, and 16 checkout branding regressions also passed.
 
-Payment SMS deployment verification remains pending until the exact new migration, worker, and signed-payment webhook are published and their live readiness and schedule are confirmed. No historical payment or real outbound test message has been sent.
+Payment SMS is deployed and its live readiness, schedule and source parity are confirmed. No historical payment or real outbound test message was sent.
 
 Payment validation passed: 16 focused Deno tests (nine SMS helpers, three worker HTTP tests, four signed Stripe webhook tests), the actual migration against isolated PostgreSQL with ownership/RLS/replay/claim assertions, and simultaneous claim transactions. Independent review also caught and fixed report purchases on an already-paid ticket: only combined ticket/report checkouts enforce representation-session and included-assessment claims. Separate add-on and linked standalone report payments retain the original representation payment and now enqueue their own payment alert. A conflicting combined checkout remains rejected.
 
 The deployed worker's authenticated readiness check returned HTTP200 through the exact vault-backed cron authentication path and confirmed ownership/SMS capability of the configured Twilio sender without sending a message. An unauthenticated request returned401. The CLI-retrieved service-role credential did not match this function's service credential; scheduled processing uses the separately verified cron secret.
+
+## Production verification — September20,2026
+
+Only migration `20260921010000_payment_sms_notifications.sql` was applied; migration history was explicitly marked applied. Activation was17:32:00.694UTC. Payment worker v1 and Stripe webhook v40 are ACTIVE; the webhook deployment completed17:32:14.456UTC. All21 downloaded TypeScript source instances match payment release commit `affa30712` exactly, including the malformed provider-response guard.
+
+The minute schedule is active. Its17:33UTC invocation recorded a healthy worker with no error. The new outbox is empty, with zero representation, assessment or report payments recorded since activation, so no payment in the deployment interval required reconciliation. Historical payments were not queued.
+
+Operational holds remain deliberate: a missing/ambiguous stored name or full ticket requires staff review; an attempted message with uncertain provider acceptance cannot be automatically resent. Standalone purchases without a ticket are held under the project's ticket-reference rule. Provider acceptance is recorded separately from handset delivery. No claim of a real handset delivery test is made.
