@@ -108,11 +108,11 @@ test('late staff authorization after sign-out cannot restore private inbox', asy
   assert.equal(f.pending.length, 0);
   assert.match(f.document.body.textContent, /Admin sign in/);
 });
-test('admin route and dashboard link exist and new webhooks use their own authentication', () => {
+test('admin route and workspace link exist and new webhooks use their own authentication', () => {
   const app = readFileSync(resolve(root, 'src/App.tsx'), 'utf8');
-  const dashboard = readFileSync(resolve(root, 'src/pages/AdminDashboard.tsx'), 'utf8');
+  const workspace = readFileSync(resolve(root, 'src/components/admin/AdminWorkspace.tsx'), 'utf8');
   assert.match(app, /path="\/admin\/sms"[^\n]+AdminSmsIntake/);
-  assert.match(dashboard, /path: "\/admin\/sms"/);
+  assert.match(workspace, /href: "\/admin\/sms"/);
   const config = readFileSync(resolve(root, 'supabase/config.toml'), 'utf8');
   for (const name of ['sms-vapi-webhook', 'process-sms-intake-emails']) {
     const section = config.split(`[functions.${name}]`)[1]?.split('[')[0];
