@@ -1,3 +1,4 @@
+import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
@@ -53,7 +54,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (!UUID_PATTERN.test(submissionId) || accessToken.length < 32) {
       throw new RequestError("Submission authorization is invalid.", 403);
     }
-    const accessTokenHash = await intakeAccessTokenHash(accessToken, supabaseServiceKey, submissionId);
+    const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), submissionId);
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
       .select("id,first_name,last_name,email,phone,address,city,postal_code,drivers_license,ticket_number,violation,violation_date,status,service_type,preferred_locale,representation_access_token_hash,ticket_type,registered_owner_on_offence_date")

@@ -1,3 +1,4 @@
+import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
@@ -587,7 +588,7 @@ serve(async (req) => {
     if (accessToken.length < 32) {
       throw new RequestError("Submission authorization is invalid.", 403);
     }
-    const accessTokenHash = await intakeAccessTokenHash(accessToken, serviceRoleKey, submissionId);
+    const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), submissionId);
     const customerEmail = requiredString(formData.email, "email", 255)
       .toLowerCase();
     const customerName = `${requiredString(formData.firstName, "firstName", 100)} ${requiredString(formData.lastName, "lastName", 100)}`;

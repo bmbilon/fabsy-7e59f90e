@@ -1,3 +1,4 @@
+import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
@@ -317,7 +318,7 @@ async function activeDraft(
 ): Promise<{ row: DraftRow; accessToken: string; accessTokenHash: string }> {
   const accessToken = parseDraftAccessToken(body.accessToken);
   const draftId = parseOptionalDraftId(body.draftId);
-  const accessTokenHash = await intakeAccessTokenHash(accessToken, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "", typeof body.draftId === "string" ? body.draftId : undefined);
+  const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), typeof body.draftId === "string" ? body.draftId : undefined);
   let query = admin
     .from("ticket_intake_drafts")
     .select(
@@ -370,7 +371,7 @@ async function activeDraftForSave(
     body.replacementAccessToken,
     accessToken,
   );
-  const accessTokenHash = await intakeAccessTokenHash(accessToken, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "", typeof body.draftId === "string" ? body.draftId : undefined);
+  const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), typeof body.draftId === "string" ? body.draftId : undefined);
   const replacementAccessTokenHash = replacement.clientRetained
     ? await sha256Hex(replacement.accessToken)
     : null;

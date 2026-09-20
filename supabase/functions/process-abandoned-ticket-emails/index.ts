@@ -1,3 +1,4 @@
+import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { createTicketCompletionUrl } from "../_shared/ticket-completion.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { secretMatches } from "../_shared/disclosure-confirmation.ts";
@@ -73,7 +74,7 @@ export async function handler(req: Request): Promise<Response> {
         }
         return { ...context, completionUrl: await createTicketCompletionUrl({
           draftId: draft.id, accessTokenHash: draft.access_token_hash,
-          expiresAt: draft.expires_at, secret: serviceKey,
+          expiresAt: draft.expires_at, secret: ticketCompletionSecret(),
         }) };
       },
       freeze: async (job, email) =>

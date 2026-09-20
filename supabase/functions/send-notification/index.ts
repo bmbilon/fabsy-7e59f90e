@@ -1,3 +1,4 @@
+import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
@@ -97,7 +98,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (paymentLinkCode && !PAYMENT_LINK_CODE_PATTERN.test(paymentLinkCode)) {
       throw new RequestError("Payment link is invalid.", 403);
     }
-    const accessTokenHash = await intakeAccessTokenHash(accessToken, supabaseServiceKey, submissionId);
+    const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), submissionId);
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
       .select("id,first_name,last_name,email,phone,ticket_number,violation,fine_amount,created_at,sms_opt_in,status,service_type,consent_form_path,representation_access_token_hash,preferred_locale")

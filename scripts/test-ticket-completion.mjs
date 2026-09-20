@@ -61,6 +61,8 @@ async function runtime(t, options = {}) {
   win.IS_REACT_ACT_ENVIRONMENT = true;
   win.fetch = () => { throw new Error('External network forbidden'); };
   win.structuredClone = structuredClone;
+  win.TextEncoder = TextEncoder;
+  win.TextDecoder = TextDecoder;
   let record = structuredClone({ ...base, ...options.record });
   const calls = [], toasts = [];
   win.__fixture = { toasts, invoke: async (name, { body }) => {
