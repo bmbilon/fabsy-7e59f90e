@@ -1,3 +1,4 @@
+import CaseQueueSection from "@/components/admin/CaseQueueSection";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -294,6 +295,7 @@ export default function AdminDashboard() {
             retry={() => void live.refetch()}
           />
         </div>
+        <CaseQueueSection userId={auth.session?.user.id} role={auth.role.data} trials />
         <DashboardPerformance
           data={overview.data}
           days={days}

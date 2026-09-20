@@ -45,6 +45,7 @@ try {
     if (url.hostname.endsWith('.supabase.co') || url.hostname === 'supabase-configuration-missing.invalid') {
       if (request.method() === 'OPTIONS') return json({});
       if (url.pathname.startsWith('/auth/v1/')) return json(url.pathname.endsWith('/user') ? user : session);
+      if (url.pathname.endsWith('/rpc/admin_dashboard_queue')) return json({ items: [], total: 0, page_size: 8, counts: {} });
       if (url.pathname.endsWith('/rpc/idr_staff_role')) return json('admin');
       if (url.pathname.endsWith('/rpc/ate_first_twenty_metrics')) return json({ cohort_count: 0, resolved_count: 0, pending_count: 0, median_reduction_cad: null, below_40: null, cohort_complete: false });
       if (url.pathname.endsWith('/rpc/record_ticket_intake_follow_up')) {
@@ -94,7 +95,7 @@ try {
   const page = await context.newPage();
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(`${origin}/admin/cases`);
-  await page.getByRole('heading', { name: 'Incomplete ticket intakes', exact: true }).waitFor();
+  await page.getByRole('heading', { name: 'Ticket intakes', exact: true }).waitFor();
   await page.getByRole('link', { name: 'new-ticket@example.test', exact: true }).waitFor();
   assert.equal(await page.locator('vite-error-overlay').count(), 0);
   const row = email => page.locator('div.rounded-lg.border').filter({ has: page.getByRole('link', { name: email, exact: true }) }).last();

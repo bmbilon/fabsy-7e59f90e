@@ -39,6 +39,8 @@ function PreviewBar() {
         >
           <option value="normal">Normal</option>
           <option value="empty">Empty</option>
+          <option value="save_error">Status save failure</option>
+          <option value="conflict">Concurrent staff update</option>
           <option value="error">Connection outage</option>
           <option value="case_manager">Case manager</option>
         </select>

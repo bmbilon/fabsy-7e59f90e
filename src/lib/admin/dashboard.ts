@@ -1,5 +1,6 @@
 export type DashboardDays = 7 | 30;
 export type QueueFilter =
+  | "trial"
   | "attention"
   | "partial"
   | "active"
@@ -51,7 +52,9 @@ export interface QueueItem {
   service_type: string;
   ticket_type: string;
   status: string;
-  category: "partial" | "payment" | "new" | "active" | "completed";
+  case_stage: import("./caseStatus").CaseStage | null;
+  case_stage_version: number;
+  category: "trial" | "partial" | "payment" | "new" | "active" | "completed";
   current_step: number | null;
   created_at: string;
   updated_at: string;
@@ -102,6 +105,7 @@ export function itemHref(item: QueueItem): string {
     : `/admin/submissions/${item.id}`;
 }
 export const queueLabels: Record<QueueFilter, string> = {
+  trial: "Trial matters",
   attention: "Needs attention",
   partial: "Partial intakes",
   active: "Active cases",
