@@ -29,6 +29,7 @@ try {
     "@/hooks/useTicketIntakeDraft": `export const useTicketIntakeDraft = () => ({ capability: null, record: null, status: "idle", error: "", hasUploadedTicket: false, createContact: async () => null, createOrUpload: async () => null, save: async () => null, getResumeUrl: () => null });`,
     "@/lib/referrals/capture": `export const readActiveReferral = () => null; export const captureReferralFromLocation = async () => null; export const captureReferralCode = async () => null; export const clearReferralAttribution = () => {}; export const REFERRAL_ATTRIBUTION_EVENT = "test-referral-event";`,
     "./form-steps/TicketDetailsStep": `export default function TicketDetailsStep(props) { globalThis.__intakeDateTest.details = props; return null; }`,
+    "./PhotoTicketForm": "export default function TestPhotoIntake() { return null; }",
     "./TicketCapture": "export default function TestLocalTicketSelection() { return null; }",
     ...Object.fromEntries(["PersonalInfoStep", "DefenseStep", "ConsentStep", "PaymentStep", "ReviewStep"].map(name => [`./form-steps/${name}`, "export default function TestStep() { return null; }"])),
     "./LocalizedTicketJourney": "export default function TestLocalizedStep() { return null; }",
