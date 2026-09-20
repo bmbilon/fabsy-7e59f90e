@@ -149,7 +149,7 @@ export type Database = {
           city: string | null
           created_at: string
           date_of_birth: string | null
-          drivers_license: string
+          drivers_license: string | null
           email: string
           first_name: string
           id: string
@@ -164,7 +164,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
-          drivers_license: string
+          drivers_license: string | null
           email: string
           first_name: string
           id?: string
@@ -179,7 +179,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
-          drivers_license?: string
+          drivers_license?: string | null
           email?: string
           first_name?: string
           id?: string
@@ -531,6 +531,10 @@ export type Database = {
       }
       ticket_submissions: {
         Row: {
+          intake_consent: Json | null
+          intake_mode: string
+          intake_review_status: string
+          intake_scan_started_at: string | null
           deleted_at: string | null
           deleted_by: string | null
           ticket_type: "photo_radar" | "officer_issued"
@@ -616,6 +620,10 @@ export type Database = {
           violation_time: string | null
         }
         Insert: {
+          intake_consent?: Json | null
+          intake_mode?: string
+          intake_review_status?: string
+          intake_scan_started_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
           ticket_type?: "photo_radar" | "officer_issued"
@@ -701,6 +709,10 @@ export type Database = {
           violation_time?: string | null
         }
         Update: {
+          intake_consent?: Json | null
+          intake_mode?: string
+          intake_review_status?: string
+          intake_scan_started_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
           ticket_type?: "photo_radar" | "officer_issued"

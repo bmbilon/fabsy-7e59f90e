@@ -19,7 +19,9 @@ import PaymentStep from "./form-steps/PaymentStep";
 import ReviewStep from "./form-steps/ReviewStep";
 import LeadCaptureFields from "./form-steps/LeadCaptureFields";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import PhotoTicketForm from "./PhotoTicketForm";
+import { resumeTokenFromHash } from "@/lib/ticket/intakeDraft";
 import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
 import { useLocale } from "@/i18n/locale-context";
 import { validateLocalizedIntakeStep } from "@/i18n/intake-validation";
@@ -208,19 +210,22 @@ function ReferralCodeField({ referral, onChange }: {
   </div>;
 }
 
-const TicketForm = ({
-  initialTicketImage = null,
-  initialPrefill = null,
-  initialStep,
-  initialTicketType,
-  sourceAssessment = null,
-}: {
+export interface TicketFormProps {
   initialTicketImage?: File | null;
   initialPrefill?: Partial<FormData> | null;
   initialStep?: number;
   initialTicketType?: TicketType | null;
   sourceAssessment?: { submissionId: string; accessToken: string } | null;
-}) => {
+  embedded?: boolean;
+}
+
+export const LegacyTicketForm = ({
+  initialTicketImage = null,
+  initialPrefill = null,
+  initialStep,
+  initialTicketType,
+  sourceAssessment = null,
+}: TicketFormProps) => {
   const { locale, setIntakeHandoff } = useLocale();
   const [currentStep, setCurrentStep] = useState<number>(() => {
     const s = typeof initialStep === 'number' ? initialStep : 1;
@@ -1104,4 +1109,11 @@ const TicketForm = ({
   );
 };
 
-export default TicketForm;
+export default function TicketForm(props: TicketFormProps) {
+  const { locale } = useLocale();
+  const { hash } = useLocation();
+  // Existing emailed resume links and reviewed translated journeys keep their
+  // saved draft and checkout contracts; new English uploads use photo + consent.
+  if (locale !== "en" || resumeTokenFromHash(hash)) return <LegacyTicketForm {...props} />;
+  return <PhotoTicketForm {...props} />;
+}

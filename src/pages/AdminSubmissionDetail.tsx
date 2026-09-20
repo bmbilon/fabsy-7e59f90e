@@ -140,15 +140,15 @@ export default function AdminSubmissionDetail() {
       >;
       const transformedData = {
         ...data,
-        first_name: data.clients?.first_name || '',
-        last_name: data.clients?.last_name || '',
+        first_name: data.clients?.first_name || data.first_name || '',
+        last_name: data.clients?.last_name || data.last_name || '',
         email: data.clients?.email || '',
         phone: data.clients?.phone || '',
         address: data.clients?.address || '',
         city: data.clients?.city || '',
         postal_code: data.clients?.postal_code || '',
         date_of_birth: data.clients?.date_of_birth || '',
-        drivers_license: data.clients?.drivers_license || '',
+        drivers_license: data.clients?.drivers_license || data.drivers_license || '',
         sms_opt_in: data.clients?.sms_opt_in || false,
         verdict: assessment.verdict ?? null,
         case_outcome: assessment.case_outcome ?? null,
@@ -365,7 +365,7 @@ export default function AdminSubmissionDetail() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">
-                {submission.first_name} {submission.last_name}
+                {[submission.first_name, submission.last_name].filter(Boolean).join(" ") || "Ticket awaiting review"}
               </h1>
               <p className="text-sm text-muted-foreground">
                 Ticket #{submission.ticket_number}
@@ -404,7 +404,7 @@ export default function AdminSubmissionDetail() {
               <CardContent className="space-y-3">
                 <div>
                   <p className="text-sm text-muted-foreground">Full Name</p>
-                  <p className="font-medium">{submission.first_name} {submission.last_name}</p>
+                  <p className="font-medium">{[submission.first_name, submission.last_name].filter(Boolean).join(" ") || "Ticket awaiting review"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">

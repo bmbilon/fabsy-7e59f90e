@@ -23,6 +23,7 @@ export interface TicketCaptureProps {
   required?: boolean;
   skipInitialScan?: boolean;
   selectionOnly?: boolean;
+  scanOnSelect?: boolean;
   compact?: boolean;
   onCaptureStateChange?: (state: TicketCaptureState) => void;
 }
@@ -70,6 +71,7 @@ export default function TicketCapture({
   required = false,
   skipInitialScan = false,
   selectionOnly = false,
+  scanOnSelect = true,
   compact = false,
   onCaptureStateChange,
 }: TicketCaptureProps) {
@@ -117,6 +119,11 @@ export default function TicketCapture({
 
     // The first intake checkpoint selects a local file. Contact permission
     // must be saved before either OCR or private storage receives its bytes.
+    if (!scanOnSelect) {
+      setStatus({ kind: "success", title: "Ticket attached", message: "Ready to submit." });
+      latestStateHandler.current?.("complete");
+      return;
+    }
     if (selectionOnly) {
       setStatus({ kind: "success", title: "Ticket selected", message: "This file is still on your device. Save your contact details and permission below before we scan or upload it." });
       latestStateHandler.current?.("empty");
@@ -178,7 +185,7 @@ export default function TicketCapture({
     return () => {
       requestId.current += 1;
     };
-  }, [file, selectionOnly]);
+  }, [file, selectionOnly, scanOnSelect]);
 
   const selectFile = (selectedFile: File | undefined, input: HTMLInputElement) => {
     input.value = "";
@@ -213,13 +220,13 @@ export default function TicketCapture({
     <fieldset
       className="space-y-3"
       disabled={disabled}
-      aria-describedby={`${inputId}-help ${inputId}-status`}
+      aria-describedby={`${scanOnSelect ? `${inputId}-help ` : ""}${inputId}-status`}
     >
-      <legend className="text-sm font-medium text-foreground">
+      <legend className={scanOnSelect ? "text-sm font-medium text-foreground" : "sr-only"}>
         {label}{required ? <span className="text-destructive"> *</span> : null}
       </legend>
 
-      {!compact && <TicketPhotoGuide />}
+      {scanOnSelect && !compact && <TicketPhotoGuide />}
 
       <div className={`rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 ${compact ? "p-3" : "p-5 sm:p-6"}`}>
         <div className={`flex flex-col items-center text-center ${compact ? "gap-2" : "gap-4"}`}>
@@ -248,9 +255,9 @@ export default function TicketCapture({
               disabled={disabled}
             >
               <Upload aria-hidden="true" />
-              Browse files
+              {!scanOnSelect && file ? "Change" : "Browse files"}
             </Button>
-            <Button
+            {(scanOnSelect || !file) && <Button
               type="button"
               variant="outline"
               onClick={() => cameraInputRef.current?.click()}
@@ -258,7 +265,7 @@ export default function TicketCapture({
             >
               <Camera aria-hidden="true" />
               Take photo
-            </Button>
+            </Button>}
             {file ? (
               <Button
                 type="button"
@@ -274,7 +281,7 @@ export default function TicketCapture({
         </div>
       </div>
 
-      {selectedFileType?.valid && selectedFileType.kind === "image" ? <TicketPhotoCheck /> : null}
+      {scanOnSelect && selectedFileType?.valid && selectedFileType.kind === "image" ? <TicketPhotoCheck /> : null}
 
       <input
         ref={browseInputRef}
@@ -285,7 +292,7 @@ export default function TicketCapture({
         tabIndex={-1}
         aria-label={`Browse for ${label.toLowerCase()}`}
         aria-required={required}
-        aria-describedby={`${inputId}-help ${inputId}-status`}
+        aria-describedby={`${scanOnSelect ? `${inputId}-help ` : ""}${inputId}-status`}
         onChange={(event) => selectFile(event.target.files?.[0], event.currentTarget)}
       />
       <input
@@ -298,23 +305,23 @@ export default function TicketCapture({
         tabIndex={-1}
         aria-label={`Take a photo of ${label.toLowerCase()}`}
         aria-required={required}
-        aria-describedby={`${inputId}-help ${inputId}-status`}
+        aria-describedby={`${scanOnSelect ? `${inputId}-help ` : ""}${inputId}-status`}
         onChange={(event) => selectFile(event.target.files?.[0], event.currentTarget)}
       />
 
-      <p id={`${inputId}-help`} className="text-xs text-muted-foreground">
+      {scanOnSelect && <p id={`${inputId}-help`} className="text-xs text-muted-foreground">
         Images are scanned to help fill the form. PDFs are attached for manual review and are not sent to OCR.
-      </p>
+      </p>}
 
       <div id={`${inputId}-status`} aria-live="polite">
-        {status.kind === "processing" ? (
+        {!scanOnSelect && status.kind === "success" ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><CheckCircle2 className="h-4 w-4" aria-hidden="true" />Ticket attached</p> : status.kind === "processing" ? (
           <p className="flex items-center gap-2 text-sm font-medium text-primary">
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             {status.message}
           </p>
         ) : null}
 
-        {status.kind === "success" ? (
+        {scanOnSelect && status.kind === "success" ? (
           <Alert className="border-emerald-200 bg-emerald-50 text-emerald-950">
             <CheckCircle2 className="h-4 w-4 text-emerald-700" aria-hidden="true" />
             <AlertTitle>{status.title}</AlertTitle>

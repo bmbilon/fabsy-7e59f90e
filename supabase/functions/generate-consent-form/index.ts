@@ -5,6 +5,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { createConsentPdf } from "../_shared/consent-pdf.ts";
 import { ConsentTextError } from "../_shared/consent-unicode.ts";
 import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
+import type { IntakeConsent } from "../_shared/intake-consent.ts";
+import { queuePhotoIntake } from "../_shared/process-photo-intake.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -21,7 +23,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 interface ConsentRequest {
   submissionId: string;
   accessToken: string;
-  digitalSignature: string;
+  digitalSignature?: string;
 }
 
 class RequestError extends Error {
@@ -37,7 +39,7 @@ function requiredText(value: unknown, label: string, maxLength: number) {
   return normalized;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+export const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -46,10 +48,9 @@ const handler = async (req: Request): Promise<Response> => {
     const request = await req.json() as Partial<ConsentRequest>;
     const submissionId = requiredText(request.submissionId, "Submission", 36).toLowerCase();
     const accessToken = requiredText(request.accessToken, "Submission access token", 200);
-    requiredText(request.digitalSignature, "Digital signature", 200);
     // Validate a comparison form without replacing the exact submitted spelling,
     // script, marks, or whitespace in the generated consent record.
-    const digitalSignature = request.digitalSignature!;
+    const digitalSignature = typeof request.digitalSignature === "string" ? request.digitalSignature : "";
     if (digitalSignature.length > 200) throw new RequestError("Digital signature is invalid.");
     if (!UUID_PATTERN.test(submissionId) || accessToken.length < 32) {
       throw new RequestError("Submission authorization is invalid.", 403);
@@ -57,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
     const accessTokenHash = await intakeAccessTokenHash(accessToken, ticketCompletionSecret(), submissionId);
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
-      .select("id,first_name,last_name,email,phone,address,city,postal_code,drivers_license,ticket_number,violation,violation_date,status,service_type,preferred_locale,representation_access_token_hash,ticket_type,registered_owner_on_offence_date")
+      .select("id,first_name,last_name,email,phone,address,city,postal_code,drivers_license,ticket_number,violation,violation_date,status,service_type,preferred_locale,representation_access_token_hash,ticket_type,registered_owner_on_offence_date,intake_consent,ticket_document_path,source_assessment_id,intake_mode")
       .eq("id", submissionId)
       .maybeSingle();
     if (submissionError) throw submissionError;
@@ -70,7 +71,24 @@ const handler = async (req: Request): Promise<Response> => {
       throw new RequestError("Submission authorization is invalid or expired.", 403);
     }
 
+    const intakeConsent = submission.intake_consent as IntakeConsent | null;
+    if (intakeConsent && (intakeConsent.accepted !== true || !["checkbox", "typed"].includes(intakeConsent.method))) {
+      throw new RequestError("Submit your ticket with the consent box checked.");
+    }
+    if (intakeConsent) {
+    // A consent document must never make an unfinished source upload look complete.
+    const ticketPath = String(submission.ticket_document_path || "");
+    const ownerId = submission.source_assessment_id || submission.id;
+    if (!ticketPath.startsWith(`${ownerId}/`) || ticketPath.includes("..")) throw new RequestError("Upload your ticket before saving consent.", 409);
+    const slash = ticketPath.lastIndexOf("/");
+    const { data: files, error: fileError } = await supabase.storage.from("assessment-tickets")
+      .list(ticketPath.slice(0, slash), { search: ticketPath.slice(slash + 1), limit: 100 });
+    if (fileError || !files?.some(file => file.name === ticketPath.slice(slash + 1) && Number(file.metadata?.size) > 0)) {
+      throw new RequestError("The ticket upload did not finish. Please submit again.", 409);
+    }
+    }
     const formData = {
+      ...(intakeConsent ? { intakeConsent } : {}),
       ticketType: submission.ticket_type === "photo_radar" ? "photo_radar" as const : "officer_issued" as const,
       registeredOwnerOnOffenceDate: submission.registered_owner_on_offence_date,
       submissionId: submission.id,
@@ -86,10 +104,10 @@ const handler = async (req: Request): Promise<Response> => {
       ticketNumber: String(submission.ticket_number || ""),
       violation: String(submission.violation || ""),
       issueDate: submission.violation_date ? String(submission.violation_date) : "Not supplied",
-      digitalSignature,
+      digitalSignature: intakeConsent?.method === "checkbox" ? "" : digitalSignature,
     };
     const expectedSignature = `${formData.firstName} ${formData.lastName}`.trim().replace(/\s+/g, " ").toLocaleLowerCase("en-CA");
-    if (digitalSignature.trim().replace(/\s+/g, " ").toLocaleLowerCase("en-CA") !== expectedSignature) {
+    if (intakeConsent?.method !== "checkbox" && (!digitalSignature.trim() || digitalSignature.trim().replace(/\s+/g, " ").toLocaleLowerCase("en-CA") !== expectedSignature)) {
       throw new RequestError("Type the same full legal name shown on the consent form.");
     }
 
@@ -135,6 +153,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log("Submission updated with consent form path");
+    if (submission.intake_mode === "photo_only") queuePhotoIntake(supabase, submissionId);
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -160,4 +179,4 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-serve(handler);
+if (import.meta.main) serve(handler);

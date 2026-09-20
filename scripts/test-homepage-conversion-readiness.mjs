@@ -53,20 +53,20 @@ try {
   check('hero uses the requested money-back headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Fine or demerits reduced or your money back'));
   check('hero omits the repeated court-outcome disclaimer', () => assert.doesNotMatch(hero.body.textContent, /We can’t guarantee a court outcome\./));
   check('hero removes the superseded promises', () => assert.doesNotMatch(hero.body.textContent, /success guaranteed|you don[’']t pay/i));
-  check('hero displays the price without an appended disclaimer', () => assert.equal(hero.querySelector('strong')?.parentElement?.textContent, `$${offers.rapidResolution.priceCad} CAD + GST`));
-  check('hero CTA is measurable and calculates the assessment', () => {
+  check('hero displays the price without an appended disclaimer', () => assert.equal([...hero.querySelectorAll('strong')].find(node => node.textContent.includes('CAD + GST'))?.parentElement?.textContent, `$${offers.rapidResolution.priceCad} CAD + GST`));
+  check('hero CTA is measurable and submits ticket with consent', () => {
     const cta = hero.querySelector('button[data-funnel-action="primary_cta"]');
     assert.equal(cta?.getAttribute('type'), 'submit');
-    assert.equal(cta?.textContent.trim(), 'Instant Ticket Assessment');
+    assert.equal(cta?.textContent.trim(), 'Submit ticket and consent');
     assert.equal(cta?.getAttribute('data-funnel-position'), 'hero');
   });
 
   const homeBar = parse(render.renderCallBar('/'));
-  check('homepage sticky CTA opens the instant assessment', () => {
+  check('homepage sticky CTA opens ticket upload', () => {
     const cta = homeBar.querySelector('a[data-funnel-action="primary_cta"]');
-    assert.equal(cta?.getAttribute('href'), '#instant-ticket-assessment');
+    assert.equal(cta?.getAttribute('href'), '#ticket-form-container');
     assert.equal(cta?.getAttribute('data-funnel-position'), 'sticky');
-    assert.equal(cta?.textContent?.trim(), 'Instant Ticket Assessment');
+    assert.equal(cta?.textContent?.trim(), 'Upload your ticket');
   });
   check('sticky CTA preserves a 44px-plus target', () => assert.match(homeBar.querySelector('a')?.className || '', /min-h-14/));
 

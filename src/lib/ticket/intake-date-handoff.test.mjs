@@ -49,7 +49,7 @@ try {
   const { act, createElement } = await import("react");
   const { createRoot } = await import("react-dom/client");
   const { MemoryRouter } = await import("react-router-dom");
-  const { default: TicketForm } = await import(pathToFileURL(outfile).href);
+  const { LegacyTicketForm: TicketForm } = await import(pathToFileURL(outfile).href);
   const day = date => date && `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   const mount = async (props = {}, fixture = {}) => {
     localStorage.clear();

@@ -19,7 +19,7 @@ const compiled = await build({
       import React, { act } from 'react';
       import { createRoot } from 'react-dom/client';
       import { MemoryRouter } from 'react-router-dom';
-      import TicketForm from './src/components/TicketForm';
+      import { LegacyTicketForm as TicketForm } from './src/components/TicketForm';
 
       let root;
       export { act };
@@ -206,7 +206,9 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
     ticketDocumentPath: missingTicketPath ? "" : `${draftId}/representation-ticket-r1.png`,
     ticketUploadedAt: null, status: "active",
     hasPendingTicketUpload: false,
-    resumeDelivery: resumeDelivery(),
+    // Saving unchanged contact must retain the server delivery state, including
+    // when the autosave timer fires during a slow test run.
+    resumeDelivery: resumeDelivery(deliveryStatus, deliveryChannel, deliveryMode),
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     ...extra,
   });

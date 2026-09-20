@@ -606,7 +606,7 @@ serve(async (req) => {
     const { data: submission, error: submissionError } = await admin
       .from("ticket_submissions")
       .select(
-        "id,client_id,ticket_number,status,service_type,ticket_document_path,consent_form_path,representation_access_token_hash,source_assessment_id,representation_includes_assessment,preferred_locale,ticket_type,registered_owner_on_offence_date,order_type,review_path,declared_licence_class,pro_verified,pro_verification_id,ref_code,clients(email)",
+        "id,client_id,ticket_number,status,service_type,ticket_document_path,consent_form_path,representation_access_token_hash,source_assessment_id,representation_includes_assessment,preferred_locale,ticket_type,registered_owner_on_offence_date,order_type,review_path,declared_licence_class,pro_verified,pro_verification_id,ref_code,intake_mode,intake_review_status,clients(email)",
       )
       .eq("id", submissionId)
       .maybeSingle();
@@ -624,6 +624,10 @@ serve(async (req) => {
         "Ticket checkout details could not be verified.",
         403,
       );
+    }
+
+    if (submission.intake_mode === "photo_only" && submission.intake_review_status !== "ready") {
+      throw new RequestError("Your ticket is saved. Fabsy will confirm any missing details before payment.", 409);
     }
 
     // Price and routing come only from the authorized stored intake. Browser amounts

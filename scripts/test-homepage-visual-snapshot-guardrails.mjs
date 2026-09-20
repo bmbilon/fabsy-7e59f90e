@@ -105,6 +105,10 @@ try {
   });
 
   const mutations = [
+    ['missing upload heading', document => document.querySelector('#ticket-form-container h2').remove()],
+    ['extra intake field', document => document.querySelector('#ticket-form-container form').insertAdjacentHTML('beforeend', '<input type="text" name="name" />')],
+    ['enabled empty upload', document => document.querySelector('#ticket-form-container button[type="submit"]').disabled = false],
+    ['expanded initial guide', document => document.querySelector('#ticket-form-container details').open = true],
     ['missing policy', document => document.querySelector('#money-back-guarantee').remove()],
     ['missing policy condition', document => exactNode(document, '#money-back-guarantee p', feeRefund.condition).remove()],
     ['hidden policy condition', document => exactNode(document, '#money-back-guarantee p', feeRefund.condition).hidden = true],
@@ -132,7 +136,7 @@ try {
       node.textContent = 'Only the Rapid Resolution portion of a bundle is refunded.';
     }],
     ['wrong hero price', document => {
-      const node = document.querySelector('section[aria-labelledby="homepage-hero-heading"] strong');
+      const node = exactNode(document, 'section[aria-labelledby="homepage-hero-heading"] strong', `$${offers.rapidResolution.priceCad} CAD + GST`);
       node.textContent = '$199 CAD + GST';
     }],
     ['wrong assessment price', document => {

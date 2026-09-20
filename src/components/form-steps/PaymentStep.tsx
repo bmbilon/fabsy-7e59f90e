@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { PreparedTicketSubmission, SavedTicketSubmission } from "@/lib/ticket/submitIntake";
 import FeeRefundNotice from "@/components/FeeRefundNotice";
 import { CreditCard, DollarSign, FileSearch, Shield } from "lucide-react";
 import { FormData } from "../TicketForm";
@@ -51,6 +52,7 @@ interface PaymentStepProps {
   intakeDraft?: IntakeDraftCapability | null;
   storedConsent?: boolean;
   completionFlow?: boolean;
+  savedSubmission?: SavedTicketSubmission;
 }
 
 class CheckoutFailure extends Error {
@@ -72,17 +74,17 @@ async function functionErrorDetails(error: unknown, fallback: string): Promise<{
   return { message: error instanceof Error && error.message ? error.message : fallback };
 }
 
-export default function PaymentStep({ formData, updateFormData, intakeDraft = null, storedConsent = false, completionFlow = false }: PaymentStepProps) {
+export default function PaymentStep({ formData, updateFormData, intakeDraft = null, storedConsent = false, completionFlow = false, savedSubmission }: PaymentStepProps) {
   const { t } = useTranslation();
   const { locale, isReleased, href } = useLocale();
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(Boolean(savedSubmission));
   const [selectedIdrAddon, setIncludeIdrAddon] = useState(false);
   // The report intake is still English. Offer the released RR service alone on
   // localized checkout instead of silently handing off an untranslated add-on.
   const isPhotoRadar = formData.ticketType === "photo_radar";
   const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const { includeIdrAddon } = ticketCheckoutSelection(formData.ticketType, selectedIdrAddon, locale);
-  useEffect(() => { setIncludeIdrAddon(false); setAgreedToTerms(false); }, [formData.ticketType, locale]);
+  useEffect(() => { setIncludeIdrAddon(false); setAgreedToTerms(Boolean(savedSubmission)); }, [formData.ticketType, locale, savedSubmission]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isVerifyingPro, setIsVerifyingPro] = useState(false);
   const [proVerification, setProVerification] = useState<{ response: ProVerificationResponse; identity: string; image: File } | null>(null);
@@ -141,7 +143,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
         }
         : null;
       const ticketFile = formData.ticketImage;
-      if (!sourceAssessment && !intakeDraft && !ticketFile) {
+      if (!savedSubmission && !sourceAssessment && !intakeDraft && !ticketFile) {
         throw new Error("Return to Ticket Details and attach the ticket PDF or photo before checkout.");
       }
       let ticketMimeType: string | undefined;
@@ -151,8 +153,10 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
         ticketMimeType = ticketDescriptor.mimeType;
       }
 
+      let submission: PreparedTicketSubmission | undefined = savedSubmission;
+      if (!submission) {
       const referral = latestReferralAttribution([formData.referral, await referralForCheckout()]);
-      const { data: submission, error: submissionError } = await supabase.functions.invoke("submit-ticket", {
+      const { data: prepared, error: submissionError } = await supabase.functions.invoke("submit-ticket", {
         body: {
           preferred_locale: locale,
           ticket_type: formData.ticketType,
@@ -189,17 +193,15 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
         },
       });
 
-      if (submissionError || !submission?.success || !submission.submissionId || !submission.clientId || !submission.accessToken) {
+      if (submissionError || !prepared?.success || !prepared.submissionId || !prepared.clientId || !prepared.accessToken) {
         throw new Error(
-          typeof submission?.error === "string"
-            ? submission.error
+          typeof prepared?.error === "string"
+            ? prepared.error
             : (await functionErrorDetails(submissionError, "Ticket submission could not be created.")).message,
         );
       }
 
-      const submissionId = submission.submissionId as string;
-      const clientId = submission.clientId as string;
-      const representationAccessToken = submission.accessToken as string;
+      submission = prepared as PreparedTicketSubmission;
       if (!intakeDraft && submission.upload?.path && submission.upload?.token && ticketFile) {
         if (!ticketMimeType) throw new Error("The ticket file type could not be validated.");
         const { error: uploadError } = await supabase.storage
@@ -210,6 +212,11 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
           });
         if (uploadError) throw new Error("Your ticket was saved, but the private file upload did not finish. Please try again.");
       }
+
+      }
+      const submissionId = submission.submissionId as string;
+      const clientId = submission.clientId as string;
+      const representationAccessToken = submission.accessToken as string;
 
       // Only a direct response for this stored submission can change the UI
       // price. The checkout endpoint independently rechecks the stored result.
@@ -237,7 +244,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
           if (licencePhoto) toast({ title: "Continuing at full price", description: fullPriceNotice });
         }
       }
-      if (!storedConsent) {
+      if (!storedConsent && !savedSubmission) {
         const { data: consent, error: consentError } = await supabase.functions.invoke("generate-consent-form", {
           body: {
             submissionId,
@@ -451,7 +458,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
             )}
           </div>}
 
-          <div className="rounded-lg border bg-muted/30 p-4">
+          {!savedSubmission && <div className="rounded-lg border bg-muted/30 p-4">
             <div className="flex items-start gap-3">
               <Checkbox
                 id="payment-terms"
@@ -469,7 +476,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
                 </p>
               </div>
             </div>
-          </div>
+          </div>}
 
           <Button
             onClick={handleStripeCheckout}

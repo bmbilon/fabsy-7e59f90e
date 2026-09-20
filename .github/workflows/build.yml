@@ -73,6 +73,9 @@ jobs:
             supabase/functions/_shared/meta-purchase.ts \
             supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
+            supabase/functions/photo-ticket-intake/index.ts \
+            supabase/functions/generate-consent-form/index.ts \
+            supabase/functions/ocr-ticket/index.ts \
             supabase/functions/resolve-payment-link/index.ts \
             supabase/functions/idr-payment-webhook/index.ts \
             supabase/functions/meta-capi-worker/index.ts \
@@ -84,6 +87,9 @@ jobs:
             supabase/functions/send-notification/index.ts \
             supabase/functions/withdraw-meta-measurement/index.ts
       
+      - name: Verify photo intake consent and background review
+        run: deno test --allow-env --allow-net --allow-read --node-modules-dir=none --frozen supabase/functions/_shared/intake-consent.test.ts supabase/functions/_shared/consent-pdf.test.ts supabase/functions/photo-ticket-intake/index.test.ts
+
       - name: Build guarded snapshots and app
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

@@ -170,3 +170,6 @@ verify_jwt = false
 
 [functions.process-sms-intake-emails]
 verify_jwt = false
+
+[functions.photo-ticket-intake]
+verify_jwt = false
