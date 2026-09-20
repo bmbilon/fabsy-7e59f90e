@@ -129,6 +129,12 @@ export async function createConsentPdf(
   if (formData.ticketType === "photo_radar") await field("Offence-date ownership", formData.registeredOwnerOnOffenceDate?.replaceAll("_", " ") || "Not supplied");
   section(formData.intakeConsent?.identitySource === "uploaded_ticket_pending_review" ? "UPLOADED TICKET AUTHORIZATION" : formData.ticketType === "photo_radar" ? "PHOTO RADAR AUTHORIZATION" : "RAPID RESOLUTION AUTHORIZATION");
   for (const line of authorizationLines) english(line);
+  if (typeof formData.intakeConsent?.pleadNotGuilty === "boolean") {
+    section("CLIENT PLEA INSTRUCTION");
+    english(`${formData.intakeConsent.pleaLabel}: ${formData.intakeConsent.pleadNotGuilty ? "Checked" : "Not checked"}`);
+    english(formData.intakeConsent.pleaInstruction || "No plea instruction recorded.");
+    english("The checkbox choice above was submitted with this electronic acceptance.", 9, 15);
+  }
   const signatureLines = await wrapConsentText(formData.digitalSignature || "Not supplied", locale, 11, printableWidth - 108);
   ensureRoom(signatureLines.length * 23 + 136);
   section(formData.intakeConsent?.method === "checkbox" ? "CLIENT ELECTRONIC ACCEPTANCE" : "CLIENT SIGNATURE");

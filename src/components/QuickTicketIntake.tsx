@@ -9,13 +9,14 @@ import { Button } from "./ui/button";
 import { validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
 import { newPhotoIntakeAttempt, savePhotoTicket, type PhotoIntakeAttempt } from "@/lib/ticket/photoIntake";
 import type { PreparedTicketSubmission, SavedTicketSubmission } from "@/lib/ticket/submitIntake";
-import { PHOTO_UPLOAD_AUTHORIZATION_LINES, CONSENT_PRIVACY_LINES, INTAKE_CONSENT_LABEL, PHOTO_UPLOAD_CONSENT_CONFIRMATION } from "../../supabase/functions/_shared/intake-consent";
+import { PHOTO_UPLOAD_AUTHORIZATION_LINES, CONSENT_PRIVACY_LINES, INTAKE_CONSENT_LABEL, PHOTO_UPLOAD_CONSENT_CONFIRMATION, NOT_GUILTY_PLEA_LABEL, NOT_GUILTY_PLEA_INSTRUCTION, NO_PLEA_INSTRUCTION } from "../../supabase/functions/_shared/intake-consent";
 
 type Update = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void;
 
 export default function QuickTicketIntake({ formData, updateFormData, embedded = false, allowFileSelection = true }: { formData: FormData; updateFormData: Update; embedded?: boolean; allowFileSelection?: boolean }) {
   const Heading = embedded ? "h2" : "h1";
   const [busy, setBusy] = useState(false);
+  const [pleadNotGuilty, setPleadNotGuilty] = useState(true);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState<SavedTicketSubmission | null>(null);
   const inFlight = useRef(false);
@@ -27,13 +28,19 @@ export default function QuickTicketIntake({ formData, updateFormData, embedded =
     attempt.current = null; prepared.current = null; setError("");
     updateFormData({ ticketImage, consentGiven: false, digitalSignature: "", sourceAssessmentId: "", sourceAssessmentAccessToken: "" });
   };
+  const changePlea = (checked: boolean) => {
+    // A failed request may already have stored immutable consent. A changed
+    // instruction must be submitted as a fresh acceptance, never a stale retry.
+    attempt.current = null; prepared.current = null; setError("");
+    setPleadNotGuilty(checked);
+  };
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (inFlight.current || !formData.consentGiven || !hasTicket || !fileValid) return;
     inFlight.current = true; setBusy(true); setError("");
     try {
       attempt.current ??= newPhotoIntakeAttempt();
-      const result = await savePhotoTicket(formData, attempt.current, { prepared: prepared.current, onPrepared: value => { prepared.current = value; } });
+      const result = await savePhotoTicket(formData, attempt.current, { pleadNotGuilty, prepared: prepared.current, onPrepared: value => { prepared.current = value; } });
       setSaved(result);
       window.dispatchEvent(new CustomEvent("fabsy:live-stage", { detail: "review" }));
       document.getElementById("ticket-form-container")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -50,6 +57,13 @@ export default function QuickTicketIntake({ formData, updateFormData, embedded =
         <TicketCapture file={formData.ticketImage} onFileChange={changeFile} onOcrData={() => {}} scanOnSelect={false} allowFileSelection={allowFileSelection}
           disabled={busy} compact={hasTicket} required={!formData.sourceAssessmentId} />
         {hasTicket && <>
+          <label htmlFor="quick-not-guilty" className="flex cursor-pointer items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-[12px]">
+            <input id="quick-not-guilty" name="pleadNotGuilty" type="checkbox" checked={pleadNotGuilty}
+              onChange={event => changePlea(event.target.checked)} aria-describedby="quick-not-guilty-help"
+              className="mt-0.5 h-5 w-5 shrink-0 accent-emerald-700" />
+            <span className="font-semibold leading-6">{NOT_GUILTY_PLEA_LABEL}</span>
+          </label>
+          <p id="quick-not-guilty-help" className="text-xs leading-5 text-muted-foreground">{pleadNotGuilty ? NOT_GUILTY_PLEA_INSTRUCTION : NO_PLEA_INSTRUCTION}</p>
           <label htmlFor="quick-consent" className="flex cursor-pointer items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-[12px]">
             <input id="quick-consent" name="consent" type="checkbox" required checked={formData.consentGiven}
               onChange={event => updateFormData({ consentGiven: event.target.checked, digitalSignature: "" })}

@@ -24,6 +24,13 @@ function snapshotPath(pathname: string): string | null {
 }
 
 export default function middleware(request: Request) {
+  if (new URL(request.url).pathname.replace(/\/$/, "") === "/disclosure-approval") {
+    return next({ headers: {
+      "X-Robots-Tag": "noindex, nofollow, noarchive",
+      "Referrer-Policy": "no-referrer",
+      "Cache-Control": "private, no-store",
+    } });
+  }
   const ua = request.headers.get("user-agent") || "";
   if (!BOT.test(ua)) return next();
 
