@@ -45,7 +45,7 @@ update ticket_submissions set representation_paid_at=now();
 
 do $$ declare later_stage text; begin
   foreach later_stage in array array['disclosure_requested','crown_offer_received','done_reduced',
-    'done_withdrawn','trial_proceeding','trial_date_pending','trial_date_set',
+    'done_withdrawn','lapsed_expired','trial_proceeding','trial_date_pending','trial_date_set',
     'trial_concluded_reduced','trial_concluded_upheld'] loop
     update admin_ticket_case_status set stage=later_stage where kind='submission';
     perform test_assert(not disclosure_approval_case_eligible('30000000-0000-4000-8000-000000000001'),

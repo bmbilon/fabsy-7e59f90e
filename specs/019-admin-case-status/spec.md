@@ -17,3 +17,6 @@ A staff-only status table and append-only history keep operational stages indepe
 
 ## Verification
 The isolated PostgreSQL suite covers anonymous/customer denial, staff roles, forbidden direct writes, invalid/deleted targets, stale versions, idempotent retries, all stages, trial routing, audit identity, payment isolation, cleanup exclusion, conversion, retention and reminder suppression. The mounted editor tests cover failed saves, server confirmation, concurrent updates, disabled records and stale query results. Existing ticket opening and follow-up tests remain green. The synthetic browser preview verifies partial-to-completed and trial transitions at desktop and 390px mobile width.
+
+## Lapsed/expired status
+Add Lapsed/expired as a terminal staff case status on every shared ticket dropdown. It leaves partial/active queues and remains accessible under Completed and All submissions. The same staff authorization, audit, stale-edit protection, retention and automation exclusions apply. Verify saving, reopening and queue classification, then correct the uniquely identified reported example before releasing the combined updates.
