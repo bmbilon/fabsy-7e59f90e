@@ -1,3 +1,4 @@
+import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { createConsentPdf } from "../_shared/consent-pdf.ts";
@@ -28,11 +29,6 @@ class RequestError extends Error {
   }
 }
 
-async function sha256(value: string) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(digest)).map((part) => part.toString(16).padStart(2, "0")).join("");
-}
-
 function requiredText(value: unknown, label: string, maxLength: number) {
   if (typeof value !== "string") throw new RequestError(`${label} is required.`);
   const normalized = value.trim();
@@ -57,7 +53,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (!UUID_PATTERN.test(submissionId) || accessToken.length < 32) {
       throw new RequestError("Submission authorization is invalid.", 403);
     }
-    const accessTokenHash = await sha256(accessToken);
+    const accessTokenHash = await intakeAccessTokenHash(accessToken, supabaseServiceKey, submissionId);
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
       .select("id,first_name,last_name,email,phone,address,city,postal_code,drivers_license,ticket_number,violation,violation_date,status,service_type,preferred_locale,representation_access_token_hash,ticket_type,registered_owner_on_offence_date")

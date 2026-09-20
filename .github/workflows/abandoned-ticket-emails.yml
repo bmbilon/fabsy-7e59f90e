@@ -4,6 +4,7 @@ on:
     paths:
       - 'supabase/functions/process-abandoned-ticket-emails/**'
       - 'supabase/functions/_shared/abandoned-ticket-*.ts'
+      - 'supabase/functions/_shared/ticket-completion*.ts'
       - 'supabase/functions/_shared/email-signature.ts'
       - 'supabase/migrations/*abandoned_ticket_emails.sql'
       - 'supabase/migrations/*ticket_intake_follow_up_channels.sql'
@@ -17,6 +18,7 @@ on:
     paths:
       - 'supabase/functions/process-abandoned-ticket-emails/**'
       - 'supabase/functions/_shared/abandoned-ticket-*.ts'
+      - 'supabase/functions/_shared/ticket-completion*.ts'
       - 'supabase/functions/_shared/email-signature.ts'
       - 'supabase/migrations/*abandoned_ticket_emails.sql'
       - 'supabase/migrations/*ticket_intake_follow_up_channels.sql'
@@ -39,7 +41,7 @@ jobs:
         with:
           deno-version: v2.x
       - name: Verify email, payment checks and worker authorization without sending
-        run: deno test --no-config --no-npm --allow-env supabase/functions/_shared/abandoned-ticket-email.test.ts supabase/functions/_shared/abandoned-ticket-delivery.test.ts supabase/functions/process-abandoned-ticket-emails/index.test.ts
+        run: deno test --no-config --no-npm --allow-env supabase/functions/_shared/ticket-completion.test.ts supabase/functions/_shared/abandoned-ticket-email.test.ts supabase/functions/_shared/abandoned-ticket-delivery.test.ts supabase/functions/process-abandoned-ticket-emails/index.test.ts
       - name: Verify timing, payment races, retry leases and private access
         run: |
           sudo apt-get update -qq

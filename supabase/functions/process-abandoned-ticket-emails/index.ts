@@ -1,3 +1,4 @@
+import { createTicketCompletionUrl } from "../_shared/ticket-completion.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { secretMatches } from "../_shared/disclosure-confirmation.ts";
 import type { AbandonedTicketEmail } from "../_shared/abandoned-ticket-email.ts";
@@ -56,11 +57,25 @@ export async function handler(req: Request): Promise<Response> {
         ((await rpc("claim_abandoned_ticket_emails", { p_limit: 1 })) as
           | AbandonedTicketJob[]
           | null)?.[0] || null,
-      context: async (job) =>
-        await rpc("get_abandoned_ticket_email_context", {
+      context: async (job) => {
+        const context = await rpc("get_abandoned_ticket_email_context", {
           p_id: job.id,
           p_claim_id: job.claim_id,
-        }) as AbandonedTicketContext,
+        }) as AbandonedTicketContext;
+        if (!context.eligible) return context;
+        const { data: draft, error } = await db.from("ticket_intake_drafts")
+          .select("id,access_token_hash,expires_at,email,preferred_locale,ticket_uploaded_at,deleted_at")
+          .eq("id", job.draft_id).maybeSingle();
+        if (error) throw new Error("completion_source_unavailable");
+        if (!draft || draft.deleted_at || !draft.ticket_uploaded_at ||
+            draft.email?.trim().toLowerCase() !== context.email || draft.preferred_locale !== "en") {
+          return { eligible: false, reason: "completion_source_unavailable" };
+        }
+        return { ...context, completionUrl: await createTicketCompletionUrl({
+          draftId: draft.id, accessTokenHash: draft.access_token_hash,
+          expiresAt: draft.expires_at, secret: serviceKey,
+        }) };
+      },
       freeze: async (job, email) =>
         await rpc("freeze_abandoned_ticket_email", {
           p_id: job.id,

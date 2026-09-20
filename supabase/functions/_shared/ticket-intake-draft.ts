@@ -1,3 +1,4 @@
+import { INTAKE_ACCESS_TOKEN_PATTERN } from "./ticket-completion.ts";
 import { parsePreferredLocale, type PreferredLocale } from "./locale-policy.ts";
 
 export const DRAFT_SCHEMA_VERSION = 1;
@@ -5,7 +6,7 @@ export const DRAFT_TTL_DAYS = 30;
 export const MAX_DRAFT_BODY_BYTES = 64 * 1024;
 export const MAX_DRAFT_DATA_BYTES = 48 * 1024;
 export const MAX_TICKET_FILE_BYTES = 10 * 1024 * 1024;
-export const DRAFT_ACCESS_TOKEN_PATTERN = /^[0-9a-f]{64}$/;
+export const DRAFT_ACCESS_TOKEN_PATTERN = INTAKE_ACCESS_TOKEN_PATTERN;
 export const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -233,7 +234,7 @@ export function parseDraftReplacementAccessToken(
   activeAccessToken: string,
 ) {
   const candidate = parseDraftAccessToken(value);
-  if (candidate === activeAccessToken) {
+  if (candidate === activeAccessToken || !/^[0-9a-f]{64}$/.test(candidate)) {
     throw new DraftRequestError(
       "The replacement saved-intake capability is invalid.",
       400,

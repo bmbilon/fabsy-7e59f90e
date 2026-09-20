@@ -1,3 +1,4 @@
+import { validTicketCompletionUrl } from "./ticket-completion.ts";
 import { getFabsyEmailSignature } from "./email-signature.ts";
 import { FABSY_INTERNAL_NOTIFICATION_DELIVERY } from "./resend-email.ts";
 
@@ -11,9 +12,8 @@ export interface AbandonedTicketEmail {
   text: string;
 }
 
-const submissionUrl = "https://fabsy.ca/submit-ticket";
-const receiptCopy = "Thank you for submitting your ticket- we are confirming receipt, and are happy to advise that we can get the ticket reduced or withdrawn for you. If we are unable to do that, we will refund any fees we charge you for our service.";
-const checkoutCopy = "If you can kindly click through the below form it will let you attach that same image, sign the consent form, and process payment for us to fight your ticket for you in about 90sec";
+const receiptCopy = "Thank you for submitting your ticket. We've received it and can help you take the next steps with Fabsy.";
+const checkoutCopy = "Your ticket is already saved. You just need to review and sign your consent, then pay the service fee using your private link below. Any details you've already provided will be filled in. You do not need to upload or submit your ticket again.";
 const questionsCopy = "Please let us know if you have any questions.";
 
 // Normalize header-breaking controls without dropping names in other alphabets.
@@ -25,15 +25,6 @@ function singleLine(value?: string | null): string {
 function escapeHtml(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
-}
-
-function subjectTicketType(value?: string | null): string {
-  const type = singleLine(value);
-  // Generic intake categories are not a specific allegation. Only known
-  // speeding wording is shortened; other supplied allegations stay verbatim.
-  if (/^(unknown|not provided|n\/a|ticket|officer_issued)$/i.test(type)) return "";
-  if (/\bspeeding\b|\bexceed(?:ing|ed|s)?\b.{0,48}\bspeed(?:\s+limit)?\b/i.test(type)) return "Speeding";
-  return type;
 }
 
 const plainTextSignature = `Fabsy
@@ -53,13 +44,16 @@ Service Disclaimer: Fabsy is an agent service for Alberta traffic matters, not a
 /** Pure rendering only: calling this function never sends email. */
 export function renderAbandonedTicketEmail(input: {
   email: string;
+  completionUrl: string;
   firstName?: string | null;
   ticketType?: string | null;
   ticketNumber?: string | null;
 }): AbandonedTicketEmail {
+  if (!validTicketCompletionUrl(input.completionUrl)) throw new Error("A private ticket completion link is required.");
+  const submissionUrl = input.completionUrl;
   const greeting = `Hi ${singleLine(input.firstName) || "there"},`;
-  const subject = ["Alberta", subjectTicketType(input.ticketType), singleLine(input.ticketNumber), "Ticket Inquiry"]
-    .filter(Boolean).join(" ");
+  const number = singleLine(input.ticketNumber);
+  const subject = `Ticket received — complete consent and payment${number ? ` (${number})` : ""}`;
   const text = [greeting, receiptCopy, checkoutCopy, submissionUrl, questionsCopy, "Kind regards,", plainTextSignature].join("\n\n");
   const paragraph = (copy: string) => `<p style="margin:0 0 28px;">${escapeHtml(copy)}</p>`;
 
@@ -82,7 +76,8 @@ export function renderAbandonedTicketEmail(input: {
       ${paragraph(greeting)}
       ${paragraph(receiptCopy)}
       ${paragraph(checkoutCopy)}
-      <p style="margin:0 0 28px;"><a href="${submissionUrl}" style="color:#2563eb;text-decoration:underline;">${submissionUrl}</a></p>
+      <p style="margin:0 0 28px;"><a href="${submissionUrl}" style="color:#2563eb;text-decoration:underline;">Complete consent and payment</a></p>
+      ${paragraph("This private link is for your ticket only. Please do not forward it.")}
       ${paragraph(questionsCopy)}
       <p style="margin:0;">Kind regards,</p>
       ${getFabsyEmailSignature()}

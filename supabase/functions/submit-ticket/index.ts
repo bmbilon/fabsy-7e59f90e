@@ -1,3 +1,4 @@
+import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { LocaleRequestError, parsePreferredLocale, requireReleasedServiceLocale } from "../_shared/locale-policy.ts";
@@ -244,7 +245,7 @@ const handler = async (req: Request): Promise<Response> => {
     let draftAccessToken: string | null = null;
     if (formData.draftAccessToken !== undefined) {
       draftAccessToken = parseDraftAccessToken(formData.draftAccessToken);
-      const draftAccessTokenHash = await sha256(draftAccessToken);
+      const draftAccessTokenHash = await intakeAccessTokenHash(draftAccessToken, supabaseServiceKey, typeof formData.draftId === "string" ? formData.draftId : undefined);
       let draftQuery = supabase
         .from("ticket_intake_drafts")
         .select("id,access_token_hash,email,phone,preferred_locale,status,expires_at,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,converted_submission_id,client_id")

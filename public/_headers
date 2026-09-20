@@ -19,3 +19,8 @@
 /prerendered/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: public, max-age=86400
+
+/complete-ticket
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+  Cache-Control: private, no-store

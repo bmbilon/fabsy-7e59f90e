@@ -1,3 +1,4 @@
+import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
@@ -65,11 +66,6 @@ class RequestError extends Error {
   }
 }
 
-async function sha256(value: string) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(digest)).map((part) => part.toString(16).padStart(2, "0")).join("");
-}
-
 function requiredText(value: unknown, label: string, maxLength: number) {
   if (typeof value !== "string") throw new RequestError(`${label} is required.`);
   const normalized = value.trim();
@@ -101,7 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (paymentLinkCode && !PAYMENT_LINK_CODE_PATTERN.test(paymentLinkCode)) {
       throw new RequestError("Payment link is invalid.", 403);
     }
-    const accessTokenHash = await sha256(accessToken);
+    const accessTokenHash = await intakeAccessTokenHash(accessToken, supabaseServiceKey, submissionId);
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
       .select("id,first_name,last_name,email,phone,ticket_number,violation,fine_amount,created_at,sms_opt_in,status,service_type,consent_form_path,representation_access_token_hash,preferred_locale")

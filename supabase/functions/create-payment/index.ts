@@ -1,3 +1,4 @@
+import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import StripeCheckout from "https://esm.sh/stripe@19.1.0";
@@ -586,7 +587,7 @@ serve(async (req) => {
     if (accessToken.length < 32) {
       throw new RequestError("Submission authorization is invalid.", 403);
     }
-    const accessTokenHash = await sha256(accessToken);
+    const accessTokenHash = await intakeAccessTokenHash(accessToken, serviceRoleKey, submissionId);
     const customerEmail = requiredString(formData.email, "email", 255)
       .toLowerCase();
     const customerName = `${requiredString(formData.firstName, "firstName", 100)} ${requiredString(formData.lastName, "lastName", 100)}`;
@@ -935,7 +936,9 @@ serve(async (req) => {
       automatic_tax: { enabled: !product.isPhotoRadar },
       tax_id_collection: { enabled: false },
       success_url: successUrl,
-      cancel_url: `${siteUrl}${localizedPublicPath(preferredLocale, "/payment-canceled")}${draftId ? `?draft=${encodeURIComponent(draftId)}` : ""}`,
+      cancel_url: raw.completionFlow === true && draftId
+        ? `${siteUrl}/complete-ticket`
+        : `${siteUrl}${localizedPublicPath(preferredLocale, "/payment-canceled")}${draftId ? `?draft=${encodeURIComponent(draftId)}` : ""}`,
       metadata,
       payment_intent_data: { metadata },
     } satisfies Stripe.Checkout.SessionCreateParams;

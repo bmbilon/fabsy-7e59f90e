@@ -1,3 +1,4 @@
+import { validTicketCompletionUrl } from "./ticket-completion.ts";
 import {
   type AbandonedTicketEmail,
   renderAbandonedTicketEmail,
@@ -16,6 +17,7 @@ export type AbandonedTicketContext = {
   reason?: string;
   retryable?: boolean;
   email?: string;
+  completionUrl?: string;
   firstName?: string | null;
   ticketType?: string | null;
   ticketNumber?: string | null;
@@ -165,7 +167,7 @@ export async function processAbandonedTicketEmails(
       if (!context.eligible) {
         status = context.retryable ? "retry" : "suppressed";
         reason = safeReason(context.reason);
-      } else if (!context.email || !Array.isArray(context.checkoutSessionIds)) {
+      } else if (!context.email || !Array.isArray(context.checkoutSessionIds) || !validTicketCompletionUrl(context.completionUrl)) {
         throw new AbandonedTicketDeliveryError("intake_context_invalid");
       } else {
         let completed = false;
@@ -184,6 +186,7 @@ export async function processAbandonedTicketEmails(
         } else {
           const proposed = job.email_payload || renderAbandonedTicketEmail({
             email: context.email,
+            completionUrl: context.completionUrl!,
             firstName: context.firstName,
             ticketType: context.ticketType,
             ticketNumber: context.ticketNumber,
@@ -199,6 +202,15 @@ export async function processAbandonedTicketEmails(
           ) {
             status = "suppressed";
             reason = "recipient_changed";
+          } else if (
+            !validTicketCompletionUrl(latest.completionUrl) ||
+            !email.text.includes(latest.completionUrl) ||
+            !email.html.includes(latest.completionUrl)
+          ) {
+            // A retry cannot change a frozen provider payload. Never resend a
+            // public intake link or an alias revoked by a contact correction.
+            status = "suppressed";
+            reason = "completion_link_changed";
           } else if (
             !Array.isArray(latest.checkoutSessionIds) ||
             latest.checkoutSessionIds.some((id) =>

@@ -1,3 +1,4 @@
+const completionUrl = `https://fabsy.ca/complete-ticket#access=c1.${"1".repeat(32)}.${"a".repeat(64)}.1999999999.${"b".repeat(64)}`;
 import {
   assertEquals,
   assertRejects,
@@ -22,6 +23,7 @@ const job: AbandonedTicketJob = {
 };
 const context: AbandonedTicketContext = {
   eligible: true,
+  completionUrl,
   email: "ali@example.com",
   firstName: "Ali",
   ticketType: "Speeding",
@@ -67,7 +69,7 @@ Deno.test("eligible unpaid draft sends once with the personalized payload", asyn
   });
   assertEquals(f.outcomes, [[job.id, "sent", "email-1", null]]);
   assertEquals(f.sent, [[
-    renderAbandonedTicketEmail({
+    renderAbandonedTicketEmail({ completionUrl,
       email: context.email!,
       firstName: "Ali",
       ticketType: "Speeding",
@@ -176,7 +178,7 @@ Deno.test("changed recipient or a lost freeze never sends stale mail", async () 
 });
 
 Deno.test("retries reuse the frozen email even when personal details change", async () => {
-  const frozen = renderAbandonedTicketEmail({
+  const frozen = renderAbandonedTicketEmail({ completionUrl,
     email: context.email!,
     firstName: "Original",
   });
@@ -253,7 +255,7 @@ Deno.test("Stripe reader verifies unpaid, paid, free and delayed complete checko
 
 Deno.test("Resend attempts use identical payload bytes and a stable idempotency key", async () => {
   const requests: RequestInit[] = [];
-  const email = renderAbandonedTicketEmail({ email: context.email! });
+  const email = renderAbandonedTicketEmail({ completionUrl, email: context.email! });
   const fetcher: typeof fetch = (_url, options) => {
     requests.push(options!);
     return Promise.resolve(Response.json({ id: "email-1" }));
@@ -282,7 +284,7 @@ Deno.test("Resend attempts use identical payload bytes and a stable idempotency 
 });
 
 Deno.test("legacy frozen email without the required BCC never reaches Resend", async () => {
-  const email = renderAbandonedTicketEmail({ email: context.email! });
+  const email = renderAbandonedTicketEmail({ completionUrl, email: context.email! });
   const legacy = { ...email };
   Reflect.deleteProperty(legacy, "bcc");
   let providerCalls = 0;
@@ -304,4 +306,16 @@ Deno.test("legacy frozen email without the required BCC never reaches Resend", a
     assertEquals(error.permanent, true);
   }
   assertEquals(providerCalls, 0);
+});
+
+Deno.test("revoked completion links and frozen legacy intake emails are suppressed", async () => {
+  for (const legacy of [false, true]) {
+    let reads = 0;
+    const f = fixture({
+      context: () => Promise.resolve({ ...context, completionUrl: !legacy && ++reads > 1 ? completionUrl.replace("a".repeat(64), "c".repeat(64)) : completionUrl }),
+      freeze: (_job, email) => Promise.resolve(legacy ? { ...email, text: "https://fabsy.ca/submit-ticket", html: "https://fabsy.ca/submit-ticket" } : email),
+    });
+    assertEquals((await processAbandonedTicketEmails(f.deps)).suppressed, 1);
+    assertEquals(f.sent.length, 0);
+  }
 });
