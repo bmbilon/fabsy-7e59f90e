@@ -99,6 +99,7 @@ export const EXPECTED_SHARED_FUNCTION_FILES = Object.freeze([
   'supabase/functions/_shared/notification-locale.ts',
   'supabase/functions/_shared/paid-payment-ledger.ts',
   'supabase/functions/_shared/payment-checkout-link.ts',
+  'supabase/functions/_shared/payment-notification-sms.ts',
   'supabase/functions/_shared/photo-radar.ts',
   'supabase/functions/_shared/pro-licence.ts',
   'supabase/functions/_shared/pro-pricing.ts',
@@ -114,6 +115,7 @@ export const EXPECTED_SHARED_FUNCTION_FILES = Object.freeze([
   'supabase/functions/_shared/ticket-intake-draft.ts',
   'supabase/functions/_shared/ticket-intake-resume-delivery.ts',
   'supabase/functions/_shared/ticket-notification-html.ts',
+  'supabase/functions/_shared/ticket-upload-sms.ts',
 ]);
 export const EXPECTED_TRUSTED_IP_FUNCTIONS = Object.freeze([
   'ticket-intake-draft',
