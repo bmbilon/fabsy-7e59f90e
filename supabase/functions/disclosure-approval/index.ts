@@ -135,7 +135,7 @@ async function createApproval(raw: Record<string, unknown>) {
     throw new Error("Approval could not be created.");
   }
   const link = `${siteUrl}/disclosure-approval#token=${token}`;
-  const smsBody = `Fabsy: approval needed for ${caseLabel}, ticket ending ${ticketNumber.slice(-4)}. Review Alberta terms and approve the not-guilty plea + disclosure request: ${link} Expires in 30 min. Opening the link does not approve.`;
+  const smsBody = `Fabsy: approval needed for ${caseLabel}, ticket ${ticketNumber}. Review Alberta terms and approve the not-guilty plea + disclosure request: ${link} Expires in 30 min. Opening the link does not approve.`;
   try {
     const sent = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${account}/Messages.json`, {
       method: "POST", headers: { Authorization: `Basic ${btoa(`${account}:${authToken}`)}`, "Content-Type": "application/x-www-form-urlencoded" },
