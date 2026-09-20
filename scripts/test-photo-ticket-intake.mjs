@@ -336,8 +336,8 @@ test("PDFs can submit without names, ticket numbers, DL, DOB or a successful sca
   assert.match(app.document.body.textContent, /Success, Your ticket has been received/);
 });
 
-test("the contact form accepts email only, phone only, or both after success", async t => {
-  for (const values of [{ email: "alex@example.test", phone: "" }, { email: "", phone: "4035550123" }, { email: "alex@example.test", phone: "4035550123" }]) {
+test("the contact form requires email and accepts an optional phone after success", async t => {
+  for (const values of [{ email: "alex@example.test", phone: "" }, { email: "alex@example.test", phone: "4035550123" }]) {
     await t.test(JSON.stringify(values), async st => {
       const app = await runtime(st);
       await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
@@ -353,11 +353,15 @@ test("the contact form accepts email only, phone only, or both after success", a
   }
 });
 
-test("blank contact details do not erase a completed submission", async t => {
+test("blank or phone-only contact details do not erase a completed submission", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
   await app.api.click(app.button("Accept")); await app.flush();
-  assert.match(app.document.body.textContent, /Enter an email address or phone number/);
+  assert.equal(app.field("updates-email").required, true);
+  assert.equal(app.field("updates-email").validity.valueMissing, true);
+  await app.edit("updates-phone", "4035550123");
+  await app.api.click(app.button("Accept")); await app.flush();
+  assert.equal(app.field("updates-email").validity.valueMissing, true);
   assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
   assert.equal(app.saves.filter(x => x.name === "contact").length, 0);
 });

@@ -116,20 +116,20 @@ Deno.test("true, false and legacy missing plea instructions survive intake and c
   }
 });
 
-Deno.test("contact details are saved only after receipt, with email or phone or both", async () => {
+Deno.test("contact details require email after receipt, with optional phone", async () => {
   await boundary(async state => {
     await (await handler(request(prepare))).body?.cancel();
     const early = await handler(request({ action: "contact", submissionId, accessToken, email: "alex@example.test" }));
     assert.equal(early.status, 403); await early.body?.cancel();
     state.row.consent_form_path = `${submissionId}/consent.pdf`;
-    for (const contact of [{ email: "Alex@Example.test", phone: "" }, { email: "", phone: "(403) 555-0123" }, { email: "alex@example.test", phone: "+14035550123" }]) {
+    for (const contact of [{ email: "Alex@Example.test", phone: "" }, { email: "alex@example.test", phone: "+14035550123" }]) {
       const response = await handler(request({ action: "contact", submissionId, accessToken, ...contact }));
       assert.equal(response.status, 200); const result = await response.json();
       assert.equal(result.fields.email, contact.email.toLowerCase());
       assert.equal(result.fields.phone.replace(/\D/g, ""), contact.phone.replace(/\D/g, ""));
       assert.ok(state.row.consent_form_path);
     }
-    for (const contact of [{ email: "", phone: "" }, { email: "bad-address", phone: "" }, { email: "", phone: "123" }]) {
+    for (const contact of [{ email: "", phone: "" }, { email: "", phone: "(403) 555-0123" }, { email: "bad-address", phone: "" }, { email: "alex@example.test", phone: "123" }]) {
       const response = await handler(request({ action: "contact", submissionId, accessToken, ...contact })); assert.equal(response.status, 400); await response.body?.cancel();
     }
     const badToken = await handler(request({ action: "contact", submissionId, accessToken: "b".repeat(64), email: "other@example.test" }));

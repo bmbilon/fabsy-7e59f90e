@@ -59,6 +59,7 @@ interface NotificationClaim {
   status?: unknown;
   failureCode?: unknown;
   manualReviewRequired?: unknown;
+  clientEmailOwner?: unknown;
 }
 
 class RequestError extends Error {
@@ -72,6 +73,13 @@ function requiredText(value: unknown, label: string, maxLength: number) {
   const normalized = value.trim();
   if (!normalized || normalized.length > maxLength) throw new RequestError(`${label} is invalid.`);
   return normalized;
+}
+
+function requiredTicketReference(value: unknown): string {
+  if (typeof value !== "string" || !/^[A-Za-z0-9 -]+$/.test(value.trim())) throw new RequestError("A verified ticket number is required before notification.", 409);
+  const ticket = value.trim().toUpperCase().replace(/[ -]/g, "");
+  if (!/^[A-Z0-9]{5,30}$/.test(ticket) || !/[0-9]/.test(ticket)) throw new RequestError("A verified ticket number is required before notification.", 409);
+  return ticket;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -123,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
       lastName: String(submission.last_name || ""),
       email: String(submission.email || ""),
       phone: String(submission.phone || ""),
-      ticketNumber: String(submission.ticket_number || ""),
+      ticketNumber: requiredTicketReference(submission.ticket_number),
       violation: String(submission.violation || ""),
       fineAmount: String(submission.fine_amount || ""),
       submittedAt: submission.created_at ? String(submission.created_at) : new Date().toISOString(),
@@ -192,6 +200,13 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
     claimedSubmissionId = submissionId;
+    // The claim RPC decides ownership under the same lock as consent enqueue.
+    // An absent field supports the handler-first rollout before that migration.
+    // Never infer ownership from a separate read that could race with enqueue.
+    if (claim.clientEmailOwner !== undefined && claim.clientEmailOwner !== "legacy" && claim.clientEmailOwner !== "consent_welcome") {
+      throw new Error("Client email ownership could not be verified.");
+    }
+    const sendLegacyClientEmail = claim.clientEmailOwner !== "consent_welcome";
     
     console.log("Sending notification email for ticket:", ticketData.ticketNumber);
 
@@ -205,7 +220,7 @@ const handler = async (req: Request): Promise<Response> => {
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "hello@fabsy.ca",
       ...internalNotificationDelivery(),
-      subject: `Payment Pending - ${ticketData.firstName} ${ticketData.lastName}`,
+      subject: `Ticket ${ticketData.ticketNumber} — Payment pending`,
       html: renderTicketAdminEmailHtml(ticketData, siteOrigin),
     });
     if (emailResponse && typeof emailResponse === "object" && "error" in emailResponse && emailResponse.error) {
@@ -218,7 +233,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Fetch the dynamically generated consent form from storage with retry logic
     let pdfBuffer: ArrayBuffer | null = null;
     
-    if (ticketData.submissionId) {
+    if (sendLegacyClientEmail && ticketData.submissionId) {
       const fileName = submission.consent_form_path;
       let retries = 3;
       let retryDelay = 1000; // Start with 1 second delay
@@ -262,28 +277,32 @@ const handler = async (req: Request): Promise<Response> => {
       if (!pdfBuffer) {
         console.error("Failed to fetch consent form after 3 attempts");
       }
-    } else {
+    } else if (sendLegacyClientEmail) {
       console.warn("No submission ID provided, cannot fetch consent form");
     }
 
     // SECURITY: Send CLIENT confirmation email - contains ONLY this client's own data
     // Client should NEVER receive other clients' information or admin-only data
-    const clientEmailResponse = await resend.emails.send(prepareClientEmail({
-      from: "Fabsy <hello@fabsy.ca>",
-      reply_to: "hello@fabsy.ca",
-      to: [ticketData.email],
-      subject: "Your Ticket Submission Confirmation",
-      html: renderTicketClientEmailHtml(ticketData),
-      attachments: pdfBuffer ? [{
-        filename: 'Written-Consent-Form.pdf',
-        content: arrayBufferToBase64(pdfBuffer),
-      }] : [],
-    }, localeContext));
-    if (clientEmailResponse && typeof clientEmailResponse === "object" && "error" in clientEmailResponse && clientEmailResponse.error) {
-      providerDeliveryFailures.push("client_email_rejected");
-      console.error("Client email provider rejected delivery:", clientEmailResponse.error);
-    } else {
-      console.log("Client email accepted by provider:", clientEmailResponse);
+    let clientEmailResponse = null;
+    if (sendLegacyClientEmail) {
+      if (!pdfBuffer) throw new Error("The stored consent PDF could not be attached; client email held.");
+      clientEmailResponse = await resend.emails.send(prepareClientEmail({
+        from: "Fabsy <hello@fabsy.ca>",
+        reply_to: "hello@fabsy.ca",
+        to: [ticketData.email],
+        subject: `Ticket ${ticketData.ticketNumber} — Submission confirmation`,
+        html: renderTicketClientEmailHtml(ticketData),
+        attachments: pdfBuffer ? [{
+          filename: 'Written-Consent-Form.pdf',
+          content: arrayBufferToBase64(pdfBuffer),
+        }] : [],
+      }, localeContext));
+      if (clientEmailResponse && typeof clientEmailResponse === "object" && "error" in clientEmailResponse && clientEmailResponse.error) {
+        providerDeliveryFailures.push("client_email_rejected");
+        console.error("Client email provider rejected delivery:", clientEmailResponse.error);
+      } else {
+        console.log("Client email accepted by provider:", clientEmailResponse);
+      }
     }
 
     // SECURITY: Send SMS notification to admin - contains client data, only for verified admin
@@ -329,8 +348,8 @@ const handler = async (req: Request): Promise<Response> => {
       try {
         const englishClientSms = paymentResumeUrl
           ? renderPaymentPendingResumeSms(ticketData.firstName, paymentResumeUrl)
-          : `Hi ${ticketData.firstName}! Your ticket submission has been received. Complete Stripe Checkout before service begins. We've emailed copies of your forms and consent agreement. - Fabsy`;
-        const clientSmsMessage = prepareClientSms(englishClientSms, localeContext);
+          : `Hi ${ticketData.firstName}! Your ticket submission has been received. Complete Stripe Checkout before service begins. ${sendLegacyClientEmail ? "We've emailed copies of your forms and consent agreement." : "Your consent copy and next steps will arrive by email."} - Fabsy`;
+        const clientSmsMessage = prepareClientSms(`Ticket ${ticketData.ticketNumber}: ${englishClientSms}`, localeContext);
         
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
         const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
@@ -393,6 +412,7 @@ const handler = async (req: Request): Promise<Response> => {
       localization: notificationLocale(localeContext),
       adminEmail: emailResponse, 
       clientEmail: clientEmailResponse,
+      clientEmailDeferredToConsentWelcome: !sendLegacyClientEmail,
       adminSms: adminSmsResponse,
       clientSms: clientSmsResponse 
     }), {

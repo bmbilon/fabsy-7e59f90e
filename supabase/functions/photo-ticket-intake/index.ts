@@ -66,7 +66,7 @@ export const handler = async (req: Request): Promise<Response> => {
       const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
       const phoneInput = typeof input.phone === "string" ? input.phone.trim() : "";
       const digits = phoneInput.replace(/\D/g, "");
-      if (!email && !phoneInput) throw new RequestError("Enter an email address or phone number for updates.");
+      if (!email) throw new RequestError("Enter your email address so we can send your consent copy and next steps.");
       if (email && (email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) throw new RequestError("Enter a valid email address.");
       if (phoneInput && (phoneInput.length > 30 || digits.length < 7 || digits.length > 15)) throw new RequestError("Enter a valid phone number.");
       const phone = phoneInput ? `${phoneInput.startsWith("+") ? "+" : ""}${digits}` : "";
