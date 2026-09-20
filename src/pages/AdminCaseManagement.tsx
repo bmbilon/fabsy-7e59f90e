@@ -1,3 +1,7 @@
+import CaseStatusSelect from "@/components/admin/CaseStatusSelect";
+import CaseQueueSection from "@/components/admin/CaseQueueSection";
+import { useCaseStatuses, resolveCaseStatus } from "@/hooks/useCaseStatuses";
+import { caseStageLabel, isTrialStage, isCompletedStage } from "@/lib/admin/caseStatus";
 import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureAutomationPanel } from "@/components/DisclosureConfirmations";
 import { useEffect, useRef, useState } from "react";
@@ -34,6 +38,7 @@ interface TicketSubmission {
 }
 
 interface IntakeLead {
+  draft_data: { firstName?: string; lastName?: string; ticketNumber?: string };
   deleted_at: string | null;
   id: string;
   email: string | null;
@@ -63,7 +68,7 @@ interface IntakeLead {
   updated_at: string;
 }
 
-type IntakeLeadView = "outstanding" | "dismissed" | "deleted";
+type IntakeLeadView = "outstanding" | "managed" | "dismissed" | "deleted";
 type UploadAlertStatus = { draft_id: string; email_status: string; sms_status: string | null };
 
 function ownerAlertStatusText(status: string | null): string {
@@ -114,6 +119,9 @@ export default function AdminCaseManagement() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const caseStatuses = useCaseStatuses(user?.id, userRole);
+  const leadStatus = (lead: IntakeLead) => resolveCaseStatus(caseStatuses.data, 'draft', lead.id, lead.converted_submission_id);
+  const submissionStatus = (id: string) => resolveCaseStatus(caseStatuses.data, 'submission', id, intakeLeads.find(lead => lead.converted_submission_id === id)?.id);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -160,8 +168,8 @@ export default function AdminCaseManagement() {
     };
   }, [userRole]);
 
-  const activeSubmissions = submissions.filter(sub => !sub.deleted_at &&
-    (sub.intake_mode === 'photo_only' && Boolean(sub.consent_form_path) || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)));
+  const activeSubmissions = submissions.filter(sub => !sub.deleted_at && !isTrialStage(submissionStatus(sub.id)?.stage) &&
+    (Boolean(submissionStatus(sub.id)?.stage) || sub.intake_mode === 'photo_only' && Boolean(sub.consent_form_path) || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)));
   const viewSubmissions = ticketView === "deleted" ? submissions.filter(sub => sub.deleted_at) : activeSubmissions;
   const query = searchQuery.trim().toLowerCase();
   const filteredSubmissions = viewSubmissions.filter(sub =>
@@ -205,8 +213,8 @@ export default function AdminCaseManagement() {
         `)
         .order('created_at', { ascending: false }),
         supabase.from('ticket_intake_drafts')
-          .select('id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,follow_up_email_sent_at,follow_up_email_sent_by,follow_up_phone_called_at,follow_up_phone_called_by,expires_at,updated_at')
-          .or(selectedIntakeId ? `status.in.(active,converted),id.eq.${selectedIntakeId}` : 'status.in.(active,converted)')
+          .select('draft_data,id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,follow_up_email_sent_at,follow_up_email_sent_by,follow_up_phone_called_at,follow_up_phone_called_by,expires_at,updated_at')
+          .or(selectedIntakeId ? `status.in.(active,converted,expired),id.eq.${selectedIntakeId}` : 'status.in.(active,converted,expired)')
           .order('updated_at', { ascending: false }),
         supabase.rpc('get_ticket_upload_alert_statuses'),
       ]);
@@ -244,11 +252,7 @@ export default function AdminCaseManagement() {
         setIntakeLeads([]);
         setIntakeLeadError('Incomplete intakes could not be loaded. Existing submitted cases remain available below.');
       } else {
-        const managedCaseIds = new Set(transformedData.filter(sub => sub.deleted_at || (sub.intake_mode === 'photo_only' && Boolean(sub.consent_form_path) || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status))).map(submission => submission.id));
-        setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
-          (lead.id === selectedIntakeId || Boolean(lead.deleted_at) || lead.expires_at > new Date().toISOString()) &&
-          (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
-        ));
+        setIntakeLeads((leadResult.data || []) as unknown as IntakeLead[]);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -400,11 +404,16 @@ export default function AdminCaseManagement() {
     );
   }
 
-  const outstandingIntakeLeads = intakeLeads.filter(lead => !lead.deleted_at && lead.staff_follow_up_status !== "dismissed");
-  const dismissedIntakeLeads = intakeLeads.filter(lead => !lead.deleted_at && lead.staff_follow_up_status === "dismissed");
+  const managedCaseIds = new Set(submissions.filter(sub => sub.deleted_at || Boolean(submissionStatus(sub.id)?.stage) || (sub.intake_mode === 'photo_only' && Boolean(sub.consent_form_path)) || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)).map(sub => sub.id));
+  const availableLeads = intakeLeads.filter(lead => !lead.deleted_at && (!lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id)));
+  const partialLeads = availableLeads.filter(lead => (!leadStatus(lead)?.stage || leadStatus(lead)?.stage === 'partial') && (lead.expires_at > new Date().toISOString() || leadStatus(lead)?.stage));
+  const outstandingIntakeLeads = partialLeads.filter(lead => lead.staff_follow_up_status !== "dismissed");
+  const dismissedIntakeLeads = partialLeads.filter(lead => lead.staff_follow_up_status === "dismissed");
+  const managedIntakeLeads = availableLeads.filter(lead => leadStatus(lead)?.stage && leadStatus(lead)?.stage !== 'partial' && !isTrialStage(leadStatus(lead)?.stage));
   const deletedIntakeLeads = intakeLeads.filter(lead => lead.deleted_at);
-  const queueIntakeLeads = intakeLeadView === "deleted" ? deletedIntakeLeads : intakeLeadView === "dismissed" ? dismissedIntakeLeads : outstandingIntakeLeads;
+  const queueIntakeLeads = intakeLeadView === "deleted" ? deletedIntakeLeads : intakeLeadView === "managed" ? managedIntakeLeads : intakeLeadView === "dismissed" ? dismissedIntakeLeads : outstandingIntakeLeads;
   const visibleIntakeLeads = selectedIntakeId ? intakeLeads.filter(lead => lead.id === selectedIntakeId) : queueIntakeLeads;
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -427,12 +436,14 @@ export default function AdminCaseManagement() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-8"><CaseQueueSection userId={user?.id} role={userRole} trials /></div>
+        {caseStatuses.isError && <p role="alert" className="mb-4 text-red-700">Case statuses could not be loaded. <button className="underline" onClick={() => void caseStatuses.refetch()}>Retry</button></p>}
         <Card className="mb-8 border-amber-300/70">
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <CardTitle>Incomplete ticket intakes</CardTitle>
-                <CardDescription>Customers who allowed intake follow-up but have not completed payment, including contacts saved before upload.</CardDescription>
+                <CardTitle>{selectedIntakeId ? "Ticket intake" : "Ticket intakes"}</CardTitle>
+                <CardDescription>Review partial intakes and tickets you have moved forward manually.</CardDescription>
               </div>
               <div className="flex flex-wrap items-center gap-3">
               <Badge variant={intakeLeadError ? "destructive" : "outline"}>
@@ -460,6 +471,9 @@ export default function AdminCaseManagement() {
                 <Button type="button" size="sm" variant={intakeLeadView === "outstanding" ? "default" : "outline"} onClick={() => setIntakeLeadView("outstanding")}>
                   Outstanding ({outstandingIntakeLeads.length})
                 </Button>
+                <Button type="button" size="sm" variant={intakeLeadView === "managed" ? "default" : "outline"} onClick={() => setIntakeLeadView("managed")}>
+                  Managed tickets ({managedIntakeLeads.length})
+                </Button>
                 <Button type="button" size="sm" variant={intakeLeadView === "dismissed" ? "default" : "outline"} onClick={() => setIntakeLeadView("dismissed")}>
                   Dismissed ({dismissedIntakeLeads.length})
                 </Button>
@@ -472,6 +486,8 @@ export default function AdminCaseManagement() {
               ) : visibleIntakeLeads.map(lead => <div id={`intake-${lead.id}`} key={lead.id} className="flex scroll-mt-4 flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 xl:flex-row xl:items-center xl:justify-between">
                 <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold">{[lead.draft_data?.firstName, lead.draft_data?.lastName].filter(Boolean).join(' ') || 'Ticket intake'}</span>
+                    {caseStageLabel(leadStatus(lead)?.stage) && <Badge>{caseStageLabel(leadStatus(lead)?.stage)}</Badge>}
                     <Badge variant="outline">{lead.status === "converted" ? "Checkout started" : `Step ${lead.current_step} of 6`}</Badge>
                     {(lead.staff_follow_up_status === "dismissed" || (!lead.follow_up_email_sent_at && !lead.follow_up_phone_called_at)) ? <Badge variant={lead.staff_follow_up_status === "contacted" ? "secondary" : "outline"}>
                       {lead.staff_follow_up_status === "open" ? "Follow-up open" : lead.staff_follow_up_status === "contacted" ? "Contacted" : "Dismissed"}
@@ -502,6 +518,7 @@ export default function AdminCaseManagement() {
                   ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2 xl:max-w-[52%] xl:justify-end">
+                  <CaseStatusSelect kind="draft" ticketId={lead.id} label={[lead.draft_data?.firstName, lead.draft_data?.lastName].filter(Boolean).join(' ') || lead.email || lead.phone || 'this intake'} initial={leadStatus(lead)} fallback="Partial intake" disabled={Boolean(lead.deleted_at) || !caseStatuses.data} />
                   {lead.ticket_uploaded_at ? <Button type="button" variant="outline" disabled={openingIntakeLeadId !== null} aria-busy={openingIntakeLeadId === lead.id} onClick={() => void openLeadTicket(lead)}>
                     <FileText className="mr-2 h-4 w-4" aria-hidden="true" />{openingIntakeLeadId === lead.id ? "Opening…" : "Open ticket"}
                   </Button> : null}
@@ -536,7 +553,7 @@ export default function AdminCaseManagement() {
             <CardHeader className="pb-3">
               <CardDescription>Pending</CardDescription>
               <CardTitle className="text-3xl">
-                {activeSubmissions.filter(s => s.status === 'pending' || s.status === 'assessment_pending').length}
+                {activeSubmissions.filter(s => !submissionStatus(s.id)?.stage && (s.status === 'pending' || s.status === 'assessment_pending')).length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -544,7 +561,7 @@ export default function AdminCaseManagement() {
             <CardHeader className="pb-3">
               <CardDescription>In Progress</CardDescription>
               <CardTitle className="text-3xl">
-                {activeSubmissions.filter(s => s.status === 'in_progress').length}
+                {activeSubmissions.filter(s => submissionStatus(s.id)?.stage ? !isCompletedStage(submissionStatus(s.id)?.stage) && submissionStatus(s.id)?.stage !== 'partial' : s.status === 'in_progress').length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -552,7 +569,7 @@ export default function AdminCaseManagement() {
             <CardHeader className="pb-3">
               <CardDescription>Completed</CardDescription>
               <CardTitle className="text-3xl">
-                {activeSubmissions.filter(s => s.status === 'completed').length}
+                {activeSubmissions.filter(s => submissionStatus(s.id)?.stage ? isCompletedStage(submissionStatus(s.id)?.stage) : s.status === 'completed').length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -609,12 +626,13 @@ export default function AdminCaseManagement() {
                             <h3 className="font-semibold text-lg">
                               {[submission.first_name, submission.last_name].filter(Boolean).join(' ') || 'Ticket awaiting review'}
                             </h3>
-                            {getStatusBadge(submission.status)}
+                            {submissionStatus(submission.id)?.stage ? <Badge>{caseStageLabel(submissionStatus(submission.id)?.stage)}</Badge> : getStatusBadge(submission.status)}
                             {submission.ticket_type === 'photo_radar' && <Badge variant="secondary">Photo Radar · $79 · ATE</Badge>}
                             {submission.service_type === 'ticket_insurance_assessment' && (
                               <Badge variant="secondary">Legacy Ticket Triage · ${TICKET_ASSESSMENT.priceCad}</Badge>
                             )}
                           </div>
+                          <div className="mb-3"><CaseStatusSelect kind="submission" ticketId={submission.id} label={[submission.first_name, submission.last_name].filter(Boolean).join(' ') || submission.ticket_number} initial={submissionStatus(submission.id)} fallback={submission.status.replace(/_/g, ' ')} disabled={Boolean(submission.deleted_at) || !caseStatuses.data} /></div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
                             <p className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /> {submission.email}</p>
                             <p className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" aria-hidden="true" /> {submission.phone}</p>

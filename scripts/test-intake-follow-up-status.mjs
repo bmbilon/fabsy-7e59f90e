@@ -83,6 +83,10 @@ let root;
 try {
   const outfile = path.join(temporary, 'AdminCaseManagement.mjs');
   const mocks = {
+    '@/components/admin/CaseQueueSection': 'export default () => null;',
+    '@/components/admin/CaseStatusSelect': 'export default () => null;',
+    '@/hooks/useCaseStatuses': 'export const useCaseStatuses = () => ({ data: [] }); export const resolveCaseStatus = () => undefined;',
+
     '@/hooks/use-toast': 'export const useToast = () => ({ toast: globalThis.__intakeFollowUpTest.toast });',
     '@/hooks/useIdrAuth': 'export const getIdrStaffRole = async () => "admin";',
     '@/components/DisclosureConfirmations': 'export const DisclosureAutomationPanel = () => null;',

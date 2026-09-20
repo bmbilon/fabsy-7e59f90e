@@ -29,9 +29,9 @@ const server = await createServer({
       { find: "@", replacement: resolve(root, "src") },
     ],
   },
-  server: { host: "127.0.0.1", port: 4193, strictPort: true },
+  server: { host: "127.0.0.1", port: Number(process.env.ADMIN_PREVIEW_PORT || 4193), strictPort: true },
 });
 await server.listen();
 console.log(
-  "Synthetic dashboard preview: http://127.0.0.1:4193/admin/dashboard",
+  `Synthetic dashboard preview: http://127.0.0.1:${process.env.ADMIN_PREVIEW_PORT || 4193}/admin/dashboard`,
 );

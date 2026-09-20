@@ -1,3 +1,4 @@
+import CaseStatusSelect from "@/components/admin/CaseStatusSelect";
 import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureConfirmations } from "@/components/DisclosureConfirmations";
 import { useEffect, useState } from "react";
@@ -166,39 +167,6 @@ export default function AdminSubmissionDetail() {
       navigate('/admin/dashboard');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const updateStatus = async (newStatus: string) => {
-    if (!submission) return;
-    if (submission.ticket_type === "photo_radar" && newStatus === "completed") {
-      toast({ title: "Record the actual ATE outcome", description: "Use the Photo Radar outcome form so the final fine, client approval and reduction metric stay consistent.", variant: "destructive" });
-      return;
-    }
-
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase
-        .from('ticket_submissions')
-        .update({ status: newStatus })
-        .eq('id', submission.id);
-
-      if (error) throw error;
-
-      setSubmission({ ...submission, status: newStatus });
-      toast({
-        title: "Status Updated",
-        description: `Case status changed to ${newStatus.replace('_', ' ')}`,
-      });
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast({
-        title: "Update Failed",
-        description: "Failed to update case status",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUpdating(false);
     }
   };
 
@@ -373,16 +341,7 @@ export default function AdminSubmissionDetail() {
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <AdminTicketDelete id={submission.id} label={submission.ticket_number} onChanged={() => navigate("/admin/cases")} />
-              <Select value={submission.status} onValueChange={updateStatus} disabled={isUpdating}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed" disabled={submission.ticket_type === "photo_radar"}>Completed{submission.ticket_type === "photo_radar" ? " — use ATE outcome form" : ""}</SelectItem>
-                </SelectContent>
-              </Select>
+              <CaseStatusSelect kind="submission" ticketId={submission.id} label={submission.ticket_number || 'this ticket'} fallback={submission.status.replace(/_/g, ' ')} />
             </div>
           </div>
         </div>

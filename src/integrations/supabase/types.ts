@@ -14,6 +14,13 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_ticket_case_status: {
+        Row: { kind: string; ticket_id: string; stage: string; version: number; updated_at: string; updated_by: string | null; note: string | null }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+
       aeo_analytics: {
         Row: {
           created_at: string | null
@@ -849,6 +856,9 @@ export type Database = {
       }
     }
     Functions: {
+      get_admin_ticket_case_status: { Args: { p_kind: string; p_ticket_id: string }; Returns: Json }
+      set_admin_ticket_case_status: { Args: { p_kind: string; p_ticket_id: string; p_stage: string; p_expected_version: number }; Returns: Json }
+
       admin_dashboard_overview: {
         Args: { p_days?: number }
         Returns: Json
