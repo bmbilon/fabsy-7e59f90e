@@ -34,6 +34,9 @@ try {
     "supabase/tests/admin-case-status.test.sql",
     "supabase/migrations/20260920220000_admin_ticket_lapsed_status.sql",
     "supabase/tests/admin-lapsed-status.test.sql",
+    "supabase/tests/admin-performance.fixture.sql",
+    "supabase/migrations/20260921020000_admin_performance_history.sql",
+    "supabase/tests/admin-performance.test.sql",
   ]) {
     run("psql", [
       "-h",

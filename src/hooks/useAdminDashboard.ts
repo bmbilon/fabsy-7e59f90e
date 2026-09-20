@@ -4,13 +4,47 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getIdrStaffRole } from "@/hooks/useIdrAuth";
 import type {
-  DashboardDays,
-  DashboardOverview,
+  DashboardActivity,
   DashboardQueue,
   QueueFilter,
   QueueRange,
 } from "@/lib/admin/dashboard";
 import type { LiveSnapshot } from "@/lib/live-view/core";
+import type {
+  PerformanceReport,
+  PerformanceSelection,
+} from "@/lib/admin/performance";
+
+export function usePerformanceReport(
+  userId: string | undefined,
+  role: string | null | undefined,
+  selection: PerformanceSelection,
+) {
+  return useQuery({
+    queryKey: ["admin-performance", userId, selection],
+    enabled: !!userId && (role === "admin" || role === "case_manager"),
+    queryFn: async ({ signal }) => {
+      const { data, error } = await supabase
+        .rpc("admin_performance_report", {
+          p_period: selection.period,
+          p_compare: selection.compare,
+          p_granularity: selection.granularity,
+          ...(selection.period === "custom"
+            ? { p_start: selection.start, p_end: selection.end }
+            : {}),
+        })
+        .abortSignal(signal);
+      if (error || !data || typeof data !== "object" || !("series" in data))
+        throw new Error("Performance report unavailable.");
+      return data as unknown as PerformanceReport;
+    },
+    staleTime: 30_000,
+    gcTime: 0,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+    retry: false,
+  });
+}
 
 export function useDashboardAuth() {
   const [session, setSession] = useState<Session | null>(null);
@@ -53,7 +87,6 @@ export function useDashboardAuth() {
 export function useDashboardData(
   userId: string | undefined,
   role: string | null | undefined,
-  days: DashboardDays,
   filter: QueueFilter,
   search: string,
   offset: number,
@@ -61,15 +94,15 @@ export function useDashboardData(
 ) {
   const enabled = !!userId && (role === "admin" || role === "case_manager");
   const overview = useQuery({
-    queryKey: ["admin-dashboard", userId, days],
+    queryKey: ["admin-dashboard", userId],
     enabled,
     queryFn: async ({ signal }) => {
       const { data, error } = await supabase
-        .rpc("admin_dashboard_overview", { p_days: days })
+        .rpc("admin_dashboard_activity")
         .abortSignal(signal);
-      if (error || !data || typeof data !== "object" || !("daily" in data))
+      if (error || !data || typeof data !== "object" || !("today" in data))
         throw new Error("Performance data could not be loaded.");
-      return data as unknown as DashboardOverview;
+      return data as unknown as DashboardActivity;
     },
     refetchInterval: 60_000,
     refetchIntervalInBackground: false,
