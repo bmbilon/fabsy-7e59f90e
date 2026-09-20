@@ -55,7 +55,7 @@ try {
     assert.equal(state.rows.length, 1, 'Call metadata persists independently of recording availability');
     assert.equal(state.emails.length, 1);
     assert.deepEqual(state.emails[0].to, ['hello@fabsy.ca']);
-    assert.deepEqual(state.emails[0].bcc, ['brett@execom.ca']);
+    assert.deepEqual(state.emails[0].bcc, []);
     assert.equal(state.emails[0].reply_to, 'hello@fabsy.ca');
     return response.json();
   }

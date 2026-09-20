@@ -11,7 +11,7 @@ set -euo pipefail
 #  export TWILIO_PHONE_E164="+18252532279"  # your Twilio number
 #  export TWILIO_ACCOUNT_SID="AC..."         # optional if not using default profile
 #  export RESEND_API_KEY="re_..."
-#  export EMAIL_TO="brett@execom.ca,hello@fabsy.ca"
+#  Internal notification recipient is fixed to hello@fabsy.ca.
 #  export EMAIL_FROM="no-reply@fabsy.ca"
 #  scripts/deploy-twilio-sms-forward.sh
 
@@ -26,7 +26,7 @@ fi
 
 # Prepare env for serverless deploy
 cp -n "$SRV_DIR/.env.example" "$SRV_DIR/.env" || true
-awk -v rk="${RESEND_API_KEY:-}" -v to="${EMAIL_TO:-brett@execom.ca,hello@fabsy.ca}" -v from="${EMAIL_FROM:-no-reply@fabsy.ca}" '
+awk -v rk="${RESEND_API_KEY:-}" -v to="hello@fabsy.ca" -v from="${EMAIL_FROM:-no-reply@fabsy.ca}" '
   BEGIN { FS=OFS="=" }
   $1=="RESEND_API_KEY" { $2=rk; print; next }
   $1=="EMAIL_TO" { $2=to; print; next }
@@ -59,5 +59,5 @@ TWILIO_LOG_LEVEL=debug twilio api:core:incoming-phone-numbers:update \
   --sms-url "$WEBHOOK_URL" \
   --sms-method POST
 
-echo "✅ Inbound SMS will be forwarded to: ${EMAIL_TO:-brett@execom.ca,hello@fabsy.ca}"
+echo "✅ Inbound SMS will be forwarded to: hello@fabsy.ca"
 echo "Webhook set to: $WEBHOOK_URL (PN SID: $PNSID)"

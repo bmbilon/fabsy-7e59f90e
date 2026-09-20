@@ -64,7 +64,7 @@ for (const inquiryType of ["contact", "fleet"]) {
       assert.equal(messages.length, 2);
       const [client, admin] = messages;
       assert.equal(client.from, "Fabsy <hello@fabsy.ca>");
-      assert.equal(client.reply_to, "brett@execom.ca");
+      assert.equal(client.reply_to, "hello@fabsy.ca");
       assert.deepEqual([...client.to], [fixture.email]);
       assert.equal(client.subject, inquiryType === "fleet" ? "We've Received Your Fleet Enquiry - Fabsy" : "We've Received Your Message - Fabsy");
       assert.equal(client.headers["Content-Language"], "en");
@@ -73,7 +73,8 @@ for (const inquiryType of ["contact", "fleet"]) {
       assert.equal(client.headers["X-Fabsy-Language-Fallback"], locale === "en" ? undefined : "translation_not_reviewed");
       assert.equal(admin.from, "Fabsy Notifications <hello@fabsy.ca>");
       assert.equal(admin.reply_to, fixture.email);
-      assert.deepEqual([...admin.to], ["brett@execom.ca"]);
+      assert.deepEqual([...admin.to], ["hello@fabsy.ca"]);
+      assert.deepEqual([...admin.bcc], []);
       assert.equal(admin.subject, `${inquiryType === "fleet" ? "Fleet Account Enquiry" : "New Contact Form Submission"} from ${fixture.name}`);
 
       const dom = new JSDOM(client.html);

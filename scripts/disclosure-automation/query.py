@@ -51,8 +51,9 @@ def main():
         with tempfile.TemporaryDirectory(prefix='fabsy-disclosure-query-') as directory:
             path = Path(directory)/'candidates.sql'
             path.write_text(query)
-            return subprocess.run(['supabase','db','query','--linked','--workdir',str(REPO),
-                '--file',str(path),'--output','json','--log-level','error'],check=False).returncode
+            return subprocess.run(['supabase','db','query','--linked',
+                '--file',str(path),'--output','json','--log-level','error'],
+                cwd=REPO,check=False).returncode
     except OSError as error:
         print(str(error),file=sys.stderr)
         return 1
