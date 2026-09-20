@@ -68,7 +68,7 @@ try {
         },
         from(table) {
           const chain = { select() { return chain; }, neq() { return chain; },
-            in() { return chain; }, not() { return chain; }, gt() { return chain; },
+            in() { return chain; }, or() { return chain; }, not() { return chain; }, gt() { return chain; },
             order: async () => ({ data: table === 'ticket_intake_drafts' ? [globalThis.__ticketOpeningTest.lead] : [], error: null }) };
           return chain;
         },

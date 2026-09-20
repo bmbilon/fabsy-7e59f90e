@@ -1,0 +1,17 @@
+create role anon;
+create role authenticated;
+create schema auth;
+create schema analytics_private;
+create schema storage;
+grant usage on schema public,auth to anon,authenticated;
+create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+create function public.is_idr_staff() returns boolean language sql stable as $$select auth.uid() in ('10000000-0000-4000-8000-000000000001'::uuid,'10000000-0000-4000-8000-000000000002'::uuid)$$;
+create function analytics_private.is_paid_funnel_verification(text,text,text) returns boolean language sql immutable as $$select lower(coalesce($1,''))='qa' or lower(coalesce($2,''))='qa' or lower(coalesce($3,'')) ~ '^(qa_|fabsy_aeo_verification_)'$$;
+create table analytics_private.paid_funnel_events(event_name text,session_id uuid,occurred_at timestamptz,utm_source text,utm_medium text,utm_campaign text,click_id_kind text,click_id_hash text);
+create table analytics_private.paid_payment_purchases(occurred_at timestamptz,amount_cents bigint,tax_cents bigint,currency text);
+create table analytics_private.paid_payment_refunds(status_observed_at timestamptz,amount_cents bigint,currency text,status text);
+create table public.ticket_submissions(id uuid primary key,first_name text,last_name text,email text,phone text,ticket_number text,service_type text default 'representation',ticket_type text default 'officer_issued',status text,created_at timestamptz default now(),updated_at timestamptz default now(),deleted_at timestamptz,ticket_document_path text,assessment_ticket_path text);
+create table public.ticket_intake_drafts(id uuid primary key,converted_submission_id uuid unique,draft_data jsonb default '{}',email text,phone text,status text default 'active',current_step integer default 1,created_at timestamptz default now(),updated_at timestamptz default now(),ticket_uploaded_at timestamptz,ticket_document_path text,deleted_at timestamptz,staff_follow_up_status text default 'open',expires_at timestamptz default now()+interval '30 days');
+create table storage.objects(bucket_id text,name text,created_at timestamptz,unique(bucket_id,name));
+alter table public.ticket_submissions add column representation_paid_at timestamptz, add column assessment_paid_at timestamptz;
+create function public.test_assert(ok boolean,message text) returns void language plpgsql as $$begin if ok is distinct from true then raise exception 'FAILED: %',message; end if; end$$;

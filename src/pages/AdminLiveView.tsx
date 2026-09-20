@@ -175,9 +175,9 @@ export default function AdminLiveView() {
       icon: Activity,
     },
     {
-      label: "Submissions today",
+      label: "Cases submitted today",
       value: data?.submissions_today,
-      hint: "Saved ticket submissions",
+      hint: "Saved cases; partial uploads are on the overview",
       icon: FileText,
     },
     {

@@ -99,7 +99,7 @@ try {
         from(table) {
           const chain = {
             select(fields) { fixture.query(table, fields); return chain; },
-            neq() { return chain; }, in() { return chain; }, not() { return chain; }, gt() { return chain; },
+            neq() { return chain; }, in() { return chain; }, or() { return chain; }, not() { return chain; }, gt() { return chain; },
             order: () => fixture.read(table),
           };
           return chain;
