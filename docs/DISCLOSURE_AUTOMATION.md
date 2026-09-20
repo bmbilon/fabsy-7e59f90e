@@ -5,8 +5,9 @@ paid representation clients whose ticket and signed consent are available, enter
 their instructed not-guilty plea in Alberta Traffic Tickets Digital Service,
 upload their consent, and request disclosure. Use `hello@fabsy.ca` as the
 representative email, select **No email address** for the defendant, and identify
-Brett Bilon / Fabsy Traffic Ticket Services as an **Agent**. Do not send a separate
-client email from this workflow. Government-generated receipts are expected.
+Brett Bilon / Fabsy Traffic Ticket Services as an **Agent**. Brett also authorized
+confirmed disclosure requests to update **Disclosure requested** and send one client
+notice through the existing outbox. Government-generated receipts are separate.
 
 The portal browser work runs in this Codex task through a heartbeat. It is a local
 runner: the Mac, Codex, connected browser, and authenticated Fabsy/Supabase access
@@ -48,7 +49,8 @@ A new automatic case can start only when:
   a staff `paid` label never replaces actual payment evidence. A canonical
   submission stage takes precedence over its converted draft's stage. Ambiguous
   inheritance and every later stage require reconciliation, even when no portal
-  receipt is recorded. Do not change staff stages automatically.
+  receipt is recorded. The verified disclosure receipt finalizer is the only
+  automatic staff-stage transition authorized by this workflow.
 - Original ticket and signed consent can both be downloaded and visually checked.
   Match client identity and ticket number; do not rely on OCR alone.
 - There is a documented not-guilty instruction. For the combined form this means
@@ -62,7 +64,7 @@ A new automatic case can start only when:
   across every date. Never repeat a confirmed plea to recover a failed disclosure
   request, or re-request disclosure because a plea receipt is missing.
 
-`disclosure_request_state=already_acknowledged` means disclosure must not be
+`disclosure_request_state=request_confirmed` or `already_acknowledged` means disclosure must not be
 requested again. It says nothing about whether a plea/trial request was filed.
 `needs_reconciliation` means an unmatched or ambiguous acknowledgement requires
 review before any repeat. `not_recorded` is only absence of a database receipt;
@@ -167,14 +169,16 @@ needed (September 20, 2026). Check any other mandatory questions against case ev
 explicit workflow instructions; do not invent witnesses, interpreter needs,
 address changes, admissions, or other case facts.
 
-The trial-appearance preference remains pending. If the portal requires a trial
-appearance choice and the specific case has no documented instruction, leave
-that question unanswered and hold the case for Brett's decision. Do not infer
-remote, in-person, agent-only, or any other appearance preference from the
-not-guilty plea, the consent form, or the No interpreter/witness defaults.
+Brett’s standing instruction is **remote always as first choice for any trial
+appearance requests** (September 20, 2026). Choose **Online by virtual trial**
+when available, unless a later case-specific instruction controls. Brett also instructed **always Yes** for stable high-speed internet, camera
+and microphone questions. Use those confirmed defaults. Verify other factual
+prerequisites, such as physical evidence, from the case. If
+remote is unavailable or a required fact cannot be established, hold the plea
+for resolution; do not silently choose in-person.
 
 The independent disclosure request may proceed while the plea/trial step waits
-for that preference, provided disclosure's own facts and approval are satisfied.
+for a missing prerequisite, provided disclosure's own facts and approval are satisfied.
 Keep the case partial and the plea held; never describe it as a completed
 not-guilty filing merely because disclosure succeeded.
 
@@ -195,10 +199,19 @@ Immediately before **each** portal final click, fetch fresh source records and
 recheck active status, `deleted_at`, effective staff stage/version, actual payment,
 refund/dispute holds, current consent and plea instruction, and the local ledger.
 The Terms approval was consumed earlier and is not a substitute for this check.
-Any staff stage outside absent/`partial`/`paid`, changed stage/version, deletion,
-missing source record, or changed authority stops the attempt for reconciliation.
-Do not automatically alter staff workflow status. For a partial case, preserve its confirmed step;
-an existing disclosure acknowledgement cannot authorize another disclosure.
+A changed stage/version, deletion, missing source record, or changed authority
+stops the attempt for reconciliation. The narrow exception is continuing an
+unfiled plea in the same live accepted session after this exact attempt’s own
+confirmed disclosure receipt advanced the stage to `disclosure_requested`. Verify
+the immutable receipt’s ticket, submission, portal session and saved source key,
+its `staff_stage_before`/`staff_version_before` against the approved snapshot, and
+its `staff_version_after` against the current canonical staff version. The status
+row must still identify that exact receipt; a later staff edit or another
+receipt never qualifies. Recheck payment, consent, documents, authority and local
+step state independently; the new-case eligibility flag is intentionally false
+after disclosure. An inbound receipt without a verified same-session mapping
+requires reconciliation. Preserve every confirmed step; an existing disclosure
+acknowledgement never authorizes another disclosure.
 
 Reserve the normalized ticket once with `ledger.py claim`. Immediately before
 each final click, use `mark-submitting --step plea` or `--step disclosure` with
@@ -231,9 +244,37 @@ one submission. `mark-submitting` then additionally requires
 current separate form satisfies that condition. An SMS approval covering the
 workflow is not evidence that the portal combines its two submissions.
 
-Never use the admin **Mark disclosure requested** button as a receipt shortcut:
-that control sends a client email. Do not mark complete disclosure received or
-start the 48-hour review clock merely because a request was acknowledged.
+## Finalize a confirmed disclosure request
+
+After `ledger.py confirm --step disclosure`, run the receipt finalizer with the
+same ticket claim and the actual portal session identifier:
+
+```sh
+python3 scripts/disclosure-automation/finalize-disclosure.py --ticket T12345678Z --claim-token CLAIM_UUID --portal-session-id SESSION_UUID
+```
+
+The helper requires the confirmed local step, its original operation UUID,
+unchanged consent and a nonempty saved confirmation file. It calls
+`record_disclosure_request_receipt` once with that evidence hash and a stable
+source key. It does not submit a government form. Keep its sanitized response in
+the private data directory. If the call is uncertain, reconcile the stored
+receipt/outbox before an explicit retry; never repeat the portal submission.
+
+The database records a durable receipt, advances an eligible early canonical
+staff stage to **Disclosure requested**, and queues one notice. Later, closed or
+deleted case stages are preserved. Existing sent, frozen or uncertain notices
+are reused or held, never replaced with another customer message. Crown
+acknowledgements enter this same receipt rule; they do not cause a second notice.
+A manual request must have actual confirmation evidence and explicitly assert
+`p_request_confirmed=true` through the staff RPC; changing a dropdown alone is
+not evidence or an email trigger.
+
+The client notice uses the full stored ticket number in its subject and says
+“We’ve requested disclosure of evidence from the Crown.” Its delivery runs through
+the existing cloud outbox worker. Check actual delivery state; a queued notice is
+not yet sent, and provider acceptance is not proof of inbox delivery. Do not send
+an additional courtesy email. Never mark complete disclosure received or start
+the 48-hour review clock merely because a request was acknowledged.
 
 Stay quiet when no action or state change occurs. Notify Brett for a confirmed
 submission, delivery failure, material exception, or required intervention.
@@ -243,6 +284,6 @@ Persist a blocker once; do not repeat the same SMS or notification each run.
 
 Keep actual client identifiers, live tab details and receipt evidence outside the
 repository in the private pending state and per-step ledger. The initial example
-has disclosure confirmed and its plea pending a trial-appearance preference.
+has disclosure confirmed; check its individual plea receipt and live-session status.
 Re-read those private records and the live case on each run; never infer that a
 confirmed disclosure request also filed a not-guilty plea.

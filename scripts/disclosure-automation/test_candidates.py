@@ -33,6 +33,9 @@ create table referral_payment_holds(payment_intent_id text,refunded_at timestamp
 create table idr_orders(ticket_submission_id uuid,stripe_payment_intent_id text);
 create table disclosure_confirmations(id uuid,submission_id uuid,ticket_number text,status text,
   confirmed_at timestamptz,received_at timestamptz);
+create table disclosure_request_receipts(id uuid,submission_id uuid,ticket_number text,source text,
+  confirmed_at timestamptz,portal_session_id uuid,status_sync text,staff_stage_before text,
+  staff_version_before integer,staff_version_after integer,recorded_at timestamptz default now());
 create table representation_consent_invites(id uuid,ticket_submission_id uuid,client_email text,
   ticket_numbers text[],ticket_number text,status text,signed_at timestamptz,signature_method text,
   pdf_path text,pdf_sha256 text,manual_scan_pdf_path text,manual_scan_review_status text,
@@ -194,6 +197,20 @@ class CandidateTests(unittest.TestCase):
         self.assertEqual(row['staff_workflow']['sources'][0]['kind'],'submission')
         self.assertFalse(row['representation_payment_recorded'])
         self.assertFalse(row['approval_source_requirements_met'])
+
+    def test_portal_receipt_is_visible_before_crown_acknowledgement(self):
+        rows = self.changed_rows("""
+          insert into disclosure_request_receipts(id,submission_id,ticket_number,source,confirmed_at,
+            portal_session_id,status_sync,staff_stage_before,staff_version_before,staff_version_after) values
+            ('70000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000002',
+            'E12345679T','portal',now(),'80000000-0000-4000-8000-000000000001','advanced','paid',1,2)
+        """)
+        row = rows['E12345679T']
+        self.assertEqual(row['existing_confirmation_count'],0)
+        self.assertEqual(row['existing_request_receipt_count'],1)
+        self.assertEqual(row['disclosure_request_state'],'request_confirmed')
+        self.assertEqual(row['existing_request_receipt']['portal_session_id'],'80000000-0000-4000-8000-000000000001')
+        self.assertEqual(row['existing_request_receipt']['staff_version_after'],2)
 
 
 if __name__ == '__main__':

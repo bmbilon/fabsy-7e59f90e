@@ -12,7 +12,8 @@ const db = supabase as unknown as import("@supabase/supabase-js").SupabaseClient
 interface Confirmation {
   id: string;
   confirmed_on: string;
-  timeframe_text: string;
+  source: "portal" | "manual" | "inbound";
+  ticket_number: string;
   notification_status: string;
   sent_at: string | null;
 }
@@ -25,7 +26,7 @@ export function DisclosureConfirmations({ submissionId, staff = false }: { submi
   const query = useQuery({
     queryKey: ["disclosure-confirmations", submissionId],
     queryFn: async () => {
-      const { data, error } = await db.rpc("get_case_disclosure_confirmations", { p_submission_id: submissionId });
+      const { data, error } = await db.rpc("get_case_disclosure_requests", { p_submission_id: submissionId });
       if (error) throw error;
       return data as Confirmation[];
     },
@@ -35,15 +36,13 @@ export function DisclosureConfirmations({ submissionId, staff = false }: { submi
   if (query.isError) return <div className="my-6 rounded-lg border p-4"><p role="alert">Disclosure updates could not be loaded.</p><Button variant="outline" size="sm" onClick={() => query.refetch()}>Try again</Button></div>;
   if (!query.data?.length) return staff ? <p className="my-6 text-sm text-muted-foreground">No disclosure request confirmation has been recorded for this case.</p> : null;
   return <Card className="my-6">
-    <CardHeader><CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5" />Disclosure request confirmed</CardTitle><CardDescription>The Crown has acknowledged the request. This update does not mean the disclosure has arrived.</CardDescription></CardHeader>
+    <CardHeader><CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5" />Disclosure requested</CardTitle><CardDescription>We’ve requested disclosure of evidence from the Crown. This update does not mean the evidence has arrived.</CardDescription></CardHeader>
     <CardContent className="space-y-5">
       {query.data.map(item => <div key={item.id} className="space-y-2 border-l-2 border-primary pl-4">
-        <p className="font-medium">Confirmed {dateLabel(item.confirmed_on)}</p>
-        <p className="text-sm text-muted-foreground">Crown's stated timeframe</p>
-        <p>{item.timeframe_text}</p>
+        <p className="font-medium">Ticket {item.ticket_number} · Confirmed {dateLabel(item.confirmed_on)}</p>
         {staff && <Badge variant={item.notification_status === "needs_review" ? "destructive" : "secondary"}>{deliveryLabel(item.notification_status)}</Badge>}
       </div>)}
-      <p className="text-sm text-muted-foreground">The Crown's timeframe is an estimate. Your ticket deadlines remain unchanged.</p>
+      <p className="text-sm text-muted-foreground">Your ticket deadlines remain unchanged.</p>
     </CardContent>
   </Card>;
 }
@@ -85,7 +84,7 @@ export function DisclosureAutomationPanel() {
   const active = health?.delivery_enabled && health.routing_configured && !stale && !health.last_worker_error;
   return <Card className="mb-8">
     <CardHeader className="gap-2 sm:flex-row sm:items-start sm:justify-between">
-      <div><CardTitle className="flex items-center gap-2"><Mail className="h-5 w-5" />Disclosure confirmation automation</CardTitle><CardDescription>Incoming Crown acknowledgements, case matching and client notices.</CardDescription></div>
+      <div><CardTitle className="flex items-center gap-2"><Mail className="h-5 w-5" />Disclosure confirmation automation</CardTitle><CardDescription>Verified disclosure requests, Crown acknowledgements and client notices.</CardDescription></div>
       <Button variant="outline" size="sm" onClick={() => query.refetch()} disabled={query.isFetching}><RefreshCw className="mr-2 h-4 w-4" />Refresh</Button>
     </CardHeader>
     <CardContent className="space-y-4">
@@ -98,7 +97,7 @@ export function DisclosureAutomationPanel() {
           <p className="font-medium">{item.ticket_number ? `Ticket ${item.ticket_number}` : "Ticket could not be identified"}</p><p className="my-2 text-sm">{item.review_reason || "Waiting to match a case."}</p>
           {item.parse_error ? <p className="text-sm text-muted-foreground">Check the original Crown email. A parser or authentication review is required before automated notification.</p> : <Button variant="outline" size="sm" disabled={retrying !== null} onClick={() => retry(item.id)}>{retrying === item.id ? "Matching..." : "Retry case matching"}</Button>}
         </div>)}
-        {query.data.deliveries.map(item => <div key={item.id} className="rounded-lg border p-4 text-sm"><Link className="font-medium underline" to={`/admin/submissions/${item.submission_id}`}>Open case</Link><span className="ml-3">{deliveryLabel(item.status)} · {item.attempts} attempts</span>{item.last_error && <p className="mt-2">{item.last_error}</p>}{item.status === "needs_review" && <p className="mt-2 text-muted-foreground">Check the case recipient and Resend delivery log before sending manually. Automatic delivery is paused for this notice to prevent duplicates.</p>}</div>)}
+        {query.data.deliveries.map(item => <div key={item.id} className="rounded-lg border p-4 text-sm"><Link className="font-medium underline" to={`/admin/submissions/${item.submission_id}`}>Open case</Link><span className="ml-3">{deliveryLabel(item.status)} · {item.attempts} attempts</span>{item.last_error && <p className="mt-2">{item.last_error}</p>}{item.status === "needs_review" && <p className="mt-2 text-muted-foreground">Check the case recipient and Google Workspace Sent history before sending manually. Automatic delivery is paused for this notice to prevent duplicates.</p>}</div>)}
         {(query.data.reviewCount > 50 || query.data.deliveryCount > 50) && <p className="text-sm text-muted-foreground">Showing up to 50 items in each queue. Resolve these items and refresh to see the rest.</p>}
       </>}
     </CardContent>
