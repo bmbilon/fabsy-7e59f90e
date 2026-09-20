@@ -246,7 +246,7 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
           size="icon"
           aria-label="Open admin navigation"
           onClick={() => setMobile(true)}
-          className="h-8 w-8 text-slate-200 hover:bg-white/10 hover:text-white lg:hidden"
+          className="h-8 w-8 text-slate-200 hover:bg-slate-700 hover:text-white lg:hidden"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -277,7 +277,7 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
             variant="ghost"
             size="icon"
             aria-label="Sign out"
-            className="h-8 w-8 text-slate-300 hover:bg-white/10 hover:text-white"
+            className="h-8 w-8 text-slate-300 hover:bg-slate-700 hover:text-white"
             onClick={async () => {
               const { error } = await supabase.auth.signOut();
               if (error) setSignOutError(true);
