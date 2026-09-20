@@ -1,0 +1,48 @@
+{
+  "verifiedAt": "2026-09-20T13:47:25.310123+00:00",
+  "projectRef": "gcasbisxfrssonllpqrw",
+  "migrations": [
+    {
+      "path": "supabase/migrations/20260920120000_combined_ticket_consent.sql",
+      "sha256": "595ecb865f115531ad4726e7cbc46a2025f2354f87705698664afc1e1af127ea",
+      "applied": true
+    },
+    {
+      "path": "supabase/migrations/20260920130000_photo_only_intake.sql",
+      "sha256": "37a90054ff9f5c41cfd775da5f60155dc45946a5f51a6e48f055bc3250f570aa",
+      "applied": true
+    }
+  ],
+  "functions": {
+    "photo-ticket-intake": {
+      "version": 1,
+      "status": "ACTIVE"
+    },
+    "generate-consent-form": {
+      "version": 183,
+      "status": "ACTIVE",
+      "bundleSourceCommit": "f1cc99e4bb96a4920a9237f826e2e1ee43ef7832",
+      "ezbrSha256": "43af0acb28d75c53703dd4e77ff7d24e11b089f52e52639fee3083d9906ccb18"
+    },
+    "create-payment": {
+      "version": 214,
+      "status": "ACTIVE"
+    },
+    "ocr-ticket": {
+      "version": 200,
+      "status": "ACTIVE"
+    }
+  },
+  "liveEmptyRequestStatus": {
+    "photo-ticket-intake": 403,
+    "generate-consent-form": 400,
+    "create-payment": 403,
+    "ocr-ticket": 400
+  },
+  "productionTestSubmissionsCreated": 0,
+  "notes": [
+    "Synthetic database assertions completed inside a rolled-back transaction before the two migration-only commits.",
+    "Bundled consent source matches the release backend. Existing translated wording and publication authorization remain unchanged; the PDF source fingerprint was refreshed for the English-only consent adapter.",
+    "Frontend is deployed separately through the backend-first workflow after its required checks pass."
+  ]
+}

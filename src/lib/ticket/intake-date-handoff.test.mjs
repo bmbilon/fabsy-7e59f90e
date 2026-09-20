@@ -25,6 +25,7 @@ try {
   const outfile = path.join(temporary, "TicketForm.mjs");
   const mocks = {
     "@/i18n/locale-context": `export const useLocale = () => ({ locale: "en", setIntakeHandoff: globalThis.__intakeDateTest.setIntakeHandoff });`,
+    "@/lib/ticket/intakeDraft": "export const resumeTokenFromHash = () => null;",
     "@/hooks/use-toast": `export const useToast = () => ({ toast: globalThis.__intakeDateTest.toast });`,
     "@/hooks/useTicketIntakeDraft": `export const useTicketIntakeDraft = () => ({ capability: null, record: null, status: "idle", error: "", hasUploadedTicket: false, createContact: async () => null, createOrUpload: async () => null, save: async () => null, getResumeUrl: () => null });`,
     "@/lib/referrals/capture": `export const readActiveReferral = () => null; export const captureReferralFromLocation = async () => null; export const captureReferralCode = async () => null; export const clearReferralAttribution = () => {}; export const REFERRAL_ATTRIBUTION_EVENT = "test-referral-event";`,
