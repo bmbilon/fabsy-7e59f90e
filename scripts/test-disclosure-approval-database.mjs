@@ -21,6 +21,8 @@ try {
     'supabase/tests/disclosure-approval.fixture.sql',
     'supabase/migrations/20260920150000_disclosure_remote_approval.sql',
     'supabase/migrations/20260920213000_disclosure_case_status_guard.sql',
+    'supabase/migrations/20260920223000_disclosure_operator_verification.sql',
+    'supabase/tests/disclosure-operator-verification.test.sql',
     'supabase/tests/disclosure-case-status-guard.test.sql',
     'supabase/tests/disclosure-approval.test.sql',
   ]) {
