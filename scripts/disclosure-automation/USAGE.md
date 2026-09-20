@@ -1,7 +1,9 @@
 # Disclosure automation helpers
 
-These scripts support the browser operator. They do not open the portal, enter a
-plea, submit a request, change Supabase records, or send email.
+These scripts support the browser operator. They do not open the portal or submit
+government forms. The approval helper can send Brett an authorized SMS; the
+receipt finalizer records an already confirmed request, updates its eligible
+case stage and queues the authorized client notice through the existing outbox.
 
 ## Read all candidate pages
 
@@ -21,7 +23,7 @@ with `--offset 50`, then `100`, and so on. Continue even if every previous row i
 held or already submitted locally. Stop only at `page_has_more=false` or an empty
 page. Keep the same limit throughout an enumeration; do not change remote case
 state during pagination. New records normally append to the stable
-`created_at,id` order and will also be found on the next hourly enumeration.
+`created_at,id` order and will also be found on the next 10-minute enumeration.
 
 Rows are candidates for review, not a submit list. Verify representation payment,
 refund/dispute holds, document content, case identity, exact plea instruction,
@@ -30,7 +32,7 @@ ledger before proceeding. A new quick-intake plea requires the v3 JSON boolean
 `pleadNotGuilty=true`; false must never be replaced by a legacy strategy. Legacy
 strategy indicators require actual detailed-intake origin verification. No DOB,
 licence, client email, or defendant explanation is returned by this query.
-`disclosure_request_state=already_acknowledged` prohibits repeating disclosure;
+`disclosure_request_state=request_confirmed` or `already_acknowledged` prohibits repeating disclosure;
 it does not establish that the separate plea/trial step happened. Ambiguous
 acknowledgements and partial cases require reconciliation under the approval
 service's existing guards before continuation.
@@ -128,6 +130,26 @@ phone preview masked and keep bearer links and tokens out of logs.
 `consent_sha256`, and `terms_sha256` returned for the same prepared session.
 Successful consumption is a single-use authorization receipt, not proof of a
 portal submission; retain the local ledger's separate final-click protocol.
+
+## Finalize confirmed disclosure
+
+After recording visible government success with `confirm --step disclosure`, run:
+
+```sh
+python3 scripts/disclosure-automation/finalize-disclosure.py --ticket T12345678Z --claim-token CLAIM_UUID --portal-session-id ORIGINAL_SESSION_UUID
+```
+
+Use the original recorded portal session; never manufacture a missing UUID. The
+helper verifies claim ownership, the confirmed step, its original operation ID,
+saved evidence and unchanged consent. One RPC records the actual receipt, advances
+an eligible early case stage and queues the authorized notice. Private state is
+saved in `~/.codex/fabsy-disclosure/disclosure-receipts/TICKET.json` with mode 0600.
+A repeated successful call returns the cached receipt. An uncertain attempt must
+be reconciled against the server before `--reconciled-retry` with the identical
+binding. This never authorizes another government request or a direct email.
+Historical matched Crown acknowledgements may instead be reconciled through
+`match_disclosure_confirmation(existing_confirmation_id)`; inspect their existing
+sent or uncertain outbox first. Do not send them again for the updated wording.
 
 ## Local verification
 

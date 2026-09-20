@@ -85,10 +85,22 @@ select t.id as submission_id,t.normalized_ticket as ticket_number,
   (select count(*) from public.disclosure_confirmations d where d.submission_id=t.id
     or regexp_replace(upper(d.ticket_number),'[^A-Z0-9]','','g')=t.normalized_ticket)
     as existing_confirmation_count,
+  (select count(*) from public.disclosure_request_receipts r
+    where r.submission_id=t.id or r.ticket_number=t.normalized_ticket) as existing_request_receipt_count,
+  (select jsonb_build_object('id',r.id,'submission_id',r.submission_id,'ticket_number',r.ticket_number,
+    'source',r.source,'confirmed_at',r.confirmed_at,'portal_session_id',r.portal_session_id,
+    'status_sync',r.status_sync,'staff_stage_before',r.staff_stage_before,
+    'staff_version_before',r.staff_version_before,'staff_version_after',r.staff_version_after)
+    from public.disclosure_request_receipts r
+    where r.submission_id=t.id or r.ticket_number=t.normalized_ticket order by r.recorded_at,r.id limit 1)
+    as existing_request_receipt,
   case when exists(select 1 from public.disclosure_confirmations d
     where d.status in ('matched','duplicate') and (d.submission_id=t.id
       or regexp_replace(upper(d.ticket_number),'[^A-Z0-9]','','g')=t.normalized_ticket))
     then 'already_acknowledged'
+    when exists(select 1 from public.disclosure_request_receipts r
+      where r.submission_id=t.id or r.ticket_number=t.normalized_ticket)
+    then 'request_confirmed'
     when exists(select 1 from public.disclosure_confirmations d where d.submission_id=t.id
       or regexp_replace(upper(d.ticket_number),'[^A-Z0-9]','','g')=t.normalized_ticket)
     then 'needs_reconciliation' else 'not_recorded' end as disclosure_request_state,

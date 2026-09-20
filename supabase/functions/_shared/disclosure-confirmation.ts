@@ -1,5 +1,5 @@
 /** Incoming email is untrusted data. No links, instructions or attachments are executed. */
-export interface ImprovEmail {
+export interface IncomingEmail {
   from?: { email?: string };
   to?: { email?: string }[];
   subject?: string;
@@ -9,6 +9,9 @@ export interface ImprovEmail {
   html?: string;
   headers?: Record<string, string | string[]>;
 }
+
+/** @deprecated The inbox transport is now Google Workspace. */
+export type ImprovEmail = IncomingEmail;
 
 export interface ParsedConfirmation {
   source_message_id: string;
@@ -22,12 +25,12 @@ export interface ParsedConfirmation {
 }
 
 export const normalizeTicket = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-const headerValues = (mail: ImprovEmail, name: string): string[] => {
+const headerValues = (mail: IncomingEmail, name: string): string[] => {
   const entry = Object.entries(mail.headers || {}).find(([key]) => key.toLowerCase() === name);
   return entry ? (Array.isArray(entry[1]) ? entry[1] : [entry[1]]).filter(v => typeof v === "string") : [];
 };
 
-export function emailBodyText(mail: ImprovEmail): string {
+export function emailBodyText(mail: IncomingEmail): string {
   const source = typeof mail.text === "string" && mail.text.trim() ? mail.text : (mail.html || "")
     .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
     .replace(/<[^>]*>/g, " ");
@@ -39,18 +42,18 @@ export function emailBodyText(mail: ImprovEmail): string {
     .replace(/\s+/g, " ").trim();
 }
 
-export function authenticatedCrown(mail: ImprovEmail): { ok: boolean; evidence: string } {
+export function authenticatedCrown(mail: IncomingEmail): { ok: boolean; evidence: string } {
   // Only the receiving service's first Authentication-Results header is trusted.
   // Never accept an arbitrary nested/forwarded header or DKIM-Signature by itself.
   const evidence = headerValues(mail, "authentication-results")[0] || "";
-  if (!/^mx[12]\.improvmx\.com\s*;/i.test(evidence)) return { ok: false, evidence };
+  if (!/^mx\.google\.com\s*;/i.test(evidence)) return { ok: false, evidence };
   const clauses = evidence.split(";").slice(1);
   const ok = clauses.some(clause => /\bdmarc=pass\b/i.test(clause) && /\bheader\.from=gov\.ab\.ca(?:\s|;|$)/i.test(clause))
     || clauses.some(clause => /\bdkim=pass\b/i.test(clause) && /\bheader\.(?:d|i)=@?gov\.ab\.ca(?:\s|;|$)/i.test(clause));
   return { ok, evidence: evidence.slice(0, 2000) };
 }
 
-export async function parseConfirmation(mail: ImprovEmail, now = new Date()): Promise<ParsedConfirmation | null> {
+export async function parseConfirmation(mail: IncomingEmail, now = new Date()): Promise<ParsedConfirmation | null> {
   const sender = String(mail.from?.email || "").trim().toLowerCase();
   if (sender !== "noreply@gov.ab.ca" || String(mail.subject || "").trim().toLowerCase() !== "disclosure request submitted") return null;
   const body = emailBodyText(mail);
@@ -69,7 +72,8 @@ export async function parseConfirmation(mail: ImprovEmail, now = new Date()): Pr
     .map(match => match[0].trim()).filter(value => /\b(?:days?|weeks?|months?)\b/i.test(value)
       && /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/i.test(value));
   const timeframe = sentences.length === 1 ? sentences[0] : null;
-  if (!timeframe) errors.push("timeframe_missing_or_ambiguous");
+  // A request acknowledgement is valid without an estimate. Keep uncertain
+  // timeframe wording null; client notices never infer a delivery timeline.
   const date = typeof mail.date === "string" ? new Date(mail.date) : new Date(NaN);
   const validDate = Number.isFinite(date.getTime());
   if (!validDate) errors.push("confirmation_date_missing");
@@ -93,29 +97,29 @@ export interface NoticeSnapshot {
   recipient: string;
   first_name: string;
   ticket_number: string;
-  confirmed_on: string;
-  timeframe_text: string;
+  confirmed_on?: string;
+  timeframe_text?: string | null;
   submission_id: string;
 }
 
-/** Version 1 is frozen per outbox row before delivery. No promotional content. */
+/** Version 2: a verified request receipt, without asserting that evidence arrived. */
 export function disclosureNotice(snapshot: NoticeSnapshot) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(snapshot.recipient)
-    || !/^\d{4}-\d{2}-\d{2}$/.test(snapshot.confirmed_on)
+    || typeof snapshot.ticket_number !== "string"
+    || !/^[A-Z0-9]{5,30}$/.test(snapshot.ticket_number) || !/\d/.test(snapshot.ticket_number)
     || !/^[0-9a-f-]{36}$/i.test(snapshot.submission_id)) throw new Error("Invalid notice snapshot");
-  const date = new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })
-    .format(new Date(`${snapshot.confirmed_on}T12:00:00Z`));
+  const greeting = snapshot.first_name || "there";
+  const caseUrl = `https://fabsy.ca/portal/cases/${snapshot.submission_id}`;
   return {
     from: "Fabsy <hello@fabsy.ca>", to: [snapshot.recipient], reply_to: "hello@fabsy.ca",
-    subject: `Disclosure request confirmed — ticket ${snapshot.ticket_number}`,
+    subject: `Ticket ${snapshot.ticket_number} — Disclosure requested`,
+    text: `Hello ${greeting},\n\nWe’ve requested disclosure of evidence from the Crown for ticket ${snapshot.ticket_number}.\n\nWe’ll review the evidence when it becomes available and keep you updated.\n\nView your case update: ${caseUrl}\n\nFabsy\nhello@fabsy.ca\n(825) 793-2279`,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;color:#1e293b;line-height:1.6">
-<h1 style="font-size:24px">Your disclosure request is confirmed</h1>
-<p>Hello ${escapeHtml(snapshot.first_name || "there")},</p>
-<p>The Crown confirmed receipt of the disclosure request for ticket <strong>${escapeHtml(snapshot.ticket_number)}</strong> on <strong>${escapeHtml(date)}</strong>.</p>
-<p>The Crown's stated timeframe is:</p><blockquote style="border-left:3px solid #3b82f6;padding-left:16px">${escapeHtml(snapshot.timeframe_text)}</blockquote>
-<p>This is the Crown's estimate. The disclosure itself has not yet been received. We will keep you updated as your file progresses.</p>
-<p>A disclosure request does not change the deadlines on your ticket.</p>
-<p><a href="https://fabsy.ca/portal/cases/${snapshot.submission_id}">View your case update</a></p>
+<h1 style="font-size:24px">Disclosure requested</h1>
+<p>Hello ${escapeHtml(greeting)},</p>
+<p>We’ve requested disclosure of evidence from the Crown for ticket <strong>${escapeHtml(snapshot.ticket_number)}</strong>.</p>
+<p>We’ll review the evidence when it becomes available and keep you updated.</p>
+<p><a href="${caseUrl}">View your case update</a></p>
 <p>Fabsy<br><a href="mailto:hello@fabsy.ca">hello@fabsy.ca</a><br>(825) 793-2279</p></div>`,
   };
 }

@@ -350,31 +350,62 @@ export interface GmailMessageSummary {
   threadId?: string;
 }
 
+export interface GmailMessagePage {
+  messages: GmailMessageSummary[];
+  nextPageToken?: string;
+}
+
 export async function listWorkspaceMessages(
   query: string,
   maxResults = 25,
 ): Promise<GmailMessageSummary[]> {
+  return (await listWorkspaceMessagesPage(query, maxResults)).messages;
+}
+
+/** Disclosure polling uses the page token; existing callers still receive one array. */
+export async function listWorkspaceMessagesPage(
+  query: string,
+  maxResults = 25,
+  pageToken?: string,
+): Promise<GmailMessagePage> {
   const token = await accessToken();
   const params = new URLSearchParams({
     q: assertHeader(query, "gmail_query"),
     maxResults: String(Math.max(1, Math.min(100, Math.trunc(maxResults)))),
   });
+  if (pageToken) params.set("pageToken", assertHeader(pageToken, "gmail_page_token"));
   const response = await fetch(`${GMAIL_API}/users/me/messages?${params}`, {
     signal: AbortSignal.timeout(20_000),
     headers: { Authorization: `Bearer ${token}` },
   });
-  const result = await response.json().catch(() => ({})) as {
+  const result = await response.json().catch(() => null) as {
     messages?: GmailMessageSummary[];
+    nextPageToken?: string;
     error?: { message?: string };
-  };
+  } | null;
+  if (!result || typeof result !== "object" || Array.isArray(result)) {
+    throw new Error("GOOGLE_WORKSPACE_MESSAGE_LIST_INVALID");
+  }
   if (!response.ok) {
+    if (response.status === 400 && pageToken && /page.?token/i.test(result.error?.message || "")
+      && /invalid|expired/i.test(result.error?.message || "")) {
+      throw new Error("GOOGLE_WORKSPACE_PAGE_TOKEN_INVALID");
+    }
     throw new Error(
       `GOOGLE_WORKSPACE_LIST_REJECTED_${response.status}_${
         result.error?.message || "unknown"
       }`,
     );
   }
-  return result.messages || [];
+  if (result.messages !== undefined && (!Array.isArray(result.messages)
+    || result.messages.some(message => !message || typeof message.id !== "string" || !/^[A-Za-z0-9_-]+$/.test(message.id)))) {
+    throw new Error("GOOGLE_WORKSPACE_MESSAGE_LIST_INVALID");
+  }
+  if (result.nextPageToken !== undefined && (typeof result.nextPageToken !== "string"
+    || !result.nextPageToken || result.nextPageToken.length > 4096 || /[\r\n\0]/.test(result.nextPageToken))) {
+    throw new Error("GOOGLE_WORKSPACE_PAGE_TOKEN_INVALID_RESPONSE");
+  }
+  return { messages: result.messages || [], ...(result.nextPageToken ? { nextPageToken: result.nextPageToken } : {}) };
 }
 
 export async function getWorkspaceMessage(id: string): Promise<unknown> {
