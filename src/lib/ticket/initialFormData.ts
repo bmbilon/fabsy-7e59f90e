@@ -23,7 +23,7 @@ export const initialFormData: FormData = {
   licenceClass: "unknown",
   addressDifferentFromLicense: false,
   referral: null,
-  
+
   // Ticket Details
   ticketType: "officer_issued",
   ticketTypeSource: "default",
@@ -45,7 +45,7 @@ export const initialFormData: FormData = {
   agentRepresentationPermitted: null,
   ticketImage: null,
   vehicleSeized: false,
-  
+
   // Defense Information
   pleaType: "",
   explanation: "",
@@ -55,11 +55,11 @@ export const initialFormData: FormData = {
   evidence: false,
   evidenceDetails: "",
   priorTickets: "none",
-  
+
   // Consent Information
   consentGiven: false,
   digitalSignature: "",
-  
+
   // Additional Info
   insuranceCompany: "",
   vehicleDetails: "",
