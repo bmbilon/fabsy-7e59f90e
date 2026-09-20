@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, BarChart3, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getIdrStaffRole } from '@/hooks/useIdrAuth';
@@ -266,7 +266,11 @@ function cad(cents: number): string {
 }
 
 export default function AdminPaidFunnel() {
-  const [days, setDays] = useState<(typeof windows)[number]>(7);
+  const [searchParams] = useSearchParams();
+  const [days, setDays] = useState<(typeof windows)[number]>(() => {
+    const requested = Number(searchParams.get('days'));
+    return windows.includes(requested as (typeof windows)[number]) ? requested as (typeof windows)[number] : 7;
+  });
   const [result, setResult] = useState<{
     days: (typeof windows)[number];
     status: 'loading' | 'ready' | 'failed';
@@ -365,6 +369,7 @@ export default function AdminPaidFunnel() {
             </Button>
           ))}
         </div>
+        <p className="text-xs text-muted-foreground">This detailed report uses rolling 24-hour days. The overview uses Edmonton calendar days, so their start times can differ.</p>
 
         {loading ? <p role="status" className="rounded-lg border bg-background p-6 text-sm text-muted-foreground">Loading acquisition report…</p> : null}
         {failed ? <div role="alert" className="rounded-lg border border-destructive/50 bg-background p-6">

@@ -837,6 +837,18 @@ export type Database = {
       }
     }
     Functions: {
+      admin_dashboard_overview: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
+      admin_dashboard_queue: {
+        Args: { p_filter?: string; p_search?: string; p_offset?: number; p_since?: string; p_until?: string }
+        Returns: Json
+      }
+      admin_live_view: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       admin_sms_intake_inbox: {
         Args: Record<PropertyKey, never>
         Returns: Json

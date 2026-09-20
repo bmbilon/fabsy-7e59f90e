@@ -1,7 +1,7 @@
 import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureAutomationPanel } from "@/components/DisclosureConfirmations";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,9 @@ function resumeDeliveryStatusText(lead: IntakeLead): string {
 }
 
 export default function AdminCaseManagement() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const intakeParam = searchParams.get('intake');
+  const selectedIntakeId = intakeParam && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(intakeParam) ? intakeParam : null;
   const [submissions, setSubmissions] = useState<TicketSubmission[]>([]);
   const [ticketView, setTicketView] = useState<"active" | "deleted">("active");
   const [intakeLeads, setIntakeLeads] = useState<IntakeLead[]>([]);
@@ -201,7 +204,7 @@ export default function AdminCaseManagement() {
         .order('created_at', { ascending: false }),
         supabase.from('ticket_intake_drafts')
           .select('id,deleted_at,email,phone,preferred_locale,current_step,completed_step,status,converted_submission_id,ticket_document_path,ticket_document_content_type,ticket_document_size_bytes,ticket_uploaded_at,resume_delivery_status,resume_delivery_channel,resume_delivery_sent_at,resume_delivery_attempt_count,resume_delivery_failure_code,staff_follow_up_status,staff_follow_up_updated_at,staff_follow_up_updated_by,follow_up_email_sent_at,follow_up_email_sent_by,follow_up_phone_called_at,follow_up_phone_called_by,expires_at,updated_at')
-          .in('status', ['active', 'converted'])
+          .or(selectedIntakeId ? `status.in.(active,converted),id.eq.${selectedIntakeId}` : 'status.in.(active,converted)')
           .order('updated_at', { ascending: false }),
         supabase.rpc('get_ticket_upload_alert_statuses'),
       ]);
@@ -239,7 +242,7 @@ export default function AdminCaseManagement() {
       } else {
         const managedCaseIds = new Set(transformedData.filter(sub => sub.deleted_at || !['awaiting_payment', 'assessment_awaiting_payment', 'assessment_checkout_open'].includes(sub.status)).map(submission => submission.id));
         setIntakeLeads((leadResult.data || []).filter((lead): lead is IntakeLead =>
-          (Boolean(lead.deleted_at) || lead.expires_at > new Date().toISOString()) &&
+          (lead.id === selectedIntakeId || Boolean(lead.deleted_at) || lead.expires_at > new Date().toISOString()) &&
           (lead.status === 'active' || !lead.converted_submission_id || !managedCaseIds.has(lead.converted_submission_id))
         ));
       }
@@ -396,7 +399,8 @@ export default function AdminCaseManagement() {
   const outstandingIntakeLeads = intakeLeads.filter(lead => !lead.deleted_at && lead.staff_follow_up_status !== "dismissed");
   const dismissedIntakeLeads = intakeLeads.filter(lead => !lead.deleted_at && lead.staff_follow_up_status === "dismissed");
   const deletedIntakeLeads = intakeLeads.filter(lead => lead.deleted_at);
-  const visibleIntakeLeads = intakeLeadView === "deleted" ? deletedIntakeLeads : intakeLeadView === "dismissed" ? dismissedIntakeLeads : outstandingIntakeLeads;
+  const queueIntakeLeads = intakeLeadView === "deleted" ? deletedIntakeLeads : intakeLeadView === "dismissed" ? dismissedIntakeLeads : outstandingIntakeLeads;
+  const visibleIntakeLeads = selectedIntakeId ? intakeLeads.filter(lead => lead.id === selectedIntakeId) : queueIntakeLeads;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -438,6 +442,7 @@ export default function AdminCaseManagement() {
             </div>
           </CardHeader>
           <CardContent>
+            {selectedIntakeId && <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"><span>Showing the intake opened from your overview.</span><Button variant="outline" size="sm" onClick={() => setSearchParams(params => { params.delete('intake'); return params; })}>Show all intakes</Button></div>}
             {intakeLeadError ? (
               <div role="alert" className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
                 <p className="font-semibold">Lead follow-up queue is unavailable</p>
@@ -460,7 +465,7 @@ export default function AdminCaseManagement() {
               </div>
               {visibleIntakeLeads.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">No {intakeLeadView} incomplete intakes.</p>
-              ) : visibleIntakeLeads.map(lead => <div key={lead.id} className="flex flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 xl:flex-row xl:items-center xl:justify-between">
+              ) : visibleIntakeLeads.map(lead => <div id={`intake-${lead.id}`} key={lead.id} className="flex scroll-mt-4 flex-col gap-4 rounded-lg border bg-amber-50/40 p-4 xl:flex-row xl:items-center xl:justify-between">
                 <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline">{lead.status === "converted" ? "Checkout started" : `Step ${lead.current_step} of 6`}</Badge>
