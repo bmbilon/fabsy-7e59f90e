@@ -1,3 +1,5 @@
+// Repository-standard pinned test assertions.
+// deno-lint-ignore no-import-prefix
 import { assert, assertEquals, assertRejects, assertThrows } from "https://deno.land/std@0.190.0/testing/asserts.ts";
 import { consentWelcomeDocuments } from "./consent-welcome-documents.ts";
 import { consentWelcomeEmail } from "./consent-welcome-email.ts";

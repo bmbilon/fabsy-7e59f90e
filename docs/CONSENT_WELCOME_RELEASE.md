@@ -33,7 +33,7 @@ The queue, client email and staff copy share the same saved document identity. T
 - [x] Implement client welcome, attachment and payment checks.
 - [x] Refresh staff copy identity and actual signed attachments.
 - [x] Verify required contact email and interrupted-contact behavior.
-- [ ] Run focused flow, database, provider and regression checks.
+- [x] Run focused flow, database, provider and regression checks.
 - [ ] Deploy backend, verify source/configuration/schedule, then release frontend.
 
 Baseline audit: all eight portal events were sent, including five representation-consent events. Five legacy submission notification bundles were sent; no pending or uncertain bundle was available to replay. Existing consents without a bundle are not proof of non-delivery and are not backfilled. The live send-notification, process-portal-activity and representation-consent sources matched the reviewed main revision. Generation and photo-intake dependency parity was checked against the existing verified backend release; the CLI cannot fully extract their large/externally bundled assets.
@@ -41,3 +41,5 @@ Baseline audit: all eight portal events were sent, including five representation
 Focused checks can be rerun with `npm run test:consent-welcome`. The PostgreSQL suite creates an isolated temporary database; it never connects to production. Frontend verification covered 86 upload/intake regressions, seven photo intake handler cases and a production Vite build. The required-email empty/phone-only case was also checked directly.
 
 Staff consent events waiting for a valid ticket reference follow the existing bounded retry policy, then move to `needs_review`. Staff must verify the reference and explicitly requeue an unattempted event; a provider-started or uncertain event requires delivery reconciliation first.
+
+Release validation passed: 31 Deno tests across client delivery, worker HTTP boundaries and staff consent mail; seven actual legacy-handler tests; isolated PostgreSQL migration/RLS/ownership/claim/source and payment-race tests, including two concurrent claim transactions. All four changed Edge Function entrypoints type-check. No test touched live client data or sent an email.

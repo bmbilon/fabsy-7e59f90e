@@ -148,6 +148,7 @@ begin
         where i.ticket_submission_id=ticket.id and i.client_id=ticket.client_id and i.status='paid'
           and i.checkout_kind in ('ticket_only','ticket_with_addon','photo_radar'));
       payment_unknown:=(not paid and ticket.status<>'awaiting_payment')
+        or (not paid and to_jsonb(ticket)->>'referral_payment_intent_id' is not null)
         or to_jsonb(ticket)->>'referral_refunded_at' is not null or to_jsonb(ticket)->>'referral_disputed_at' is not null
         or exists(select 1 from public.referral_payment_holds h where h.payment_intent_id in
           (to_jsonb(ticket)->>'referral_payment_intent_id',to_jsonb(ticket)->>'representation_payment_intent_id')
@@ -370,4 +371,5 @@ do $$ begin
   end if;
 end $$;
 comment on table public.consent_welcome_notifications is 'Prospective signed-consent client email delivery, one canonical PDF across sources. Preparing retries are safe; any uncertain send is held. Staff copies use the separate portal activity queue.';
+notify pgrst, 'reload schema';
 commit;

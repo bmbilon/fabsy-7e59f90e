@@ -61,6 +61,7 @@ delete from storage.objects where bucket_id='assessment-tickets' and name=pg_tem
 do $$ declare job consent_welcome_notifications%rowtype; context jsonb; begin
   job:=pg_temp.claim_case(6); context:=get_consent_welcome_context(job.id,job.claim_id);
   perform pg_temp.assert(context->'eligible'='false','missing source held before provider');
+  perform pg_temp.assert(context->'retryable'='true','late missing data is retryable');
   perform pg_temp.assert(finish_consent_welcome_notification(job.id,job.claim_id,'pending',null,'email_unavailable'),'missing source retries safely');
 end $$;
 update clients set email='alex6@example.test' where id=pg_temp.case_id(6);
@@ -148,6 +149,9 @@ update ticket_submissions set ticket_number='unclear / two tickets' where id=pg_
 do $$ declare job consent_welcome_notifications%rowtype; context jsonb; begin
   job:=pg_temp.claim_case(10); context:=get_consent_welcome_context(job.id,job.claim_id);
   perform pg_temp.assert(context->>'reason'='ticket_number_unavailable','ambiguous ticket string waits for correction');
+  update ticket_submissions set ticket_number='unknown 1' where id=pg_temp.case_id(10);
+  context:=get_consent_welcome_context(job.id,job.claim_id);
+  perform pg_temp.assert(context->>'reason'='ticket_number_unavailable' and context->'retryable'='true','placeholder reference waits for correction');
   perform finish_consent_welcome_notification(job.id,job.claim_id,'pending',null,'ticket_number_unavailable');
 end $$;
 select pg_temp.make_case(11);
@@ -156,6 +160,28 @@ insert into referral_payment_holds values('pi_Hold');
 do $$ declare job consent_welcome_notifications%rowtype; context jsonb; begin
   job:=pg_temp.claim_case(11); context:=get_consent_welcome_context(job.id,job.claim_id);
   perform pg_temp.assert(context->'payment_unknown'='true' and context->'payment_not_started_verified'='false','refund dispute hold prevents payment demand');
+  perform finish_consent_welcome_notification(job.id,job.claim_id,'pending',null,'test_wait');
+end $$;
+select pg_temp.make_case(12);
+do $$ declare job consent_welcome_notifications%rowtype; context jsonb; begin
+  job:=pg_temp.claim_case(12);
+  update ticket_submissions set consent_form_path=id||'/replacement.pdf' where id=pg_temp.case_id(12);
+  context:=get_consent_welcome_context(job.id,job.claim_id);
+  perform pg_temp.assert(context->>'reason'='consent_source_changed' and context->'retryable'='false','superseded PDF is permanently held');
+  perform finish_consent_welcome_notification(job.id,job.claim_id,'failed',null,'consent_source_changed');
+end $$;
+select pg_temp.make_case(13);
+update ticket_submissions set deleted_at=now() where id=pg_temp.case_id(13);
+do $$ declare job consent_welcome_notifications%rowtype; context jsonb; begin
+  job:=pg_temp.claim_case(13); context:=get_consent_welcome_context(job.id,job.claim_id);
+  perform pg_temp.assert(context->'eligible'='false' and context->'retryable'='false','deleted source cannot retry forever');
+  perform finish_consent_welcome_notification(job.id,job.claim_id,'failed',null,'submission_unavailable');
+end $$;
+select pg_temp.make_case(14);
+update ticket_submissions set referral_payment_intent_id='pi_InFlight' where id=pg_temp.case_id(14);
+do $$ declare job consent_welcome_notifications%rowtype; context jsonb; begin
+  job:=pg_temp.claim_case(14); context:=get_consent_welcome_context(job.id,job.claim_id);
+  perform pg_temp.assert(context->'payment_unknown'='true' and context->'payment_not_started_verified'='false','unresolved recorded payment intent cannot become unpaid');
   perform finish_consent_welcome_notification(job.id,job.claim_id,'pending',null,'test_wait');
 end $$;
 set role authenticated;
