@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import { build } from 'esbuild';
+const compiled = await build({ entryPoints: ['src/lib/admin/caseFunnel.ts'], bundle: true, format: 'esm', platform: 'node', write: false });
+const { buildCaseFunnel, filterFunnelCases, FUNNEL_STAGES } = await import(`data:text/javascript;base64,${Buffer.from(compiled.outputFiles[0].text).toString('base64')}`);
+const now = Date.parse('2026-09-20T12:00:00Z');
+const submission = (id, extra = {}) => ({ id, first_name: 'Sam', last_name: 'Example', email: 'sample@example.test', phone: '5550101000', ticket_number: 'TEST-1001', violation: 'Speeding', status: 'awaiting_payment', consent_form_path: null, representation_paid_at: null, assessment_paid_at: null, referral_refunded_at: null, case_outcome: null, service_type: 'representation', ticket_type: 'officer_issued', created_at: '2026-09-19T12:00:00Z', deleted_at: null, ...extra });
+const intake = (id, extra = {}) => ({ id, draft_data: {}, email: 'intake@example.test', phone: null, status: 'active', converted_submission_id: null, ticket_uploaded_at: '2026-09-19T12:00:00Z', staff_follow_up_status: 'open', expires_at: '2026-10-19T12:00:00Z', updated_at: '2026-09-19T12:00:00Z', deleted_at: null, ...extra });
+const state = (kind, ticket_id, stage, version = 1) => ({ kind, ticket_id, stage, version });
+const stage = (sub, states = []) => buildCaseFunnel([sub], [], states, now)[0]?.stage;
+assert.equal(FUNNEL_STAGES.length, 9);
+assert.equal(stage(submission('new')), 'ticket_submitted');
+assert.equal(stage(submission('consent', { consent_form_path: 'private/form.pdf' })), 'consent_submitted');
+assert.equal(stage(submission('paid', { representation_paid_at: '2026-09-19' })), 'paid');
+assert.equal(stage(submission('assessment', { assessment_paid_at: '2026-09-19' })), 'paid');
+assert.equal(stage(submission('done', { status: 'completed' })), 'closed_resolved');
+assert.equal(stage(submission('refunded', { status: 'completed', referral_refunded_at: '2026-09-19' })), 'closed_refunded');
+assert.equal(stage(submission('discount', { representation_paid_at: '2026-09-19', referral_refunded_at: '2026-09-19' })), 'paid', 'A partial refund or discount cannot close an active matter');
+assert.equal(stage(submission('pending', { status: 'pending' })), 'ticket_submitted', 'Legacy statuses are not proof of payment');
+for (const [saved, expected] of [['partial','ticket_submitted'],['paid','paid'],['disclosure_requested','disclosure_requested'],['crown_offer_received','crown_offer_received'],['trial_proceeding','proceeding_to_trial'],['trial_date_pending','proceeding_to_trial'],['trial_date_set','proceeding_to_trial'],['trial_concluded_reduced','closed_resolved'],['trial_concluded_upheld','closed_resolved'],['done_reduced','closed_resolved'],['done_withdrawn','closed_resolved'],['lapsed_expired','expired_lapsed']]) {
+  assert.equal(stage(submission('saved'), [state('submission','saved',saved)]), expected);
+}
+const linked = intake('draft', { converted_submission_id: 'sub', status: 'converted', expires_at: '2020-01-01' });
+let rows = buildCaseFunnel([submission('sub')], [linked], [state('draft','draft','crown_offer_received')], now);
+assert.equal(rows.length, 1, 'Converted intakes do not duplicate submissions');
+assert.equal(rows[0].stage, 'crown_offer_received');
+assert.equal(rows[0].caseStatus.kind, 'submission');
+rows = buildCaseFunnel([submission('sub')], [linked], [state('draft','draft','crown_offer_received', 9), state('submission','sub','trial_date_set', 10)], now);
+assert.equal(rows[0].stage, 'proceeding_to_trial');
+assert.equal(rows[0].caseStatus.version, 10);
+assert.equal(buildCaseFunnel([submission('sub', { deleted_at: '2026-09-20' })], [linked], [], now).length, 0, 'Deleted submission must not reappear as an intake');
+assert.equal(buildCaseFunnel([], [intake('expired', { expires_at: '2026-09-20T12:00:00Z' })], [], now)[0].stage, 'expired_lapsed');
+assert.equal(buildCaseFunnel([], [intake('managed', { expires_at: '2020-01-01' })], [state('draft','managed','paid')], now)[0].stage, 'paid', 'Resume expiry is not case expiry');
+assert.equal(buildCaseFunnel([], [intake('dismissed', { staff_follow_up_status: 'dismissed' }), intake('deleted', { deleted_at: '2026-09-20' })], [], now).length, 0);
+assert.equal(buildCaseFunnel([], [intake('incomplete')], [], now).length, 1, 'Missing identity/contact fields must not hide a case');
+rows = buildCaseFunnel([submission('search')], [], [], now);
+for (const query of [' sam example ', 'TEST-1001', 'example.test', '5550101000', 'speeding']) assert.equal(filterFunnelCases(rows, query).length, 1);
+assert.equal(filterFunnelCases(rows, 'no match').length, 0);
+console.log('Case funnel passed: all stages, evidence-based placement, conversion, canonical precedence, refunds, expiry, exclusions and search.');

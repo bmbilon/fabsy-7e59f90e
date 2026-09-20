@@ -84,7 +84,7 @@ export function DisclosureAutomationPanel() {
   const active = health?.delivery_enabled && health.routing_configured && !stale && !health.last_worker_error;
   return <Card className="mb-8">
     <CardHeader className="gap-2 sm:flex-row sm:items-start sm:justify-between">
-      <div><CardTitle className="flex items-center gap-2"><Mail className="h-5 w-5" />Disclosure confirmation automation</CardTitle><CardDescription>Verified disclosure requests, Crown acknowledgements and client notices.</CardDescription></div>
+      <div><CardTitle className="flex items-center gap-2"><Mail className="h-5 w-5" />Disclosure confirmation automation</CardTitle></div>
       <Button variant="outline" size="sm" onClick={() => query.refetch()} disabled={query.isFetching}><RefreshCw className="mr-2 h-4 w-4" />Refresh</Button>
     </CardHeader>
     <CardContent className="space-y-4">

@@ -1,7 +1,8 @@
 import CaseStatusSelect from "@/components/admin/CaseStatusSelect";
-import CaseQueueSection from "@/components/admin/CaseQueueSection";
+import CaseFunnelBoard from "@/components/admin/CaseFunnelBoard";
+import { buildCaseFunnel } from "@/lib/admin/caseFunnel";
 import { useCaseStatuses, resolveCaseStatus } from "@/hooks/useCaseStatuses";
-import { caseStageLabel, isTrialStage, isCompletedStage } from "@/lib/admin/caseStatus";
+import { caseStageLabel, isTrialStage } from "@/lib/admin/caseStatus";
 import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureAutomationPanel } from "@/components/DisclosureConfirmations";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +23,10 @@ import { AtePilotMetrics } from "@/components/AteCaseReview";
 interface TicketSubmission {
   intake_mode: string;
   consent_form_path: string | null;
+  representation_paid_at: string | null;
+  assessment_paid_at: string | null;
+  referral_refunded_at: string | null;
+  case_outcome: string | null;
   id: string;
   first_name: string;
   last_name: string;
@@ -46,7 +51,7 @@ interface IntakeLead {
   preferred_locale: string;
   current_step: number;
   completed_step: number;
-  status: "active" | "converted";
+  status: "active" | "converted" | "expired";
   converted_submission_id: string | null;
   ticket_document_path: string;
   ticket_document_content_type: string;
@@ -102,6 +107,9 @@ export default function AdminCaseManagement() {
   const [searchParams, setSearchParams] = useSearchParams();
   const intakeParam = searchParams.get('intake');
   const selectedIntakeId = intakeParam && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(intakeParam) ? intakeParam : null;
+  const [detailsOpen, setDetailsOpen] = useState(Boolean(selectedIntakeId));
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [submissions, setSubmissions] = useState<TicketSubmission[]>([]);
   const [ticketView, setTicketView] = useState<"active" | "deleted">("active");
   const [intakeLeads, setIntakeLeads] = useState<IntakeLead[]>([]);
@@ -186,6 +194,7 @@ export default function AdminCaseManagement() {
     setIsRefreshing(true);
     try {
       setIntakeLeadError(null);
+      setLoadError(null);
       const roleData = await getIdrStaffRole();
 
       if (!roleData) {
@@ -230,6 +239,10 @@ export default function AdminCaseManagement() {
         id: sub.id,
         intake_mode: sub.intake_mode,
         consent_form_path: sub.consent_form_path,
+        representation_paid_at: sub.representation_paid_at,
+        assessment_paid_at: sub.assessment_paid_at,
+        referral_refunded_at: sub.referral_refunded_at,
+        case_outcome: (sub as typeof sub & { case_outcome?: string | null }).case_outcome || null,
         first_name: sub.clients?.first_name || sub.first_name || '',
         last_name: sub.clients?.last_name || sub.last_name || '',
         email: sub.clients?.email || sub.email || '',
@@ -255,6 +268,7 @@ export default function AdminCaseManagement() {
         setIntakeLeads((leadResult.data || []) as unknown as IntakeLead[]);
       }
     } catch (error) {
+      setLoadError('Cases could not be refreshed. Any cases shown are from the last successful load.');
       console.error('Error fetching data:', error);
       toast({
         title: "Error",
@@ -418,7 +432,7 @@ export default function AdminCaseManagement() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4">
+        <div className="mx-auto max-w-[2400px] px-4 py-4 sm:px-6">
           <Button 
             onClick={() => navigate('/admin/dashboard')} 
             variant="ghost" 
@@ -428,22 +442,34 @@ export default function AdminCaseManagement() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
           </Button>
-          <h1 className="text-2xl font-bold">Client Case Management</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage active ticket matters and historical Ticket Triage orders
-          </p>
+          <h1 className="text-2xl font-bold">Case management</h1>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8"><CaseQueueSection userId={user?.id} role={userRole} trials /></div>
+      <main className="mx-auto max-w-[2400px] px-4 py-6 sm:px-6">
+        {loadError && <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{loadError}</p>}
+        {intakeLeadError && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">{intakeLeadError}</p>}
+        {caseStatuses.isPending && <p role="status" className="mb-4 text-sm text-slate-600">Loading saved case stages…</p>}
+        {caseStatuses.data ? <CaseFunnelBoard
+          cases={buildCaseFunnel(submissions, intakeLeads, caseStatuses.data)}
+          statusesReady={!caseStatuses.isError}
+          refreshing={isRefreshing || caseStatuses.isFetching || updatingIntakeLeadIds.length > 0}
+          refresh={() => { void checkAuthAndFetchData(); void caseStatuses.refetch(); }}
+          openIntake={id => {
+            setSearchParams(params => { params.set('intake', id); return params; });
+            setDetailsOpen(true);
+            window.requestAnimationFrame(() => detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+        /> : null}
         {caseStatuses.isError && <p role="alert" className="mb-4 text-red-700">Case statuses could not be loaded. <button className="underline" onClick={() => void caseStatuses.refetch()}>Retry</button></p>}
+        <details ref={detailsRef} open={detailsOpen} onToggle={event => setDetailsOpen(event.currentTarget.open)} className="mb-8 rounded-xl border bg-white p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-slate-700">Intake follow-up, case details & deleted records</summary>
+        <div className="mt-5">
         <Card className="mb-8 border-amber-300/70">
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <CardTitle>{selectedIntakeId ? "Ticket intake" : "Ticket intakes"}</CardTitle>
-                <CardDescription>Review partial intakes and tickets you have moved forward manually.</CardDescription>
               </div>
               <div className="flex flex-wrap items-center gap-3">
               <Badge variant={intakeLeadError ? "destructive" : "outline"}>
@@ -457,7 +483,7 @@ export default function AdminCaseManagement() {
             </div>
           </CardHeader>
           <CardContent>
-            {selectedIntakeId && <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"><span>Showing the intake opened from your overview.</span><Button variant="outline" size="sm" onClick={() => setSearchParams(params => { params.delete('intake'); return params; })}>Show all intakes</Button></div>}
+            {selectedIntakeId && <div className="mb-4"><Button variant="outline" size="sm" onClick={() => setSearchParams(params => { params.delete('intake'); return params; })}>Show all intakes</Button></div>}
             {intakeLeadError ? (
               <div role="alert" className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
                 <p className="font-semibold">Lead follow-up queue is unavailable</p>
@@ -540,41 +566,6 @@ export default function AdminCaseManagement() {
             </div>}
           </CardContent>
         </Card>
-        <DisclosureAutomationPanel />
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Total Submissions</CardDescription>
-              <CardTitle className="text-3xl">{activeSubmissions.length}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Pending</CardDescription>
-              <CardTitle className="text-3xl">
-                {activeSubmissions.filter(s => !submissionStatus(s.id)?.stage && (s.status === 'pending' || s.status === 'assessment_pending')).length}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>In Progress</CardDescription>
-              <CardTitle className="text-3xl">
-                {activeSubmissions.filter(s => submissionStatus(s.id)?.stage ? !isCompletedStage(submissionStatus(s.id)?.stage) && submissionStatus(s.id)?.stage !== 'partial' : s.status === 'in_progress').length}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Completed</CardDescription>
-              <CardTitle className="text-3xl">
-                {activeSubmissions.filter(s => submissionStatus(s.id)?.stage ? isCompletedStage(submissionStatus(s.id)?.stage) : s.status === 'completed').length}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-
         {/* Search */}
         <Card className="mb-6">
           <CardHeader>
@@ -584,7 +575,8 @@ export default function AdminCaseManagement() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search by name, email, ticket number, or violation..."
+                aria-label="Search submissions"
+                placeholder="Search submissions…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -598,7 +590,7 @@ export default function AdminCaseManagement() {
           <CardHeader>
             <CardTitle>{ticketView === "deleted" ? "Deleted tickets" : "Recent Submissions"}</CardTitle>
             <CardDescription>
-              Showing {filteredSubmissions.length} of {viewSubmissions.length} submissions
+              {filteredSubmissions.length} / {viewSubmissions.length} submissions
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -655,9 +647,12 @@ export default function AdminCaseManagement() {
             </div>
           </CardContent>
         </Card>
-        <div className="mt-8">
-          <AtePilotMetrics />
         </div>
+        </details>
+        <details className="rounded-xl border bg-white p-4">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-700">Disclosure automation & ATE reporting</summary>
+          <div className="mt-5"><DisclosureAutomationPanel /><AtePilotMetrics /></div>
+        </details>
       </main>
     </div>
   );
