@@ -118,6 +118,11 @@ detailed-form not-guilty instruction. The terms URL must be the actual
 live unchecked terms step. Creating the request sends the configured approval
 text; only do so under the user's authorized approval workflow.
 
+Every ticket-specific approval SMS must include the full actual ticket number
+from the stored case, matched to the prepared ticket and consent. Hold the request
+without sending a text if the number is missing, invalid, or mismatched. Keep the
+phone preview masked and keep bearer links and tokens out of logs.
+
 `status` and `revoke` need `action` and the approval `id`. `consume` requires
 `action`, `id`, `submission_id`, `portal_session_id`, `case_fingerprint`,
 `consent_sha256`, and `terms_sha256` returned for the same prepared session.
