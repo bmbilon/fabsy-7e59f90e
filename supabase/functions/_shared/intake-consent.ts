@@ -3,8 +3,12 @@ import feeRefund from "../../../src/config/feeRefund.json" with { type: "json" }
 export const INTAKE_CONSENT_VERSION = "ticket-upload-consent-v1";
 export const INTAKE_CONSENT_LABEL = "I consent for Fabsy to fight my ticket";
 export const INTAKE_CONSENT_CONFIRMATION = "I am the person named above. By checking this box and submitting, I electronically accept this authorization, the Terms of Service and Privacy Policy for this ticket.";
-export const PHOTO_UPLOAD_CONSENT_VERSION = "photo-upload-consent-v2";
+export const PHOTO_UPLOAD_CONSENT_VERSION = "photo-upload-consent-v3";
+export const LEGACY_PHOTO_UPLOAD_CONSENT_VERSION = "photo-upload-consent-v2";
 export const PHOTO_UPLOAD_CONSENT_CONFIRMATION = "I am the person named on the ticket I am submitting. By checking this box and submitting, I accept the authorization, Terms of Purchase, Terms of Service and Privacy Policy for this ticket.";
+export const NOT_GUILTY_PLEA_LABEL = "I plead not guilty";
+export const NOT_GUILTY_PLEA_INSTRUCTION = "I instruct Fabsy to enter a not-guilty plea and request disclosure for the ticket I am submitting.";
+export const NO_PLEA_INSTRUCTION = "I have not authorized Fabsy to enter a plea. Fabsy must obtain my specific instruction before entering any plea.";
 
 export interface IntakeConsent {
   version: string;
@@ -19,18 +23,32 @@ export interface IntakeConsent {
   ticketSubmissionId?: string;
   ticketDocumentPath?: string;
   identitySource?: "uploaded_ticket_pending_review";
+  // Only a versioned, submitted checkbox choice authorizes an automated plea.
+  // Missing means the client was never asked; false must never become true.
+  pleadNotGuilty?: boolean;
+  pleaLabel?: string;
+  pleaInstruction?: string;
 }
 
 export function parsePhotoUploadConsent(value: unknown, submissionId: string, ticketPath: string, now = new Date()): IntakeConsent {
   const input = value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
-  if (input.accepted !== true || input.method !== "checkbox" || input.version !== PHOTO_UPLOAD_CONSENT_VERSION) {
+  if (input.accepted !== true || input.method !== "checkbox" || ![PHOTO_UPLOAD_CONSENT_VERSION, LEGACY_PHOTO_UPLOAD_CONSENT_VERSION].includes(String(input.version))) {
     throw new IntakeConsentError("Check the consent box before submitting your ticket.");
   }
+  const currentVersion = input.version === PHOTO_UPLOAD_CONSENT_VERSION;
+  if (currentVersion && typeof input.pleadNotGuilty !== "boolean") {
+    throw new IntakeConsentError("Review your not-guilty plea choice before submitting your ticket.");
+  }
   return {
-    version: PHOTO_UPLOAD_CONSENT_VERSION, accepted: true, method: "checkbox", acceptedAt: now.toISOString(),
+    version: String(input.version), accepted: true, method: "checkbox", acceptedAt: now.toISOString(),
     name: "", identitySource: "uploaded_ticket_pending_review", ticketSubmissionId: submissionId, ticketDocumentPath: ticketPath,
     label: INTAKE_CONSENT_LABEL, confirmation: PHOTO_UPLOAD_CONSENT_CONFIRMATION,
-    authorization: PHOTO_UPLOAD_AUTHORIZATION_LINES, privacy: CONSENT_PRIVACY_LINES,
+    authorization: currentVersion ? PHOTO_UPLOAD_AUTHORIZATION_LINES : LEGACY_PHOTO_UPLOAD_AUTHORIZATION_LINES, privacy: CONSENT_PRIVACY_LINES,
+    ...(currentVersion ? {
+      pleadNotGuilty: input.pleadNotGuilty as boolean,
+      pleaLabel: NOT_GUILTY_PLEA_LABEL,
+      pleaInstruction: input.pleadNotGuilty ? NOT_GUILTY_PLEA_INSTRUCTION : NO_PLEA_INSTRUCTION,
+    } : {}),
   };
 }
 
@@ -114,10 +132,18 @@ export const CONSENT_PRIVACY_LINES = [
   "to authorized service providers or public bodies when needed or required by law.",
 ] as const;
 
-export const PHOTO_UPLOAD_AUTHORIZATION_LINES = [
+const LEGACY_PHOTO_UPLOAD_AUTHORIZATION_LINES = [
   "This authorization applies to the ticket file submitted with this acceptance.",
   "Fabsy will read the ticket and confirm any missing details before acting.",
   "The following terms apply according to the type of ticket in the uploaded file.",
   "", "FOR AN OFFICER-ISSUED TICKET:", ...CONSENT_AUTHORIZATION_LINES,
   "", "FOR A REGISTERED-OWNER CAMERA NOTICE:", ...PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES,
 ] as const;
+
+// The separate plea checkbox controls both ticket types in the combined flow.
+// Preserve old wording only for old v2 clients; never infer their checkbox choice.
+export const PHOTO_UPLOAD_AUTHORIZATION_LINES = LEGACY_PHOTO_UPLOAD_AUTHORIZATION_LINES.map(line =>
+  line === "• Enter a not-guilty plea for this notice and request and review disclosure"
+    ? "• Request and review disclosure; any plea requires my specific instruction"
+    : line
+);

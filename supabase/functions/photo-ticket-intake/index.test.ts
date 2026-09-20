@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { PHOTO_UPLOAD_CONSENT_VERSION } from "../_shared/intake-consent.ts";
+import { PHOTO_UPLOAD_CONSENT_VERSION, LEGACY_PHOTO_UPLOAD_CONSENT_VERSION } from "../_shared/intake-consent.ts";
 import { processPhotoIntake } from "../_shared/process-photo-intake.ts";
 import { photoIntakeDetails } from "../_shared/photo-intake-details.ts";
 
@@ -21,7 +21,7 @@ const request = (body: unknown) => new Request("https://photo-intake.example.tes
 const prepare = {
   action: "prepare", submissionId, accessToken,
   file: { contentType: "image/png", size: 100 },
-  consent: { accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION },
+  consent: { accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION, pleadNotGuilty: true },
 };
 const fixture = { firstName: "Alex", lastName: "Example", ticketNumber: "TEST-TICKET", officer_issued_format: true };
 
@@ -95,6 +95,25 @@ Deno.test("a photo with no identity or contact fields saves affirmative consent 
     assert.equal(state.row.intake_review_status, "pending_scan", "Success must not wait on OCR");
     assert.ok(!state.writes.some(path => path.includes("ocr-ticket")));
   });
+});
+
+Deno.test("true, false and legacy missing plea instructions survive intake and consent PDF creation", async () => {
+  for (const choice of [true, false, undefined]) {
+    await boundary(async state => {
+      const consent = choice === undefined
+        ? { accepted: true, method: "checkbox", version: LEGACY_PHOTO_UPLOAD_CONSENT_VERSION }
+        : { ...prepare.consent, pleadNotGuilty: choice };
+      const response = await handler(request({ ...prepare, consent }));
+      assert.equal(response.status, 200); await response.body?.cancel();
+      assert.equal(state.row.intake_consent.pleadNotGuilty, choice);
+      state.ticketExists = true;
+      const complete = await finalize(request({ submissionId, accessToken }));
+      assert.equal(complete.status, 200); await complete.body?.cancel();
+      assert.ok(state.pdf && state.pdf.length > 1000);
+      assert.equal(state.row.intake_consent.pleadNotGuilty, choice);
+      if (choice === undefined) assert.equal("pleadNotGuilty" in state.row.intake_consent, false);
+    });
+  }
 });
 
 Deno.test("contact details are saved only after receipt, with email or phone or both", async () => {

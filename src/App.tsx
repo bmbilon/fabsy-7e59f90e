@@ -81,6 +81,7 @@ const AdminSmsIntake = lazy(() => import("./pages/AdminSmsIntake"));
 const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
 const AdminLiveView = lazy(() => import("./pages/AdminLiveView"));
 const CompleteTicket = lazy(() => import("./pages/CompleteTicket"));
+const DisclosureApproval = lazy(() => import("./pages/DisclosureApproval"));
 const AdminManualRepresentationLinks = lazy(() => import("./pages/AdminManualRepresentationLinks"));
 
 function RouteSuspense({ children }: PropsWithChildren) {
@@ -91,7 +92,7 @@ const queryClient = new QueryClient();
 
 const RouteAnalytics = () => {
   const location = useLocation();
-  if (location.pathname === "/representation-consent" || location.pathname === "/complete-ticket" || location.pathname.startsWith("/pay/")) return null;
+  if (location.pathname === "/representation-consent" || location.pathname.replace(/\/$/, "") === "/disclosure-approval" || location.pathname === "/complete-ticket" || location.pathname.startsWith("/pay/")) return null;
   return (
     <>
       <AcquisitionTracker />
@@ -138,6 +139,7 @@ const App = () => (
           <Route path="/ticket-form" element={<TicketFormPage />} />
           <Route path="/complete-ticket" element={<RouteSuspense><CompleteTicket /></RouteSuspense>} />
           <Route path="/representation-consent" element={<RepresentationConsent />} />
+          <Route path="/disclosure-approval" element={<RouteSuspense><DisclosureApproval /></RouteSuspense>} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/about" element={<About />} />
           <Route path="/about/comparison" element={<CompetitorComparison />} />

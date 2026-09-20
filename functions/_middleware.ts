@@ -86,6 +86,7 @@ const servePage: PagesFunction<Env> = async (context) => {
   const { request, env, next } = context;
   const requestUrl = new URL(request.url);
   const pathname = requestUrl.pathname === "/" ? "/" : requestUrl.pathname.replace(/\/+$/, "");
+  if (pathname === "/disclosure-approval") return next();
 
   const localeRoute = splitLocalePath(pathname);
   if (localeRoute.hasLocalePrefix && localeRoute.path === '/ticket-form') {
@@ -222,6 +223,10 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   }
   const headers = new Headers(response.headers);
   headers.set('Referrer-Policy', 'no-referrer');
+  if (requestUrl.pathname.replace(/\/$/, '') === '/disclosure-approval') {
+    headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    headers.set('Cache-Control', 'private, no-store');
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

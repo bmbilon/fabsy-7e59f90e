@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { INTAKE_CONSENT_VERSION, INTAKE_CONSENT_LABEL, parseIntakeConsent } from "./intake-consent.ts";
+import { INTAKE_CONSENT_VERSION, INTAKE_CONSENT_LABEL, parseIntakeConsent, parsePhotoUploadConsent, PHOTO_UPLOAD_CONSENT_VERSION, LEGACY_PHOTO_UPLOAD_CONSENT_VERSION, NOT_GUILTY_PLEA_INSTRUCTION, NO_PLEA_INSTRUCTION } from "./intake-consent.ts";
 
 const valid = { accepted: true, version: INTAKE_CONSENT_VERSION, method: "checkbox" };
 Deno.test("intake consent rejects missing, false, stale and coerced acceptance", () => {
@@ -24,4 +24,28 @@ Deno.test("typed consent still requires the actual matching legal-name signature
   const consent = parseIntakeConsent({ ...valid, method: "typed", signature: " Alex  Example " }, "Alex Example", false);
   assert.equal(consent.method, "typed");
   assert.match(consent.authorization.join("\n"), /\$198/);
+});
+
+Deno.test("photo consent preserves either submitted plea choice with server-owned instruction", () => {
+  for (const pleadNotGuilty of [true, false]) {
+    const consent = parsePhotoUploadConsent({ accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION,
+      pleadNotGuilty, pleaLabel: "spoof", pleaInstruction: "spoof" }, "ticket-id", "ticket-id/ticket.pdf");
+    const saved = JSON.parse(JSON.stringify(consent));
+    assert.equal(saved.pleadNotGuilty, pleadNotGuilty);
+    assert.equal(saved.pleaLabel, "I plead not guilty");
+    assert.equal(saved.pleaInstruction, pleadNotGuilty ? NOT_GUILTY_PLEA_INSTRUCTION : NO_PLEA_INSTRUCTION);
+    assert.ok(!saved.authorization.join("\n").includes("Enter a not-guilty plea"));
+  }
+});
+
+Deno.test("current photo consent rejects missing or coerced plea choice; legacy consent never gains one", () => {
+  for (const pleadNotGuilty of [undefined, null, "true", "false", 0, 1]) {
+    assert.throws(() => parsePhotoUploadConsent({ accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION,
+      pleadNotGuilty }, "ticket-id", "ticket-id/ticket.pdf"));
+  }
+  const legacy = parsePhotoUploadConsent({ accepted: true, method: "checkbox", version: LEGACY_PHOTO_UPLOAD_CONSENT_VERSION,
+    pleadNotGuilty: true }, "ticket-id", "ticket-id/ticket.pdf");
+  assert.equal(legacy.version, LEGACY_PHOTO_UPLOAD_CONSENT_VERSION);
+  assert.equal("pleadNotGuilty" in JSON.parse(JSON.stringify(legacy)), false);
+  assert.equal("pleaInstruction" in legacy, false);
 });

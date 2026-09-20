@@ -5,6 +5,33 @@ import { ConsentTextError, shapeConsentLine, wrapConsentText } from "./consent-u
 import { CONSENT_FIXTURE_DATE, CONSENT_FIXTURES } from "../../tests/consent-fixtures.ts";
 import reference from "../../tests/consent-shaping-reference.json" with { type: "json" };
 import { LocaleRequestError, SUPPORTED_LOCALES, type PreferredLocale } from "./locale-policy.ts";
+import { parsePhotoUploadConsent, PHOTO_UPLOAD_CONSENT_VERSION, LEGACY_PHOTO_UPLOAD_CONSENT_VERSION } from "./intake-consent.ts";
+
+Deno.test("photo-upload PDF prints and embeds true or false plea choices without inventing a legacy instruction", async () => {
+  for (const choice of [true, false, undefined]) {
+    const input = { accepted: true, method: "checkbox", version: choice === undefined ? LEGACY_PHOTO_UPLOAD_CONSENT_VERSION : PHOTO_UPLOAD_CONSENT_VERSION,
+      ...(choice === undefined ? {} : { pleadNotGuilty: choice }) };
+    const consent = parsePhotoUploadConsent(input, "synthetic-ticket", "synthetic-ticket/ticket.pdf", new Date(CONSENT_FIXTURE_DATE));
+    const fields = { ...CONSENT_FIXTURES[0].fields, digitalSignature: "", intakeConsent: consent };
+    const pdf = await PDFDocument.load(await createConsentPdf(fields));
+    const embedded = pdf.catalog.lookup(PDFName.of("Names"), PDFDict).lookup(PDFName.of("EmbeddedFiles"), PDFDict).lookup(PDFName.of("Names"), PDFArray);
+    const stream = embedded.lookup(1, PDFDict).lookup(PDFName.of("EF"), PDFDict).lookup(PDFName.of("F"));
+    assert.ok(stream instanceof PDFRawStream);
+    const saved = JSON.parse(new TextDecoder().decode(decodePDFRawStream(stream).decode()));
+    assert.deepEqual(saved.fields.intakeConsent, consent);
+    assert.equal(saved.fields.intakeConsent.pleadNotGuilty, choice);
+    const content = pdf.getPages().flatMap(page => {
+      const streams = page.node.Contents() as PDFArray;
+      return Array.from({ length: streams.size() }, (_, i) => new TextDecoder().decode(decodePDFRawStream(streams.lookup(i, PDFRawStream)).decode()));
+    }).join("\n");
+    const printed = (text: string) => content.includes(Buffer.from(text).toString("hex").toUpperCase());
+    assert.equal(printed("CLIENT PLEA INSTRUCTION"), choice !== undefined);
+    if (choice !== undefined) {
+      assert.ok(printed(`I plead not guilty: ${choice ? "Checked" : "Not checked"}`));
+      assert.equal(saved.fields.intakeConsent.pleaInstruction, consent.pleaInstruction);
+    } else assert.equal("pleadNotGuilty" in saved.fields.intakeConsent, false);
+  }
+});
 
 Deno.test("consent shaping matches independent native HarfBuzz glyph IDs and mark positions", async () => {
   for (const item of reference.cases) {

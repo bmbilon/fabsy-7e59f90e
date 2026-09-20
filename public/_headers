@@ -12,6 +12,11 @@
   Referrer-Policy: no-referrer
   Cache-Control: private, no-store
 
+/disclosure-approval
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+  Cache-Control: private, no-store
+
 /admin/consent-links
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: private, no-store

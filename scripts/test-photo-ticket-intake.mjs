@@ -282,6 +282,8 @@ test("the upload form contains no ticket, identity, contact or referral fields a
   assert.equal((app.document.body.textContent.match(/Ticket attached/g) || []).length, 1);
   assert.doesNotMatch(app.document.body.textContent, /Check your details|Legal first name|Driver’s licence number|referral code|Enter any readable details|Scanning/);
   assert.equal(app.field("quick-consent").checked, false);
+  assert.equal(app.field("quick-not-guilty").checked, true);
+  assert.equal(app.document.querySelector('label[for="quick-not-guilty"]').textContent.trim(), "I plead not guilty");
   app.continueBlocked(); await app.accept(); app.continueEnabled();
   assert.equal(app.saves.length, 0);
 });
@@ -292,12 +294,38 @@ test("one click saves a photo and consent without sending invented or cached ide
   await app.api.click(app.button("Submit ticket and consent")); await app.flush();
   assert.deepEqual(app.saves.map(x => x.name), ["prepare", "upload", "generate-consent-form"]);
   const body = app.saves[0].body;
-  assert.equal(body.consent.version, "photo-upload-consent-v2");
+  assert.equal(body.consent.version, "photo-upload-consent-v3");
+  assert.equal(body.consent.pleadNotGuilty, true);
   assert.equal(body.consent.accepted, true); assert.equal(body.consent.method, "checkbox");
   for (const key of ["firstName", "lastName", "email", "phone", "driversLicense", "ticketNumber", "ticket_type"]) assert.equal(body[key], undefined);
   assert.equal(app.saves[2].body.digitalSignature, undefined);
   assert.match(app.document.body.textContent, /Success, Your ticket has been received/);
   assert.ok(app.field("updates-email")); assert.ok(app.field("updates-phone")); assert.ok(app.button("Accept"));
+});
+
+test("unchecking not guilty still accepts intake and submits explicit false", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file()); await app.accept();
+  await app.api.click(app.field("quick-not-guilty"));
+  assert.equal(app.field("quick-not-guilty").checked, false);
+  assert.match(app.document.getElementById("quick-not-guilty-help").textContent, /not authorized Fabsy to enter a plea/);
+  app.continueEnabled();
+  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  assert.equal(app.saves.find(x => x.name === "prepare").body.consent.pleadNotGuilty, false);
+  assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
+});
+
+test("changing plea after a failed save uses a fresh acceptance instead of the old prepared choice", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file()); await app.accept(); app.failConsent(true);
+  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.field("quick-not-guilty")); app.failConsent(false);
+  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  const attempts = app.saves.filter(x => x.name === "prepare");
+  assert.equal(attempts.length, 2);
+  assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
+  assert.equal(attempts[0].body.consent.pleadNotGuilty, true);
+  assert.equal(attempts[1].body.consent.pleadNotGuilty, false);
 });
 
 test("PDFs can submit without names, ticket numbers, DL, DOB or a successful scan", async t => {

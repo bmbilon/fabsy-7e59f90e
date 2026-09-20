@@ -61,7 +61,7 @@ export default function GoogleConsent() {
   const headingId = `${id}-heading`;
   const descriptionId = `${id}-description`;
   const statusId = `${id}-status`;
-  const sensitive = /(?:^|\/)representation-consent(?:\/|$)/.test(basePath) || /^\/pay\//.test(basePath);
+  const sensitive = /(?:^|\/)(?:representation-consent|disclosure-approval)(?:\/|$)/.test(basePath) || /^\/pay\//.test(basePath);
   // A manually opened panel does not follow navigation into a form or portal.
   const settingsOpen = settingsLocation === location.key;
   const initialBanner = (googleChoice === 'unknown' || metaChoice === 'unknown' || openAIChoice === 'unknown' || fabsyChoice === 'unknown') &&

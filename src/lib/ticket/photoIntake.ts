@@ -27,6 +27,7 @@ export async function photoIntakeAction<T>(attempt: PhotoIntakeAttempt, action: 
 }
 
 export async function savePhotoTicket(data: FormData, attempt: PhotoIntakeAttempt, options: {
+  pleadNotGuilty: boolean;
   prepared?: PreparedTicketSubmission | null;
   onPrepared: (value: PreparedTicketSubmission) => void;
 }): Promise<SavedTicketSubmission> {
@@ -41,7 +42,7 @@ export async function savePhotoTicket(data: FormData, attempt: PhotoIntakeAttemp
   if (!prepared) {
     const referral = latestReferralAttribution([data.referral, readActiveReferral()]);
     prepared = await photoIntakeAction<PreparedTicketSubmission>(attempt, "prepare", {
-      consent: { accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION },
+      consent: { accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION, pleadNotGuilty: options.pleadNotGuilty },
       ...(referral ? { refCode: referral.code, refAttributionToken: referral.attributionToken } : {}),
       ...(sourceAssessment ? { sourceAssessment } : { file: { contentType: descriptor?.valid ? descriptor.mimeType : "", size: file!.size } }),
     });

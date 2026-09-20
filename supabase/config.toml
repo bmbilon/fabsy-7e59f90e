@@ -173,3 +173,7 @@ verify_jwt = false
 
 [functions.photo-ticket-intake]
 verify_jwt = false
+
+[functions.disclosure-approval]
+# Operator actions authenticate inside the function; public decisions require a 256-bit token.
+verify_jwt = false
