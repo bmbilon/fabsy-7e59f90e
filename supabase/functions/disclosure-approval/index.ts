@@ -3,9 +3,11 @@ import {
   APPROVAL_TOKEN_PATTERN, approvalHash, approvalPublicSummary, DISCLOSURE_ADMIN_PHONE,
   DISCLOSURE_APPROVAL_SCOPE, newApprovalToken, normalizeApprovalTicket, SHA256_PATTERN, validateTermsUrl,
 } from "../_shared/disclosure-approval.ts";
+import { verifyDisclosureServiceOperator } from "../_shared/disclosure-operator-auth.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 const siteUrl = (Deno.env.get("SITE_URL") || "https://fabsy.ca").replace(/\/$/, "");
 const allowedOrigins = new Set([siteUrl, "https://fabsy.ca", "https://www.fabsy.ca"]);
@@ -36,6 +38,7 @@ async function requireOperator(req: Request) {
   const authorization = req.headers.get("authorization") || "";
   if (!authorization.startsWith("Bearer ")) throw new RequestError("Operator authentication required.", 401);
   if (await approvalHash(authorization.slice(7)) === await approvalHash(serviceKey)) return;
+  if (await verifyDisclosureServiceOperator(authorization, { supabaseUrl, anonKey })) return;
   const { data, error } = await admin.auth.getUser(authorization.slice(7));
   if (error || !data.user) throw new RequestError("Operator authentication required.", 401);
   const { data: role, error: roleError } = await admin.from("user_roles").select("role")

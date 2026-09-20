@@ -3,6 +3,7 @@ import { strict as assert } from "node:assert";
 // Synthetic configuration only. Every request is intercepted; no SMS is sent.
 Deno.env.set("SUPABASE_URL", "https://approval-fixture.invalid");
 Deno.env.set("SUPABASE_SERVICE_ROLE_KEY", "test-service-role");
+Deno.env.set("SUPABASE_ANON_KEY", "test-anon-key");
 Deno.env.set("SITE_URL", "https://fabsy.ca");
 const realFetch = globalThis.fetch;
 let mockFetch: typeof fetch = () => { throw new Error("Unexpected network request"); };
@@ -58,6 +59,46 @@ Deno.test("operator actions and public decisions reject missing authentication o
     assert.equal((await handler(request({ action: "preview", token }, { Origin: "https://evil.invalid" }))).status, 403);
   } finally { mockFetch = original; }
 });
+
+for (const fixture of [
+  { name: "exact configured service key", credential: "test-service-role", service: true, user: false, admin: false, status: 404, paths: ["/rest/v1/disclosure_portal_approvals"] },
+  { name: "different service credential verified by PostgREST", credential: "rotated-service-fixture", service: true, user: false, admin: false, status: 404, paths: ["/rest/v1/rpc/verify_disclosure_automation_operator", "/rest/v1/disclosure_portal_approvals"] },
+  { name: "forged service credential", credential: "forged-service-fixture", service: false, user: false, admin: false, status: 401, paths: ["/rest/v1/rpc/verify_disclosure_automation_operator", "/auth/v1/user"] },
+  { name: "verified ordinary user", credential: "ordinary-user-fixture", service: false, user: true, admin: false, status: 403, paths: ["/rest/v1/rpc/verify_disclosure_automation_operator", "/auth/v1/user", "/rest/v1/user_roles"] },
+  { name: "verified administrator", credential: "admin-user-fixture", service: false, user: true, admin: true, status: 404, paths: ["/rest/v1/rpc/verify_disclosure_automation_operator", "/auth/v1/user", "/rest/v1/user_roles", "/rest/v1/disclosure_portal_approvals"] },
+]) {
+  Deno.test(`operator status authentication: ${fixture.name}`, async () => {
+    const original = mockFetch;
+    const originalFetch = globalThis.fetch;
+    const paths: string[] = [];
+    mockFetch = async (input, init) => {
+      const url = new URL(typeof input === "string" ? input : input instanceof Request ? input.url : input.href);
+      assert.equal(url.hostname, "approval-fixture.invalid");
+      paths.push(url.pathname);
+      if (url.pathname === "/rest/v1/rpc/verify_disclosure_automation_operator") {
+        const headers = new Headers(init?.headers);
+        assert.equal(headers.get("authorization"), `Bearer ${fixture.credential}`);
+        assert.equal(headers.get("apikey"), "test-anon-key");
+        return fixture.service ? Response.json(true) : Response.json({ message: "permission denied" }, { status: 403 });
+      }
+      if (url.pathname === "/auth/v1/user") {
+        assert.equal(new Headers(init?.headers).get("authorization"), `Bearer ${fixture.credential}`);
+        return fixture.user ? Response.json({ id: "12345678-1234-4234-8234-123456789abc" })
+          : Response.json({ message: "Invalid JWT", code: "bad_jwt" }, { status: 401 });
+      }
+      if (url.pathname === "/rest/v1/user_roles") return Response.json(fixture.admin ? { role: "admin" } : null);
+      if (url.pathname === "/rest/v1/disclosure_portal_approvals") return Response.json(null);
+      throw new Error("Unexpected endpoint");
+    };
+    globalThis.fetch = (input, init) => mockFetch(input, init);
+    try {
+      const result = await handler(request({ action: "status", id: "12345678-1234-4234-8234-123456789abc" },
+        { Authorization: `Bearer ${fixture.credential}` }));
+      assert.equal(result.status, fixture.status);
+      assert.deepEqual(paths, fixture.paths);
+    } finally { mockFetch = original; globalThis.fetch = originalFetch; }
+  });
+}
 
 Deno.test("explicit phone POST binds the decision to the captured terms hash", async () => {
   const original = mockFetch;
