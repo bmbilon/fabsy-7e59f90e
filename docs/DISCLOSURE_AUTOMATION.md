@@ -36,12 +36,19 @@ enumeration. `query.py --print-sql` is available for offline inspection. The
 query runs in a read-only transaction through existing Supabase CLI
 authentication; do not enable debug logging or print credentials.
 
-A candidate can proceed only when:
+A new automatic case can start only when:
 
 - The representation service is paid (the representation timestamp or a matching
   paid representation checkout, not a paid insurance report).
-- The case is active, has no unresolved refund/dispute hold or withdrawn consent,
-  and has one unambiguous submission for its normalized ticket number.
+- The case is active and not soft-deleted, has no unresolved refund/dispute hold
+  or withdrawn consent, and has one unambiguous submission for its normalized
+  ticket number.
+- `staff_workflow_allows_new_request` and `approval_source_requirements_met` are
+  both true. The effective staff stage must be absent, `partial`, or `paid`;
+  a staff `paid` label never replaces actual payment evidence. A canonical
+  submission stage takes precedence over its converted draft's stage. Ambiguous
+  inheritance and every later stage require reconciliation, even when no portal
+  receipt is recorded. Do not change staff stages automatically.
 - Original ticket and signed consent can both be downloaded and visually checked.
   Match client identity and ticket number; do not rely on OCR alone.
 - There is a documented not-guilty instruction. For the combined form this means
@@ -183,6 +190,15 @@ chat confirmation once its exact case-specific approval and client instruction
 are satisfied. Pause for a genuinely new decision, identity mismatch, unsupported
 consent, mandatory missing fact, unexpected agreement, or CAPTCHA. Never solve or
 bypass a CAPTCHA automatically.
+
+Immediately before **each** portal final click, fetch fresh source records and
+recheck active status, `deleted_at`, effective staff stage/version, actual payment,
+refund/dispute holds, current consent and plea instruction, and the local ledger.
+The Terms approval was consumed earlier and is not a substitute for this check.
+Any staff stage outside absent/`partial`/`paid`, changed stage/version, deletion,
+missing source record, or changed authority stops the attempt for reconciliation.
+Do not automatically alter staff workflow status. For a partial case, preserve its confirmed step;
+an existing disclosure acknowledgement cannot authorize another disclosure.
 
 Reserve the normalized ticket once with `ledger.py claim`. Immediately before
 each final click, use `mark-submitting --step plea` or `--step disclosure` with

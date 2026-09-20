@@ -1,5 +1,3 @@
-create function public.test_assert(ok boolean, label text) returns void language plpgsql as $$
-begin if ok is distinct from true then raise exception 'FAILED: %',label; end if; end $$;
 select set_config('request.jwt.claim.role','service_role',false);
 select test_assert(disclosure_approval_case_eligible('30000000-0000-4000-8000-000000000001'),'paid ready explicit instruction eligible');
 begin;

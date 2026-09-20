@@ -17,7 +17,13 @@ try {
   run('pg_ctl', ['-D', join(dir, 'data'), '-l', join(dir, 'postgres.log'), '-o', `-k ${dir} -h '' -p 55446`, '-w', 'start']);
   started = true;
   const args = ['-h', dir, '-p', '55446', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1'];
-  for (const file of ['supabase/tests/disclosure-approval.fixture.sql', 'supabase/migrations/20260920150000_disclosure_remote_approval.sql', 'supabase/tests/disclosure-approval.test.sql']) {
+  for (const file of [
+    'supabase/tests/disclosure-approval.fixture.sql',
+    'supabase/migrations/20260920150000_disclosure_remote_approval.sql',
+    'supabase/migrations/20260920213000_disclosure_case_status_guard.sql',
+    'supabase/tests/disclosure-case-status-guard.test.sql',
+    'supabase/tests/disclosure-approval.test.sql',
+  ]) {
     run('psql', [...args, '-f', file]);
     console.log(`${file}: passed`);
   }
