@@ -21,7 +21,6 @@ import FAQ from "./pages/FAQ";
 import AIInfo from "./pages/AIInfo";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
 import AdminCaseManagement from "./pages/AdminCaseManagement";
 import AdminPaidFunnel from "./pages/AdminPaidFunnel";
 import AdminSubmissionDetail from "./pages/AdminSubmissionDetail";
@@ -79,6 +78,8 @@ const ReferralPortal = lazy(() => import("./pages/ReferralPortal"));
 const ProDiscountPortal = lazy(() => import("./pages/ProDiscountPortal"));
 const AdminSmsIntake = lazy(() => import("./pages/AdminSmsIntake"));
 const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
+const AdminWorkspace = lazy(() => import('./components/admin/AdminWorkspace'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLiveView = lazy(() => import("./pages/AdminLiveView"));
 const CompleteTicket = lazy(() => import("./pages/CompleteTicket"));
 const DisclosureApproval = lazy(() => import("./pages/DisclosureApproval"));
@@ -132,8 +133,6 @@ const App = () => (
           <Route path="/portal/referrals" element={<RouteSuspense><ReferralPortal /></RouteSuspense>} />
           <Route path="/portal/pro-discount" element={<RouteSuspense><ProDiscountPortal /></RouteSuspense>} />
           <Route path="/portal/pro-discount/:submissionId" element={<RouteSuspense><ProDiscountPortal /></RouteSuspense>} />
-          <Route path="/admin/referrals" element={<RouteSuspense><AdminReferrals /></RouteSuspense>} />
-          <Route path="/admin/consent-links" element={<RouteSuspense><AdminManualRepresentationLinks /></RouteSuspense>} />
           <Route path="/admin/emailed-ticket-links" element={<Navigate to="/admin/consent-links" replace />} />
           <Route path="/submit-ticket" element={<TicketFormPage />} />
           <Route path="/ticket-form" element={<TicketFormPage />} />
@@ -178,7 +177,10 @@ const App = () => (
           <Route path="/blog/:slug" element={<BlogPost />} />
            {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route element={<RouteSuspense><AdminWorkspace /></RouteSuspense>}>
+          <Route path="/admin/referrals" element={<RouteSuspense><AdminReferrals /></RouteSuspense>} />
+          <Route path="/admin/consent-links" element={<RouteSuspense><AdminManualRepresentationLinks /></RouteSuspense>} />
+          <Route path="/admin/dashboard" element={<RouteSuspense><AdminDashboard /></RouteSuspense>} />
           <Route path="/admin/live" element={<RouteSuspense><AdminLiveView /></RouteSuspense>} />
           <Route path="/admin/cases" element={<AdminCaseManagement />} />
           <Route path="/admin/acquisition" element={<AdminPaidFunnel />} />
@@ -190,6 +192,7 @@ const App = () => (
           <Route path="/admin/idr" element={<AdminIdrDashboard />} />
           <Route path="/admin/idr/:orderId" element={<AdminIdrReview />} />
           <Route path="/admin/assessments/:id" element={<AdminAssessmentReview />} />
+          </Route>
           {/* Blog routes */}
           <Route path="/blog/:slug" element={<BlogPost />} />
           {/* Static test route */}

@@ -42,6 +42,7 @@ export interface DashboardOverview {
   funnel: Array<{ event_name: string; sessions: number }>;
   sources: Array<{ source: string; sessions: number }>;
 }
+export type DashboardActivity = Pick<DashboardOverview, 'generated_at' | 'until' | 'today_since' | 'today'>;
 export interface QueueItem {
   id: string;
   kind: "draft" | "submission";

@@ -856,6 +856,11 @@ export type Database = {
       }
     }
     Functions: {
+      admin_dashboard_activity: { Args: Record<PropertyKey, never>; Returns: Json }
+      admin_performance_report: {
+        Args: { p_period?: string; p_start?: string; p_end?: string; p_compare?: string; p_granularity?: string }
+        Returns: Json
+      }
       get_admin_ticket_case_status: { Args: { p_kind: string; p_ticket_id: string }; Returns: Json }
       set_admin_ticket_case_status: { Args: { p_kind: string; p_ticket_id: string; p_stage: string; p_expected_version: number }; Returns: Json }
 

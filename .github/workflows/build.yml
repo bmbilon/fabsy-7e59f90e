@@ -47,6 +47,7 @@ jobs:
         run: |
           node scripts/test-admin-case-status.mjs
           node scripts/test-case-funnel.mjs
+          node scripts/test-admin-performance.mjs
 
       - name: Validate admin ticket delete and restore
         run: node scripts/test-admin-ticket-deletion.mjs

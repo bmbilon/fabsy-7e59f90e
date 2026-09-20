@@ -13,6 +13,7 @@ import {
   QueryClientProvider,
   useQueryClient,
 } from "@tanstack/react-query";
+import AdminWorkspace from "../../src/components/admin/AdminWorkspace";
 import AdminDashboard from "../../src/pages/AdminDashboard";
 import { fixture } from "./client";
 import "../../src/index.css";
@@ -74,16 +75,21 @@ function Destination() {
     </main>
   );
 }
-createRoot(document.getElementById("root")!).render(
+const previewRoot = createRoot(document.getElementById("root")!);
+previewRoot.render(
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
       <BrowserRouter>
         <PreviewBar />
         <Routes>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route element={<AdminWorkspace />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          </Route>
           <Route path="*" element={<Destination />} />
         </Routes>
       </BrowserRouter>
     </HelmetProvider>
   </QueryClientProvider>,
 );
+
+if (import.meta.hot) import.meta.hot.dispose(() => previewRoot.unmount());
