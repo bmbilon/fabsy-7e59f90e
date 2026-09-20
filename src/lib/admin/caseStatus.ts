@@ -5,6 +5,7 @@ export const CASE_STAGES = [
   ['crown_offer_received', 'Crown offer received'],
   ['done_reduced', 'Done — ticket reduced'],
   ['done_withdrawn', 'Done — ticket voided/withdrawn'],
+  ['lapsed_expired', 'Lapsed/expired'],
   ['trial_proceeding', 'Crown offer rejected — client proceeding to trial'],
   ['trial_date_pending', 'Trial date pending'],
   ['trial_date_set', 'Trial date set'],
@@ -20,5 +21,5 @@ export interface CaseStatus {
   version: number;
 }
 export const isTrialStage = (stage: string | null | undefined) => Boolean(stage?.startsWith('trial_'));
-export const isCompletedStage = (stage: string | null | undefined) => Boolean(stage?.startsWith('done_') || stage?.startsWith('trial_concluded_'));
+export const isCompletedStage = (stage: string | null | undefined) => Boolean(stage === 'lapsed_expired' || stage?.startsWith('done_') || stage?.startsWith('trial_concluded_'));
 export const caseStageLabel = (stage: string | null | undefined) => CASE_STAGES.find(([value]) => value === stage)?.[1];

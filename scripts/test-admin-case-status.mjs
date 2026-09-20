@@ -47,7 +47,7 @@ try {
   const choose = async value => act(async () => { select().value = value; select().dispatchEvent(new dom.window.Event('change', { bubbles: true })); });
   await render();
   assert.equal(select().getAttribute('aria-label'), 'Case status for Sample Ticket');
-  assert.equal(select().options.length, 12, 'All eleven staff stages are available');
+  assert.equal(select().options.length, 13, 'All twelve staff stages are available');
   await choose('done_withdrawn');
   assert.equal(select().disabled, true, 'Duplicate saves disabled');
   assert.equal(select().value, '', 'Never claim success before server acknowledgement');
@@ -69,6 +69,11 @@ try {
   assert.equal(calls.at(-1).args.p_expected_version, 3, 'Retry uses refreshed server version');
   await act(async () => resolveSave({ data: { ...base.initial, stage: 'trial_date_pending', version: 4 } }));
   assert.equal(select().querySelector('optgroup').label, 'Trial matters', 'Trial choices are first for trial cases');
+  await choose('lapsed_expired');
+  assert.equal(calls.at(-1).args.p_stage, 'lapsed_expired');
+  await act(async () => resolveSave({ data: { ...base.initial, stage: 'lapsed_expired', version: 5 } }));
+  assert.equal(select().value, 'lapsed_expired');
+  assert.equal(select().selectedOptions[0].textContent, 'Lapsed/expired');
   await render({ disabled: true });
   assert.equal(select().disabled, true, 'Deleted tickets cannot be edited');
   await act(async () => root.unmount()); root = null;
