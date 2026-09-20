@@ -395,11 +395,15 @@ async function persistPaidTicketCheckout(
   }
   const proPayment = validateProPayment(session, intent, false);
   await persistProPayment(supabase, submissionId, intent, proPayment.verified);
+  const paidAt = new Date().toISOString();
+  const paymentIntentId = typeof session.payment_intent === "string"
+    ? session.payment_intent
+    : session.payment_intent?.id || null;
 
   const { data: submission, error: submissionError } = await supabase
     .from("ticket_submissions")
     .select(
-      "id,client_id,status,source_assessment_id,representation_includes_assessment,ticket_type",
+      "id,client_id,status,source_assessment_id,representation_includes_assessment,ticket_type,representation_paid_at,representation_checkout_session_id,representation_payment_intent_id",
     )
     .eq("id", submissionId)
     .maybeSingle();
@@ -408,6 +412,10 @@ async function persistPaidTicketCheckout(
     throw new Error(
       "Paid ticket checkout does not belong to its reserved client.",
     );
+  }
+  if (submission.representation_checkout_session_id &&
+      submission.representation_checkout_session_id !== session.id) {
+    throw new Error("Paid ticket checkout conflicts with the recorded payment session.");
   }
   if (submission.representation_includes_assessment) {
     if (
@@ -425,7 +433,7 @@ async function persistPaidTicketCheckout(
   if (submission.status === "awaiting_payment") {
     const { data: activated, error: activationError } = await supabase
       .from("ticket_submissions")
-      .update({ status: "pending", updated_at: new Date().toISOString() })
+      .update({ status: "pending", updated_at: paidAt })
       .eq("id", submissionId)
       .eq("status", "awaiting_payment")
       .select("id")
@@ -440,6 +448,17 @@ async function persistPaidTicketCheckout(
     .eq("id", intentId)
     .eq("attempts", intent.attempts);
   if (intentPaidError) throw intentPaidError;
+  const { error: paidSubmissionError } = await supabase
+    .from("ticket_submissions")
+    .update({
+      representation_paid_at: submission.representation_paid_at || paidAt,
+      representation_checkout_session_id: session.id,
+      representation_payment_intent_id:
+        submission.representation_payment_intent_id || paymentIntentId,
+      updated_at: paidAt,
+    })
+    .eq("id", submissionId);
+  if (paidSubmissionError) throw paidSubmissionError;
   if (submission.representation_includes_assessment) {
     await activateIncludedAssessment(
       supabase,
@@ -947,14 +966,18 @@ async function persistPaidOrder(
 
   let combinedRepresentation: {
     id: string;
+    status?: string | null;
     source_assessment_id?: string | null;
     representation_includes_assessment?: boolean;
+    representation_paid_at?: string | null;
+    representation_checkout_session_id?: string | null;
+    representation_payment_intent_id?: string | null;
   } | null = null;
   if (ticketSubmissionId) {
     const { data: submission, error: submissionError } = await supabase
       .from("ticket_submissions")
       .select(
-        "id,client_id,source_assessment_id,representation_includes_assessment,ticket_type",
+        "id,client_id,status,source_assessment_id,representation_includes_assessment,ticket_type,representation_paid_at,representation_checkout_session_id,representation_payment_intent_id",
       )
       .eq("id", ticketSubmissionId)
       .maybeSingle();
@@ -963,6 +986,10 @@ async function persistPaidOrder(
       throw new Error("Ticket submission does not belong to the IDR client.");
     }
     combinedRepresentation = submission;
+    if (combinedRepresentation.representation_checkout_session_id &&
+        combinedRepresentation.representation_checkout_session_id !== session.id) {
+      throw new Error("Paid representation add-on conflicts with the recorded payment session.");
+    }
     if (combinedRepresentation.representation_includes_assessment) {
       if (
         !isUuid(combinedRepresentation.source_assessment_id || undefined) ||
@@ -989,11 +1016,22 @@ async function persistPaidOrder(
   const paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id || null;
   const activateCombinedTicket = async () => {
     if (checkoutKind !== "ticket_with_addon" || !ticketSubmissionId) return;
+    const paidAt = new Date().toISOString();
     const { error: activationError } = await supabase
       .from("ticket_submissions")
-      .update({ status: "pending", updated_at: new Date().toISOString() })
-      .eq("id", ticketSubmissionId)
-      .eq("status", "awaiting_payment");
+      .update({
+        status: combinedRepresentation?.status === "awaiting_payment"
+          ? "pending"
+          : combinedRepresentation?.status,
+        representation_paid_at:
+          combinedRepresentation?.representation_paid_at || paidAt,
+        representation_checkout_session_id: session.id,
+        representation_payment_intent_id:
+          combinedRepresentation?.representation_payment_intent_id ||
+          paymentIntentId,
+        updated_at: paidAt,
+      })
+      .eq("id", ticketSubmissionId);
     if (activationError) throw activationError;
     if (combinedRepresentation?.representation_includes_assessment) {
       await activateIncludedAssessment(
