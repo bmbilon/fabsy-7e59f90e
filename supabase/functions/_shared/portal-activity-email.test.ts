@@ -2,6 +2,7 @@
 import {
   assertEquals,
   assertStringIncludes,
+  assertThrows,
 } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import {
   type PortalActivityEvent,
@@ -29,7 +30,7 @@ const event: PortalActivityEvent = {
 Deno.test("portal activity email identifies the person and escapes private fields", () => {
   assertEquals(
     portalActivitySubject(event),
-    "[Fabsy Portal] Representation consent signed — Coady <Barnes>",
+    "Ticket AB123 — Representation consent received",
   );
   const html = renderPortalActivityHtml(event, "https://fabsy.ca");
   assertStringIncludes(html, "Coady &lt;Barnes&gt;");
@@ -41,4 +42,39 @@ Deno.test("portal activity email identifies the person and escapes private field
   assertStringIncludes(html, "drivers licence");
   assertStringIncludes(html, "123456789");
   assertStringIncludes(html, "1994-06-03");
+});
+
+Deno.test("consent subjects require every actual ticket reference while other events stay unchanged", () => {
+  for (
+    const ticket_number of [
+      "",
+      "UNKNOWN",
+      "E123\r\nBcc: other@example.test",
+      "<E12345>",
+    ]
+  ) {
+    assertThrows(() =>
+      portalActivitySubject({ ...event, payload: { ticket_number } })
+    );
+  }
+  assertEquals(
+    portalActivitySubject({
+      ...event,
+      payload: { ticket_numbers: ["E12345678T", "E98765432A"] },
+    }),
+    "Ticket E12345678T, E98765432A — Representation consent received",
+  );
+  assertEquals(
+    portalActivitySubject({ ...event, event_type: "payment_paid" }),
+    "[Fabsy Portal] Payment confirmed — Coady <Barnes>",
+  );
+  const html = renderPortalActivityHtml({
+    ...event,
+    payload: { ...event.payload, signature_method: "manual_scan" },
+  }, "https://fabsy.ca");
+  assertStringIncludes(
+    html,
+    "client-provided signed scan and consent audit PDF",
+  );
+  assertStringIncludes(html, "does not confirm staff approval");
 });

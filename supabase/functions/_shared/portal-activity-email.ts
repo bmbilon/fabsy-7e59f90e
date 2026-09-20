@@ -1,7 +1,6 @@
 import { sendWorkspaceEmail } from "./google-workspace-email.ts";
 import { internalNotificationDelivery } from "./resend-email.ts";
 
-
 export interface PortalActivityEvent {
   id: string;
   event_type: string;
@@ -61,7 +60,27 @@ function money(cents: unknown) {
   }).format(amount / 100);
 }
 
+export function consentTicketReference(value: unknown): string {
+  if (typeof value !== "string" || !/^[A-Za-z0-9 -]+$/.test(value.trim())) {
+    throw new Error("consent_ticket_reference_required");
+  }
+  const ticket = value.trim().toUpperCase().replace(/[ -]/g, "");
+  if (!/^[A-Z0-9]{5,30}$/.test(ticket) || !/[0-9]/.test(ticket)) {
+    throw new Error("consent_ticket_reference_required");
+  }
+  return ticket;
+}
+
 export function portalActivitySubject(event: PortalActivityEvent) {
+  if (event.event_type === "representation_consent_signed") {
+    const tickets = Array.isArray(event.payload.ticket_numbers)
+      ? event.payload.ticket_numbers.map(consentTicketReference)
+      : [consentTicketReference(event.payload.ticket_number)];
+    if (!tickets.length) throw new Error("consent_ticket_reference_required");
+    return `Ticket ${
+      [...new Set(tickets)].join(", ")
+    } — Representation consent received`;
+  }
   const name = text(event.payload.client_name);
   const ticket = text(event.payload.ticket_number);
   const detail = name || (ticket ? `ticket ${ticket}` : null);
@@ -129,7 +148,11 @@ export function renderPortalActivityHtml(
     </table>
     ${
     event.event_type === "representation_consent_signed"
-      ? '<p style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:14px">The signed consent PDF is attached to this email.</p>'
+      ? `<p style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:14px">${
+        payload.signature_method === "manual_scan"
+          ? "The client-provided signed scan and consent audit PDF are attached. Receiving these files does not confirm staff approval of the signature."
+          : "The signed consent PDF is attached to this email."
+      }</p>`
       : ""
   }
     <p style="margin:26px 0"><a href="${

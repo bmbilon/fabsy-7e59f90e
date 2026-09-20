@@ -46,7 +46,7 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
   const accept = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (inFlight.current) return;
-    if (!email.trim() && !phone.trim()) { setError("Enter an email address or phone number for updates."); return; }
+    if (!email.trim()) { setError("Enter your email address so we can send your consent copy and next steps."); return; }
     if (phone.trim() && !/^[+\d().\s-]{7,30}$/.test(phone.trim())) { setError("Enter a valid phone number."); return; }
     inFlight.current = true; setBusy(true); setError("");
     try {
@@ -76,11 +76,11 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
     {!accepted ? <form onSubmit={accept} className="space-y-5">
       <fieldset disabled={busy} className="space-y-5">
         <legend className="mb-4 text-lg font-semibold">Provide me with updates</legend>
-        <div className="space-y-2"><Label htmlFor="updates-email">By email</Label><Input id="updates-email" type="email" autoComplete="email" maxLength={255} value={email} onChange={event => setEmail(event.target.value)} /></div>
-        <div className="space-y-2"><Label htmlFor="updates-phone">And/or phone</Label><Input id="updates-phone" type="tel" autoComplete="tel" maxLength={30} value={phone} onChange={event => setPhone(event.target.value)} /></div>
+        <div className="space-y-2"><Label htmlFor="updates-email">Email address</Label><Input id="updates-email" type="email" required aria-describedby="consent-email-help" autoComplete="email" maxLength={255} value={email} onChange={event => setEmail(event.target.value)} /><p id="consent-email-help" className="text-sm text-muted-foreground">We’ll email your consent copy, welcome and next steps here.</p></div>
+        <div className="space-y-2"><Label htmlFor="updates-phone">Phone (optional)</Label><Input id="updates-phone" type="tel" autoComplete="tel" maxLength={30} value={phone} onChange={event => setPhone(event.target.value)} /></div>
         <Button className="min-h-12 w-full" type="submit" disabled={busy}>{busy ? "Saving…" : "Accept"}</Button>
       </fieldset>
-    </form> : <p role="status" className="text-center">Updates enabled. We’ll contact you if we need any more information.</p>}
+    </form> : <p role="status" className="text-center">Updates enabled. We’ll email your consent copy and next steps once your ticket details are confirmed.</p>}
     {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
     {needsOwner && <div className="space-y-3 rounded-xl border p-[16px]">
       <Label htmlFor="checkout-owner">Before paying for this camera notice, was the vehicle registered to you on the offence date?</Label>

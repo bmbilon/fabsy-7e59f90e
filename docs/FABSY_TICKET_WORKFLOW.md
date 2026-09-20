@@ -8,11 +8,17 @@ This describes the ticket representation workflow as reviewed on September 20, 2
 flowchart TD
   subgraph Intake[Client intake and payment]
     A[Client uploads ticket, accepts consent<br/>I plead not guilty starts checked]
-    B[Automatic: save ticket and consent proof<br/>Collect updates contact; scan ticket]
+    B[Automatic: save ticket and consent proof<br/>Collect email; scan ticket]
     C{Details ready for checkout?}
     D[Brett / staff: resolve unclear details]
     E[Client pays; Stripe webhook verifies<br/>representation payment]
+    Welcome[Automatic: email consent copy, welcome and next steps<br/>Payment reminder only if outstanding]
+    StaffCopy[Automatic: consent copy to hello@fabsy.ca]
+    PaidAlert[Automatic: payment SMS to Brett<br/>Amount, client and full ticket number]
     A --> B --> C
+    B --> Welcome
+    B --> StaffCopy
+    E --> PaidAlert
     C -- No --> D --> C
     C -- Yes --> E
   end
@@ -67,7 +73,9 @@ The two portal branches are independent. A disclosure receipt proves neither a n
 
 The new English intake lets the client upload a ticket and accept consent together. **“I plead not guilty” is checked by default**, while the separate authorization/consent checkbox requires the client's acceptance. The server stores the actual plea choice and its wording in versioned consent evidence and the generated PDF. Unchecking the plea still permits intake; it does not authorize a not-guilty filing. Older records do not acquire a new checked choice retrospectively.
 
-After the ticket and consent are saved, the client supplies email and/or phone for updates. Image extraction suggests the ticket details; PDFs, failed scans, unclear classifications, missing required details and out-of-scope flags require staff review. The intake states are `pending_scan → scanning → ready` or `needs_review`. A `ready` scan is not visual verification of the original document. Current quick checkout also needs email; a phone-only receipt can remain saved for staff follow-up. Camera notices ask the registered-owner question before checkout.
+After the ticket and consent are saved, the client supplies a required email address and optional phone number for updates. Image extraction suggests the ticket details; PDFs, failed scans, unclear classifications, missing required details and out-of-scope flags require staff review. The intake states are `pending_scan → scanning → ready` or `needs_review`. A `ready` scan is not visual verification of the original document. An interrupted contact step leaves the saved ticket and consent intact; email delivery waits until the address and ticket reference are available. Camera notices ask the registered-owner question before checkout.
+
+A saved consent queues a client welcome with the actual PDF and next steps, independent of checkout navigation. The worker checks current representation payment evidence before adding a payment reminder. The existing staff event sends the consent to hello@fabsy.ca. Full stored ticket numbers appear in both subjects; missing identity/documents hold delivery. Queue ownership prevents a second checkout welcome or contradictory abandoned-consent reminder. Historical and uncertain sends are not replayed. See [consent welcome release](CONSENT_WELCOME_RELEASE.md) for deployment evidence.
 
 The localized and existing detailed intake remains a separate supported path. For a legacy officer-issued file, a verified explicit `not_guilty` selection can supply the plea instruction. A default strategy, missing quick-intake choice or an explicit false choice cannot replace client authority.
 
