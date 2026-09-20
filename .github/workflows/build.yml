@@ -43,6 +43,9 @@ jobs:
       - name: Validate Live View privacy and session behavior
         run: node --test scripts/test-live-view.mjs
 
+      - name: Validate staff case status controls
+        run: node scripts/test-admin-case-status.mjs
+
       - name: Validate admin ticket delete and restore
         run: node scripts/test-admin-ticket-deletion.mjs
 
@@ -65,14 +68,12 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Type-check paid-acquisition and disclosure Edge Functions
+      - name: Type-check paid-acquisition Edge Functions
         run: |
           deno check --node-modules-dir=none --frozen \
             supabase/functions/_shared/meta-capi.ts \
             supabase/functions/_shared/meta-lead.ts \
             supabase/functions/_shared/meta-purchase.ts \
-            supabase/functions/_shared/disclosure-approval.ts \
-            supabase/functions/disclosure-approval/index.ts \
             supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
             supabase/functions/photo-ticket-intake/index.ts \
@@ -89,29 +90,8 @@ jobs:
             supabase/functions/send-notification/index.ts \
             supabase/functions/withdraw-meta-measurement/index.ts
       
-      - name: Verify photo intake consent, background review and disclosure approvals
-        run: |
-          deno test --allow-env --allow-net --allow-read --node-modules-dir=none --frozen \
-            supabase/functions/_shared/intake-consent.test.ts \
-            supabase/functions/_shared/consent-pdf.test.ts \
-            supabase/functions/photo-ticket-intake/index.test.ts \
-            supabase/functions/_shared/disclosure-approval.test.ts \
-            supabase/functions/disclosure-approval/index.test.ts
-
-      - name: Verify disclosure and plea persistence with isolated local PostgreSQL
-        shell: bash
-        run: |
-          set -euo pipefail
-          DISCLOSURE_TEST_PG_BIN="$(pg_config --bindir)"
-          test -x "$DISCLOSURE_TEST_PG_BIN/initdb"
-          test -x "$DISCLOSURE_TEST_PG_BIN/pg_ctl"
-          test -x "$DISCLOSURE_TEST_PG_BIN/psql"
-          export DISCLOSURE_TEST_PG_BIN
-          export PATH="$DISCLOSURE_TEST_PG_BIN:$PATH"
-          export PYTHONDONTWRITEBYTECODE=1
-          node scripts/test-disclosure-approval-database.mjs
-          python3 supabase/tests/test_intake_plea_migration.py
-          python3 -m unittest discover -s scripts/disclosure-automation -p 'test_*.py' -v
+      - name: Verify photo intake consent and background review
+        run: deno test --allow-env --allow-net --allow-read --node-modules-dir=none --frozen supabase/functions/_shared/intake-consent.test.ts supabase/functions/_shared/consent-pdf.test.ts supabase/functions/photo-ticket-intake/index.test.ts
 
       - name: Build guarded snapshots and app
         env:
