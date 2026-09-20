@@ -57,6 +57,6 @@ export default function PhotoTicketForm({ initialTicketImage = null, initialPref
   };
 
   return <div onPointerDownCapture={enterPrivateUpload} onFocusCapture={enterPrivateUpload} onClickCapture={enterPrivateUpload}>
-    <QuickTicketIntake formData={formData} updateFormData={updateFormData} embedded={embedded} />
+    <QuickTicketIntake formData={formData} updateFormData={updateFormData} embedded={embedded} allowFileSelection={privateUpload} />
   </div>;
 }

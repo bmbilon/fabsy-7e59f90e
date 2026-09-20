@@ -436,15 +436,15 @@ async function untagged(page, documentId, observationMs = 1000) {
 async function fillPrivate(page, pathname) {
   if (pathname === '/contact') { await page.locator('#name').fill(privateValues[0]); await page.locator('#email').fill(privateValues[1]); await page.locator('#message').fill(privateValues[2]); }
   else if (pathname === '/submit-ticket') {
-    // Select a local file to reveal contact capture. All service requests stay
-    // blocked; never save a lead or transfer the synthetic ticket.
+    // Select a local file to reveal consent. All service requests stay
+    // blocked; never submit or transfer the synthetic ticket.
     const ticketFile = page.locator('input[type="file"][accept*="application/pdf"]');
     await ticketFile.waitFor({ state: 'attached' });
     assert.equal(await page.locator('#lead-email').count(), 0, 'Fresh intake starts with local file selection');
     await ticketFile.setInputFiles(syntheticTicketPdf());
-    await page.locator('#lead-email').waitFor({ state: 'visible' });
-    await page.locator('#lead-email').fill(privateValues[1]);
-    await page.locator('#lead-phone').fill(privateValues[4]);
+    await page.locator('#quick-consent').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#updates-email, #updates-phone, #lead-email, #lead-phone').count(), 0, 'Contact fields wait until receipt');
+    await page.locator('#quick-consent').check();
   }
   else if (pathname === '/fleet') { await page.locator('#fleet-company').fill(privateValues[0]); await page.locator('#fleet-email').fill(privateValues[1]); await page.locator('#fleet-notes').fill(privateValues[2]); }
 }
@@ -473,6 +473,21 @@ try {
     return { documentId: initial.id, livePageViewRequired: options.live };
   });
   const main = contexts[0]; const page = main.page;
+  await checkpoint('homepage-upload-enters-untagged-document-before-ticket-input', async () => {
+    const scope = await isolatedContext(); const upload = await scope.context.newPage();
+    await go(upload, '/'); await choose(upload, scope, 'accepted');
+    const previous = await tagged(upload);
+    assert.equal(await upload.locator('#ticket-form-container input[type="file"]').count(), 0);
+    await upload.getByRole('button', { name: 'Browse files', exact: true }).click();
+    await upload.waitForURL(url => url.searchParams.get('upload') === '1');
+    const current = await ready(upload, '/');
+    assert.notEqual(current.id, previous.id, 'Ticket upload requires a fresh document');
+    await fillPrivate(upload, '/submit-ticket'); await untagged(upload, current.id);
+    safeOldDocument(previous.id, '/?upload=1');
+    assert.equal(await upload.locator('#fabsy-meta-pixel, #fabsy-openai-ads-pixel, #fabsy-tawk-widget').count(), 0);
+    await upload.close();
+    return { oldDocumentId: previous.id, uploadDocumentId: current.id, localFileOnly: true };
+  });
   await checkpoint('homepage-assessment-enters-untagged-document-before-ticket-input', async () => {
     const scope = await isolatedContext(); const assessment = await scope.context.newPage();
     await go(assessment, '/'); await choose(assessment, scope, 'accepted');
@@ -483,7 +498,7 @@ try {
     const current = await ready(assessment, '/');
     assert.notEqual(current.id, previous.id, 'Assessment data requires a fresh document');
     await assessment.locator('#assessment-upload').click();
-    await assessment.locator('input[type="file"][accept*="application/pdf"]').setInputFiles(syntheticTicketPdf());
+    await assessment.locator('#instant-ticket-assessment input[type="file"][accept*="application/pdf"]').setInputFiles(syntheticTicketPdf());
     await assessment.locator('#assessment-offence').selectOption('lowSpeeding');
     await assessment.locator('#assessment-fine').fill('4321.99');
     await assessment.locator('#assessment-demerits').selectOption('3');

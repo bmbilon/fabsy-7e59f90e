@@ -24,6 +24,7 @@ export interface TicketCaptureProps {
   skipInitialScan?: boolean;
   selectionOnly?: boolean;
   scanOnSelect?: boolean;
+  allowFileSelection?: boolean;
   compact?: boolean;
   onCaptureStateChange?: (state: TicketCaptureState) => void;
 }
@@ -72,6 +73,7 @@ export default function TicketCapture({
   skipInitialScan = false,
   selectionOnly = false,
   scanOnSelect = true,
+  allowFileSelection = true,
   compact = false,
   onCaptureStateChange,
 }: TicketCaptureProps) {
@@ -283,7 +285,7 @@ export default function TicketCapture({
 
       {scanOnSelect && selectedFileType?.valid && selectedFileType.kind === "image" ? <TicketPhotoCheck /> : null}
 
-      <input
+      {allowFileSelection && <><input
         ref={browseInputRef}
         id={`${inputId}-browse`}
         type="file"
@@ -307,7 +309,7 @@ export default function TicketCapture({
         aria-required={required}
         aria-describedby={`${scanOnSelect ? `${inputId}-help ` : ""}${inputId}-status`}
         onChange={(event) => selectFile(event.target.files?.[0], event.currentTarget)}
-      />
+      /></>}
 
       {scanOnSelect && <p id={`${inputId}-help`} className="text-xs text-muted-foreground">
         Images are scanned to help fill the form. PDFs are attached for manual review and are not sent to OCR.

@@ -138,7 +138,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
     const valid = main.querySelectorAll('#ticket-form-container').length === 1 && visible(upload)
       && compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket.'
       && guide && !guide.open && compact(guide.querySelector('summary')?.textContent) === 'Howtoproperlycaptureanimageofyourticket'
-      && upload.querySelectorAll('input[type="file"]').length === 2
+      && upload.querySelectorAll('input[type="file"]').length === 0
       && upload.querySelectorAll('input:not([type="file"]),select,textarea').length === 0
       && submit && visible(submit) && submit.disabled && compact(submit.textContent) === 'Submitticketandconsent';
     if (!valid) issues.push('Homepage upload must retain its empty photo-only form, collapsed capture guide and disabled submit');

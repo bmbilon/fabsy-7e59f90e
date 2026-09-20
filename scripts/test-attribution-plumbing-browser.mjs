@@ -137,8 +137,9 @@ try {
       await localTicket.waitFor({ state: 'attached' });
       assert.equal(await f.page.locator('#lead-email').count(), 0, 'Camera intake starts with local ticket selection');
       await localTicket.setInputFiles({ name: 'synthetic-camera.png', mimeType: 'image/png', buffer: Buffer.from('SYNTHETIC OFFLINE TICKET') });
-      await f.page.locator('#lead-email').waitFor();
-      assert.equal(f.ticketTransfers.length, 0, 'Local ticket selection does not send bytes before contact permission is saved');
+      await f.page.locator('#quick-consent').waitFor();
+      assert.equal(await f.page.locator('#lead-email, #updates-email').count(), 0, 'Contact is requested after receipt');
+      assert.equal(f.ticketTransfers.length, 0, 'Local ticket selection does not send bytes before affirmative consent and submission');
       assert.equal(f.vendorLoads.length, loadsBeforePrivate, 'No new vendor loads in private camera intake');
       assert.equal(await f.page.locator('#fabsy-google-tag, #fabsy-meta-pixel').count(), 0);
       if (choice === 'accepted') {

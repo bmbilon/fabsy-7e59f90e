@@ -13,7 +13,7 @@ import { PHOTO_UPLOAD_AUTHORIZATION_LINES, CONSENT_PRIVACY_LINES, INTAKE_CONSENT
 
 type Update = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => void;
 
-export default function QuickTicketIntake({ formData, updateFormData, embedded = false }: { formData: FormData; updateFormData: Update; embedded?: boolean }) {
+export default function QuickTicketIntake({ formData, updateFormData, embedded = false, allowFileSelection = true }: { formData: FormData; updateFormData: Update; embedded?: boolean; allowFileSelection?: boolean }) {
   const Heading = embedded ? "h2" : "h1";
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +47,7 @@ export default function QuickTicketIntake({ formData, updateFormData, embedded =
     <form onSubmit={submit} aria-busy={busy}>
       <fieldset disabled={busy} className="min-w-0 space-y-4">
         <legend className="sr-only">Ticket and consent</legend>
-        <TicketCapture file={formData.ticketImage} onFileChange={changeFile} onOcrData={() => {}} scanOnSelect={false}
+        <TicketCapture file={formData.ticketImage} onFileChange={changeFile} onOcrData={() => {}} scanOnSelect={false} allowFileSelection={allowFileSelection}
           disabled={busy} compact={hasTicket} required={!formData.sourceAssessmentId} />
         {hasTicket && <>
           <label htmlFor="quick-consent" className="flex cursor-pointer items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-[12px]">
