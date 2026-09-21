@@ -41,6 +41,11 @@ const payload = indexNowPayload([
 assert.equal(payload.host, 'fabsy.ca');
 assert.equal(payload.key, INDEXNOW_KEY);
 assert.equal(payload.keyLocation, INDEXNOW_KEY_LOCATION);
+assert.equal(
+  fs.readFileSync(new URL(`../public/${INDEXNOW_KEY}.txt`, import.meta.url), 'utf8'),
+  INDEXNOW_KEY,
+  'The published key file must contain the exact key without a trailing newline',
+);
 assert.deepEqual(payload.urlList, [
   'https://fabsy.ca/blog/example',
   'https://fabsy.ca/content/speeding-ticket-alberta',
