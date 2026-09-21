@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import TrafficOverview from '@/components/admin/TrafficOverview';
+import { normalizeTraffic, type TrafficReport } from '@/lib/admin/traffic';
 
 type FunnelEventName =
   | 'landing_view'
@@ -122,6 +124,7 @@ interface FunnelReport {
     steps: BehaviorStepTotal[];
   };
   preconsent?: PreconsentReport;
+  traffic: TrafficReport;
   financials?: {
     scope: 'all_customer_purchases_from_signed_stripe_webhooks';
     amount_basis: 'gross_customer_cash_including_tax';
@@ -166,6 +169,7 @@ function numberValue(value: unknown): number {
 function normalizeReport(value: FunnelReport): FunnelReport {
   return {
     ...value,
+    traffic: normalizeTraffic(value.traffic),
     verification_traffic_excluded: value.verification_traffic_excluded === true,
     events: Array.isArray(value.events)
       ? value.events.map(event => ({ ...event, event_count: numberValue(event.event_count), sessions: numberValue(event.sessions) }))
@@ -273,19 +277,19 @@ export default function AdminPaidFunnel() {
   });
   const [result, setResult] = useState<{
     days: (typeof windows)[number];
-    status: 'loading' | 'ready' | 'failed';
+    status: 'loading' | 'ready' | 'failed' | 'stale';
     report: FunnelReport | null;
   }>({ days: 7, status: 'loading', report: null });
   const requestNumber = useRef(0);
   const loading = result.days !== days || result.status === 'loading';
-  const failed = result.days === days && result.status === 'failed';
-  const report = result.days === days && result.status === 'ready' ? result.report : null;
+  const failed = result.days === days && (result.status === 'failed' || result.status === 'stale');
+  const report = result.days === days && (result.status === 'ready' || result.status === 'stale') ? result.report : null;
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const load = useCallback(async (windowDays: (typeof windows)[number]) => {
+  const load = useCallback(async (windowDays: (typeof windows)[number], silent = false) => {
     const request = ++requestNumber.current;
-    setResult({ days: windowDays, status: 'loading', report: null });
+    if (!silent) setResult({ days: windowDays, status: 'loading', report: null });
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const staffRole = sessionData.session ? await getIdrStaffRole() : null;
@@ -298,13 +302,14 @@ export default function AdminPaidFunnel() {
         body: { days: windowDays },
       });
       if (request !== requestNumber.current) return;
-      if (error || !data || data.consented_sessions_only !== true) throw error || new Error('Invalid funnel report');
+      if (error || !data || data.consented_sessions_only !== true || !data.traffic) throw error || new Error('Invalid traffic report');
       setResult({ days: windowDays, status: 'ready', report: normalizeReport(data) });
     } catch (error) {
       if (request !== requestNumber.current) return;
       console.error('Unable to load paid funnel report', error);
-      setResult({ days: windowDays, status: 'failed', report: null });
-      toast({
+      setResult(current => silent && current.days === windowDays && current.report
+        ? { ...current, status: 'stale' } : { days: windowDays, status: 'failed', report: null });
+      if (!silent) toast({
         title: 'Funnel report unavailable',
         description: 'No campaign decision should be made until the report can be read back.',
         variant: 'destructive',
@@ -315,6 +320,11 @@ export default function AdminPaidFunnel() {
   useEffect(() => {
     void load(days);
     return () => { requestNumber.current += 1; };
+  }, [days, load]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => { if (document.visibilityState === 'visible') void load(days, true); }, 60_000);
+    return () => window.clearInterval(timer);
   }, [days, load]);
 
   const eventSessions = useMemo(() => new Map(
@@ -337,8 +347,8 @@ export default function AdminPaidFunnel() {
           </Button>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Paid acquisition funnel</h1>
-              <p className="text-sm text-muted-foreground">Consent-qualified, first-party counts by campaign and creative.</p>
+              <h1 className="text-2xl font-bold">Traffic & acquisition</h1>
+              <p className="text-sm text-muted-foreground">All-source requests, live activity, measured behavior and verified results.</p>
             </div>
             <Button type="button" variant="outline" disabled={loading} onClick={() => void load(days)}>
               <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />Refresh
@@ -350,7 +360,7 @@ export default function AdminPaidFunnel() {
       <main className="container mx-auto space-y-6 px-4 py-8">
         <Card className="border-amber-300/70 bg-amber-50/40">
           <CardContent className="pt-6 text-sm leading-relaxed text-slate-700">
-            The aggregate request counts below begin before optional browser measurement. The session funnel includes only visitors who explicitly allowed Fabsy funnel measurement. Reconcile them with Meta and Google clicks, spend, and consent acceptance before calculating conversion rates or changing budget.
+            The all-source section counts eligible public page requests. The paid session funnel includes only visitors who explicitly allowed Fabsy funnel measurement. Requests, sessions, cases and purchases have different counting rules. Reconcile paid requests with Meta and Google clicks, spend, and consent acceptance before changing budget.
             {report?.verification_traffic_excluded ? <p className="mt-2">Tagged verification traffic is excluded from the session funnel. Payment totals include all signed live purchases.</p> : null}
           </CardContent>
         </Card>
@@ -373,11 +383,12 @@ export default function AdminPaidFunnel() {
 
         {loading ? <p role="status" className="rounded-lg border bg-background p-6 text-sm text-muted-foreground">Loading acquisition report…</p> : null}
         {failed ? <div role="alert" className="rounded-lg border border-destructive/50 bg-background p-6">
-          <p className="font-semibold">Acquisition report unavailable</p>
-          <p className="mt-2 text-sm text-muted-foreground">Counts could not be loaded for the selected window. Refresh to retry before making campaign decisions.</p>
+          <p className="font-semibold">{report ? 'Traffic refresh failed — showing the last report' : 'Acquisition report unavailable'}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{report ? `Last updated ${new Date(report.generated_at).toLocaleString('en-CA')}.` : 'Counts could not be loaded for the selected window.'} Refresh to retry before making campaign decisions.</p>
         </div> : null}
 
         {report ? <>
+        <TrafficOverview report={report.traffic} />
         <Card>
           <CardHeader>
             <CardTitle>Paid landing visibility before consent</CardTitle>

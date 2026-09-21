@@ -40,6 +40,9 @@ const approvedCampaigns = new Set([
   'rr-pilot-edmonton-202608',
   'rr-pilot-alberta-202608',
 ]);
+export function reviewedCampaignLabel(value: string): string {
+  return approvedCampaigns.has(value) ? value : '';
+}
 const approvedContents = new Set([
   'rr_relief_v1',
   'rr_flat_fee_v1',

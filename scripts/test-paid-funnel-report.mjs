@@ -54,7 +54,7 @@ test('aggregate report is staff gated and exposes no row-level identifiers', asy
 test('admin report clearly identifies consent scope and platform reconciliation', async () => {
   const ui = await fs.readFile(path.join(root, 'src/pages/AdminPaidFunnel.tsx'), 'utf8');
   assert.match(ui, /only visitors who explicitly allowed Fabsy funnel measurement/i);
-  assert.match(ui, /Reconcile them with Meta and Google clicks, spend, and consent acceptance/i);
+  assert.match(ui, /Reconcile paid requests with Meta and Google clicks, spend, and consent acceptance/i);
   assert.match(ui, /Recoverable lead rate/);
   assert.match(ui, /Verified purchases/);
   assert.match(ui, /All-customer, order-level facts from signed Stripe webhooks/i);
@@ -146,6 +146,7 @@ test('report failures and overlapping window requests cannot appear as zero or s
   const payload = (marker, count = 17) => ({ data: {
     generated_at: '2026-09-18T12:00:00Z', since: '2026-09-11T12:00:00Z', until: '2026-09-18T12:00:00Z',
     consented_sessions_only: true, events: [], campaigns: [], daily: [],
+    traffic: { request_counts_not_people_or_sessions: true, generated_at: '2026-09-18T12:00:00Z', collection_started_at: '2026-09-18T10:00:00Z', comparison_complete: false, requests: count, previous_requests: 5, this_hour: 2, submissions: 1, channels: [{ channel: 'Organic search', requests: count }], sources: [{ channel: 'Organic search', source: 'Google', requests: count }], pages: [{ page: '/content/speeding-ticket-calgary', requests: count }], breakdown: [{ channel: 'Organic search', source: 'Google', page: '/content/speeding-ticket-calgary', campaign: '', device: 'mobile', requests: count }], devices: [{ device: 'mobile', requests: count }], daily: [{ day: '2026-09-18', requests: count }], recent_hours: [], consented_activity: [{ source: 'Google', page: '/content/speeding-ticket-calgary', stage: 'browsing', sessions: 2 }] },
     preconsent: { events: [{ event_name: 'paid_landing', event_count: count }], campaigns: [{
       source: 'google', campaign: marker, medium: 'cpc', content: 'en_rsa_v1', locale: 'en',
       landing_requests: count, consent_accepted: 0, consent_declined: 0, consent_dismissed: 0,
@@ -163,6 +164,10 @@ test('report failures and overlapping window requests cannot appear as zero or s
     await fixture.click('Refresh');
     await fixture.resolve(1, payload('seven_day_campaign'));
     assert.match(text(), /seven_day_campaign/);
+    assert.match(text(), /All-source traffic/);
+    assert.match(text(), /Organic search/);
+    assert.match(text(), /Consented behavior by source and page/);
+    assert.match(text(), /Submitted cases/);
     assert.doesNotMatch(text(), /Tagged verification traffic is excluded/);
     assert.equal(dom.window.document.querySelector('[role="alert"]'), null);
 

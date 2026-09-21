@@ -4,9 +4,11 @@ import { localizePath, splitLocalePath } from '../src/i18n/locale-policy.mjs';
 import localeRegistry from '../src/i18n/locales.json';
 import seoRoutePolicies from '../src/config/seoRoutePolicies.json';
 import { preconsentMetricPayload } from '../src/lib/preconsentMeasurementCore';
+import { trafficRequestMetric } from '../src/lib/trafficRequest';
 import { isBot } from '../src/lib/live-view/core';
 import {
   recordAggregatePreconsentMetric,
+  recordAggregateTrafficRequest,
   type PreconsentMeasurementEnv,
 } from './_shared/preconsent-measurement';
 
@@ -202,24 +204,33 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     context.request.headers.get('Sec-Purpose'),
     context.request.headers.get('X-Purpose'),
   ].filter(Boolean).join(' '));
-  const preconsentMetric = documentRequest &&
+  const eligibleDocument = documentRequest &&
     ['fabsy.ca', 'www.fabsy.ca'].includes(requestUrl.hostname) &&
     context.request.headers.get('DNT') !== '1' &&
     context.request.headers.get('Sec-GPC') !== '1' &&
     !speculativeRequest && !isBot(userAgent) && !BOT.test(userAgent)
-    ? preconsentMetricPayload(requestUrl, 'paid_landing')
-    : null;
+    && !/\/(?:admin|portal|client|checkout|auth)(?:\/|$)/.test(requestUrl.pathname);
+  const preconsentMetric = eligibleDocument ? preconsentMetricPayload(requestUrl, 'paid_landing') : null;
+  const trafficMetric = eligibleDocument
+    ? trafficRequestMetric(requestUrl, context.request.headers.get('Referer'), userAgent) : null;
   const response = await servePage(context);
-  if (preconsentMetric && response.ok && response.headers.get('Content-Type')?.includes('text/html')) {
-    context.waitUntil(
-      recordAggregatePreconsentMetric(context.env, preconsentMetric)
-        .then(recorded => {
-          if (!recorded && context.env.PRECONSENT_MEASUREMENT_ENABLED !== 'false') {
-            console.warn('preconsent_landing_write_failed');
-          }
-        })
-        .catch(() => { console.warn('preconsent_landing_write_failed'); }),
+  if (response.ok && response.headers.get('Content-Type')?.includes('text/html')) {
+    if (trafficMetric) context.waitUntil(
+      recordAggregateTrafficRequest(context.env, trafficMetric)
+        .then(recorded => { if (!recorded && context.env.TRAFFIC_MEASUREMENT_ENABLED !== 'false') console.warn('traffic_request_write_failed'); })
+        .catch(() => { console.warn('traffic_request_write_failed'); }),
     );
+    if (preconsentMetric) {
+      context.waitUntil(
+        recordAggregatePreconsentMetric(context.env, preconsentMetric)
+          .then(recorded => {
+            if (!recorded && context.env.PRECONSENT_MEASUREMENT_ENABLED !== 'false') {
+              console.warn('preconsent_landing_write_failed');
+            }
+          })
+          .catch(() => { console.warn('preconsent_landing_write_failed'); }),
+      );
+    }
   }
   const headers = new Headers(response.headers);
   headers.set('Referrer-Policy', 'no-referrer');

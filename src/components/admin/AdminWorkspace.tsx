@@ -77,7 +77,7 @@ const navigation = [
     admin: true,
   },
   {
-    label: "Acquisition",
+    label: "Traffic & acquisition",
     href: "/admin/acquisition",
     icon: BarChart3,
     group: "Insights",

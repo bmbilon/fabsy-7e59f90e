@@ -69,7 +69,7 @@ export default function LiveVisitorTracker() {
     let pending = false;
     let retryAfter = 0;
     let stage: VisitorStage = pageStage(page);
-    const source = visitorSource(document.referrer);
+    const source = visitorSource(document.referrer, window.location.search);
     const abort = new AbortController();
     const heartbeat = async () => {
       if (
