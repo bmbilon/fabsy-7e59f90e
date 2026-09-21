@@ -119,14 +119,14 @@ test('Cloudflare middleware counts successful paid HTML requests in waitUntil on
     waitUntil: promise => background.push(promise),
   });
   assert.equal(response.status, 200);
-  assert.equal(background.length, 1);
+  assert.equal(background.length, 2);
   await Promise.all(background);
-  assert.equal(calls.length, 1);
-  const body = JSON.parse(calls[0].body);
+  assert.equal(calls.length, 2);
+  const body = JSON.parse(calls.find(call => call.url.includes('record_preconsent_metric')).body);
   assert.equal(body.p_event_name, 'paid_landing');
   assert.equal(body.p_locale, 'hi');
   assert.equal(body.p_click_id_kind, 'fbclid');
-  assert.ok(!calls[0].body.includes('opaque-click'));
+  assert.ok(calls.every(call => !call.body.includes('opaque-click')));
 });
 
 test('paid landing counts exclude automated and speculative requests and surface failed writes without request data', async () => {
@@ -165,11 +165,11 @@ test('paid landing counts exclude automated and speculative requests and surface
   assert.equal(calls.length, 0);
   assert.equal(warnings.length, 0);
   await invoke({});
-  assert.equal(calls.length, 1);
+  assert.equal(calls.length, 2);
   failWrites = true;
   await invoke({});
-  assert.equal(calls.length, 2);
-  assert.deepEqual(warnings, ['preconsent_landing_write_failed']);
+  assert.equal(calls.length, 4);
+  assert.deepEqual(warnings.sort(), ['preconsent_landing_write_failed', 'traffic_request_write_failed'].sort());
 });
 
 test('browser consent action sends a reduced payload without storage or raw click identifiers', async () => {

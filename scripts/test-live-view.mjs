@@ -7,7 +7,7 @@ import { JSDOM } from 'jsdom';
 
 const bundle = async (file) => (await build({ entryPoints: [file], bundle: true, platform: 'node', format: 'cjs', write: false, logLevel: 'silent' })).outputFiles[0].text;
 const coreModule = { exports: {} };
-runInNewContext(await bundle('src/lib/live-view/core.ts'), { module: coreModule, URL });
+runInNewContext(await bundle('src/lib/live-view/core.ts'), { module: coreModule, URL, URLSearchParams });
 const core = coreModule.exports;
 const endpointCode = await bundle('functions/api/live-view.ts');
 const plain = value => JSON.parse(JSON.stringify(value));

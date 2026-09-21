@@ -7,11 +7,15 @@ export const SESSION_KEY = "fabsy.live-session.v1";
 export const SOURCES = [
   "Direct",
   "Google",
+  "Google Ads",
   "Bing",
   "Facebook",
+  "Meta Ads",
   "Instagram",
   "ChatGPT",
   "Perplexity",
+  "Email",
+  "Other paid",
   "Other referral",
 ] as const;
 export type VisitorSource = (typeof SOURCES)[number];
@@ -79,7 +83,17 @@ export function pageStage(page: string, requested?: unknown): VisitorStage {
   return "browsing";
 }
 
-export function visitorSource(referrer: string): VisitorSource {
+export function visitorSource(referrer: string, search = ''): VisitorSource {
+  const params = new URLSearchParams(search);
+  const medium = params.getAll('utm_medium');
+  const source = params.getAll('utm_source');
+  const paidMedium = medium.length === 1 && ['cpc','ppc','paid','paid_social','paid-social'].includes(medium[0].toLowerCase());
+  const explicitSource = source.length === 1 ? source[0].toLowerCase() : '';
+  const googleClick = ['gclid','gbraid','wbraid'].some(key => params.getAll(key).length === 1 && /^[A-Za-z0-9_-]{1,512}$/.test(params.get(key) || ''));
+  if (googleClick || (paidMedium && explicitSource === 'google')) return 'Google Ads';
+  if (paidMedium && ['meta','facebook','instagram'].includes(explicitSource)) return 'Meta Ads';
+  if (paidMedium) return 'Other paid';
+  if (medium.length === 1 && medium[0].toLowerCase() === 'email') return 'Email';
   if (!referrer) return "Direct";
   try {
     const host = new URL(referrer).hostname.toLowerCase();
