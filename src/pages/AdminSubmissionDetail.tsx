@@ -2,7 +2,7 @@ import CaseStatusSelect from "@/components/admin/CaseStatusSelect";
 import { AdminTicketDelete } from "@/components/AdminTicketDelete";
 import { DisclosureConfirmations } from "@/components/DisclosureConfirmations";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -350,6 +350,7 @@ export default function AdminSubmissionDetail() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <DisclosureConfirmations submissionId={submission.id} staff />
+        <Link to={`/admin/checkout-links?email=${encodeURIComponent(submission.email)}`} className="mb-5 inline-block text-sm text-primary underline">View consent and payment orders for {submission.email}</Link>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Personal Info */}
           <div className="lg:col-span-1 space-y-6">

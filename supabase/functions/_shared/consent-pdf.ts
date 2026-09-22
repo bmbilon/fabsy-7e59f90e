@@ -6,6 +6,7 @@ import { CONSENT_AUTHORIZATION_LINES, PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES, C
 export { CONSENT_AUTHORIZATION_LINES, PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES, CONSENT_PRIVACY_LINES } from "./intake-consent.ts";
 
 export interface ConsentFormData {
+  serviceOrderTitle?: string;
   ticketType?: "photo_radar" | "officer_issued";
   registeredOwnerOnOffenceDate?: string | null;
   submissionId: string;
@@ -37,7 +38,7 @@ export async function createConsentPdf(
   const authorizationLines = formData.intakeConsent?.authorization ?? (formData.ticketType === "photo_radar" ? PHOTO_RADAR_CONSENT_AUTHORIZATION_LINES : CONSENT_AUTHORIZATION_LINES);
   const privacyLines = formData.intakeConsent?.privacy ?? CONSENT_PRIVACY_LINES;
   const doc = await PDFDocument.create();
-  doc.setTitle("Client consent for traffic ticket agent services");
+  doc.setTitle(formData.serviceOrderTitle || "Client consent for traffic ticket agent services");
   doc.setAuthor("Fabsy Traffic Ticket Services");
   doc.setSubject("English authorization with original client-entered fields");
   doc.setCreationDate(generatedAt);
@@ -60,7 +61,7 @@ export async function createConsentPdf(
     y = 746;
     page.drawText("FABSY TRAFFIC TICKET SERVICES", { x: margin, y, size: 9, font: bold, color: secondary });
     y -= 24;
-    page.drawText("Client consent for traffic ticket agent services", { x: margin, y, size: 14, font: bold, color: ink });
+    page.drawText(formData.serviceOrderTitle || "Client consent for traffic ticket agent services", { x: margin, y, size: 14, font: bold, color: ink });
     y -= 23;
     page.drawLine({ start: { x: margin, y }, end: { x: pageWidth - margin, y }, color: rgb(0.8, 0.83, 0.86), thickness: 0.6 });
     y -= 25;
@@ -122,12 +123,12 @@ export async function createConsentPdf(
   await field("Address", [formData.address, formData.city, formData.province].filter(Boolean).join(", "));
   await field("Postal code", formData.postalCode);
   await field("Driver's license", formData.driversLicense);
-  section("TICKET INFORMATION");
+  section(formData.serviceOrderTitle ? "SERVICE ORDER INFORMATION" : "TICKET INFORMATION");
   await field("Ticket number", formData.ticketNumber);
   await field("Violation", formData.violation);
   await field(formData.ticketType === "photo_radar" ? "Offence date" : "Issue date", formData.issueDate);
   if (formData.ticketType === "photo_radar") await field("Offence-date ownership", formData.registeredOwnerOnOffenceDate?.replaceAll("_", " ") || "Not supplied");
-  section(formData.intakeConsent?.identitySource === "uploaded_ticket_pending_review" ? "UPLOADED TICKET AUTHORIZATION" : formData.ticketType === "photo_radar" ? "PHOTO RADAR AUTHORIZATION" : "RAPID RESOLUTION AUTHORIZATION");
+  section(formData.serviceOrderTitle ? "SERVICE AUTHORIZATION" : formData.intakeConsent?.identitySource === "uploaded_ticket_pending_review" ? "UPLOADED TICKET AUTHORIZATION" : formData.ticketType === "photo_radar" ? "PHOTO RADAR AUTHORIZATION" : "RAPID RESOLUTION AUTHORIZATION");
   for (const line of authorizationLines) english(line);
   if (typeof formData.intakeConsent?.pleadNotGuilty === "boolean") {
     section("CLIENT PLEA INSTRUCTION");
@@ -141,7 +142,7 @@ export async function createConsentPdf(
   if (formData.intakeConsent?.method === "checkbox") {
     await field("Accepted by", formData.intakeConsent.name || "Person identified on the uploaded ticket; identity pending review");
     if (formData.intakeConsent.ticketDocumentPath) await field("Submitted ticket", formData.intakeConsent.ticketDocumentPath);
-    english("Method: customer checked the consent box and submitted the ticket.");
+    english(formData.serviceOrderTitle ? "Method: customer checked the consent box and submitted the service order." : "Method: customer checked the consent box and submitted the ticket.");
     english(formData.intakeConsent.label);
     english(formData.intakeConsent.confirmation);
     english("This records Fabsy authorization; a prescribed Government of Alberta form may still be required.");

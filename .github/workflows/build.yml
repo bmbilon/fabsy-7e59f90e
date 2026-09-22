@@ -56,6 +56,7 @@ jobs:
         run: |
           node --test scripts/test-ticket-completion.mjs
           node --test scripts/test-consent-checkout.mjs
+          node --test scripts/test-universal-checkout.mjs
 
       - name: Validate intake email and phone follow-up records
         run: node scripts/test-intake-follow-up-status.mjs
@@ -73,6 +74,9 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Validate universal checkout prices, consent and payment verification
+        run: deno test --node-modules-dir=none --allow-env --allow-read --frozen supabase/functions/_shared/service-checkout.test.ts supabase/functions/service-checkout/index.test.ts
+
       - name: Type-check paid-acquisition Edge Functions
         run: |
           deno check --node-modules-dir=none --frozen \
@@ -82,6 +86,7 @@ jobs:
             supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
             supabase/functions/manual-representation-link/index.ts \
+            supabase/functions/service-checkout/index.ts \
             supabase/functions/photo-ticket-intake/index.ts \
             supabase/functions/generate-consent-form/index.ts \
             supabase/functions/ocr-ticket/index.ts \

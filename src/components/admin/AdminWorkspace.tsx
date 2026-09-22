@@ -45,7 +45,7 @@ import {
 } from "@/lib/admin/dashboard";
 
 const navigation = [
-  { label: "Consent and payment links", href: "/admin/checkout-links", icon: HandCoins, group: "Workspace" },
+  { label: "Consent and payments", href: "/admin/checkout-links", icon: HandCoins, group: "Workspace" },
   {
     label: "Overview",
     href: "/admin/dashboard",

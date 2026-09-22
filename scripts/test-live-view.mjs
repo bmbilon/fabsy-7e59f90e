@@ -14,7 +14,7 @@ const plain = value => JSON.parse(JSON.stringify(value));
 const id = '20000000-0000-4000-8000-000000000001';
 
 test('public paths never accept private routes, tokens or identifiers', () => {
-  for (const path of ['/admin', '/admin/live', '/portal/cases/secret', '/pa/portal', '/representation-consent', '/representation-payment', '/thank-you', '/submit-ticket?email=private', '/blog/private%40email', '/content/12345', '/blog/20000000-0000-4000-8000-000000000001', '//admin', '/unknown']) assert.equal(core.livePage(path), null, path);
+  for (const path of ['/admin', '/admin/live', '/portal/cases/secret', '/pa/portal', '/representation-consent', '/representation-payment', '/checkout', '/consent', '/payment', '/thank-you', '/submit-ticket?email=private', '/blog/private%40email', '/content/12345', '/blog/20000000-0000-4000-8000-000000000001', '//admin', '/unknown']) assert.equal(core.livePage(path), null, path);
   for (const path of ['/', '/submit-ticket', '/hi/submit-ticket', '/blog/traffic-ticket-alberta', '/blog/speeding-182-kmh-alberta-extreme-penalties', '/content/distracted-driving-ticket-alberta']) assert.equal(core.livePage(path), path);
   assert.equal(core.pageStage('/', 'review'), 'browsing');
   assert.equal(core.pageStage('/pa/submit-ticket', 'review'), 'review');
