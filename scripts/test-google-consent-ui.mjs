@@ -169,7 +169,7 @@ try {
             assert.ok(!/<[^>]*>|{{|}}/.test(value), locale.code + '.' + key + ' must be plain, fully resolved text');
             if (nativeScripts[locale.code]) assert.ok(nativeScripts[locale.code].test(value), locale.code + '.' + key + ' must contain its native script');
           }
-          for (const name of ['Google Analytics', 'Google Ads', 'Fabsy']) assert.ok(copy.body.includes(name));
+          for (const name of ['Google', 'Meta', 'OpenAI Ads', 'Fabsy']) assert.ok(copy.body.includes(name));
           for (const name of ['Google', 'Cloudflare']) assert.ok(copy.scope.includes(name));
           if (locale.code !== 'en') for (const key of ['allow', 'decline', 'withdraw', 'settings', 'privacyPolicy']) {
             assert.notEqual(copy[key], googleConsentCopy.en[key], locale.code + ' must not silently use English action labels');

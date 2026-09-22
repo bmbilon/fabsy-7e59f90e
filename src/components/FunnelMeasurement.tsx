@@ -165,6 +165,7 @@ export default function FunnelMeasurement() {
         position,
         dedupeKey: `primary_cta_click:${pageKey}:${position || 'unknown'}`,
       });
+      if (action === 'whatsapp') void recordFunnelEvent('whatsapp_click', { position, dedupeKey: `whatsapp_click:${pageKey}:${position || 'unknown'}` });
       if (action === 'phone') void recordFunnelEvent('phone_click', {
         position,
         dedupeKey: `phone_click:${pageKey}:${position || 'unknown'}`,

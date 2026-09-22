@@ -1,7 +1,7 @@
 import TicketForm from "@/components/TicketForm";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { FormData } from "@/components/TicketForm";
 import useSafeHead from "@/hooks/useSafeHead";
 import { useLocale } from "@/i18n/locale-context";
@@ -29,14 +29,15 @@ const TicketFormPage = () => {
   });
   const location = useLocation() as unknown as LocationState;
   const initialTicketType = ticketTypeFromSearch(location.search);
+  const paidEntry = locale === "en" && (initialTicketType !== null || new URLSearchParams(location.search).get("lp") === "rapid-resolution");
   const initialTicketImage = location?.state?.ticketImage ?? null;
   const prefillTicketData = location?.state?.prefillTicketData ?? null;
   const startAtStep = location?.state?.startAtStep ?? null;
   const sourceAssessment = location?.state?.sourceAssessment ?? null;
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
+      {paidEntry ? <header className="border-b border-slate-200 bg-white px-5 py-4"><div className="mx-auto flex max-w-3xl items-center justify-between gap-4"><Link to="/rapid-resolution" className="text-2xl font-bold tracking-tight text-slate-950">Fabsy</Link><span className="text-xs font-semibold text-slate-600">Private ticket upload</span></div></header> : <Header />}
+      <main className="container mx-auto px-4 py-4 sm:py-8">
         <TicketForm
           key={`${locale}:${initialTicketType ?? 'default'}`}
           initialTicketType={initialTicketType}
@@ -46,7 +47,7 @@ const TicketFormPage = () => {
           sourceAssessment={sourceAssessment}
         />
       </main>
-      <Footer />
+      {paidEntry ? <footer className="flex flex-wrap justify-center gap-5 px-5 py-8 text-sm text-slate-600"><Link to="/terms-of-purchase" className="underline">Terms of Purchase</Link><Link to="/privacy-policy" className="underline">Privacy Policy</Link><a href="tel:+18257932279" className="underline">(825) 793-2279</a></footer> : <Footer />}
     </div>
   );
 };

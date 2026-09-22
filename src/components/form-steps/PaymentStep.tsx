@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "@/i18n/locale-context";
 import { buildIntakeAdditionalNotes, buildIntakeDefenseStrategy, validateLocalizedIntakeStep } from "@/i18n/intake-validation";
@@ -78,13 +78,15 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
   const { t } = useTranslation();
   const { locale, isReleased, href } = useLocale();
   const [agreedToTerms, setAgreedToTerms] = useState(Boolean(savedSubmission));
-  const [selectedIdrAddon, setIncludeIdrAddon] = useState(false);
+  const { search } = useLocation();
+  const bundleRequested = new URLSearchParams(search).get("bundle") === "1";
+  const [selectedIdrAddon, setIncludeIdrAddon] = useState(bundleRequested);
   // The report intake is still English. Offer the released RR service alone on
   // localized checkout instead of silently handing off an untranslated add-on.
   const isPhotoRadar = formData.ticketType === "photo_radar";
   const offer = isPhotoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const { includeIdrAddon } = ticketCheckoutSelection(formData.ticketType, selectedIdrAddon, locale);
-  useEffect(() => { setIncludeIdrAddon(false); setAgreedToTerms(Boolean(savedSubmission)); }, [formData.ticketType, locale, savedSubmission]);
+  useEffect(() => { setIncludeIdrAddon(bundleRequested && formData.ticketType !== "photo_radar"); setAgreedToTerms(Boolean(savedSubmission)); }, [formData.ticketType, locale, savedSubmission, bundleRequested]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isVerifyingPro, setIsVerifyingPro] = useState(false);
   const [proVerification, setProVerification] = useState<{ response: ProVerificationResponse; identity: string; image: File } | null>(null);

@@ -15,6 +15,7 @@ export const FUNNEL_EVENT_NAMES = [
   'primary_cta_viewed',
   'primary_cta_click',
   'phone_click',
+  'whatsapp_click',
   'engaged_10s',
   'engaged_30s',
   'engaged_60s',
@@ -207,13 +208,13 @@ function validStep(eventName: FunnelEventName, step: number | undefined): boolea
 
 function validPosition(eventName: FunnelEventName, position: FunnelActionPosition | undefined): boolean {
   if (position === undefined) return true;
-  return (eventName === 'primary_cta_viewed' || eventName === 'primary_cta_click' || eventName === 'phone_click') &&
+  return (eventName === 'primary_cta_viewed' || eventName === 'primary_cta_click' || eventName === 'phone_click' || eventName === 'whatsapp_click') &&
     ['hero', 'header', 'sticky', 'section', 'footer'].includes(position);
 }
 
 function validEventPage(eventName: FunnelEventName, pageKey: FunnelPageKey): boolean {
   if ([
-    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click',
+    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click', 'whatsapp_click',
     'engaged_10s', 'engaged_30s', 'engaged_60s',
     'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90',
   ].includes(eventName)) {

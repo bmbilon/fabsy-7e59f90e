@@ -29,3 +29,6 @@
   X-Robots-Tag: noindex, nofollow, noarchive
   Referrer-Policy: no-referrer
   Cache-Control: private, no-store
+
+/_landing/*
+  X-Robots-Tag: noindex, follow

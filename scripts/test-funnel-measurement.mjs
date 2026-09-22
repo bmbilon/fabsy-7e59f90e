@@ -444,6 +444,7 @@ test('photo radar landing events require consent and satisfy the server contract
     ['primary_cta_viewed', { position: 'hero' }],
     ['primary_cta_click', { position: 'hero' }],
     ['phone_click', { position: 'header' }],
+    ['whatsapp_click', { position: 'section' }],
     ...['engaged_10s', 'engaged_30s', 'engaged_60s', 'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90'].map(name => [name, {}]),
   ];
   try {

@@ -15,8 +15,8 @@ const qualification = 'We can’t guarantee a court outcome. Our guarantee cover
 const heroSupport = 'Fabsy negotiates for a lower fine, fewer demerits or withdrawal.';
 const successDefinition = 'A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.';
 const refundScope = `${feeRefund.scope} The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. A standalone insurance report is not covered by this outcome-based guarantee. Trial representation, court charges and third-party costs are separate.`;
-const heroHeadline = 'Fine or demerits reduced';
-const heroHeadlineAccent = 'or your money back';
+const heroHeadline = 'Lower fine, fewer demerits, or withdrawal';
+const heroHeadlineAccent = 'or your service fee is refunded';
 const heroHeading = `${heroHeadline} ${heroHeadlineAccent}`;
 const heroPrice = `$${offers.rapidResolution.priceCad} CAD + GST`;
 const price = `${heroPrice} · Paid upfront; refunded if the policy applies`;
@@ -136,12 +136,17 @@ function redactHomepageVisualSnapshot(document, route, issues) {
     const submit = upload.querySelector('button[type="submit"]');
     const guide = upload.querySelector('details');
     const valid = main.querySelectorAll('#ticket-form-container').length === 1 && visible(upload)
-      && compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket.'
+      && compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket'
       && guide && !guide.open && compact(guide.querySelector('summary')?.textContent) === 'Howtoproperlycaptureanimageofyourticket'
       && upload.querySelectorAll('input[type="file"]').length === 0
-      && upload.querySelectorAll('input:not([type="file"]),select,textarea').length === 0
-      && submit && visible(submit) && submit.disabled && compact(submit.textContent) === 'Submitticketandconsent';
-    if (!valid) issues.push('Homepage upload must retain its empty photo-only form, collapsed capture guide and disabled submit');
+      && upload.querySelectorAll('input:not([type="file"]):not([type="radio"]),select,textarea').length === 0
+      && upload.querySelectorAll('input[type="radio"]').length === 2
+      && [...upload.querySelectorAll('input[type="radio"]')].every(input => input.name === 'quick-ticket-type' && !input.checked)
+      && submit && visible(submit) && submit.disabled && compact(submit.textContent) === 'Savemyticketandcontinue';
+    if (!valid) issues.push('Homepage upload must retain its empty ticket-type selector, collapsed capture guide and disabled submit');
+    field(upload, 'p', `Rapid Resolution · $${offers.rapidResolution.priceCad} CAD + GST ($${(offers.rapidResolution.priceCad * 1.05).toFixed(2)} total)`, 'intake price and GST');
+    field(upload, 'strong', `Officer-issued ticket $${offers.rapidResolution.priceCad} + GST`, 'officer ticket selection');
+    field(upload, 'strong', `Photo radar / red-light camera $${offers.photoRadar.priceCad} + GST`, 'camera ticket selection');
   }
   const assessment = main.querySelector('#instant-ticket-assessment');
   if (assessment) {

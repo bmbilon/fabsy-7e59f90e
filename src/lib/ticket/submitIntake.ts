@@ -3,12 +3,14 @@ export interface SavedTicketSubmission {
   clientId: string;
   accessToken: string;
   consentFormPath: string;
+  contactSaved?: boolean;
 }
 
 export interface PreparedTicketSubmission {
   submissionId: string;
   clientId: string;
   accessToken: string;
+  contactSaved?: boolean;
   upload?: { path: string; token: string } | null;
 }
 

@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import fs from "node:fs";
-import { fingerprint, LEGAL_SOURCE_DOCUMENT_PATHS } from "./src/i18n/locale-policy.mjs";
+import { fingerprint, LEGAL_SOURCE_DOCUMENT_PATHS, WAVE_ONE_LOCALES } from "./src/i18n/locale-policy.mjs";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => ({
     ? path.resolve(__dirname, "scripts/paid-acquisition-evidence-env")
     : undefined,
   define: {
+    __FABSY_LOCALE_BUNDLE_HASHES__: JSON.stringify(Object.fromEntries(
+      WAVE_ONE_LOCALES.map(code => [code, fingerprint(JSON.parse(fs.readFileSync(path.resolve(__dirname, `src/i18n/locales/${code}.json`), "utf8")))]),
+    )),
     __FABSY_LEGAL_SOURCE_HASHES__: JSON.stringify(Object.fromEntries(
       LEGAL_SOURCE_DOCUMENT_PATHS.map(file => [file, fingerprint(fs.readFileSync(path.resolve(__dirname, file), "utf8"))]),
     )),
@@ -21,7 +24,14 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [react()],
+  plugins: [react(), {
+    name: "rapid-resolution-static-entry",
+    apply: "build",
+    async closeBundle() {
+      const { renderRapidLanding } = await import("./scripts/render-rapid-landing.mjs");
+      await renderRapidLanding();
+    },
+  }],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

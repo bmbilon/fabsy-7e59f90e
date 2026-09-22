@@ -107,10 +107,10 @@ def run():
             started = True
             connection = [binaries["psql"], "-X", "-q", "-h", str(socket), "-p", "55447", "-U", "fabsy_plea_test", "-d", "postgres", "-v", "ON_ERROR_STOP=1"]
             command(connection, input=BOOTSTRAP)
-            for migration in ("20260920120000_combined_ticket_consent.sql", "20260920130000_photo_only_intake.sql", "20260920140000_intake_plea_instruction.sql"):
+            for migration in ("20260920120000_combined_ticket_consent.sql", "20260920130000_photo_only_intake.sql", "20260920140000_intake_plea_instruction.sql", "20260922120000_intake_offer_context.sql"):
                 command([*connection, "-f", str(ROOT / "supabase/migrations" / migration)])
-            command(connection, input=CHECKS)
-            print("Intake plea database assertions passed: true/false/legacy, immutable retries, strict JSON booleans, paid-consent protection and RPC permissions.")
+            command(connection, input=CHECKS + (ROOT / "supabase/tests/intake-offer-context.test.sql").read_text())
+            print("Intake plea database assertions passed: true/false/legacy, immutable retries, strict JSON booleans, paid-consent protection RPC permissions, atomic contact capture, immutable offer context and pricing isolation.")
         finally:
             if started:
                 command([binaries["pg_ctl"], "-D", str(cluster), "-m", "immediate", "-w", "stop"])

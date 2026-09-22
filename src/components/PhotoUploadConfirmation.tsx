@@ -4,6 +4,7 @@ import type { FormData } from "./TicketForm";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import IntakeProgress from "./IntakeProgress";
 import PaymentStep from "./form-steps/PaymentStep";
 import { photoIntakeAction, type PhotoIntakeStatus } from "@/lib/ticket/photoIntake";
 import type { SavedTicketSubmission } from "@/lib/ticket/submitIntake";
@@ -17,7 +18,7 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
   const Heading = embedded ? "h2" : "h1";
   const [email, setEmail] = useState(formData.email);
   const [phone, setPhone] = useState(formData.phone);
-  const [accepted, setAccepted] = useState(false);
+  const [accepted, setAccepted] = useState(saved.contactSaved === true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState<PhotoIntakeStatus | null>(null);
@@ -73,6 +74,7 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
   const needsOwner = ready && status.fields.ticketType === "photo_radar" && !status.fields.registeredOwnerOnOffenceDate;
 
   return <section id="ticket-form-container" className="mx-auto max-w-3xl scroll-mt-28 space-y-6 rounded-2xl bg-background p-[16px] text-foreground sm:p-[28px]">
+    <IntakeProgress current={accepted ? 3 : 2} />
     <div role="status" className="space-y-3 text-center">
       {accepted
         ? <CheckCircle2 className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
@@ -92,6 +94,7 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
       </fieldset>
     </form> : <p role="status" className="text-center">We’ll email your consent copy and next steps once your ticket details are confirmed. Payment is required before we begin work.</p>}
     {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+    {accepted && !ready && <p role="status" className="rounded-lg bg-blue-50 p-4 text-sm leading-6">{status?.reviewStatus === "needs_review" ? "Your ticket needs a team review. We’ll email you with the next step; there’s nothing to pay yet." : "We’re checking your ticket details before checkout. If this takes longer, we’ll email your next step. Your ticket and email are saved."}</p>}
     {needsOwner && <div className="space-y-3 rounded-xl border p-[16px]">
       <Label htmlFor="checkout-owner">Before paying for this camera notice, was the vehicle registered to you on the offence date?</Label>
       <select id="checkout-owner" className="h-12 w-full rounded-md border bg-background px-3" value={owner} onChange={event => setOwner(event.target.value)} disabled={busy}>

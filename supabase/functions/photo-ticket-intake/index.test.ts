@@ -34,7 +34,7 @@ async function boundary(run: (state: { row: Record<string, any>; clients: Record
     const method = options?.method || "GET";
     const body = typeof options?.body === "string" ? JSON.parse(options.body) : null;
     if (method !== "GET") state.writes.push(`${method} ${url.pathname}`);
-    if (url.pathname.endsWith("/rpc/prepare_photo_ticket_intake")) {
+    if (url.pathname.endsWith("/rpc/prepare_photo_ticket_intake") || url.pathname.endsWith("/rpc/prepare_photo_ticket_with_contact")) {
       if (!state.row.id) Object.assign(state.row, {
         id: body.p_id, client_id: body.p_id, service_type: "representation", status: "awaiting_payment", preferred_locale: "en",
         intake_mode: "photo_only", intake_review_status: "pending_scan", intake_consent: body.p_consent,
@@ -42,6 +42,10 @@ async function boundary(run: (state: { row: Record<string, any>; clients: Record
         first_name: "", last_name: "", ticket_number: "", email: "", phone: "", ticket_type: "officer_issued",
       });
       else assert.equal(state.row.representation_access_token_hash, body.p_token_hash);
+      if (url.pathname.endsWith("/rpc/prepare_photo_ticket_with_contact")) Object.assign(state.row, {
+        email: body.p_email, intake_ticket_type: body.p_ticket_type,
+        intake_bundle_requested: body.p_bundle_requested, landing_page_variant: body.p_landing_page,
+      });
       return json(body.p_id);
     }
     if (url.pathname.endsWith("/rpc/save_photo_intake_contact")) {
@@ -168,4 +172,26 @@ Deno.test("unreadable, unclassified and seized tickets need review; camera owner
   const camera = photoIntakeDetails({ ...fixture, ticket_type: "photo_radar", dateOfBirth: "2026-02-31" });
   assert.equal(camera.registered_owner_on_offence_date, null); assert.equal(camera.date_of_birth, null);
   assert.equal(camera.order_type, "photo_radar"); assert.equal(camera.representation_includes_assessment, false);
+});
+
+Deno.test("contact and offer context are supplied before upload without setting authoritative ticket type", async () => {
+  await boundary(async state => {
+    const response = await handler(request({ ...prepare, email: "Alex@Example.test", ticketType: "photo_radar", landingPage: "rapid-resolution", bundleRequested: false }));
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).contactSaved, true);
+    assert.equal(state.row.email, "alex@example.test");
+    assert.equal(state.row.intake_ticket_type, "photo_radar");
+    assert.equal(state.row.ticket_type, "officer_issued", "entry selection must not determine the reviewed service or checkout price");
+    assert.equal(state.row.landing_page_variant, "rapid-resolution");
+    assert.equal(state.ticketExists, false);
+  });
+});
+Deno.test("invalid contact or arbitrary landing context is rejected before writes", async () => {
+  for (const values of [{email:"bad"}, {email:""}, {ticketType:"criminal"}, {landingPage:"person@example.test"}]) {
+    await boundary(async state => {
+      const response = await handler(request({ ...prepare, email:"alex@example.test", ticketType:"officer_issued", ...values }));
+      assert.equal(response.status, 400); await response.body?.cancel();
+      assert.deepEqual(state.writes, []);
+    });
+  }
 });

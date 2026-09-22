@@ -16,10 +16,9 @@ export const REGISTERED_OWNER_LABELS: Record<Exclude<RegisteredOwnerAnswer, "">,
 
 export function ticketTypeFromSearch(search: string): TicketType | null {
   const params = new URLSearchParams(search);
-  if (params.get("ticket_type") === "officer_issued") return "officer_issued";
   return params.get("ticket_type") === "photo_radar" || params.get("product") === "photo-radar"
     ? "photo_radar"
-    : null;
+    : params.get("ticket_type") === "officer_issued" || params.get("bundle") === "1" ? "officer_issued" : null;
 }
 
 function calendarDate(value: unknown): string {

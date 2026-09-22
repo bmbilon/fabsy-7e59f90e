@@ -134,6 +134,21 @@ const servePage: PagesFunction<Env> = async (context) => {
     );
   }
 
+  // The paid offer is present before JavaScript executes, for people and bots.
+  // Build this from the same React page; never serve a stale shell as a snapshot.
+  if (pathname === "/rapid-resolution" && ["GET", "HEAD"].includes(request.method)) {
+    try {
+      const rendered = await env.ASSETS.fetch(new URL("/_landing/rapid-resolution/", request.url));
+      const html = rendered.status === 200 ? await rendered.text() : "";
+      if (html.includes('data-rapid-prerender="true"') && canonicalFromHtml(html) === canonicalFor(pathname)) {
+        const headers = new Headers(rendered.headers);
+        headers.set("X-Robots-Tag", "index, follow");
+        headers.set("X-Prerendered", "true");
+        return new Response(request.method === "HEAD" ? null : html, { status: 200, headers });
+      }
+    } catch { /* The normal page remains available if the asset is missing. */ }
+  }
+
   const ua = request.headers.get("User-Agent") || "";
   if (!BOT.test(ua)) return next();
 

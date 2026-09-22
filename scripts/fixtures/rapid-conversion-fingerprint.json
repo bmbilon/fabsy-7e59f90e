@@ -1,0 +1,14 @@
+{
+  "sources": {
+    "src/pages/RapidResolution.tsx": "81459f906f2d7b3ebb1ba627301fc021f687f88cb9259caa4e9dcbfc0a318faa",
+    "src/components/RapidResolutionCta.tsx": "f9ba449e413316c58331cd660cb3aa20bd549e3af89825e2ce75491141c6d8a1",
+    "src/components/FeeRefundNotice.tsx": "ad227b5389aeb9a91047826071b462a9cc089af6c16a29d7ef4384a753792d72",
+    "src/config/offers.json": "4a4be022eb7ab22935dec7bbeab82897c55f38a10684a181e240f4d50401163a",
+    "src/config/feeRefund.json": "c3548043cfe7b0a8379bb2b0f35f9c4eacf51ae8aa8969e50136cbfea7465860",
+    "src/content/homepageRefundCopy.ts": "911ea66d280a5ae85f3cca38869ec2816ee117fdd46e11e0a60a3576fcca9c25",
+    "src/content/client-testimonials.json": "d5b6f92291fdd85bb2b784c290c4a61b51754aa8e8cb28905e1724f75ab4cf07",
+    "src/content/clientTestimonials.ts": "8c8c78578fe915c73bae96019cb417cd91f5fd63e1281be6f4e9a52e4fa53481"
+  },
+  "main": "8fc2b18aeb0ef64e8634c4e6374a4d38267f5bdf50044abefeea9410391743df",
+  "schemas": "350198d16622618e4ad2617b918f7d8a7f1da5a5565da911ac00fc7229983acd"
+}

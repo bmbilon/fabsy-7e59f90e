@@ -11,6 +11,7 @@ export type { LocaleCode };
 export const locales = registry.locales.filter(locale => locale.wave <= 1);
 export const sourceFingerprint = fingerprint({ english, offers });
 export const sourceDocuments: Record<string, string> = typeof __FABSY_LEGAL_SOURCE_HASHES__ === 'undefined' ? {} : __FABSY_LEGAL_SOURCE_HASHES__;
+const bundleHashes: Record<string, string> = typeof __FABSY_LOCALE_BUNDLE_HASHES__ === "undefined" ? {} : __FABSY_LOCALE_BUNDLE_HASHES__;
 export const translationValues = {
   price: `$${offers.rapidResolution.priceCad}`,
   reportPrice: `$${offers.insuranceReport.priceCad}`,
@@ -59,7 +60,7 @@ export function localeIsReleased(locale: LocaleCode) {
   return isLocaleReleased(locale, review, {
     sourceVersion: registry.sourceVersion,
     sourceFingerprint,
-    bundleFingerprint: bundle ? fingerprint(bundle) : '',
+    bundleFingerprint: bundle ? fingerprint(bundle) : bundleHashes[locale] || '',
     sourceDocuments,
   });
 }
@@ -69,14 +70,15 @@ export function localeIsIndexable(locale: LocaleCode) {
   return isLocaleIndexable(locale, review, {
     sourceVersion: registry.sourceVersion,
     sourceFingerprint,
-    bundleFingerprint: bundle ? fingerprint(bundle) : '',
+    bundleFingerprint: bundle ? fingerprint(bundle) : bundleHashes[locale] || '',
     sourceDocuments,
   });
 }
 
-// Load explicitly published or reviewed candidates to verify their fingerprints
-// before offering them publicly. Unpublished drafts remain lazy.
+// Vite verifies dictionary fingerprints at build time so English does not fetch
+// every published language. Non-Vite consumers retain runtime verification.
 export async function loadReleaseCandidates() {
+  if (locales.every(item => bundleHashes[item.code])) return;
   const candidates = Object.entries(review.locales)
     .filter(([, entry]) => entry.status === 'approved' || entry.status === 'published')
     .map(([code]) => loadLocale(code as LocaleCode));

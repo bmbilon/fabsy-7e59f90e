@@ -4,3 +4,5 @@ interface ImportMetaEnv {
 }
 
 declare const __FABSY_LEGAL_SOURCE_HASHES__: Record<string, string>;
+
+declare const __FABSY_LOCALE_BUNDLE_HASHES__: Record<string, string>;

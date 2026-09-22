@@ -3,6 +3,7 @@ export const FUNNEL_EVENT_NAMES = [
   'primary_cta_viewed',
   'primary_cta_click',
   'phone_click',
+  'whatsapp_click',
   'engaged_10s',
   'engaged_30s',
   'engaged_60s',
@@ -95,7 +96,7 @@ function optionalUtm(value: unknown): string | null {
 
 function eventMatchesPage(eventName: FunnelEventName, pageKey: FunnelPageKey): boolean {
   if ([
-    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click',
+    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click', 'whatsapp_click',
     'engaged_10s', 'engaged_30s', 'engaged_60s',
     'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90',
   ].includes(eventName)) return pageKey === 'rapid_resolution' || pageKey === 'photo_radar';
@@ -147,7 +148,7 @@ export function parseFunnelEventRequest(value: unknown, now = Date.now()): Parse
   if (product !== null) throw new FunnelRequestError('product_invalid');
   const position = body.position === undefined ? null : body.position;
   if (position !== null && (typeof position !== 'string' || !actionPositions.has(position as FunnelActionPosition) ||
-      (eventName !== 'primary_cta_viewed' && eventName !== 'primary_cta_click' && eventName !== 'phone_click'))) {
+      (eventName !== 'primary_cta_viewed' && eventName !== 'primary_cta_click' && eventName !== 'phone_click' && eventName !== 'whatsapp_click'))) {
     throw new FunnelRequestError('position_invalid');
   }
 
