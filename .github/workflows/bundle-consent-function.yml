@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/bundle-consent-function.yml'
       - 'supabase/functions/generate-consent-form/**'
+      - 'supabase/functions/service-checkout/**'
+      - 'supabase/functions/_shared/service-consent-pdf.ts'
       - 'supabase/functions/_shared/consent-*'
       - 'supabase/functions/_shared/consent-fonts/**'
       - 'supabase/functions/_shared/consent-harfbuzz/**'
@@ -33,4 +35,26 @@ jobs:
         with:
           name: consent-function-bundle
           path: consent-bundle/
+          retention-days: 3
+  service-checkout-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bundle universal checkout with consent fonts and shaping assets
+        run: |
+          mkdir -p service-checkout-bundle
+          docker run --rm -e DENO_NO_PACKAGE_JSON=1 \
+            -v "$PWD:/workspace" -w /workspace \
+            public.ecr.aws/supabase/edge-runtime:v1.74.3 \
+            bundle --entrypoint /workspace/supabase/functions/service-checkout/index.ts \
+            --output /workspace/service-checkout-bundle/output.eszip \
+            --static '/workspace/supabase/functions/_shared/consent-fonts/*.ttf' \
+            --static '/workspace/supabase/functions/_shared/consent-fonts/*.gz' \
+            --static '/workspace/supabase/functions/_shared/consent-harfbuzz/*.wasm'
+          git rev-parse HEAD > service-checkout-bundle/source-commit.txt
+          sha256sum service-checkout-bundle/output.eszip > service-checkout-bundle/sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: service-checkout-function-bundle
+          path: service-checkout-bundle/
           retention-days: 3

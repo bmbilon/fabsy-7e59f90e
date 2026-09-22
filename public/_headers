@@ -41,3 +41,18 @@
 /admin/checkout-links
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: private, no-store
+
+/checkout
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+  Cache-Control: private, no-store
+
+/consent
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+  Cache-Control: private, no-store
+
+/payment
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+  Cache-Control: private, no-store

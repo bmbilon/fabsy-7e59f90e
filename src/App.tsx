@@ -82,6 +82,8 @@ const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
 const AdminWorkspace = lazy(() => import('./components/admin/AdminWorkspace'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLiveView = lazy(() => import("./pages/AdminLiveView"));
+const ServiceCheckout = lazy(() => import("./pages/ServiceCheckout"));
+const AdminServiceOrders = lazy(() => import("./pages/AdminServiceOrders"));
 const ManualCheckout = lazy(() => import("./pages/ManualCheckout"));
 const AdminCheckoutLinks = lazy(() => import("./pages/AdminCheckoutLinks"));
 const CompleteTicket = lazy(() => import("./pages/CompleteTicket"));
@@ -96,7 +98,7 @@ const queryClient = new QueryClient();
 
 const RouteAnalytics = () => {
   const location = useLocation();
-  if (location.pathname === "/representation-consent" || location.pathname === "/representation-payment" || location.pathname.replace(/\/$/, "") === "/disclosure-approval" || location.pathname === "/complete-ticket" || location.pathname.startsWith("/pay/")) return null;
+  if (["/checkout", "/consent", "/payment"].includes(location.pathname.replace(/\/$/, "")) || location.pathname === "/representation-consent" || location.pathname === "/representation-payment" || location.pathname.replace(/\/$/, "") === "/disclosure-approval" || location.pathname === "/complete-ticket" || location.pathname.startsWith("/pay/")) return null;
   return (
     <>
       <AcquisitionTracker />
@@ -140,6 +142,9 @@ const App = () => (
           <Route path="/submit-ticket" element={<TicketFormPage />} />
           <Route path="/ticket-form" element={<TicketFormPage />} />
           <Route path="/complete-ticket" element={<RouteSuspense><CompleteTicket /></RouteSuspense>} />
+          <Route path="/checkout" element={<RouteSuspense><ServiceCheckout /></RouteSuspense>} />
+          <Route path="/consent" element={<RouteSuspense><ServiceCheckout /></RouteSuspense>} />
+          <Route path="/payment" element={<RouteSuspense><ServiceCheckout /></RouteSuspense>} />
           <Route path="/representation-payment" element={<RouteSuspense><ManualCheckout /></RouteSuspense>} />
           <Route path="/representation-consent" element={<RepresentationConsent />} />
           <Route path="/disclosure-approval" element={<RouteSuspense><DisclosureApproval /></RouteSuspense>} />
@@ -184,7 +189,8 @@ const App = () => (
           <Route path="/admin" element={<AdminLogin />} />
           <Route element={<RouteSuspense><AdminWorkspace /></RouteSuspense>}>
           <Route path="/admin/referrals" element={<RouteSuspense><AdminReferrals /></RouteSuspense>} />
-          <Route path="/admin/checkout-links" element={<RouteSuspense><AdminCheckoutLinks /></RouteSuspense>} />
+          <Route path="/admin/checkout-links" element={<RouteSuspense><AdminServiceOrders /></RouteSuspense>} />
+            <Route path="/admin/checkout-links/private" element={<RouteSuspense><AdminCheckoutLinks /></RouteSuspense>} />
           <Route path="/admin/consent-links" element={<RouteSuspense><AdminManualRepresentationLinks /></RouteSuspense>} />
           <Route path="/admin/dashboard" element={<RouteSuspense><AdminDashboard /></RouteSuspense>} />
           <Route path="/admin/live" element={<RouteSuspense><AdminLiveView /></RouteSuspense>} />

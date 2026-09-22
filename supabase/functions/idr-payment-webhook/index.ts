@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { recordServiceOrderPayment } from "../_shared/service-order-payment.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
@@ -1283,6 +1284,10 @@ export async function handler(req: Request): Promise<Response> {
       const charge = session as unknown as Stripe.Charge;
       const paymentIntentId = typeof charge.payment_intent === "string"
         ? charge.payment_intent : charge.payment_intent?.id;
+      if (paymentIntentId && charge.amount_refunded === charge.amount) {
+        const { error } = await supabase.from("service_orders").update({ payment_status: "refunded" }).eq("stripe_payment_intent_id", paymentIntentId);
+        if (error) throw error;
+      }
       if (paymentIntentId && charge.amount_refunded > 0) {
         await recordReferralRefund(supabase, { paymentIntentId, eventId: event.id });
       }
@@ -1297,9 +1302,21 @@ export async function handler(req: Request): Promise<Response> {
         const charge = typeof dispute.charge === "string" ? await stripe.charges.retrieve(dispute.charge) : dispute.charge;
         paymentIntentId = typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
       }
+      if (paymentIntentId) {
+        const { error } = await supabase.from("service_orders").update({ payment_status: "disputed" }).eq("stripe_payment_intent_id", paymentIntentId);
+        if (error) throw error;
+      }
       if (paymentIntentId) await recordReferralRefund(supabase, {
         paymentIntentId, disputedAt: new Date(dispute.created * 1000).toISOString(), eventId: event.id,
       });
+      return json({ received: true, handled: true });
+    }
+    if (session.metadata?.fabsy_checkout_kind === "service_order") {
+      if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {
+        const { error } = await supabase.from("service_orders").update({ payment_status: event.type === "checkout.session.expired" ? "expired" : "failed" })
+          .eq("id", session.metadata.service_order_id).eq("stripe_session_id", session.id).in("payment_status", ["not_started", "open"]);
+        if (error) throw error;
+      } else if (session.payment_status === "paid") await recordServiceOrderPayment(supabase, session);
       return json({ received: true, handled: true });
     }
     if (

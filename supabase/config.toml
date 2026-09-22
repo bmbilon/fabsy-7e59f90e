@@ -188,3 +188,12 @@ verify_jwt = false
 
 [functions.manual-representation-link]
 verify_jwt = false
+
+[functions.service-checkout]
+# Public order creation; private actions require a random capability, staff actions a role-checked JWT.
+verify_jwt = false
+static_files = [
+  "./functions/_shared/consent-fonts/*.ttf",
+  "./functions/_shared/consent-fonts/*.gz",
+  "./functions/_shared/consent-harfbuzz/*.wasm"
+]

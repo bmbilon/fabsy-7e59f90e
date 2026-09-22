@@ -1,5 +1,11 @@
 # Codex Configuration - Fabsy Traffic Ticket Defense
 
+## Reusable consent and payment links
+
+- When Brett asks for a consent and/or payment link, use the permanent public links: `https://fabsy.ca/checkout` (both), `https://fabsy.ca/consent` (consent only), or `https://fabsy.ca/payment` (payment only).
+- These pages collect the customer's name, email, standard service selection, and applicable authorization/payment. Tickets may be uploaded or emailed using the same email.
+- Do not create a client-specific page, private link, case record, or deployment for an ordinary link request. Use the existing universal page. Older private links remain supported for existing cases.
+
 ## Project Overview
 This is a React/TypeScript application for traffic ticket defense services in Alberta, Canada. The application includes:
 

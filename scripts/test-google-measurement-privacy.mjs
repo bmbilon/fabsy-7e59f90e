@@ -335,7 +335,7 @@ test("private, unknown, encoded and misleading route variants remain excluded", 
   const privatePaths = [
     "/portal", "/portal/cases/SYNTHETIC-CASE", "/portal/pro-discount/SYNTHETIC-SUBMISSION",
     "/admin", "/admin/submissions/SYNTHETIC-SUBMISSION", "/insurance-damage-report/intake",
-    "/representation-consent", "/representation-payment", "/disclosure-approval", "/submit-ticket", "/ticket-assessment/confirmation", "/contact", "/fleet", "/free-ticket-check",
+    "/representation-consent", "/representation-payment", "/checkout", "/consent", "/payment", "/disclosure-approval", "/submit-ticket", "/ticket-assessment/confirmation", "/contact", "/fleet", "/free-ticket-check",
     "/thank-you/SYNTHETIC-TOKEN", "/unknown", "/%70ortal", "/thank-you//", "//thank-you",
   ];
   for (const path of privatePaths) {
@@ -526,7 +526,7 @@ test("a receipt with extra query fields or a fragment cannot become a Google doc
 
 test("cleanup never changes private intake, authorization links or mismatched receipts", async () => {
   const token = "cs_live_SYNTHETICreceipt";
-  for (const path of ["/insurance-damage-report/intake", "/es/insurance-damage-report/intake", "/representation-consent", "/representation-payment", "/disclosure-approval", "/portal/cases/SYNTHETIC", "/rapid-resolution"]) {
+  for (const path of ["/insurance-damage-report/intake", "/es/insurance-damage-report/intake", "/representation-consent", "/representation-payment", "/checkout", "/consent", "/payment", "/disclosure-approval", "/portal/cases/SYNTHETIC", "/rapid-resolution"]) {
     const href = `https://fabsy.ca${path}?session_id=${token}&order_id=SYNTHETIC#SYNTHETIC`;
     const { api, browser } = await runtime(enabledEnv, { href });
     api.removeCheckoutTokenFromUrl(token);
