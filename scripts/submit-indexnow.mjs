@@ -5,10 +5,9 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 export const SITE = 'https://fabsy.ca';
-// Participating IndexNow endpoints share accepted URLs. The global/Bing
-// verifier rejects this publicly accessible key, while Yandex verifies it.
-export const INDEXNOW_ENDPOINT = 'https://yandex.com/indexnow';
-export const INDEXNOW_KEY = '029f128b27e35d1bf1707629f053c5db';
+// The fresh key was verified by Bing's single-URL and bulk endpoints in production.
+export const INDEXNOW_ENDPOINT = 'https://www.bing.com/indexnow';
+export const INDEXNOW_KEY = 'b58210a6b324b796ce22578758ea32f4';
 export const INDEXNOW_KEY_LOCATION = `${SITE}/${INDEXNOW_KEY}.txt`;
 const INDEXNOW_KEY_FILE = `public/${INDEXNOW_KEY}.txt`;
 const MAX_URLS = 10_000;

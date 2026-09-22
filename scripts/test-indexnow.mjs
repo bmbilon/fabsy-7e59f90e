@@ -39,6 +39,7 @@ const payload = indexNowPayload([
   '/blog/example',
 ]);
 assert.equal(payload.host, 'fabsy.ca');
+assert.equal(INDEXNOW_ENDPOINT, 'https://www.bing.com/indexnow');
 assert.equal(payload.key, INDEXNOW_KEY);
 assert.equal(payload.keyLocation, INDEXNOW_KEY_LOCATION);
 assert.equal(
