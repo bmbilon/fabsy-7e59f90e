@@ -537,14 +537,6 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/distracted-driving-ticket-calgary-out-of-province" />
   </url>
   <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-calgary-photo-radar</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:48:37.390989+00:00</lastmod>
-    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/distracted-driving-ticket-calgary-photo-radar" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/distracted-driving-ticket-calgary-photo-radar" />
-  </url>
-  <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-calgary-weather-conditions</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -639,14 +631,6 @@
     <lastmod>2025-10-02T16:48:25.127472+00:00</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/distracted-driving-ticket-edmonton-out-of-province" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/distracted-driving-ticket-edmonton-out-of-province" />
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/distracted-driving-ticket-edmonton-photo-radar</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:48:25.254008+00:00</lastmod>
-    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/distracted-driving-ticket-edmonton-photo-radar" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/distracted-driving-ticket-edmonton-photo-radar" />
   </url>
   <url>
     <loc>https://fabsy.ca/content/distracted-driving-ticket-edmonton-weather-conditions</loc>
@@ -7999,5 +7983,21 @@
     <lastmod>2025-10-02T16:49:49.288436+00:00</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-out-of-province" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-out-of-province" />
+  </url>
+  <url>
+    <loc>https://fabsy.ca/content/tinted-windows-ticket-lethbridge-photo-radar</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:49:49.457694+00:00</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-photo-radar" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-photo-radar" />
+  </url>
+  <url>
+    <loc>https://fabsy.ca/content/tinted-windows-ticket-lethbridge-weather-conditions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2025-10-02T16:49:49.752129+00:00</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-weather-conditions" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-weather-conditions" />
   </url>
 </urlset>

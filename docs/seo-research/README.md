@@ -27,10 +27,35 @@ Nothing here authorizes a redirect, noindex, deletion, canonical change, or lega
 - `first-party-evidence-baseline.md` — human-readable evidence receipt and interpretation limits.
 - `content-consolidation-summary.md` — reproducible scorer results from the current manifest and read-only GSC exports.
 - `content-consolidation-pilot.csv` — the bounded, manually reviewed 20-URL first redirect cohort with evidence gaps and rollback recorded per URL.
+- `content-consolidation-next-review.md` and `.csv` — a URL-level review of the next 34 priority pages, including two misleading photo-radar pages withdrawn with 410 and 32 held for either pilot results or missing destination coverage.
 
 The raw authenticated Search Console exports are intentionally not stored in the repository.
 
-## Run the consolidation scorer
+## Content review tools
+
+### Build a current manual review queue
+
+`build-content-review-queue.mjs` joins the rendered content manifest and HTML snapshots with a Search Console Web **Pages** export, the Generative AI Features **Pages** export, optional page-indexing examples, and the existing 20-URL pilot. It writes the whole inventory plus a small `RETIRE_REVIEW` subset. It does not edit production routes or content.
+
+```sh
+node scripts/seo-evidence/build-content-review-queue.mjs \
+  --gsc /secure/path/Pages.csv \
+  --gsc-ai /secure/path/AI-Pages.csv \
+  --indexing /secure/path/Indexing.csv \
+  --gsc-through YYYY-MM-DD \
+  --indexing-as-of YYYY-MM-DD \
+  --out /secure/path/review-queue.csv \
+  --priority-out /secure/path/priority-review.csv \
+  --summary /secure/path/summary.json
+```
+
+The indexing CSV uses `URL,Index reason,Last crawled` with `indexed`, `discovered_not_indexed`, `crawled_not_indexed`, or `google_chose_other_canonical`. The indexing examples may be incomplete, and missing performance rows are unknown rather than zero. Keep raw exports and the URL-level queue outside Git.
+
+Review `RETIRE_REVIEW` URLs one by one: inspect Search Console queries and Google's selected canonical, check actual landing conversions and backlinks, compare unique local/scenario facts with the proposed destination, and verify current legal information. Record those results in the empty `review_*` and `final_decision` columns. Keep or improve a useful page; use a reversible 301 only if a destination satisfies the same intent. Do not expand the first 20-URL pilot until its 30-day measurements are available. A text-overlap score includes common service copy and cannot decide a redirect.
+
+Run the guardrail test with `node scripts/seo-evidence/test-build-content-review-queue.mjs`.
+
+### Run the original consolidation scorer
 
 Without page-level Search Console evidence:
 
