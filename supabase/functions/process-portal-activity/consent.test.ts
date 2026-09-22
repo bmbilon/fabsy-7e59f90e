@@ -325,15 +325,12 @@ Deno.test("worker refuses provider send when durable reservation was not acquire
   );
 });
 
-Deno.test("worker retries missing ticket without calling Gmail", async () => {
+Deno.test("worker sends the operator alert when a ticket number is missing", async () => {
   const result = await workerScenario({ missingTicket: true });
-  assertEquals(result.providerCalls, 0);
-  assertEquals(result.patches.length, 0);
-  assertEquals(result.completions[0].p_provider_id, null);
-  assertEquals(
-    result.completions[0].p_error,
-    "consent_ticket_reference_required",
-  );
+  assertEquals(result.providerCalls, 1);
+  assertEquals(result.result.sent, 1);
+  assertEquals(result.completions[0].p_provider_id, "synthetic-gmail-id");
+  assertEquals(result.completions[0].p_error, null);
 });
 
 Deno.test("worker holds uncertain consent provider outcome rather than retrying", async () => {

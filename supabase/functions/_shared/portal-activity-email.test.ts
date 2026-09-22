@@ -2,7 +2,6 @@
 import {
   assertEquals,
   assertStringIncludes,
-  assertThrows,
 } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import {
   type PortalActivityEvent,
@@ -44,7 +43,7 @@ Deno.test("portal activity email identifies the person and escapes private field
   assertStringIncludes(html, "1994-06-03");
 });
 
-Deno.test("consent subjects require every actual ticket reference while other events stay unchanged", () => {
+Deno.test("alerts work without ticket references and include known ticket numbers", () => {
   for (
     const ticket_number of [
       "",
@@ -53,8 +52,13 @@ Deno.test("consent subjects require every actual ticket reference while other ev
       "<E12345>",
     ]
   ) {
-    assertThrows(() =>
-      portalActivitySubject({ ...event, payload: { ticket_number } })
+    assertEquals(
+      portalActivitySubject({
+        ...event,
+        entity_id: null,
+        payload: { ticket_number },
+      }),
+      "[Fabsy] Representation consent received",
     );
   }
   assertEquals(
@@ -66,7 +70,7 @@ Deno.test("consent subjects require every actual ticket reference while other ev
   );
   assertEquals(
     portalActivitySubject({ ...event, event_type: "payment_paid" }),
-    "[Fabsy Portal] Payment confirmed — Coady <Barnes>",
+    "Ticket AB123 — Payment confirmed",
   );
   const html = renderPortalActivityHtml({
     ...event,
@@ -77,4 +81,15 @@ Deno.test("consent subjects require every actual ticket reference while other ev
     "client-provided signed scan and consent audit PDF",
   );
   assertStringIncludes(html, "does not confirm staff approval");
+});
+
+Deno.test("missing attachment and identifiers produce a truthful generic alert", () => {
+  const html = renderPortalActivityHtml({
+    ...event,
+    entity_id: null,
+    payload: { attachment_unavailable: true },
+  }, "https://fabsy.ca");
+  assertStringIncludes(html, "could not yet be verified");
+  assertEquals(html.includes("signed consent PDF is attached"), false);
+  assertEquals(html.includes("$0.00"), false);
 });

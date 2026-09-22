@@ -249,9 +249,22 @@ export async function handler(req: Request): Promise<Response> {
     const claim =
       (row as PortalActivityEvent & { claim_token: string }).claim_token;
     try {
-      const prepared = row.event_type === "representation_consent_signed"
-        ? await preparePortalConsentEmail(db, row)
-        : { event: row, attachments: [] };
+      // The operator alert must not wait for ticket matching, OCR, or a PDF.
+      // Keep strict attachment verification; fall back to a factual activity notice.
+      let prepared: {
+        event: PortalActivityEvent;
+        attachments: { filename: string; content: string }[];
+      } = { event: row, attachments: [] };
+      if (row.event_type === "representation_consent_signed") {
+        try {
+          prepared = await preparePortalConsentEmail(db, row);
+        } catch {
+          prepared.event = {
+            ...row,
+            payload: { ...row.payload, attachment_unavailable: true },
+          };
+        }
+      }
       if (row.event_type === "representation_consent_signed") {
         // A persisted marker fences an interrupted Gmail attempt. The claimant
         // holds an expired marked consent lease for review instead of resending.

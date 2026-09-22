@@ -16,6 +16,11 @@ interface EmailAttachment {
 }
 
 const EVENT_LABELS: Record<string, string> = {
+  ticket_uploaded: "Ticket uploaded",
+  contact_message: "New website question",
+  tawk_question: "New Tawk question",
+  tawk_transcript: "Tawk conversation transcript",
+  tawk_ticket: "New Tawk support request",
   intake_created: "New portal intake",
   review_consent_signed: "Review consent signed",
   representation_consent_signed: "Representation consent signed",
@@ -51,12 +56,15 @@ function eventLabel(eventType: string) {
   return EVENT_LABELS[eventType] || eventType.replaceAll("_", " ");
 }
 
-function money(cents: unknown) {
+function money(cents: unknown, currency: unknown = "CAD") {
+  if (cents === null || cents === undefined) return null;
   const amount = Number(cents);
   if (!Number.isSafeInteger(amount) || amount < 0) return null;
   return new Intl.NumberFormat("en-CA", {
     style: "currency",
-    currency: "CAD",
+    currency: typeof currency === "string" && /^[a-z]{3}$/i.test(currency)
+      ? currency.toUpperCase()
+      : "CAD",
   }).format(amount / 100);
 }
 
@@ -72,21 +80,27 @@ export function consentTicketReference(value: unknown): string {
 }
 
 export function portalActivitySubject(event: PortalActivityEvent) {
-  if (event.event_type === "representation_consent_signed") {
-    const tickets = Array.isArray(event.payload.ticket_numbers)
-      ? event.payload.ticket_numbers.map(consentTicketReference)
-      : [consentTicketReference(event.payload.ticket_number)];
-    if (!tickets.length) throw new Error("consent_ticket_reference_required");
-    return `Ticket ${
-      [...new Set(tickets)].join(", ")
-    } — Representation consent received`;
+  const references = Array.isArray(event.payload.ticket_numbers)
+    ? event.payload.ticket_numbers
+    : [event.payload.ticket_number];
+  const tickets = references.flatMap((value) => {
+    try {
+      return [consentTicketReference(value)];
+    } catch {
+      return [];
+    }
+  });
+  const label = event.event_type === "representation_consent_signed"
+    ? "Representation consent received"
+    : eventLabel(event.event_type);
+  if (tickets.length) {
+    return `Ticket ${[...new Set(tickets)].join(", ")} — ${label}`;
   }
-  const name = text(event.payload.client_name);
-  const ticket = text(event.payload.ticket_number);
-  const detail = name || (ticket ? `ticket ${ticket}` : null);
-  return `[Fabsy Portal] ${eventLabel(event.event_type)}${
-    detail ? ` — ${detail}` : ""
-  }`;
+  const name = text(event.payload.client_name)?.replace(/[\r\n\0]/g, " ").slice(
+    0,
+    120,
+  );
+  return `[Fabsy] ${label}${name ? ` — ${name}` : ""}`;
 }
 
 export function renderPortalActivityHtml(
@@ -94,13 +108,24 @@ export function renderPortalActivityHtml(
   siteUrl: string,
 ) {
   const payload = event.payload || {};
+  const sourceTime = text(payload.occurred_at);
+  const occurredAt = sourceTime && Number.isFinite(Date.parse(sourceTime))
+    ? sourceTime
+    : event.occurred_at;
   const rows: Array<[string, string | null]> = [
     ["Customer", text(payload.client_name)],
     ["Customer email", text(payload.client_email)],
     ["Ticket", text(payload.ticket_number)],
     ["Date of birth", text(payload.client_date_of_birth)],
     ["Product", text(payload.product)],
-    ["Payment subtotal", money(payload.amount_cents)],
+    ["Payment subtotal", money(payload.amount_cents, payload.currency)],
+    ["Payment total", money(payload.amount_total_cents, payload.currency)],
+    ["Tax", money(payload.tax_cents, payload.currency)],
+    ["Phone", text(payload.client_phone)],
+    ["Subject", text(payload.subject)],
+    ["Message", text(payload.message)],
+    ["File", text(payload.file_name)],
+    ["Notice", text(payload.notification_note)],
     ["Status", text(payload.status)],
     ["Decision", text(payload.decision)],
     ["Source", text(payload.intake_source)],
@@ -111,7 +136,7 @@ export function renderPortalActivityHtml(
     ["Driver licence / plate", text(payload.disclosure_lookup_value)],
     [
       "Occurred",
-      new Date(event.occurred_at).toLocaleString("en-CA", {
+      new Date(occurredAt).toLocaleString("en-CA", {
         timeZone: "America/Edmonton",
         dateStyle: "medium",
         timeStyle: "long",
@@ -122,7 +147,9 @@ export function renderPortalActivityHtml(
     Boolean(row[1])
   );
   const submissionId = text(payload.submission_id);
-  const adminUrl = submissionId
+  const adminUrl = event.entity_type === "tawk"
+    ? "https://dashboard.tawk.to/"
+    : submissionId
     ? `${siteUrl.replace(/\/$/, "")}/admin/submissions/${
       encodeURIComponent(submissionId)
     }`
@@ -141,7 +168,7 @@ export function renderPortalActivityHtml(
       `<tr><td style="padding:8px 12px 8px 0;color:#64748b;vertical-align:top;width:145px">${
         escapeHtml(label)
       }</td><td style="padding:8px 0;font-weight:600">${
-        escapeHtml(value)
+        escapeHtml(value).replaceAll("\n", "<br>")
       }</td></tr>`
     ).join("")
   }
@@ -149,7 +176,9 @@ export function renderPortalActivityHtml(
     ${
     event.event_type === "representation_consent_signed"
       ? `<p style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:14px">${
-        payload.signature_method === "manual_scan"
+        payload.attachment_unavailable
+          ? "Consent activity was received. The signed document could not yet be verified for attachment; review it in Fabsy admin."
+          : payload.signature_method === "manual_scan"
           ? "The client-provided signed scan and consent audit PDF are attached. Receiving these files does not confirm staff approval of the signature."
           : "The signed consent PDF is attached to this email."
       }</p>`
@@ -157,7 +186,9 @@ export function renderPortalActivityHtml(
   }
     <p style="margin:26px 0"><a href="${
     escapeHtml(adminUrl)
-  }" style="background:#7c3aed;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:700">Open Fabsy admin</a></p>
+  }" style="background:#7c3aed;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;font-weight:700">${
+    event.entity_type === "tawk" ? "Open Tawk inbox" : "Open Fabsy admin"
+  }</a></p>
     <p style="color:#64748b;font-size:12px;line-height:1.5">Event ${
     escapeHtml(event.id)
   } · ${escapeHtml(event.entity_type)} ${escapeHtml(event.entity_id || "")}</p>
@@ -170,9 +201,15 @@ export async function sendPortalActivityEmail(
   attachments: EmailAttachment[] = [],
 ) {
   const delivery = internalNotificationDelivery();
+  const customerEmail = text(event.payload.client_email);
+  const isQuestion = event.event_type === "contact_message" ||
+    event.entity_type === "tawk";
   const result = await sendWorkspaceEmail({
     from: "Fabsy Portal <hello@fabsy.ca>",
-    reply_to: "hello@fabsy.ca",
+    reply_to: isQuestion && customerEmail &&
+        /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(customerEmail)
+      ? customerEmail
+      : "hello@fabsy.ca",
     ...delivery,
     subject: portalActivitySubject(event),
     html: renderPortalActivityHtml(event, siteUrl),

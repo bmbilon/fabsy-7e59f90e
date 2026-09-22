@@ -4,9 +4,7 @@ import { getFabsyEmailSignature } from "../_shared/email-signature.ts";
 import { LocaleRequestError, parsePreferredLocale } from "../_shared/locale-policy.ts";
 import { prepareClientEmail } from "../_shared/notification-locale.ts";
 import { ContactRequestError, escapeContactHtml, parseContactRequest } from "../_shared/contact-request.ts";
-import { internalNotificationDelivery } from "../_shared/resend-email.ts";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,7 +12,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const handler = async (req: Request): Promise<Response> => {
+export const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -32,7 +30,24 @@ const handler = async (req: Request): Promise<Response> => {
     const emailHtml = escapeContactHtml(email);
     const isFleet = inquiryType === "fleet";
 
+    // Save the operator alert first, independent of customer email delivery.
+    // Repeated browser retries of the same enquiry share a ten-minute key.
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(
+      JSON.stringify([request, Math.floor(Date.now() / 600000)]),
+    ));
+    const key = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("");
+    const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { error: queueError } = await db.rpc("enqueue_portal_activity", {
+      p_event_key: `contact:${key}`, p_event_type: "contact_message", p_entity_type: "website_contact", p_entity_id: null,
+      p_payload: { client_name: request.name, client_email: email, client_phone: request.phone,
+        subject: request.subject, message: request.message, intake_source: isFleet ? "Fleet enquiry" : "Contact form" },
+    });
+    if (queueError) throw new Error("Your message could not be saved. Please try again.");
+
     // Send confirmation email to the user
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     const userEmailResponse = await resend.emails.send(prepareClientEmail({
       from: "Fabsy <hello@fabsy.ca>",
       reply_to: "hello@fabsy.ca",
@@ -114,71 +129,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (userEmailResponse.error) throw new Error("Contact confirmation delivery failed.");
 
-    // Send notification email to admin
-    const adminEmailResponse = await resend.emails.send({
-      from: "Fabsy Notifications <hello@fabsy.ca>",
-      reply_to: email, // Set reply-to as the user's email so admin can reply directly
-      ...internalNotificationDelivery(),
-      subject: `${isFleet ? "Fleet Account Enquiry" : "New Contact Form Submission"} from ${request.name}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: #0F172A; color: white; padding: 20px; border-radius: 5px 5px 0 0; }
-              .content { background: #ffffff; padding: 20px; border: 1px solid #e5e7eb; border-top: none; }
-              .field { margin: 15px 0; padding: 10px; background: #EFF6FF; border-left: 3px solid #3B82F6; }
-              .label { font-weight: bold; color: #1D4ED8; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h2 style="margin: 0;">🔔 New Contact Form Submission</h2>
-              </div>
-              
-              <div class="content">
-                <div class="field">
-                  <span class="label">Name:</span> ${name}
-                </div>
-                
-                <div class="field">
-                  <span class="label">Email:</span> ${emailHtml}
-                </div>
-                
-                ${phone ? `
-                  <div class="field">
-                    <span class="label">Phone:</span> ${phone}
-                  </div>
-                ` : ''}
-                
-                ${subject ? `
-                  <div class="field">
-                    <span class="label">Subject:</span> ${subject}
-                  </div>
-                ` : ''}
-                
-                <div class="field">
-                  <span class="label">Preferred language:</span> ${preferredLocale}<br>
-                  <span class="label">Message:</span><br>
-                  <div style="margin-top: 10px; white-space: pre-wrap;">${message}</div>
-                </div>
-                
-                <div style="margin-top: 20px; padding: 15px; background: #eff6ff; border-radius: 5px;">
-                  <strong>Quick Actions:</strong><br>
-                  <p style="margin: 10px 0 0 0;">Reply directly to this email to respond to ${name}.</p>
-                </div>
-              </div>
-            </div>
-          </body>
-        </html>
-      `,
-    });
-
-    if (adminEmailResponse.error) throw new Error("Contact notification delivery failed.");
-
     return new Response(
       JSON.stringify({ 
         success: true,
@@ -211,4 +161,4 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-serve(handler);
+if (import.meta.main) serve(handler);
