@@ -335,7 +335,7 @@ test("private, unknown, encoded and misleading route variants remain excluded", 
   const privatePaths = [
     "/portal", "/portal/cases/SYNTHETIC-CASE", "/portal/pro-discount/SYNTHETIC-SUBMISSION",
     "/admin", "/admin/submissions/SYNTHETIC-SUBMISSION", "/insurance-damage-report/intake",
-    "/representation-consent", "/disclosure-approval", "/submit-ticket", "/ticket-assessment/confirmation", "/contact", "/fleet", "/free-ticket-check",
+    "/representation-consent", "/representation-payment", "/disclosure-approval", "/submit-ticket", "/ticket-assessment/confirmation", "/contact", "/fleet", "/free-ticket-check",
     "/thank-you/SYNTHETIC-TOKEN", "/unknown", "/%70ortal", "/thank-you//", "//thank-you",
   ];
   for (const path of privatePaths) {
@@ -488,7 +488,7 @@ test("unsafe immutable referrers prevent measurement even on a clean public page
   for (const referrer of [
     "not-a-url", "http://example.invalid/", "https://synthetic:secret@example.invalid/",
     "https://fabsy.ca/portal/cases/SYNTHETIC", "https://fabsy.ca/es/portal/cases/SYNTHETIC",
-    "https://fabsy.ca/representation-consent", "https://fabsy.ca/disclosure-approval#token=SYNTHETIC", "https://fabsy.ca/insurance-damage-report/intake",
+    "https://fabsy.ca/representation-consent", "https://fabsy.ca/representation-payment#case=SYNTHETIC&token=SYNTHETIC", "https://fabsy.ca/disclosure-approval#token=SYNTHETIC", "https://fabsy.ca/insurance-damage-report/intake",
     "https://fabsy.ca/thank-you?session_id=cs_live_SYNTHETIC", "https://fabsy.ca/rapid-resolution#SYNTHETIC",
     "https://checkout.stripe.com/c/pay/cs_live_SYNTHETIC", "https://example.invalid/private-path",
     "https://example.invalid/?email=synthetic%40example.invalid",
@@ -526,7 +526,7 @@ test("a receipt with extra query fields or a fragment cannot become a Google doc
 
 test("cleanup never changes private intake, authorization links or mismatched receipts", async () => {
   const token = "cs_live_SYNTHETICreceipt";
-  for (const path of ["/insurance-damage-report/intake", "/es/insurance-damage-report/intake", "/representation-consent", "/disclosure-approval", "/portal/cases/SYNTHETIC", "/rapid-resolution"]) {
+  for (const path of ["/insurance-damage-report/intake", "/es/insurance-damage-report/intake", "/representation-consent", "/representation-payment", "/disclosure-approval", "/portal/cases/SYNTHETIC", "/rapid-resolution"]) {
     const href = `https://fabsy.ca${path}?session_id=${token}&order_id=SYNTHETIC#SYNTHETIC`;
     const { api, browser } = await runtime(enabledEnv, { href });
     api.removeCheckoutTokenFromUrl(token);
