@@ -27,6 +27,7 @@ Nothing here authorizes a redirect, noindex, deletion, canonical change, or lega
 - `first-party-evidence-baseline.md` — human-readable evidence receipt and interpretation limits.
 - `content-consolidation-summary.md` — reproducible scorer results from the current manifest and read-only GSC exports.
 - `content-consolidation-pilot.csv` — the bounded, manually reviewed 20-URL first redirect cohort with evidence gaps and rollback recorded per URL.
+- `content-consolidation-next-review.md` and `.csv` — a URL-level review of the next 34 priority pages, including two misleading photo-radar pages withdrawn with 410 and 32 held for either pilot results or missing destination coverage.
 
 The raw authenticated Search Console exports are intentionally not stored in the repository.
 

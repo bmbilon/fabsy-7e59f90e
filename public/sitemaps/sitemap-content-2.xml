@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-lethbridge-photo-radar</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:49:49.457694+00:00</lastmod>
-    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-photo-radar" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-photo-radar" />
-  </url>
-  <url>
-    <loc>https://fabsy.ca/content/tinted-windows-ticket-lethbridge-weather-conditions</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <lastmod>2025-10-02T16:49:49.752129+00:00</lastmod>
-    <xhtml:link rel="alternate" hreflang="en" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-weather-conditions" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://fabsy.ca/content/tinted-windows-ticket-lethbridge-weather-conditions" />
-  </url>
-  <url>
     <loc>https://fabsy.ca/content/tinted-windows-ticket-lethbridge</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
