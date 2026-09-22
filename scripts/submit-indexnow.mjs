@@ -5,7 +5,9 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 export const SITE = 'https://fabsy.ca';
-export const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow';
+// Participating IndexNow endpoints share accepted URLs. The global/Bing
+// verifier rejects this publicly accessible key, while Yandex verifies it.
+export const INDEXNOW_ENDPOINT = 'https://yandex.com/indexnow';
 export const INDEXNOW_KEY = '029f128b27e35d1bf1707629f053c5db';
 export const INDEXNOW_KEY_LOCATION = `${SITE}/${INDEXNOW_KEY}.txt`;
 const INDEXNOW_KEY_FILE = `public/${INDEXNOW_KEY}.txt`;
