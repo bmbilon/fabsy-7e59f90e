@@ -107,6 +107,17 @@ try {
   const mutations = [
     ['missing upload heading', document => document.querySelector('#ticket-form-container h2').remove()],
     ['extra intake field', document => document.querySelector('#ticket-form-container form').insertAdjacentHTML('beforeend', '<input type="text" name="name" />')],
+    ['wrong uploader price', document => {
+      const label = document.querySelector('#ticket-form-container input[value="photo_radar"]').parentElement;
+      label.innerHTML = label.innerHTML.replace('$79', '$179');
+    }],
+    ['missing uploader service', document => document.querySelector('#ticket-form-container input[value="photo_radar"]').parentElement.remove()],
+    ['hidden uploader service', document => document.querySelector('#ticket-form-container fieldset').hidden = true],
+    ['personalized uploader selection', document => {
+      document.querySelector('#ticket-form-container input[value="officer_issued"]').removeAttribute('checked');
+      document.querySelector('#ticket-form-container input[value="photo_radar"]').setAttribute('checked', '');
+    }],
+    ['unsupported uploader claim', document => document.querySelector('#ticket-form-container fieldset').append(' Guaranteed dismissal.')],
     ['enabled empty upload', document => document.querySelector('#ticket-form-container button[type="submit"]').disabled = false],
     ['expanded initial guide', document => document.querySelector('#ticket-form-container details').open = true],
     ['missing policy', document => document.querySelector('#money-back-guarantee').remove()],
