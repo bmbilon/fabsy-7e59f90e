@@ -118,7 +118,7 @@ test('all eight consent locales name both providers and explain the limited Meta
     const copies = context.module.exports.googleConsentCopy;
     assert.deepEqual(Object.keys(copies).sort(), ['ar', 'en', 'es', 'hi', 'pa', 'tl', 'zh-hans', 'zh-hant']);
     for (const [locale, copy] of Object.entries(copies)) {
-      for (const provider of ['Google Analytics', 'Google Ads', 'Meta Pixel', 'Fabsy']) {
+      for (const provider of ['Google', 'Meta', 'OpenAI Ads', 'Fabsy']) {
         assert.ok(copy.body.includes(provider), `${locale} body must name ${provider}`);
       }
       for (const term of ['Google', 'Meta', 'Cloudflare']) assert.ok(copy.scope.includes(term), `${locale} scope must name ${term}`);

@@ -230,7 +230,7 @@ export default function TicketCapture({
 
       {scanOnSelect && !compact && <TicketPhotoGuide />}
 
-      <div className={`rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 ${compact ? "p-3" : "p-5 sm:p-6"}`}>
+      <div className={`rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 ${compact ? "p-[12px]" : "p-5 sm:p-6"}`}>
         <div className={`flex flex-col items-center text-center ${compact ? "gap-2" : "gap-4"}`}>
           {!compact && (status.kind === "processing" ? (
             <Loader2 className="h-9 w-9 animate-spin text-primary" aria-hidden="true" />
@@ -254,6 +254,7 @@ export default function TicketCapture({
               type="button"
               variant="outline"
               onClick={() => browseInputRef.current?.click()}
+              className={compact ? "min-h-11 px-[10px] text-xs" : undefined}
               disabled={disabled}
             >
               <Upload aria-hidden="true" />
@@ -263,6 +264,7 @@ export default function TicketCapture({
               type="button"
               variant="outline"
               onClick={() => cameraInputRef.current?.click()}
+              className={compact ? "min-h-11 px-[10px] text-xs" : undefined}
               disabled={disabled}
             >
               <Camera aria-hidden="true" />

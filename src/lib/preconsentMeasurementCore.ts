@@ -8,7 +8,7 @@ export const PRECONSENT_METRIC_EVENTS = [
 ] as const;
 
 export type PreconsentMetricEvent = (typeof PRECONSENT_METRIC_EVENTS)[number];
-export type PreconsentPageKey = 'home' | 'rapid_resolution' | 'photo_radar' | 'pro_drivers';
+export type PreconsentPageKey = 'home' | 'rapid_resolution' | 'rapid_resolution_alt' | 'photo_radar' | 'pro_drivers';
 
 export interface PreconsentMetricPayload {
   eventName: PreconsentMetricEvent;
@@ -27,6 +27,7 @@ const locales = new Set<PreconsentMetricPayload['locale']>([
 const pageKeys = new Map<string, PreconsentPageKey>([
   ['/', 'home'],
   ['/rapid-resolution', 'rapid_resolution'],
+  ['/rapid-resolution-alt', 'rapid_resolution_alt'],
   ['/photo-radar', 'photo_radar'],
   ['/pro-drivers', 'pro_drivers'],
 ]);

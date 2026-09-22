@@ -831,9 +831,15 @@ test("a reload discards an unfinished replacement and restores the last confirme
   const app = await runtime(t, {}, { resumeDraft: true, pendingUpload: true });
   await app.until(() => app.document.getElementById("ticketNumber"), "Expected the saved ticket to restore");
   assert.deepEqual(
-    app.draftRequests.map(request => request.action),
+    app.draftRequests.slice(0, 2).map(request => request.action),
     ["read", "discard_pending_upload"],
   );
+  // A normal debounced autosave may run before this assertion on a busy machine.
+  // It must still contain the last confirmed ticket, never the replacement.
+  for (const request of app.draftRequests.slice(2)) {
+    assert.equal(request.action, "save");
+    assert.equal(request.draftData.ticketNumber, completeTicket.ticketNumber);
+  }
   assert.equal(app.buttons("Keep previous ticket").length, 0, "Successful automatic recovery clears the pending replacement");
   app.continueEnabled();
 });

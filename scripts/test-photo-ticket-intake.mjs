@@ -20,15 +20,16 @@ const compiled = await build({
       import { createRoot } from 'react-dom/client';
       import { MemoryRouter } from 'react-router-dom';
       import TicketForm from './src/components/TicketForm';
+      import { ticketTypeFromSearch } from './src/lib/ticket/ticketType';
 
       let root;
       export { act };
-      export async function mount(props = {}) {
+      export async function mount(props = {}, entry = "/submit-ticket") {
         root = createRoot(document.getElementById('root'));
         await act(async () => {
-          root.render(<MemoryRouter initialEntries={['/submit-ticket']}
+          root.render(<MemoryRouter initialEntries={[entry]}
             future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <TicketForm {...props} />
+            <TicketForm initialTicketType={ticketTypeFromSearch(new URL(entry, "https://offline.test").search)} {...props} />
           </MemoryRouter>);
         });
       }
@@ -118,7 +119,7 @@ const completeTicket = {
   courtDate: null,
 };
 
-async function runtime(t, props = {}, { cacheKey } = {}) {
+async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = "/submit-ticket" } = {}) {
   const domErrors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on("jsdomError", error => domErrors.push(error));
@@ -171,8 +172,9 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
         saves.push({ name: options.body.action, body: options.body });
         if (options.body.action === "prepare") {
           if (failPrepare) return Promise.resolve({ data: null, error: new window.Error("Preparation response lost") });
-          ticketType = options.body.ticketType ?? "officer_issued";
-          return Promise.resolve({ data: { success: true, submissionId: options.body.submissionId, clientId: "synthetic-client", accessToken: options.body.accessToken, upload: { path: options.body.submissionId + "/ticket.png", token: "synthetic-upload" } }, error: null });
+          ticketType = options.body.ticketType ?? ticketType;
+          if (contactSaved) savedContact = { email: options.body.email, phone: "" };
+          return Promise.resolve({ data: { success: true, contactSaved, submissionId: options.body.submissionId, clientId: "synthetic-client", accessToken: options.body.accessToken, upload: { path: options.body.submissionId + "/ticket.png", token: "synthetic-upload" } }, error: null });
         }
         if (options.body.action === "contact") {
           if (failContact) return Promise.resolve({ data: null, error: new window.Error("Contact save failed") });
@@ -223,7 +225,7 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
     assert.deepEqual(forbidden, [], "the integration test must never attempt a real backend/network operation");
     assert.deepEqual(domErrors.map(error => error.message), [], "the mounted UI must not throw DOM/runtime errors");
   });
-  await api.mount(props);
+  await api.mount(props, entry);
 
   const flush = async () => {
     await api.act(async () => { await new Promise(resolveTick => setTimeout(resolveTick, 0)); });
@@ -242,8 +244,8 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
     assert.ok(found, `Expected a ${label} button`);
     return found;
   };
-  const continueBlocked = () => assert.equal(button("Submit ticket and consent").disabled, true);
-  const continueEnabled = () => assert.equal(button("Submit ticket and consent").disabled, false);
+  const continueBlocked = () => assert.equal(button("Save my ticket and continue").disabled, true);
+  const continueEnabled = () => assert.equal(button("Save my ticket and continue").disabled, false);
   const hiddenDetails = () => assert.equal(document.getElementById("quick-ticketNumber"), null);
   const file = (name = "synthetic-ticket.png", mime = "image/png") => new window.File(["SYNTHETIC TEST CONTENT — NOT A REAL TICKET"], name, { type: mime });
   const choose = async selectedFile => {
@@ -270,27 +272,26 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
   const fill = async () => {
     for (const [key, value] of Object.entries({ firstName: "Alex", lastName: "Example", email: "alex@example.test", phone: "4035550123", driversLicense: "SYNTHETIC-LICENCE", ticketNumber: "SYNTHETIC-TICKET" })) await edit(`quick-${key}`, value);
   };
-  const accept = async () => { if (!field("quick-consent").checked) await api.click(field("quick-consent")); };
+  const accept = async () => {
+    if (!document.querySelector('input[type="radio"]:checked')) await api.click(document.querySelector('input[value="officer_issued"]'));
+    if (!field("quick-email").value) await edit("quick-email", "alex@example.test");
+    if (!field("quick-consent").checked) await api.click(field("quick-consent")); };
   return { window, document, api, requests, cacheRequests, saves, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, edit, fill, accept,
     failUpload: value => { failUpload = value; }, failConsent: value => { failConsent = value; }, failContact: value => { failContact = value; }, failPrepare: value => { failPrepare = value; }, readyForPayment: () => { reviewStatus = "ready"; } };
 }
 
-test("the upload form shows the assessment service choices without requiring identity or waiting for OCR", async t => {
+test("the upload form shows price, ticket type and email without waiting for OCR or collecting identity", async t => {
   const app = await runtime(t);
   app.continueBlocked();
   assert.ok(app.document.querySelector('input[capture="environment"]'));
   await app.choose(app.file());
   assert.equal(app.requests.length, 0);
-  assert.equal(app.document.querySelectorAll('input:not([type="file"]):not([type="checkbox"]):not([type="radio"])').length, 0);
-  assert.equal(app.document.querySelectorAll('input[type="radio"]').length, 2);
-  assert.match(app.document.body.textContent, /By an officer\$198 \+ GST service/);
-  assert.match(app.document.body.textContent, /By a camera\$79 \+ GST service/);
-  assert.equal(app.document.querySelector('input[value="officer_issued"]').checked, true);
+  assert.equal(app.document.querySelectorAll('input:not([type="file"]):not([type="checkbox"]):not([type="radio"])').length, 1);
   assert.equal(app.document.querySelectorAll("select,textarea").length, 0);
   assert.equal((app.document.body.textContent.match(/Ticket attached/g) || []).length, 1);
   assert.doesNotMatch(app.document.body.textContent, /Check your details|Legal first name|Driver’s licence number|referral code|Enter any readable details|Scanning/);
   assert.equal(app.field("quick-consent").checked, false);
-  assert.equal(app.field("quick-not-guilty").checked, true);
+  assert.equal(app.field("quick-not-guilty").checked, false);
   assert.equal(app.document.querySelector('label[for="quick-not-guilty"]').textContent.trim(), "I plead not guilty");
   app.continueBlocked(); await app.accept(); app.continueEnabled();
   assert.equal(app.saves.length, 0);
@@ -299,27 +300,27 @@ test("the upload form shows the assessment service choices without requiring ide
 test("one click saves a photo and consent without sending invented or cached identity fields", async t => {
   const app = await runtime(t, { initialPrefill: { firstName: "Old", driversLicense: "OLD-LICENCE", ticketNumber: "OLD-TICKET" } });
   await app.choose(app.file()); await app.accept();
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.deepEqual(app.saves.map(x => x.name), ["prepare", "upload", "generate-consent-form"]);
   const body = app.saves[0].body;
   assert.equal(body.consent.version, "photo-upload-consent-v3");
-  assert.equal(body.consent.pleadNotGuilty, true);
+  assert.equal(body.consent.pleadNotGuilty, false);
   assert.equal(body.consent.accepted, true); assert.equal(body.consent.method, "checkbox");
+  for (const key of ["firstName", "lastName", "phone", "driversLicense", "ticketNumber", "ticket_type"]) assert.equal(body[key], undefined);
+  assert.equal(body.email, "alex@example.test");
   assert.equal(body.ticketType, "officer_issued");
-  for (const key of ["firstName", "lastName", "email", "phone", "driversLicense", "ticketNumber", "ticket_type"]) assert.equal(body[key], undefined);
   assert.equal(app.saves[2].body.digitalSignature, undefined);
   assert.match(app.document.body.textContent, /Contact information required/);
   assert.ok(app.field("updates-email")); assert.ok(app.field("updates-phone")); assert.ok(app.button("Save contact details"));
 });
 
-test("unchecking not guilty still accepts intake and submits explicit false", async t => {
+test("leaving not guilty unchecked submits explicit false", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept();
-  await app.api.click(app.field("quick-not-guilty"));
   assert.equal(app.field("quick-not-guilty").checked, false);
   assert.match(app.document.getElementById("quick-not-guilty-help").textContent, /not authorized Fabsy to enter a plea/);
   app.continueEnabled();
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.equal(app.saves.find(x => x.name === "prepare").body.consent.pleadNotGuilty, false);
   assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
 });
@@ -327,25 +328,25 @@ test("unchecking not guilty still accepts intake and submits explicit false", as
 test("changing plea after a failed save uses a fresh acceptance instead of the old prepared choice", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); app.failConsent(true);
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   await app.api.click(app.field("quick-not-guilty")); app.failConsent(false);
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   const attempts = app.saves.filter(x => x.name === "prepare");
   assert.equal(attempts.length, 2);
   assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
-  assert.equal(attempts[0].body.consent.pleadNotGuilty, true);
-  assert.equal(attempts[1].body.consent.pleadNotGuilty, false);
+  assert.equal(attempts[0].body.consent.pleadNotGuilty, false);
+  assert.equal(attempts[1].body.consent.pleadNotGuilty, true);
 });
 
 test("switching service after a failed save resets consent and creates a fresh submission", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); app.failConsent(true);
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   await app.api.click(app.document.querySelector('input[value="photo_radar"]'));
   app.continueBlocked();
   assert.equal(app.field("quick-consent").checked, false);
   await app.accept(); app.failConsent(false);
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   const attempts = app.saves.filter(x => x.name === "prepare");
   assert.equal(attempts.length, 2);
   assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
@@ -361,7 +362,7 @@ test("camera entry and assessment handoff retain the selected service across fil
       await app.choose(app.file());
       await app.choose(app.file("replacement.png"));
       assert.equal(app.document.querySelector('input[value="photo_radar"]').checked, true);
-      await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+      await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
       assert.equal(app.saves.find(x => x.name === "prepare").body.ticketType, "photo_radar");
     });
   }
@@ -370,7 +371,7 @@ test("camera entry and assessment handoff retain the selected service across fil
 test("camera service carries through ownership confirmation to the $79 checkout", async t => {
   const app = await runtime(t); app.readyForPayment();
   await app.api.click(app.document.querySelector('input[value="photo_radar"]'));
-  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   await app.edit("updates-email", "alex@example.test"); await app.api.click(app.button("Save contact details")); await app.flush();
   await app.api.act(async () => {
     const select = app.field("checkout-owner"); select.value = "yes";
@@ -389,7 +390,7 @@ test("camera service carries through ownership confirmation to the $79 checkout"
 test("PDFs can submit without names, ticket numbers, DL, DOB or a successful scan", async t => {
   const app = await runtime(t);
   await app.choose(app.file("ticket.pdf", "application/pdf")); await app.accept();
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.equal(app.requests.length, 0);
   assert.match(app.document.body.textContent, /Contact information required/);
 });
@@ -398,7 +399,7 @@ test("the contact form requires email and accepts an optional phone before showi
   for (const values of [{ email: "alex@example.test", phone: "" }, { email: "alex@example.test", phone: "4035550123" }]) {
     await t.test(JSON.stringify(values), async st => {
       const app = await runtime(st);
-      await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+      await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
       if (values.email) await app.edit("updates-email", values.email);
       if (values.phone) await app.edit("updates-phone", values.phone);
       await app.api.click(app.button("Save contact details")); await app.flush();
@@ -415,13 +416,14 @@ test("the contact form requires email and accepts an optional phone before showi
 
 test("missing email immediately warns that the submission is incomplete", async t => {
   const app = await runtime(t);
-  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   const warning = app.document.getElementById("contact-required");
   assert.equal(warning.getAttribute("role"), "alert");
   assert.match(warning.textContent, /Your submission is incomplete/);
   assert.match(warning.textContent, /cannot contact you or proceed with your submission without it/);
   assert.match(app.field("updates-email").getAttribute("aria-describedby"), /contact-required/);
   assert.doesNotMatch(app.document.body.textContent, /Success|Ticket and contact details received/);
+  await app.edit("updates-email", "");
   await app.api.click(app.button("Save contact details")); await app.flush();
   assert.equal(app.field("updates-email").required, true);
   assert.equal(app.field("updates-email").validity.valueMissing, true);
@@ -434,7 +436,7 @@ test("missing email immediately warns that the submission is incomplete", async 
 
 test("failed contact save keeps the receipt and retries only contact details", async t => {
   const app = await runtime(t);
-  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   await app.edit("updates-email", "alex@example.test"); app.failContact(true);
   await app.api.click(app.button("Save contact details")); await app.flush();
   assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
@@ -449,11 +451,11 @@ test("failed contact save keeps the receipt and retries only contact details", a
 test("failed upload retains the checkbox and retries the same prepared submission", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); app.failUpload(true);
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.match(app.document.body.textContent, /upload did not finish/);
   assert.doesNotMatch(app.document.body.textContent, /Your ticket and consent are saved/);
   assert.equal(app.field("quick-consent").checked, true);
-  app.failUpload(false); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  app.failUpload(false); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
   assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
 });
@@ -461,8 +463,8 @@ test("failed upload retains the checkbox and retries the same prepared submissio
 test("a lost preparation response retries with the same idempotency identity", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); app.failPrepare(true);
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
-  app.failPrepare(false); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  app.failPrepare(false); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   const attempts = app.saves.filter(x => x.name === "prepare");
   assert.equal(attempts.length, 2);
   assert.equal(attempts[0].body.submissionId, attempts[1].body.submissionId);
@@ -472,10 +474,10 @@ test("a lost preparation response retries with the same idempotency identity", a
 test("failed consent never shows success and retry uses the same ticket", async t => {
   const app = await runtime(t);
   await app.choose(app.file()); await app.accept(); app.failConsent(true);
-  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.doesNotMatch(app.document.body.textContent, /Contact information required/);
   assert.equal(app.field("quick-consent").checked, true);
-  app.failConsent(false); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  app.failConsent(false); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
   assert.match(app.document.body.textContent, /Your ticket and consent are saved/);
 });
@@ -498,7 +500,7 @@ test("cached and handoff consent never precheck the box", async t => {
 
 test("checkout reuses the completed upload after contact details and background extraction are ready", async t => {
   const app = await runtime(t); app.readyForPayment();
-  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   await app.edit("updates-email", "alex@example.test"); await app.api.click(app.button("Save contact details")); await app.flush();
   assert.equal(app.document.getElementById("payment-terms"), null);
   await app.api.click(app.button("Continue to Stripe for $198.00 CAD plus GST")); await app.flush();
@@ -511,7 +513,71 @@ test("checkout reuses the completed upload after contact details and background 
 
 test("double clicking Submit cannot create simultaneous submissions", async t => {
   const app = await runtime(t);
-  await app.choose(app.file()); await app.accept(); const submit = app.button("Submit ticket and consent");
+  await app.choose(app.file()); await app.accept(); const submit = app.button("Save my ticket and continue");
   await app.api.act(async () => { submit.click(); submit.click(); }); await app.flush();
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
+});
+
+
+test("saving email at prepare skips the contact screen and proceeds to reviewed checkout", async t => {
+  const app = await runtime(t, {}, { contactSaved: true }); app.readyForPayment();
+  await app.choose(app.file()); await app.accept();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  assert.equal(app.saves[0].body.email, "alex@example.test");
+  assert.equal(app.document.getElementById("updates-email"), null);
+  assert.match(app.document.body.textContent, /Ticket and contact details received/);
+  await app.api.click(app.button("Continue to Stripe for $198.00 CAD plus GST")); await app.flush();
+  assert.equal(app.saves.find(x => x.name === "create-payment").body.formData.email, "alex@example.test");
+  assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
+  assert.equal(app.saves.filter(x => x.name === "contact").length, 0);
+});
+
+test("changing the email after a failed upload creates a fresh context", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file()); await app.accept(); app.failUpload(true);
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  await app.edit("quick-email", "new@example.test"); app.failUpload(false);
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  const attempts = app.saves.filter(x => x.name === "prepare");
+  assert.equal(attempts.length, 2);
+  assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
+  assert.equal(attempts[1].body.email, "new@example.test");
+});
+
+
+test("paid entry links preselect the service without prechecking consent or plea", async t => {
+  for (const [entry, type, total] of [
+    ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution", "officer_issued", "207.90"],
+    ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt", "officer_issued", "207.90"],
+    ["/submit-ticket?ticket_type=photo_radar", "photo_radar", "82.95"],
+    ["/submit-ticket?bundle=1", "officer_issued", "240.45"],
+  ]) {
+    await t.test(entry, async sub => {
+      const app = await runtime(sub, {}, { entry });
+      assert.equal(app.document.querySelector('input[type="radio"]:checked').value, type);
+      assert.ok(app.document.body.textContent.includes(total));
+      await app.choose(app.file());
+      assert.equal(app.field("quick-consent").checked, false);
+      assert.equal(app.field("quick-not-guilty").checked, false);
+      assert.equal(app.saves.length, 0);
+    });
+  }
+});
+
+test("a bundle entry retains the selected add-on through reviewed checkout", async t => {
+  const app = await runtime(t, {}, { contactSaved: true, entry: "/submit-ticket?bundle=1&lp=rapid-resolution" });
+  app.readyForPayment(); await app.choose(app.file()); await app.accept();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  assert.equal(app.saves[0].body.bundleRequested, true);
+  assert.equal(app.saves[0].body.landingPage, "rapid-resolution");
+  await app.api.click(app.button("Continue to Stripe for $229.00 CAD plus GST")); await app.flush();
+  assert.equal(app.saves.find(x => x.name === "create-payment").body.includeIdrAddon, true);
+});
+
+
+test("the alternate entry survives client preparation", async t => {
+  const app = await runtime(t, {}, { contactSaved: true, entry: "/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt" });
+  await app.choose(app.file()); await app.accept();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  assert.equal(app.saves[0].body.landingPage, "rapid-resolution-alt");
 });

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "contrast:guard": "node scripts/contrast-guard.cjs",
-    "prebuild": "npm run validate:browser-config && npm run test:i18n && npm run test:measurement && npm run test:ticket-upload && npm run test:checkout-branding && npm run test:seo && node scripts/contrast-guard.cjs && node scripts/test-published-content-guardrails.mjs && node scripts/test-supabase-generated-content-guardrails.mjs && node scripts/test-rapid-resolution-content-normalizer.cjs && node scripts/test-snapshot-offer-guardrails.cjs && node scripts/test-photo-radar-content.cjs && node scripts/test-pro-referral-snapshots.mjs && node scripts/test-public-offer-snapshot-guardrails.mjs && node scripts/test-homepage-visual-snapshot-guardrails.mjs && node scripts/test-snapshot-runtime-hygiene.mjs && node scripts/sync-pages-from-db.js && node scripts/normalize-rapid-resolution-content.cjs && node scripts/generate-jsonld.js && node scripts/generate-sitemap-from-db.js && node scripts/generate-routes.js && node scripts/generate-static-snapshots.cjs && node scripts/generate-localized-snapshots.mjs && node scripts/validate-snapshot-guardrails.cjs",
+    "prebuild": "npm run validate:browser-config && npm run test:i18n && npm run test:measurement && npm run test:ticket-upload && npm run test:rapid-landing && npm run test:checkout-branding && npm run test:seo && node scripts/contrast-guard.cjs && node scripts/test-published-content-guardrails.mjs && node scripts/test-supabase-generated-content-guardrails.mjs && node scripts/test-rapid-resolution-content-normalizer.cjs && node scripts/test-snapshot-offer-guardrails.cjs && node scripts/test-photo-radar-content.cjs && node scripts/test-pro-referral-snapshots.mjs && node scripts/test-public-offer-snapshot-guardrails.mjs && node scripts/test-homepage-visual-snapshot-guardrails.mjs && node scripts/test-snapshot-runtime-hygiene.mjs && node scripts/sync-pages-from-db.js && node scripts/normalize-rapid-resolution-content.cjs && node scripts/generate-jsonld.js && node scripts/generate-sitemap-from-db.js && node scripts/generate-routes.js && node scripts/generate-static-snapshots.cjs && node scripts/generate-localized-snapshots.mjs && node scripts/validate-snapshot-guardrails.cjs",
     "build": "vite build",
     "build:evidence": "node scripts/build-paid-acquisition-evidence.mjs",
     "postbuild": "node scripts/copy-prerendered.js",
@@ -27,7 +27,8 @@
     "test:ticket-upload": "node --test scripts/test-instant-ticket-assessment.mjs && node scripts/test-ticket-upload-review.mjs && node --test scripts/test-photo-ticket-intake.mjs && node --test src/lib/ticket/intakeDraft.test.mjs src/hooks/useTicketCache.test.mjs src/lib/ticket/intake-date-handoff.test.mjs && node scripts/test-admin-ticket-opening.mjs",
     "test:checkout-branding": "node scripts/test-checkout-branding.mjs",
     "test:consent-welcome": "deno test --allow-env --allow-net --allow-read --node-modules-dir=none --frozen supabase/functions/_shared/consent-welcome.test.ts supabase/functions/process-consent-welcome/index.test.ts supabase/functions/process-portal-activity/consent.test.ts supabase/functions/_shared/portal-activity-email.test.ts && node --test scripts/test-consent-legacy-notification.mjs && node scripts/test-consent-welcome-db.mjs",
-    "test:photo-radar-claims": "node scripts/test-photo-radar-insurance-claims.mjs"
+    "test:photo-radar-claims": "node scripts/test-photo-radar-insurance-claims.mjs",
+    "test:rapid-landing": "node scripts/test-rapid-landing.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

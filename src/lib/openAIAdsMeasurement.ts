@@ -39,7 +39,7 @@ export function publicOpenAIAdsMeasurementUrl(url: URL): boolean {
   if (url.username || url.password || url.hash) return false;
   const path = url.pathname.replace(/\/$/, '');
   if (path === '/ticket-uploaded') return !url.search;
-  if (path !== '/rapid-resolution') return false;
+  if (path !== '/rapid-resolution' && path !== '/rapid-resolution-alt') return false;
   const allowed = new Set(['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'oppref']);
   const values = new Map<string, string>();
   for (const [key, value] of url.searchParams) {

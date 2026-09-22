@@ -8,7 +8,7 @@ import { useLocale } from "@/i18n/locale-context";
 import { latestReferralAttribution } from "@/lib/referrals/attribution";
 import { captureReferralFromLocation, readActiveReferral, REFERRAL_ATTRIBUTION_EVENT } from "@/lib/referrals/capture";
 
-export default function PhotoTicketForm({ initialTicketImage = null, initialTicketType = null, initialPrefill = null, sourceAssessment = null, embedded = false }: TicketFormProps) {
+export default function PhotoTicketForm({ initialTicketType, initialTicketImage = null, initialPrefill = null, sourceAssessment = null, embedded = false }: TicketFormProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const leaving = useRef(false);
@@ -28,8 +28,7 @@ export default function PhotoTicketForm({ initialTicketImage = null, initialTick
       digitalSignature: "",
     };
     return initialTicketType && draft.ticketTypeSource !== "manual"
-      ? applyTicketType(draft, initialTicketType, "entry")
-      : draft;
+      ? applyTicketType(draft, initialTicketType, "entry") : draft;
   });
   const updateFormData = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => {
     setFormData(current => ({ ...current, ...(typeof updates === "function" ? updates(current) : updates) }));

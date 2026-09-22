@@ -141,9 +141,11 @@ def run():
                 command([*connection, "-f", str(ROOT / "supabase/migrations" / migration)])
             command(connection, input=CHECKS)
             command([*connection, "-f", str(ROOT / "supabase/migrations/20260922120000_photo_intake_service_selection.sql")])
-            # Legacy calls keep working under the new, optional-argument signature.
             command(connection, input=CHECKS.replace("(uuid,text,jsonb,text,uuid)", "(uuid,text,jsonb,text,uuid,text)") + SERVICE_CHECKS)
-            print("Intake database assertions passed: consent, legacy compatibility, service selection, matching product routes, immutable retries and RPC permissions.")
+            for migration in ("20260922180000_intake_offer_context.sql", "20260922182000_intake_landing_variant.sql"):
+                command([*connection, "-f", str(ROOT / "supabase/migrations" / migration)])
+            command(connection, input=CHECKS.split("do $$")[0] + (ROOT / "supabase/tests/intake-offer-context.test.sql").read_text())
+            print("Intake database assertions passed: legacy, service selection, immutable consent/context, atomic contact and alternate label.")
         finally:
             if started:
                 command([binaries["pg_ctl"], "-D", str(cluster), "-m", "immediate", "-w", "stop"])

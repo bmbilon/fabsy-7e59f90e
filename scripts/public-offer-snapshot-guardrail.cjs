@@ -1,3 +1,4 @@
+const { redactRapidConversionSnapshot } = require('./rapid-conversion-snapshot-guardrail.cjs');
 /** Exact English public-offer admissions. This does not change article or locale policy. */
 const fs = require('node:fs');
 const path = require('node:path');
@@ -574,6 +575,7 @@ function redactPublicOfferSnapshot(html, { route }) {
   const document = dom.window.document;
   const issues = [];
   try {
+    redactRapidConversionSnapshot(document, route, issues);
     redactHomepageVisualSnapshot(document, route, issues);
     redactExactRefundNotices(document, route, issues);
     redactExactRefundFaqs(document, route, issues);

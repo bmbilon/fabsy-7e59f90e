@@ -45,9 +45,15 @@ export const handler = async (req: Request): Promise<Response> => {
         ticketPath = `${submissionId}/representation-ticket.${extension}`;
       }
       const consent = parsePhotoUploadConsent(input.consent, submissionId, ticketPath);
-      const { data: clientId, error } = await admin.rpc("prepare_photo_ticket_intake", {
+      const withContact = input.email !== undefined;
+      const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
+      if (withContact && (!email || email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) throw new RequestError("Enter a valid email address.");
+      if (withContact && !["officer_issued", "photo_radar"].includes(input.ticketType)) throw new RequestError("Choose your ticket type.");
+      if (input.landingPage != null && !["rapid-resolution", "rapid-resolution-alt", "photo-radar"].includes(input.landingPage)) throw new RequestError("Invalid service entry page.");
+      const { data: clientId, error } = await admin.rpc(withContact ? "prepare_photo_ticket_with_contact" : "prepare_photo_ticket_intake", {
         p_id: submissionId, p_token_hash: tokenHash, p_consent: consent, p_ticket_path: ticketPath, p_source_assessment_id: sourceId,
-        ...(input.ticketType ? { p_ticket_type: input.ticketType } : {}),
+        ...(withContact ? { p_email: email, p_ticket_type: input.ticketType,
+          p_bundle_requested: input.bundleRequested === true && input.ticketType !== "photo_radar", p_landing_page: input.landingPage ?? null } : input.ticketType ? { p_ticket_type: input.ticketType } : {}),
       });
       if (error || !clientId) throw new RequestError("Your upload could not be prepared. Please try again.", 409);
       let upload = null;
@@ -57,7 +63,7 @@ export const handler = async (req: Request): Promise<Response> => {
         upload = { path: ticketPath, token: signed.token };
       }
       await attachReferralAttribution(admin, submissionId, { refCode: input.refCode, refAttributionToken: input.refAttributionToken });
-      return json({ success: true, submissionId, clientId, accessToken: input.accessToken, upload });
+      return json({ success: true, submissionId, clientId, accessToken: input.accessToken, upload, contactSaved: withContact });
     }
 
     const { data: ticket, error } = await admin.from("ticket_submissions")

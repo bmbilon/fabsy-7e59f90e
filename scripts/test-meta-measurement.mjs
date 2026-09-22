@@ -131,7 +131,7 @@ test('Meta production gate requires the exact flag, Pixel ID and production orig
 test('Meta URL policy admits released-language RR campaigns; receipts require verification', async () => {
   const r = await runtime();
   try {
-    for (const path of ['/rapid-resolution', '/rapid-resolution/', '/en/rapid-resolution', '/pa/rapid-resolution', '/tl/rapid-resolution', '/zh-hans/rapid-resolution', '/zh-hant/rapid-resolution', '/ar/rapid-resolution', '/hi/rapid-resolution', '/es/rapid-resolution/']) {
+    for (const path of ['/rapid-resolution-alt', '/rapid-resolution-alt/', '/rapid-resolution', '/rapid-resolution/', '/en/rapid-resolution', '/pa/rapid-resolution', '/tl/rapid-resolution', '/zh-hans/rapid-resolution', '/zh-hant/rapid-resolution', '/ar/rapid-resolution', '/hi/rapid-resolution', '/es/rapid-resolution/']) {
     for (const content of ['rr_relief_v1', 'rr_flat_fee_v1', 'rr_client_control_v1', 'pa_rr_v1']) {
       for (const extra of ['', '&fbclid=IwZXh0bgNhZW0_SYNTHETIC-123']) {
         const url = new URL(`https://fabsy.ca${path}${campaign(content)}${extra}`);
@@ -152,6 +152,8 @@ test('Meta URL policy admits released-language RR campaigns; receipts require ve
         'the shared receipt document remains available to the existing Google verifier');
     }
     for (const href of [
+      'https://fabsy.ca/rapid-resolution-alt',
+      `https://fabsy.ca/rapid-resolution-alt${campaign('rr_relief_v1')}&email=private`,
       'https://fabsy.ca/rapid-resolution',
       `https://fabsy.ca/fr/rapid-resolution${campaign('rr_relief_v1')}`,
       `https://fabsy.ca/pa/submit-ticket${campaign('rr_relief_v1')}`,

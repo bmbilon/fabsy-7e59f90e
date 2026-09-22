@@ -63,6 +63,7 @@ import TicketAssessmentConfirmation from "./pages/TicketAssessmentConfirmation";
 import AdminAssessmentReview from "./pages/AdminAssessmentReview";
 import RepresentationConsent from "./pages/RepresentationConsent";
 import RapidResolution from "./pages/RapidResolution";
+import RapidResolutionAlternate from "./pages/RapidResolutionAlternate";
 import { lazy, Suspense, type PropsWithChildren } from "react";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import LocaleAlternates from "@/i18n/LocaleAlternates";
@@ -159,6 +160,7 @@ const App = () => (
           <Route path="/insurance-damage-report/checkout" element={<IdrCheckout />} />
           <Route path="/insurance-damage-report/intake" element={<IdrIntake />} />
           <Route path="/rapid-resolution" element={<RapidResolution />} />
+                <Route path="/rapid-resolution-alt" element={<RapidResolutionAlternate />} />
           <Route path="/photo-radar" element={<RouteSuspense><PhotoRadar /></RouteSuspense>} />
           <Route path="/fleet" element={<RouteSuspense><Fleet /></RouteSuspense>} />
           <Route path="/free-ticket-check" element={<RouteSuspense><FreeTicketCheck /></RouteSuspense>} />

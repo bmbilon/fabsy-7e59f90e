@@ -15,6 +15,7 @@ export const FUNNEL_EVENT_NAMES = [
   'primary_cta_viewed',
   'primary_cta_click',
   'phone_click',
+  'whatsapp_click',
   'engaged_10s',
   'engaged_30s',
   'engaged_60s',
@@ -36,7 +37,7 @@ export const FUNNEL_EVENT_NAMES = [
 ] as const;
 
 export type FunnelEventName = (typeof FUNNEL_EVENT_NAMES)[number];
-export type FunnelPageKey = 'rapid_resolution' | 'photo_radar' | 'intake' | 'payment_canceled' | 'thank_you';
+export type FunnelPageKey = 'rapid_resolution' | 'rapid_resolution_alt' | 'photo_radar' | 'intake' | 'payment_canceled' | 'thank_you';
 export type FunnelActionPosition = 'hero' | 'header' | 'sticky' | 'section' | 'footer';
 
 interface FunnelMeasurementEnvironment {
@@ -128,6 +129,7 @@ export function funnelPageKey(pathname: string): FunnelPageKey | null {
     .replace(/^\/(?:en|pa|tl|zh-hans|zh-hant|ar|es|hi)(?=\/|$)/, '')
     .replace(/\/$/, '') || '/';
   if (base === '/rapid-resolution') return 'rapid_resolution';
+  if (pathname.replace(/\/$/, '') === '/rapid-resolution-alt') return 'rapid_resolution_alt';
   if (base === '/photo-radar') return 'photo_radar';
   if (base === '/submit-ticket' || base === '/ticket-form') return 'intake';
   if (base === '/payment-canceled') return 'payment_canceled';
@@ -207,17 +209,17 @@ function validStep(eventName: FunnelEventName, step: number | undefined): boolea
 
 function validPosition(eventName: FunnelEventName, position: FunnelActionPosition | undefined): boolean {
   if (position === undefined) return true;
-  return (eventName === 'primary_cta_viewed' || eventName === 'primary_cta_click' || eventName === 'phone_click') &&
+  return (eventName === 'primary_cta_viewed' || eventName === 'primary_cta_click' || eventName === 'phone_click' || eventName === 'whatsapp_click') &&
     ['hero', 'header', 'sticky', 'section', 'footer'].includes(position);
 }
 
 function validEventPage(eventName: FunnelEventName, pageKey: FunnelPageKey): boolean {
   if ([
-    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click',
+    'landing_view', 'primary_cta_viewed', 'primary_cta_click', 'phone_click', 'whatsapp_click',
     'engaged_10s', 'engaged_30s', 'engaged_60s',
     'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90',
   ].includes(eventName)) {
-    return pageKey === 'rapid_resolution' || pageKey === 'photo_radar';
+    return pageKey === 'rapid_resolution' || pageKey === 'rapid_resolution_alt' || pageKey === 'photo_radar';
   }
   if ([
     'intake_started', 'intake_step_viewed', 'intake_validation_blocked',

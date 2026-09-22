@@ -218,3 +218,13 @@ test('database and staff report retain aggregate counters only', async () => {
   assert.match(campaignMigration, /en_rsa_v1/);
   assert.match(campaignMigration, /pa_rsa_v1/);
 });
+
+
+test('alternate page aggregate labels remain identifier free', async () => {
+  const module = { exports: {} };
+  runInNewContext(await bundle('src/lib/preconsentMeasurementCore.ts'), { module, URL });
+  const payload = module.exports.preconsentMetricPayload(new URL('https://fabsy.ca/rapid-resolution-alt?utm_source=google&utm_medium=cpc&gclid=PRIVATE'), 'paid_landing');
+  assert.equal(payload.pageKey, 'rapid_resolution_alt');
+  assert.equal(payload.clickIdKind, 'gclid');
+  assert.ok(!JSON.stringify(payload).includes('PRIVATE'));
+});

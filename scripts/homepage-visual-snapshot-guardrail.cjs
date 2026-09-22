@@ -150,11 +150,14 @@ function redactHomepageVisualSnapshot(document, route, issues) {
           ['aria-label', 'aria-description', 'title'].some(name => node.hasAttribute(name)) || !visible(node))
       : radios.length === 0;
     const valid = main.querySelectorAll('#ticket-form-container').length === 1 && visible(upload)
-      && compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket.'
+      && ['Uploadyourticket.', 'Uploadyourticket'].includes(compact(upload.querySelector('h2')?.textContent))
       && guide && !guide.open && compact(guide.querySelector('summary')?.textContent) === 'Howtoproperlycaptureanimageofyourticket'
       && upload.querySelectorAll('input[type="file"]').length === 0
       && validServiceChoices && upload.querySelectorAll('input:not([type="file"]):not([type="radio"]),select,textarea').length === 0
-      && submit && visible(submit) && submit.disabled && compact(submit.textContent) === 'Submitticketandconsent';
+      && submit && visible(submit) && submit.disabled && ['Submitticketandconsent', 'Savemyticketandcontinue'].includes(compact(submit.textContent));
+    if (compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket') {
+      field(upload, 'p', `Rapid Resolution · $${offers.rapidResolution.priceCad} CAD + GST ($${(offers.rapidResolution.priceCad * 1.05).toFixed(2)} total)`, 'intake price and GST');
+    }
     if (!valid) issues.push('Homepage upload must retain its empty form, configured service choices, collapsed capture guide and disabled submit');
     else if (serviceChoices) redactions.add(serviceChoices);
   }

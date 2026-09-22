@@ -28,10 +28,13 @@ export async function photoIntakeAction<T>(attempt: PhotoIntakeAttempt, action: 
 
 export async function savePhotoTicket(data: FormData, attempt: PhotoIntakeAttempt, options: {
   pleadNotGuilty: boolean;
+  bundleRequested?: boolean;
+  landingPage?: string | null;
   prepared?: PreparedTicketSubmission | null;
   onPrepared: (value: PreparedTicketSubmission) => void;
 }): Promise<SavedTicketSubmission> {
   if (data.consentGiven !== true) throw new IntakeSaveError("Check the consent box before submitting your ticket.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()) || data.email.trim().length > 255) throw new IntakeSaveError("Enter a valid email address.");
   const file = data.ticketImage;
   const sourceAssessment = data.sourceAssessmentId && data.sourceAssessmentAccessToken
     ? { submissionId: data.sourceAssessmentId, accessToken: data.sourceAssessmentAccessToken } : null;
@@ -42,7 +45,10 @@ export async function savePhotoTicket(data: FormData, attempt: PhotoIntakeAttemp
   if (!prepared) {
     const referral = latestReferralAttribution([data.referral, readActiveReferral()]);
     prepared = await photoIntakeAction<PreparedTicketSubmission>(attempt, "prepare", {
+      email: data.email.trim(),
       ticketType: data.ticketType,
+      bundleRequested: options.bundleRequested === true && data.ticketType !== "photo_radar",
+      landingPage: options.landingPage === "rapid-resolution" || options.landingPage === "rapid-resolution-alt" || options.landingPage === "photo-radar" ? options.landingPage : null,
       consent: { accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION, pleadNotGuilty: options.pleadNotGuilty },
       ...(referral ? { refCode: referral.code, refAttributionToken: referral.attributionToken } : {}),
       ...(sourceAssessment ? { sourceAssessment } : { file: { contentType: descriptor?.valid ? descriptor.mimeType : "", size: file!.size } }),
@@ -60,5 +66,5 @@ export async function savePhotoTicket(data: FormData, attempt: PhotoIntakeAttemp
     const detail = await functionErrorDetails(error, consent?.error || "Your consent could not be saved. Please submit again.");
     throw new IntakeSaveError(detail.message, detail.code);
   }
-  return { ...attempt, clientId: prepared.clientId, consentFormPath: consent.consentFormPath };
+  return { ...attempt, clientId: prepared.clientId, consentFormPath: consent.consentFormPath, contactSaved: prepared.contactSaved === true };
 }

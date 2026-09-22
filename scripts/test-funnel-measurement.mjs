@@ -444,6 +444,7 @@ test('photo radar landing events require consent and satisfy the server contract
     ['primary_cta_viewed', { position: 'hero' }],
     ['primary_cta_click', { position: 'hero' }],
     ['phone_click', { position: 'header' }],
+    ['whatsapp_click', { position: 'section' }],
     ...['engaged_10s', 'engaged_30s', 'engaged_60s', 'scroll_25', 'scroll_50', 'scroll_75', 'scroll_90'].map(name => [name, {}]),
   ];
   try {
@@ -829,5 +830,20 @@ test('an in-flight event from the previous ad cannot suppress the new ad landing
     assert.equal(calls, 2);
     resolveFirst();
     assert.equal(await first, false);
+  } finally { r.close(); }
+});
+
+
+test('challenger events retain a separate page key and require the same consent', async () => {
+  const r = await runtime('https://fabsy.ca/rapid-resolution-alt');
+  try {
+    assert.equal(await r.api.recordFunnelEvent('landing_view'), false);
+    assert.equal(r.calls.length, 0);
+    r.api.setFabsyFunnelConsentChoice('accepted');
+    assert.equal(await r.api.recordFunnelEvent('landing_view'), true);
+    assert.equal(JSON.parse(r.calls[0].options.body).pageKey, 'rapid_resolution_alt');
+    r.win.history.replaceState(null, '', '/rapid-resolution');
+    assert.equal(await r.api.recordFunnelEvent('landing_view'), true);
+    assert.equal(JSON.parse(r.calls[1].options.body).pageKey, 'rapid_resolution');
   } finally { r.close(); }
 });

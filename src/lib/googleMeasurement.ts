@@ -51,7 +51,7 @@ export function currentGoogleMeasurementConfig(): PaidPurchaseConfig {
 }
 
 const publicPaths = new Set([
-  '/', '/rapid-resolution', '/photo-radar', '/pro-drivers', '/refer',
+  '/', '/rapid-resolution', '/rapid-resolution-alt', '/photo-radar', '/pro-drivers', '/refer',
   '/how-it-works', '/about', '/about/comparison', '/services', '/testimonials',
   '/faq', '/founder', '/ai-info', '/privacy-policy', '/terms-of-service',
   '/terms-of-purchase', '/insurance-damage-report', '/blog', '/thank-you',
@@ -79,7 +79,7 @@ export function publicMeasurementPath(pathname: string): string | null {
 function hasOnlyApprovedAcquisitionParameters(url: URL, ads = false): boolean {
   if (url.hash) return false;
   const basePath = baseMeasurementPath(url.pathname);
-  const paidLanding = basePath === '/rapid-resolution';
+  const paidLanding = basePath === '/rapid-resolution' || basePath === '/rapid-resolution-alt';
   const publicAcquisition = !ads && !['/thank-you', '/ticket-uploaded'].includes(basePath);
   const allowed = new Set<string>([
     ...CLICK_ID_KEYS.filter(key => paidLanding || key !== 'fbclid'),

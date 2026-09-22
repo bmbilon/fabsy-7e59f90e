@@ -50,14 +50,14 @@ try {
   const parse = html => new JSDOM(html).window.document;
 
   const hero = parse(render.renderHero());
-  check('hero uses the requested money-back headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Fine or demerits reduced or your money back'));
+  check('hero retains the control headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Fine or demerits reduced or your money back'));
   check('hero omits the repeated court-outcome disclaimer', () => assert.doesNotMatch(hero.body.textContent, /We can’t guarantee a court outcome\./));
   check('hero removes the superseded promises', () => assert.doesNotMatch(hero.body.textContent, /success guaranteed|you don[’']t pay/i));
   check('hero displays the price without an appended disclaimer', () => assert.equal([...hero.querySelectorAll('strong')].find(node => node.textContent.includes('CAD + GST'))?.parentElement?.textContent, `$${offers.rapidResolution.priceCad} CAD + GST`));
   check('hero CTA is measurable and submits ticket with consent', () => {
     const cta = hero.querySelector('button[data-funnel-action="primary_cta"]');
     assert.equal(cta?.getAttribute('type'), 'submit');
-    assert.equal(cta?.textContent.trim(), 'Submit ticket and consent');
+    assert.equal(cta?.textContent.trim(), 'Save my ticket and continue');
     assert.equal(cta?.getAttribute('data-funnel-position'), 'hero');
   });
 

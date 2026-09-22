@@ -18,9 +18,9 @@ const intakeEvents = new Map<string, Parameters<typeof recordFunnelEvent>[0]>([
 const engagementCheckpoints = [10, 30, 60] as const;
 const scrollCheckpoints = [25, 50, 75, 90] as const;
 
-function landingPageKey(pathname: string): 'rapid_resolution' | 'photo_radar' | null {
+function landingPageKey(pathname: string): 'rapid_resolution' | 'rapid_resolution_alt' | 'photo_radar' | null {
   const pageKey = funnelPageKey(pathname);
-  return pageKey === 'rapid_resolution' || pageKey === 'photo_radar' ? pageKey : null;
+  return pageKey === 'rapid_resolution' || pageKey === 'rapid_resolution_alt' || pageKey === 'photo_radar' ? pageKey : null;
 }
 
 export default function FunnelMeasurement() {
@@ -165,6 +165,7 @@ export default function FunnelMeasurement() {
         position,
         dedupeKey: `primary_cta_click:${pageKey}:${position || 'unknown'}`,
       });
+      if (action === 'whatsapp') void recordFunnelEvent('whatsapp_click', { position, dedupeKey: `whatsapp_click:${pageKey}:${position || 'unknown'}` });
       if (action === 'phone') void recordFunnelEvent('phone_click', {
         position,
         dedupeKey: `phone_click:${pageKey}:${position || 'unknown'}`,

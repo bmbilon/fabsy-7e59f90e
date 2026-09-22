@@ -24,7 +24,7 @@ type GoogleConsentCopy = {
 export const googleConsentCopy: Record<LocaleCode, GoogleConsentCopy> = {
   en: {
     title: 'Your privacy choices',
-    body: 'Allow Fabsy’s first-party funnel measurement and Google Analytics, Google Ads, Meta Pixel and OpenAI Ads measurement to measure visits, key progress steps and completed purchases? This helps us understand how people find and use Fabsy.',
+    body: 'Allow measurement of visits, steps and purchases by Fabsy, Google, Meta and OpenAI Ads?',
     scope: 'Fabsy funnel events contain only named steps and campaign fields: no form contents, IP address or user agent, and ad click IDs are hashed. Google ad personalization is off. Meta automatic events, advanced matching and customer lists are not used. Google, Meta and OpenAI Ads tags stay off ticket and contact forms. Cloudflare site analytics are separate.',
     changeHint: 'You can change your choice at any time.',
     allow: 'Allow measurement',
