@@ -135,18 +135,31 @@ function redactHomepageVisualSnapshot(document, route, issues) {
   if (upload) {
     const submit = upload.querySelector('button[type="submit"]');
     const guide = upload.querySelector('details');
+    const serviceChoices = upload.querySelector('input[type="radio"]')?.closest('fieldset');
+    const radios = [...upload.querySelectorAll('input[type="radio"]')];
+    // Previously generated snapshots have no selector. New snapshots may
+    // include only the exact public service choices, in their default state.
+    const validServiceChoices = serviceChoices
+      ? visible(serviceChoices) && !serviceChoices.disabled
+        && compact(serviceChoices.textContent) === compact(`How was the ticket issued?By an officer$${offers.rapidResolution.priceCad} + GST serviceBy a camera$${offers.photoRadar.priceCad} + GST service`)
+        && radios.length === 2 && radios.every(radio => serviceChoices.contains(radio) && visible(radio) && !radio.disabled)
+        && radios[0].value === 'officer_issued' && radios[0].checked
+        && radios[1].value === 'photo_radar' && !radios[1].checked
+        && radios[0].name && radios[0].name === radios[1].name
+        && ![serviceChoices, ...serviceChoices.querySelectorAll('*')].some(node =>
+          ['aria-label', 'aria-description', 'title'].some(name => node.hasAttribute(name)) || !visible(node))
+      : radios.length === 0;
     const valid = main.querySelectorAll('#ticket-form-container').length === 1 && visible(upload)
-      && compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket'
+      && ['Uploadyourticket.', 'Uploadyourticket'].includes(compact(upload.querySelector('h2')?.textContent))
       && guide && !guide.open && compact(guide.querySelector('summary')?.textContent) === 'Howtoproperlycaptureanimageofyourticket'
       && upload.querySelectorAll('input[type="file"]').length === 0
-      && upload.querySelectorAll('input:not([type="file"]):not([type="radio"]),select,textarea').length === 0
-      && upload.querySelectorAll('input[type="radio"]').length === 2
-      && [...upload.querySelectorAll('input[type="radio"]')].every(input => input.name === 'quick-ticket-type' && !input.checked)
-      && submit && visible(submit) && submit.disabled && compact(submit.textContent) === 'Savemyticketandcontinue';
-    if (!valid) issues.push('Homepage upload must retain its empty ticket-type selector, collapsed capture guide and disabled submit');
-    field(upload, 'p', `Rapid Resolution · $${offers.rapidResolution.priceCad} CAD + GST ($${(offers.rapidResolution.priceCad * 1.05).toFixed(2)} total)`, 'intake price and GST');
-    field(upload, 'strong', `Officer-issued ticket $${offers.rapidResolution.priceCad} + GST`, 'officer ticket selection');
-    field(upload, 'strong', `Photo radar / red-light camera $${offers.photoRadar.priceCad} + GST`, 'camera ticket selection');
+      && validServiceChoices && upload.querySelectorAll('input:not([type="file"]):not([type="radio"]),select,textarea').length === 0
+      && submit && visible(submit) && submit.disabled && ['Submitticketandconsent', 'Savemyticketandcontinue'].includes(compact(submit.textContent));
+    if (compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket') {
+      field(upload, 'p', `Rapid Resolution · $${offers.rapidResolution.priceCad} CAD + GST ($${(offers.rapidResolution.priceCad * 1.05).toFixed(2)} total)`, 'intake price and GST');
+    }
+    if (!valid) issues.push('Homepage upload must retain its empty form, configured service choices, collapsed capture guide and disabled submit');
+    else if (serviceChoices) redactions.add(serviceChoices);
   }
   const assessment = main.querySelector('#instant-ticket-assessment');
   if (assessment) {

@@ -24,15 +24,15 @@ begin
     format('select public.prepare_photo_ticket_with_contact(%L,%L,%L::jsonb,%L,%L,%L,false,%L)',ticket_id,repeat('a',64),consent,ticket_id||'/ticket.pdf','person@example.test','officer_issued','rapid-resolution'),
     format('select public.prepare_photo_ticket_with_contact(%L,%L,%L::jsonb,%L,%L,%L,false,%L)',ticket_id,repeat('a',64),consent,ticket_id||'/ticket.pdf','person@example.test','photo_radar','rapid-resolution')
   ] loop
-    perform pg_temp.expect_error(statement,'INTAKE_CONTEXT_CHANGED');
+    perform pg_temp.expect_error(statement,case when position('photo_radar' in statement)>0 then 'INTAKE_TICKET_TYPE_CHANGED' else 'INTAKE_CONTEXT_CHANGED' end);
   end loop;
   perform pg_temp.check_true((select email='person@example.test' and intake_bundle_requested from public.ticket_submissions where id=ticket_id),'changed retries cannot alter saved data');
   consent := consent || jsonb_build_object('ticketSubmissionId',camera_id::text,'ticketDocumentPath',camera_id::text||'/ticket.pdf');
   perform public.prepare_photo_ticket_with_contact(camera_id,repeat('b',64),consent,camera_id||'/ticket.pdf',
     'camera@example.test','photo_radar',false,'photo-radar');
-  perform pg_temp.check_true((select intake_ticket_type='photo_radar' and ticket_type='officer_issued'
-    and ticket_type_source='default' and not intake_bundle_requested from public.ticket_submissions where id=camera_id),
-    'customer hint cannot set reviewed classification or pricing');
+  perform pg_temp.check_true((select intake_ticket_type='photo_radar' and ticket_type='photo_radar'
+    and ticket_type_source='manual' and intake_review_status='pending_scan' and not intake_bundle_requested from public.ticket_submissions where id=camera_id),
+    'selected service stays pending scan before checkout');
   consent := consent || jsonb_build_object('ticketSubmissionId',invalid_id::text,'ticketDocumentPath',invalid_id::text||'/ticket.pdf');
   perform pg_temp.expect_error(format('select public.prepare_photo_ticket_with_contact(%L,%L,%L::jsonb,%L,%L,%L,true,%L)',
     invalid_id,repeat('c',64),consent,invalid_id||'/ticket.pdf','bad-email','officer_issued','rapid-resolution'),'INTAKE_CONTEXT_INVALID');

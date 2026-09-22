@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Check, ChevronDown, RotateCcw, Sparkles, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TicketCapture, { type TicketOcrData } from "@/components/TicketCapture";
+import TicketServiceOptions from "@/components/TicketServiceOptions";
 import type { FormData } from "@/components/TicketForm";
 import { PHOTO_RADAR, RAPID_RESOLUTION } from "@/config/offers";
 import { trackAssessmentEvent } from "@/lib/assessment/analytics";
@@ -176,17 +177,7 @@ export default function InstantTicketAssessment() {
           {file && <p className="mt-2 text-xs text-slate-600" role="status">{scanning ? "Reading your ticket…" : "Check the details below and complete anything the scan missed."}</p>}
           <fieldset disabled={scanning} className="mt-5 space-y-4">
             <legend className="sr-only">Ticket basics</legend>
-            <fieldset>
-              <legend className={labelClass}>How was the ticket issued?</legend>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {([["officer_issued", "By an officer", RAPID_RESOLUTION.priceCad], ["photo_radar", "By a camera", PHOTO_RADAR.priceCad]] as const).map(([value, label, price]) => (
-                  <label key={value} className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-600 ${ticketType === value ? "border-blue-600 bg-blue-50 text-blue-900" : "border-slate-300 text-slate-700"}`}>
-                    <input className="h-4 w-4 accent-blue-700" type="radio" name="assessment-ticket-type" value={value} checked={ticketType === value} onChange={() => { setTicketType(value); setOffence(""); setDemerits(""); }} />
-                    <span className="font-semibold">{label}<span className="block text-xs font-normal">${price} + GST service</span></span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+            <TicketServiceOptions ticketType={ticketType} onChange={value => { setTicketType(value); setOffence(""); setDemerits(""); }} />
             <label className={labelClass} htmlFor="assessment-offence">Offence
               <select id="assessment-offence" className={control} required value={offence} onChange={event => setOffence(event.target.value as AssessmentOffence)}>
                 <option value="" disabled>Select your offence</option>

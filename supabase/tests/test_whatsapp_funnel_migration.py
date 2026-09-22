@@ -14,7 +14,7 @@ with tempfile.TemporaryDirectory(prefix='fabsy-whatsapp-',dir='/tmp') as folder:
  try:
   args=['-X','-h',folder,'-p','55449','-d','postgres','-v','ON_ERROR_STOP=1']
   run('psql',args,'create role anon; create role authenticated; create role service_role;')
-  for migration in ['20260903170000_paid_funnel_measurement.sql','20260906170000_paid_funnel_behavior_diagnostics.sql','20260918180000_paid_funnel_photo_radar.sql','20260922121000_funnel_whatsapp_click.sql','20260922131000_funnel_landing_variant.sql','20260913130000_preconsent_paid_measurement.sql','20260913170000_preconsent_campaign_labels.sql','20260922132000_preconsent_landing_variant.sql']:
+  for migration in ['20260903170000_paid_funnel_measurement.sql','20260906170000_paid_funnel_behavior_diagnostics.sql','20260918180000_paid_funnel_photo_radar.sql','20260922181000_funnel_whatsapp_click.sql','20260922183000_funnel_landing_variant.sql','20260913130000_preconsent_paid_measurement.sql','20260913170000_preconsent_campaign_labels.sql','20260922184000_preconsent_landing_variant.sql']:
    sql=Path('supabase/migrations',migration).read_text()
    # Local PostgreSQL has no pg_cron; scheduling existing retention is unrelated.
    if migration=='20260903170000_paid_funnel_measurement.sql': sql=sql.split('create extension if not exists pg_cron')[0]

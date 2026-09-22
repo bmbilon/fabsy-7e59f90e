@@ -139,6 +139,8 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
   let failContact = false;
   let failPrepare = false;
   let reviewStatus = "needs_review";
+  let ticketType = "officer_issued";
+  let registeredOwner = "";
   let savedContact = { email: "", phone: "" };
   const forbidden = [];
   const channels = [];
@@ -170,6 +172,7 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
         saves.push({ name: options.body.action, body: options.body });
         if (options.body.action === "prepare") {
           if (failPrepare) return Promise.resolve({ data: null, error: new window.Error("Preparation response lost") });
+          ticketType = options.body.ticketType ?? ticketType;
           if (contactSaved) savedContact = { email: options.body.email, phone: "" };
           return Promise.resolve({ data: { success: true, contactSaved, submissionId: options.body.submissionId, clientId: "synthetic-client", accessToken: options.body.accessToken, upload: { path: options.body.submissionId + "/ticket.png", token: "synthetic-upload" } }, error: null });
         }
@@ -177,7 +180,8 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
           if (failContact) return Promise.resolve({ data: null, error: new window.Error("Contact save failed") });
           savedContact = { email: options.body.email, phone: options.body.phone };
         }
-        return Promise.resolve({ data: { success: true, reviewStatus, fields: { firstName: "Alex", lastName: "Example", ticketNumber: "SCANNED-TICKET", ticketType: "officer_issued", registeredOwnerOnOffenceDate: "", ...savedContact } }, error: null });
+        if (options.body.action === "owner") registeredOwner = options.body.answer;
+        return Promise.resolve({ data: { success: true, reviewStatus, fields: { firstName: "Alex", lastName: "Example", ticketNumber: "SCANNED-TICKET", ticketType, registeredOwnerOnOffenceDate: registeredOwner, ...savedContact } }, error: null });
       }
       if (name === "submit-ticket") {
         saves.push({ name, body: options.body });
@@ -269,7 +273,7 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
     for (const [key, value] of Object.entries({ firstName: "Alex", lastName: "Example", email: "alex@example.test", phone: "4035550123", driversLicense: "SYNTHETIC-LICENCE", ticketNumber: "SYNTHETIC-TICKET" })) await edit(`quick-${key}`, value);
   };
   const accept = async () => {
-    if (!document.querySelector('input[name="quick-ticket-type"]:checked')) await api.click(document.querySelector('input[value="officer_issued"]'));
+    if (!document.querySelector('input[type="radio"]:checked')) await api.click(document.querySelector('input[value="officer_issued"]'));
     if (!field("quick-email").value) await edit("quick-email", "alex@example.test");
     if (!field("quick-consent").checked) await api.click(field("quick-consent")); };
   return { window, document, api, requests, cacheRequests, saves, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, edit, fill, accept,
@@ -332,6 +336,55 @@ test("changing plea after a failed save uses a fresh acceptance instead of the o
   assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
   assert.equal(attempts[0].body.consent.pleadNotGuilty, false);
   assert.equal(attempts[1].body.consent.pleadNotGuilty, true);
+});
+
+test("switching service after a failed save resets consent and creates a fresh submission", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file()); await app.accept(); app.failConsent(true);
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  await app.api.click(app.document.querySelector('input[value="photo_radar"]'));
+  app.continueBlocked();
+  assert.equal(app.field("quick-consent").checked, false);
+  await app.accept(); app.failConsent(false);
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  const attempts = app.saves.filter(x => x.name === "prepare");
+  assert.equal(attempts.length, 2);
+  assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
+  assert.equal(attempts[0].body.ticketType, "officer_issued");
+  assert.equal(attempts[1].body.ticketType, "photo_radar");
+});
+
+test("camera entry and assessment handoff retain the selected service across file changes", async t => {
+  for (const props of [{ initialTicketType: "photo_radar" }, { initialPrefill: { ticketType: "photo_radar", ticketTypeSource: "manual" } }]) {
+    await t.test(JSON.stringify(props), async st => {
+      const app = await runtime(st, props);
+      assert.equal(app.document.querySelector('input[value="photo_radar"]').checked, true);
+      await app.choose(app.file());
+      await app.choose(app.file("replacement.png"));
+      assert.equal(app.document.querySelector('input[value="photo_radar"]').checked, true);
+      await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+      assert.equal(app.saves.find(x => x.name === "prepare").body.ticketType, "photo_radar");
+    });
+  }
+});
+
+test("camera service carries through ownership confirmation to the $79 checkout", async t => {
+  const app = await runtime(t); app.readyForPayment();
+  await app.api.click(app.document.querySelector('input[value="photo_radar"]'));
+  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  await app.edit("updates-email", "alex@example.test"); await app.api.click(app.button("Save contact details")); await app.flush();
+  await app.api.act(async () => {
+    const select = app.field("checkout-owner"); select.value = "yes";
+    select.dispatchEvent(new app.window.Event("change", { bubbles: true }));
+  });
+  await app.api.click(app.button("Continue to payment")); await app.flush();
+  await app.api.click(app.button("$79 + GST")); await app.flush();
+  const payment = app.saves.find(x => x.name === "create-payment");
+  const prepared = app.saves.find(x => x.name === "prepare");
+  assert.equal(prepared.body.ticketType, "photo_radar");
+  assert.equal(payment.body.submissionId, prepared.body.submissionId);
+  assert.equal(payment.body.accessToken, prepared.body.accessToken);
+  assert.equal(payment.body.includeIdrAddon, false);
 });
 
 test("PDFs can submit without names, ticket numbers, DL, DOB or a successful scan", async t => {
@@ -501,7 +554,7 @@ test("paid entry links preselect the service without prechecking consent or plea
   ]) {
     await t.test(entry, async sub => {
       const app = await runtime(sub, {}, { entry });
-      assert.equal(app.document.querySelector('input[name="quick-ticket-type"]:checked').value, type);
+      assert.equal(app.document.querySelector('input[type="radio"]:checked').value, type);
       assert.ok(app.document.body.textContent.includes(total));
       await app.choose(app.file());
       assert.equal(app.field("quick-consent").checked, false);
