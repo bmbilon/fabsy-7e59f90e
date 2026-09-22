@@ -39,7 +39,8 @@ async function boundary(run: (state: { row: Record<string, any>; clients: Record
         id: body.p_id, client_id: body.p_id, service_type: "representation", status: "awaiting_payment", preferred_locale: "en",
         intake_mode: "photo_only", intake_review_status: "pending_scan", intake_consent: body.p_consent,
         representation_access_token_hash: body.p_token_hash, ticket_document_path: body.p_ticket_path,
-        first_name: "", last_name: "", ticket_number: "", email: "", phone: "", ticket_type: "officer_issued",
+        first_name: "", last_name: "", ticket_number: "", email: "", phone: "", ticket_type: body.p_ticket_type ?? "officer_issued",
+        ticket_type_source: body.p_ticket_type ? "manual" : "default",
       });
       else assert.equal(state.row.representation_access_token_hash, body.p_token_hash);
       return json(body.p_id);
@@ -73,7 +74,7 @@ async function boundary(run: (state: { row: Record<string, any>; clients: Record
 
 Deno.test("photo upload rejects missing consent and invalid files before creating any record", async () => {
   await boundary(async state => {
-    for (const body of [{ ...prepare, consent: undefined }, { ...prepare, consent: { ...prepare.consent, accepted: false } }, { ...prepare, file: { contentType: "text/plain", size: 1 } }]) {
+    for (const body of [{ ...prepare, ticketType: "invalid" }, { ...prepare, ticketType: null }, { ...prepare, consent: undefined }, { ...prepare, consent: { ...prepare.consent, accepted: false } }, { ...prepare, file: { contentType: "text/plain", size: 1 } }]) {
       const response = await handler(request(body)); assert.equal(response.status, 400); await response.body?.cancel();
     }
     assert.deepEqual(state.writes, []);
@@ -161,6 +162,37 @@ Deno.test("a failed scan becomes staff follow-up without losing the receipt or c
     assert.equal(state.row.intake_review_status, "needs_review"); assert.equal(state.row.phone, "4035550123");
     assert.ok(state.row.consent_form_path); assert.equal(state.row.intake_consent.accepted, true);
   });
+});
+
+Deno.test("selected services persist through prepare and a conflicting scan cannot silently change the price", async () => {
+  for (const ticketType of ["officer_issued", "photo_radar"]) {
+    await boundary(async state => {
+      const response = await handler(request({ ...prepare, ticketType }));
+      assert.equal(response.status, 200); await response.body?.cancel();
+      assert.equal(state.row.ticket_type, ticketType);
+      assert.equal(state.row.ticket_type_source, "manual");
+      state.row.consent_form_path = `${submissionId}/consent.pdf`;
+      await processPhotoIntake(admin, submissionId);
+      assert.equal(state.row.ticket_type, ticketType);
+      assert.equal(state.row.ticket_type_source, "manual");
+      assert.equal(state.row.intake_review_status, ticketType === "photo_radar" ? "needs_review" : "ready");
+      if (ticketType === "photo_radar") assert.match(state.row.additional_notes, /Confirm the ticket type and service fee/);
+    });
+  }
+});
+
+Deno.test("camera selection is ready only for matching readable camera notices", () => {
+  const camera = photoIntakeDetails({ ...fixture, ticket_type: "photo_radar" }, "photo_radar");
+  assert.equal(camera.intake_review_status, "ready");
+  assert.equal(camera.order_type, "photo_radar");
+  assert.equal(camera.ticket_type_source, "manual");
+  assert.equal(camera.representation_includes_assessment, false);
+  const conflict = photoIntakeDetails({ ...fixture, ticket_type: "photo_radar" }, "officer_issued");
+  assert.equal(conflict.ticket_type, "officer_issued");
+  assert.equal(conflict.intake_review_status, "needs_review");
+  const unreadable = photoIntakeDetails({}, "photo_radar");
+  assert.equal(unreadable.ticket_type, "photo_radar");
+  assert.equal(unreadable.intake_review_status, "needs_review");
 });
 
 Deno.test("unreadable, unclassified and seized tickets need review; camera ownership is never invented", () => {

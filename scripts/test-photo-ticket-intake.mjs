@@ -138,6 +138,8 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
   let failContact = false;
   let failPrepare = false;
   let reviewStatus = "needs_review";
+  let ticketType = "officer_issued";
+  let registeredOwner = "";
   let savedContact = { email: "", phone: "" };
   const forbidden = [];
   const channels = [];
@@ -169,13 +171,15 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
         saves.push({ name: options.body.action, body: options.body });
         if (options.body.action === "prepare") {
           if (failPrepare) return Promise.resolve({ data: null, error: new window.Error("Preparation response lost") });
+          ticketType = options.body.ticketType ?? "officer_issued";
           return Promise.resolve({ data: { success: true, submissionId: options.body.submissionId, clientId: "synthetic-client", accessToken: options.body.accessToken, upload: { path: options.body.submissionId + "/ticket.png", token: "synthetic-upload" } }, error: null });
         }
         if (options.body.action === "contact") {
           if (failContact) return Promise.resolve({ data: null, error: new window.Error("Contact save failed") });
           savedContact = { email: options.body.email, phone: options.body.phone };
         }
-        return Promise.resolve({ data: { success: true, reviewStatus, fields: { firstName: "Alex", lastName: "Example", ticketNumber: "SCANNED-TICKET", ticketType: "officer_issued", registeredOwnerOnOffenceDate: "", ...savedContact } }, error: null });
+        if (options.body.action === "owner") registeredOwner = options.body.answer;
+        return Promise.resolve({ data: { success: true, reviewStatus, fields: { firstName: "Alex", lastName: "Example", ticketNumber: "SCANNED-TICKET", ticketType, registeredOwnerOnOffenceDate: registeredOwner, ...savedContact } }, error: null });
       }
       if (name === "submit-ticket") {
         saves.push({ name, body: options.body });
@@ -271,13 +275,17 @@ async function runtime(t, props = {}, { cacheKey } = {}) {
     failUpload: value => { failUpload = value; }, failConsent: value => { failConsent = value; }, failContact: value => { failContact = value; }, failPrepare: value => { failPrepare = value; }, readyForPayment: () => { reviewStatus = "ready"; } };
 }
 
-test("the upload form contains no ticket, identity, contact or referral fields and never waits for OCR", async t => {
+test("the upload form shows the assessment service choices without requiring identity or waiting for OCR", async t => {
   const app = await runtime(t);
   app.continueBlocked();
   assert.ok(app.document.querySelector('input[capture="environment"]'));
   await app.choose(app.file());
   assert.equal(app.requests.length, 0);
-  assert.equal(app.document.querySelectorAll('input:not([type="file"]):not([type="checkbox"])').length, 0);
+  assert.equal(app.document.querySelectorAll('input:not([type="file"]):not([type="checkbox"]):not([type="radio"])').length, 0);
+  assert.equal(app.document.querySelectorAll('input[type="radio"]').length, 2);
+  assert.match(app.document.body.textContent, /By an officer\$198 \+ GST service/);
+  assert.match(app.document.body.textContent, /By a camera\$79 \+ GST service/);
+  assert.equal(app.document.querySelector('input[value="officer_issued"]').checked, true);
   assert.equal(app.document.querySelectorAll("select,textarea").length, 0);
   assert.equal((app.document.body.textContent.match(/Ticket attached/g) || []).length, 1);
   assert.doesNotMatch(app.document.body.textContent, /Check your details|Legal first name|Driver’s licence number|referral code|Enter any readable details|Scanning/);
@@ -297,6 +305,7 @@ test("one click saves a photo and consent without sending invented or cached ide
   assert.equal(body.consent.version, "photo-upload-consent-v3");
   assert.equal(body.consent.pleadNotGuilty, true);
   assert.equal(body.consent.accepted, true); assert.equal(body.consent.method, "checkbox");
+  assert.equal(body.ticketType, "officer_issued");
   for (const key of ["firstName", "lastName", "email", "phone", "driversLicense", "ticketNumber", "ticket_type"]) assert.equal(body[key], undefined);
   assert.equal(app.saves[2].body.digitalSignature, undefined);
   assert.match(app.document.body.textContent, /Contact information required/);
@@ -326,6 +335,55 @@ test("changing plea after a failed save uses a fresh acceptance instead of the o
   assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
   assert.equal(attempts[0].body.consent.pleadNotGuilty, true);
   assert.equal(attempts[1].body.consent.pleadNotGuilty, false);
+});
+
+test("switching service after a failed save resets consent and creates a fresh submission", async t => {
+  const app = await runtime(t);
+  await app.choose(app.file()); await app.accept(); app.failConsent(true);
+  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.api.click(app.document.querySelector('input[value="photo_radar"]'));
+  app.continueBlocked();
+  assert.equal(app.field("quick-consent").checked, false);
+  await app.accept(); app.failConsent(false);
+  await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  const attempts = app.saves.filter(x => x.name === "prepare");
+  assert.equal(attempts.length, 2);
+  assert.notEqual(attempts[0].body.submissionId, attempts[1].body.submissionId);
+  assert.equal(attempts[0].body.ticketType, "officer_issued");
+  assert.equal(attempts[1].body.ticketType, "photo_radar");
+});
+
+test("camera entry and assessment handoff retain the selected service across file changes", async t => {
+  for (const props of [{ initialTicketType: "photo_radar" }, { initialPrefill: { ticketType: "photo_radar", ticketTypeSource: "manual" } }]) {
+    await t.test(JSON.stringify(props), async st => {
+      const app = await runtime(st, props);
+      assert.equal(app.document.querySelector('input[value="photo_radar"]').checked, true);
+      await app.choose(app.file());
+      await app.choose(app.file("replacement.png"));
+      assert.equal(app.document.querySelector('input[value="photo_radar"]').checked, true);
+      await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+      assert.equal(app.saves.find(x => x.name === "prepare").body.ticketType, "photo_radar");
+    });
+  }
+});
+
+test("camera service carries through ownership confirmation to the $79 checkout", async t => {
+  const app = await runtime(t); app.readyForPayment();
+  await app.api.click(app.document.querySelector('input[value="photo_radar"]'));
+  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Submit ticket and consent")); await app.flush();
+  await app.edit("updates-email", "alex@example.test"); await app.api.click(app.button("Save contact details")); await app.flush();
+  await app.api.act(async () => {
+    const select = app.field("checkout-owner"); select.value = "yes";
+    select.dispatchEvent(new app.window.Event("change", { bubbles: true }));
+  });
+  await app.api.click(app.button("Continue to payment")); await app.flush();
+  await app.api.click(app.button("$79 + GST")); await app.flush();
+  const payment = app.saves.find(x => x.name === "create-payment");
+  const prepared = app.saves.find(x => x.name === "prepare");
+  assert.equal(prepared.body.ticketType, "photo_radar");
+  assert.equal(payment.body.submissionId, prepared.body.submissionId);
+  assert.equal(payment.body.accessToken, prepared.body.accessToken);
+  assert.equal(payment.body.includeIdrAddon, false);
 });
 
 test("PDFs can submit without names, ticket numbers, DL, DOB or a successful scan", async t => {
