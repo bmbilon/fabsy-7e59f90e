@@ -34,6 +34,7 @@ const excerpts: Record<string, string> = {
 };
 
 const heroReview = VERIFIED_CLIENT_TESTIMONIALS.find(review => review.name === "Sam" && review.quote.includes(excerpts.Sam));
+const proofPanelClassName = "border border-white/80 bg-gradient-to-br from-sky-50 via-sky-100 to-blue-200 text-slate-950 shadow-[0_0_0_1px_rgba(255,255,255,0.3),0_0_32px_rgba(255,255,255,0.35)]";
 
 export default function RapidResolutionAlternate() {
   useSafeHead({ title: "Rapid Resolution | Alberta Ticket Help | $198 CAD + GST", description: "Fabsy negotiates eligible Alberta traffic tickets for a lower fine, fewer demerits or withdrawal. $198 + GST ($207.90 total). You approve any deal.", canonical: "https://fabsy.ca/rapid-resolution", robots: "noindex, follow" });
@@ -56,7 +57,7 @@ export default function RapidResolutionAlternate() {
             <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-blue-200 sm:text-xs"><ShieldCheck className="h-4 w-4" aria-hidden="true" /> Alberta traffic ticket agents</p>
             <h1 className="mt-[12px] text-[2.35rem] font-bold leading-[1.03] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">Fight your ticket.<br /><span className="text-blue-200">We do the work.</span></h1>
             <p data-rapid-offer className="mt-[12px] max-w-lg text-sm leading-5 text-slate-200 sm:mt-5 sm:text-lg sm:leading-7">We negotiate for a lower fine, fewer demerits or withdrawal. You approve any deal.</p>
-            {heroReview && <figure className="mt-[12px] lg:hidden"><blockquote className="text-xs leading-4 text-slate-200">“{excerpts.Sam}”</blockquote><figcaption className="mt-[4px] text-[11px] text-slate-300">{heroReview.name} · {heroReview.location} · Shared with permission</figcaption></figure>}
+            {heroReview && <figure className={`${proofPanelClassName} mt-[12px] rounded-xl px-4 py-3 lg:hidden`}><blockquote className="ml-2 border-l-2 border-white pl-3 text-sm font-semibold italic leading-5">“{excerpts.Sam}”</blockquote><figcaption className="ml-2 mt-[4px] pl-3 text-[11px] font-medium leading-4 text-slate-700">{heroReview.name} · {heroReview.location} · Shared with permission</figcaption></figure>}
             <div data-rapid-refund-summary className="mt-[16px] flex items-center gap-3 border-l-2 border-emerald-300 pl-3 sm:mt-6">
               <ShieldCheck className="h-6 w-6 shrink-0 text-emerald-200" aria-hidden="true" />
               <div><p className="text-sm font-bold text-white sm:text-base">Your ticket gets reduced or withdrawn, or we refund our Service Fee.<Link to={FEE_REFUND.termsPath} className="text-white underline" aria-label="Read the fee-refund conditions">*</Link></p><p className="mt-[4px] text-[11px] leading-4 text-slate-300">Conditions apply.</p></div>
@@ -67,9 +68,9 @@ export default function RapidResolutionAlternate() {
 
             <p className="mt-[16px] text-xs leading-5 text-slate-300">Camera notice in the mail? <Link to={PHOTO_RADAR.slug} className="font-semibold text-blue-200 underline underline-offset-4">Photo Radar · $79 + GST →</Link></p>
           </div>
-          <aside className="hidden overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl lg:block" aria-label="Ticket fighting made simple">
+          <aside className="hidden rounded-2xl bg-white text-slate-900 shadow-2xl lg:block" aria-label="Ticket fighting made simple">
             <div className="border-b border-slate-200 p-8"><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">A better next move</p><h2 className="mt-[12px] text-3xl font-bold tracking-tight">You send the ticket.<br />We take it from there.</h2><ul className="mt-6 space-y-4">{["Evidence reviewed. Deadlines checked.", "Crown negotiation handled for you.", "Every offer explained. Your decision."].map(text => <li key={text} className="flex items-center gap-3 text-sm font-medium"><CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />{text}</li>)}</ul></div>
-            {heroReview && <figure className="bg-slate-50 p-8"><span className="text-4xl leading-none text-blue-700" aria-hidden="true">“</span><blockquote className="mt-[4px] text-xl font-medium leading-8">{excerpts.Sam}</blockquote><figcaption className="mt-[16px] text-sm"><strong>{heroReview.name} · {heroReview.location}</strong><span className="mt-[4px] block text-xs text-slate-600">{heroReview.matter} · Shared with permission</span></figcaption><p className="mt-[16px] text-xs text-slate-500">Individual experience. Results vary.</p></figure>}
+            {heroReview && <figure className={`${proofPanelClassName} relative z-10 -mx-3 rounded-2xl px-8 py-7`}><span className="absolute left-5 top-4 font-serif text-6xl leading-none text-blue-400" aria-hidden="true">“</span><blockquote className="relative ml-4 border-l-2 border-white pl-5 text-xl font-semibold italic leading-8">{excerpts.Sam}</blockquote><figcaption className="ml-4 mt-[16px] pl-5 text-sm"><strong>{heroReview.name} · {heroReview.location}</strong><span className="mt-[4px] block text-xs text-slate-700">{heroReview.matter} · Shared with permission</span></figcaption><p className="ml-4 mt-[12px] pl-5 text-xs text-slate-600">Individual experience. Results vary.</p></figure>}
             <div className="flex items-center justify-between gap-4 border-t border-slate-200 px-8 py-4 text-xs font-semibold text-slate-600"><span>Agent service, not a law firm</span><span>Secure Stripe checkout</span></div>
           </aside>
         </div>
@@ -88,7 +89,7 @@ export default function RapidResolutionAlternate() {
       <section aria-labelledby="rapid-proof" className="bg-blue-50 px-5 py-9 sm:py-12">
         <div className="mx-auto max-w-5xl">
           <h2 id="rapid-proof" className="text-2xl font-bold sm:text-3xl">What Fabsy clients say</h2>
-          <ul className="mt-5 grid gap-4 md:grid-cols-3">{VERIFIED_CLIENT_TESTIMONIALS.map(review => <li key={review.name} className="rounded-xl border border-blue-100 bg-white p-5"><blockquote className="text-sm leading-6">“{excerpts[review.name] && review.quote.includes(excerpts[review.name]) ? excerpts[review.name] : review.quote}”</blockquote><p className="mt-[16px] font-bold">{review.name} · {review.location}</p><p className="mt-[4px] text-xs text-slate-600">{review.matter} · Shared with permission</p></li>)}</ul>
+          <ul className="mt-5 grid gap-4 md:grid-cols-3">{VERIFIED_CLIENT_TESTIMONIALS.map(review => <li key={review.name} className={`${proofPanelClassName} rounded-xl p-5`}><blockquote className="ml-2 border-l-2 border-white pl-4 text-sm font-medium italic leading-6">“{excerpts[review.name] && review.quote.includes(excerpts[review.name]) ? excerpts[review.name] : review.quote}”</blockquote><p className="ml-2 mt-[16px] pl-4 font-bold">{review.name} · {review.location}</p><p className="ml-2 mt-[4px] pl-4 text-xs text-slate-700">{review.matter} · Shared with permission</p></li>)}</ul>
           <p className="mt-[16px] text-xs leading-5 text-slate-600">Excerpts from individual traffic-ticket client experiences. Results vary by case; no outcome is guaranteed. Feedback is published only with confirmed permission. Fabsy does not use unsupported success percentages.</p>
         </div>
       </section>
