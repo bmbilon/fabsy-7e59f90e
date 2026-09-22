@@ -83,6 +83,36 @@ select pg_temp.check_true(not has_function_privilege('authenticated','public.pre
 select pg_temp.check_true(has_function_privilege('service_role','public.prepare_photo_ticket_intake(uuid,text,jsonb,text,uuid)','execute'),'validated service can prepare');
 """
 
+SERVICE_CHECKS = """
+do $$
+declare ticket_id uuid; ticket_type text; consent jsonb; saved public.ticket_submissions;
+begin
+  foreach ticket_type in array array['officer_issued','photo_radar'] loop
+    ticket_id := gen_random_uuid();
+    consent := jsonb_build_object('accepted',true,'method','checkbox','version','photo-upload-consent-v3',
+      'pleadNotGuilty',true,'acceptedAt','2026-09-22T12:00:00Z',
+      'ticketSubmissionId',ticket_id::text,'ticketDocumentPath',ticket_id::text||'/ticket.png');
+    perform public.prepare_photo_ticket_intake(ticket_id,repeat('a',64),consent,ticket_id::text||'/ticket.png',gen_random_uuid(),ticket_type);
+    select * into saved from public.ticket_submissions where id=ticket_id;
+    perform pg_temp.check_true(saved.ticket_type=ticket_type and saved.ticket_type_source='manual','selected ticket type stored');
+    perform pg_temp.check_true(saved.order_type=case when ticket_type='photo_radar' then 'photo_radar' else 'rapid_resolution' end,'matching order type');
+    perform pg_temp.check_true(saved.review_path=case when ticket_type='photo_radar' then 'ate' else 'standard' end,'matching review path');
+    perform pg_temp.check_true(saved.representation_includes_assessment=(ticket_type<>'photo_radar'),'camera selection excludes assessment');
+    perform public.prepare_photo_ticket_intake(ticket_id,repeat('a',64),consent||'{"acceptedAt":"2026-09-22T12:01:00Z"}',ticket_id::text||'/ticket.png',null,ticket_type);
+    perform pg_temp.check_true((select intake_consent=consent from public.ticket_submissions where id=ticket_id),'same service retry retains consent');
+    perform pg_temp.expect_error(format('select public.prepare_photo_ticket_intake(%L,%L,%L::jsonb,%L,null,%L)',
+      ticket_id,repeat('a',64),consent,ticket_id::text||'/ticket.png',case when ticket_type='photo_radar' then 'officer_issued' else 'photo_radar' end),'INTAKE_TICKET_TYPE_CHANGED');
+    perform pg_temp.expect_error(format('select public.prepare_photo_ticket_intake(%L,%L,%L::jsonb,%L,null,%L)',
+      ticket_id,repeat('b',64),consent,ticket_id::text||'/ticket.png',ticket_type),'INTAKE_AUTHORIZATION_INVALID');
+    insert into public.idr_checkout_intents values(ticket_id,'ticket_only','open');
+    perform pg_temp.expect_error(format('select public.prepare_photo_ticket_intake(%L,%L,%L::jsonb,%L,null,%L)',
+      ticket_id,repeat('a',64),consent,ticket_id::text||'/ticket.png',ticket_type),'REPRESENTATION_CHECKOUT_IMMUTABLE');
+  end loop;
+  perform pg_temp.expect_error(format('select public.prepare_photo_ticket_intake(%L,%L,%L::jsonb,%L,null,%L)',
+    ticket_id,repeat('a',64),consent,ticket_id::text||'/ticket.png','invalid'),'INTAKE_TICKET_TYPE_INVALID');
+end; $$;
+"""
+
 
 def run():
     binaries = {name: shutil.which(name) for name in ("initdb", "pg_ctl", "psql")}
@@ -110,7 +140,10 @@ def run():
             for migration in ("20260920120000_combined_ticket_consent.sql", "20260920130000_photo_only_intake.sql", "20260920140000_intake_plea_instruction.sql"):
                 command([*connection, "-f", str(ROOT / "supabase/migrations" / migration)])
             command(connection, input=CHECKS)
-            print("Intake plea database assertions passed: true/false/legacy, immutable retries, strict JSON booleans, paid-consent protection and RPC permissions.")
+            command([*connection, "-f", str(ROOT / "supabase/migrations/20260922120000_photo_intake_service_selection.sql")])
+            # Legacy calls keep working under the new, optional-argument signature.
+            command(connection, input=CHECKS.replace("(uuid,text,jsonb,text,uuid)", "(uuid,text,jsonb,text,uuid,text)") + SERVICE_CHECKS)
+            print("Intake database assertions passed: consent, legacy compatibility, service selection, matching product routes, immutable retries and RPC permissions.")
         finally:
             if started:
                 command([binaries["pg_ctl"], "-D", str(cluster), "-m", "immediate", "-w", "stop"])

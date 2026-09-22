@@ -6,7 +6,7 @@ export async function processPhotoIntake(admin: SupabaseClient, submissionId: st
   const { data: ticket, error } = await admin.from("ticket_submissions")
     .update({ intake_review_status: "scanning", intake_scan_started_at: new Date().toISOString() })
     .eq("id", submissionId).eq("intake_mode", "photo_only").eq("intake_review_status", "pending_scan")
-    .not("consent_form_path", "is", null).select("id,client_id,ticket_document_path").maybeSingle();
+    .not("consent_form_path", "is", null).select("id,client_id,ticket_document_path,ticket_type,ticket_type_source").maybeSingle();
   if (error || !ticket) return;
   try {
     if (/\.pdf$/i.test(ticket.ticket_document_path)) throw new Error("PDF requires staff review");
@@ -19,7 +19,9 @@ export async function processPhotoIntake(admin: SupabaseClient, submissionId: st
       body: { imageBase64: `data:${file.type || "image/jpeg"};base64,${btoa(binary)}` },
     });
     if (scanError || scan?.success !== true || !scan.data || typeof scan.data !== "object") throw new Error("Scan unavailable");
-    const fields = photoIntakeDetails(scan.data);
+    const selectedTicketType = ticket.ticket_type_source === "manual" && ["officer_issued", "photo_radar"].includes(ticket.ticket_type)
+      ? ticket.ticket_type as "officer_issued" | "photo_radar" : undefined;
+    const fields = photoIntakeDetails(scan.data, selectedTicketType);
     // Only the provisional client created for this ticket is enriched. Never
     // look up or overwrite another client's record using unconfirmed OCR.
     if (ticket.client_id === ticket.id) {

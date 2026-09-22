@@ -3,10 +3,12 @@ import { Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { FormData } from "./TicketForm";
 import TicketCapture from "./TicketCapture";
+import TicketServiceOptions from "./TicketServiceOptions";
 import { TicketPhotoGuide } from "./TicketPhotoGuide";
 import PhotoUploadConfirmation from "./PhotoUploadConfirmation";
 import { Button } from "./ui/button";
 import { validateTicketCaptureFile } from "@/lib/ticket/ticketCapture";
+import type { TicketType } from "@/lib/ticket/ticketType";
 import { newPhotoIntakeAttempt, savePhotoTicket, type PhotoIntakeAttempt } from "@/lib/ticket/photoIntake";
 import type { PreparedTicketSubmission, SavedTicketSubmission } from "@/lib/ticket/submitIntake";
 import { PHOTO_UPLOAD_AUTHORIZATION_LINES, CONSENT_PRIVACY_LINES, INTAKE_CONSENT_LABEL, PHOTO_UPLOAD_CONSENT_CONFIRMATION, NOT_GUILTY_PLEA_LABEL, NOT_GUILTY_PLEA_INSTRUCTION, NO_PLEA_INSTRUCTION } from "../../supabase/functions/_shared/intake-consent";
@@ -34,6 +36,10 @@ export default function QuickTicketIntake({ formData, updateFormData, embedded =
     attempt.current = null; prepared.current = null; setError("");
     setPleadNotGuilty(checked);
   };
+  const changeTicketType = (ticketType: TicketType) => {
+    attempt.current = null; prepared.current = null; setError("");
+    updateFormData({ ticketType, ticketTypeSource: "manual", consentGiven: false, digitalSignature: "" });
+  };
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (inFlight.current || !formData.consentGiven || !hasTicket || !fileValid) return;
@@ -54,6 +60,7 @@ export default function QuickTicketIntake({ formData, updateFormData, embedded =
     <form onSubmit={submit} aria-busy={busy}>
       <fieldset disabled={busy} className="min-w-0 space-y-4">
         <legend className="sr-only">Ticket and consent</legend>
+        <TicketServiceOptions ticketType={formData.ticketType} onChange={changeTicketType} disabled={busy} />
         <TicketCapture file={formData.ticketImage} onFileChange={changeFile} onOcrData={() => {}} scanOnSelect={false} allowFileSelection={allowFileSelection}
           disabled={busy} compact={hasTicket} required={!formData.sourceAssessmentId} />
         {hasTicket && <>

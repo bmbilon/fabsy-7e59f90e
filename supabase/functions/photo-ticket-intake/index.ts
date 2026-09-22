@@ -22,6 +22,7 @@ export const handler = async (req: Request): Promise<Response> => {
     const submissionId = String(input.submissionId).toLowerCase();
     const tokenHash = await hash(input.accessToken);
     if (input.action === "prepare") {
+      if (input.ticketType !== undefined && !["officer_issued", "photo_radar"].includes(input.ticketType)) throw new RequestError("Choose an officer-issued or camera ticket.");
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
       const now = Date.now();
       const bucket = attempts.get(ip);
@@ -46,6 +47,7 @@ export const handler = async (req: Request): Promise<Response> => {
       const consent = parsePhotoUploadConsent(input.consent, submissionId, ticketPath);
       const { data: clientId, error } = await admin.rpc("prepare_photo_ticket_intake", {
         p_id: submissionId, p_token_hash: tokenHash, p_consent: consent, p_ticket_path: ticketPath, p_source_assessment_id: sourceId,
+        ...(input.ticketType ? { p_ticket_type: input.ticketType } : {}),
       });
       if (error || !clientId) throw new RequestError("Your upload could not be prepared. Please try again.", 409);
       let upload = null;
