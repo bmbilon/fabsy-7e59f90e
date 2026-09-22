@@ -29,14 +29,14 @@ const TicketFormPage = () => {
   });
   const location = useLocation() as unknown as LocationState;
   const initialTicketType = ticketTypeFromSearch(location.search);
-  const paidEntry = locale === "en" && (initialTicketType !== null || new URLSearchParams(location.search).get("lp") === "rapid-resolution");
+  const paidEntry = locale === "en" && (initialTicketType !== null || ["rapid-resolution", "rapid-resolution-alt"].includes(new URLSearchParams(location.search).get("lp") || ""));
   const initialTicketImage = location?.state?.ticketImage ?? null;
   const prefillTicketData = location?.state?.prefillTicketData ?? null;
   const startAtStep = location?.state?.startAtStep ?? null;
   const sourceAssessment = location?.state?.sourceAssessment ?? null;
   return (
     <div className="min-h-screen bg-gradient-hero">
-      {paidEntry ? <header className="border-b border-slate-200 bg-white px-5 py-4"><div className="mx-auto flex max-w-3xl items-center justify-between gap-4"><Link to="/rapid-resolution" className="text-2xl font-bold tracking-tight text-slate-950">Fabsy</Link><span className="text-xs font-semibold text-slate-600">Private ticket upload</span></div></header> : <Header />}
+      {paidEntry ? <header className="border-b border-slate-200 bg-white px-5 py-4"><div className="mx-auto flex max-w-3xl items-center justify-between gap-4"><Link to={new URLSearchParams(location.search).get("lp") === "rapid-resolution-alt" ? "/rapid-resolution-alt" : "/rapid-resolution"} className="text-2xl font-bold tracking-tight text-slate-950">Fabsy</Link><span className="text-xs font-semibold text-slate-600">Private ticket upload</span></div></header> : <Header />}
       <main className="container mx-auto px-4 py-4 sm:py-8">
         <TicketForm
           key={`${locale}:${initialTicketType ?? 'default'}`}

@@ -44,3 +44,12 @@ end; $$;
 select pg_temp.check_true(not has_function_privilege('anon','public.prepare_photo_ticket_with_contact(uuid,text,jsonb,text,text,text,boolean,text,uuid)','execute'),'anonymous offer context writes denied');
 select pg_temp.check_true(not has_function_privilege('authenticated','public.prepare_photo_ticket_with_contact(uuid,text,jsonb,text,text,text,boolean,text,uuid)','execute'),'customer offer context writes denied');
 select pg_temp.check_true(has_function_privilege('service_role','public.prepare_photo_ticket_with_contact(uuid,text,jsonb,text,text,text,boolean,text,uuid)','execute'),'validated service can create with contact');
+
+-- The challenger is accepted as a bounded entry label; it cannot change on retry.
+do $$ declare alternate_id uuid:=gen_random_uuid(); consent jsonb; begin
+  consent:=jsonb_build_object('accepted',true,'method','checkbox','version','photo-upload-consent-v3',
+    'acceptedAt','2026-09-22T12:00:00Z','pleadNotGuilty',false,'ticketSubmissionId',alternate_id::text,'ticketDocumentPath',alternate_id||'/ticket.pdf');
+  perform public.prepare_photo_ticket_with_contact(alternate_id,repeat('d',64),consent,alternate_id||'/ticket.pdf','alternate@example.test','officer_issued',false,'rapid-resolution-alt');
+  perform pg_temp.check_true((select landing_page_variant='rapid-resolution-alt' from public.ticket_submissions where ticket_submissions.id=alternate_id),'alternate persists');
+  perform pg_temp.expect_error(format('select public.prepare_photo_ticket_with_contact(%L,%L,%L::jsonb,%L,%L,%L,false,%L)',alternate_id,repeat('d',64),consent,alternate_id||'/ticket.pdf','alternate@example.test','officer_issued','rapid-resolution'),'INTAKE_CONTEXT_CHANGED');
+end; $$;

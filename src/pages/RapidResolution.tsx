@@ -1,113 +1,399 @@
 import { Link } from "react-router-dom";
-import { CheckCircle2, Phone, ShieldCheck } from "lucide-react";
-import FeeRefundNotice from "@/components/FeeRefundNotice";
+import {
+  ArrowRight,
+  BellRing,
+  CheckCircle2,
+  Clock3,
+  FileCheck2,
+  FileSearch,
+  LockKeyhole,
+  MessageSquareText,
+  Phone,
+  Scale,
+  ShieldCheck,
+  Upload,
+  XCircle,
+} from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import StaticJsonLd from "@/components/StaticJsonLd";
-import RapidResolutionCta from "@/components/RapidResolutionCta";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { RAPID_RESOLUTION, PHOTO_RADAR } from "@/config/offers";
-import { FEE_REFUND } from "@/config/feeRefund";
-import { FABSY_WHATSAPP_URL, WHATSAPP_ENABLED } from "@/config/whatsapp";
-import { VERIFIED_CLIENT_TESTIMONIALS } from "@/content/clientTestimonials";
-import { HOMEPAGE_REFUND_COPY } from "@/content/homepageRefundCopy";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  INSURANCE_IMPACT_REPORT,
+  RAPID_RESOLUTION,
+  RAPID_RESOLUTION_BUNDLE,
+} from "@/config/offers";
 import useSafeHead from "@/hooks/useSafeHead";
+import FeeRefundNotice from "@/components/FeeRefundNotice";
+import { FEE_REFUND } from "@/config/feeRefund";
+import ClientReviewsMarquee from "@/components/ClientReviewsMarquee";
 
-const price = `$${RAPID_RESOLUTION.priceCad} CAD + GST`;
-const total = (RAPID_RESOLUTION.priceCad * 1.05).toFixed(2);
+const PHONE_DISPLAY = "(825) 793-2279";
+const PHONE_HREF = "tel:+18257932279";
+
 const processSteps = [
-  ["Upload and authorize", "A ticket photo or PDF, your email, and your digital authorization. Payment comes at checkout after your ticket details are confirmed."],
-  ["Fabsy requests disclosure", "The request is tracked. It does not extend your deadline, so you receive deadline instructions and file updates."],
-  ["Review and prosecutor step within 48 hours", `${RAPID_RESOLUTION.actionCommitment} The clock covers Fabsy's action, not the Crown's reply or the final outcome.`],
-  ["You decide", "Fabsy explains any Crown response in plain language. You direct whether to accept. Nothing is accepted automatically."],
-];
+  {
+    icon: Upload,
+    title: "Upload and authorize",
+    description:
+      "Complete the secure intake, upload your ticket, and sign the digital consent needed for Fabsy to act within the accepted service scope.",
+  },
+  {
+    icon: FileSearch,
+    title: "We request disclosure",
+    description:
+      "Fabsy submits and tracks the disclosure request. A request does not itself extend a ticket or trial deadline, so you receive clear deadline instructions and file updates.",
+  },
+  {
+    icon: FileCheck2,
+    title: "Disclosure is reviewed",
+    description:
+      "Technology-assisted analysis and qualified review identify the evidence, procedural issues, and practical pre-trial options.",
+  },
+  {
+    icon: MessageSquareText,
+    title: "We advance the review",
+    description:
+      "Fabsy prepares or submits the next authorized prosecutor-review step, then explains any Crown response in plain language.",
+  },
+  {
+    icon: BellRing,
+    title: "You choose the outcome",
+    description:
+      "You are notified when a response arrives and direct whether an available pre-trial resolution should be accepted. Nothing is accepted automatically.",
+  },
+] as const;
+
+const trustPoints = [
+  { icon: LockKeyhole, label: "Secure digital intake" },
+  { icon: FileSearch, label: "Disclosure requested and tracked" },
+  { icon: Clock3, label: "48-hour Fabsy action commitment" },
+  { icon: ShieldCheck, label: "You direct any acceptance" },
+] as const;
+
 const faqs = [
-  ["Is Fabsy a law firm?", "No. Fabsy is a traffic ticket agent service and does not give legal advice. A matter outside permitted agent scope may need a lawyer."],
-  ["Do I have to go to court?", "Rapid Resolution is a pre-trial service handled online. If a court or the procedure requires you personally, you must attend. Trial representation is quoted separately."],
-  ["Does uploading pause my deadline?", "No. Uploading a ticket or requesting disclosure does not extend a response date or trial date. You remain responsible for every deadline on your ticket, portal or court notice."],
-  ["What if my ticket is not eligible?", "Fabsy reads the ticket and confirms eligibility. If Fabsy declines an otherwise complete paid matter before substantive work begins, the service fee is refunded."],
-  ["Will you accept a deal without asking me?", "No. Fabsy explains the response; you give the case-specific instruction. Nothing is accepted automatically."],
-  ["Is it resolved in 48 hours?", RAPID_RESOLUTION.speedDisclaimer],
-  ["I got a photo radar notice in the mail. Which service do I need?", "Use Rapid Resolution: Photo Radar, $79 CAD + GST ($82.95 total), for eligible photo radar or red-light camera notices mailed to the registered owner."],
-];
-const excerpts: Record<string, string> = {
-  Sam: "Excellent communication and responsiveness the whole time.",
-  Paula: "thanks to Fabsy I ended up with a lesser amount at the end of the day",
-  James: "answered all my questions clearly, didn't try to push any services on me, and made it easy to choose which option to start with.",
+  {
+    question: `What does the $${RAPID_RESOLUTION.priceCad} fee cover?`,
+    answer:
+      "It covers secure intake, eligibility and deadline review, digital authorization, disclosure request and tracking, disclosure analysis with qualified review, a fact-specific prosecutor-review submission, status notifications, and explanation of an available Crown response. Applicable GST is extra.",
+  },
+  {
+    question: "Is the matter resolved within 48 hours?",
+    answer: RAPID_RESOLUTION.speedDisclaimer,
+  },
+  {
+    question: "Does requesting disclosure extend my deadline?",
+    answer:
+      "No. A disclosure request does not itself extend the response date or a scheduled trial date. Follow the deadline instructions Fabsy provides and the dates shown on the ticket, portal, or court notice.",
+  },
+  {
+    question: "Does Rapid Resolution include a trial?",
+    answer:
+      "No. Rapid Resolution is a pre-trial service. Trial representation, appeals, reopenings, government charges, and out-of-scope matters are separate. If you want to continue to trial, Fabsy can explain whether a separate quote or referral is available.",
+  },
+  {
+    question: "Will Fabsy accept a Crown response for me?",
+    answer:
+      "Only after you give file-specific instructions. Fabsy explains the original ticket and the Crown response so you can decide; an offer is never accepted automatically.",
+  },
+  {
+    question: "Is a withdrawal or reduction promised?",
+    answer: `${FEE_REFUND.payment} ${FEE_REFUND.condition}`,
+  },
+] as const;
+
+const RapidResolution = () => {
+  useSafeHead({
+    title: `Rapid Resolution | Alberta Ticket Help | $${RAPID_RESOLUTION.priceCad} CAD`,
+    description:
+      "Secure Alberta ticket intake, disclosure request and analysis, prosecutor review, and clear client updates for one flat pre-trial service fee.",
+    canonical: `https://fabsy.ca${RAPID_RESOLUTION.slug}`,
+  });
+
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: RAPID_RESOLUTION.name,
+    description: RAPID_RESOLUTION.oneLineDescription,
+    url: `https://fabsy.ca${RAPID_RESOLUTION.slug}`,
+    areaServed: { "@type": "AdministrativeArea", name: "Alberta, Canada" },
+    provider: { "@type": "Organization", name: "Fabsy", url: "https://fabsy.ca" },
+    offers: {
+      "@type": "Offer",
+      url: `https://fabsy.ca${RAPID_RESOLUTION.intakePath}`,
+      price: RAPID_RESOLUTION.priceCad.toFixed(2),
+      priceCurrency: RAPID_RESOLUTION.currency,
+      availability: "https://schema.org/InStock",
+    },
+  } as const;
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  } as const;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <StaticJsonLd schema={productSchema} dataAttr="rapid-resolution-service" />
+      <StaticJsonLd schema={faqSchema} dataAttr="rapid-resolution-faq" />
+      <Header />
+
+      <main>
+        <section
+          className="relative overflow-hidden bg-gradient-hero px-4 pb-10 pt-3 text-white sm:py-14 lg:py-16"
+          data-rapid-first-view
+        >
+          <div className="container relative z-10 mx-auto max-w-6xl px-0 sm:px-8">
+            <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-14">
+              <div className="max-w-2xl">
+                <h1 className="max-w-xl text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  Got an Alberta traffic ticket?
+                </h1>
+                <p className="mt-2 max-w-xl text-base font-semibold leading-6 text-slate-100 sm:mt-5 sm:text-xl sm:leading-7" data-rapid-offer>
+                  Fabsy negotiates your ticket for a lower fine, fewer demerits, or withdrawal.
+                </p>
+                <p className="mt-2 max-w-xl text-xs font-medium leading-4 text-slate-200 sm:mt-4 sm:text-sm sm:leading-6" data-rapid-refund-summary>
+                  If the Crown rejects those efforts and no fine or demerit reduction or withdrawal is obtained,
+                  your service fee is refunded.{' '}
+                  <Link
+                    to={FEE_REFUND.termsPath}
+                    className="inline-flex min-h-6 items-center rounded-sm font-bold text-white underline decoration-1 underline-offset-4 hover:text-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-light"
+                    aria-label="Read the full fee-refund conditions"
+                  >
+                    Refund terms
+                  </Link>. No legal outcome is guaranteed.
+                </p>
+                <p className="mt-2 text-white sm:mt-5" data-rapid-price>
+                  <span className="block text-xs font-bold uppercase tracking-[0.12em] text-primary-light sm:text-sm">Rapid Resolution</span>
+                  <span className="mt-0.5 flex items-baseline gap-2">
+                    <span className="text-2xl font-bold tracking-tight sm:text-3xl">${RAPID_RESOLUTION.priceCad} CAD + GST</span>
+                    <span className="text-xs text-slate-300">Paid upfront</span>
+                  </span>
+                </p>
+                <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:mt-6 sm:flex sm:flex-row sm:gap-3">
+                  <Button asChild size="lg" className="min-h-12 min-w-0 px-4 text-base font-bold shadow-glow sm:px-7">
+                    <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="hero">
+                      Upload your ticket
+                      <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="min-h-12 border-slate-500 bg-transparent px-4 text-base font-bold text-white hover:bg-slate-800 hover:text-white sm:px-6">
+                    <a href={PHONE_HREF} aria-label={`Call Fabsy at ${PHONE_DISPLAY}`} data-funnel-action="phone" data-funnel-position="hero">
+                      <Phone className="mr-2 h-5 w-5" aria-hidden="true" />
+                      Call
+                    </a>
+                  </Button>
+                </div>
+                <p className="mt-3 text-xs leading-relaxed text-slate-300">
+                  Choose a ticket photo or PDF first, then add your contact details to save and continue.
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-200">
+                  Questions before you start?{" "}
+                  <Link to="/contact" className="font-semibold text-white underline underline-offset-4 hover:text-primary-light">Contact the Fabsy team</Link>.
+                </p>
+              </div>
+
+              <Card className="hidden overflow-hidden border-white/15 bg-white shadow-2xl lg:block" data-rapid-price-card>
+                <div className="border-b bg-primary/5 p-7 sm:p-8">
+                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary">Rapid Resolution</p>
+                  <div className="mt-3 flex items-end gap-2">
+                    <span className="text-5xl font-bold tracking-tight text-slate-950">${RAPID_RESOLUTION.priceCad}</span>
+                    <span className="pb-1 text-sm font-semibold text-slate-600">CAD + GST</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">One flat service fee. No percentage-based success fee.</p>
+                </div>
+                <div className="p-7 sm:p-8">
+                  <ul className="space-y-4 text-sm text-slate-700">
+                    {RAPID_RESOLUTION.included.slice(0, 6).map((item) => (
+                      <li key={item} className="flex items-start gap-3">
+                        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild size="lg" className="mt-7 w-full font-bold">
+                    <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="hero">Upload your ticket</Link>
+                  </Button>
+                </div>
+              </Card>
+            </div>
+
+            <FeeRefundNotice tone="dark" className="mt-8 sm:mt-10" />
+
+            <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {trustPoints.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-900 p-4 text-sm font-semibold text-slate-100">
+                  <Icon className="h-5 w-5 shrink-0 text-primary-light" aria-hidden="true" />
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <ClientReviewsMarquee />
+
+        <section id="how-it-works" className="scroll-mt-20 px-4 py-16 sm:py-20" aria-labelledby="rapid-process-heading">
+          <div className="container mx-auto max-w-6xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <Badge variant="outline">From upload to client decision</Badge>
+              <h2 id="rapid-process-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                One connected process. No chasing the file yourself.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Each stage is tied to the same secure file, so the ticket, consent, disclosure, review, and response stay together.
+              </p>
+            </div>
+            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+              {processSteps.map(({ icon: Icon, title, description }, index) => (
+                <Card key={title} className="relative p-6 shadow-fab">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <span className="text-xs font-bold text-muted-foreground">0{index + 1}</span>
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-950 px-4 py-16 text-white sm:py-20" aria-labelledby="rapid-speed-heading">
+          <div className="container mx-auto max-w-5xl">
+            <Card className="border-primary/30 bg-slate-900 p-7 text-white shadow-elevated sm:p-10">
+              <div className="grid gap-7 lg:grid-cols-[auto_1fr] lg:items-start">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary-light">
+                  <Clock3 className="h-7 w-7" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary-light">The 48-hour commitment</p>
+                  <h2 id="rapid-speed-heading" className="mt-3 text-3xl font-bold tracking-tight text-white">
+                    Complete disclosure in. Fabsy's next action within 48 hours.
+                  </h2>
+                  <p className="mt-4 text-lg leading-relaxed text-slate-300">
+                    {RAPID_RESOLUTION.actionCommitment}
+                  </p>
+                  <p className="mt-4 text-sm leading-relaxed text-slate-400">
+                    {RAPID_RESOLUTION.speedDisclaimer}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        <section className="px-4 py-16 sm:py-20" aria-labelledby="rapid-scope-heading">
+          <div className="container mx-auto max-w-6xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <Badge variant="outline">Clear scope</Badge>
+              <h2 id="rapid-scope-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Know exactly what is included</h2>
+            </div>
+            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+              <Card className="border-primary/20 p-7 shadow-fab sm:p-8">
+                <h3 className="text-2xl font-bold">Included in Rapid Resolution</h3>
+                <ul className="mt-6 space-y-4">
+                  {RAPID_RESOLUTION.included.map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-muted-foreground">
+                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+              <Card className="p-7 shadow-fab sm:p-8">
+                <h3 className="text-2xl font-bold">Separate or outside scope</h3>
+                <ul className="mt-6 space-y-4">
+                  {RAPID_RESOLUTION.excluded.map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-muted-foreground">
+                      <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-6 rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-700">
+                  If you want to go to trial, any available representation is quoted separately on a case-by-case basis.
+                </p>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-gradient-soft px-4 py-16 sm:py-20" aria-labelledby="rapid-pricing-heading">
+          <div className="container mx-auto max-w-6xl">
+            <div className="mx-auto max-w-3xl text-center">
+              <Badge variant="outline">Choose your service</Badge>
+              <h2 id="rapid-pricing-heading" className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Straightforward pricing</h2>
+              <p className="mt-4 text-muted-foreground">All prices are CAD plus applicable GST. Government and third-party fees are separate.</p>
+            </div>
+            <div className="mt-10 grid gap-6 lg:grid-cols-3">
+              <Card className="flex flex-col p-7 shadow-fab">
+                <Scale className="h-7 w-7 text-primary" aria-hidden="true" />
+                <h3 className="mt-5 text-2xl font-bold">{RAPID_RESOLUTION.name}</h3>
+                <p className="mt-3 text-4xl font-bold">${RAPID_RESOLUTION.priceCad}</p>
+                <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">Eligible Alberta pre-trial ticket resolution from intake through an available client-directed resolution.</p>
+                <Button asChild className="mt-6"><Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="section">Start now</Link></Button>
+              </Card>
+              <Card className="flex flex-col p-7 shadow-fab">
+                <FileCheck2 className="h-7 w-7 text-primary" aria-hidden="true" />
+                <h3 className="mt-5 text-2xl font-bold">{INSURANCE_IMPACT_REPORT.shortName}</h3>
+                <p className="mt-3 text-4xl font-bold">${INSURANCE_IMPACT_REPORT.priceCad}</p>
+                <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">Source-backed planning information about possible conviction impact and renewal preparation.</p>
+                <Button asChild variant="outline" className="mt-6"><Link to={INSURANCE_IMPACT_REPORT.slug}>View report</Link></Button>
+              </Card>
+              <Card className="flex flex-col border-primary/40 bg-primary/5 p-7 shadow-elevated">
+                <Badge className="w-fit">Both services</Badge>
+                <h3 className="mt-5 text-2xl font-bold">{RAPID_RESOLUTION_BUNDLE.shortName}</h3>
+                <p className="mt-3 text-4xl font-bold text-primary">${RAPID_RESOLUTION_BUNDLE.priceCad}</p>
+                <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">Rapid Resolution plus the Insurance Impact & Renewal Planning Report for one bundle price.</p>
+                <Button asChild className="mt-6"><Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="section">Choose the bundle</Link></Button>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 py-16 sm:py-20" aria-labelledby="rapid-faq-heading">
+          <div className="container mx-auto max-w-3xl">
+            <h2 id="rapid-faq-heading" className="text-center text-3xl font-bold tracking-tight sm:text-4xl">Rapid Resolution FAQs</h2>
+            <Accordion type="single" collapsible className="mt-8">
+              {faqs.map((faq, index) => (
+                <AccordionItem key={faq.question} value={`rapid-faq-${index}`}>
+                  <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
+                  <AccordionContent className="leading-relaxed text-muted-foreground">{faq.answer}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+
+        <section className="bg-slate-950 px-4 py-16 text-white" aria-labelledby="rapid-final-heading">
+          <div className="container mx-auto max-w-4xl text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.15em] text-primary-light">${RAPID_RESOLUTION.priceCad} CAD + GST · Eligible pre-trial matters</p>
+            <h2 id="rapid-final-heading" className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">Put your ticket into motion today.</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-300">Upload your ticket, complete the secure intake, and choose the service that fits your file.</p>
+            <Button asChild size="lg" className="mt-7 min-h-12 px-8 text-base font-bold">
+              <Link to={RAPID_RESOLUTION.intakePath} data-funnel-action="primary_cta" data-funnel-position="footer">
+                Start Rapid Resolution
+                <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
 };
 
-const heroReview = VERIFIED_CLIENT_TESTIMONIALS.find(review => review.name === "Sam" && review.quote.includes(excerpts.Sam));
-
-export default function RapidResolution() {
-  useSafeHead({ title: "Rapid Resolution | Alberta Ticket Help | $198 CAD + GST", description: "Fabsy negotiates eligible Alberta traffic tickets for a lower fine, fewer demerits or withdrawal. $198 + GST ($207.90 total). You approve any deal.", canonical: "https://fabsy.ca/rapid-resolution" });
-  return <div className="rapid-landing min-h-screen bg-white text-slate-900">
-    <StaticJsonLd dataAttr="rapid-resolution-service" schema={{ "@context": "https://schema.org", "@type": "Service", name: RAPID_RESOLUTION.name, description: RAPID_RESOLUTION.oneLineDescription, url: "https://fabsy.ca/rapid-resolution", areaServed: { "@type": "AdministrativeArea", name: "Alberta, Canada" }, provider: { "@type": "Organization", name: "Fabsy", url: "https://fabsy.ca" }, offers: { "@type": "Offer", price: RAPID_RESOLUTION.priceCad.toFixed(2), priceCurrency: "CAD", url: "https://fabsy.ca/submit-ticket" } }} />
-    <StaticJsonLd dataAttr="rapid-resolution-faq" schema={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map(([question, answer]) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })) }} />
-    <header className="border-b border-slate-200 bg-white px-5 py-2">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-        <Link to="/" aria-label="Fabsy home" className="text-2xl font-bold tracking-tight text-slate-950">Fabsy</Link>
-        <div className="flex items-center gap-5">
-          <a href="tel:+18257932279" data-funnel-action="phone" data-funnel-position="header" aria-label="Call Fabsy at (825) 793-2279" className="inline-flex min-h-11 items-center gap-2 font-semibold text-slate-800"><Phone className="h-5 w-5" aria-hidden="true" /><span className="hidden sm:inline">(825) 793-2279</span></a>
-          <RapidResolutionCta position="header" className="hidden lg:inline-flex" />
-        </div>
-      </div>
-    </header>
-    <main id="main-content">
-      <section data-rapid-first-view className="bg-slate-950 px-5 pb-7 pt-5 text-white sm:py-12 lg:py-16">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.12fr_0.88fr] lg:items-center lg:gap-20">
-          <div>
-            <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-blue-200 sm:text-xs"><ShieldCheck className="h-4 w-4" aria-hidden="true" /> Alberta traffic ticket agents</p>
-            <h1 className="mt-[12px] text-[2.35rem] font-bold leading-[1.03] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">Fight your ticket.<br /><span className="text-blue-200">We do the work.</span></h1>
-            <p data-rapid-offer className="mt-[12px] max-w-lg text-sm leading-5 text-slate-200 sm:mt-5 sm:text-lg sm:leading-7">We negotiate for a lower fine, fewer demerits or withdrawal. You approve any deal.</p>
-            {heroReview && <figure className="mt-[12px] lg:hidden"><blockquote className="text-xs leading-4 text-slate-200">“{excerpts.Sam}”</blockquote><figcaption className="mt-[4px] text-[11px] text-slate-300">{heroReview.name} · {heroReview.location} · Shared with permission</figcaption></figure>}
-            <div data-rapid-refund-summary className="mt-[16px] flex items-center gap-3 border-l-2 border-emerald-300 pl-3 sm:mt-6">
-              <ShieldCheck className="h-6 w-6 shrink-0 text-emerald-200" aria-hidden="true" />
-              <div><p className="text-sm font-bold text-white sm:text-base">No improvement? Your service fee is refunded.<Link to={FEE_REFUND.termsPath} className="text-white underline" aria-label="Read the fee-refund conditions">*</Link></p><p className="mt-[4px] text-[11px] leading-4 text-slate-300">After the Crown rejects our efforts. Conditions apply. No legal outcome guaranteed.</p></div>
-            </div>
-            <div data-rapid-price className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1"><p className="text-[2rem] font-bold leading-none tracking-tight text-white">${RAPID_RESOLUTION.priceCad}<span className="ml-1 text-sm font-medium text-slate-300">CAD + GST</span></p><p className="text-xs text-slate-300">${total} total · One-time fee</p></div>
-            <RapidResolutionCta id="rapid-hero-cta" position="hero" className="mt-[16px] w-full sm:max-w-md" />
-            <p className="mt-[8px] text-center text-[11px] leading-4 text-slate-300 sm:max-w-md">Start before your deadline. Nothing charged now.</p>
-
-            <p className="mt-[16px] text-xs leading-5 text-slate-300">Camera notice in the mail? <Link to={PHOTO_RADAR.slug} className="font-semibold text-blue-200 underline underline-offset-4">Photo Radar · $79 + GST →</Link></p>
-          </div>
-          <aside className="hidden overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl lg:block" aria-label="Ticket fighting made simple">
-            <div className="border-b border-slate-200 p-8"><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">A better next move</p><h2 className="mt-[12px] text-3xl font-bold tracking-tight">You send the ticket.<br />We take it from there.</h2><ul className="mt-6 space-y-4">{["Evidence reviewed. Deadlines checked.", "Crown negotiation handled for you.", "Every offer explained. Your decision."].map(text => <li key={text} className="flex items-center gap-3 text-sm font-medium"><CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />{text}</li>)}</ul></div>
-            {heroReview && <figure className="bg-slate-50 p-8"><span className="text-4xl leading-none text-blue-700" aria-hidden="true">“</span><blockquote className="mt-[4px] text-xl font-medium leading-8">{excerpts.Sam}</blockquote><figcaption className="mt-[16px] text-sm"><strong>{heroReview.name} · {heroReview.location}</strong><span className="mt-[4px] block text-xs text-slate-600">{heroReview.matter} · Shared with permission</span></figcaption><p className="mt-[16px] text-xs text-slate-500">Individual experience. Results vary.</p></figure>}
-            <div className="flex items-center justify-between gap-4 border-t border-slate-200 px-8 py-4 text-xs font-semibold text-slate-600"><span>Agent service, not a law firm</span><span>Secure Stripe checkout</span></div>
-          </aside>
-        </div>
-      </section>
-      <section aria-labelledby="rapid-eligibility" className="px-5 py-9 sm:py-12">
-        <div className="mx-auto max-w-5xl">
-          <h2 id="rapid-eligibility" className="text-2xl font-bold sm:text-3xl">Is your ticket eligible?</h2>
-          <div className="mt-5 grid gap-5 text-sm leading-6 md:grid-cols-3">
-            <p><strong className="block text-base text-emerald-800">Eligible</strong>An Alberta traffic ticket issued to you as the driver that has not gone to trial. Rapid Resolution is a pre-trial service; Fabsy confirms eligibility after reading your ticket.</p>
-            <p><strong className="block text-base">Different service</strong>A photo radar or red-light camera notice mailed to the registered owner. <Link to={PHOTO_RADAR.slug} className="font-semibold text-blue-800 underline">Use Photo Radar ($79 + GST).</Link></p>
-            <p><strong className="block text-base">Not covered</strong>Immediate Roadside Sanctions, Notices of Administrative Penalty, appeals, reopenings, trial representation and matters outside Fabsy's permitted agent scope. Trial representation is quoted separately.</p>
-          </div>
-          <div className="mt-5 rounded-xl bg-slate-100 p-5 text-sm leading-6"><p>If Fabsy declines an otherwise complete paid matter before substantive work begins, your service fee is refunded.</p><p className="mt-[8px]"><strong>Your deadlines stay yours.</strong> Uploading a ticket or requesting disclosure does not extend your response date or trial date. You remain responsible for every deadline and for attending if the court requires you personally. Fabsy provides deadline instructions with file updates.</p></div>
-        </div>
-      </section>
-      <section aria-labelledby="rapid-proof" className="bg-blue-50 px-5 py-9 sm:py-12">
-        <div className="mx-auto max-w-5xl">
-          <h2 id="rapid-proof" className="text-2xl font-bold sm:text-3xl">What Fabsy clients say</h2>
-          <ul className="mt-5 grid gap-4 md:grid-cols-3">{VERIFIED_CLIENT_TESTIMONIALS.map(review => <li key={review.name} className="rounded-xl border border-blue-100 bg-white p-5"><blockquote className="text-sm leading-6">“{excerpts[review.name] && review.quote.includes(excerpts[review.name]) ? excerpts[review.name] : review.quote}”</blockquote><p className="mt-[16px] font-bold">{review.name} · {review.location}</p><p className="mt-[4px] text-xs text-slate-600">{review.matter} · Shared with permission</p></li>)}</ul>
-          <p className="mt-[16px] text-xs leading-5 text-slate-600">Excerpts from individual traffic-ticket client experiences. Results vary by case; no outcome is guaranteed. Feedback is published only with confirmed permission. Fabsy does not use unsupported success percentages.</p>
-        </div>
-      </section>
-      <section id="how-it-works" aria-labelledby="rapid-process-heading" className="scroll-mt-4 px-5 py-9 sm:py-12">
-        <div className="mx-auto max-w-5xl"><h2 id="rapid-process-heading" className="text-2xl font-bold sm:text-3xl">How it works</h2><ol className="mt-6 grid gap-6 sm:grid-cols-2">{processSteps.map(([title, description], index) => <li key={title} className="flex gap-4"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-900">{index + 1}</span><div><h3 className="font-bold">{title}</h3><p className="mt-[8px] text-sm leading-6 text-slate-700">{description}</p></div></li>)}</ol><RapidResolutionCta className="mt-7 w-full sm:w-auto" /></div>
-      </section>
-      <section aria-labelledby="rapid-pricing-heading" className="bg-slate-50 px-5 py-9 sm:py-12">
-        <div className="mx-auto max-w-5xl"><h2 id="rapid-pricing-heading" className="text-2xl font-bold sm:text-3xl">What you pay. What you get.</h2><p className="mt-[16px] text-xl font-bold">Rapid Resolution: {price} (${total} total)</p><p className="mt-[4px] text-sm text-slate-700">Paid once at checkout. Government fines, court charges and third-party fees are separate.</p>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2">{RAPID_RESOLUTION.included.map(item => <li key={item} className="flex items-start gap-3 text-sm leading-6"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />{item}</li>)}</ul>
-          <p className="mt-5 text-sm leading-6"><Link to="/pro-drivers" className="font-semibold text-blue-800 underline">Class 1, 2 or 4 licence? 20% off with a verified Alberta licence ($158.40 + GST).</Link> Officer-issued tickets only.</p>
-          <RapidResolutionCta className="mt-6 w-full sm:w-auto" />
-          <div id="fee-refund" className="mt-8"><FeeRefundNotice /><p className="mt-[12px] text-sm leading-6 text-slate-700">Any reduction counts; there is no minimum. The refund includes the GST paid. Payment does not start the 30-calendar-day clock; an opening or unchanged offer before Fabsy’s efforts are rejected does not start it either.</p></div>
-          <RapidResolutionCta className="mt-6 w-full sm:w-auto" />
-        </div>
-      </section>
-      <section aria-labelledby="rapid-faq-heading" className="px-5 py-9 sm:py-12"><div className="mx-auto max-w-3xl"><h2 id="rapid-faq-heading" className="text-2xl font-bold sm:text-3xl">Common questions</h2><Accordion type="single" collapsible className="mt-5">{faqs.map(([question, answer], index) => <AccordionItem key={question} value={`faq-${index}`}><AccordionTrigger className="text-left">{question}</AccordionTrigger><AccordionContent className="leading-6 text-slate-700">{answer}</AccordionContent></AccordionItem>)}</Accordion><div className="mt-6 text-sm leading-7"><h3 className="font-bold">Can I talk to someone first?</h3><p>Call <a href="tel:+18257932279" data-funnel-action="phone" data-funnel-position="section" className="font-semibold text-blue-800 underline">(825) 793-2279</a>{WHATSAPP_ENABLED && <>, message on <a href={FABSY_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" data-funnel-action="whatsapp" data-funnel-position="section" className="font-semibold text-blue-800 underline">WhatsApp</a></>}, or email <a href="mailto:hello@fabsy.ca" className="font-semibold text-blue-800 underline">hello@fabsy.ca</a>.</p></div></div></section>
-      <section aria-labelledby="rapid-final-heading" className="bg-slate-950 px-5 py-10 text-center text-white"><h2 id="rapid-final-heading" className="text-2xl font-bold text-white sm:text-3xl">Put your ticket into motion today.</h2><p className="mt-[12px] text-slate-200">{price} (${total} total), paid at checkout.</p><p className="mx-auto mt-[12px] max-w-xl text-sm text-slate-200">{HOMEPAGE_REFUND_COPY.headline} {HOMEPAGE_REFUND_COPY.headlineAccent}<Link to={FEE_REFUND.termsPath} className="text-white underline" aria-label="Fee-refund conditions">*</Link></p><RapidResolutionCta position="footer" className="mt-5 w-full sm:w-auto" /></section>
-    </main>
-    <footer className="px-5 pb-28 pt-8 text-sm text-slate-700 md:pb-8"><div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-6"><div><p className="font-bold">Fabsy Traffic Ticket Services · Alberta</p><p className="mt-[8px]">Agent service, not a law firm. No legal advice.</p><p className="mt-[8px]"><a href="tel:+18257932279" data-funnel-action="phone" data-funnel-position="footer" className="underline">(825) 793-2279</a> · <a href="mailto:hello@fabsy.ca" className="underline">hello@fabsy.ca</a></p></div><nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">{[["/privacy-policy", "Privacy Policy"], ["/terms-of-service", "Terms of Service"], ["/terms-of-purchase", "Terms of Purchase"], [FEE_REFUND.termsPath, "Fee-refund guarantee"]].map(([to, label]) => <Link key={label} to={to} className="inline-flex min-h-11 items-center underline">{label}</Link>)}</nav></div></footer>
-  </div>;
-}
+export default RapidResolution;

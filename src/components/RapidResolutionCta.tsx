@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export const RAPID_INTAKE_PATH = "/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution";
+export const RAPID_INTAKE_PATH = "/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt";
 
 /** The router opens a fresh private document before any ticket file is chosen. */
 export default function RapidResolutionCta({ position = "section", id, className = "" }: {

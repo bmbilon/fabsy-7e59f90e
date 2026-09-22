@@ -136,17 +136,21 @@ const servePage: PagesFunction<Env> = async (context) => {
 
   // The paid offer is present before JavaScript executes, for people and bots.
   // Build this from the same React page; never serve a stale shell as a snapshot.
-  if (pathname === "/rapid-resolution" && ["GET", "HEAD"].includes(request.method)) {
+  if (pathname === "/rapid-resolution-alt" && ["GET", "HEAD"].includes(request.method)) {
     try {
-      const rendered = await env.ASSETS.fetch(new URL("/_landing/rapid-resolution/", request.url));
+      const rendered = await env.ASSETS.fetch(new URL("/_landing/rapid-resolution-alt/", request.url));
       const html = rendered.status === 200 ? await rendered.text() : "";
-      if (html.includes('data-rapid-prerender="true"') && canonicalFromHtml(html) === canonicalFor(pathname)) {
+      if (html.includes('data-rapid-prerender="true"') && canonicalFromHtml(html) === canonicalFor("/rapid-resolution")) {
         const headers = new Headers(rendered.headers);
-        headers.set("X-Robots-Tag", "index, follow");
+        headers.set("X-Robots-Tag", "noindex, follow");
         headers.set("X-Prerendered", "true");
         return new Response(request.method === "HEAD" ? null : html, { status: 200, headers });
       }
     } catch { /* The normal page remains available if the asset is missing. */ }
+    const fallback = await next();
+    const headers = new Headers(fallback.headers);
+    headers.set("X-Robots-Tag", "noindex, follow");
+    return new Response(request.method === "HEAD" ? null : fallback.body, { status: fallback.status, headers });
   }
 
   const ua = request.headers.get("User-Agent") || "";

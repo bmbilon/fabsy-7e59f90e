@@ -18,19 +18,20 @@ test('Rapid Resolution serves a usable first paint before JavaScript, with safe 
   try {
     await writeFile(path.join(dist, 'index.html'), '<!doctype html><html><head><script type="module" src="/assets/app.js"></script><link rel="stylesheet" href="/assets/app.css"></head><body><div id="root"></div></body></html>');
     await renderRapidLanding(dist);
-    const html = await readFile(path.join(dist, '_landing/rapid-resolution/index.html'), 'utf8');
+    const html = await readFile(path.join(dist, '_landing/rapid-resolution-alt/index.html'), 'utf8');
     const dom = new JSDOM(html);
     const doc = dom.window.document;
     assert.equal(doc.querySelector('#root').dataset.rapidPrerender, 'true');
     assert.equal(doc.querySelector('h1').textContent, 'Fight your ticket.We do the work.');
-    assert.equal(doc.querySelector('#rapid-hero-cta').getAttribute('href'), '/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution');
+    assert.equal(doc.querySelector('#rapid-hero-cta').getAttribute('href'), '/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt');
     assert.match(doc.querySelector('[data-rapid-first-view]').textContent, /\$207\.90 total/);
     assert.match(doc.querySelector('[data-rapid-first-view]').textContent, /Shared with permission/);
     assert.match(doc.querySelector('[data-rapid-first-view]').textContent, /Conditions apply/);
     assert.equal(doc.querySelector('script[type="module"]').getAttribute('src'), '/assets/app.js');
     assert.equal(doc.querySelector('link[rel="stylesheet"]').getAttribute('href'), '/assets/app.css');
     assert.equal(doc.querySelector('link[rel="canonical"]').href, 'https://fabsy.ca/rapid-resolution');
-    assert.deepEqual(publicSnapshotGuardrailIssues(html, '/rapid-resolution'), []);
+    assert.equal(doc.querySelector('meta[name=robots]').content, 'noindex, follow');
+    assert.deepEqual(publicSnapshotGuardrailIssues(html, '/rapid-resolution-alt'), []);
     for (const mutate of [
       doc => { doc.querySelector('[data-rapid-price]').textContent = '$99 including GST'; },
       doc => { doc.querySelector('[data-fee-refund-notice]').remove(); },
@@ -40,7 +41,7 @@ test('Rapid Resolution serves a usable first paint before JavaScript, with safe 
     ]) {
       const changed = new JSDOM(html);
       mutate(changed.window.document);
-      assert.ok(publicSnapshotGuardrailIssues(changed.serialize(), '/rapid-resolution').length > 0, 'Altered offers must fail the exact page contract');
+      assert.ok(publicSnapshotGuardrailIssues(changed.serialize(), '/rapid-resolution-alt').length > 0, 'Altered offers must fail the exact page contract');
       changed.window.close();
     }
     dom.window.close();
@@ -56,18 +57,21 @@ test('Rapid Resolution serves a usable first paint before JavaScript, with safe 
       next: () => { nextCalls++; return new Response('SPA fallback'); },
       waitUntil: promise => background.push(promise),
     });
-    const response = await invoke('/rapid-resolution?gclid=PRIVATE&lp=untrusted');
+    const response = await invoke('/rapid-resolution-alt?gclid=PRIVATE&lp=untrusted');
     assert.equal(await response.text(), html);
-    assert.equal(response.headers.get('X-Robots-Tag'), 'index, follow');
+    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, follow');
     assert.equal(response.headers.get('X-Prerendered'), 'true');
-    assert.deepEqual(assetRequests, ['https://fabsy.ca/_landing/rapid-resolution/']);
-    assert.equal(await (await invoke('/rapid-resolution', 'HEAD')).text(), '');
-    assert.equal(await (await invoke('/rapid-resolution', 'GET', html, 'Googlebot')).text(), html);
-    assert.equal(await (await invoke('/rapid-resolution', 'GET', '<html>SPA fallback</html>')).text(), 'SPA fallback');
-    assert.equal(await (await invoke('/rapid-resolution', 'GET', html.replaceAll('https://fabsy.ca/rapid-resolution', 'https://fabsy.ca/wrong-page'))).text(), 'SPA fallback');
-    assert.equal(await (await invoke('/rapid-resolution', 'POST')).text(), 'SPA fallback');
+    assert.deepEqual(assetRequests, ['https://fabsy.ca/_landing/rapid-resolution-alt/']);
+    assert.equal(await (await invoke('/rapid-resolution-alt', 'HEAD')).text(), '');
+    assert.equal(await (await invoke('/rapid-resolution-alt', 'GET', html, 'Googlebot')).text(), html);
+    const fallback = await invoke('/rapid-resolution-alt', 'GET', '<html>SPA fallback</html>');
+    assert.equal(fallback.headers.get('X-Robots-Tag'), 'noindex, follow');
+    assert.equal(await fallback.text(), 'SPA fallback');
+    assert.equal(await (await invoke('/rapid-resolution-alt', 'GET', html.replaceAll('https://fabsy.ca/rapid-resolution', 'https://fabsy.ca/wrong-page'))).text(), 'SPA fallback');
+    assert.equal(await (await invoke('/rapid-resolution-alt', 'POST')).text(), 'SPA fallback');
     assert.equal(await (await invoke('/submit-ticket')).text(), 'SPA fallback');
-    assert.equal(nextCalls, 4);
+    assert.equal(await (await invoke('/rapid-resolution')).text(), 'SPA fallback');
+    assert.equal(nextCalls, 5);
     await Promise.all(background);
   } finally { await rm(dist, { recursive: true, force: true }); }
 });

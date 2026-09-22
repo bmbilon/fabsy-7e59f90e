@@ -5,9 +5,9 @@ const path = require('node:path');
 const { createHash } = require('node:crypto');
 const root = path.resolve(__dirname, '..');
 const sourceFiles = [
-  'src/pages/RapidResolution.tsx', 'src/components/RapidResolutionCta.tsx',
+  'src/pages/RapidResolutionAlternate.tsx', 'src/components/RapidResolutionCta.tsx',
   'src/components/FeeRefundNotice.tsx', 'src/config/offers.json',
-  'src/config/feeRefund.json', 'src/content/homepageRefundCopy.ts',
+  'src/config/feeRefund.json',
   'src/content/client-testimonials.json', 'src/content/clientTestimonials.ts',
 ];
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -34,7 +34,7 @@ function schemaFingerprint(document) {
   return hash([...document.querySelectorAll('.rapid-landing > script[type="application/ld+json"]')].map(node => node.outerHTML).join(''));
 }
 function redactRapidConversionSnapshot(document, route, issues) {
-  if (route !== '/rapid-resolution') return;
+  if (route !== '/rapid-resolution-alt') return;
   const main = document.querySelector('.rapid-landing > main');
   if (!main) return;
   const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/rapid-conversion-fingerprint.json'), 'utf8'));

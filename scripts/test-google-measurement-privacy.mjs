@@ -356,7 +356,7 @@ test("safe context strips approved click identifiers and uses no document title 
 test("approved paid-landing UTMs do not silently disable Google measurement", async () => {
   const { api } = await runtime();
   for (const href of [
-    "https://fabsy.ca/rapid-resolution?utm_source=google&utm_medium=cpc&utm_campaign=rr_search_v2&utm_term=traffic_ticket&utm_content=rsa_01&gclid=SYNTHETIC_CLICK",
+    "https://fabsy.ca/rapid-resolution-alt?utm_source=google&utm_medium=cpc&utm_campaign=rr_search_v2&utm_term=traffic_ticket&utm_content=rsa_01&gclid=SYNTHETIC_CLICK",
     "https://fabsy.ca/rapid-resolution?utm_source=meta&utm_medium=paid_social&utm_campaign=rr_creative_v2&utm_content=rr_easy_v2&fbclid=SYNTHETIC_META",
     "https://fabsy.ca/es/rapid-resolution?utm_source=google&utm_medium=cpc&utm_campaign=rr_es_v1&utm_content=rsa_02&wbraid=SYNTHETIC_BRAID",
   ]) {

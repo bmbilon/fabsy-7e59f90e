@@ -5,7 +5,7 @@ const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const { sourceFingerprints, mainFingerprint, schemaFingerprint } = require('./rapid-conversion-snapshot-guardrail.cjs');
 const root = path.resolve(__dirname, '..');
-const dom = new JSDOM(fs.readFileSync(path.join(root, 'dist/_landing/rapid-resolution/index.html'), 'utf8'));
+const dom = new JSDOM(fs.readFileSync(path.join(root, 'dist/_landing/rapid-resolution-alt/index.html'), 'utf8'));
 fs.writeFileSync(path.join(__dirname, 'fixtures/rapid-conversion-fingerprint.json'), JSON.stringify({
   sources: sourceFingerprints(), main: mainFingerprint(dom.window.document.querySelector('main')),
   schemas: schemaFingerprint(dom.window.document),

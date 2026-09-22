@@ -50,7 +50,7 @@ try {
   const parse = html => new JSDOM(html).window.document;
 
   const hero = parse(render.renderHero());
-  check('hero identifies the service-fee refund', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Lower fine, fewer demerits, or withdrawal or your service fee is refunded'));
+  check('hero retains the control headline', () => assert.equal(hero.querySelector('#homepage-hero-heading')?.textContent, 'Fine or demerits reduced or your money back'));
   check('hero omits the repeated court-outcome disclaimer', () => assert.doesNotMatch(hero.body.textContent, /We can’t guarantee a court outcome\./));
   check('hero removes the superseded promises', () => assert.doesNotMatch(hero.body.textContent, /success guaranteed|you don[’']t pay/i));
   check('hero displays the price without an appended disclaimer', () => assert.equal([...hero.querySelectorAll('strong')].find(node => node.textContent.includes('CAD + GST'))?.parentElement?.textContent, `$${offers.rapidResolution.priceCad} CAD + GST`));

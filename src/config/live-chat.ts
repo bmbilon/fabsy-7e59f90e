@@ -6,7 +6,7 @@ export const TAWK_CHAT_URL = `https://tawk.to/chat/${TAWK_PROPERTY_ID}/${TAWK_WI
 
 const publicPaths = new Set([
   "/", "/about", "/about/comparison", "/services", "/how-it-works",
-  "/testimonials", "/faq", "/founder", "/blog", "/photo-radar",
+  "/testimonials", "/faq", "/founder", "/blog", "/rapid-resolution", "/photo-radar",
   "/pro-drivers", "/refer", "/insurance-damage-report", "/ai-info",
   "/privacy-policy", "/terms-of-service", "/terms-of-purchase",
 ]);

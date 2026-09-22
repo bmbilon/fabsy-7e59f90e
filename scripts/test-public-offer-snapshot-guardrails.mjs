@@ -180,25 +180,25 @@ try {
   const rapidRefundSummary = rapidFirstView?.querySelector('[data-rapid-refund-summary]');
   const rapidPrice = rapidFirstView?.querySelector('[data-rapid-price]');
   const rapidPrimaryCta = rapidFirstView?.querySelector('[data-funnel-action="primary_cta"]');
-  const rapidPhone = rapidDocument.querySelector('header [data-funnel-action="phone"]');
-  const rapidFullRefundNotice = rapidDocument.querySelector('aside[data-fee-refund-notice="ticket-representation"]');
+  const rapidPhone = rapidFirstView?.querySelector('[data-funnel-action="phone"]');
+  const rapidFullRefundNotice = rapidFirstView?.querySelector('aside[data-fee-refund-notice="ticket-representation"]');
   const rapidProcess = rapidDocument.querySelector('#how-it-works');
   assert.equal(rapidDocument.querySelectorAll('[data-rapid-first-view]').length, 1, 'Rapid Resolution has one first-view offer');
-  assert.equal(rapidFirstView?.querySelector('h1')?.textContent.trim(), 'Fight your ticket.We do the work.');
+  assert.equal(rapidFirstView?.querySelector('h1')?.textContent.trim(), 'Got an Alberta traffic ticket?');
   for (const fragment of ['lower fine', 'fewer demerits', 'withdrawal']) {
     assert.ok(rapidOffer?.textContent.includes(fragment), `Rapid Resolution first-view offer includes ${fragment}`);
   }
-  for (const fragment of ['service fee is refunded', 'No legal outcome guaranteed']) {
+  for (const fragment of ['service fee is refunded', 'No legal outcome is guaranteed']) {
     assert.ok(rapidRefundSummary?.textContent.includes(fragment), `Rapid Resolution first-view refund summary includes ${fragment}`);
   }
   assert.equal(rapidRefundSummary?.querySelector('a')?.getAttribute('href'), feeRefund.termsPath, 'The compact refund promise links to the full published terms');
-  for (const fragment of ['$198', 'CAD + GST', '$207.90 total', 'One-time fee']) {
+  for (const fragment of ['Rapid Resolution', '$198 CAD + GST', 'Paid upfront']) {
     assert.ok(rapidPrice?.textContent.includes(fragment), `Rapid Resolution first-view price includes ${fragment}`);
   }
-  assert.equal(rapidPrimaryCta?.getAttribute('href'), '/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution');
+  assert.equal(rapidPrimaryCta?.getAttribute('href'), '/submit-ticket');
   assert.equal(rapidPrimaryCta?.textContent.trim(), 'Upload your ticket');
   assert.equal(rapidPhone?.getAttribute('href'), 'tel:+18257932279');
-  assert.equal(rapidPhone?.textContent.trim(), '(825) 793-2279');
+  assert.equal(rapidPhone?.textContent.trim(), 'Call');
   for (const [earlier, later, label] of [
     [rapidRefundSummary, rapidPrice, 'refund qualification precedes the price'],
     [rapidPrice, rapidPrimaryCta, 'price precedes the primary action'],
@@ -286,10 +286,9 @@ try {
         const script = [...document.querySelectorAll('script[type="application/ld+json"]')].find(node => JSON.parse(node.textContent)['@type'] === 'FAQPage');
         assert(script, `${route}: source FAQ schema exists`);
         const schema = JSON.parse(script.textContent);
-        const clock = route === '/rapid-resolution' ? '48-hour' : '30 days';
-        const question = schema.mainEntity.find(entry => entry.acceptedAnswer.text.includes(clock));
-        assert(question, `${route}: service or refund clock FAQ exists`);
-        if (mutation === 'window') question.acceptedAnswer.text = question.acceptedAnswer.text.replace(clock, route === '/rapid-resolution' ? '72-hour' : '60 days');
+        const question = schema.mainEntity.find(entry => entry.acceptedAnswer.text.includes('30 days'));
+        assert(question, `${route}: refund FAQ exists`);
+        if (mutation === 'window') question.acceptedAnswer.text = question.acceptedAnswer.text.replace('30 days', '60 days');
         else question.acceptedAnswer.extraClaim = 'We guarantee a withdrawal.';
         script.textContent = JSON.stringify(schema);
       });

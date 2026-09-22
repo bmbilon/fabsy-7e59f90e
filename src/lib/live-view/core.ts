@@ -25,6 +25,7 @@ export type VisitorDevice = "mobile" | "tablet" | "desktop";
 const publicPaths = new Set([
   "/",
   "/rapid-resolution",
+  "/rapid-resolution-alt",
   "/photo-radar",
   "/pro-drivers",
   "/fleet",

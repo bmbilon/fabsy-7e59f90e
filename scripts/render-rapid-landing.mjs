@@ -13,7 +13,7 @@ export async function renderRapidLanding(dist = path.join(root, 'dist')) {
   const renderPath = path.join(cache, `rapid-landing-${process.pid}.mjs`);
   try {
     await build({
-      stdin: { contents: `import React from 'react'; import { renderToString } from 'react-dom/server'; import { StaticRouter } from 'react-router-dom/server.js'; import Page from './src/pages/RapidResolution'; import { createInstance } from 'i18next'; import { I18nextProvider } from 'react-i18next'; const i18n = createInstance(); i18n.init({ lng: 'en', resources: { en: { translation: {} } }, initImmediate: false }); export const html = renderToString(React.createElement(I18nextProvider, { i18n }, React.createElement(StaticRouter, { location: '/rapid-resolution' }, React.createElement(Page))));`, resolveDir: root, loader: 'tsx' },
+      stdin: { contents: `import React from 'react'; import { renderToString } from 'react-dom/server'; import { StaticRouter } from 'react-router-dom/server.js'; import Page from './src/pages/RapidResolutionAlternate'; import { createInstance } from 'i18next'; import { I18nextProvider } from 'react-i18next'; const i18n = createInstance(); i18n.init({ lng: 'en', resources: { en: { translation: {} } }, initImmediate: false }); export const html = renderToString(React.createElement(I18nextProvider, { i18n }, React.createElement(StaticRouter, { location: '/rapid-resolution-alt' }, React.createElement(Page))));`, resolveDir: root, loader: 'tsx' },
       outfile: renderPath, bundle: true, platform: 'node', format: 'esm', packages: 'external', jsx: 'automatic',
       alias: { '@': path.join(root, 'src') },
       define: { 'import.meta.env': JSON.stringify({ VITE_WHATSAPP_ENABLED: process.env.VITE_WHATSAPP_ENABLED || 'false' }) },
@@ -34,10 +34,11 @@ export async function renderRapidLanding(dist = path.join(root, 'dist')) {
     for (const key of ['description', 'og:description', 'twitter:description']) setMeta(key, description);
     for (const key of ['og:title', 'twitter:title']) setMeta(key, doc.title);
     setMeta('og:url', 'https://fabsy.ca/rapid-resolution');
+    setMeta('robots', 'noindex, follow');
     let canonical = doc.querySelector('link[rel="canonical"]');
     if (!canonical) { canonical = doc.createElement('link'); canonical.rel = 'canonical'; doc.head.append(canonical); }
     canonical.href = 'https://fabsy.ca/rapid-resolution';
-    const output = path.join(dist, '_landing/rapid-resolution');
+    const output = path.join(dist, '_landing/rapid-resolution-alt');
     await fs.mkdir(output, { recursive: true });
     await fs.writeFile(path.join(output, 'index.html'), dom.serialize());
     dom.window.close();

@@ -495,6 +495,7 @@ test("changing the email after a failed upload creates a fresh context", async t
 test("paid entry links preselect the service without prechecking consent or plea", async t => {
   for (const [entry, type, total] of [
     ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution", "officer_issued", "207.90"],
+    ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt", "officer_issued", "207.90"],
     ["/submit-ticket?ticket_type=photo_radar", "photo_radar", "82.95"],
     ["/submit-ticket?bundle=1", "officer_issued", "240.45"],
   ]) {
@@ -518,4 +519,12 @@ test("a bundle entry retains the selected add-on through reviewed checkout", asy
   assert.equal(app.saves[0].body.landingPage, "rapid-resolution");
   await app.api.click(app.button("Continue to Stripe for $229.00 CAD plus GST")); await app.flush();
   assert.equal(app.saves.find(x => x.name === "create-payment").body.includeIdrAddon, true);
+});
+
+
+test("the alternate entry survives client preparation", async t => {
+  const app = await runtime(t, {}, { contactSaved: true, entry: "/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt" });
+  await app.choose(app.file()); await app.accept();
+  await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  assert.equal(app.saves[0].body.landingPage, "rapid-resolution-alt");
 });

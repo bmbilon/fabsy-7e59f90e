@@ -42,10 +42,10 @@ function fixture(href = 'https://fabsy.ca/', referrer = '') {
 
 test('public/localized articles work; intake, contacts, portals, unknown and token URLs do not', () => {
   const r = fixture();
-  for (const path of ['/', '/about', '/photo-radar', '/blog/alberta-tickets', '/content/speeding-ticket-calgary']) {
+  for (const path of ['/', '/about', '/photo-radar', '/es/rapid-resolution', '/blog/alberta-tickets', '/content/speeding-ticket-calgary']) {
     assert.equal(r.api.isLiveChatUrl('https://fabsy.ca' + path), true, path);
   }
-  for (const path of ['/rapid-resolution', '/es/rapid-resolution', '/submit-ticket', '/contact', '/fleet', '/free-ticket-check', '/admin', '/portal/cases/abc', '/representation-consent?token=secret', '/pay/abc', '/es/submit-ticket', '/%73ubmit-ticket', '/not-a-page', '/about?email=a%40example.invalid', '/about#access_token=secret']) {
+  for (const path of ['/rapid-resolution-alt', '/submit-ticket', '/contact', '/fleet', '/free-ticket-check', '/admin', '/portal/cases/abc', '/representation-consent?token=secret', '/pay/abc', '/es/submit-ticket', '/%73ubmit-ticket', '/not-a-page', '/about?email=a%40example.invalid', '/about#access_token=secret']) {
     assert.equal(r.api.isLiveChatUrl('https://fabsy.ca' + path), false, path);
   }
   assert.equal(r.api.liveChatContextAllowed('https://fabsy.ca/', 'https://fabsy.ca/portal/cases/abc'), false);
@@ -148,7 +148,7 @@ test('minimizing restores the compact launcher; replies and triggers cannot reop
 });
 
 test('private and sensitive contexts refuse even an explicit open request', () => {
-  for (const path of ['/submit-ticket', '/about?token=synthetic']) {
+  for (const path of ['/rapid-resolution-alt', '/submit-ticket', '/about?token=synthetic']) {
     const r = fixture('https://fabsy.ca' + path);
     r.api.setLiveChatVisible(true);
     r.api.openLiveChat();

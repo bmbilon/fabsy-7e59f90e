@@ -48,7 +48,7 @@ export const handler = async (req: Request): Promise<Response> => {
       const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
       if (withContact && (!email || email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) throw new RequestError("Enter a valid email address.");
       if (withContact && !["officer_issued", "photo_radar"].includes(input.ticketType)) throw new RequestError("Choose your ticket type.");
-      if (input.landingPage != null && !["rapid-resolution", "photo-radar"].includes(input.landingPage)) throw new RequestError("Invalid service entry page.");
+      if (input.landingPage != null && !["rapid-resolution", "rapid-resolution-alt", "photo-radar"].includes(input.landingPage)) throw new RequestError("Invalid service entry page.");
       const { data: clientId, error } = await admin.rpc(withContact ? "prepare_photo_ticket_with_contact" : "prepare_photo_ticket_intake", {
         p_id: submissionId, p_token_hash: tokenHash, p_consent: consent, p_ticket_path: ticketPath, p_source_assessment_id: sourceId,
         ...(withContact ? { p_email: email, p_ticket_type: input.ticketType,

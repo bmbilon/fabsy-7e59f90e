@@ -123,7 +123,7 @@ function approvedRapidResolutionCampaign(url: URL): boolean {
 /** The same reviewed RR campaign policy applies to every released language. */
 export function publicMetaMeasurementUrl(url: URL): boolean {
   if (url.username || url.password || url.hash) return false;
-  return metaLandingPath.test(url.pathname) && approvedRapidResolutionCampaign(url);
+  return (metaLandingPath.test(url.pathname) || /^\/rapid-resolution-alt\/?$/.test(url.pathname)) && approvedRapidResolutionCampaign(url);
 }
 
 function safeMetaContext(
@@ -238,7 +238,7 @@ export function sendMetaPageView(): void {
 function deleteMetaCookies(): void {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   const localePrefixes = ['en', 'pa', 'tl', 'zh-hans', 'zh-hant', 'ar', 'hi', 'es'];
-  const paths = new Set(['/', '/rapid-resolution', '/thank-you', '/thank-you/']);
+  const paths = new Set(['/', '/rapid-resolution', '/rapid-resolution-alt', '/thank-you', '/thank-you/']);
   for (const locale of localePrefixes) {
     paths.add(`/${locale}`);
     paths.add(`/${locale}/`);

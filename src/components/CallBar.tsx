@@ -18,14 +18,14 @@ const CallBar = () => {
   const { locale } = useLocale();
   const [heroVisible, setHeroVisible] = useState(true);
   useEffect(() => {
-    if (location.pathname !== RAPID_RESOLUTION.slug) return;
+    if (location.pathname !== "/rapid-resolution-alt") return;
     const hero = document.getElementById("rapid-hero-cta");
     if (!hero) return;
     const observer = new IntersectionObserver(([entry]) => setHeroVisible(entry.isIntersecting));
     observer.observe(hero);
     return () => observer.disconnect();
   }, [location.pathname]);
-  if (location.pathname === RAPID_RESOLUTION.slug && heroVisible) return null;
+  if (location.pathname === "/rapid-resolution-alt" && heroVisible) return null;
   // A translated page does not imply phone staffing in that language.
   if (locale !== "en" || /^\/admin(?:\/|$)/.test(location.pathname)) return null;
   if (location.pathname === "/complete-ticket" || location.pathname.replace(/\/$/, "") === "/disclosure-approval" || location.pathname.startsWith("/pay/")) return null;
@@ -40,7 +40,7 @@ const CallBar = () => {
 
   return (
     <div data-mobile-call-bar className="md:hidden fixed inset-x-0 bottom-0 z-40 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-white/95 backdrop-blur-sm border-t border-muted shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
-      {location.pathname === RAPID_RESOLUTION.slug ? <RapidResolutionCta position="sticky" className="w-full" /> : location.pathname === "/" ? (
+      {location.pathname === "/rapid-resolution-alt" ? <RapidResolutionCta position="sticky" className="w-full" /> : location.pathname === "/" ? (
         <a
           href="#ticket-form-container"
           data-funnel-action="primary_cta"

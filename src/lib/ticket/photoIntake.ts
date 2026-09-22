@@ -48,7 +48,7 @@ export async function savePhotoTicket(data: FormData, attempt: PhotoIntakeAttemp
       email: data.email.trim(),
       ticketType: data.ticketType,
       bundleRequested: options.bundleRequested === true && data.ticketType !== "photo_radar",
-      landingPage: options.landingPage === "rapid-resolution" || options.landingPage === "photo-radar" ? options.landingPage : null,
+      landingPage: options.landingPage === "rapid-resolution" || options.landingPage === "rapid-resolution-alt" || options.landingPage === "photo-radar" ? options.landingPage : null,
       consent: { accepted: true, method: "checkbox", version: PHOTO_UPLOAD_CONSENT_VERSION, pleadNotGuilty: options.pleadNotGuilty },
       ...(referral ? { refCode: referral.code, refAttributionToken: referral.attributionToken } : {}),
       ...(sourceAssessment ? { sourceAssessment } : { file: { contentType: descriptor?.valid ? descriptor.mimeType : "", size: file!.size } }),

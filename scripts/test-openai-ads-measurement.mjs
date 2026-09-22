@@ -47,7 +47,7 @@ test('the OpenAI Ads pixel is production-, consent-, route- and referrer-gated',
   ]) assert.deepEqual(api.openAIAdsMeasurementConfig({ ...env, ...override }, 'https://fabsy.ca'), {});
   assert.deepEqual(api.openAIAdsMeasurementConfig(env, 'https://preview.fabsy.ca'), {});
   assert.equal(api.publicOpenAIAdsMeasurementUrl(new URL('https://fabsy.ca/ticket-uploaded')), true);
-  assert.equal(api.publicOpenAIAdsMeasurementUrl(new URL('https://fabsy.ca/rapid-resolution?utm_source=openai&utm_medium=cpc&utm_campaign=rr_alberta_pilot_202609&utm_content=admin_198&oppref=chatgpt_click_123')), true);
+  assert.equal(api.publicOpenAIAdsMeasurementUrl(new URL('https://fabsy.ca/rapid-resolution-alt?utm_source=openai&utm_medium=cpc&utm_campaign=rr_alberta_pilot_202609&utm_content=admin_198&oppref=chatgpt_click_123')), true);
   for (const href of [
     'https://fabsy.ca/submit-ticket',
     'https://fabsy.ca/rapid-resolution',
