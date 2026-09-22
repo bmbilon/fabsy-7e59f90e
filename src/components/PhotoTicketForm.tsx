@@ -3,29 +3,34 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { FormData, TicketFormProps } from "./TicketForm";
 import QuickTicketIntake from "./QuickTicketIntake";
 import { initialFormData } from "@/lib/ticket/initialFormData";
-import { ticketDateAsLocalDate } from "@/lib/ticket/ticketType";
+import { applyTicketType, ticketDateAsLocalDate } from "@/lib/ticket/ticketType";
 import { useLocale } from "@/i18n/locale-context";
 import { latestReferralAttribution } from "@/lib/referrals/attribution";
 import { captureReferralFromLocation, readActiveReferral, REFERRAL_ATTRIBUTION_EVENT } from "@/lib/referrals/capture";
 
-export default function PhotoTicketForm({ initialTicketImage = null, initialPrefill = null, sourceAssessment = null, embedded = false }: TicketFormProps) {
+export default function PhotoTicketForm({ initialTicketImage = null, initialTicketType = null, initialPrefill = null, sourceAssessment = null, embedded = false }: TicketFormProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const leaving = useRef(false);
   const { setIntakeHandoff } = useLocale();
-  const [formData, setFormData] = useState<FormData>(() => ({
-    ...initialFormData,
-    ...initialPrefill,
-    ticketImage: initialTicketImage,
-    sourceAssessmentId: sourceAssessment?.submissionId ?? initialPrefill?.sourceAssessmentId ?? "",
-    sourceAssessmentAccessToken: sourceAssessment?.accessToken ?? initialPrefill?.sourceAssessmentAccessToken ?? "",
-    issueDate: ticketDateAsLocalDate(initialPrefill?.issueDate),
-    courtDate: ticketDateAsLocalDate(initialPrefill?.courtDate),
-    dateOfBirth: ticketDateAsLocalDate(initialPrefill?.dateOfBirth),
-    referral: latestReferralAttribution([initialPrefill?.referral, readActiveReferral()]),
-    consentGiven: false,
-    digitalSignature: "",
-  }));
+  const [formData, setFormData] = useState<FormData>(() => {
+    const draft: FormData = {
+      ...initialFormData,
+      ...initialPrefill,
+      ticketImage: initialTicketImage,
+      sourceAssessmentId: sourceAssessment?.submissionId ?? initialPrefill?.sourceAssessmentId ?? "",
+      sourceAssessmentAccessToken: sourceAssessment?.accessToken ?? initialPrefill?.sourceAssessmentAccessToken ?? "",
+      issueDate: ticketDateAsLocalDate(initialPrefill?.issueDate),
+      courtDate: ticketDateAsLocalDate(initialPrefill?.courtDate),
+      dateOfBirth: ticketDateAsLocalDate(initialPrefill?.dateOfBirth),
+      referral: latestReferralAttribution([initialPrefill?.referral, readActiveReferral()]),
+      consentGiven: false,
+      digitalSignature: "",
+    };
+    return initialTicketType && draft.ticketTypeSource !== "manual"
+      ? applyTicketType(draft, initialTicketType, "entry")
+      : draft;
+  });
   const updateFormData = (updates: Partial<FormData> | ((current: FormData) => Partial<FormData>)) => {
     setFormData(current => ({ ...current, ...(typeof updates === "function" ? updates(current) : updates) }));
   };
