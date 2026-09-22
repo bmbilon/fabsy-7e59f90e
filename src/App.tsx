@@ -82,6 +82,8 @@ const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
 const AdminWorkspace = lazy(() => import('./components/admin/AdminWorkspace'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLiveView = lazy(() => import("./pages/AdminLiveView"));
+const ManualCheckout = lazy(() => import("./pages/ManualCheckout"));
+const AdminCheckoutLinks = lazy(() => import("./pages/AdminCheckoutLinks"));
 const CompleteTicket = lazy(() => import("./pages/CompleteTicket"));
 const DisclosureApproval = lazy(() => import("./pages/DisclosureApproval"));
 const AdminManualRepresentationLinks = lazy(() => import("./pages/AdminManualRepresentationLinks"));
@@ -94,7 +96,7 @@ const queryClient = new QueryClient();
 
 const RouteAnalytics = () => {
   const location = useLocation();
-  if (location.pathname === "/representation-consent" || location.pathname.replace(/\/$/, "") === "/disclosure-approval" || location.pathname === "/complete-ticket" || location.pathname.startsWith("/pay/")) return null;
+  if (location.pathname === "/representation-consent" || location.pathname === "/representation-payment" || location.pathname.replace(/\/$/, "") === "/disclosure-approval" || location.pathname === "/complete-ticket" || location.pathname.startsWith("/pay/")) return null;
   return (
     <>
       <AcquisitionTracker />
@@ -138,6 +140,7 @@ const App = () => (
           <Route path="/submit-ticket" element={<TicketFormPage />} />
           <Route path="/ticket-form" element={<TicketFormPage />} />
           <Route path="/complete-ticket" element={<RouteSuspense><CompleteTicket /></RouteSuspense>} />
+          <Route path="/representation-payment" element={<RouteSuspense><ManualCheckout /></RouteSuspense>} />
           <Route path="/representation-consent" element={<RepresentationConsent />} />
           <Route path="/disclosure-approval" element={<RouteSuspense><DisclosureApproval /></RouteSuspense>} />
           <Route path="/how-it-works" element={<HowItWorks />} />
@@ -181,6 +184,7 @@ const App = () => (
           <Route path="/admin" element={<AdminLogin />} />
           <Route element={<RouteSuspense><AdminWorkspace /></RouteSuspense>}>
           <Route path="/admin/referrals" element={<RouteSuspense><AdminReferrals /></RouteSuspense>} />
+          <Route path="/admin/checkout-links" element={<RouteSuspense><AdminCheckoutLinks /></RouteSuspense>} />
           <Route path="/admin/consent-links" element={<RouteSuspense><AdminManualRepresentationLinks /></RouteSuspense>} />
           <Route path="/admin/dashboard" element={<RouteSuspense><AdminDashboard /></RouteSuspense>} />
           <Route path="/admin/live" element={<RouteSuspense><AdminLiveView /></RouteSuspense>} />

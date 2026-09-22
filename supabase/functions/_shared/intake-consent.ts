@@ -21,6 +21,7 @@ export interface IntakeConsent {
   authorization: readonly string[];
   privacy: readonly string[];
   ticketSubmissionId?: string;
+  ticketNumber?: string;
   ticketDocumentPath?: string;
   identitySource?: "uploaded_ticket_pending_review";
   // Only a versioned, submitted checkbox choice authorizes an automated plea.

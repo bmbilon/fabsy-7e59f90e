@@ -53,7 +53,9 @@ jobs:
         run: node scripts/test-admin-ticket-deletion.mjs
 
       - name: Validate existing-ticket consent and payment
-        run: node --test scripts/test-ticket-completion.mjs
+        run: |
+          node --test scripts/test-ticket-completion.mjs
+          node --test scripts/test-consent-checkout.mjs
 
       - name: Validate intake email and phone follow-up records
         run: node scripts/test-intake-follow-up-status.mjs
@@ -79,6 +81,7 @@ jobs:
             supabase/functions/_shared/meta-purchase.ts \
             supabase/functions/cache-ticket-data/index.ts \
             supabase/functions/create-payment/index.ts \
+            supabase/functions/manual-representation-link/index.ts \
             supabase/functions/photo-ticket-intake/index.ts \
             supabase/functions/generate-consent-form/index.ts \
             supabase/functions/ocr-ticket/index.ts \
