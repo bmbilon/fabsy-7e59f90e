@@ -7,7 +7,7 @@ import { JSDOM } from 'jsdom';
 const root = fileURLToPath(new URL('../', import.meta.url));
 
 /** Render the actual React page into the built shell, without a browser or network. */
-export async function renderRapidLanding(dist = path.join(root, 'dist')) {
+export async function renderRapidLanding(dist = path.join(root, 'dist'), { whatsappEnabled = process.env.VITE_WHATSAPP_ENABLED === 'true' } = {}) {
   const cache = path.join(root, 'node_modules/.cache');
   await fs.mkdir(cache, { recursive: true });
   const renderPath = path.join(cache, `rapid-landing-${process.pid}.mjs`);
@@ -16,7 +16,7 @@ export async function renderRapidLanding(dist = path.join(root, 'dist')) {
       stdin: { contents: `import React from 'react'; import { renderToString } from 'react-dom/server'; import { StaticRouter } from 'react-router-dom/server.js'; import Page from './src/pages/RapidResolutionAlternate'; import { createInstance } from 'i18next'; import { I18nextProvider } from 'react-i18next'; const i18n = createInstance(); i18n.init({ lng: 'en', resources: { en: { translation: {} } }, initImmediate: false }); export const html = renderToString(React.createElement(I18nextProvider, { i18n }, React.createElement(StaticRouter, { location: '/rapid-resolution-alt' }, React.createElement(Page))));`, resolveDir: root, loader: 'tsx' },
       outfile: renderPath, bundle: true, platform: 'node', format: 'esm', packages: 'external', jsx: 'automatic',
       alias: { '@': path.join(root, 'src') },
-      define: { 'import.meta.env': JSON.stringify({ VITE_WHATSAPP_ENABLED: process.env.VITE_WHATSAPP_ENABLED || 'false' }) },
+      define: { 'import.meta.env': JSON.stringify({ VITE_WHATSAPP_ENABLED: String(whatsappEnabled) }) },
       logLevel: 'silent',
     });
     const { html } = await import(`${pathToFileURL(renderPath).href}?time=${Date.now()}`);

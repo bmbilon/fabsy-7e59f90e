@@ -38,7 +38,7 @@ function redactRapidConversionSnapshot(document, route, issues) {
   const main = document.querySelector('.rapid-landing > main');
   if (!main) return;
   const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/rapid-conversion-fingerprint.json'), 'utf8'));
-  if (JSON.stringify(fixture.sources) !== JSON.stringify(sourceFingerprints()) || mainFingerprint(main) !== fixture.main || schemaFingerprint(document) !== fixture.schemas) {
+  if (JSON.stringify(fixture.sources) !== JSON.stringify(sourceFingerprints()) || !fixture.mains.includes(mainFingerprint(main)) || schemaFingerprint(document) !== fixture.schemas) {
     issues.push('Rapid Resolution conversion page differs from its reviewed complete offer, refund and link contract');
     return;
   }
