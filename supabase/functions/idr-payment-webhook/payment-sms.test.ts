@@ -21,6 +21,7 @@ async function runCase(options: { badSignature?: boolean; testMode?: boolean; un
   globalThis.fetch = (input, request) => {
     const url = new URL(String(input)); const name = url.pathname.split("/").at(-1)!;
     calls.push(name + ":" + (request?.method || "GET"));
+    if (name === "enqueue_portal_activity") return Promise.resolve(Response.json(null));
     if (name === "idr_checkout_intents" && request?.method === "GET") return Promise.resolve(Response.json({ id: id.intent, client_id: options.ownershipMismatch ? "44444444-4444-4444-8444-444444444444" : id.client,
       ticket_submission_id: id.submission, type: "assessment", checkout_kind: "ticket_assessment", expected_amount_cents: 14900,
       purchaser_email: "person@example.test", stripe_checkout_session_id: snapshot.data.object.id, status: "open", attempts: 1 }));
@@ -86,6 +87,7 @@ async function runReportPurchase(type: "addon" | "standalone", combined = false)
   globalThis.fetch = (input, request) => {
     const url = new URL(String(input)); const name = url.pathname.split("/").at(-1)!;
     calls.push(name + ":" + (request?.method || "GET"));
+    if (name === "enqueue_portal_activity") return Promise.resolve(Response.json(null));
     if (name === "idr_checkout_intents" && request?.method === "GET") return Promise.resolve(Response.json({ id: id.intent, client_id: id.client,
       ticket_submission_id: id.submission, type, checkout_kind: combined ? "ticket_with_addon" : "idr_only", expected_amount_cents: reportCents,
       purchaser_email: "person@example.test", stripe_checkout_session_id: snapshot.data.object.id, status: "open", attempts: 1 }));

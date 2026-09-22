@@ -1,5 +1,13 @@
 # Codex Configuration - Fabsy Traffic Ticket Defense
 
+## Internal activity notifications
+
+Send internal alerts for payments, ticket uploads, consent, website questions,
+and Tawk conversations to `hello@fabsy.ca`, even when no client, submission, or
+ticket ID exists. Include the actual traffic ticket number in the subject when
+available. Missing identifiers must not suppress an operator alert; use a
+generic subject rather than an invented ticket number or intake UUID.
+
 ## Project Overview
 This is a React/TypeScript application for traffic ticket defense services in Alberta, Canada. The application includes:
 

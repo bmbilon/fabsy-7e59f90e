@@ -16,6 +16,7 @@ import {
 import { currentMetaPurchaseFromSignedCheckout } from "../_shared/meta-purchase.ts";
 import { paidFunnelProductFromSignedCheckout } from "../_shared/funnel-checkout.ts";
 import { enqueuePaymentSms } from "../_shared/payment-notification-sms.ts";
+import { lineItemsIdentifyFabsy, metadataIdentifiesFabsy, paymentActivityPayload } from "../_shared/payment-activity.ts";
 import {
   recordPaidPurchaseLedger,
   recordPaidRefundLedger,
@@ -1322,6 +1323,28 @@ export async function handler(req: Request): Promise<Response> {
     }
     if (session.payment_status !== "paid") {
       return json({ received: true, handled: false });
+    }
+
+    // Persist the internal alert before case fulfillment. Standalone Payment
+    // Links have no intake metadata; identify those by Stripe's product data.
+    // This Stripe account is shared, so unrelated businesses remain excluded.
+    if (event.livemode && session.livemode && session.mode === "payment") {
+      const isFabsy = metadataIdentifiesFabsy(session) || lineItemsIdentifyFabsy(
+        (await stripe.checkout.sessions.listLineItems(session.id, {
+          limit: 100, expand: ["data.price.product"],
+        })).data,
+        Deno.env.get("STRIPE_PHOTO_RADAR_PRICE_ID") || "",
+      );
+      if (isFabsy) {
+        const { error } = await supabase.rpc("enqueue_portal_activity", {
+          p_event_key: `payment:checkout:${session.id}`,
+          p_event_type: "payment_paid",
+          p_entity_type: "stripe_checkout",
+          p_entity_id: null,
+          p_payload: paymentActivityPayload(session, event.id, new Date(event.created * 1000).toISOString()),
+        });
+        if (error) throw new Error("Payment notification could not be queued.");
+      }
     }
 
     if (session.metadata?.fabsy_checkout_kind === "photo_radar") {
