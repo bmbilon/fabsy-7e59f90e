@@ -12,6 +12,10 @@ const { curatedPageIssues } = require('./curated-content-guardrails.cjs');
 const policies = JSON.parse(fs.readFileSync(path.join(root, 'src/config/seoRoutePolicies.json'), 'utf8'));
 const redirectsFile = fs.readFileSync(path.join(root, 'public/_redirects'), 'utf8');
 const llms = fs.readFileSync(path.join(root, 'public/llms.txt'), 'utf8');
+const sitemap = fs.readFileSync(path.join(root, 'public/sitemaps/sitemap-pages.xml'), 'utf8');
+const retiredImpairedArticle = '/blog/impaired-driving-young-driver-alberta-penalties';
+assert.ok(policies.gone.includes(retiredImpairedArticle), 'unverified impaired-driving article must return 410');
+assert.ok(!sitemap.includes(`https://fabsy.ca${retiredImpairedArticle}`), 'retired article must not appear in the sitemap');
 
 const retired = new Map([
   ['/blog/caught-driving-over-speed-limit-alberta-fines-suspension', '/content/speeding-ticket-alberta'],
