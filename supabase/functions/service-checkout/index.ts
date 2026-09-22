@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { parseServiceOrder, serviceProduct } from "../_shared/service-checkout.ts";
-import { createConsentPdf } from "../_shared/consent-pdf.ts";
+import { createConsentPdf } from "../_shared/service-consent-pdf.ts";
 import { recordServiceOrderPayment } from "../_shared/service-order-payment.ts";
 import { queuePhotoIntake } from "../_shared/process-photo-intake.ts";
 
