@@ -124,7 +124,9 @@ export function recoveryMessage(
       }">Stop these reminders</a></p></body></html>`,
   }, { preferredLocale: s.preferred_locale, template: "case_update" });
   const sms = prepareClientSms(
-    `Fabsy: Ticket ${s.ticket_number}. Please complete ${needed}: ${url} Use the same email and ticket number. Questions? (825) 793-2279. Reply STOP to opt out.`,
+    `Fabsy: Ticket ${s.ticket_number}. Please complete ${needed}: ${url} Use the same email and ticket number. Questions? (825) 793-2279. ${
+      singleLine(mailingAddress)
+    }. Reply STOP to opt out.`,
     { preferredLocale: s.preferred_locale, template: "case_update" },
   );
   return { email, sms };
