@@ -197,3 +197,6 @@ static_files = [
   "./functions/_shared/consent-fonts/*.gz",
   "./functions/_shared/consent-harfbuzz/*.wasm"
 ]
+
+[functions.process-ticket-recovery]
+verify_jwt = false
