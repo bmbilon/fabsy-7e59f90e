@@ -253,3 +253,12 @@ Deno.test("unsubscribe signatures cannot be changed or minted without secret", a
   );
   await assertRejects(() => unsubscribeSignature(job.id, ""));
 });
+
+Deno.test("email body uses the first-party page and one-click header uses the signed API", () => {
+  const body = "https://fabsy.ca/reminder-preferences.html#id=example";
+  const api =
+    "https://fixture.supabase.co/functions/v1/process-ticket-recovery?action=unsubscribe";
+  const m = recoveryMessage(base, body, "123 Test Street, Calgary AB", api);
+  assertStringIncludes(m.email.html, body);
+  assertEquals(m.email.headers?.["List-Unsubscribe"], `<${api}>`);
+});

@@ -207,7 +207,12 @@ export async function handler(req: Request): Promise<Response> {
           const unsubscribe = `${
             env("SUPABASE_URL")
           }/functions/v1/process-ticket-recovery?action=unsubscribe&id=${j.id}&signature=${signature}`;
-          const message = recoveryMessage(s, unsubscribe, cfg.mailing_address);
+          const message = recoveryMessage(
+            s,
+            `https://fabsy.ca/reminder-preferences.html#id=${j.id}&signature=${signature}`,
+            cfg.mailing_address,
+            unsubscribe,
+          );
           if (j.channel === "email") {
             return (await sendWorkspaceEmail(
               message.email,
