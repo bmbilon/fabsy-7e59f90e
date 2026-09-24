@@ -1,0 +1,47 @@
+name: Ticket recovery checks
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/process-ticket-recovery/**'
+      - 'supabase/functions/_shared/ticket-recovery*'
+      - 'supabase/migrations/*ticket_recovery.sql'
+      - 'supabase/tests/ticket-recovery*'
+      - 'public/reminder-preferences.*'
+      - 'scripts/test-ticket-recovery-db.mjs'
+      - 'scripts/test-reminder-preferences.mjs'
+      - '.github/workflows/ticket-recovery.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/process-ticket-recovery/**'
+      - 'supabase/functions/_shared/ticket-recovery*'
+      - 'supabase/migrations/*ticket_recovery.sql'
+      - 'supabase/tests/ticket-recovery*'
+      - 'public/reminder-preferences.*'
+      - 'scripts/test-ticket-recovery-db.mjs'
+      - 'scripts/test-reminder-preferences.mjs'
+      - '.github/workflows/ticket-recovery.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: npm ci
+      - name: Verify reminders, provider boundaries, unsubscribe and authorization without sending
+        run: |
+          deno test --no-config --no-npm --allow-env supabase/functions/_shared/ticket-recovery.test.ts supabase/functions/process-ticket-recovery/index.test.ts
+          node --test scripts/test-reminder-preferences.mjs
+      - name: Verify database lifecycle and concurrent delivery reservation
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql
+          export TICKET_RECOVERY_TEST_PG_BIN="$(pg_config --bindir)"
+          node scripts/test-ticket-recovery-db.mjs
