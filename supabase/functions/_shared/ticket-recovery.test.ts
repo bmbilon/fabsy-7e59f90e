@@ -51,6 +51,7 @@ Deno.test("links and copy request only the missing requirement", () => {
     assertStringIncludes(m.email.subject, `Ticket ${s.ticket_number} —`);
     assertStringIncludes(m.sms, s.ticket_number);
     assertStringIncludes(m.sms, "STOP");
+    assertStringIncludes(m.sms, "123 Test Street, Calgary AB");
     assertStringIncludes(m.email.text!, "same email");
     assertEquals(m.email.html.includes("private link"), false);
   }
