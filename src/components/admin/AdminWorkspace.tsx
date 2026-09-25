@@ -38,6 +38,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { useDashboardAuth } from "@/hooks/useAdminDashboard";
+import { useAdminWorkspaceLive } from "@/hooks/useAdminWorkspaceLive";
 import { supabase } from "@/integrations/supabase/client";
 import {
   itemHref,
@@ -46,6 +47,7 @@ import {
 } from "@/lib/admin/dashboard";
 
 const navigation = [
+  { label: "Portal queue", href: "/admin/portal", icon: Inbox, group: "Workspace" },
   { label: "Consent and payments", href: "/admin/checkout-links", icon: HandCoins, group: "Workspace" },
   {
     label: "Overview",
@@ -140,6 +142,7 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
   const navigate = useNavigate();
   const auth = useDashboardAuth();
   const fabsyStaff = auth.role.data === "admin" || auth.role.data === "case_manager";
+  useAdminWorkspaceLive(auth.session?.user.id, fabsyStaff);
   // Practice members without a Fabsy staff role only work Ontario LTB files.
   const links = navigation.filter((item) =>
     fabsyStaff
@@ -202,7 +205,8 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
     setCommand(false);
     setMobile(false);
     setSearch("");
-    navigate(contextualHref(path));
+    if (path === '/admin/portal') window.location.assign(path);
+    else navigate(contextualHref(path));
   };
   const nav = (
     <nav aria-label="Admin navigation" className="space-y-5 px-3 py-5">
@@ -222,6 +226,7 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
                   <Link
                     key={item.href}
                     to={contextualHref(item.href)}
+                    reloadDocument={item.href === '/admin/portal'}
                     aria-current={active ? "page" : undefined}
                     onClick={() => setMobile(false)}
                     className={`flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${active ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/70" : "text-slate-600 hover:bg-white/70 hover:text-slate-900"}`}
@@ -283,6 +288,9 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
           </kbd>
         </button>
         <div className="ml-auto flex items-center gap-3">
+          {fabsyStaff && <a href="/admin/portal" className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-white/10 px-2.5 text-xs font-medium text-white hover:bg-white/20">
+            <Inbox className="h-4 w-4" /><span>Portal queue</span>
+          </a>}
           <span className="hidden rounded-md bg-white/5 px-2 py-1 text-[11px] capitalize text-slate-300 sm:inline">
             {auth.role.data?.replace("_", " ") || "Staff"}
           </span>

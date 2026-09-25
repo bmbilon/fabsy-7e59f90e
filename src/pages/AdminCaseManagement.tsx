@@ -170,9 +170,11 @@ export default function AdminCaseManagement() {
     };
     const interval = window.setInterval(refresh, 60_000);
     window.addEventListener("focus", refresh);
+    window.addEventListener("fabsy:workspace-updated", refresh);
     return () => {
       window.clearInterval(interval);
       window.removeEventListener("focus", refresh);
+      window.removeEventListener("fabsy:workspace-updated", refresh);
     };
   }, [userRole]);
 

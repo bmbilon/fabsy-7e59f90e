@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,13 @@ export default function AdminServiceOrders() {
     catch (caught) { setError((caught as Error).message); }
     finally { setLoading(false); }
   }
+  const latestLoad = useRef(load);
+  latestLoad.current = load;
+  useEffect(() => {
+    const refresh = () => { void latestLoad.current(); };
+    window.addEventListener('fabsy:workspace-updated', refresh);
+    return () => window.removeEventListener('fabsy:workspace-updated', refresh);
+  }, []);
   useEffect(() => { void (async () => {
     if (!await getIdrStaffRole()) { navigate("/admin", { replace: true }); return; }
     await load();
