@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useDashboardAuth } from '@/hooks/useAdminDashboard';
 import useSafeHead from '@/hooks/useSafeHead';
+import type { LtbPracticeBrand } from '@/lib/admin/ltbBranding';
 import { fetchLtbBoard, fetchMyLtbPractices, setLtbCaseStage } from '@/lib/admin/ltbApi';
 import { LTB_STAGES, buildLtbBoard, filterLtbCards, type LtbCard, type LtbStage } from '@/lib/admin/ltbFunnel';
 
@@ -82,8 +83,8 @@ function CaseCard({ card, onMoved }: { card: LtbCard; onMoved: () => void }) {
   </article>;
 }
 
-export default function AdminLtbCases() {
-  useSafeHead({ title: 'Ontario LTB files | Fabsy admin', robots: 'noindex, nofollow' });
+export default function AdminLtbCases({ practice }: { practice?: LtbPracticeBrand } = {}) {
+  useSafeHead({ title: `Ontario LTB files | ${practice?.name || 'Fabsy admin'}`, robots: 'noindex, nofollow' });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const auth = useDashboardAuth();
@@ -91,19 +92,20 @@ export default function AdminLtbCases() {
   const board = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (auth.ready && !auth.session) navigate('/admin');
-  }, [auth.ready, auth.session, navigate]);
+    if (auth.ready && !auth.session) navigate(practice?.loginPath || '/admin');
+  }, [auth.ready, auth.session, navigate, practice?.loginPath]);
 
   const practices = useQuery({
     queryKey: ['ltb-practices', auth.session?.user.id],
     enabled: !!auth.session,
     queryFn: fetchMyLtbPractices,
+    select: rows => practice ? rows.filter(row => row.practice_id === practice.practiceId) : rows,
     retry: false,
   });
   const cases = useQuery({
-    queryKey: ['ltb-board', auth.session?.user.id],
+    queryKey: ['ltb-board', auth.session?.user.id, practice?.practiceId],
     enabled: !!practices.data?.length,
-    queryFn: fetchLtbBoard,
+    queryFn: () => fetchLtbBoard(practice?.practiceId),
     refetchInterval: 60_000,
     refetchIntervalInBackground: false,
     retry: false,
@@ -118,7 +120,7 @@ export default function AdminLtbCases() {
   if (practices.isError || !practices.data?.length) {
     return <main className="p-6">
       <h1 className="text-xl font-semibold text-slate-900">Ontario LTB files</h1>
-      <p className="mt-2 text-sm text-slate-600">Your account does not have access to an Ontario practice. Ask a Fabsy admin to add you.</p>
+      <p className="mt-2 text-sm text-slate-600">{practice ? 'Ask your practice administrator to enable LTB access.' : 'Your account does not have access to an Ontario practice. Ask a Fabsy admin to add you.'}</p>
     </main>;
   }
 

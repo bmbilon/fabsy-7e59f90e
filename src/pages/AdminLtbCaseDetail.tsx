@@ -1,3 +1,4 @@
+import type { LtbPracticeBrand } from '@/lib/admin/ltbBranding';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -140,29 +141,34 @@ function SourceTag({ source }: { source?: Source }) {
   return <span className={`ml-2 rounded px-1.5 py-0.5 text-[10px] font-medium ${tone}`}>{label}</span>;
 }
 
-export default function AdminLtbCaseDetail() {
+export default function AdminLtbCaseDetail({ practice }: { practice?: LtbPracticeBrand } = {}) {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const auth = useDashboardAuth();
-  useSafeHead({ title: 'LTB file | Fabsy admin', robots: 'noindex, nofollow' });
+  useSafeHead({ title: `LTB file | ${practice?.name || 'Fabsy admin'}`, robots: 'noindex, nofollow' });
 
   useEffect(() => {
-    if (auth.ready && !auth.session) navigate('/admin');
-  }, [auth.ready, auth.session, navigate]);
+    if (auth.ready && !auth.session) navigate(practice?.loginPath || '/admin');
+  }, [auth.ready, auth.session, navigate, practice?.loginPath]);
 
   const validId = /^[0-9a-f-]{36}$/i.test(id);
   const detail = useQuery({
-    queryKey: ['ltb-case', id],
+    queryKey: ['ltb-case', id, auth.session?.user.id, practice?.practiceId],
     enabled: !!auth.session && validId,
     retry: false,
     queryFn: async () => {
+      // Apply the practice scope before resolving any file or attachment.
+      const scoped = (table: string, columns: string) => {
+        const query = ltbDb.from(table).select(columns);
+        return practice ? query.eq('practice_id', practice.practiceId) : query;
+      };
       const [caseResult, docResult, eventResult] = await Promise.all([
-        ltbDb.from('ltb_cases').select('*, ltb_clients(*)').eq('id', id).maybeSingle(),
-        ltbDb.from('ltb_case_documents').select('id,storage_path,original_name,content_type,size_bytes,uploaded_at,kind,extraction_status,extracted')
+        scoped('ltb_cases', '*, ltb_clients(*)').eq('id', id).maybeSingle(),
+        scoped('ltb_case_documents', 'id,storage_path,original_name,content_type,size_bytes,uploaded_at,kind,extraction_status,extracted')
           .eq('case_id', id).order('created_at'),
-        ltbDb.from('ltb_case_events').select('id,event,detail,at').eq('case_id', id).order('at', { ascending: false }).limit(100),
+        scoped('ltb_case_events', 'id,event,detail,at').eq('case_id', id).order('at', { ascending: false }).limit(100),
       ]);
       if (caseResult.error || docResult.error || eventResult.error) throw new Error('File could not be loaded.');
       return {

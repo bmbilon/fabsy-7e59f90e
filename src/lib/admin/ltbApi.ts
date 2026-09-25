@@ -21,9 +21,11 @@ export const LTB_BOARD_SELECT = 'id,case_number,stage,issue,intake_review_status
   'returning_client,unit_city,arrears_claimed_cents,arrears_reported_text,created_at,stage_changed_at,' +
   'ltb_clients(first_name,last_name,organization_name,email,phone,registration_status)';
 
-export async function fetchLtbBoard(): Promise<LtbCaseRow[]> {
-  const { data, error } = await ltbDb.from('ltb_cases').select(LTB_BOARD_SELECT)
+export async function fetchLtbBoard(practiceId?: string): Promise<LtbCaseRow[]> {
+  let query = ltbDb.from('ltb_cases').select(LTB_BOARD_SELECT)
     .order('created_at', { ascending: false }).limit(500);
+  if (practiceId) query = query.eq('practice_id', practiceId);
+  const { data, error } = await query;
   if (error) throw error;
   return (data || []) as LtbCaseRow[];
 }
