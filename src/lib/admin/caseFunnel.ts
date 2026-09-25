@@ -95,7 +95,7 @@ export function buildCaseFunnel(
         : sub.consent_form_path ? 'consent_submitted' : 'ticket_submitted');
     result.push({
       key: `submission:${sub.id}`, id: sub.id, kind: 'submission', stage,
-      name: `${sub.first_name} ${sub.last_name}`.trim() || 'Ticket awaiting review',
+      name: `${sub.first_name} ${sub.last_name}`.trim(),
       email: sub.email, phone: sub.phone, ticketNumber: sub.ticket_number, violation: sub.violation,
       detail: sub.service_type === 'ticket_insurance_assessment' ? 'Legacy Ticket Triage' : sub.ticket_type === 'photo_radar' ? 'Photo radar · ATE' : 'Officer-issued ticket',
       updatedAt: sub.created_at, linkedIntakeId: linked?.id,
@@ -113,7 +113,7 @@ export function buildCaseFunnel(
     result.push({
       key: `draft:${intake.id}`, id: intake.id, kind: 'draft',
       stage: expired ? 'expired_lapsed' : staffStage(saved?.stage) || 'ticket_submitted',
-      name: [intake.draft_data?.firstName, intake.draft_data?.lastName].filter(Boolean).join(' ') || 'Ticket intake',
+      name: [intake.draft_data?.firstName, intake.draft_data?.lastName].filter(Boolean).join(' ').trim(),
       email: intake.email || '', phone: intake.phone || '', ticketNumber: intake.draft_data?.ticketNumber || '',
       violation: intake.draft_data?.violation || '', updatedAt: intake.updated_at,
       detail: intake.ticket_uploaded_at ? 'Intake · ticket received' : 'Intake · awaiting ticket upload',

@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ChevronRight, FileText, Search, RefreshCw, Archive } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronRight, FileText, Search, RefreshCw, Archive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import CaseStatusSelect from '@/components/admin/CaseStatusSelect';
@@ -19,24 +19,44 @@ const tones: Record<FunnelStage, string> = {
   expired_lapsed: 'border-t-slate-400 bg-slate-200/70',
 };
 
-function CaseCard({ item, openIntake, statusesReady }: { item: FunnelCase; openIntake: (id: string) => void; statusesReady: boolean }) {
+function CaseCard({ item, openIntake, statusesReady, expanded, onToggle }: {
+  item: FunnelCase; openIntake: (id: string) => void; statusesReady: boolean; expanded: boolean; onToggle: () => void;
+}) {
+  const detailsId = useId();
   const label = item.ticketNumber ? `Ticket ${item.ticketNumber}` : 'Ticket number pending';
-  return <article className="min-w-0 rounded-xl border border-slate-200 bg-white p-3 shadow-sm" aria-label={`${item.name} · ${label}`}>
-    <p className="text-[11px] font-medium text-slate-500">{item.detail}</p>
-    <h4 className="mt-2 break-words text-sm font-semibold leading-5 text-slate-900">{item.name}</h4>
-    <p className="mt-1 break-words text-xs font-medium text-blue-700">{label}</p>
-    <div className="mt-3 space-y-1 text-xs text-slate-600">
-      {item.email && <p className="break-all">{item.email}</p>}
-      {item.phone && <p>{item.phone}</p>}
-      {!item.email && !item.phone && <p>Contact details pending</p>}
-      {item.violation && <p className="line-clamp-2" title={item.violation}>{item.violation}</p>}
+  const name = item.name || (item.kind === 'draft' ? 'Ticket intake' : 'Ticket awaiting review');
+  return <article className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-label={`${name} · ${label}`}>
+    <h4>
+      <button type="button" onClick={onToggle} aria-expanded={expanded} aria-controls={detailsId}
+        aria-label={`${expanded ? 'Collapse' : 'Expand'} ${label}${item.name ? ` · ${item.name}` : ''}`}
+        className={`flex min-h-11 w-full items-start justify-between gap-2 px-3 text-left hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-600 ${expanded ? 'py-3' : 'py-2'}`}>
+        <span className="min-w-0 flex-1">
+          {expanded && <>
+            <span className="block text-[11px] font-medium text-slate-500">{item.detail}</span>
+            <span className="mt-2 block break-words text-sm font-semibold leading-5 text-slate-900">{name}</span>
+          </>}
+          <span className={`block break-words text-xs font-medium text-blue-700 ${expanded ? 'mt-1' : ''}`}>{label}</span>
+          {!expanded && item.name && <span className="mt-1 block truncate text-xs font-medium text-slate-700" title={item.name}>{item.name}</span>}
+        </span>
+        <ChevronDown className={`mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400 ${expanded ? 'rotate-180' : ''}`} aria-hidden="true" />
+      </button>
+    </h4>
+    <div id={detailsId} hidden={!expanded}>
+      {expanded && <div className="px-3 pb-3">
+        <div className="space-y-1 text-xs text-slate-600">
+          {item.email && <p className="break-all">{item.email}</p>}
+          {item.phone && <p>{item.phone}</p>}
+          {!item.email && !item.phone && <p>Contact details pending</p>}
+          {item.violation && <p className="line-clamp-2" title={item.violation}>{item.violation}</p>}
+        </div>
+        <details className="mt-3 border-t border-slate-100 pt-2">
+          <summary className="cursor-pointer text-xs font-medium text-slate-600 focus-visible:outline-blue-600">{caseStageLabel(item.caseStatus?.stage) || 'Update case status'}</summary>
+          <div className="pt-2"><CaseStatusSelect kind={item.kind} ticketId={item.id} label={item.ticketNumber || name} initial={item.caseStatus} disabled={!statusesReady} compact /></div>
+        </details>
+        {item.href ? <Link to={item.href} className="mt-3 flex min-h-9 items-center justify-between rounded-md bg-slate-50 px-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-blue-600">Open case <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
+          : <button type="button" onClick={() => openIntake(item.id)} className="mt-3 flex min-h-9 w-full items-center justify-between rounded-md bg-slate-50 px-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-blue-600">Manage intake <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></button>}
+      </div>}
     </div>
-    <details className="mt-3 border-t border-slate-100 pt-2">
-      <summary className="cursor-pointer text-xs font-medium text-slate-600 focus-visible:outline-blue-600">{caseStageLabel(item.caseStatus?.stage) || 'Update case status'}</summary>
-      <div className="pt-2"><CaseStatusSelect kind={item.kind} ticketId={item.id} label={item.ticketNumber || item.name} initial={item.caseStatus} disabled={!statusesReady} compact /></div>
-    </details>
-    {item.href ? <Link to={item.href} className="mt-3 flex min-h-9 items-center justify-between rounded-md bg-slate-50 px-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-blue-600">Open case <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
-      : <button type="button" onClick={() => openIntake(item.id)} className="mt-3 flex min-h-9 w-full items-center justify-between rounded-md bg-slate-50 px-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-blue-600">Manage intake <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></button>}
   </article>;
 }
 
@@ -44,22 +64,29 @@ export default function CaseFunnelBoard({ cases, statusesReady, refreshing, refr
   cases: FunnelCase[]; statusesReady: boolean; refreshing: boolean; refresh: () => void; openIntake: (id: string) => void;
 }) {
   const [search, setSearch] = useState('');
+  const [expandedCases, setExpandedCases] = useState<Partial<Record<FunnelStage, string | null>>>({});
   const board = useRef<HTMLDivElement>(null);
   const visible = filterFunnelCases(cases, search);
   const groups = new Map(FUNNEL_STAGES.map(([stage]) => [stage, visible.filter(item => item.stage === stage)]));
   const active = cases.filter(item => !['closed_resolved', 'closed_refunded', 'expired_lapsed'].includes(item.stage)).length;
-  const lane = (stage: FunnelStage, label: string, index: number) => <section key={stage} aria-labelledby={`stage-${stage}`} className={`min-w-0 rounded-xl border border-slate-200 border-t-[3px] ${tones[stage]} ${stage === 'expired_lapsed' ? 'col-span-2' : ''}`}>
-    <div className="flex min-h-20 items-center gap-2 border-b border-slate-200/70 px-3 py-3">
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-semibold text-slate-500" aria-hidden="true">{stage === 'expired_lapsed' ? <Archive className="h-3 w-3" /> : String(index + 1).padStart(2, '0')}</span>
-      <h3 id={`stage-${stage}`} className="flex-1 text-xs font-semibold leading-4 text-slate-800">{label}</h3>
-      <span aria-label={`${groups.get(stage)?.length} cases`} className="rounded-md bg-white px-1.5 py-1 text-xs font-semibold text-slate-600">{groups.get(stage)?.length}</span>
-      {index < 5 && <ChevronRight className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />}
-    </div>
-    <div className={`grid gap-3 p-2.5 ${stage === 'expired_lapsed' ? 'grid-cols-2' : ''}`}>
-      {groups.get(stage)?.length ? groups.get(stage)?.map(item => <CaseCard key={item.key} item={item} openIntake={openIntake} statusesReady={statusesReady} />)
-        : <p className={`py-7 text-center text-xs text-slate-500 ${stage === 'expired_lapsed' ? 'col-span-2' : ''}`}>No {search ? 'matching ' : ''}cases</p>}
-    </div>
-  </section>;
+  const lane = (stage: FunnelStage, label: string, index: number) => {
+    const items = groups.get(stage) || [];
+    const selected = expandedCases[stage];
+    const expandedKey = selected === null ? null : items.find(item => item.key === selected)?.key ?? items[0]?.key;
+    return <section key={stage} aria-labelledby={`stage-${stage}`} className={`min-w-0 rounded-xl border border-slate-200 border-t-[3px] ${tones[stage]} ${stage === 'expired_lapsed' ? 'col-span-2' : ''}`}>
+      <div className="flex min-h-20 items-center gap-2 border-b border-slate-200/70 px-3 py-3">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-semibold text-slate-500" aria-hidden="true">{stage === 'expired_lapsed' ? <Archive className="h-3 w-3" /> : String(index + 1).padStart(2, '0')}</span>
+        <h3 id={`stage-${stage}`} className="flex-1 text-xs font-semibold leading-4 text-slate-800">{label}</h3>
+        <span aria-label={`${groups.get(stage)?.length} cases`} className="rounded-md bg-white px-1.5 py-1 text-xs font-semibold text-slate-600">{groups.get(stage)?.length}</span>
+        {index < 5 && <ChevronRight className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />}
+      </div>
+      <div className="grid gap-2 p-2.5">
+        {items.length ? items.map(item => <CaseCard key={item.key} item={item} openIntake={openIntake} statusesReady={statusesReady}
+          expanded={item.key === expandedKey} onToggle={() => setExpandedCases(current => ({ ...current, [stage]: item.key === expandedKey ? null : item.key }))} />)
+          : <p className="py-7 text-center text-xs text-slate-500">No {search ? 'matching ' : ''}cases</p>}
+      </div>
+    </section>;
+  };
   return <section aria-labelledby="case-pipeline-title" className="mb-8">
     <h2 id="case-pipeline-title" className="sr-only">Case stages</h2>
     <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
