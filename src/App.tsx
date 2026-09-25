@@ -80,6 +80,8 @@ const ProDiscountPortal = lazy(() => import("./pages/ProDiscountPortal"));
 const AdminSmsIntake = lazy(() => import("./pages/AdminSmsIntake"));
 const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
 const AdminWorkspace = lazy(() => import('./components/admin/AdminWorkspace'));
+const AdminLtbCases = lazy(() => import('./pages/AdminLtbCases'));
+const AdminLtbCaseDetail = lazy(() => import('./pages/AdminLtbCaseDetail'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLiveView = lazy(() => import("./pages/AdminLiveView"));
 const ServiceCheckout = lazy(() => import("./pages/ServiceCheckout"));
@@ -204,6 +206,8 @@ const App = () => (
           <Route path="/admin/idr" element={<AdminIdrDashboard />} />
           <Route path="/admin/idr/:orderId" element={<AdminIdrReview />} />
           <Route path="/admin/assessments/:id" element={<AdminAssessmentReview />} />
+          <Route path="/admin/ltb" element={<RouteSuspense><AdminLtbCases /></RouteSuspense>} />
+          <Route path="/admin/ltb/cases/:id" element={<RouteSuspense><AdminLtbCaseDetail /></RouteSuspense>} />
           </Route>
           {/* Blog routes */}
           <Route path="/blog/:slug" element={<BlogPost />} />

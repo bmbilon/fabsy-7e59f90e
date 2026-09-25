@@ -10,6 +10,7 @@ import {
   HandCoins,
   Home,
   Inbox,
+  Landmark,
   LogOut,
   MailCheck,
   Menu,
@@ -57,6 +58,13 @@ const navigation = [
     href: "/admin/cases",
     icon: FolderOpen,
     group: "Workspace",
+  },
+  {
+    label: "Ontario LTB files",
+    href: "/admin/ltb",
+    icon: Landmark,
+    group: "Workspace",
+    ltb: true,
   },
   {
     label: "Work queue",
@@ -131,8 +139,12 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const auth = useDashboardAuth();
-  const links = navigation.filter(
-    (item) => !item.admin || auth.role.data === "admin",
+  const fabsyStaff = auth.role.data === "admin" || auth.role.data === "case_manager";
+  // Practice members without a Fabsy staff role only work Ontario LTB files.
+  const links = navigation.filter((item) =>
+    fabsyStaff
+      ? !item.admin || auth.role.data === "admin"
+      : auth.role.isSuccess && "ltb" in item && item.ltb === true,
   );
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {

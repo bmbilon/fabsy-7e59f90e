@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="AnderHue Paralegal represents Ontario landlords at the Landlord and Tenant Board. N4 notices, L1 and L2 applications and hearings at posted flat fees.">
+<title>AnderHue Paralegal LTB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+</style>
+<style>
+:root{
+--paper:#F1F4EE;
+--surface:#FAFBF7;
+--ink:#17221C;
+--ink-2:#4B5B52;
+--ink-3:#6E7D74;
+--rule:#CAD5C5;
+--rule-strong:#9FB19F;
+--ledger:#1D5A42;
+--ledger-ink:#F4F8F2;
+--ledger-soft:#DCE8DE;
+--arrears:#B22A1F;
+--arrears-soft:#F6DEDA;
+--pending-bg:#F5E6A8;
+--pending-ink:#4A3A00;
+--focus:#1D5A42;
+--display:"Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+--body:"Public Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+--mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+:root:not([data-theme="light"]){
+color-scheme:dark;
+--paper:#0D1310;
+--surface:#141C17;
+--ink:#E2EAE3;
+--ink-2:#A3B3A9;
+--ink-3:#7F9086;
+--rule:#26332B;
+--rule-strong:#3B4B41;
+--ledger:#7FC7A1;
+--ledger-ink:#0D1310;
+--ledger-soft:#1A2B22;
+--arrears:#F08276;
+--arrears-soft:#3A1D1A;
+--pending-bg:#4A3E12;
+--pending-ink:#F6DD86;
+--focus:#7FC7A1;
+}
+}
+:root[data-theme="dark"]{
+color-scheme:dark;
+--paper:#0D1310;
+--surface:#141C17;
+--ink:#E2EAE3;
+--ink-2:#A3B3A9;
+--ink-3:#7F9086;
+--rule:#26332B;
+--rule-strong:#3B4B41;
+--ledger:#7FC7A1;
+--ledger-ink:#0D1310;
+--ledger-soft:#1A2B22;
+--arrears:#F08276;
+--arrears-soft:#3A1D1A;
+--pending-bg:#4A3E12;
+--pending-ink:#F6DD86;
+--focus:#7FC7A1;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+background:var(--paper);color:var(--ink);
+font-family:var(--body);font-size:16px;line-height:1.55;
+-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:780px;margin-inline:auto;padding-inline:20px}
+a{color:var(--ledger);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+h1,h2,h3{margin:0;font-family:var(--display);font-stretch:78%;line-height:1.05;text-wrap:balance}
+p{margin:0}
+ul,ol{margin:0;padding:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.pending{
+background:var(--pending-bg);color:var(--pending-ink);
+padding:0 .3em;border-radius:3px;font-family:var(--mono);font-size:.88em;
+-webkit-box-decoration-break:clone;box-decoration-break:clone;
+}
+/* draft ribbon */
+.draft{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:11.5px;letter-spacing:.03em}
+.draft .wrap{padding-block:6px}
+/* header */
+.top{
+position:sticky;top:env(safe-area-inset-top,0px);z-index:10;
+background:var(--paper);border-bottom:1px solid var(--rule);
+}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand-mark{
+width:30px;height:30px;border:2px solid var(--ink);display:grid;place-items:center;
+font-family:var(--display);font-stretch:70%;font-weight:800;font-size:13px;
+}
+.brand-name{font-family:var(--display);font-stretch:82%;font-weight:700;font-size:18px;line-height:1}
+.btn{
+display:inline-flex;align-items:center;justify-content:center;gap:8px;
+font:600 15px/1 var(--body);padding:13px 18px;
+border:2px solid var(--ink);background:var(--ink);color:var(--paper);
+text-decoration:none;cursor:pointer;border-radius:0;
+}
+.btn:hover{background:var(--ledger);border-color:var(--ledger);color:var(--ledger-ink)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.sm{padding:9px 13px;font-size:14px}
+.btn[disabled]{opacity:.6;cursor:progress}
+/* hero */
+.hero{padding-block:40px 32px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.hero h1{font-size:clamp(34px,6.2vw,58px);font-weight:800;font-stretch:72%;margin-top:14px}
+.hero h1 .seven{color:var(--arrears)}
+.lede{font-size:18px;color:var(--ink-2);max-width:54ch;margin-top:14px}
+.ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.licence{margin-top:22px;font-size:13.5px;color:var(--ink-3)}
+.licence strong{color:var(--ink-2);font-weight:600}
+/* section stack */
+.stack{border-top:1.5px solid var(--ink)}
+.sec{border-bottom:1px solid var(--rule);scroll-margin-top:64px}
+.sec > summary{
+list-style:none;cursor:pointer;display:flex;align-items:center;gap:16px;padding-block:18px;
+}
+.sec > summary::-webkit-details-marker{display:none}
+.sum-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sum-title{font-family:var(--display);font-stretch:80%;font-weight:700;font-size:clamp(21px,3.2vw,26px);line-height:1.15}
+.sum-sub{font-size:14.5px;color:var(--ink-2)}
+.sum-sub.mono{font-size:13px;letter-spacing:0}
+.sec > summary:hover .sum-title{color:var(--ledger)}
+.pm{width:30px;height:30px;flex:none;border:1.5px solid var(--ink);color:var(--ink);position:relative}
+.pm::before,.pm::after{
+content:"";position:absolute;left:50%;top:50%;width:11px;height:1.5px;background:currentColor;
+transform:translate(-50%,-50%);
+}
+.pm::after{transform:translate(-50%,-50%) rotate(90deg)}
+.sec[open] > summary .pm{background:var(--ink);color:var(--paper)}
+.sec[open] > summary .pm::after{transform:translate(-50%,-50%) rotate(0deg)}
+.sec-body{padding-bottom:28px}
+@media (prefers-reduced-motion:no-preference){
+.pm::after{transition:transform .2s ease}
+.sec[open] > .sec-body{animation:rise .24s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+}
+.note{font-size:13.5px;color:var(--ink-3);margin-top:14px}
+/* small rows inside sections (fees, FAQ) */
+.rows{border-top:1px solid var(--rule-strong)}
+.row{border-bottom:1px solid var(--rule)}
+.row > summary{
+list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto 14px;
+align-items:center;gap:14px;padding-block:13px;
+}
+.row > summary::-webkit-details-marker{display:none}
+.chev{width:8px;height:8px;border:solid var(--ink-3);border-width:0 1.5px 1.5px 0;transform:rotate(45deg);justify-self:end;margin-top:-4px}
+.row[open] > summary .chev{transform:rotate(-135deg);margin-top:4px}
+.row-name{font-weight:600;font-size:16px;line-height:1.3}
+.row-name small{display:block;font:400 12.5px/1.4 var(--mono);color:var(--ink-3);margin-top:2px}
+.price{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:20px;text-align:right;white-space:nowrap}
+.price small{font-size:11.5px;color:var(--ink-3);margin-left:4px}
+.row-body{padding:0 0 14px;font-size:15px;color:var(--ink-2)}
+.row-body ul{padding-left:18px}
+.row-body li+li{margin-top:3px}
+.faq .row > summary{grid-template-columns:minmax(0,1fr) 14px}
+/* calculator */
+.calc{background:var(--surface);border:1.5px solid var(--ink)}
+.fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid var(--rule-strong)}
+.field{min-width:0;display:flex;flex-direction:column;padding:10px 14px;border-right:1px solid var(--rule-strong)}
+.field:nth-child(2n){border-right:0}
+.field.full{grid-column:1 / -1;border-right:0;border-top:1px solid var(--rule-strong)}
+.field label,.field .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.field input,.field select,.field textarea{
+font:inherit;font-size:16px;color:var(--ink);background:transparent;border:0;padding:3px 0;width:100%;min-width:0;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none}
+.field:focus-within{background:var(--ledger-soft)}
+.seg{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.seg input{position:absolute;left:0;top:0;width:1px;height:1px;margin:0;opacity:0;pointer-events:none}
+.seg label{
+font:400 14px/1.2 var(--body);letter-spacing:0;text-transform:none;color:var(--ink-2);
+border:1px solid var(--rule-strong);padding:7px 10px;margin:0;cursor:pointer;
+}
+.seg input:checked + label{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.seg input:focus-visible + label{outline:2px solid var(--focus);outline-offset:2px}
+.cal{padding:12px 14px 4px}
+.cal-cap{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-dow{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-align:center}
+.cell{
+aspect-ratio:1/1;max-width:100%;min-height:36px;border:1px solid transparent;
+display:flex;flex-direction:column;justify-content:space-between;padding:3px 5px;
+font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--ink-3);
+}
+.cell .t{font-size:9.5px;text-transform:uppercase;line-height:1;align-self:flex-end}
+.cell.svc{border:1.5px solid var(--ink);color:var(--ink)}
+.cell.mail{background:repeating-linear-gradient(135deg,transparent 0 5px,var(--rule) 5px 6px);color:var(--ink-2);border-color:var(--rule)}
+.cell.count{background:var(--ledger-soft);color:var(--ink);border-color:var(--ledger-soft)}
+.cell.term{background:var(--arrears-soft);border:1.5px solid var(--arrears);color:var(--arrears);font-weight:600}
+.cell.file{background:var(--ledger);color:var(--ledger-ink);border-color:var(--ledger);font-weight:600}
+.cal-out{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;padding:12px 14px;border-top:1px solid var(--rule-strong);margin:8px 0 0}
+.cal-out dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.cal-out dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14.5px}
+.cal-out dd.hot{color:var(--arrears);font-weight:600}
+.cal-out dd.go{color:var(--ledger);font-weight:600}
+.cal-foot{padding:10px 14px 12px;font-size:13px;color:var(--ink-2);border-top:1px dashed var(--rule-strong)}
+/* lists inside sections */
+.changes li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;padding-block:10px;border-bottom:1px solid var(--rule);font-size:15px;color:var(--ink-2)}
+.changes li:first-child{border-top:1px solid var(--rule-strong)}
+.changes time{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);padding-top:2px}
+.changes b{color:var(--ink);font-weight:600}
+.changes .hot{color:var(--arrears)}
+.steps{list-style:none;counter-reset:s;border-top:1px solid var(--rule-strong)}
+.steps li{counter-increment:s;display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;padding-block:10px;border-bottom:1px solid var(--rule);font-size:15px;color:var(--ink-2)}
+.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:12.5px;color:var(--ledger);font-weight:600;padding-top:2px}
+.steps b{color:var(--ink);font-weight:600}
+.prose{font-size:15.5px;color:var(--ink-2);max-width:60ch}
+.prose + .prose{margin-top:10px}
+.prose strong{color:var(--ink)}
+.person{margin-top:18px;display:flex;gap:14px;align-items:center;padding:14px;background:var(--surface);border:1px solid var(--rule-strong)}
+.avatar{width:48px;height:48px;flex:none;background:var(--ledger-soft);display:grid;place-items:center;font-family:var(--display);font-stretch:70%;font-weight:800;font-size:19px;color:var(--ledger)}
+.person b{display:block;font-size:16px}
+.person span{font-size:13px;color:var(--ink-3)}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.facts li{list-style:none;font-size:13px;padding:5px 10px;border:1px solid var(--rule-strong);color:var(--ink-2)}
+/* intake */
+.intake-intro{font-size:15.5px;color:var(--ink-2);margin-bottom:14px}
+.intake-intro b{color:var(--ink);font-weight:600}
+.form-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px}
+.form-foot small{color:var(--ink-3);font-size:12.5px;max-width:36ch}
+.form-msg{margin:0 14px 14px;padding:11px 13px;border:1px solid var(--ledger);background:var(--ledger-soft);font-size:14px}
+.form-msg.err{border-color:var(--arrears);background:var(--arrears-soft)}
+.privacy{padding:0 14px 14px;font-size:12px;color:var(--ink-3)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.field input[type="file"]{font-size:14px;padding:6px 0}
+.file-note{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.contact{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;font-size:14px;color:var(--ink-2)}
+.contact b{color:var(--ink);font-weight:600;margin-right:4px}
+@media (max-width:520px){
+.intake-form .fields{grid-template-columns:minmax(0,1fr)}
+.intake-form .field{border-right:0}
+.intake-form .field + .field{border-top:1px solid var(--rule-strong)}
+}
+.intake-form .field:nth-child(n+3){border-top:1px solid var(--rule-strong)}
+/* footer */
+footer{padding-block:28px 40px;font-size:12.5px;color:var(--ink-3)}
+footer p + p{margin-top:6px}
+footer strong{color:var(--ink-2);font-weight:600}
+</style>
+</head>
+<body>
+<div class="draft" role="note">
+<div class="wrap">Draft · licence number pending</div>
+</div>
+<header class="top">
+<div class="wrap">
+<a class="brand" href="#top" aria-label="AnderHue Paralegal home">
+<span class="brand-mark" aria-hidden="true">AP</span>
+<span class="brand-name">AnderHue Paralegal</span>
+</a>
+<a class="btn sm" href="#intake" data-open="intake">Start a file</a>
+</div>
+</header>
+<main id="top" class="wrap">
+<section class="hero">
+<p class="eyebrow">Ontario landlords · LTB</p>
+<h1>Unpaid rent now runs on a <span class="seven">7-day</span> notice.</h1>
+<p class="lede">We prepare your N4, file your L1 or L2 and represent you at the hearing. Every fee is posted, and your first 15-minute file review is free.</p>
+<div class="ctas">
+<a class="btn" href="#intake" data-open="intake">Start a file</a>
+<a class="btn ghost" href="#dates" data-open="dates">Check your N4 dates</a>
+</div>
+<p class="licence"><strong>Don Anderson, Paralegal</strong> · Licensed by the Law Society of Ontario · <span class="pending">P#####</span></p>
+</section>
+<div class="stack">
+<details class="sec" id="fees" name="sec">
+<summary>
+<span class="sum-text">
+<span class="sum-title">Flat fees</span>
+<span class="sum-sub mono">N4 $149 · L1 $695 · L2 $995 · Hearing $395</span>
+</span>
+<span class="pm" aria-hidden="true"></span>
+</summary>
+<div class="sec-body">
+<div class="rows">
+<details class="row" name="fee">
+<summary><span class="row-name">N4 notice<small>Non-payment of rent</small></span><span class="price">$149<small>+HST</small></span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body"><ul>
+<li>Arrears reconciled against your ledger, to the cent</li>
+<li>N4 on the current 2026/09 form</li>
+<li>Service instructions, certificate of service, your key dates</li>
+</ul></div>
+</details>
+<details class="row" name="fee">
+<summary><span class="row-name">L1 application<small>Through one hearing</small></span><span class="price">$695<small>+HST</small></span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body"><ul>
+<li>N4 and service checked before filing</li>
+<li>L1 filed on the Tribunals Ontario Portal</li>
+<li>Evidence bundle, notice of hearing service, one hearing</li>
+</ul></div>
+</details>
+<details class="row" name="fee">
+<summary><span class="row-name">L2 application<small>N5 · N7 · N8 · N12</small></span><span class="price">$995<small>+HST</small></span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body"><ul>
+<li>Notice prepared or reviewed, including N12 compensation and declaration</li>
+<li>Affidavits and declarations commissioned in-house</li>
+<li>L2 filed on the Tribunals Ontario Portal</li>
+<li>Evidence bundle, notice of hearing service, one hearing</li>
+</ul></div>
+</details>
+<details class="row" name="fee">
+<summary><span class="row-name">Hearing only<small>You filed, we appear</small></span><span class="price">$395<small>+HST</small></span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body"><ul>
+<li>File review and evidence check</li>
+<li>Representation at one hearing</li>
+</ul></div>
+</details>
+</div>
+<p class="note">First 15-minute file review is free. LTB filing fee of $186 (Portal) is extra, paid at cost. Adjournments, reviews and Sheriff enforcement are quoted in writing first. Written retainer before any work.</p>
+</div>
+</details>
+<details class="sec" id="dates" name="sec">
+<summary>
+<span class="sum-text">
+<span class="sum-title">N4 date calculator</span>
+<span class="sum-sub">Your earliest termination date and L1 filing date</span>
+</span>
+<span class="pm" aria-hidden="true"></span>
+</summary>
+<div class="sec-body">
+<div class="calc">
+<div class="fields">
+<div class="field">
+<label for="svc-date">Date served</label>
+<input type="date" id="svc-date">
+</div>
+<div class="field">
+<label for="period">Rent paid</label>
+<select id="period">
+<option value="month">Monthly or yearly</option>
+<option value="week">Daily or weekly</option>
+</select>
+</div>
+<div class="field full">
+<span class="lbl" id="method-label">How it was served</span>
+<div class="seg" role="radiogroup" aria-labelledby="method-label">
+<input type="radio" name="method" id="m-hand" value="hand" checked><label for="m-hand">Handed over</label>
+<input type="radio" name="method" id="m-box" value="box"><label for="m-box">Mailbox</label>
+<input type="radio" name="method" id="m-mail" value="mail"><label for="m-mail">Mailed</label>
+</div>
+</div>
+</div>
+<div class="cal">
+<p class="cal-cap mono" id="cal-cap"></p>
+<div class="cal-grid" id="cal" aria-hidden="true"></div>
+</div>
+<dl class="cal-out" aria-live="polite">
+<dt>Deemed served</dt><dd id="o-deem">&nbsp;</dd>
+<dt>Earliest end</dt><dd class="hot" id="o-term">&nbsp;</dd>
+<dt>File L1 from</dt><dd class="go" id="o-file">&nbsp;</dd>
+</dl>
+<p class="cal-foot" id="cal-foot">Estimate. If the tenant pays all arrears before you file, the N4 is void.</p>
+</div>
+</div>
+</details>
+<details class="sec" id="changes" name="sec">
+<summary>
+<span class="sum-text">
+<span class="sum-title">What changed in 2026</span>
+<span class="sum-sub">7-day N4, new form, half-arrears rule, N12 at 120 days</span>
+</span>
+<span class="pm" aria-hidden="true"></span>
+</summary>
+<div class="sec-body">
+<ol class="changes">
+<li><time datetime="2026-09-21">Sep 21</time><span><b>N4 notice: <span class="hot">7 days</span>, down from 14.</b> Monthly and yearly tenancies. Mail still adds five days.</span></li>
+<li><time datetime="2026-09-21">Sep 21</time><span><b>New N4 form (2026/09).</b> The 2022 form no longer works.</span></li>
+<li><time datetime="2026-09-21">Sep 21</time><span><b>Half the arrears first.</b> Tenants must pay half before raising unrelated issues like repairs.</span></li>
+<li><time datetime="2026-09-21">Sep 21</time><span><b>N12 at 120 days.</b> No compensation owed with at least 120 days' notice.</span></li>
+<li><time datetime="2026-09-21">Sep 21</time><span><b>Persistent late payment defined.</b> The Act now sets the test for N8 and L2.</span></li>
+<li><time datetime="2026-07-01">Jul 1</time><span><b>Reviews: 15 days.</b> Down from 30 to ask the Board to review an order.</span></li>
+</ol>
+<p class="note">Current to September 25, 2026.</p>
+</div>
+</details>
+<details class="sec" id="process" name="sec">
+<summary>
+<span class="sum-text">
+<span class="sum-title">How an arrears file runs</span>
+<span class="sum-sub">Six steps from your lease to a Board order</span>
+</span>
+<span class="pm" aria-hidden="true"></span>
+</summary>
+<div class="sec-body">
+<ol class="steps">
+<li><span><b>Send the lease and ledger.</b> A photo of a paper ledger is fine.</span></li>
+<li><span><b>We reconcile the arrears.</b> Every amount on the N4 matches your ledger.</span></li>
+<li><span><b>N4 served.</b> You get instructions and your earliest end date.</span></li>
+<li><span><b>L1 filed.</b> The day after the end date, unless the tenant paid in full.</span></li>
+<li><span><b>Hearing.</b> We serve, disclose evidence on time and represent you.</span></li>
+<li><span><b>Order.</b> We walk you through it. Sheriff enforcement is quoted separately.</span></li>
+</ol>
+</div>
+</details>
+<details class="sec" id="who" name="sec">
+<summary>
+<span class="sum-text">
+<span class="sum-title">Who does the work</span>
+<span class="sum-sub">A licensed paralegal signs every document</span>
+</span>
+<span class="pm" aria-hidden="true"></span>
+</summary>
+<div class="sec-body">
+<p class="prose">Software reads your lease and ledger, drafts the notice and application, and checks every date and dollar against current rules.</p>
+<p class="prose"><strong>Nothing is served or filed until Don Anderson has reviewed and signed it.</strong> Your retainer and fees are with AnderHue Paralegal Professional Corporation only.</p>
+<div class="person">
+<div class="avatar" aria-hidden="true">DA</div>
+<div><b>Don Anderson</b><span>Paralegal · Notary Public · Commissioner of Oaths · LSO <span class="pending">P#####</span></span></div>
+</div>
+<ul class="facts">
+<li>Landlords only</li>
+<li>Encrypted records</li>
+<li>Across Ontario</li>
+<li>Ontario Paralegal Association member</li>
+</ul>
+</div>
+</details>
+<details class="sec faq" id="faq" name="sec">
+<summary>
+<span class="sum-text">
+<span class="sum-title">Questions</span>
+<span class="sum-sub">Paying to void an N4, older notices, hearings, exclusions</span>
+</span>
+<span class="pm" aria-hidden="true"></span>
+</summary>
+<div class="sec-body">
+<div class="rows">
+<details class="row" name="faq">
+<summary><span class="row-name">Can the tenant cancel the N4 by paying?</span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body">Yes. Full payment of the arrears before the L1 is filed voids the N4. After filing, the tenant still has limited ways to stop the eviction by paying what is owed plus your filing fee.</div>
+</details>
+<details class="row" name="faq">
+<summary><span class="row-name">My N4 was served before September 21. Is it still good?</span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body">It follows the rules in force when served: 14 days for monthly and yearly tenancies, on the form that applied then. We check it before you file.</div>
+</details>
+<details class="row" name="faq">
+<summary><span class="row-name">Do I need to be at the hearing?</span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body">Usually, yes. The adjudicator may need to hear from you about the rent owed. We prepare you and represent you.</div>
+</details>
+<details class="row" name="faq">
+<summary><span class="row-name">What doesn't the flat fee cover?</span><span class="chev" aria-hidden="true"></span></summary>
+<div class="row-body">HST, the LTB filing fee, adjournments, second hearings, review requests and Sheriff enforcement. Anything extra is quoted in writing first.</div>
+</details>
+</div>
+</div>
+</details>
+<details class="sec" id="intake" name="sec">
+<summary>
+<span class="sum-text">
+<span class="sum-title">Start a file</span>
+<span class="sum-sub">Free 15-minute file review. We reply with your next deadline and the fee.</span>
+</span>
+<span class="pm" aria-hidden="true"></span>
+</summary>
+<div class="sec-body">
+<p class="intake-intro"><b>Attach what you have:</b> your lease, rent ledger, any notice already served and photo ID. We read them to set up your file, so you type less.</p>
+<form class="calc intake-form" id="intake-form" novalidate data-endpoint="https://gcasbisxfrssonllpqrw.supabase.co/functions/v1/ltb-intake" data-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYXNiaXN4ZnJzc29ubGxwcXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1NDg5OTMsImV4cCI6MjA3NDEyNDk5M30.iWXMMWmnRuPQYVJCwAbUp0FiYxZWhe_bdyZycZYqBK8" data-live="">
+<div class="fields">
+<div class="field">
+<label for="f-name">Your name</label>
+<input id="f-name" name="name" autocomplete="name" required>
+</div>
+<div class="field">
+<label for="f-email">Email</label>
+<input id="f-email" name="email" type="email" autocomplete="email" required>
+</div>
+<div class="field">
+<label for="f-phone">Phone</label>
+<input id="f-phone" name="phone" type="tel" autocomplete="tel">
+</div>
+<div class="field">
+<label for="f-city">Rental unit city</label>
+<input id="f-city" name="city" placeholder="e.g. Hamilton">
+</div>
+<div class="field">
+<label for="f-issue">Issue</label>
+<select id="f-issue" name="issue">
+<option value="arrears">Unpaid rent</option>
+<option value="persistent_late">Persistent late payment</option>
+<option value="n12_own_use">Own or family use (N12)</option>
+<option value="n5_damage">Damage (N5)</option>
+<option value="n5_conduct">Interference or conduct (N5)</option>
+<option value="hearing_scheduled">Hearing already scheduled</option>
+<option value="other">Something else</option>
+</select>
+</div>
+<div class="field">
+<label for="f-owed">Rent owed (approx.)</label>
+<input id="f-owed" name="owed" inputmode="decimal" placeholder="$0.00">
+</div>
+<div class="field full">
+<span class="lbl" id="served-label">Notice served?</span>
+<div class="seg" role="radiogroup" aria-labelledby="served-label">
+<input type="radio" name="served" id="s-no" value="no" checked><label for="s-no">Not yet</label>
+<input type="radio" name="served" id="s-yes" value="yes"><label for="s-yes">Yes</label>
+<input type="radio" name="served" id="s-unsure" value="unsure"><label for="s-unsure">Not sure</label>
+</div>
+</div>
+<div class="hp" aria-hidden="true">
+<label for="f-company">Company</label>
+<input id="f-company" name="company" tabindex="-1" autocomplete="off">
+</div>
+<div class="field full">
+<label for="f-files">Documents or photos</label>
+<input id="f-files" name="files" type="file" multiple accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf,.heic,.heif">
+<span class="file-note" id="f-files-note">Optional. Lease, rent ledger, notice, photo ID. Up to 6 files, 10 MB each.</span>
+</div>
+<div class="field full">
+<label for="f-notes">Anything we should know</label>
+<textarea id="f-notes" name="notes" rows="2" placeholder="Dates, amounts, what the tenant has said"></textarea>
+</div>
+</div>
+<div class="form-foot">
+<small>No retainer until we confirm scope and fee in writing.</small>
+<button class="btn" type="submit" id="f-submit">Send</button>
+</div>
+<p class="form-msg" id="form-msg" role="status" hidden></p>
+<p class="privacy">Used only to reply about your file. Stored with our service providers, which may process it outside Canada.</p>
+</form>
+<div class="contact">
+<span><b>Phone</b><a href="tel:+12899850166">(289) 985-0166</a></span>
+<span><b>Email</b><a href="mailto:info@onlineparalegals.ca">info@onlineparalegals.ca</a></span>
+<span><b>Hours</b>Mon–Fri, 9–5</span>
+</div>
+</div>
+</details>
+</div>
+</main>
+<footer>
+<div class="wrap">
+<p><strong>AnderHue Paralegal Professional Corporation</strong> · Paralegal services by Don Anderson, licensed by the Law Society of Ontario, <span class="pending">P#####</span>.</p>
+<p>General information about LTB procedure, not legal advice about your tenancy. Case preparation software by Fabsy, which provides no legal services and holds no client funds.</p>
+</div>
+</footer>
+<script>
+(function(){
+var DAY = 86400000;
+var CUTOVER = Date.UTC(2026, 8, 21);
+var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* sections: one open at a time, scroll the opened one into view */
+var secs = Array.prototype.slice.call(document.querySelectorAll('details.sec'));
+var nativeGroups = 'name' in HTMLDetailsElement.prototype;
+function reveal(d){
+requestAnimationFrame(function(){
+var top = d.getBoundingClientRect().top;
+if (top < 56 || top > window.innerHeight * 0.55) {
+d.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+}
+});
+}
+secs.forEach(function(d){
+d.addEventListener('toggle', function(){
+if (!d.open) return;
+if (!nativeGroups) secs.forEach(function(o){ if (o !== d && o.open) o.open = false; });
+reveal(d);
+});
+});
+function openSec(id){
+var d = document.getElementById(id);
+if (!d || !d.classList.contains('sec')) return;
+if (d.open) reveal(d); else d.open = true;
+}
+document.querySelectorAll('[data-open]').forEach(function(a){
+a.addEventListener('click', function(e){ e.preventDefault(); openSec(a.getAttribute('data-open')); });
+});
+if (/^#[a-z]+$/.test(location.hash)) openSec(location.hash.slice(1));
+/* N4 calculator */
+var dateEl = document.getElementById('svc-date');
+var periodEl = document.getElementById('period');
+var cal = document.getElementById('cal');
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function todayIso(){
+var n = new Date();
+return n.getFullYear() + '-' + pad(n.getMonth() + 1) + '-' + pad(n.getDate());
+}
+function parse(s){
+var p = (s || '').split('-').map(Number);
+if (p.length !== 3 || !p[0] || !p[1] || !p[2]) return null;
+return Date.UTC(p[0], p[1] - 1, p[2]);
+}
+function fmt(t){
+return new Date(t).toLocaleDateString('en-CA', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' });
+}
+function dow(t){ return new Date(t).getUTCDay(); }
+function method(){
+var r = document.querySelector('input[name="method"]:checked');
+return r ? r.value : 'hand';
+}
+function render(){
+var svc = parse(dateEl.value);
+if (svc === null) { svc = parse(todayIso()); dateEl.value = todayIso(); }
+var mailDays = method() === 'mail' ? 5 : 0;
+var deemed = svc + mailDays * DAY;
+var oldRule = svc < CUTOVER;
+var minDays = (oldRule && periodEl.value === 'month') ? 14 : 7;
+var term = deemed + minDays * DAY;
+var file = term + DAY;
+document.getElementById('o-deem').textContent = fmt(deemed) + (mailDays ? '  (+5, mail)' : '');
+document.getElementById('o-term').textContent = fmt(term) + '  (' + minDays + ' days)';
+document.getElementById('o-file').textContent = fmt(file);
+document.getElementById('cal-foot').textContent = oldRule
+? 'Served before Sept 21, 2026: old rules apply, including 14 days for monthly and yearly tenancies.'
+: 'Estimate. If the tenant pays all arrears before you file, the N4 is void.';
+var start = svc - dow(svc) * DAY;
+var end = file + (6 - dow(file)) * DAY;
+var html = '';
+['S','M','T','W','T','F','S'].forEach(function(d){ html += '<div class="cal-dow">' + d + '</div>'; });
+for (var t = start; t <= end; t += DAY) {
+var cls = 'cell', tag = '';
+if (t === svc) { cls += ' svc'; tag = 'Srv'; }
+else if (t > svc && t <= deemed) { cls += ' mail'; tag = t === deemed ? '+5' : ''; }
+else if (t > deemed && t < term) { cls += ' count'; tag = String(Math.round((t - deemed) / DAY)); }
+else if (t === term) { cls += ' term'; tag = 'End'; }
+else if (t === file) { cls += ' file'; tag = 'L1'; }
+html += '<div class="' + cls + '"><span>' + new Date(t).getUTCDate() + '</span><span class="t">' + tag + '</span></div>';
+}
+cal.innerHTML = html;
+var mo = function(x){ return new Date(x).toLocaleDateString('en-CA', { timeZone: 'UTC', month: 'long' }); };
+document.getElementById('cal-cap').textContent =
+(mo(start) === mo(end) ? mo(start) : mo(start) + ' – ' + mo(end)) + ' ' + new Date(end).getUTCFullYear();
+}
+dateEl.value = todayIso();
+dateEl.addEventListener('change', render);
+dateEl.addEventListener('input', render);
+periodEl.addEventListener('change', render);
+document.querySelectorAll('input[name="method"]').forEach(function(r){ r.addEventListener('change', render); });
+render();
+/* intake: register, upload documents privately, then start reading them */
+var form = document.getElementById('intake-form');
+var msg = document.getElementById('form-msg');
+var submitBtn = document.getElementById('f-submit');
+var filesEl = document.getElementById('f-files');
+var filesNote = document.getElementById('f-files-note');
+var endpoint = form.getAttribute('data-endpoint');
+var apiKey = form.getAttribute('data-key');
+var live = form.getAttribute('data-live');
+var loadedAt = Date.now();
+var TYPES = { pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif' };
+var ACCEPTED = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+var MAX_FILES = 6, MAX_BYTES = 10 * 1024 * 1024;
+var NOTE = filesNote.textContent;
+if (endpoint.indexOf('__') === 0) endpoint = '';
+if (apiKey.indexOf('__') === 0) apiKey = '';
+if (live.indexOf('__') === 0) live = '';
+function show(text, isError){
+msg.textContent = text;
+msg.classList.toggle('err', !!isError);
+msg.hidden = false;
+}
+function val(id){ return document.getElementById(id).value.trim(); }
+function fileType(file){
+if (ACCEPTED.indexOf(file.type) >= 0) return file.type;
+return TYPES[(file.name.split('.').pop() || '').toLowerCase()] || '';
+}
+function chosen(){ return Array.prototype.slice.call(filesEl.files || []); }
+function describeFiles(){
+var files = chosen();
+if (!files.length) { filesNote.textContent = NOTE; return; }
+var bad = files.filter(function(f){ return !fileType(f) || f.size > MAX_BYTES; }).length;
+filesNote.textContent = files.length + ' file' + (files.length === 1 ? '' : 's') + ' chosen' +
+(files.length > MAX_FILES ? '. Choose 6 or fewer.' : '') +
+(bad ? '. ' + bad + ' not accepted: photos or PDFs, 10 MB max.' : '');
+}
+filesEl.addEventListener('change', describeFiles);
+function post(body){
+return fetch(endpoint, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json', 'apikey': apiKey, 'Authorization': 'Bearer ' + apiKey },
+body: JSON.stringify(body)
+}).then(function(r){
+return r.json().catch(function(){ return {}; }).then(function(j){ return { ok: r.ok && j.ok === true, status: r.status, body: j }; });
+});
+}
+function upload(target, file){
+var data = new FormData();
+data.append('cacheControl', '3600');
+data.append('', new Blob([file], { type: target.contentType }), file.name);
+return fetch(target.signedUrl, {
+method: 'PUT',
+headers: { 'x-upsert': 'false', 'apikey': apiKey, 'Authorization': 'Bearer ' + apiKey },
+body: data
+}).then(function(r){ return r.ok; }).catch(function(){ return false; });
+}
+form.addEventListener('submit', function(e){
+e.preventDefault();
+var name = val('f-name');
+var email = val('f-email');
+if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+show('Add your name and a working email so we can reply.', true);
+(name ? document.getElementById('f-email') : document.getElementById('f-name')).focus();
+return;
+}
+var files = chosen();
+if (files.length > MAX_FILES) { show('Choose 6 files or fewer.', true); filesEl.focus(); return; }
+if (files.some(function(f){ return !fileType(f) || f.size > MAX_BYTES; })) {
+show('Attach photos or PDFs, 10 MB or smaller each.', true); filesEl.focus(); return;
+}
+if (!endpoint) {
+show(live ? 'Preview copy. Submit on the live page: ' + live : 'Preview copy. This form is not connected here.', false);
+return;
+}
+var served = document.querySelector('input[name="served"]:checked');
+var payload = {
+action: 'submit', practiceId: 'anderhue-paralegal',
+name: name, email: email, phone: val('f-phone'), city: val('f-city'),
+issue: document.getElementById('f-issue').value, owed: val('f-owed'),
+served: served ? served.value : 'unsure', notes: val('f-notes'),
+company: val('f-company'), elapsedMs: Date.now() - loadedAt,
+files: files.map(function(f){ return { name: f.name, contentType: fileType(f), size: f.size }; })
+};
+submitBtn.disabled = true;
+var label = submitBtn.textContent;
+submitBtn.textContent = 'Sending…';
+var uploaded = 0;
+post(payload).then(function(res){
+if (!res.ok) throw res;
+var data = res.body;
+if (!data.caseId || !files.length) return data;
+var targets = data.uploads || [];
+var done = [];
+var chain = Promise.resolve();
+targets.forEach(function(target, i){
+chain = chain.then(function(){
+show('Uploading document ' + (i + 1) + ' of ' + targets.length + '…', false);
+return upload(target, files[target.index]).then(function(ok){ if (ok) done.push(target.documentId); });
+});
+});
+return chain.then(function(){
+uploaded = done.length;
+return post({ action: 'finalize', caseId: data.caseId, intakeToken: data.intakeToken, uploaded: done });
+}).then(function(){ return data; });
+}).then(function(data){
+form.reset();
+describeFiles();
+loadedAt = Date.now();
+var ref = data && data.caseNumber ? ' Your file number is ' + data.caseNumber + '.' : '';
+var missed = data && data.caseId && files.length > uploaded
+? ' ' + (files.length - uploaded) + ' document' + (files.length - uploaded === 1 ? '' : 's') + ' did not upload. Email ' + (files.length - uploaded === 1 ? 'it' : 'them') + ' to us.'
+: '';
+show('Received.' + ref + ' We’ll reply by email with your next deadline and the fee that applies.' + missed, false);
+}).catch(function(res){
+if (res && res.status === 422) show((res.body && res.body.error) || 'Check your name and email, then send again.', true);
+else if (res && res.status === 429) show('Too many submissions from this connection. Call the office or try again later.', true);
+else show('That didn’t go through. Try again shortly, or use the phone or email below.', true);
+}).then(function(){ submitBtn.disabled = false; submitBtn.textContent = label; });
+});
+})();
+</script>
+</body>
+</html>

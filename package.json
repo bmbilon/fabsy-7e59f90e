@@ -28,7 +28,8 @@
     "test:checkout-branding": "node scripts/test-checkout-branding.mjs",
     "test:consent-welcome": "deno test --allow-env --allow-net --allow-read --node-modules-dir=none --frozen supabase/functions/_shared/consent-welcome.test.ts supabase/functions/process-consent-welcome/index.test.ts supabase/functions/process-portal-activity/consent.test.ts supabase/functions/_shared/portal-activity-email.test.ts && node --test scripts/test-consent-legacy-notification.mjs && node scripts/test-consent-welcome-db.mjs",
     "test:photo-radar-claims": "node scripts/test-photo-radar-insurance-claims.mjs",
-    "test:rapid-landing": "node scripts/test-rapid-landing.mjs"
+    "test:rapid-landing": "node scripts/test-rapid-landing.mjs",
+    "test:ltb": "node --test scripts/test-ltb-intake.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getIdrStaffRole } from "@/hooks/useIdrAuth";
+import { fetchMyLtbPractices } from "@/lib/admin/ltbApi";
 import { Lock } from "lucide-react";
 
 export default function AdminLogin() {
@@ -54,6 +55,12 @@ export default function AdminLogin() {
         const roleData = await getIdrStaffRole();
 
         if (!roleData) {
+          // Ontario LTB practice members have their own workspace.
+          const practices = await fetchMyLtbPractices().catch(() => []);
+          if (practices.length) {
+            navigate('/admin/ltb');
+            return;
+          }
           await supabase.auth.signOut();
           throw new Error('Unauthorized: You do not have admin access');
         }
