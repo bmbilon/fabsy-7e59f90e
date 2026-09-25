@@ -288,7 +288,7 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
           </kbd>
         </button>
         <div className="ml-auto flex items-center gap-3">
-          {fabsyStaff && <a href="/admin/portal" className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-white/10 px-2.5 text-xs font-medium text-white hover:bg-white/20">
+          {fabsyStaff && <a href="/admin/portal" className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-slate-700 px-2.5 text-xs font-medium text-white hover:bg-slate-600">
             <Inbox className="h-4 w-4" /><span>Portal queue</span>
           </a>}
           <span className="hidden rounded-md bg-white/5 px-2 py-1 text-[11px] capitalize text-slate-300 sm:inline">
