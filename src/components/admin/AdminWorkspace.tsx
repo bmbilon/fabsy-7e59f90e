@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
@@ -171,7 +171,8 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
       command &&
       term.length >= 2 &&
       !!auth.session &&
-      (auth.role.data === "admin" || auth.role.data === "case_manager"),
+      auth.role.isSuccess &&
+      fabsyStaff,
     queryFn: async ({ signal }) => {
       const responses = await Promise.all(
         ["submitted", "partial"].map((p_filter) =>
@@ -204,9 +205,23 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
     setSearch("");
     navigate(contextualHref(path));
   };
+  // Gate the outlet before any child page mounts or starts fetching traffic data.
+  // LTB practice access is enforced separately by its pages and database policies.
+  if (!auth.ready) return <main role="status" className="p-6">Checking access…</main>;
+  if (!auth.session) return <Navigate to="/admin" replace />;
+  if (auth.role.isError) {
+    return <main className="p-6">
+      <p role="alert">Your access could not be verified. Try again.</p>
+      <Button className="mt-3" onClick={() => void auth.role.refetch()}>Retry access check</Button>
+    </main>;
+  }
+  if (!auth.role.isSuccess) return <main role="status" className="p-6">Checking access…</main>;
+  if (!fabsyStaff && location.pathname !== "/admin/ltb" && !location.pathname.startsWith("/admin/ltb/")) {
+    return <Navigate to="/admin/ltb" replace />;
+  }
   const nav = (
     <nav aria-label="Admin navigation" className="space-y-5 px-3 py-5">
-      {["Workspace", "Insights", "Operations", "Manage"].map((group) => (
+      {["Workspace", "Insights", "Operations", "Manage"].filter((group) => links.some((item) => item.group === group)).map((group) => (
         <div key={group}>
           <h2 className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
             {group}
@@ -264,8 +279,8 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
           <Menu className="h-5 w-5" />
         </Button>
         <Link
-          to="/admin/dashboard"
-          aria-label="Fabsy admin overview"
+          to={fabsyStaff ? "/admin/dashboard" : "/admin/ltb"}
+          aria-label={fabsyStaff ? "Fabsy admin overview" : "Ontario LTB files home"}
           className="text-2xl font-extrabold tracking-tight lg:w-[192px]"
         >
           fabsy<span className="text-blue-400">.</span>
@@ -274,17 +289,17 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
           type="button"
           onClick={() => setCommand(true)}
           className="ml-auto flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 text-left text-xs text-slate-300 transition-colors hover:bg-white/10 sm:ml-0 sm:max-w-md"
-          aria-label="Search cases and admin tools"
+          aria-label={fabsyStaff ? "Search cases and admin tools" : "Search LTB tools"}
         >
           <Search className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">Search cases & tools</span>
+          <span className="truncate">{fabsyStaff ? "Search cases & tools" : "Search LTB tools"}</span>
           <kbd className="ml-auto hidden shrink-0 rounded border border-white/15 px-1.5 py-0.5 text-[10px] sm:block">
             ⌘ / Ctrl K
           </kbd>
         </button>
         <div className="ml-auto flex items-center gap-3">
           <span className="hidden rounded-md bg-white/5 px-2 py-1 text-[11px] capitalize text-slate-300 sm:inline">
-            {auth.role.data?.replace("_", " ") || "Staff"}
+            {auth.role.data?.replace("_", " ") || "LTB member"}
           </span>
           <Button
             variant="ghost"
@@ -342,10 +357,10 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
       >
         <DialogTitle className="sr-only">Search cases and tools</DialogTitle>
         <DialogDescription className="sr-only">
-          Search by name, ticket number, email, or admin tool.
+          {fabsyStaff ? "Search by name, ticket number, email, or admin tool." : "Search Ontario LTB tools."}
         </DialogDescription>
         <CommandInput
-          placeholder="Search cases, ticket numbers, tools…"
+          placeholder={fabsyStaff ? "Search cases, ticket numbers, tools…" : "Search LTB tools…"}
           value={search}
           onValueChange={setSearch}
           maxLength={120}
@@ -367,7 +382,7 @@ export default function AdminWorkspace({ children }: { children?: ReactNode }) {
               );
             })}
           </CommandGroup>
-          {term.length >= 2 && (
+          {fabsyStaff && term.length >= 2 && (
             <>
               <CommandSeparator />
               <CommandGroup heading="Cases">
