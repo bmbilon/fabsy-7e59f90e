@@ -14,6 +14,16 @@ Static landing page for AnderHue Paralegal Professional Corporation (landlord LT
 3. When reading finishes, `ltb_intake_alerts` queues one email per case. The `fabsy-ltb-intake-alerts` cron job sends it to `ltb_practices.alert_emails`.
 4. Staff work the file at `/admin/ltb` (practice members and Fabsy admins only).
 
+### Practice access
+
+Add an existing login to `ltb_practice_members` for `anderhue-paralegal` with
+role `licensee` or `clerk`. This grants access to that practice's LTB files only.
+Do not add a practice member to `user_roles` as `admin` or `case_manager`, since
+those separate roles grant access to the Fabsy traffic workspace. The shared
+admin shell redirects members without a traffic role to `/admin/ltb` before
+mounting other admin pages. Database policies enforce the same separation for
+traffic data and limit LTB records to the member's practice.
+
 ## Pending
 
 - LSO licence number (`P#####` placeholders).
