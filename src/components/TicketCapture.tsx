@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type DragEvent } from "react";
 import { Camera, CheckCircle2, FileText, Loader2, Upload, X } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -84,8 +84,10 @@ export default function TicketCapture({
   const latestOcrHandler = useRef(onOcrData);
   const latestStateHandler = useRef(onCaptureStateChange);
   const requestId = useRef(0);
+  const dragDepth = useRef(0);
   const alreadyCapturedFile = useRef(skipInitialScan ? file : null);
   const [status, setStatus] = useState<CaptureStatus>({ kind: "idle" });
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     latestOcrHandler.current = onOcrData;
@@ -189,8 +191,8 @@ export default function TicketCapture({
     };
   }, [file, selectionOnly, scanOnSelect]);
 
-  const selectFile = (selectedFile: File | undefined, input: HTMLInputElement) => {
-    input.value = "";
+  const selectFile = (selectedFile: File | undefined, input?: HTMLInputElement) => {
+    if (input) input.value = "";
     if (!selectedFile || selectedFile === file) return;
 
     const validation = validateTicketCaptureFile(selectedFile);
@@ -216,6 +218,42 @@ export default function TicketCapture({
     setStatus({ kind: "idle" });
   };
 
+  const isFileDrag = (event: DragEvent<HTMLDivElement>) =>
+    Array.from(event.dataTransfer.types).includes("Files");
+
+  const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
+    if (disabled || !allowFileSelection || !isFileDrag(event)) return;
+    event.preventDefault();
+    dragDepth.current += 1;
+    setIsDragging(true);
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    if (disabled || !allowFileSelection || !isFileDrag(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    if (disabled || dragDepth.current === 0) return;
+    event.preventDefault();
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setIsDragging(false);
+  };
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    if (!isFileDrag(event)) return;
+    event.preventDefault();
+    dragDepth.current = 0;
+    setIsDragging(false);
+    if (disabled || !allowFileSelection) return;
+    if (event.dataTransfer.files.length > 1) {
+      setStatus({ kind: "error", title: "Choose one ticket file", message: "Upload one ticket file at a time." });
+      return;
+    }
+    selectFile(event.dataTransfer.files[0]);
+  };
+
   const selectedFileType = file ? validateTicketCaptureFile(file) : null;
 
   return (
@@ -230,24 +268,35 @@ export default function TicketCapture({
 
       {scanOnSelect && !compact && <TicketPhotoGuide />}
 
-      <div className={`rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 ${compact ? "p-[12px]" : "p-5 sm:p-6"}`}>
+      <div
+        className={`rounded-xl border-2 border-dashed transition-colors ${isDragging ? "border-primary bg-primary/15 ring-4 ring-primary/20" : "border-primary/40 bg-primary/5"} ${compact ? "p-[12px]" : "p-5 sm:p-6"}`}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <div className={`flex flex-col items-center text-center ${compact ? "gap-2" : "gap-4"}`}>
-          {!compact && (status.kind === "processing" ? (
-            <Loader2 className="h-9 w-9 animate-spin text-primary" aria-hidden="true" />
-          ) : file ? (
-            <FileText className="h-9 w-9 text-primary" aria-hidden="true" />
-          ) : (
-            <Upload className="h-9 w-9 text-primary" aria-hidden="true" />
-          ))}
-
-          <div className="min-w-0 max-w-full">
-            <p className={compact ? "sr-only" : "font-semibold text-foreground"}>
-              {file ? "Ticket file selected" : "Add a ticket file"}
-            </p>
-            <p className="mt-1 max-w-full break-all text-sm text-muted-foreground">
+          <button
+            type="button"
+            className={`flex w-full min-w-0 flex-col items-center rounded-lg border border-primary/30 bg-background px-4 text-center shadow-sm transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${compact ? "gap-1 py-3" : "gap-2 py-4"}`}
+            onClick={() => browseInputRef.current?.click()}
+            disabled={disabled}
+            aria-label={file ? "Change ticket file" : "Choose a ticket file"}
+          >
+            {status.kind === "processing" ? (
+              <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+            ) : file ? (
+              <FileText className="h-8 w-8 text-primary" aria-hidden="true" />
+            ) : (
+              <Upload className="h-8 w-8 text-primary" aria-hidden="true" />
+            )}
+            <span className={`font-semibold text-primary ${compact ? "text-sm" : "text-base sm:text-lg"}`}>
+              {isDragging ? "Drop your ticket here" : file ? "Ticket file selected — click to change" : allowFileSelection ? <><span className="sm:hidden">Tap to upload your ticket</span><span className="hidden sm:inline">Click to upload or drag and drop</span></> : "Click to upload your ticket"}
+            </span>
+            <span className={`max-w-full break-all text-muted-foreground ${compact ? "text-xs" : "text-sm"}`}>
               {file?.name || "PDF, JPG, PNG, WebP, HEIC or HEIF · maximum 10 MB"}
-            </p>
-          </div>
+            </span>
+          </button>
 
           <div className={`flex w-full justify-center gap-3 ${compact ? "flex-wrap" : "flex-col sm:flex-row"}`}>
             <Button
