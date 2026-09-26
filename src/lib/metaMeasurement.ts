@@ -50,10 +50,11 @@ export interface MetaCheckoutContext {
 }
 
 const productionOrigins = new Set(['https://fabsy.ca', 'https://www.fabsy.ca']);
-const eligibleOrderTypes = new Set(['rapid_resolution', 'rapid_resolution_bundle']);
+const eligibleOrderTypes = new Set(['rapid_resolution', 'rapid_resolution_bundle', 'photo_radar']);
 const eligiblePurchaseValues: Record<string, ReadonlySet<number>> = {
   rapid_resolution: new Set([158.4, 198]),
   rapid_resolution_bundle: new Set([183.2, 229]),
+  photo_radar: new Set([79]),
 };
 const metaThankYouPath = /^\/(?:en\/|pa\/|tl\/|zh-hans\/|zh-hant\/|ar\/|hi\/|es\/)?thank-you\/?$/;
 const metaLandingPath = /^\/(?:en\/|pa\/|tl\/|zh-hans\/|zh-hant\/|ar\/|hi\/|es\/)?rapid-resolution\/?$/;
@@ -110,7 +111,7 @@ export function currentMetaCheckoutContext(): MetaCheckoutContext | null {
   return context;
 }
 
-function approvedRapidResolutionCampaign(url: URL): boolean {
+function approvedMetaCampaign(url: URL): boolean {
   const allowedKeys = new Set(['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid']);
   const values = uniqueSafeSearchValues(url, allowedKeys);
   if (!values) return false;
@@ -120,10 +121,10 @@ function approvedRapidResolutionCampaign(url: URL): boolean {
   return true;
 }
 
-/** The same reviewed RR campaign policy applies to every released language. */
+/** Only tagged public offer pages may load Meta; intake remains excluded. */
 export function publicMetaMeasurementUrl(url: URL): boolean {
   if (url.username || url.password || url.hash) return false;
-  return (metaLandingPath.test(url.pathname) || /^\/rapid-resolution-alt\/?$/.test(url.pathname)) && approvedRapidResolutionCampaign(url);
+  return (metaLandingPath.test(url.pathname) || /^\/(?:rapid-resolution-alt|photo-radar)\/?$/.test(url.pathname)) && approvedMetaCampaign(url);
 }
 
 function safeMetaContext(
@@ -238,7 +239,7 @@ export function sendMetaPageView(): void {
 function deleteMetaCookies(): void {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   const localePrefixes = ['en', 'pa', 'tl', 'zh-hans', 'zh-hant', 'ar', 'hi', 'es'];
-  const paths = new Set(['/', '/rapid-resolution', '/rapid-resolution-alt', '/thank-you', '/thank-you/']);
+  const paths = new Set(['/', '/rapid-resolution', '/rapid-resolution-alt', '/photo-radar', '/photo-radar/', '/thank-you', '/thank-you/']);
   for (const locale of localePrefixes) {
     paths.add(`/${locale}`);
     paths.add(`/${locale}/`);

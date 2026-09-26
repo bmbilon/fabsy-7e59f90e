@@ -58,6 +58,7 @@ assert.equal(meta.META_CAPI_EVENT_SOURCE_URL, "https://fabsy.ca/rapid-resolution
 assert.deepEqual([...meta.META_CAPI_CONTENT_IDS], [
   "rapid_resolution",
   "rapid_resolution_bundle",
+  "photo_radar",
 ]);
 assertions += 7;
 
@@ -302,7 +303,7 @@ await assert.rejects(
     }),
     {
       checkoutSessionId: sessionId,
-      valueCents: 7900,
+      valueCents: 8295,
       eventTimeEpochSeconds: eventCreated,
       contentId: "photo_radar",
     },
@@ -367,6 +368,15 @@ assert.equal(meta.parseMetaPurchaseClaim({ ...claimRow, fbc: longestFbc + "a" })
 assert.equal(meta.parseMetaPurchaseClaim({ ...claimRow, fbp: longestFbc }), null);
 assertions += 4;
 const payload = meta.buildMetaPurchasePayload(claim);
+const photoPayload = meta.buildMetaPurchasePayload({ ...claim, contentId: "photo_radar", valueCents: 7900 });
+assert.equal(photoPayload.data[0].event_source_url, "https://fabsy.ca/photo-radar");
+assert.deepEqual(photoPayload.data[0].custom_data, {
+  currency: "CAD", value: 79, content_ids: ["photo_radar"], content_type: "product",
+});
+assert.equal(meta.isMetaCapiPurchaseValue("photo_radar", 7900), true);
+assert.equal(meta.isMetaCapiPurchaseValue("photo_radar", 19800), false);
+assert.equal(meta.isMetaCapiPurchaseValue("rapid_resolution", 7900), false);
+
 assert.deepEqual(payload, {
   data: [{
     event_name: "Purchase",

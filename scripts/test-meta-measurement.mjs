@@ -131,7 +131,7 @@ test('Meta production gate requires the exact flag, Pixel ID and production orig
 test('Meta URL policy admits released-language RR campaigns; receipts require verification', async () => {
   const r = await runtime();
   try {
-    for (const path of ['/rapid-resolution-alt', '/rapid-resolution-alt/', '/rapid-resolution', '/rapid-resolution/', '/en/rapid-resolution', '/pa/rapid-resolution', '/tl/rapid-resolution', '/zh-hans/rapid-resolution', '/zh-hant/rapid-resolution', '/ar/rapid-resolution', '/hi/rapid-resolution', '/es/rapid-resolution/']) {
+    for (const path of ['/photo-radar', '/photo-radar/', '/rapid-resolution-alt', '/rapid-resolution-alt/', '/rapid-resolution', '/rapid-resolution/', '/en/rapid-resolution', '/pa/rapid-resolution', '/tl/rapid-resolution', '/zh-hans/rapid-resolution', '/zh-hant/rapid-resolution', '/ar/rapid-resolution', '/hi/rapid-resolution', '/es/rapid-resolution/']) {
     for (const content of ['rr_relief_v1', 'rr_flat_fee_v1', 'rr_client_control_v1', 'pa_rr_v1']) {
       for (const extra of ['', '&fbclid=IwZXh0bgNhZW0_SYNTHETIC-123']) {
         const url = new URL(`https://fabsy.ca${path}${campaign(content)}${extra}`);
@@ -152,6 +152,9 @@ test('Meta URL policy admits released-language RR campaigns; receipts require ve
         'the shared receipt document remains available to the existing Google verifier');
     }
     for (const href of [
+      'https://fabsy.ca/photo-radar',
+      `https://fabsy.ca/photo-radar${campaign('photo_radar')}&ticket_number=PRIVATE`,
+      `https://fabsy.ca/submit-ticket${campaign('photo_radar')}`,
       'https://fabsy.ca/rapid-resolution-alt',
       `https://fabsy.ca/rapid-resolution-alt${campaign('rr_relief_v1')}&email=private`,
       'https://fabsy.ca/rapid-resolution',
@@ -202,7 +205,7 @@ test('loader is consent gated, manual only, and queues no advanced matching or a
   } finally { r.close(); }
 });
 
-test('Photo Radar and direct clean receipts cannot authorize a Meta tag or PageView', async () => {
+test('verified Photo Radar receipt reports $79 once; direct clean receipts stay excluded', async () => {
   const photoId = 'cs_live_SYNTHETICPhotoReceipt1';
   const r = await runtime(`https://fabsy.ca/thank-you?session_id=${photoId}`);
   try {
@@ -222,8 +225,19 @@ test('Photo Radar and direct clean receipts cannot authorize a Meta tag or PageV
       order_type: 'photo_radar',
     };
     assert.equal(await r.api.reportMetaPurchase(photo, photoId, r.win.sessionStorage), null);
-    assert.equal(r.win.document.getElementById('fabsy-meta-pixel'), null);
-    assert.equal(r.win.fbq, undefined);
+    const script = r.win.document.getElementById('fabsy-meta-pixel');
+    assert.ok(script, 'only a verified paid receipt may authorize the tag');
+    script.onload();
+    const eventId = await r.api.reportMetaPurchase(photo, photoId, r.win.sessionStorage);
+    const expected = Buffer.from(await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode(photoId))).toString('hex');
+    assert.equal(eventId, expected);
+    assert.deepEqual(plain(r.win.fbq.queue.find(command => command[2] === 'Purchase')), [
+      'trackSingle', expectedPixelId, 'Purchase', {
+        value: 79, currency: 'CAD', content_type: 'product', content_ids: ['photo_radar'], num_items: 1,
+      }, { eventID: expected },
+    ]);
+    assert.equal(await r.api.reportMetaPurchase(photo, photoId, r.win.sessionStorage), null);
+    assert.equal(r.win.fbq.queue.filter(command => command[2] === 'Purchase').length, 1);
   } finally { r.close(); }
 
   const clean = await runtime('https://fabsy.ca/thank-you');

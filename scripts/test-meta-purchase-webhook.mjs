@@ -169,6 +169,13 @@ const photoRadar = {
   amount_total: 8_295,
   total_details: { amount_discount: 0, amount_tax: 395, amount_shipping: 0 },
   metadata: {
+    checkout_intent_id: ids.intent,
+    submission_id: ids.submission,
+    ticket_submission_id: ids.submission,
+    client_id: ids.client,
+    checkout_attempt: "1",
+    order_type: "photo_radar",
+    tax_behavior: "exclusive",
     fabsy_checkout_kind: "photo_radar",
     fabsy_product: "photo_radar",
     fabsy_pricing_version: "photo_radar_2026_08",
@@ -181,6 +188,30 @@ const photoRadar = {
   },
 };
 assert.equal(paidFunnelProductFromSignedCheckout(event, photoRadar), "photo_radar");
+assert.deepEqual(currentMetaPurchaseFromSignedCheckout(event, photoRadar), {
+  checkoutSessionId: photoRadar.id, valueCents: 7900,
+  eventTimeEpochSeconds: event.created, contentId: "photo_radar",
+});
+for (const [field, wrong] of Object.entries({
+  checkout_intent_id: "bad", ticket_submission_id: ids.client, submission_id: ids.client,
+  client_id: "bad", checkout_attempt: "0", order_type: "rapid_resolution",
+  fabsy_pricing_version: "future", fabsy_product: "unknown", ticket_type: "officer_issued",
+  review_path: "standard", ticket_base_cents: "19800", gst_cents: "0", total_cents: "7900",
+  tax_behavior: "inclusive", representation_includes_assessment: "true",
+  idr_order_id: ids.intent, pro_coupon: "PRO20",
+})) {
+  assert.equal(currentMetaPurchaseFromSignedCheckout(event, {
+    ...photoRadar, metadata: { ...photoRadar.metadata, [field]: wrong },
+  }), null, `invalid Photo Radar ${field}`);
+}
+for (const override of [
+  { livemode: false }, { status: "open" }, { payment_status: "unpaid" },
+  { id: "cs_test_SYNTHETIC_PHOTO_12345678" }, { amount_subtotal: 19800 },
+  { amount_total: 7900 }, { client_reference_id: ids.client },
+  { total_details: { amount_tax: 395, amount_discount: 1, amount_shipping: 0 } },
+  { total_details: { amount_tax: 395, amount_discount: 0, amount_shipping: 100 } },
+]) assert.equal(currentMetaPurchaseFromSignedCheckout(event, { ...photoRadar, ...override }), null);
+
 assert.equal(paidFunnelProductFromSignedCheckout({ ...event, livemode: false }, photoRadar), null);
 
 const immutableInput = bundle(true);
@@ -244,11 +275,11 @@ const webhook = fs.readFileSync(webhookPath, "utf8");
 assert.match(
   webhook,
   /failedCheckoutKind === "ticket_only" \|\|\s*failedCheckoutKind === "ticket_with_addon"[\s\S]*?clearMetaCheckoutAttribution\(supabase, session\.id\)/,
-  "Only RR and RR bundle failures may touch Meta attribution storage",
+  "Only eligible product failures may touch Meta attribution storage",
 );
 assert.equal(
   webhook.match(/await enqueueCurrentMetaPurchaseIfEligible\(supabase, event, session\);/g)?.length,
-  2,
+  3,
 );
 assert.equal(
   webhook.match(/await recordCurrentPaidFunnelPurchaseIfEligible\(supabase, event, session\);/g)?.length,
@@ -266,4 +297,4 @@ assert.ok(
   "bundle Purchase must enqueue after report access fulfillment",
 );
 
-console.log("Meta signed-payment webhook tests passed (4 eligible values, 19 exclusions, consent no-op, retry contract). ");
+console.log("Meta signed-payment webhook tests passed (5 eligible values, invalid Photo Radar and existing product exclusions, consent no-op, retry contract). ");

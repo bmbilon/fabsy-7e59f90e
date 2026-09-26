@@ -79,7 +79,7 @@ export function publicMeasurementPath(pathname: string): string | null {
 function hasOnlyApprovedAcquisitionParameters(url: URL, ads = false): boolean {
   if (url.hash) return false;
   const basePath = baseMeasurementPath(url.pathname);
-  const paidLanding = basePath === '/rapid-resolution' || basePath === '/rapid-resolution-alt';
+  const paidLanding = basePath === '/rapid-resolution' || basePath === '/rapid-resolution-alt' || basePath === '/photo-radar';
   const publicAcquisition = !ads && !['/thank-you', '/ticket-uploaded'].includes(basePath);
   const allowed = new Set<string>([
     ...CLICK_ID_KEYS.filter(key => paidLanding || key !== 'fbclid'),

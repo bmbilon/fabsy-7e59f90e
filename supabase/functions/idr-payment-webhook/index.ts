@@ -1326,7 +1326,8 @@ export async function handler(req: Request): Promise<Response> {
       const failedCheckoutKind = session.metadata?.fabsy_checkout_kind;
       if (
         failedCheckoutKind === "ticket_only" ||
-        failedCheckoutKind === "ticket_with_addon"
+        failedCheckoutKind === "ticket_with_addon" ||
+        failedCheckoutKind === "photo_radar"
       ) {
         await clearMetaCheckoutAttribution(supabase, session.id);
       }
@@ -1347,6 +1348,7 @@ export async function handler(req: Request): Promise<Response> {
       await recordRepresentationPayment(supabase, session);
       await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
       await recordCurrentPaidPaymentPurchaseIfEligible(supabase, event, session);
+      await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
       return json({ received: true, handled: true, result, review_path: "ate" });
     }
     if (session.metadata?.fabsy_checkout_kind === "ticket_assessment") {

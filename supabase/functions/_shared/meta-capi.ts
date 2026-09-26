@@ -6,6 +6,7 @@ export const META_CAPI_CURRENCY = "CAD";
 export const META_CAPI_CONTENT_IDS = [
   "rapid_resolution",
   "rapid_resolution_bundle",
+  "photo_radar",
 ] as const;
 
 export type MetaCapiContentId = (typeof META_CAPI_CONTENT_IDS)[number];
@@ -198,7 +199,7 @@ export function sanitizeMetaUserAgent(value: unknown): string | null {
 }
 
 export function isMetaCapiContentId(value: unknown): value is MetaCapiContentId {
-  return value === "rapid_resolution" || value === "rapid_resolution_bundle";
+  return value === "rapid_resolution" || value === "rapid_resolution_bundle" || value === "photo_radar";
 }
 
 export function isMetaCapiPurchaseValue(
@@ -207,7 +208,8 @@ export function isMetaCapiPurchaseValue(
 ): contentId is MetaCapiContentId {
   return Number.isSafeInteger(valueCents) && (
     (contentId === "rapid_resolution" && (valueCents === 19_800 || valueCents === 15_840)) ||
-    (contentId === "rapid_resolution_bundle" && (valueCents === 22_900 || valueCents === 18_320))
+    (contentId === "rapid_resolution_bundle" && (valueCents === 22_900 || valueCents === 18_320)) ||
+    (contentId === "photo_radar" && valueCents === 7_900)
   );
 }
 
@@ -448,7 +450,7 @@ export function buildMetaPurchasePayload(claim: MetaPurchaseClaim): MetaPurchase
       event_time: claim.eventTimeEpoch,
       event_id: claim.eventId,
       action_source: "website",
-      event_source_url: META_CAPI_EVENT_SOURCE_URL,
+      event_source_url: claim.contentId === "photo_radar" ? "https://fabsy.ca/photo-radar" : META_CAPI_EVENT_SOURCE_URL,
       user_data: userData,
       custom_data: {
         currency: "CAD",
