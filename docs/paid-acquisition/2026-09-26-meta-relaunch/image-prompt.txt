@@ -1,0 +1,15 @@
+Use case: text-localization / ads-marketing. Edit target: supplied Fabsy ad image. Create one polished 4:5 portrait Meta feed ad, requested 1080 x 1350, revising its text hierarchy for the existing Alberta Photo Radar offer. Preserve Fabsy's blue scales mark and wordmark, navy/white/blue brand palette, realistic fictional notice emerging from a white envelope, and premium clean typography. This is a layout and copy revision of this exact ad, not a new brand.
+At the top keep small Fabsy logo and eyebrow "ALBERTA PHOTO RADAR".
+Replace the old "Hefty Fine?" headline and old long subhead completely with the large exact headline:
+"Photo radar
+in the mail?"
+Immediately below the headline, prominently in the TOP HALF of the image, put a very large "$79 + GST" with smaller "$82.95 total" adjacent below. Price must be as prominent as headline.
+Below that use exact concise supporting copy:
+"We pursue a lower fine or withdrawal.
+You approve any deal."
+Place the fictional notice/envelope photo in the middle/lower half with label "Illustrative sample notice". No real personal data or real government logos; all notice fields must remain blank or neutral gray bars, and no readable case numbers. Replace the QR on the illustrative document with neutral gray placeholder bars, no scannable code.
+In the bottom white panel, include a clear blue CTA "Upload your notice →", and "fabsy.ca/photo-radar".
+Use readable footer text, split into lines as needed, exact:
+"Paid upfront. No success fee. Government fines separate."
+"Trial excluded. Results vary. Agent service, not a law firm."
+Maintain generous margins, high contrast, sharp exact spelling, uncluttered hierarchy. All text remains inside safe margins and legible in a phone feed. Do not include refunds in this artwork because qualified guarantee copy accompanies the ad. Do not invent discounts, deadlines, success rates, outcome guarantees or extra copy. Produce one finished ad, no device mockup or collage.

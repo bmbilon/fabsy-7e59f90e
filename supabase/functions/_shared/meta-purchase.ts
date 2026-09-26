@@ -2,6 +2,7 @@ import type {
   MetaCapiContentId,
   MetaPurchaseEnqueueInput,
 } from "./meta-capi.ts";
+import { PHOTO_RADAR_PRODUCT } from "./photo-radar.ts";
 
 const RAPID_RESOLUTION_PRICING_VERSION = "rapid_resolution_2026_08";
 const PRO_PRICING_VERSION = "pro_drivers_2026_08";
@@ -167,9 +168,6 @@ export function currentMetaPurchaseFromSignedCheckout(
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
     return null;
   }
-  const product = exactCurrentProduct(metadata);
-  if (!product) return null;
-
   const submissionId = ownText(metadata, "ticket_submission_id");
   const sourceAssessmentId = ownText(metadata, "source_assessment_id");
   const checkoutIntentId = ownText(metadata, "checkout_intent_id");
@@ -181,6 +179,43 @@ export function currentMetaPurchaseFromSignedCheckout(
     !isUuid(clientId) ||
     session.client_reference_id !== submissionId ||
     !/^[1-9]\d{0,8}$/.test(ownText(metadata, "checkout_attempt") || "") ||
+    (sourceAssessmentId !== null && !isUuid(sourceAssessmentId))
+  ) return null;
+
+  if (ownText(metadata, "fabsy_checkout_kind") === "photo_radar") {
+    // Only the current, fully paid fixed-price product qualifies. Legal case
+    // fields stay in Fabsy; the returned event contains no case/customer data.
+    if (
+      ownText(metadata, "fabsy_product") !== "photo_radar" ||
+      ownText(metadata, "fabsy_pricing_version") !== PHOTO_RADAR_PRODUCT.pricingVersion ||
+      ownText(metadata, "ticket_type") !== "photo_radar" ||
+      ownText(metadata, "order_type") !== "photo_radar" ||
+      ownText(metadata, "review_path") !== "ate" ||
+      ownText(metadata, "ticket_base_cents") !== String(PHOTO_RADAR_PRODUCT.priceCents) ||
+      ownText(metadata, "gst_cents") !== String(PHOTO_RADAR_PRODUCT.gstCents) ||
+      ownText(metadata, "total_cents") !== String(PHOTO_RADAR_PRODUCT.totalCents) ||
+      ownText(metadata, "tax_behavior") !== "exclusive" ||
+      ownText(metadata, "representation_includes_assessment") !== "false" ||
+      ["idr_type", "idr_checkout_kind", "idr_price_cents", "idr_order_id", "idr_client_id",
+        "pro_coupon", "pro_discount_cents", "pro_verification_id", "pro_pricing_version"]
+        .some(key => ownText(metadata, key) !== null) ||
+      session.amount_subtotal !== PHOTO_RADAR_PRODUCT.priceCents ||
+      session.amount_total !== PHOTO_RADAR_PRODUCT.totalCents ||
+      session.total_details?.amount_tax !== PHOTO_RADAR_PRODUCT.gstCents ||
+      (session.total_details?.amount_discount ?? 0) !== 0 ||
+      (session.total_details?.amount_shipping ?? 0) !== 0
+    ) return null;
+    return {
+      checkoutSessionId: session.id,
+      valueCents: PHOTO_RADAR_PRODUCT.priceCents,
+      eventTimeEpochSeconds: Number(event.created),
+      contentId: "photo_radar",
+    };
+  }
+
+  const product = exactCurrentProduct(metadata);
+  if (!product) return null;
+  if (
     ownText(metadata, "fabsy_pricing_version") !==
       RAPID_RESOLUTION_PRICING_VERSION ||
     ownText(metadata, "pro_pricing_version") !== PRO_PRICING_VERSION ||

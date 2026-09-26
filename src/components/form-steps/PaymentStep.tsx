@@ -270,7 +270,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
           includeIdrAddon,
           ...(completionFlow ? { completionFlow: true } : {}),
           funnelMeasurement: currentFunnelCheckoutContext(),
-          ...(!isPhotoRadar ? { metaMeasurement: currentMetaCheckoutContext() } : {}),
+          metaMeasurement: currentMetaCheckoutContext(),
           ...(includeIdrAddon ? { idrOrderId } : {}),
         },
       });

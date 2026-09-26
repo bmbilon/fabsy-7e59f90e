@@ -788,7 +788,7 @@ serve(async (req) => {
     }
     if (reservation?.url) {
       let metaAttributionHandle: string | null = null;
-      if (!product.isPhotoRadar && reservation.sessionId) {
+      if (reservation.sessionId) {
         const attribution = await recordMetaCheckoutAttribution(
           reservation.sessionId,
           rawMetaMeasurement,
@@ -1023,15 +1023,12 @@ serve(async (req) => {
         sessionId: session.id,
       };
     }
-    let metaAttributionHandle: string | null = null;
-    if (!product.isPhotoRadar) {
-      const attribution = await recordMetaCheckoutAttribution(
-        session.id,
-        rawMetaMeasurement,
-        req.headers.get("user-agent"),
-      );
-      metaAttributionHandle = attribution.withdrawalHandle;
-    }
+    const attribution = await recordMetaCheckoutAttribution(
+      session.id,
+      rawMetaMeasurement,
+      req.headers.get("user-agent"),
+    );
+    const metaAttributionHandle = attribution.withdrawalHandle;
     const funnelAttributionHandle = await recordPaidFunnelCheckoutAttribution(
       session.id,
       rawFunnelMeasurement,
