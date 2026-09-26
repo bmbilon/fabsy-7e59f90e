@@ -10,6 +10,7 @@ import {
   HandCoins,
   Home,
   Inbox,
+  PhoneCall,
   Landmark,
   LogOut,
   MailCheck,
@@ -93,6 +94,7 @@ const navigation = [
     icon: BarChart3,
     group: "Insights",
   },
+  { label: "Calls & voicemail", href: "/admin/calls", icon: PhoneCall, group: "Operations", admin: true },
   {
     label: "SMS inquiries",
     href: "/admin/sms",

@@ -78,6 +78,7 @@ const Refer = lazy(() => import("./pages/Refer"));
 const ReferralPortal = lazy(() => import("./pages/ReferralPortal"));
 const ProDiscountPortal = lazy(() => import("./pages/ProDiscountPortal"));
 const AdminSmsIntake = lazy(() => import("./pages/AdminSmsIntake"));
+const AdminCallHistory = lazy(() => import("./pages/AdminCallHistory"));
 const AdminReferrals = lazy(() => import("./pages/AdminReferrals"));
 const AdminWorkspace = lazy(() => import('./components/admin/AdminWorkspace'));
 const AdminLtbCases = lazy(() => import('./pages/AdminLtbCases'));
@@ -199,6 +200,7 @@ const App = () => (
           <Route path="/admin/cases" element={<AdminCaseManagement />} />
           <Route path="/admin/acquisition" element={<AdminPaidFunnel />} />
           <Route path="/admin/sms" element={<RouteSuspense><AdminSmsIntake /></RouteSuspense>} />
+          <Route path="/admin/calls" element={<RouteSuspense><AdminCallHistory /></RouteSuspense>} />
           <Route path="/admin/submissions/:id" element={<AdminSubmissionDetail />} />
           <Route path="/admin/users" element={<AdminUserManagement />} />
           <Route path="/admin/aeo" element={<AEODashboard />} />
