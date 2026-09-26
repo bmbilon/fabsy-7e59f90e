@@ -1,0 +1,16 @@
+html[data-app="anderhue"] {
+  --background: 90 21% 95%;
+  --foreground: 142 19% 11%;
+  --primary: 156 51% 23%;
+  --primary-dark: 156 51% 18%;
+  --ring: 156 51% 23%;
+  --card: 75 33% 98%;
+  --card-foreground: 142 19% 11%;
+  --border: 101 16% 80%;
+  --input: 101 16% 80%;
+  --muted: 90 21% 92%;
+  --muted-foreground: 142 10% 37%;
+  --accent: 101 16% 89%;
+  --font-display: system-ui, sans-serif;
+  --font-body: system-ui, sans-serif;
+}
