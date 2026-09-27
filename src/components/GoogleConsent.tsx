@@ -2,8 +2,12 @@ import {useSyncExternalStore} from 'react';
 import {googleOptOutCopy} from '@/i18n/googleOptOutCopy';
 import {splitLocalePath} from '@/i18n/locale-policy.mjs';
 import {Link,useLocation} from 'react-router-dom';
-import {GOOGLE_CONSENT_CHANGED,getGoogleConsentChoice,setGoogleConsentChoice} from '@/lib/googleConsent';
-const subscribe=(notify:()=>void)=>{window.addEventListener(GOOGLE_CONSENT_CHANGED,notify);window.addEventListener('storage',notify);return()=>{window.removeEventListener(GOOGLE_CONSENT_CHANGED,notify);window.removeEventListener('storage',notify);};};
+import {GOOGLE_CONSENT_CHANGED,GOOGLE_CONSENT_STORAGE_KEY,getGoogleConsentChoice,setGoogleConsentChoice} from '@/lib/googleConsent';
+const subscribe=(notify:()=>void)=>{
+ const storage=(event:StorageEvent)=>{if(event.key===null||event.key===GOOGLE_CONSENT_STORAGE_KEY||event.key==='fabsy_ads_consent_v1')notify();};
+ window.addEventListener(GOOGLE_CONSENT_CHANGED,notify);window.addEventListener('storage',storage);
+ return()=>{window.removeEventListener(GOOGLE_CONSENT_CHANGED,notify);window.removeEventListener('storage',storage);};
+};
 export default function GoogleConsent(){
  const choice=useSyncExternalStore(subscribe,getGoogleConsentChoice,()=> 'unknown' as const);
  const allowed=choice==='accepted';

@@ -411,12 +411,13 @@ async function actualLink(page, pathname) {
   throw new Error(`No visible app link to ${pathname}`);
 }
 async function choose(page, scope, choice) {
+  await page.bringToFront();
   if (choice === 'accepted') scope.optedIn = true;
   const text = await page.locator('[data-google-measurement-toggle]').innerText();
   const currentlyAccepted = text.includes('Opt out');
   if (currentlyAccepted !== (choice === 'accepted')) {
-    await page.locator('[data-google-measurement-toggle]').scrollIntoViewIfNeeded();
-    await page.locator('[data-google-measurement-toggle]').click();
+    // Keyboard activation also works when background-tab animation frames lag.
+    await page.locator('[data-google-measurement-toggle]').press('Enter');
   }
   if (choice === 'declined') scope.optedIn = false;
 }

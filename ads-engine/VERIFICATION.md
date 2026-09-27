@@ -8,6 +8,7 @@ September 27, 2026. Real upload/payment recording and ad delivery are not claime
 - `npm run ads:test`: 21 engine/account tests plus all three migrations, temporary PostgreSQL RLS, authenticated approval identity, leases and deduplication checks.
 - Measurement endpoint tests reject invalid private capabilities, caller-invented verification and stale contact/document proof; accept only current stored evidence.
 - Frontend TypeScript and deployed Supabase graphs through Deno. Existing phone/cloud runner checks and deploy passed.
+- Browser network suite: 13 scenarios passed with inert provider fixtures, including granted defaults, persisted opt-out, cross-tab retirement, held-loader/private navigation and receipt-token isolation. Google contact delivery was not simulated as a real conversion.
 - Mobile 390x844: camera nonrefund copy, footer opt-out persistence, no horizontal overflow, camera upload selection and untagged private form. No runtime errors. Synthetic, with external requests blocked; no file submitted or purchase made.
 - Production Google account read, Alberta Province geo, conversion resource names/labels and primary/secondary states verified. Live sync has no primary-conversion hold.
 - Nonspending conversion setup applied through the single platform mutation gate with authenticated admin approval, source hash, idempotency and before/after/rollback evidence.
