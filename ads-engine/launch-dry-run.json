@@ -120,125 +120,6 @@
           "url": "https://fabsy.ca/rapid-resolution"
         }
       ]
-    },
-    {
-      "name": "G-Search-Camera",
-      "service": "camera",
-      "status": "PAUSED",
-      "destination": "https://fabsy.ca/photo-radar",
-      "geo": "Alberta",
-      "network": "SEARCH_ONLY",
-      "bidding": "MAXIMIZE_CONVERSIONS",
-      "targetCpa": null,
-      "aiMax": false,
-      "automaticallyCreatedAssets": false,
-      "primaryGoal": "qualified_ticket_upload",
-      "secondaryGoal": "client_paid",
-      "negativeKeywords": [
-        "pay ticket online",
-        "ticket lookup",
-        "jobs"
-      ],
-      "groups": [
-        {
-          "name": "Photo Radar",
-          "keywords": [
-            "photo radar ticket help alberta",
-            "fight photo radar ticket alberta",
-            "photo radar ticket agent alberta",
-            "photo radar ticket representation",
-            "photo radar ticket reduction alberta",
-            "photo radar ticket help calgary",
-            "photo radar ticket help edmonton",
-            "dispute photo radar ticket alberta",
-            "photo radar ticket review alberta",
-            "photo radar ticket service alberta",
-            "contest photo radar ticket alberta",
-            "photo radar fine help alberta"
-          ],
-          "matchType": "PHRASE",
-          "headlines": [
-            "$79 CAD + GST",
-            "Alberta Ticket Agent Services",
-            "Upload Your Ticket Photo",
-            "Eligible Pre-Trial Service",
-            "Government Fines Are Separate",
-            "You Approve Any Crown Deal",
-            "Disclosure Review Included",
-            "Secure Digital Ticket Intake",
-            "Fabsy Traffic Ticket Services",
-            "Photo Radar Ticket Help"
-          ],
-          "pinnedHeadlineIndex": 0,
-          "descriptions": [
-            "$79 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
-            "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
-            "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
-            "Government fines and trial representation are separate. No outcome is promised."
-          ]
-        },
-        {
-          "name": "Red Light Camera",
-          "keywords": [
-            "red light camera ticket help alberta",
-            "fight red light camera ticket alberta",
-            "red light camera ticket agent alberta",
-            "red light camera ticket representation",
-            "red light camera ticket reduction alberta",
-            "red light camera ticket help calgary",
-            "red light camera ticket help edmonton",
-            "dispute red light camera ticket alberta",
-            "red light camera ticket review alberta",
-            "red light camera ticket service alberta",
-            "contest red light camera ticket alberta",
-            "red light camera fine help alberta"
-          ],
-          "matchType": "PHRASE",
-          "headlines": [
-            "$79 CAD + GST",
-            "Alberta Ticket Agent Services",
-            "Upload Your Ticket Photo",
-            "Eligible Pre-Trial Service",
-            "Government Fines Are Separate",
-            "You Approve Any Crown Deal",
-            "Disclosure Review Included",
-            "Secure Digital Ticket Intake",
-            "Fabsy Traffic Ticket Services",
-            "Photo Radar Ticket Help"
-          ],
-          "pinnedHeadlineIndex": 0,
-          "descriptions": [
-            "$79 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
-            "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
-            "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
-            "Government fines and trial representation are separate. No outcome is promised."
-          ]
-        }
-      ],
-      "callouts": [
-        "Eligible Alberta Tickets",
-        "Digital Ticket Intake",
-        "Government Fines Separate",
-        "You Approve Any Deal"
-      ],
-      "sitelinks": [
-        {
-          "text": "Upload Your Ticket Photo",
-          "url": "https://fabsy.ca/photo-radar#ticket-form-container"
-        },
-        {
-          "text": "Service Scope",
-          "url": "https://fabsy.ca/photo-radar#scope"
-        }
-      ],
-      "priceAssets": [
-        {
-          "header": "Photo Radar",
-          "description": "Pre-trial service + GST",
-          "amountCad": 79,
-          "url": "https://fabsy.ca/photo-radar"
-        }
-      ]
     }
   ],
   "config": {
@@ -247,9 +128,9 @@
     "timezone": "America/Edmonton",
     "spendingAuthorized": false,
     "paused": true,
-    "learningSpendLimitCad": null,
-    "startDate": null,
-    "durationDays": 30,
+    "learningSpendLimitCad": 150,
+    "startDate": "2026-09-27",
+    "durationDays": 14,
     "freshnessMinutes": 120,
     "monitorMinutes": 15,
     "googleApiVersion": "v23",
@@ -264,15 +145,12 @@
     "campaigns": {
       "G-Search-Officer": {
         "service": "officer",
-        "dailyBudgetCad": 50,
+        "budgetType": "TOTAL",
+        "totalBudgetCad": 150,
         "planningCpaCad": 90
-      },
-      "G-Search-Camera": {
-        "service": "camera",
-        "dailyBudgetCad": 20,
-        "planningCpaCad": 35
       }
     },
+    "priceAssetsEnabled": false,
     "meta": {
       "active": false,
       "budgetCad": null,
@@ -290,25 +168,17 @@
       "24266674718"
     ]
   },
-  "copyHash": "9deb7cdd4ce34b858b36990187323bbe4eb6607018693f279bb20d2f49d86596",
-  "liveAccountHash": "7978e9d65d9d4f11e30bc282e6126144f752b02cab53309553953309e8f3adc2",
+  "copyHash": "c3ca7667530e3d6819cc05c4bf4596b37c91ccb855643b1fe1a84e961b63c649",
+  "liveAccountHash": "e11bdaec9695ca1336f3644e4dbf1e476c6bfd435fb47c21ae6e5d9a8be5f932",
   "plan": {
     "operations": [
-      {
-        "campaignOperation": {
-          "update": {
-            "resourceName": "customers/9385017797/campaigns/24266674718",
-            "status": "PAUSED"
-          },
-          "updateMask": "status"
-        }
-      },
       {
         "campaignBudgetOperation": {
           "create": {
             "resourceName": "customers/9385017797/campaignBudgets/-1",
             "name": "G-Search-Officer launch v1",
-            "amountMicros": "50000000",
+            "totalAmountMicros": "150000000",
+            "period": "CUSTOM_PERIOD",
             "deliveryMethod": "STANDARD",
             "explicitlyShared": false
           }
@@ -320,6 +190,8 @@
             "resourceName": "customers/9385017797/campaigns/-2",
             "name": "G-Search-Officer",
             "status": "PAUSED",
+            "startDateTime": "2026-09-27 00:00:00",
+            "endDateTime": "2026-10-10 23:59:59",
             "finalUrlSuffix": "utm_source=google&utm_medium=cpc&utm_campaign=G-Search-Officer&utm_content=officer_launch_v1&variant_id=officer_v1",
             "maximizeConversions": {},
             "networkSettings": {
@@ -962,793 +834,21 @@
             "status": "ENABLED"
           }
         }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-11",
-            "name": "G-Search-Officer: Price",
-            "priceAsset": {
-              "type": "SERVICES",
-              "languageCode": "en",
-              "priceOfferings": [
-                {
-                  "header": "Officer Tickets",
-                  "description": "Pre-trial service + GST",
-                  "price": {
-                    "amountMicros": "198000000",
-                    "currencyCode": "CAD"
-                  },
-                  "finalUrl": "https://fabsy.ca/rapid-resolution"
-                },
-                {
-                  "header": "Photo Radar",
-                  "description": "Pre-trial service + GST",
-                  "price": {
-                    "amountMicros": "79000000",
-                    "currencyCode": "CAD"
-                  },
-                  "finalUrl": "https://fabsy.ca/photo-radar"
-                },
-                {
-                  "header": "Resolution Bundle",
-                  "description": "Service and report + GST",
-                  "price": {
-                    "amountMicros": "229000000",
-                    "currencyCode": "CAD"
-                  },
-                  "finalUrl": "https://fabsy.ca/rapid-resolution"
-                }
-              ]
-            }
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-2",
-            "asset": "customers/9385017797/assets/-11",
-            "fieldType": "PRICE",
-            "status": "ENABLED"
-          }
-        }
-      },
-      {
-        "campaignBudgetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/campaignBudgets/-12",
-            "name": "G-Search-Camera launch v1",
-            "amountMicros": "20000000",
-            "deliveryMethod": "STANDARD",
-            "explicitlyShared": false
-          }
-        }
-      },
-      {
-        "campaignOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/campaigns/-13",
-            "name": "G-Search-Camera",
-            "status": "PAUSED",
-            "finalUrlSuffix": "utm_source=google&utm_medium=cpc&utm_campaign=G-Search-Camera&utm_content=camera_launch_v1&variant_id=camera_v1",
-            "maximizeConversions": {},
-            "networkSettings": {
-              "targetGoogleSearch": true,
-              "targetSearchNetwork": false,
-              "targetContentNetwork": false,
-              "targetPartnerSearchNetwork": false
-            },
-            "geoTargetTypeSetting": {
-              "positiveGeoTargetType": "PRESENCE",
-              "negativeGeoTargetType": "PRESENCE"
-            },
-            "aiMaxSetting": {
-              "enableAiMax": false
-            },
-            "assetAutomationSettings": [
-              {
-                "assetAutomationType": "TEXT_ASSET_AUTOMATION",
-                "assetAutomationStatus": "OPTED_OUT"
-              },
-              {
-                "assetAutomationType": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
-                "assetAutomationStatus": "OPTED_OUT"
-              }
-            ],
-            "campaignBudget": "customers/9385017797/campaignBudgets/-12",
-            "advertisingChannelType": "SEARCH",
-            "containsEuPoliticalAdvertising": "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
-          }
-        }
-      },
-      {
-        "campaignCriterionOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "location": {
-              "geoTargetConstant": "geoTargetConstants/20113"
-            }
-          }
-        }
-      },
-      {
-        "campaignCriterionOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "negative": true,
-            "keyword": {
-              "text": "pay ticket online",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "campaignCriterionOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "negative": true,
-            "keyword": {
-              "text": "ticket lookup",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "campaignCriterionOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "negative": true,
-            "keyword": {
-              "text": "jobs",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/adGroups/-14",
-            "campaign": "customers/9385017797/campaigns/-13",
-            "name": "Photo Radar",
-            "status": "ENABLED",
-            "type": "SEARCH_STANDARD"
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket help alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "fight photo radar ticket alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket agent alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket representation",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket reduction alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket help calgary",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket help edmonton",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "dispute photo radar ticket alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket review alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar ticket service alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "contest photo radar ticket alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "photo radar fine help alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupAdOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-14",
-            "status": "ENABLED",
-            "ad": {
-              "finalUrls": [
-                "https://fabsy.ca/photo-radar"
-              ],
-              "responsiveSearchAd": {
-                "headlines": [
-                  {
-                    "text": "$79 CAD + GST",
-                    "pinnedField": "HEADLINE_1"
-                  },
-                  {
-                    "text": "Alberta Ticket Agent Services"
-                  },
-                  {
-                    "text": "Upload Your Ticket Photo"
-                  },
-                  {
-                    "text": "Eligible Pre-Trial Service"
-                  },
-                  {
-                    "text": "Government Fines Are Separate"
-                  },
-                  {
-                    "text": "You Approve Any Crown Deal"
-                  },
-                  {
-                    "text": "Disclosure Review Included"
-                  },
-                  {
-                    "text": "Secure Digital Ticket Intake"
-                  },
-                  {
-                    "text": "Fabsy Traffic Ticket Services"
-                  },
-                  {
-                    "text": "Photo Radar Ticket Help"
-                  }
-                ],
-                "descriptions": [
-                  {
-                    "text": "$79 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket."
-                  },
-                  {
-                    "text": "Fabsy provides traffic ticket agent services where permitted. Outcomes vary."
-                  },
-                  {
-                    "text": "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal."
-                  },
-                  {
-                    "text": "Government fines and trial representation are separate. No outcome is promised."
-                  }
-                ]
-              }
-            }
-          }
-        }
-      },
-      {
-        "adGroupOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/adGroups/-15",
-            "campaign": "customers/9385017797/campaigns/-13",
-            "name": "Red Light Camera",
-            "status": "ENABLED",
-            "type": "SEARCH_STANDARD"
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket help alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "fight red light camera ticket alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket agent alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket representation",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket reduction alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket help calgary",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket help edmonton",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "dispute red light camera ticket alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket review alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera ticket service alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "contest red light camera ticket alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupCriterionOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "keyword": {
-              "text": "red light camera fine help alberta",
-              "matchType": "PHRASE"
-            }
-          }
-        }
-      },
-      {
-        "adGroupAdOperation": {
-          "create": {
-            "adGroup": "customers/9385017797/adGroups/-15",
-            "status": "ENABLED",
-            "ad": {
-              "finalUrls": [
-                "https://fabsy.ca/photo-radar"
-              ],
-              "responsiveSearchAd": {
-                "headlines": [
-                  {
-                    "text": "$79 CAD + GST",
-                    "pinnedField": "HEADLINE_1"
-                  },
-                  {
-                    "text": "Alberta Ticket Agent Services"
-                  },
-                  {
-                    "text": "Upload Your Ticket Photo"
-                  },
-                  {
-                    "text": "Eligible Pre-Trial Service"
-                  },
-                  {
-                    "text": "Government Fines Are Separate"
-                  },
-                  {
-                    "text": "You Approve Any Crown Deal"
-                  },
-                  {
-                    "text": "Disclosure Review Included"
-                  },
-                  {
-                    "text": "Secure Digital Ticket Intake"
-                  },
-                  {
-                    "text": "Fabsy Traffic Ticket Services"
-                  },
-                  {
-                    "text": "Photo Radar Ticket Help"
-                  }
-                ],
-                "descriptions": [
-                  {
-                    "text": "$79 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket."
-                  },
-                  {
-                    "text": "Fabsy provides traffic ticket agent services where permitted. Outcomes vary."
-                  },
-                  {
-                    "text": "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal."
-                  },
-                  {
-                    "text": "Government fines and trial representation are separate. No outcome is promised."
-                  }
-                ]
-              }
-            }
-          }
-        }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-16",
-            "name": "G-Search-Camera: Eligible Alberta Tickets",
-            "calloutAsset": {
-              "calloutText": "Eligible Alberta Tickets"
-            }
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "asset": "customers/9385017797/assets/-16",
-            "fieldType": "CALLOUT",
-            "status": "ENABLED"
-          }
-        }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-17",
-            "name": "G-Search-Camera: Digital Ticket Intake",
-            "calloutAsset": {
-              "calloutText": "Digital Ticket Intake"
-            }
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "asset": "customers/9385017797/assets/-17",
-            "fieldType": "CALLOUT",
-            "status": "ENABLED"
-          }
-        }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-18",
-            "name": "G-Search-Camera: Government Fines Separate",
-            "calloutAsset": {
-              "calloutText": "Government Fines Separate"
-            }
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "asset": "customers/9385017797/assets/-18",
-            "fieldType": "CALLOUT",
-            "status": "ENABLED"
-          }
-        }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-19",
-            "name": "G-Search-Camera: You Approve Any Deal",
-            "calloutAsset": {
-              "calloutText": "You Approve Any Deal"
-            }
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "asset": "customers/9385017797/assets/-19",
-            "fieldType": "CALLOUT",
-            "status": "ENABLED"
-          }
-        }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-20",
-            "name": "G-Search-Camera: Upload Your Ticket Photo",
-            "sitelinkAsset": {
-              "linkText": "Upload Your Ticket Photo"
-            },
-            "finalUrls": [
-              "https://fabsy.ca/photo-radar#ticket-form-container"
-            ]
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "asset": "customers/9385017797/assets/-20",
-            "fieldType": "SITELINK",
-            "status": "ENABLED"
-          }
-        }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-21",
-            "name": "G-Search-Camera: Service Scope",
-            "sitelinkAsset": {
-              "linkText": "Service Scope"
-            },
-            "finalUrls": [
-              "https://fabsy.ca/photo-radar#scope"
-            ]
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "asset": "customers/9385017797/assets/-21",
-            "fieldType": "SITELINK",
-            "status": "ENABLED"
-          }
-        }
-      },
-      {
-        "assetOperation": {
-          "create": {
-            "resourceName": "customers/9385017797/assets/-22",
-            "name": "G-Search-Camera: Price",
-            "priceAsset": {
-              "type": "SERVICES",
-              "languageCode": "en",
-              "priceOfferings": [
-                {
-                  "header": "Photo Radar",
-                  "description": "Pre-trial service + GST",
-                  "price": {
-                    "amountMicros": "79000000",
-                    "currencyCode": "CAD"
-                  },
-                  "finalUrl": "https://fabsy.ca/photo-radar"
-                },
-                {
-                  "header": "Officer Tickets",
-                  "description": "Pre-trial service + GST",
-                  "price": {
-                    "amountMicros": "198000000",
-                    "currencyCode": "CAD"
-                  },
-                  "finalUrl": "https://fabsy.ca/rapid-resolution"
-                },
-                {
-                  "header": "Resolution Bundle",
-                  "description": "Service and report + GST",
-                  "price": {
-                    "amountMicros": "229000000",
-                    "currencyCode": "CAD"
-                  },
-                  "finalUrl": "https://fabsy.ca/rapid-resolution"
-                }
-              ]
-            }
-          }
-        }
-      },
-      {
-        "campaignAssetOperation": {
-          "create": {
-            "campaign": "customers/9385017797/campaigns/-13",
-            "asset": "customers/9385017797/assets/-22",
-            "fieldType": "PRICE",
-            "status": "ENABLED"
-          }
-        }
       }
     ],
-    "rollback": [
-      {
-        "campaignOperation": {
-          "update": {
-            "resourceName": "customers/9385017797/campaigns/24266674718",
-            "status": "ENABLED"
-          },
-          "updateMask": "status"
-        }
-      }
-    ],
+    "rollback": [],
     "newCampaignIndexes": [
-      2,
-      50
+      1
     ],
     "createdOperationKinds": {
-      "1": "campaignBudget",
-      "2": "campaign",
+      "0": "campaignBudget",
+      "1": "campaign",
+      "2": "campaignCriterion",
       "3": "campaignCriterion",
       "4": "campaignCriterion",
       "5": "campaignCriterion",
-      "6": "campaignCriterion",
-      "7": "adGroup",
+      "6": "adGroup",
+      "7": "adGroupCriterion",
       "8": "adGroupCriterion",
       "9": "adGroupCriterion",
       "10": "adGroupCriterion",
@@ -1760,9 +860,9 @@
       "16": "adGroupCriterion",
       "17": "adGroupCriterion",
       "18": "adGroupCriterion",
-      "19": "adGroupCriterion",
-      "20": "adGroupAd",
-      "21": "adGroup",
+      "19": "adGroupAd",
+      "20": "adGroup",
+      "21": "adGroupCriterion",
       "22": "adGroupCriterion",
       "23": "adGroupCriterion",
       "24": "adGroupCriterion",
@@ -1774,72 +874,21 @@
       "30": "adGroupCriterion",
       "31": "adGroupCriterion",
       "32": "adGroupCriterion",
-      "33": "adGroupCriterion",
-      "34": "adGroupAd",
-      "35": "asset",
-      "36": "campaignAsset",
-      "37": "asset",
-      "38": "campaignAsset",
-      "39": "asset",
-      "40": "campaignAsset",
-      "41": "asset",
-      "42": "campaignAsset",
-      "43": "asset",
-      "44": "campaignAsset",
-      "45": "asset",
-      "46": "campaignAsset",
-      "47": "asset",
-      "48": "campaignAsset",
-      "49": "campaignBudget",
-      "50": "campaign",
-      "51": "campaignCriterion",
-      "52": "campaignCriterion",
-      "53": "campaignCriterion",
-      "54": "campaignCriterion",
-      "55": "adGroup",
-      "56": "adGroupCriterion",
-      "57": "adGroupCriterion",
-      "58": "adGroupCriterion",
-      "59": "adGroupCriterion",
-      "60": "adGroupCriterion",
-      "61": "adGroupCriterion",
-      "62": "adGroupCriterion",
-      "63": "adGroupCriterion",
-      "64": "adGroupCriterion",
-      "65": "adGroupCriterion",
-      "66": "adGroupCriterion",
-      "67": "adGroupCriterion",
-      "68": "adGroupAd",
-      "69": "adGroup",
-      "70": "adGroupCriterion",
-      "71": "adGroupCriterion",
-      "72": "adGroupCriterion",
-      "73": "adGroupCriterion",
-      "74": "adGroupCriterion",
-      "75": "adGroupCriterion",
-      "76": "adGroupCriterion",
-      "77": "adGroupCriterion",
-      "78": "adGroupCriterion",
-      "79": "adGroupCriterion",
-      "80": "adGroupCriterion",
-      "81": "adGroupCriterion",
-      "82": "adGroupAd",
-      "83": "asset",
-      "84": "campaignAsset",
-      "85": "asset",
-      "86": "campaignAsset",
-      "87": "asset",
-      "88": "campaignAsset",
-      "89": "asset",
-      "90": "campaignAsset",
-      "91": "asset",
-      "92": "campaignAsset",
-      "93": "asset",
-      "94": "campaignAsset",
-      "95": "asset",
-      "96": "campaignAsset"
+      "33": "adGroupAd",
+      "34": "asset",
+      "35": "campaignAsset",
+      "36": "asset",
+      "37": "campaignAsset",
+      "38": "asset",
+      "39": "campaignAsset",
+      "40": "asset",
+      "41": "campaignAsset",
+      "42": "asset",
+      "43": "campaignAsset",
+      "44": "asset",
+      "45": "campaignAsset"
     },
-    "sourceHash": "7978e9d65d9d4f11e30bc282e6126144f752b02cab53309553953309e8f3adc2",
+    "sourceHash": "e11bdaec9695ca1336f3644e4dbf1e476c6bfd435fb47c21ae6e5d9a8be5f932",
     "requiresPostCreateGoalSync": true
   },
   "hold": null

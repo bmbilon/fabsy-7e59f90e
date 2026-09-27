@@ -13,7 +13,8 @@ export async function renderAds(root:HTMLElement,api:Api,message:(text:string)=>
   const config=batch.payload.config;
   const measurement=batch.payload.kind==='measurement_setup';
   if(measurement)box.append(node('p','Create Qualified Ticket Upload as primary; reuse Officer Paid and Camera Paid as secondary. This setup does not enable campaigns or authorize spending.'));
-  box.append(node('p',`CAD, America/Edmonton. Officer $${config.campaigns['G-Search-Officer'].dailyBudgetCad}/day. Camera $${config.campaigns['G-Search-Camera'].dailyBudgetCad}/day. Learning limit: ${config.learningSpendLimitCad===null?'not proposed':`$${config.learningSpendLimitCad}`}. Start: ${config.startDate||'not proposed'}.`));
+  const budgets=Object.entries(config.campaigns).map(([name,value])=>{const setting=value as any;return `${name==='G-Search-Officer'?'Officer':'Camera'} $${setting.budgetType==='TOTAL'?`${setting.totalBudgetCad} total over ${config.durationDays} days`:setting.dailyBudgetCad+'/day'}`;}).join('. ');
+  box.append(node('p',`CAD, America/Edmonton. ${budgets}. ${config.campaigns['G-Search-Camera']?'':'Camera ads off. '}Learning limit: ${config.learningSpendLimitCad===null?'not proposed':`$${config.learningSpendLimitCad}`}. Start: ${config.startDate||'not proposed'}.`));
   box.append(node('p','One approval covers this exact copy, destinations, targeting, bidding, budgets and delayed safety pauses. Opening this page grants no approval.'));
   const details=node('details','');details.append(node('summary','Review frozen campaign copy and controls'),node('pre',JSON.stringify(batch.payload,null,2)));box.append(details);
   if(batch.payload.holds.length)box.append(node('p','Launch holds: '+batch.payload.holds.join(', ')));

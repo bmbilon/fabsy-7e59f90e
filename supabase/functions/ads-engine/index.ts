@@ -1,5 +1,5 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2.57.4';
-import {buildReport,digest,edmontonDate,lint,learningRecommendation,weeklyMemo,weekKey,type Json} from '../../../ads-engine/core.ts';
+import {buildReport,campaignEndDate,digest,edmontonDate,lint,learningRecommendation,weeklyMemo,weekKey,type Json} from '../../../ads-engine/core.ts';
 import {GoogleAds,planGoogle,planMeasurement,statusOperation} from '../../../ads-engine/platform/google.ts';
 import {execute} from '../../../ads-engine/platform/actions.ts';
 import {actionStore} from '../../../ads-engine/platform/store.ts';
@@ -49,10 +49,14 @@ export async function handler(req:Request):Promise<Response>{
   if(action==='stage'){
    if(!service&&!adminId)return reply({error:'OPERATOR_REQUIRED'},403);
    const specs=input.specs,config=input.config;
-   if(!Array.isArray(specs)||specs.length!==2||!config||typeof input.brief!=='string')return reply({error:'SPEC_AND_CONFIG_REQUIRED'},400);
+   if(!Array.isArray(specs)||![1,2].includes(specs.length)||!config||typeof input.brief!=='string')return reply({error:'SPEC_AND_CONFIG_REQUIRED'},400);
    const holds=specs.flatMap(s=>lint(s,{officer:offers.rapidResolution.priceCad,camera:offers.photoRadar.priceCad}));
-   if(config.currency!=='CAD'||config.timezone!=='America/Edmonton'||config.aiMax!==false||config.targetCpa!==null||config.durationDays!==30||config.meta?.active!==false)holds.push('DECIDED_SETTINGS_OR_DISABLED_META_CHANGED');
-   if(['G-Search-Officer','G-Search-Camera'].some(name=>!Number.isFinite(config.campaigns?.[name]?.dailyBudgetCad)||config.campaigns[name].dailyBudgetCad<=0))holds.push('PROPOSE_POSITIVE_CAMPAIGN_BUDGETS');
+   const names=specs.map(s=>s.name),settings=Object.values(config.campaigns||{}) as Json[];
+   if(names.some(name=>!['G-Search-Officer','G-Search-Camera'].includes(name))||new Set(names).size!==names.length||JSON.stringify([...names].sort())!==JSON.stringify(Object.keys(config.campaigns||{}).sort()))holds.push('EXACT_CAMPAIGN_SCOPE_REQUIRED');
+   const totalBudget=settings.length>0&&settings.every(s=>s.budgetType==='TOTAL');
+   if(config.currency!=='CAD'||config.timezone!=='America/Edmonton'||config.aiMax!==false||config.targetCpa!==null||config.meta?.active!==false||(!totalBudget&&config.durationDays!==30)||(totalBudget&&(!Number.isInteger(config.durationDays)||config.durationDays<3||config.durationDays>90)))holds.push('DECIDED_SETTINGS_OR_DISABLED_META_CHANGED');
+   if(settings.some(s=>{const amount=s.budgetType==='TOTAL'?s.totalBudgetCad:s.dailyBudgetCad;return !Number.isFinite(amount)||amount<=0||s.budgetType&&!['TOTAL','DAILY'].includes(s.budgetType);} ))holds.push('PROPOSE_POSITIVE_CAMPAIGN_BUDGETS');
+   try{campaignEndDate(config);}catch{holds.push('CAMPAIGN_DATES_REQUIRED');}
    if(!(config.learningSpendLimitCad>0)||!config.spendingAuthorized||!/^\d{4}-\d{2}-\d{2}$/.test(config.startDate||''))holds.push('PROPOSE_LEARNING_LIMIT_START_DATE_AND_SPENDING_AUTHORIZATION');
    let live:Json|null=null,plan:Json|null=null;
    try{live=await google.snapshot();plan=planGoogle(specs,config,live);}catch(e){holds.push((e as Error).message);}
@@ -146,9 +150,11 @@ export async function handler(req:Request):Promise<Response>{
   }
   if(action==='pause'){
    await checked(db.from('ads_engine_state').update({paused:true}).eq('id',true));
-   const state=await store.state();if(!state.approved_batch_id)return reply({paused:true,platformPause:'No approved campaign batch'});
-   const batch=await store.approval(state.approved_batch_id),live=await google.snapshot();
-   const operations=live.campaigns.filter((r:Json)=>Object.keys(batch.payload.config.campaigns).includes(r.campaign.name)&&r.campaign.status==='ENABLED').map((r:Json)=>statusOperation(r.campaign.resourceName,'PAUSED'));
+   const state=await store.state();
+   const batch=state.approved_batch_id?await store.approval(state.approved_batch_id):(await checked(db.from('ads_batches').select('*').eq('status','approved').order('approved_at',{ascending:false}).limit(1)))[0];
+   if(!batch)return reply({paused:true,platformPause:'No approved campaign scope'});
+   const live=await google.snapshot(),scopedIds=[...Object.values(batch.payload.config.existingCampaignIds||{}),...(batch.payload.config.retiredCampaignIds||[])];
+   const operations=live.campaigns.filter((r:Json)=>(Object.keys(batch.payload.config.campaigns).includes(r.campaign.name)||scopedIds.includes(r.campaign.id))&&r.campaign.status==='ENABLED').map((r:Json)=>statusOperation(r.campaign.resourceName,'PAUSED'));
    if(!operations.length)return reply({paused:true});
    return reply(await execute(store,google,{batchId:batch.id,kind:'pause',payload:{operations},idempotencyKey:`pause:${live.hash}`,dryRun:false}));
   }
@@ -176,7 +182,7 @@ export async function handler(req:Request):Promise<Response>{
    report.holds=state.last_error?[state.last_error]:[];
    if(state.config){
     const week=await google.read(`SELECT campaign.name, segments.date, metrics.impressions FROM campaign WHERE segments.date DURING LAST_7_DAYS`).catch(()=>[]);
-    const next=learningRecommendation(events,week.map(r=>({name:r.campaign.name,date:r.segments.date,impressions:Number(r.metrics.impressions||0)})));
+    const next=learningRecommendation(events,week.filter(r=>state.config.campaigns[r.campaign.name]).map(r=>({name:r.campaign.name,date:r.segments.date,impressions:Number(r.metrics.impressions||0)})));
     if(next)report.nextAction=next;
     const ads=await google.read("SELECT campaign.name, ad_group_ad.policy_summary.approval_status FROM ad_group_ad WHERE ad_group_ad.status != 'REMOVED'").catch(()=>[]);
     report.disapprovals=ads.filter(r=>state.config.campaigns[r.campaign.name]&&r.adGroupAd.policySummary?.approvalStatus==='DISAPPROVED').map(r=>({campaign:r.campaign.name,status:'DISAPPROVED'}));

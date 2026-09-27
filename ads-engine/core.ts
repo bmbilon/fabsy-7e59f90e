@@ -34,6 +34,12 @@ export function lint(spec: Json, prices: {officer: number; camera: number}): str
 export function edmontonDate(time = Date.now()): string {
   return new Intl.DateTimeFormat('en-CA', {timeZone:'America/Edmonton',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(time));
 }
+export function campaignEndDate(config:Json):string {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(config.startDate||'')||!Number.isInteger(config.durationDays)||config.durationDays<1)throw new Error('CAMPAIGN_DATES_REQUIRED');
+  const start=Date.parse(`${config.startDate}T00:00:00Z`);
+  if(!Number.isFinite(start)||new Date(start).toISOString().slice(0,10)!==config.startDate)throw new Error('CAMPAIGN_DATES_REQUIRED');
+  return new Date(start+(config.durationDays-1)*86400000).toISOString().slice(0,10);
+}
 export function safetyStops(config: Json, snapshot: Json, now = Date.now()): Json[] {
   if (!snapshot || !Number.isFinite(Date.parse(snapshot.observedAt)) || now-Date.parse(snapshot.observedAt)>config.freshnessMinutes*60000 || Date.parse(snapshot.observedAt)>now+60000 || snapshot.date !== edmontonDate(now)) throw new Error('STALE_SPEND_DATA');
   if (!Number.isFinite(snapshot.learningSpendCad) || snapshot.learningSpendCad < 0) throw new Error('MISSING_ACCOUNT_SPEND');
@@ -41,10 +47,14 @@ export function safetyStops(config: Json, snapshot: Json, now = Date.now()): Jso
   const ended = typeof config.startDate==='string' && Date.parse(`${snapshot.date}T00:00:00Z`)-Date.parse(`${config.startDate}T00:00:00Z`)>=config.durationDays*86400000;
   return snapshot.campaigns.filter((c: Json) => {
     if (!Number.isFinite(c.spendCad) || c.spendCad < 0) throw new Error('INVALID_SPEND');
-    const budget = config.campaigns[c.name]?.dailyBudgetCad;
-    if (!(budget > 0)) throw new Error('UNAPPROVED_CAMPAIGN_BUDGET');
-    return c.status === 'ENABLED' && (ended || accountStop || c.spendCad >= budget*1.5);
-  }).map((c: Json) => ({campaign:c.resourceName, reason:ended?'THIRTY_DAY_LEARNING_PERIOD_ENDED':accountStop?'LEARNING_SPEND_LIMIT':'DAILY_150_PERCENT', spendCad:c.spendCad}));
+    const setting = config.campaigns[c.name];
+    if(setting?.budgetType==='TOTAL'){
+      if(!(setting.totalBudgetCad>0))throw new Error('UNAPPROVED_CAMPAIGN_BUDGET');
+      return c.status==='ENABLED'&&(ended||accountStop);
+    }
+    if (!(setting?.dailyBudgetCad > 0)) throw new Error('UNAPPROVED_CAMPAIGN_BUDGET');
+    return c.status === 'ENABLED' && (ended || accountStop || c.spendCad >= setting.dailyBudgetCad*1.5);
+  }).map((c: Json) => ({campaign:c.resourceName, reason:ended?'LEARNING_PERIOD_ENDED':accountStop?'LEARNING_SPEND_LIMIT':'DAILY_150_PERCENT', spendCad:c.spendCad}));
 }
 export function buildReport(events: Json[], delivery: Json[], date: string): Json {
   const rows = new Map<string, Json>();

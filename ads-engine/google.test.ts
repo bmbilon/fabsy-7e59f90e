@@ -3,7 +3,8 @@ import {GoogleAds,planGoogle,planMeasurement} from './platform/google.ts';
 import {digest,lint,type Json} from './core.ts';
 const read=async(path:string)=>JSON.parse(await Deno.readTextFile(new URL(path,import.meta.url)));
 const specs=await Promise.all(['G-Search-Officer','G-Search-Camera'].map(name=>read(`./campaigns/${name}.yaml`)));
-const config={...await read('./config.json'),googleCustomerId:'1234567890',retiredCampaignIds:[],albertaGeoTarget:'geoTargetConstants/1',googleQualifiedConversionAction:'customers/1234567890/conversionActions/1',googlePurchaseConversionActions:['customers/1234567890/conversionActions/2']};
+const pilotConfig=await read('./config.json');
+const config={...pilotConfig,campaigns:{'G-Search-Officer':{service:'officer',dailyBudgetCad:50},'G-Search-Camera':{service:'camera',dailyBudgetCad:20}},durationDays:30,priceAssetsEnabled:true,googleCustomerId:'1234567890',retiredCampaignIds:[],albertaGeoTarget:'geoTargetConstants/1',googleQualifiedConversionAction:'customers/1234567890/conversionActions/1',googlePurchaseConversionActions:['customers/1234567890/conversionActions/2']};
 function empty():Json{return {account:[{customer:{id:'1234567890',currencyCode:'CAD',timeZone:'America/Edmonton'}}],campaigns:[],groups:[],keywords:[],criteria:[],ads:[],assets:[],goals:[],conversions:[{conversionAction:{resourceName:config.googleQualifiedConversionAction,category:'SUBMIT_LEAD_FORM',primaryForGoal:true,type:'WEBPAGE',status:'ENABLED'}},{conversionAction:{resourceName:config.googlePurchaseConversionActions[0],category:'PURCHASE',primaryForGoal:false,type:'WEBPAGE',status:'ENABLED'}}],hash:'source',observedAt:new Date().toISOString()};}
 Deno.test('both campaign specs pass truth lint with 24 phrase keywords each',()=>{for(const spec of specs){assertEquals(lint(spec,{officer:198,camera:79}),[]);assertEquals(spec.groups.flatMap((g:Json)=>g.keywords).length,24);}});
 Deno.test('Google plan creates paused Search campaigns with no target and asset automation off',()=>{const plan=planGoogle(specs,config,empty());const campaigns=plan.operations.filter((o:Json)=>o.campaignOperation).map((o:Json)=>o.campaignOperation.create);assertEquals(campaigns.length,2);for(const c of campaigns){assertEquals(c.status,'PAUSED');assertEquals(c.maximizeConversions,{});assertEquals(c.aiMaxSetting.enableAiMax,false);assertEquals(c.assetAutomationSettings.every((a:Json)=>a.assetAutomationStatus==='OPTED_OUT'),true);}const budgets=plan.operations.filter((o:Json)=>o.campaignBudgetOperation).map((o:Json)=>o.campaignBudgetOperation.create.amountMicros);assertEquals(budgets,['50000000','20000000']);});
@@ -66,4 +67,13 @@ Deno.test('approved campaign replacement pauses its predecessor before creating 
  assertEquals(plan.operations[0].campaignOperation.update,{resourceName:'old',status:'PAUSED'});
  assertEquals(plan.rollback[0].campaignOperation.update.status,'ENABLED');
  assertThrows(()=>planGoogle(specs,{...config,retiredCampaignIds:['missing']},live),Error,'RETIRED_CAMPAIGN_SCOPE_INVALID');
+});
+Deno.test('officer pilot has one lifetime budget and a fixed 14-day serving window',()=>{
+ const pilot={...config,campaigns:pilotConfig.campaigns,durationDays:14,startDate:'2026-09-27',priceAssetsEnabled:false};
+ const plan=planGoogle([specs[0]],pilot,empty());
+ const budgets=plan.operations.filter((o:Json)=>o.campaignBudgetOperation).map((o:Json)=>o.campaignBudgetOperation.create);
+ const campaigns=plan.operations.filter((o:Json)=>o.campaignOperation).map((o:Json)=>o.campaignOperation.create);
+ assertEquals(budgets.length,1);assertEquals(budgets[0].period,'CUSTOM_PERIOD');assertEquals(budgets[0].totalAmountMicros,'150000000');assertEquals(budgets[0].amountMicros,undefined);assertEquals(budgets[0].explicitlyShared,false);
+ assertEquals(campaigns.length,1);assertEquals(campaigns[0].status,'PAUSED');assertEquals(campaigns[0].startDateTime,'2026-09-27 00:00:00');assertEquals(campaigns[0].endDateTime,'2026-10-10 23:59:59');
+ assertEquals(plan.operations.some((o:Json)=>o.assetOperation?.create.priceAsset),false);
 });

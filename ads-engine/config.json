@@ -4,9 +4,9 @@
   "timezone": "America/Edmonton",
   "spendingAuthorized": false,
   "paused": true,
-  "learningSpendLimitCad": null,
-  "startDate": null,
-  "durationDays": 30,
+  "learningSpendLimitCad": 150,
+  "startDate": "2026-09-27",
+  "durationDays": 14,
   "freshnessMinutes": 120,
   "monitorMinutes": 15,
   "googleApiVersion": "v23",
@@ -21,15 +21,12 @@
   "campaigns": {
     "G-Search-Officer": {
       "service": "officer",
-      "dailyBudgetCad": 50,
+      "budgetType": "TOTAL",
+      "totalBudgetCad": 150,
       "planningCpaCad": 90
-    },
-    "G-Search-Camera": {
-      "service": "camera",
-      "dailyBudgetCad": 20,
-      "planningCpaCad": 35
     }
   },
+  "priceAssetsEnabled": false,
   "meta": {
     "active": false,
     "budgetCad": null,

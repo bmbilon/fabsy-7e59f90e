@@ -2,16 +2,16 @@
 
 ## Current status
 
-Public frontend, Google conversion setup, cloud backend and phone controls are deployed. Two Search specifications contain 24 phrase keywords each and remain paused. The public release corrects camera refunds and uses granted Google defaults with a footer opt-out. Hashed contact delivery remains disabled pending the Google account customer-data setup.
+Public frontend, Google conversion setup, cloud backend and phone controls are deployed. Brett authorized an officer-only pilot on September 27: C$150 campaign total budget over 14 calendar days, with camera ads off. Both older Search campaigns are confirmed paused. The public release corrects camera refunds and uses granted Google defaults with a footer opt-out. Customer Data Terms and Google tag enhanced conversions are saved, with automatic user-data detection off.
 
-Read ASSUMPTIONS.md for evidence and remaining holds. Live account sync passes the primary conversion check. Google has not yet verified a real upload/payment recording. The launch needs those receipts, the account learning-spend limit and the frozen approval. A local test is not a Google diagnostic receipt.
+Read ASSUMPTIONS.md for evidence. Live account sync passes the primary conversion check. Google recording is unverified. Brett explicitly instructed this pilot to launch without an additional real checkout test; that instruction is retained in the frozen readiness evidence. No test or conversion receipt is invented.
 
 ## Setup
 
 1. Install existing repository dependencies and Deno 2. No new provider or orchestration service.
 2. Configure the server environment values listed in .env.example. Google Ads OAuth requires the adwords scope, client ID/secret, refresh token and actual client account ID. Apply for production API access through the owning Google Cloud project's Google Ads API overview. Google sunset developer tokens on September 9, 2026; the adapter does not send one. A manager login ID is optional. The Lovable gateway already used by this repository supplies the public-copy AI check through LOVABLE_API_KEY. No ticket data is passed to it.
 3. Apply the three named ads migrations dated 20260927160000, 20260927183000 and 20260927184500 and deploy ads-engine, ads-measurement, portal-agent, create-payment, get-checkout-session and idr-payment-webhook together. Existing workers continue their own behavior. Do not deploy a payment hook that references undeployed tables. Existing Vault idr_project_url and idr_cron_secret schedule the monitor every 15 minutes and invoke the morning report hourly; it chooses 08:05 Edmonton including DST. Inspect cron.job after migration; scheduling is skipped if those prerequisites are absent.
-4. Build the existing frontend and portal-agent phone bundle. Keep VITE_GOOGLE_MEASUREMENT_ENABLED=false until privacy/tag QA. Add VITE_GADS_QUALIFIED_UPLOAD_LABEL, the separate officer/camera purchase labels and the account Ads ID. Visitors must also opt in to Privacy choices. Google automatic user-data collection must be off in the account; only explicit hashed email/phone values are allowed.
+4. Build the existing frontend and portal-agent phone bundle. Keep VITE_GOOGLE_MEASUREMENT_ENABLED=false until privacy/tag QA. Add VITE_GADS_QUALIFIED_UPLOAD_LABEL, the separate officer/camera purchase labels and the account Ads ID. Public Google collection defaults to granted with a footer opt-out. Google automatic user-data collection must be off in the account; only explicit hashed email/phone values are allowed.
 5. Read the real account graph with `node ads-engine/cli.mjs sync --live-read`. Set googleCustomerId, actual conversion-action resource names, verified Alberta geoTargetConstant and any existing campaign IDs in config.json. Existing same-name or same-destination Search campaigns are detected. Ambiguous or incompatible historical campaigns hold for review instead of duplicating them. Shared budgets, unknown ad groups, keywords, targeting and differing creative require review before reuse.
 6. Qualified Ticket Upload must be the only enabled primary website action in its category. Client Paid website actions are secondary. Google campaign goals are overridden to qualify uploads only. Purchase remains observed from day one. New campaigns inherit goals until the post-create paused sync configures them. Launch refuses unverified goals or Google-disapproved ads.
 
@@ -22,10 +22,10 @@ Read ASSUMPTIONS.md for evidence and remaining holds. Live account sync passes t
 Propose actual limits without authorizing a spend:
 
 ```
-node ads-engine/cli.mjs stage --learning-limit 2100 --start YYYY-MM-DD
+node ads-engine/cli.mjs stage --learning-limit 150 --start YYYY-MM-DD
 ```
 
-The number above is an example proposal. Set the actual learning limit and date for Brett's review. Default daily proposals are $50 officer and $20 camera; actual positive budgets are frozen for approval from config.json. The single frozen batch includes copy, destinations, geographic targeting, goals, bidding, budgets, limit, duration, safety stops and mutation preview. Server-generated regex and AI checks must pass. No approval is inferred from a CLI call, maintenance credential or notification open.
+The current authorized scope is one officer campaign, C$150 total and 14 calendar days. The CLI loads only campaign names present in config.json. Google receives period CUSTOM_PERIOD, totalAmountMicros 150000000 and explicit start/end times in the account timezone. Daily amountMicros is absent. The budget type cannot be changed on an existing campaign. Camera remains prepared locally and receives no enabled campaign or budget. The frozen batch includes copy, destinations, geography, goals, bidding, budget, duration, safety stops and mutation preview. Server-generated regex and AI checks must pass. No approval is inferred from a CLI call, maintenance credential or notification open.
 
 In https://fabsy.ca/admin/portal, record actual upload/payment/Google diagnostic evidence and verify the corrected destinations. The server checks live destination content and stores text hashes. Then an authenticated administrator taps Approve this launch batch. Server credentials cannot call the SQL approval function. Notification delivery uses the existing staff push outbox and subscriptions.
 
@@ -41,7 +41,7 @@ node ads-engine/cli.mjs launch <batch_id> --execute
 
 The second apply is an idempotent paused goal/graph sync after creation. One approval covers the deterministic initial specs and launch. Each execution re-reads the account and checks the exact approved scope. No new offer, creative, destination or budget is inferred. An incompatible graph stays held. Google validateOnly runs before a single commit; ambiguous outcomes stay uncertain with no automatic retry.
 
-Google assets include the $198 and $79 services. Google price assets require three offerings, so the verified existing $229 Resolution + Insurance Planning bundle is explicitly shown as the third offering in the frozen mutation preview and brief. This does not create a third campaign.
+The pilot uses officer-only headlines, sitelinks and callouts. Optional Google price extensions are off because their three-offering requirement would expose additional services in this officer-only pilot. The $198 plus GST price remains in both responsive Search ads. The camera specification remains available for a separately approved later phase.
 
 ## Measurement
 
@@ -56,7 +56,7 @@ Google assets include the $198 and $79 services. Google price assets require thr
 
 The existing mobile page has Pause paid campaigns. CLI pause is dry-run until `--execute`. Pause immediately freezes discretionary launches and checks live delivery. If an action is in flight, the next independent monitor enforces the saved owner pause after the lease clears.
 
-Safety pauses apply at inclusive 150% of the approved daily campaign budget, the approved account learning-spend limit, or the end of 30 days. They are logged through platform/actions. Google may deliver above a daily average budget, and provider reports lag. The 15-minute monitor is a delayed check, never a real-time or exact spend cap. Account-level learning spend includes other account campaigns. No budget is reallocated automatically.
+Daily-budget campaigns retain the inclusive 150% daily safety pause. The current total-budget pilot relies on Google's C$150 lifetime charge cap and explicit October 10 end date, plus the delayed account learning-spend and 14-day checks. It has no invented daily limit. Account-level learning spend includes other account campaigns, including legacy spend earlier on the launch date, so it may pause the pilot before all C$150 is spent. The 15-minute monitor is a delayed check. No budget is reallocated or increased automatically. Owner pause also reaches predecessor IDs listed in the approved frozen scope, even before an enabled launch exists, and retains before/after/rollback evidence.
 
 `node ads-engine/cli.mjs revert <action_id> --batch <approved_batch_id>` stages the saved rollback for mobile review. Execute the approved rollback through `ads-revert`. New campaigns are paused and added child resources removed; prior mutable fields are restored. Original resources and logs are retained. A changed live graph holds the rollback instead of overwriting later work.
 

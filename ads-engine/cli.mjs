@@ -10,7 +10,7 @@ async function module(name){const r=await build({entryPoints:[path.join(engine,n
 const {digest,lint,buildReport}=await module('core.ts');
 const {GoogleAds,planGoogle}=await module('platform/google.ts');
 const config=JSON.parse(await readFile(path.join(engine,'config.json'),'utf8'));
-const specs=await Promise.all(['G-Search-Officer','G-Search-Camera'].map(async n=>JSON.parse(await readFile(path.join(engine,'campaigns',`${n}.yaml`),'utf8'))));
+const specs=await Promise.all(Object.keys(config.campaigns).map(async n=>JSON.parse(await readFile(path.join(engine,'campaigns',`${n}.yaml`),'utf8'))));
 const offers=JSON.parse(await readFile(path.join(root,'src/config/offers.json'),'utf8'));
 const brief=await readFile(path.join(engine,'brief.md'),'utf8');
 const [command='sync',...args]=process.argv.slice(2);

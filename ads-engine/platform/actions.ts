@@ -31,7 +31,8 @@ export async function execute(store:ActionStore,adapter:PlatformAdapter,input:{b
   }
   if(!safe&&(Date.now()-Date.parse(before.observedAt)>120000||before.hash!==input.payload.sourceHash))throw new Error('LIVE_SOURCE_CHANGED');
   if(safe){
-    const owned=new Set(before.campaigns.filter((r:Json)=>Object.keys(batch.payload.config.campaigns).includes(r.campaign.name)||Object.values(batch.payload.config.existingCampaignIds).includes(r.campaign.id)).map((r:Json)=>r.campaign.resourceName));
+    const scopedIds=[...Object.values(batch.payload.config.existingCampaignIds||{}),...(batch.payload.config.retiredCampaignIds||[])];
+    const owned=new Set(before.campaigns.filter((r:Json)=>Object.keys(batch.payload.config.campaigns).includes(r.campaign.name)||scopedIds.includes(r.campaign.id)).map((r:Json)=>r.campaign.resourceName));
     for(const op of input.payload.operations){if(!owned.has(op.campaignOperation?.update?.resourceName)||op.campaignOperation.update.status!=='PAUSED'||op.campaignOperation.updateMask!=='status')throw new Error('PAUSE_SCOPE_INVALID');}
   }
   const initialRollback=safe?input.payload.operations.map((op:Json)=>statusOperation(op.campaignOperation.update.resourceName,before.campaigns.find((r:Json)=>r.campaign.resourceName===op.campaignOperation.update.resourceName).campaign.status)):(input.payload.rollback||[]);

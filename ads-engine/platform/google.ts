@@ -1,4 +1,4 @@
-import {canonical, digest, edmontonDate, type Json} from '../core.ts';
+import {canonical, campaignEndDate, digest, edmontonDate, type Json} from '../core.ts';
 
 export class GoogleAds {
   constructor(readonly env: (key:string)=>string|undefined, readonly fetcher = fetch) {}
@@ -27,7 +27,7 @@ export class GoogleAds {
     const account=await this.read('SELECT customer.id, customer.currency_code, customer.time_zone FROM customer');
     if(account[0]?.customer.currencyCode!=='CAD'||account[0]?.customer.timeZone!=='America/Edmonton')throw new Error('ACCOUNT_CURRENCY_OR_TIMEZONE_MISMATCH');
     const [campaigns,groups,keywords,criteria,ads,assets,goals,conversions] = await Promise.all([
-      this.read("SELECT campaign.resource_name, campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, campaign.campaign_budget, campaign.maximize_conversions.target_cpa_micros, campaign.bidding_strategy_type, campaign.ai_max_setting.enable_ai_max, campaign.asset_automation_settings, campaign.network_settings.target_google_search, campaign.network_settings.target_search_network, campaign.network_settings.target_content_network, campaign.network_settings.target_partner_search_network, campaign.geo_target_type_setting.positive_geo_target_type, campaign.geo_target_type_setting.negative_geo_target_type, campaign.final_url_suffix, campaign_budget.amount_micros, campaign_budget.explicitly_shared FROM campaign WHERE campaign.status != 'REMOVED'"),
+      this.read("SELECT campaign.resource_name, campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, campaign.campaign_budget, campaign.start_date_time, campaign.end_date_time, campaign.maximize_conversions.target_cpa_micros, campaign.bidding_strategy_type, campaign.ai_max_setting.enable_ai_max, campaign.asset_automation_settings, campaign.network_settings.target_google_search, campaign.network_settings.target_search_network, campaign.network_settings.target_content_network, campaign.network_settings.target_partner_search_network, campaign.geo_target_type_setting.positive_geo_target_type, campaign.geo_target_type_setting.negative_geo_target_type, campaign.final_url_suffix, campaign_budget.amount_micros, campaign_budget.total_amount_micros, campaign_budget.period, campaign_budget.explicitly_shared FROM campaign WHERE campaign.status != 'REMOVED'"),
       this.read("SELECT ad_group.resource_name, ad_group.campaign, ad_group.name, ad_group.status FROM ad_group WHERE ad_group.status != 'REMOVED'"),
       this.read("SELECT ad_group_criterion.resource_name, ad_group_criterion.ad_group, ad_group_criterion.status, ad_group_criterion.negative, ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type FROM ad_group_criterion WHERE ad_group_criterion.type = 'KEYWORD' AND ad_group_criterion.status != 'REMOVED'"),
       this.read("SELECT campaign_criterion.resource_name, campaign_criterion.campaign, campaign_criterion.negative, campaign_criterion.type, campaign_criterion.location.geo_target_constant, campaign_criterion.keyword.text, campaign_criterion.keyword.match_type FROM campaign_criterion"),
@@ -47,7 +47,7 @@ export class GoogleAds {
     const plan=planGoogle(specs,config,live);
     if(plan.operations.length)throw new Error('SYNC_PAUSED_CAMPAIGNS_AND_GOALS_FIRST');
     const campaigns=live.campaigns.filter((r:Json)=>specs.some((s:Json)=>s.name===r.campaign.name));
-    if(campaigns.length!==2)throw new Error('EXACT_CAMPAIGNS_REQUIRED');
+    if(!specs.length||campaigns.length!==specs.length)throw new Error('EXACT_CAMPAIGNS_REQUIRED');
     for(const row of campaigns){
       const goals=live.goals.filter((r:Json)=>r.campaignConversionGoal.campaign===row.campaign.resourceName).map((r:Json)=>r.campaignConversionGoal);
       const qualified=live.conversions.find((r:Json)=>r.conversionAction.resourceName===config.googleQualifiedConversionAction).conversionAction;
@@ -126,17 +126,24 @@ export function planGoogle(specs:Json[],config:Json,live:Json):Json {
   const resource=(kind:string)=>`customers/${customer}/${kind}/${temp--}`;
   const add=(kind:string,create:Json)=>{createdOperationKinds[operations.length]=kind;operations.push({[`${kind}Operation`]:{create}});};
   for(const spec of specs){
+    const budgetSetting=config.campaigns[spec.name];
+    const totalBudget=budgetSetting?.budgetType==='TOTAL';
+    const budgetField=totalBudget?'totalAmountMicros':'amountMicros';
+    const budgetAmount=totalBudget?budgetSetting.totalBudgetCad:budgetSetting?.dailyBudgetCad;
+    if(!(Number.isFinite(budgetAmount)&&budgetAmount>0))throw new Error('PROPOSE_POSITIVE_CAMPAIGN_BUDGETS');
+    const dates=totalBudget?{startDateTime:`${config.startDate} 00:00:00`,endDateTime:`${campaignEndDate(config)} 23:59:59`}:{};
     const explicit=config.existingCampaignIds[spec.name];
     const matches=live.campaigns.filter((r:Json)=>!retired.has(r.campaign.id)&&(explicit?r.campaign.id===explicit:r.campaign.name===spec.name||r.campaign.advertisingChannelType==='SEARCH'&&live.ads.some((a:Json)=>a.adGroupAd.ad.finalUrls?.includes(spec.destination)&&live.groups.some((g:Json)=>g.adGroup.resourceName===a.adGroupAd.adGroup&&g.adGroup.campaign===r.campaign.resourceName))));
     if(matches.length>1||explicit&&!matches.length)throw new Error('AMBIGUOUS_EXISTING_CAMPAIGN');
     const existing=matches[0];
-    const settings={name:spec.name,status:'PAUSED',finalUrlSuffix:`utm_source=google&utm_medium=cpc&utm_campaign=${spec.name}&utm_content=${spec.service}_launch_v1&variant_id=${spec.service}_v1`,maximizeConversions:{},networkSettings:{targetGoogleSearch:true,targetSearchNetwork:false,targetContentNetwork:false,targetPartnerSearchNetwork:false},geoTargetTypeSetting:{positiveGeoTargetType:'PRESENCE',negativeGeoTargetType:'PRESENCE'},aiMaxSetting:{enableAiMax:false},assetAutomationSettings:['TEXT_ASSET_AUTOMATION','FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION'].map(assetAutomationType=>({assetAutomationType,assetAutomationStatus:'OPTED_OUT'}))};
+    const settings={name:spec.name,status:'PAUSED',...dates,finalUrlSuffix:`utm_source=google&utm_medium=cpc&utm_campaign=${spec.name}&utm_content=${spec.service}_launch_v1&variant_id=${spec.service}_v1`,maximizeConversions:{},networkSettings:{targetGoogleSearch:true,targetSearchNetwork:false,targetContentNetwork:false,targetPartnerSearchNetwork:false},geoTargetTypeSetting:{positiveGeoTargetType:'PRESENCE',negativeGeoTargetType:'PRESENCE'},aiMaxSetting:{enableAiMax:false},assetAutomationSettings:['TEXT_ASSET_AUTOMATION','FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION'].map(assetAutomationType=>({assetAutomationType,assetAutomationStatus:'OPTED_OUT'}))};
     let campaign:string;
     if(existing){
       campaign=existing.campaign.resourceName;
       if(existing.campaign.advertisingChannelType!=='SEARCH'||existing.campaignBudget.explicitlyShared)throw new Error('EXISTING_CAMPAIGN_NEEDS_REVIEW');
+      if((existing.campaignBudget.period==='CUSTOM_PERIOD')!==totalBudget)throw new Error('CAMPAIGN_BUDGET_TYPE_CANNOT_CHANGE');
       const fields={...settings,resourceName:campaign};
-      const mask='name,status,maximize_conversions,network_settings,geo_target_type_setting,ai_max_setting,asset_automation_settings,final_url_suffix';
+      const mask='name,status,maximize_conversions,network_settings,geo_target_type_setting,ai_max_setting,asset_automation_settings,final_url_suffix'+(totalBudget?',start_date_time,end_date_time':'');
       const oldFields=Object.fromEntries(Object.keys(settings).map(k=>[k,existing.campaign[k]??(k==='maximizeConversions'?{}:undefined)]));
       const normalized={...oldFields,networkSettings:Object.fromEntries(Object.keys(settings.networkSettings).map(k=>[k,existing.campaign.networkSettings?.[k]===true])),aiMaxSetting:{enableAiMax:existing.campaign.aiMaxSetting?.enableAiMax===true},assetAutomationSettings:existing.campaign.assetAutomationSettings?.filter((a:Json)=>settings.assetAutomationSettings.some(v=>v.assetAutomationType===a.assetAutomationType)).sort((a:Json,b:Json)=>a.assetAutomationType.localeCompare(b.assetAutomationType))};
       const compare={...settings,assetAutomationSettings:[...settings.assetAutomationSettings].sort((a,b)=>a.assetAutomationType.localeCompare(b.assetAutomationType))};
@@ -146,11 +153,11 @@ export function planGoogle(specs:Json[],config:Json,live:Json):Json {
       }
       // Bidding restoration is staged separately when the former strategy differs.
       if(existing.campaign.biddingStrategyType!=='MAXIMIZE_CONVERSIONS')throw new Error('EXISTING_BIDDING_REQUIRES_SEPARATE_APPROVED_MIGRATION');
-      const amount=String(Math.round(config.campaigns[spec.name].dailyBudgetCad*1e6));
-      if(existing.campaignBudget.amountMicros!==amount){operations.push(update('campaignBudget',{resourceName:existing.campaign.campaignBudget,amountMicros:amount},'amount_micros'));rollback.unshift(update('campaignBudget',{resourceName:existing.campaign.campaignBudget,amountMicros:existing.campaignBudget.amountMicros},'amount_micros'));}
+      const amount=String(Math.round(budgetAmount*1e6)),budgetMask=totalBudget?'total_amount_micros':'amount_micros';
+      if(existing.campaignBudget[budgetField]!==amount){operations.push(update('campaignBudget',{resourceName:existing.campaign.campaignBudget,[budgetField]:amount},budgetMask));rollback.unshift(update('campaignBudget',{resourceName:existing.campaign.campaignBudget,[budgetField]:existing.campaignBudget[budgetField]},budgetMask));}
     }else{
       const budget=resource('campaignBudgets');campaign=resource('campaigns');
-      add('campaignBudget',{resourceName:budget,name:`${spec.name} launch v1`,amountMicros:String(Math.round(config.campaigns[spec.name].dailyBudgetCad*1e6)),deliveryMethod:'STANDARD',explicitlyShared:false});
+      add('campaignBudget',{resourceName:budget,name:`${spec.name} launch v1`,[budgetField]:String(Math.round(budgetAmount*1e6)),...(totalBudget?{period:'CUSTOM_PERIOD'}:{}),deliveryMethod:'STANDARD',explicitlyShared:false});
       newCampaignIndexes.push(operations.length);
       add('campaign',{resourceName:campaign,...settings,campaignBudget:budget,advertisingChannelType:'SEARCH',containsEuPoliticalAdvertising:'DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING'});
     }
@@ -180,7 +187,7 @@ export function planGoogle(specs:Json[],config:Json,live:Json):Json {
     const goals=live.goals.filter((r:Json)=>r.campaignConversionGoal.campaign===campaign);
     for(const row of goals){const g=row.campaignConversionGoal;const biddable=g.category===qualified.category&&g.origin==='WEBSITE';if(g.biddable!==biddable){operations.push(update('campaignConversionGoal',{resourceName:g.resourceName,biddable},'biddable'));rollback.unshift(update('campaignConversionGoal',{resourceName:g.resourceName,biddable:g.biddable},'biddable'));}}
     // New campaign goals are configured after the paused create, in a second approved sync.
-    for(const [type,entries] of [['CALLOUT',spec.callouts.map((text:string)=>({name:`${spec.name}: ${text}`,calloutAsset:{calloutText:text}}))],['SITELINK',spec.sitelinks.map((s:Json)=>({name:`${spec.name}: ${s.text}`,sitelinkAsset:{linkText:s.text},finalUrls:[s.url]}))],['PRICE',[{name:`${spec.name}: Price`,priceAsset:{type:'SERVICES',languageCode:'en',priceOfferings:[...spec.priceAssets,...specs.filter(s=>s.name!==spec.name).flatMap(s=>s.priceAssets),{header:'Resolution Bundle',description:'Service and report + GST',amountCad:229,url:'https://fabsy.ca/rapid-resolution'}].map((a:Json)=>({header:a.header,description:a.description,price:{amountMicros:String(a.amountCad*1e6),currencyCode:'CAD'},finalUrl:a.url}))}}]]] as [string,Json[]][]){
+    for(const [type,entries] of [['CALLOUT',spec.callouts.map((text:string)=>({name:`${spec.name}: ${text}`,calloutAsset:{calloutText:text}}))],['SITELINK',spec.sitelinks.map((s:Json)=>({name:`${spec.name}: ${s.text}`,sitelinkAsset:{linkText:s.text},finalUrls:[s.url]}))],...(config.priceAssetsEnabled===false?[]:[['PRICE',[{name:`${spec.name}: Price`,priceAsset:{type:'SERVICES',languageCode:'en',priceOfferings:[...spec.priceAssets,...specs.filter(s=>s.name!==spec.name).flatMap(s=>s.priceAssets),{header:'Resolution Bundle',description:'Service and report + GST',amountCad:229,url:'https://fabsy.ca/rapid-resolution'}].map((a:Json)=>({header:a.header,description:a.description,price:{amountMicros:String(a.amountCad*1e6),currencyCode:'CAD'},finalUrl:a.url}))}}]]])] as [string,Json[]][]){
       for(const value of entries){
         const found=live.assets.filter((r:Json)=>r.campaignAsset.campaign===campaign&&r.asset.name===value.name);
         if(found.length){
