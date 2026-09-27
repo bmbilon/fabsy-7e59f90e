@@ -214,8 +214,8 @@ function redactExactRefundFaqs(document, route, issues) {
       if (!entries.some(faq => question.name === faq.question && answerMatches(question.acceptedAnswer.text, faq.answer))) continue;
       // Preserve every other property: an appended or unrelated schema claim
       // never inherits this one exact Question/Answer admission.
-      question.name = '[exact source fee-refund question]';
-      question.acceptedAnswer.text = '[exact source fee-refund answer]';
+      question.name = '[exact source offer question]';
+      question.acceptedAnswer.text = '[exact source offer answer]';
     }
     script.textContent = JSON.stringify(schema).replace(/</g, '\\u003c');
   }

@@ -8,6 +8,8 @@ const {
   curatedPageIssues,
   textGuardrailIssues,
 } = require('./curated-content-guardrails.cjs');
+const { redactPublicOfferSnapshot } = require('./public-offer-snapshot-guardrail.cjs');
+const { browserTextGuardrailIssues } = require('./validate-snapshot-guardrails.cjs');
 
 const root = path.resolve(__dirname, '..');
 const read = (relative) => JSON.parse(fs.readFileSync(path.join(root, relative), 'utf8'));
@@ -35,6 +37,12 @@ for (const slug of slugs) {
   if (slug === 'photo-radar-ticket-alberta') assert.match(page.what, /Acts\/T06\.pdf/);
   assert.ok(page.next.includes('($82.95 total)'));
   assert.doesNotMatch(JSON.stringify(page), /refund|money.back/i);
+  const html = fs.readFileSync(path.join(root, `public/prerendered/content/${slug}/index.html`), 'utf8');
+  assert.doesNotMatch(html, /refund|money.back/i);
+  // Match the release pipeline: offer admission runs before the article guard.
+  // Internal schema labels must not manufacture a prohibited customer claim.
+  const admitted = redactPublicOfferSnapshot(html, { route: `/content/${slug}` });
+  assert.deepEqual([...admitted.issues, ...browserTextGuardrailIssues(admitted.html, slug)], [], `${slug}: release guard pipeline`);
   const refundClaim = { ...page, next: page.next + '<p>We refund your fee if no reduction is obtained.</p>' };
   assert.ok(curatedPageIssues(refundClaim).some(issue => issue.includes('must not advertise a refund')));
 
