@@ -69,7 +69,7 @@ const TermsOfPurchase = () => {
               </li>
               <li className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                <span>{PHOTO_RADAR.name} costs ${PHOTO_RADAR.priceCad} CAD plus 5% GST (${PHOTO_RADAR.totalCad.toFixed(2)} total), paid upfront for an accepted, eligible registered-owner camera notice. The fee-refund guarantee applies.</span>
+                <span>{PHOTO_RADAR.name} costs ${PHOTO_RADAR.priceCad} CAD plus 5% GST (${PHOTO_RADAR.totalCad.toFixed(2)} total), paid upfront for an accepted, eligible registered-owner camera notice. No legal outcome is promised.</span>
               </li>
               <li className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
@@ -174,10 +174,10 @@ const TermsOfPurchase = () => {
                 has been obtained. Fabsy refunds the service fee you actually paid, together with
                 the corresponding GST, within 30 calendar days of Fabsy receiving that rejection.
                 Payment does not start the clock; an opening or unchanged offer before Fabsy's
-                negotiation efforts have been rejected does not start it either. Photo radar and
-                red-light owner notices are assessed on the original fine or withdrawal only.
-                The guarantee covers Rapid Resolution, Photo Radar and the Rapid Resolution bundle,
-                including discounted Pro Driver orders; it does not cover a standalone insurance report.
+                negotiation efforts have been rejected does not start it either.
+                The guarantee applies only to the $198 Rapid Resolution service, including discounted
+                Pro Driver orders and its service component in a bundle. Photo Radar, red-light camera
+                services and insurance reports are excluded.
                 Work already performed and payment-processing costs do not reduce a refund due under
                 this guarantee. Amounts already refunded are not paid twice. Read the{" "}
                 <Link to={FEE_REFUND.termsPath} className="font-semibold text-primary underline underline-offset-4">complete fee-refund terms</Link>.

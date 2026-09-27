@@ -1,23 +1,15 @@
-# Meta text brief — Photo Radar
+# Photo Radar and Red-light Camera creative brief
 
-Revised draft copy only; the Crown-rejection timing correction is not live. No images generated, ad account accessed, campaign created, audience uploaded or spend authorized. Keep the launch paused until the shared [launch checklist](launch-checklist.md) is complete, then obtain a separate Meta budget/activation approval. Search authorization would not authorize Meta spending.
+Updated September 27, 2026. Current reusable copy is in [meta-copy.json](meta-copy.json). This file records copy only; live Meta delivery is recorded in the September relaunch receipt.
 
-The three exact copy variants are stored in [meta-copy.json](meta-copy.json). Each leads with the service-fee refund offer while keeping upfront pricing and its condition prominent:
+Photo radar ticket? We fight it for $79 + GST.
 
-> Fine reduced or ticket dismissed—or your fee refunded.
->
-> Photo radar notice? Pay $79 + GST ($82.95 total) upfront. No hidden fees.
->
-> If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits. The refund covers the actual Photo Radar service fee and GST paid. Payment does not start the 30-day refund clock. An initial or unchanged offer alone does not trigger a refund. See terms.
->
-> For eligible Alberta camera notices mailed to a registered owner. No demerits. No insurance impact. Only the fine is at issue. We enter a not-guilty plea, request disclosure and ask the Crown for a reduction or withdrawal. We handle the Court paperwork; you approve any deal. No trial. No outcome is promised. Government fines are separate.
+We review the evidence and pursue a lower fine or withdrawal with the Crown. You approve any deal. No success fee.
 
-Headline: **Fine reduced—or your fee refunded**. Description: **Photo Radar: $79 + GST**. CTA: **Learn More**. Destination: `https://fabsy.ca/photo-radar` with the variant's unchanged static UTM parameters. The alternative variants cover red-light camera notices and registered-owner wording; all retain the upfront service price plus GST, exact refund condition, client approval and outcome limits.
+$82.95 total, paid upfront. Eligible Alberta registered-owner notices. Government fines separate. Trial excluded. No legal outcome is guaranteed.
 
-For any later creative production, use a neutral notice/envelope illustration, not a client's actual ticket. Any sample plate, address, ticket number, barcode or signature must be obviously fictional or omitted. Do not borrow a government crest, imply official court affiliation, or present Fabsy as a law firm. Show **$79 + GST**, with **$82.95 total**, **paid upfront** and **no hidden fees** nearby. Keep the refund's Crown-rejection/no-fine-cut-or-withdrawal condition and “See terms” prominent alongside its headline. Place “Check notice eligibility” and “You approve any deal” where they survive placement crops. Preview all enabled placements so the refund condition, price/tax and scope remain readable before approving an image or video.
+Upload your notice to start.
 
-Use the no-insurance answer to explain why this is a fine-only service, not to frighten people about premiums or sell IIR. Do not imply that the viewer has committed an offence, is guilty, is in financial hardship or has a known legal problem. Keep the general notice question. No “photo radar is illegal now,” automatic-dismissal claim, savings guarantee, unconditional refund promise, fabricated result, testimonial or Crown endorsement. The draft promise refunds the actual Photo Radar service fee and GST paid if the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal and neither improvement is obtained. The 30 days start when Fabsy receives that rejection. An initial or unchanged Crown offer alone does not trigger the refund; payment does not start the clock. Do not substitute a final-offer requirement, minimum reduction, claim deadline or guilty-plea acceptance condition. Court paperwork and Crown negotiation are service tasks; do not turn them into blanket no-court, no-English or no-appointment promises. No legal outcome is promised.
+Use separate Photo Radar and red-light camera creative. Lead with “We fight it for $79 + GST”, show $82.95 total, and keep client approval, separate government fines and trial exclusion legible. Use fictional notices without client information. No outcome guarantee, fabricated result, savings promise or insurer-outcome claim.
 
-If a Meta launch is later authorized, confirm the current platform classification, Alberta location controls, adult audience, privacy/consent behavior and website Purchase objective in the actual account. Do not create remarketing audiences from ticket pages, customer lists, uploaded notices or offence details. No ticket/plate/owner data belongs in pixel events or UTMs. Browser/server Purchase delivery, if used, needs supported event deduplication and a stable opaque ID; report **CAD 79 excluding GST**, not $82.95 or the government fine. This brief does not claim any Meta integration exists.
-
-The JSON headline/description length checks are conservative editorial budgets for this pack, not a claim about a universal Meta placement limit. Final placement previews and policy review remain necessary. Budget, audience settings and dates are proposals to confirm later, not active settings.
+The outcome refund offer applies only to the $198 Rapid Resolution service. Keep it out of every $79 asset, primary text, headline and description.

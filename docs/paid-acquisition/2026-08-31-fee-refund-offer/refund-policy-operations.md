@@ -1,5 +1,7 @@
 # Fee-refund offer and operating checklist
 
+**Current scope (September 27, 2026): only the $198 Rapid Resolution service carries the outcome refund offer. All references below to including Photo Radar or red-light services are superseded. Existing order terms remain recorded. See [the correction receipt](../2026-09-27-refund-scope.md).**
+
 Updated August 31, 2026 following Brett's clarification: the clock starts after the Crown rejects Fabsy's negotiation efforts for a lower fine, fewer demerits or withdrawal, with none of those improvements obtained. Payment does not start the clock. Publication evidence is recorded separately; this document does not claim a deployment, paid conversion, campaign launch or completed refund.
 
 ## Public promise

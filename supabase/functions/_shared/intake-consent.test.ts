@@ -17,6 +17,7 @@ Deno.test("checkbox consent binds server wording, identity, product and time wit
   assert.equal("signature" in consent, false);
   assert.match(consent.authorization.join("\n"), /not-guilty plea/);
   assert.match(consent.authorization.join("\n"), /\$79/);
+  assert.doesNotMatch(consent.authorization.join("\n"), /refund|money.back/i);
 });
 Deno.test("typed consent still requires the actual matching legal-name signature", () => {
   assert.throws(() => parseIntakeConsent({ ...valid, method: "typed" }, "Alex Example", false));

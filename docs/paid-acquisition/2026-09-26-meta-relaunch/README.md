@@ -1,6 +1,6 @@
 # Meta relaunch: Photo Radar and Rapid Resolution
 
-Prepared September 26, 2026. **Not launched. No new campaign spend enabled.**
+Historical preparation notes from September 26, 2026. Current $79 copy was corrected September 27; see [the correction receipt](../2026-09-27-refund-scope.md). Historical schedule and approval notes below are not current delivery status.
 
 ## Saved Meta draft
 
@@ -13,7 +13,7 @@ Prepared September 26, 2026. **Not launched. No new campaign spend enabled.**
 - Facebook Feed and Instagram feed only. All other placements excluded; limited spending on excluded placements disabled.
 - Draft lifetime budget: CA$150, **a proposal awaiting Brett's spend authorization**, not an approved budget. Draft schedule September 26 to October 3, 2026, 2:49 PM MDT; reset the seven-day schedule when actually launching.
 - Destination: https://fabsy.ca/photo-radar
-- Parameters: `utm_source=meta&utm_medium=paid_social&utm_campaign=photo_radar_relaunch_20260926&utm_content=01-mail-price-v3-refund`.
+- Parameters: `utm_source=meta&utm_medium=paid_social&utm_campaign=photo_radar_relaunch_20260926&utm_content=01-mail-price-v3`.
 - Image: `assets/01-mail-price-v3.png`, generated with built-in ImageGen as an edit of the original navy v2. Actual export 1122 x 1402 (approximately 4:5), original crop preserved. Both Facebook Feed and Instagram feed previews visually verified with the complete headline, price and footer. Exact production prompt saved in `image-prompt.txt`. Original files preserved. The ad retains its original creation name despite the revised artwork. Fable's HTML was used as layout/copy input, not uploaded as a production image.
 - CTA: Learn more. Text optimization, all AI creative enhancements, relevant-comment additions and automatic brightness/contrast adjustments disabled. Destination optimization, shop/product browsing and browser contact add-ons disabled. Automatically sourced promo codes disabled; all four creative-setup extensions are off.
 
@@ -21,17 +21,15 @@ Prepared September 26, 2026. **Not launched. No new campaign spend enabled.**
 
 ## Copy saved in the ad
 
-**Headline (27 characters):** Photo radar help: $79 + GST
+**Headline:** We fight it for $79 + GST
 
 **Description:** You approve any deal.
 
 **Primary text:**
 
-Photo radar ticket in the mail? Get Fabsy on it for $79 + GST.
+Photo radar ticket? We fight it for $79 + GST.
 
 We review the evidence and pursue a lower fine or withdrawal with the Crown. You approve any deal. No success fee.
-
-Service-fee refund guarantee: if the Crown rejects our efforts and no reduction or withdrawal is obtained, we refund your service fee and GST. Declining a lower-fine offer doesn't qualify. Terms apply.
 
 $82.95 total, paid upfront. Eligible Alberta registered-owner notices. Government fines separate. Trial excluded. No legal outcome is guaranteed.
 
@@ -41,19 +39,19 @@ Upload your notice to start.
 
 Source files: Brett's `Downloads/fabsy-photo-radar-meta-set-v2.html` and pasted review attached in this task. Their historical rules and suggested targeting are creative input, not additional authorization.
 
-Keep the concrete mailed-notice trigger, visible price, short headline, evidence review, Crown negotiation, client control and upload CTA. The existing fee-refund guarantee is the strongest supported offer addition. There is no evidence yet establishing a winning creative; this is an editorial recommendation to test.
+Keep the concrete mailed-notice trigger, visible price, short headline, evidence review, Crown negotiation, client control and upload CTA. There is no evidence yet establishing a winning creative; this is an editorial recommendation to test.
 
 Corrections:
 
 - Show **$79 + GST**, with **$82.95 total** in the primary text. Avoid "That's the whole fee" without explaining tax and separate government fines.
 - Do not use "That's the window to negotiate" as an interpretation of every notice's response date. A safe later reminder is "Check the response date on your notice. Uploading does not extend it."
-- Do not promise savings exceeding the service fee. The refund terms require no minimum reduction; any qualifying lower-fine offer defeats the refund entitlement even if declined.
-- Do not use a 30-day outcome promise. The refund period begins at a qualifying Crown rejection, not checkout.
+- Do not promise savings exceeding the service fee.
+- Do not promise a legal outcome or Crown response time.
 - Use "You approve any deal," rather than "Nothing happens without your OK," which could misdescribe the separately authorized not-guilty plea and disclosure work.
 - Do not assume male-only targeting, video performance, six-ad spending or automatic retargeting is approved or proven from the attachment.
 - Keep Stories/Reels excluded until proper 9:16 exports and previews exist. Do not crop disclaimers off the current 4:5 asset.
 
-The applied v3 image uses the mailed-notice/price hierarchy: "Photo radar in the mail?" / "$79 + GST" / "We pursue a lower fine or withdrawal. You approve any deal." The qualified refund offer remains in the accompanying primary text and landing page, rather than being compressed into the artwork. The image CTA is "Upload your notice" and its footer names paid-upfront pricing, no success fee, separate government fines, trial exclusion, variable results and agent-service status.
+The applied v3 image uses the mailed-notice/price hierarchy: "Photo radar in the mail?" / "$79 + GST" / "We pursue a lower fine or withdrawal. You approve any deal." The accompanying text describes the work and fee without an outcome refund offer. The image CTA is "Upload your notice" and its footer names paid-upfront pricing, no success fee, separate government fines, trial exclusion, variable results and agent-service status.
 
 ## Offer verification
 
@@ -61,9 +59,8 @@ Live public pages checked September 26, 2026:
 
 - https://fabsy.ca/photo-radar
 - https://fabsy.ca/terms-of-service#photo-radar-terms
-- https://fabsy.ca/terms-of-service#fee-refund-guarantee
 
-Sections 5C and 5F explicitly include Photo Radar. The fee and GST are refundable after Crown rejection of Fabsy's efforts with no qualifying improvement. Declining a lower-fine offer does not qualify. Refunds are due within 30 calendar days after the qualifying rejection. Service is paid upfront, government fines remain separate, and a legal result is not guaranteed. No new discount, refund promise or commercial term was invented.
+The historical website policy was corrected on September 27: only the $198 Rapid Resolution service carries the outcome refund offer. Camera services have an upfront fee and no promised legal result.
 
 ## Measurement verification and launch blockers
 

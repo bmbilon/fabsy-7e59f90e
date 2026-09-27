@@ -2,14 +2,12 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Camera, CheckCircle2, Clock3, FileSearch, Upload } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import FeeRefundNotice from "@/components/FeeRefundNotice";
 import StaticJsonLd from "@/components/StaticJsonLd";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL } from "@/config/offers";
-import { FEE_REFUND } from "@/config/feeRefund";
 import photoRadarContent from "@/config/photoRadarContent.json";
 import useSafeHead from "@/hooks/useSafeHead";
 import ClientReviewsMarquee from "@/components/ClientReviewsMarquee";
@@ -71,7 +69,6 @@ const PhotoRadar = () => {
                 <p className="mt-4 max-w-2xl leading-relaxed text-slate-300">
                   Fabsy enters your not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal. You approve any deal.
                 </p>
-                <FeeRefundNotice photoRadar tone="dark" className="mt-6" />
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Button asChild size="lg" className="min-h-12 px-7 text-base font-bold shadow-glow">
                     <Link to={PHOTO_RADAR.intakePath} data-funnel-action="primary_cta" data-funnel-position="hero">
@@ -122,8 +119,7 @@ const PhotoRadar = () => {
                     <Link to={PHOTO_RADAR.intakePath} data-funnel-action="primary_cta" data-funnel-position="section">Upload your notice</Link>
                   </Button>
                   <p className="mt-4 text-xs leading-relaxed text-slate-600">
-                    Government fines are separate. The service fee is paid upfront and covered by our fee refund guarantee.{" "}
-                    <Link to={FEE_REFUND.termsPath} className="underline underline-offset-4">See refund details</Link>.
+                    Government fines are separate. The service fee is paid upfront. No legal outcome is promised.
                   </p>
                 </div>
               </Card>
@@ -215,7 +211,7 @@ const PhotoRadar = () => {
               ))}
             </Accordion>
             <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
-              <Link to={FEE_REFUND.termsPath} className="underline underline-offset-4">Read the full fee refund guarantee</Link>.
+              <Link to="/terms-of-service#photo-radar-terms" className="underline underline-offset-4">Read the full service terms</Link>.
             </p>
             <aside className="mt-8 text-sm leading-relaxed text-muted-foreground" aria-label="Official sources">
               <p className="font-semibold">Official sources checked August 31, 2026</p>

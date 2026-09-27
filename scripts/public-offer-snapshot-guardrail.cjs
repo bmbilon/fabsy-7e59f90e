@@ -7,7 +7,7 @@ const { JSDOM } = require('jsdom');
 const offers = require('../src/config/offers.json');
 const photo = require('../src/config/photoRadarContent.json');
 const feeRefund = require('../src/config/feeRefund.json');
-const { PHOTO_REFUND_GUIDE_FAQ, PHOTO_REFUND_GUIDE_NOTICE, REVIEWED_REFUND_SOURCE_HASHES, REVIEWED_RAPID_REFUND_DISCLAIMER, redactReviewedFeeRefund } = require('./curated-content-guardrails.cjs');
+const { PHOTO_REFUND_GUIDE_FAQ, REVIEWED_REFUND_SOURCE_HASHES, REVIEWED_RAPID_REFUND_DISCLAIMER, redactReviewedFeeRefund } = require('./curated-content-guardrails.cjs');
 const fleet = require('../src/config/fleetContent.json');
 const { publicContent, pricing, renderProDrivers } = require('./generate-pro-referral-snapshots.cjs');
 const { renderPhotoRadar, renderFleet } = require('./generate-photo-radar-snapshots.cjs');
@@ -24,11 +24,11 @@ const MAIN_OFFER_CONTEXTS = {
 const PHOTO_GUIDE_ROUTES = new Set(require('../src/config/photoRadarPages.json').map(slug => `/content/${slug}`));
 const REFUND_NOTICE_SOURCES = {
   '/': 'src/components/Hero.tsx', '/rapid-resolution': 'src/pages/RapidResolution.tsx',
-  '/photo-radar': 'src/pages/PhotoRadar.tsx', '/pro-drivers': 'src/pages/ProDrivers.tsx',
+  '/pro-drivers': 'src/pages/ProDrivers.tsx',
   '/faq': 'src/pages/FAQ.tsx', '/terms-of-service': 'src/pages/TermsOfService.tsx',
   '/terms-of-purchase': 'src/pages/TermsOfPurchase.tsx',
 };
-const REVIEWED_PHOTO_OUTCOME_COPY = `${feeRefund.payment} ${feeRefund.photoCondition} No trial. No success fee. Government fines are separate.`;
+const REVIEWED_PHOTO_OUTCOME_COPY = 'The service fee is paid upfront. No legal outcome is promised. No trial. No success fee. Government fines are separate.';
 const REVIEWED_RAPID_OUTCOME_COPY = REVIEWED_RAPID_REFUND_DISCLAIMER;
 // The owners froze these public copy files for this release. A changed source
 // must receive a new explicit review of the admission contract and fixtures.
@@ -132,13 +132,12 @@ function redactExactRefundNotices(document, route, issues) {
   const sourceFile = REFUND_NOTICE_SOURCES[route];
   const source = sourceFile && sourceText(sourceFile);
   const component = sourceText('src/components/FeeRefundNotice.tsx');
-  const photoNotice = route === '/photo-radar';
-  const headline = photoNotice ? feeRefund.photoHeadline : feeRefund.headline;
-  const condition = photoNotice ? feeRefund.photoCondition : feeRefund.condition;
-  const marker = photoNotice ? 'photo-radar' : 'ticket-representation';
+  const headline = feeRefund.headline;
+  const condition = feeRefund.condition;
+  const marker = 'ticket-representation';
   const copies = [headline, condition, feeRefund.declinedOfferText, feeRefund.payment, feeRefund.details];
   if (source?.includes('<FeeRefundNotice') && component.includes('to={FEE_REFUND.termsPath}') &&
-      ['{copy(photoRadar ? "photoHeadline" : "headline")}', '{copy(photoRadar ? "photoCondition" : "condition")}', '{FEE_REFUND.declinedOfferText}', '{copy("payment")}', '{copy("details")}'].every(value => component.includes(value))) {
+      ['{copy("headline")}', '{copy("condition")}', '{FEE_REFUND.declinedOfferText}', '{copy("payment")}', '{copy("details")}'].every(value => component.includes(value))) {
     const notices = Array.from(document.querySelectorAll('main aside[data-fee-refund-notice]'));
     if (notices.length > 1) issues.push('Fee-refund notice is duplicated');
     for (const notice of notices) {
@@ -177,54 +176,11 @@ function redactExactRefundNotices(document, route, issues) {
       }
     }
   }
-  if (route === '/photo-radar' && sourceText('scripts/generate-photo-radar-snapshots.cjs').includes('aria-labelledby="photo-fee-refund-heading"')) {
-    for (const notice of document.querySelectorAll('main section[aria-labelledby="photo-fee-refund-heading"]')) {
-      const children = Array.from(notice.children);
-      const link = children[4]?.querySelector('a');
-      if (children.length !== 5 || children.map(child => child.tagName).join(',') !== 'H2,P,P,P,P' ||
-          children[0].id !== 'photo-fee-refund-heading' || children.slice(0, 4).some((child, index) => child.children.length || !exact(child.textContent, copies[index])) ||
-          children[2].getAttribute('lang') !== 'en' || children[2].getAttribute('dir') !== 'ltr' ||
-          children[4].children.length !== 1 || !link || link.children.length || link.getAttribute('href') !== feeRefund.termsPath ||
-          !exact(children[4].textContent, feeRefund.details) || !exact(notice.textContent, copies.join('')) || !safeRefundNotice(notice)) {
-        issues.push('Photo Radar snapshot must retain its complete exact fee-refund notice');
-        continue;
-      }
-      notice.textContent = '[exact source-scoped Photo Radar fee-refund notice]';
-    }
-  }
-  if (PHOTO_GUIDE_ROUTES.has(route)) {
-    const slug = route.slice('/content/'.length);
-    const sourcePage = JSON.parse(fs.readFileSync(path.join(ROOT, `src/content/pages/${slug}.json`), 'utf8'));
-    if (!sourcePage.next.includes(PHOTO_REFUND_GUIDE_NOTICE)) return;
-    for (const heading of document.querySelectorAll('main h3')) {
-      if (!exact(heading.textContent, feeRefund.photoHeadline)) continue;
-      const conditionNode = heading.nextElementSibling;
-      const paymentNode = conditionNode?.nextElementSibling;
-      const termsNode = paymentNode?.nextElementSibling;
-      const fields = [heading, conditionNode, paymentNode, termsNode];
-      if (fields.some(field => !field || !safeRefundElement(field)) ||
-          fields.map(field => field.tagName).join(',') !== 'H3,P,P,P' ||
-          fields.slice(0, 3).some((field, index) => field.children.length || !exact(field.textContent, [feeRefund.photoHeadline, feeRefund.photoCondition, feeRefund.payment][index])) ||
-          termsNode.children.length !== 1 || termsNode.firstElementChild.tagName !== 'A' || termsNode.firstElementChild.children.length ||
-          termsNode.firstElementChild.getAttribute('href') !== feeRefund.termsPath || !exact(termsNode.textContent, `${feeRefund.details}.`)) {
-        issues.push('Photo Radar guide must retain its complete exact fee-refund notice');
-        continue;
-      }
-      for (const field of fields) field.textContent = '[exact source-scoped Photo Radar fee-refund clause]';
-    }
-    // The same complete Crown-trigger sentence is an approved source bullet.
-    if (sourcePage.bullets.includes(feeRefund.photoCondition)) {
-      for (const item of document.querySelectorAll('main li')) {
-        if (!item.children.length && safeRefundElement(item) && exact(item.textContent, feeRefund.photoCondition)) item.textContent = '[exact Photo Radar fee-refund source bullet]';
-      }
-    }
-  }
 }
 
 function redactExactRefundFaqs(document, route, issues) {
   let entries = [];
-  if (route === '/photo-radar') entries = photo.faqs.filter(faq => faq.question === 'How does the Photo Radar fee refund guarantee work?');
-  else if (PHOTO_GUIDE_ROUTES.has(route)) {
+  if (PHOTO_GUIDE_ROUTES.has(route)) {
     const source = JSON.parse(fs.readFileSync(path.join(ROOT, `src/content/pages/${route.slice('/content/'.length)}.json`), 'utf8'));
     if (source.faqs.some(faq => faq.q === 'What does Fabsy charge to review a photo radar notice?' && faq.a === PHOTO_REFUND_GUIDE_FAQ)) {
       entries = [{ question: 'What does Fabsy charge to review a photo radar notice?', answer: PHOTO_REFUND_GUIDE_FAQ }];
@@ -232,9 +188,9 @@ function redactExactRefundFaqs(document, route, issues) {
   } else if (route === '/rapid-resolution' && sourceText(REFUND_NOTICE_SOURCES[route]).includes('answer: `${FEE_REFUND.payment} ${FEE_REFUND.condition}`')) {
     entries = [{ question: 'Is a withdrawal or reduction promised?', answer: `${feeRefund.payment} ${feeRefund.condition}` }];
   } else if (route === '/faq' && sourceText(REFUND_NOTICE_SOURCES[route]).includes('a: `${FEE_REFUND.payment} ${FEE_REFUND.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.`')) {
-    entries = [{ question: 'Does Fabsy promise a particular result?', answer: `${feeRefund.payment} ${feeRefund.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.` }];
-    if (sourceText(REFUND_NOTICE_SOURCES[route]).includes('q: "Can I get a refund if I decline a reduced Crown offer?", a: FEE_REFUND.declinedOfferText')) {
-      entries.push({ question: 'Can I get a refund if I decline a reduced Crown offer?', answer: feeRefund.declinedOfferText });
+    entries = [{ question: 'Does the $198 Rapid Resolution service promise a particular result?', answer: `${feeRefund.payment} ${feeRefund.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.` }];
+    if (sourceText(REFUND_NOTICE_SOURCES[route]).includes('q: "For Rapid Resolution ($198), can I get a refund if I decline a reduced Crown offer?", a: FEE_REFUND.declinedOfferText')) {
+      entries.push({ question: 'For Rapid Resolution ($198), can I get a refund if I decline a reduced Crown offer?', answer: feeRefund.declinedOfferText });
     }
   }
   if (!entries.length) return;
@@ -464,7 +420,7 @@ function redactTermsAdditions(document) {
       'Rapid Resolution: Photo Radar is $79 CAD plus 5% GST ($82.95 total)',
     ]],
     ['5C. Rapid Resolution: Photo Radar Terms', 'photo-radar-terms', [
-      'Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is guaranteed; the fee-refund guarantee in section 5F applies.',
+      'Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is promised.',
       offers.photoRadar.speedDisclaimer,
       offers.photoRadar.insuranceDisclaimer,
     ]],
@@ -481,8 +437,7 @@ function redactTermsAdditions(document) {
     ['5F. Fee-Refund Guarantee', 'fee-refund-guarantee', [
       feeRefund.headline, feeRefund.payment, feeRefund.condition, feeRefund.declinedOfferText,
       'A reduction in the fine, the number of demerits, or both counts as an improvement over the original ticket. A withdrawal or dismissal also improves the original penalty. No minimum reduction is required.',
-      'Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points, so the comparison is to the original fine only.',
-      'The guarantee covers the service fee actually paid for Rapid Resolution, Rapid Resolution: Photo Radar, or the Rapid Resolution and insurance-planning bundle, including a discounted Pro Driver order. A standalone insurance report is not a ticket-representation service and is not covered by this outcome-based guarantee.',
+      'The guarantee applies only to the $198 Rapid Resolution service, including discounted Pro Driver orders and the Rapid Resolution service component in a bundle. Photo Radar, red-light camera services and insurance reports are excluded.',
       'The refund includes the corresponding GST. Any amount already refunded is deducted to avoid refunding the same payment twice. Work performed and payment-processing costs do not reduce a refund due under this guarantee.',
       "The 30-calendar-day period starts when Fabsy receives the Crown's rejection of Fabsy's efforts to obtain a lower original fine, fewer original demerits or withdrawal, and none of those improvements has been obtained. Payment or checkout does not start this clock. An opening or unchanged Crown offer before Fabsy's negotiation efforts have been rejected does not start it either.",
       'This is not a promise that the Crown will respond or the case will finish within 30 days. Once a qualifying rejection has been received, further negotiation or waiting for your instructions does not postpone the refund deadline.',
@@ -532,14 +487,10 @@ function redactTermsAdditions(document) {
 }
 
 function redactRefundSourceClauses(document, route) {
-  const photoPriceNote = 'Government fines are separate. The service fee is paid upfront and covered by our fee refund guarantee. See refund details.';
-  const purchaseRefund = "The fee-refund guarantee applies when the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or obtain a withdrawal, and none of those improvements has been obtained. Fabsy refunds the service fee you actually paid, together with the corresponding GST, within 30 calendar days of Fabsy receiving that rejection. Payment does not start the clock; an opening or unchanged offer before Fabsy's negotiation efforts have been rejected does not start it either. Photo radar and red-light owner notices are assessed on the original fine or withdrawal only. The guarantee covers Rapid Resolution, Photo Radar and the Rapid Resolution bundle, including discounted Pro Driver orders; it does not cover a standalone insurance report. Work already performed and payment-processing costs do not reduce a refund due under this guarantee. Amounts already refunded are not paid twice. Read the complete fee-refund terms.";
+  const purchaseRefund = "The fee-refund guarantee applies when the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or obtain a withdrawal, and none of those improvements has been obtained. Fabsy refunds the service fee you actually paid, together with the corresponding GST, within 30 calendar days of Fabsy receiving that rejection. Payment does not start the clock; an opening or unchanged offer before Fabsy's negotiation efforts have been rejected does not start it either. The guarantee applies only to the $198 Rapid Resolution service, including discounted Pro Driver orders and its service component in a bundle. Photo Radar, red-light camera services and insurance reports are excluded. Work already performed and payment-processing costs do not reduce a refund due under this guarantee. Amounts already refunded are not paid twice. Read the complete fee-refund terms.";
   const purchaseLimit = "Fabsy does not promise a withdrawal, reduced fine, fewer demerits, a particular court result, insurance savings, or any premium outcome. Courts, prosecutors, registries, and insurers make their own decisions. The fee-refund guarantee is a commitment to refund Fabsy's fee when its stated conditions are met, not a promise of a particular legal outcome.";
-  const rules = route === '/photo-radar' ? [
-    [photoPriceNote, 'p', 0, 'See refund details'],
-    ['Read the full fee refund guarantee.', 'p', 0, 'Read the full fee refund guarantee'],
-  ] : route === '/terms-of-purchase' ? [
-    ['Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total), paid upfront for an accepted, eligible registered-owner camera notice. The fee-refund guarantee applies.', 'li', 1, null],
+  const rules = route === '/terms-of-purchase' ? [
+    ['Rapid Resolution: Photo Radar costs $79 CAD plus 5% GST ($82.95 total), paid upfront for an accepted, eligible registered-owner camera notice. No legal outcome is promised.', 'li', 1, null],
     [purchaseRefund, 'p', 0, 'complete fee-refund terms'],
     [purchaseLimit, 'p', 0, null],
   ] : [];
@@ -575,6 +526,7 @@ function redactPublicOfferSnapshot(html, { route }) {
   const document = dom.window.document;
   const issues = [];
   try {
+    if ((route === '/photo-radar' || route === '/fleet' || PHOTO_GUIDE_ROUTES.has(route)) && /refund|money.back/i.test(document.querySelector('main')?.textContent || '')) issues.push('Photo Radar must not advertise a refund');
     redactRapidConversionSnapshot(document, route, issues);
     redactHomepageVisualSnapshot(document, route, issues);
     redactExactRefundNotices(document, route, issues);

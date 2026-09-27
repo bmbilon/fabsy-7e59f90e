@@ -11,8 +11,8 @@ const PHOTO_RADAR_CONTENT = require('../src/config/photoRadarContent.json');
 const PHOTO_RADAR_CONTENT_SLUGS = new Set(require('../src/config/photoRadarPages.json'));
 const FEE_REFUND = require('../src/config/feeRefund.json');
 const REVIEWED_REFUND_SOURCE_HASHES = Object.freeze({
-  'src/config/feeRefund.json': 'c3548043cfe7b0a8379bb2b0f35f9c4eacf51ae8aa8969e50136cbfea7465860',
-  'src/config/photoRadarContent.json': '3676436bf756d467feb2a76fee5d80abe5e16e2b04be341a95c811feb3c52940',
+  'src/config/feeRefund.json': '8cbf6d9c3d0dd7008c6949d3fd97b38ae7eff232a3f31e433903605dc370c40f',
+  'src/config/photoRadarContent.json': '48760281e262341580ae9cff9ca3e636a736048b494e722ecca2167cc5219853',
 });
 // These are reviewed business-policy passages, not a licence for arbitrary
 // future config values to become legal facts. A copy change requires review.
@@ -26,9 +26,8 @@ for (const [relative, expected] of Object.entries(REVIEWED_REFUND_SOURCE_HASHES)
 // These article passages apply only to the three frozen owner-notice guides.
 const PHOTO_RADAR_OFFER_SLUGS = new Set(PHOTO_RADAR_CONTENT_SLUGS);
 const PHOTO_RADAR_COMPLETE_PRICE = `${PHOTO_RADAR.name} costs $${PHOTO_RADAR.priceCad} CAD plus 5% GST ($${PHOTO_RADAR.totalCad.toFixed(2)} total).`;
-const PHOTO_REFUND_GUIDE_FAQ = `${PHOTO_RADAR_COMPLETE_PRICE} ${FEE_REFUND.payment} The fee covers the authorized not-guilty plea, disclosure request and review, pursuit of a Crown reduction or withdrawal and client approval of any deal. ${FEE_REFUND.photoCondition} No trial or success surcharge. Government fines are separate. See the fee refund guarantee in our Terms of Service for details.`;
-const PHOTO_REFUND_GUIDE_NOTICE = `<h3>${FEE_REFUND.photoHeadline}</h3><p>${FEE_REFUND.photoCondition}</p><p>${FEE_REFUND.payment}</p><p><a href="${FEE_REFUND.termsPath}">${FEE_REFUND.details}</a>.</p>`;
-const PHOTO_REFUND_GUIDE_CLAUSES = [FEE_REFUND.photoHeadline, FEE_REFUND.photoCondition, FEE_REFUND.payment, PHOTO_REFUND_GUIDE_FAQ];
+const PHOTO_REFUND_GUIDE_FAQ = `${PHOTO_RADAR_COMPLETE_PRICE} The service fee is paid upfront. The fee covers the authorized not-guilty plea, disclosure request and review, pursuit of a Crown reduction or withdrawal and client approval of any deal. No trial or success surcharge. Government fines are separate. No legal outcome is promised.`;
+const PHOTO_REFUND_GUIDE_CLAUSES = [PHOTO_REFUND_GUIDE_FAQ];
 const REVIEWED_RAPID_REFUND_DISCLAIMER = `Outcomes depend on the charge, evidence, procedure and prosecutor. A withdrawal, reduction, lower fine, fewer demerits or insurance result is not promised. ${FEE_REFUND.condition} Payment does not start the 30-day refund clock.`;
 
 function redactReviewedFeeRefund(value, slug) {
@@ -376,6 +375,7 @@ function redactVerifiedNumericClaims(value, slug) {
 }
 
 function textGuardrailIssues(value, slug, options = {}) {
+  if (PHOTO_RADAR_CONTENT_SLUGS.has(slug) && /refund|money.back/i.test(String(value))) return ['Photo Radar must not advertise a refund'];
   const text = visibleText(redactReviewedFeeRefund(value, slug));
   const issues = [];
   if (options.marketing !== false) {
@@ -494,9 +494,6 @@ function curatedPageIssues(page) {
       !visibleText(page?.next).includes(PHOTO_RADAR_COMPLETE_PRICE)) {
     issues.push('next: complete Photo Radar pricing is required');
   }
-  if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) && !String(page?.next ?? '').includes(PHOTO_REFUND_GUIDE_NOTICE)) {
-    issues.push('next: complete reviewed Photo Radar fee-refund notice is required');
-  }
   for (const [field, value] of textFields) {
     if (PHOTO_RADAR_CONTENT_SLUGS.has(page?.slug) && hasCompleteFabsyPricing(value)) {
       issues.push(`${field}: Photo Radar guides must use their own offer, not general product pricing`);
@@ -528,7 +525,6 @@ module.exports = {
   EXACT_FABSY_PRICING,
   PHOTO_RADAR_COMPLETE_PRICE,
   PHOTO_REFUND_GUIDE_FAQ,
-  PHOTO_REFUND_GUIDE_NOTICE,
   REVIEWED_REFUND_SOURCE_HASHES,
   REVIEWED_RAPID_REFUND_DISCLAIMER,
   UNSAFE_HTML_RE,

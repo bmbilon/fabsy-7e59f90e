@@ -22,11 +22,11 @@ const FAQPage: React.FC = () => {
       a: "No. Fabsy is an Alberta traffic ticket agent service, not a law firm, and does not provide legal advice. Service availability and scope depend on the matter and court location."
     },
     {
-      q: "Does Fabsy promise a particular result?",
+      q: "Does the $198 Rapid Resolution service promise a particular result?",
       a: `${FEE_REFUND.payment} ${FEE_REFUND.condition} A reduction in the fine, demerits, or both counts; a dismissal also improves the original penalty. Government fines are separate.`
     },
     {
-      q: "Can I get a refund if I decline a reduced Crown offer?",
+      q: "For Rapid Resolution ($198), can I get a refund if I decline a reduced Crown offer?",
       a: FEE_REFUND.declinedOfferText
     },
     {

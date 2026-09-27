@@ -398,7 +398,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
             </div>
             {isPhotoRadar && <p className="mt-3 text-sm font-semibold">{PHOTO_RADAR_PRICE_LABEL}</p>}
             <p className="mt-2 text-xs text-muted-foreground">
-              {isPhotoRadar ? `GST is $${PHOTO_RADAR.gstCad.toFixed(2)}. The total charged is $${PHOTO_RADAR.totalCad.toFixed(2)} CAD. Government fines are separate. No legal outcome is guaranteed; the fee-refund terms below apply.` : "Applicable GST is calculated at Stripe checkout. Government fines, trial representation and out-of-scope work are separate."}
+              {isPhotoRadar ? `GST is $${PHOTO_RADAR.gstCad.toFixed(2)}. The total charged is $${PHOTO_RADAR.totalCad.toFixed(2)} CAD. Government fines are separate. No legal outcome is promised.` : "Applicable GST is calculated at Stripe checkout. Government fines, trial representation and out-of-scope work are separate."}
             </p>
             {includeIdrAddon && (
               <p className="mt-2 text-xs text-muted-foreground">

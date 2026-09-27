@@ -30,13 +30,11 @@
     "returnHome": "Return to home"
   },
   "feeRefund": {
-    "headline": "Fine or demerits reduced—or your fee refunded",
-    "photoHeadline": "Fine reduced or ticket dismissed—or your fee refunded",
+    "headline": "Rapid Resolution ($198): Fine or demerits reduced—or your fee refunded",
     "payment": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed.",
     "condition": "If the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection.",
-    "photoCondition": "If the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points.",
     "details": "Fee-refund terms",
-    "scope": "For ticket-representation services, including Rapid Resolution, Photo Radar and the Rapid Resolution bundle. Government fines are separate."
+    "scope": "Only the $198 Rapid Resolution service, including its discounted Pro Driver orders and its service component in a bundle. Government fines and insurance reports are separate."
   },
   "insuranceContext": {
     "eyebrow": "Insurance context",
@@ -168,7 +166,7 @@
       },
       "outcome": {
         "question": "Is an outcome guaranteed? How does the fee refund work?",
-        "answer": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed. If the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. An initial Crown offer that leaves the penalties unchanged does not by itself start the 30-day refund clock. For photo radar and red-light camera notices, the improvements are a reduction in the original fine or withdrawal of the notice. Under the current demerit schedule, an owner conviction under Traffic Safety Act s.160 receives no demerit points. For ticket-representation services, including Rapid Resolution, Photo Radar and the Rapid Resolution bundle. Government fines are separate."
+        "answer": "The service fee is paid upfront. Payment does not start the 30-day refund clock. No legal outcome is guaranteed. If the Crown rejects Fabsy's efforts to reduce your original fine or demerits, or withdraw your ticket, and none of those improvements is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. Only the $198 Rapid Resolution service, including its discounted Pro Driver orders and its service component in a bundle. Government fines and insurance reports are separate."
       },
       "language": {
         "question": "Can I write in my language?",

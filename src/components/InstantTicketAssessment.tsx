@@ -133,7 +133,7 @@ export default function InstantTicketAssessment() {
               <dt className="text-sm font-medium text-slate-700">Possible insurance impact range <span className="font-normal">· {INSURANCE_SCENARIO_YEARS} years</span></dt>
               <dd className="mt-1 text-2xl font-bold text-slate-950">{formatEstimateRange(result.insuranceImpact)}</dd>
               <dd className="mt-1 text-xs leading-relaxed text-slate-600">{camera
-                ? "Registered-owner camera tickets have no insurance impact or demerits."
+                ? PHOTO_RADAR.insuranceDisclaimer
                 : `Potential extra premiums that could be avoided if the outcome avoids a rated conviction. Based on ${formatEstimateMoney(result.annualPremium)}/year.`}</dd>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-2 py-4 text-sm">
@@ -151,7 +151,7 @@ export default function InstantTicketAssessment() {
           <p className="mt-3 text-xs leading-relaxed text-slate-600">Illustrative scenarios, not a prediction or insurer quote. No savings are guaranteed. {camera ? "A withdrawal could save more than the reduction scenario shown." : "A lower fine or fewer demerits alone may not lower insurance premiums."}</p>
           <details className="mt-3 text-xs text-slate-600">
             <summary className="cursor-pointer rounded-sm py-2 font-semibold text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">How we estimated this</summary>
-            <p className="mt-2 leading-relaxed">The fine scenario uses 0–{Math.round(result.reductionRate * 100)}% of your fine{camera ? "" : `, with ${cleanRecord === "yes" ? "a clean-record" : "a prior-conviction"} assumption`}. {camera ? "Any refund is subject to the published service-fee refund terms." : `Insurance uses 0–${Math.round(result.insuranceRate * 100)}% of your annual premium for ${INSURANCE_SCENARIO_YEARS} years. Demerit points do not set the insurance rate.`} These are Fabsy’s planning assumptions from its earlier calculator, not measured case outcomes or maximum possible changes. The combined estimate assumes the fine and insurance benefits can both be achieved. The fee is subtracted once, before any applicable refund.</p>
+            <p className="mt-2 leading-relaxed">The fine scenario uses 0–{Math.round(result.reductionRate * 100)}% of your fine{camera ? "" : `, with ${cleanRecord === "yes" ? "a clean-record" : "a prior-conviction"} assumption`}. {camera ? "No legal outcome is promised." : `Insurance uses 0–${Math.round(result.insuranceRate * 100)}% of your annual premium for ${INSURANCE_SCENARIO_YEARS} years. Demerit points do not set the insurance rate.`} These are Fabsy’s planning assumptions from its earlier calculator, not measured case outcomes or maximum possible changes. The combined estimate assumes the fine and insurance benefits can both be achieved. The fee is subtracted once{camera ? "." : ", before any applicable refund."}</p>
             <p className="mt-2 leading-relaxed">The expected range is an illustrative planning range: 30% below your ticket’s face value to 20% below the maximum estimated savings. For smaller estimates, the starting amount is limited to the upper amount. Savings are displayed from $0 when the estimated benefits do not cover the service fee.</p>
           </details>
           <Button asChild className="mt-4 h-auto min-h-14 w-full whitespace-normal rounded-xl bg-blue-700 px-4 py-4 text-base font-bold text-white hover:bg-blue-800 hover:text-white focus-visible:text-white">
@@ -195,7 +195,7 @@ export default function InstantTicketAssessment() {
                 </select>
               </label>
             </div>
-            {camera ? <p className="rounded-lg bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">Camera tickets issued to the registered owner carry no demerits or insurance impact. Your estimate focuses on the fine.</p> : <>
+            {camera ? <p className="rounded-lg bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">{PHOTO_RADAR.insuranceDisclaimer} Your estimate focuses on the fine.</p> : <>
               <label className={labelClass} htmlFor="assessment-record">Clean driving record?
                 <select id="assessment-record" className={control} required value={cleanRecord} onChange={event => setCleanRecord(event.target.value)}>
                   <option value="" disabled>Select your record</option><option value="yes">Yes — no convictions in the last 3 years</option><option value="no">No — I have previous convictions</option>

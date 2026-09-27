@@ -141,6 +141,7 @@ Deno.test("Photo Radar signed PDF uses $82.95 scope and explicit not-guilty auth
   assert.ok(clauses.includes("Enter a not-guilty plea"));
   assert.ok(clauses.includes("no trial representation"));
   assert.ok(!clauses.includes("$198"));
+  assert.doesNotMatch(clauses, /refund|money.back/i);
 });
 
 Deno.test("Photo Radar terms cannot be generated for an unreleased product locale", async () => {

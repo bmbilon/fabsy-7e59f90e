@@ -4,7 +4,6 @@ import { Link, useParams } from "react-router-dom";
 import { FileSearch, ShieldCheck } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { FEE_REFUND } from "@/config/feeRefund";
 import IdrAccessGate from "@/components/idr/IdrAccessGate";
 import { supabase } from "@/integrations/supabase/client";
 import { IDR_DISCLAIMER, IDR_PRICE_ADDON, IDR_PRICE_STANDALONE } from "@/config/idr";
@@ -135,9 +134,7 @@ function CaseContent({ caseId }: { caseId: string }) {
                 <h2 className="mt-4 text-2xl font-bold">Registered-owner notice, clearly scoped</h2>
                 <p className="mt-3 text-muted-foreground">{PHOTO_RADAR.insuranceDisclaimer} Your service is $79 + 5% GST ($82.95 total), paid upfront, with no trial or success surcharge.</p>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  No legal outcome is guaranteed. Your service-fee refund rights follow the written purchase terms for your order.{" "}
-                  <Link to={FEE_REFUND.termsPath} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-4">Current fee-refund terms</Link>{" "}
-                  do not replace the terms of an existing order.
+                  No legal outcome is promised. The written purchase terms for your existing order continue to apply.
                 </p>
                 <p className="mt-3 text-sm text-muted-foreground">{PHOTO_RADAR.actionCommitment} {PHOTO_RADAR.speedDisclaimer}</p>
               </div>
