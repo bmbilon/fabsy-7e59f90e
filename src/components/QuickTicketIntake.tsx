@@ -67,7 +67,7 @@ export default function QuickTicketIntake({ formData, updateFormData, embedded =
   return <section id="ticket-form-container" className="mx-auto max-w-3xl scroll-mt-28 space-y-5 rounded-2xl bg-background p-[16px] text-foreground sm:p-[28px]">
     <IntakeProgress current={1} />
     <div className="text-center"><Heading className="text-2xl font-bold sm:text-3xl">{hasTicket ? "Your ticket is attached. Let’s get started." : "Upload your ticket"}</Heading>
-      <p className="mt-[12px] font-semibold">{offer.name} · ${offer.priceCad} CAD + GST (${(offer.priceCad * 1.05).toFixed(2)} total)</p>
+      <p className="mt-[12px] font-semibold">{offer.name} · ${offer.priceCad}</p>
       <p className="mt-[4px] text-sm text-muted-foreground">No charge now. Pay after we confirm your ticket.</p>
     </div>
     <form onSubmit={submit} aria-busy={busy}>
