@@ -15,6 +15,12 @@ September 27, 2026. Real upload/payment recording and ad delivery are not claime
 - Named migrations and backend measurement, real payment webhook and receipt hooks are deployed. Modern worker dependencies were taken from downloaded production sources before adding ads hooks, preserving existing fulfillment and messaging behavior.
 - Cloud daily report works with zero live purchases and recommends completing diagnostics/approval.
 
+## Public production release
+
+- Cloudflare Pages production deployment: https://072f03b5.fabsy-9qa.pages.dev, serving https://fabsy.ca. Frontend release commit 6c5a565c2911125caf1b820457d05bd861d3bef6. The previous release was 3c4020c; its application source matches the selected main base, whose later commit only refreshes crawler snapshots.
+- Live browser verified the $79 plus GST camera offer, explicit nonrefundable fees, the footer opt-out and the loaded G-YRP61S5TPF Google tag. No runtime errors.
+- Existing public WhatsApp and other provider build settings were preserved. Google enhanced hash delivery is disabled pending the account terms/setup.
+
 ## Outstanding owner input
 
 - Google Customer Data Terms and manual enhanced-conversion setup. SHA256 contact delivery is disabled until account setup is saved; automatic collection and customer lists remain off.

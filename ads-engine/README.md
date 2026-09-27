@@ -2,7 +2,7 @@
 
 ## Current status
 
-Google account setup, cloud backend, phone controls and conversion resources are deployed. Two Search specifications contain 24 phrase keywords each and remain paused. The public release corrects camera refunds and uses granted Google defaults with a footer opt-out. Hashed contact delivery remains disabled pending the Google account customer-data setup.
+Public frontend, Google conversion setup, cloud backend and phone controls are deployed. Two Search specifications contain 24 phrase keywords each and remain paused. The public release corrects camera refunds and uses granted Google defaults with a footer opt-out. Hashed contact delivery remains disabled pending the Google account customer-data setup.
 
 Read ASSUMPTIONS.md for evidence and remaining holds. Live account sync passes the primary conversion check. Google has not yet verified a real upload/payment recording. The launch needs those receipts, the account learning-spend limit and the frozen approval. A local test is not a Google diagnostic receipt.
 
