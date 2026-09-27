@@ -546,16 +546,17 @@ test("changing the email after a failed upload creates a fresh context", async t
 
 
 test("paid entry links preselect the service without prechecking consent or plea", async t => {
-  for (const [entry, type, total] of [
-    ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution", "officer_issued", "207.90"],
-    ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt", "officer_issued", "207.90"],
-    ["/submit-ticket?ticket_type=photo_radar", "photo_radar", "82.95"],
-    ["/submit-ticket?bundle=1", "officer_issued", "240.45"],
+  for (const [entry, type, price] of [
+    ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution", "officer_issued", "198"],
+    ["/submit-ticket?ticket_type=officer_issued&lp=rapid-resolution-alt", "officer_issued", "198"],
+    ["/submit-ticket?ticket_type=photo_radar", "photo_radar", "79"],
+    ["/submit-ticket?bundle=1", "officer_issued", "229"],
   ]) {
     await t.test(entry, async sub => {
       const app = await runtime(sub, {}, { entry });
       assert.equal(app.document.querySelector('input[type="radio"]:checked').value, type);
-      assert.ok(app.document.body.textContent.includes(total));
+      const offerSummary = app.document.querySelector("#ticket-form-container h1, #ticket-form-container h2").parentElement.querySelector("p").textContent;
+      assert.ok(offerSummary.endsWith(` · $${price}`));
       await app.choose(app.file());
       assert.equal(app.field("quick-consent").checked, false);
       assert.equal(app.field("quick-not-guilty").checked, false);

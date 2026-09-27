@@ -20,6 +20,9 @@ const heroHeadlineAccent = 'or your money back';
 const heroHeading = `${heroHeadline} ${heroHeadlineAccent}`;
 const heroPrice = `$${offers.rapidResolution.priceCad} CAD + GST`;
 const price = `${heroPrice} · Paid upfront; refunded if the policy applies`;
+const serviceChoicesCopy = `How was the ticket issued?By an officer$${offers.rapidResolution.priceCad}By a camera$${offers.photoRadar.priceCad}`;
+// Admit the previous exact copy while builds regenerate committed snapshots.
+const previousServiceChoicesCopy = `How was the ticket issued?By an officer$${offers.rapidResolution.priceCad} + GST serviceBy a camera$${offers.photoRadar.priceCad} + GST service`;
 const policyAnchor = '#money-back-guarantee';
 
 const SOURCE_BINDINGS = {
@@ -141,7 +144,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
     // include only the exact public service choices, in their default state.
     const validServiceChoices = serviceChoices
       ? visible(serviceChoices) && !serviceChoices.disabled
-        && compact(serviceChoices.textContent) === compact(`How was the ticket issued?By an officer$${offers.rapidResolution.priceCad} + GST serviceBy a camera$${offers.photoRadar.priceCad} + GST service`)
+        && [serviceChoicesCopy, previousServiceChoicesCopy].some(copy => compact(serviceChoices.textContent) === compact(copy))
         && radios.length === 2 && radios.every(radio => serviceChoices.contains(radio) && visible(radio) && !radio.disabled)
         && radios[0].value === 'officer_issued' && radios[0].checked
         && radios[1].value === 'photo_radar' && !radios[1].checked
@@ -156,7 +159,10 @@ function redactHomepageVisualSnapshot(document, route, issues) {
       && validServiceChoices && upload.querySelectorAll('input:not([type="file"]):not([type="radio"]),select,textarea').length === 0
       && submit && visible(submit) && submit.disabled && ['Submitticketandconsent', 'Savemyticketandcontinue'].includes(compact(submit.textContent));
     if (compact(upload.querySelector('h2')?.textContent) === 'Uploadyourticket') {
-      field(upload, 'p', `Rapid Resolution · $${offers.rapidResolution.priceCad} CAD + GST ($${(offers.rapidResolution.priceCad * 1.05).toFixed(2)} total)`, 'intake price and GST');
+      const previousIntakePrice = `Rapid Resolution · $${offers.rapidResolution.priceCad} CAD + GST ($${(offers.rapidResolution.priceCad * 1.05).toFixed(2)} total)`;
+      const intakePrice = [...upload.querySelectorAll('p')].some(node => compact(node.textContent) === compact(previousIntakePrice))
+        ? previousIntakePrice : `Rapid Resolution · $${offers.rapidResolution.priceCad}`;
+      field(upload, 'p', intakePrice, 'intake price');
     }
     if (!valid) issues.push('Homepage upload must retain its empty form, configured service choices, collapsed capture guide and disabled submit');
     else if (serviceChoices) redactions.add(serviceChoices);
@@ -167,7 +173,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
     // are never a crawler snapshot and cannot inherit this admission.
     const expected = `Free ticket assessmentSee what you could save.Add your ticket or enter the basics. Get your estimate instantly.
       Upload a ticketPhoto or PDFChoose a photo or PDF to fill in the basics.
-      Ticket basicsHow was the ticket issued?By an officer$${offers.rapidResolution.priceCad} + GST serviceBy a camera$${offers.photoRadar.priceCad} + GST service
+      Ticket basics${serviceChoicesCopy}
       OffenceSelect your offenceSpeeding (under 30 km/h over)Speeding (30+ km/h over)Distracted drivingRed light, stop sign or failing to yieldCareless drivingOther traffic offence
       Fine amount (CAD)Demerit pointsSelectNot sure0123456789101112131415Clean driving record?Select your recordYes — no convictions in the last 3 yearsNo — I have previous convictions
       Insurance estimate uses $1,800/year · changeYour annual insurance premium (CAD)Use your premium for a closer estimate. The $1,800 default is an illustrative baseline.
@@ -175,7 +181,7 @@ function redactHomepageVisualSnapshot(document, route, issues) {
     const fields = ['offence', 'fine', 'demerits', 'record', 'premium'].map(name => assessment.querySelector(`#assessment-${name}`));
     const submit = assessment.querySelector('button[type="submit"][data-funnel-action="primary_cta"][data-funnel-position="hero"]');
     const valid = main.querySelectorAll('#instant-ticket-assessment').length === 1 && visible(assessment)
-      && compact(assessment.textContent) === compact(expected)
+      && [expected, expected.replace(serviceChoicesCopy, previousServiceChoicesCopy)].some(copy => compact(assessment.textContent) === compact(copy))
       && fields.every(node => node && visible(node) && node.required)
       && fields.slice(0, 4).every(node => node.value === '')
       && fields[4].value === '1800' && fields[1].getAttribute('min') === '0.01'

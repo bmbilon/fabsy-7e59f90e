@@ -290,8 +290,8 @@ export default function TicketCapture({
             ) : (
               <Upload className="h-8 w-8 text-primary" aria-hidden="true" />
             )}
-            <span className={`font-semibold text-primary ${compact ? "text-sm" : "text-base sm:text-lg"}`}>
-              {isDragging ? "Drop your ticket here" : file ? "Ticket file selected — click to change" : allowFileSelection ? <><span className="sm:hidden">Tap to upload your ticket</span><span className="hidden sm:inline">Click to upload or drag and drop</span></> : "Click to upload your ticket"}
+            <span className={`font-bold text-primary ${compact ? "text-base" : "text-lg sm:text-xl"}`}>
+              {isDragging ? "Drop your ticket here" : file ? "Ticket file selected — click to change" : allowFileSelection ? "Upload / Drag+Drop" : "Click to upload your ticket"}
             </span>
             <span className={`max-w-full break-all text-muted-foreground ${compact ? "text-xs" : "text-sm"}`}>
               {file?.name || "PDF, JPG, PNG, WebP, HEIC or HEIF · maximum 10 MB"}
