@@ -228,7 +228,7 @@ try {
   rejected(footer.replace(/<footer\b/g, '<section').replace(/<\/footer>/g, '</section>'), '/about', 'The exact link is not an exception outside the footer');
   rejected(footer, '/pa/', 'English footer exception does not bypass localized source checks');
   const visibleFaqDom = new JSDOM(actual.render('/faq'));
-  const refundQuestion = [...visibleFaqDom.window.document.querySelectorAll('h3')].find(node => node.textContent === 'Does Fabsy promise a particular result?');
+  const refundQuestion = [...visibleFaqDom.window.document.querySelectorAll('h3')].find(node => node.textContent === 'Does the $198 Rapid Resolution service promise a particular result?');
   assert(refundQuestion);
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [{ '@type': 'Question', name: refundQuestion.textContent,
     acceptedAnswer: { '@type': 'Answer', text: actual.formatFaqAnswer(refundQuestion.nextElementSibling.textContent) } }] };
@@ -271,15 +271,12 @@ try {
   rejected(notice, '/pa/', 'English component exception does not bypass localized copy checks');
   for (const route of ['/rapid-resolution', '/faq', '/terms-of-purchase']) accepted(actual.render(route), route, `${route}: actual updated refund page`);
   const photoRefundPage = actual.render('/photo-radar');
-  rejected(edit(photoRefundPage, document => {
-    const condition = [...document.querySelectorAll('aside[data-fee-refund-notice="photo-radar"] p')].find(node => node.textContent === feeRefund.photoCondition);
-    assert(condition, 'The actual Photo Radar rejection trigger is present');
-    condition.textContent = feeRefund.condition;
-  }), '/photo-radar', 'Photo Radar must retain its fine-or-withdrawal-only refund trigger');
-  rejected(photoRefundPage.replace(feeRefund.photoHeadline, feeRefund.headline), '/photo-radar', 'Photo Radar must retain its owner-notice headline');
+  assert.doesNotMatch(photoRefundPage, /refund|money.back/i);
+  assert.doesNotMatch(actual.render('/photo-refund-notice'), /refund|money.back/i);
+  rejected(photoRefundPage.replace('</main>', '<p>We refund your fee if no reduction is obtained.</p></main>'), '/photo-radar', 'Camera services cannot advertise a refund');
   // These pages emit JSON-LD during SSR. FAQSection installs its schema in a
   // browser effect, so its actual rendered copy is checked above instead.
-  for (const route of ['/photo-radar', '/rapid-resolution']) {
+  for (const route of ['/rapid-resolution']) {
     const html = actual.render(route);
     for (const mutation of ['window', 'added']) {
       const changed = edit(html, document => {

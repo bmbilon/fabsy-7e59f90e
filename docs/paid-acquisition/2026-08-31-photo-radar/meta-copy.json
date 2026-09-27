@@ -12,24 +12,25 @@
   "variants": [
     {
       "id": "eligibility",
-      "headline": "Fine reduced—or your fee refunded",
+      "headline": "We fight it for $79 + GST",
       "description": "Photo Radar: $79 + GST",
-      "primary_text": "Fine reduced or ticket dismissed—or your fee refunded.\n\nPhoto radar notice? Pay $79 + GST ($82.95 total) upfront. No hidden fees.\n\nIf the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits. The refund covers the actual Photo Radar service fee and GST paid. Payment does not start the 30-day refund clock. An initial or unchanged offer alone does not trigger a refund. See terms.\n\nFor eligible Alberta camera notices mailed to a registered owner. No demerits. No insurance impact. Only the fine is at issue. We enter a not-guilty plea, request disclosure and ask the Crown for a reduction or withdrawal. We handle the Court paperwork; you approve any deal. No trial. No outcome is promised. Government fines are separate.",
+      "primary_text": "Photo radar ticket? We fight it for $79 + GST.\n\nWe review the evidence and pursue a lower fine or withdrawal with the Crown. You approve any deal. No success fee.\n\n$82.95 total, paid upfront. Eligible Alberta registered-owner notices. Government fines separate. Trial excluded. No legal outcome is promised.\n\nUpload your notice to start.",
       "url_parameters": "utm_source=meta&utm_medium=paid_social&utm_campaign=ate-photo-radar-alberta-20260831&utm_content=eligibility"
     },
     {
       "id": "red-light",
-      "headline": "Fine reduced—or your fee refunded",
+      "headline": "We fight it for $79 + GST",
       "description": "Red-Light Notice: $79 + GST",
-      "primary_text": "Fine reduced or ticket dismissed—or your fee refunded.\n\nRed-light camera notice? Pay $79 + GST ($82.95 total) upfront. No hidden fees.\n\nIf the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits. The refund covers the actual Photo Radar service fee and GST paid. Payment does not start the 30-day refund clock. An initial or unchanged offer alone does not trigger a refund. See terms.\n\nFor eligible Alberta camera notices mailed to a registered owner. No demerits. No insurance impact. Only the fine is at issue. We enter a not-guilty plea, request disclosure and ask the Crown for a reduction or withdrawal. We handle the Court paperwork; you approve any deal. No trial. No outcome is promised. Government fines are separate.",
+      "primary_text": "Red-light camera ticket? We fight it for $79 + GST.\n\nWe review the evidence and pursue a lower fine or withdrawal with the Crown. You approve any deal. No success fee.\n\n$82.95 total, paid upfront. Eligible Alberta registered-owner notices. Government fines separate. Trial excluded. No legal outcome is promised.\n\nUpload your notice to start.",
       "url_parameters": "utm_source=meta&utm_medium=paid_social&utm_campaign=ate-photo-radar-alberta-20260831&utm_content=red-light"
     },
     {
       "id": "owner-notice",
-      "headline": "Fine reduced—or your fee refunded",
+      "headline": "We fight it for $79 + GST",
       "description": "Owner Notice: $79 + GST",
-      "primary_text": "Fine reduced or ticket dismissed—or your fee refunded.\n\nOwner camera notice? Pay $79 + GST ($82.95 total) upfront. No hidden fees.\n\nIf the Crown rejects Fabsy's efforts to reduce the original fine or obtain a withdrawal of your photo radar or red-light camera notice, and neither improvement is obtained, Fabsy refunds your service fee within 30 days of receiving the rejection. These notices have no demerits. The refund covers the actual Photo Radar service fee and GST paid. Payment does not start the 30-day refund clock. An initial or unchanged offer alone does not trigger a refund. See terms.\n\nFor eligible Alberta camera notices mailed to a registered owner. No demerits. No insurance impact. Only the fine is at issue. We enter a not-guilty plea, request disclosure and ask the Crown for a reduction or withdrawal. We handle the Court paperwork; you approve any deal. No trial. No outcome is promised. Government fines are separate.",
+      "primary_text": "Photo radar ticket? We fight it for $79 + GST.\n\nWe review the evidence and pursue a lower fine or withdrawal with the Crown. You approve any deal. No success fee.\n\n$82.95 total, paid upfront. Eligible Alberta registered-owner notices. Government fines separate. Trial excluded. No legal outcome is promised.\n\nUpload your notice to start.",
       "url_parameters": "utm_source=meta&utm_medium=paid_social&utm_campaign=ate-photo-radar-alberta-20260831&utm_content=owner-notice"
     }
-  ]
+  ],
+  "copy_updated_on": "2026-09-27"
 }

@@ -119,9 +119,11 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
                 <li>I authorize digital communication via email and text regarding my case</li>
                 <li>{isPhotoRadar ? `The service fee is ${PHOTO_RADAR_PRICE_LABEL}, one-time, charged at checkout. No trial and no success fee. Government fines are separate.` : `The service fee is $${RAPID_RESOLUTION.priceCad} CAD plus applicable GST; government fines, trial work and other excluded services are separate`}</li>
                 <li>The 48-hour commitment covers Fabsy's review and next authorized action after complete, readable disclosure is received and matched to my file—not Crown response time or final outcome timing</li>
-                <li>{FEE_REFUND.payment}</li>
-                <li>{isPhotoRadar ? FEE_REFUND.photoCondition : FEE_REFUND.condition}</li>
-                <li>{FEE_REFUND.declinedOfferText}</li>
+                {isPhotoRadar ? <li>{PHOTO_RADAR.outcomeDisclaimer}</li> : <>
+                  <li>{FEE_REFUND.payment}</li>
+                  <li>{FEE_REFUND.condition}</li>
+                  <li>{FEE_REFUND.declinedOfferText}</li>
+                </>}
                 {isPhotoRadar && <li>{PHOTO_RADAR.insuranceDisclaimer}</li>}
                 <li>I may withdraw this consent at any time by providing written notice</li>
                 <li>This consent remains valid until the matter is resolved or withdrawn</li>
@@ -209,7 +211,7 @@ const ConsentStep = ({ formData, updateFormData }: ConsentStepProps) => {
         </div>
 
         <div className="mt-6 pt-4 border-t text-xs text-muted-foreground space-y-1">
-          <p>Form Version: {isPhotoRadar ? "2026-08-31-photo-radar-refund-v2" : "2026-08-31-rr-refund-v2"}</p>
+          <p>Form Version: {isPhotoRadar ? "2026-09-27-photo-radar-scope-v3" : "2026-08-31-rr-refund-v2"}</p>
           <p>Contact: support@fabsy.ca</p>
           <p className="mt-2 italic">
             This digital authorization records your consent to Fabsy's service. Any prescribed government consent form remains separately required.

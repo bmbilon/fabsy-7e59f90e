@@ -58,6 +58,7 @@ try {
           assert.ok(!html.includes('id="insurance-company"'));
           assert.ok(!html.includes('Stale insurance data'));
           assert.ok(!html.includes('$198'));
+          assert.doesNotMatch(html, /refund|money.back/i);
         });
 
         test('officer checkout keeps the existing report option and $198 base price', () => {
@@ -75,20 +76,12 @@ try {
             assert.ok(html.includes('Rapid Resolution: Photo Radar'));
             assert.ok(html.includes('$79 + 5% GST ($82.95 total)'));
             assert.ok(!html.includes('$198'));
+          assert.doesNotMatch(html, /refund|money.back/i);
             assert.ok(!html.includes('Stale insurance data'));
           }
           assert.ok(consent.includes('Enter a not-guilty plea'));
-          assert.ok(consent.includes('within 30 days of receiving the rejection'));
-          assert.ok(consent.includes('If the Crown rejects'));
-          assert.ok(consent.includes('efforts to reduce the original fine or obtain a withdrawal'));
-          assert.ok(consent.includes('neither improvement is obtained'));
-          assert.ok(consent.includes('Payment does not start the 30-day refund clock'));
-          assert.ok(!consent.includes('within 30 days of receiving that offer'));
           assert.ok(consent.includes('service fee is paid upfront'));
-          assert.ok(!consent.includes('fee is not refunded based on outcome'));
-          assert.ok((consent.match(/<a[^>]+>/g) || []).some(link =>
-            link.includes('href="/terms-of-service#fee-refund-guarantee"') &&
-            link.includes('target="_blank"') && link.includes('rel="noopener noreferrer"')));
+          assert.doesNotMatch(consent, /refund|money.back/i);
           assert.ok(consent.includes('final resolution step that I expressly authorize'));
         });
 

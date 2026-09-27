@@ -26,6 +26,7 @@ export default function FeeRefundNotice({
   const copy = (key: Exclude<keyof typeof FEE_REFUND, "termsPath" | "refundWindowDays" | "declinedOfferText">) =>
     locale === "en" ? FEE_REFUND[key] : t(`feeRefund.${key}`, { defaultValue: FEE_REFUND[key] });
   const dark = tone === "dark";
+  if (photoRadar) return null;
 
   return (
     <aside
@@ -34,16 +35,16 @@ export default function FeeRefundNotice({
         dark ? "border-emerald-300/40 bg-white/10 text-white" : "border-primary/25 bg-primary/5 text-slate-900",
         className,
       )}
-      data-fee-refund-notice={photoRadar ? "photo-radar" : "ticket-representation"}
+      data-fee-refund-notice="ticket-representation"
     >
       <div className="flex items-start gap-3">
         <ShieldCheck className={cn("mt-0.5 h-6 w-6 shrink-0", dark ? "text-emerald-200" : "text-primary")} aria-hidden="true" />
         <div className="min-w-0 space-y-3">
           <h2 className={cn("font-bold leading-snug", compact ? "text-lg" : "text-xl sm:text-2xl", dark && "text-white")}>
-            {copy(photoRadar ? "photoHeadline" : "headline")}
+            {copy("headline")}
           </h2>
           <p className={cn("text-sm leading-relaxed", dark ? "text-slate-100" : "text-slate-700")}>
-            {copy(photoRadar ? "photoCondition" : "condition")}
+            {copy("condition")}
           </p>
           <p lang="en" dir="ltr" className={cn("text-sm leading-relaxed", dark ? "text-slate-100" : "text-slate-700")}>
             {locale !== "en" && <span className="font-semibold">Refund clarification (English): </span>}

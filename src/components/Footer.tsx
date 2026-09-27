@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { Scale, Mail, MapPin, Phone, MessageCircle, Facebook, Instagram, Twitter } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useLocale } from "@/i18n/locale-context";
 import { LocalizedFooter } from "./LocalizedNavigation";
 import {
@@ -15,6 +15,8 @@ import { FABSY_WHATSAPP_URL, WHATSAPP_ENABLED } from "@/config/whatsapp";
 
 const Footer = () => {
   const { locale } = useLocale();
+  const location = useLocation();
+  const cameraPage = /photo-radar|fleet|submit-ticket|checkout|consent|payment/.test(location.pathname);
   const currentYear = new Date().getFullYear();
   if (locale !== "en") return <LocalizedFooter />;
 
@@ -32,7 +34,7 @@ const Footer = () => {
       { name: "Privacy Policy", path: "/privacy-policy" },
       { name: "Terms of Purchase", path: "/terms-of-purchase" },
       { name: "Terms of Service", path: "/terms-of-service" },
-      { name: "Fee-refund guarantee", path: FEE_REFUND.termsPath },
+      ...(!cameraPage ? [{ name: "Fee-refund guarantee", path: FEE_REFUND.termsPath }] : []),
     ],
     support: [
       { name: `Photo Radar ($${PHOTO_RADAR.priceCad} + GST)`, path: PHOTO_RADAR.slug },
