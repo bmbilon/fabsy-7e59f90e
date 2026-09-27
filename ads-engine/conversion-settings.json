@@ -1,0 +1,35 @@
+{
+  "verifiedAt": "2026-09-27T18:59:07.635Z",
+  "geo": "geoTargetConstants/20113",
+  "actions": [
+    {
+      "name": "Officer Paid",
+      "resourceName": "customers/9385017797/conversionActions/7740835320",
+      "primary": false,
+      "destination": "AW-18419256057/MyAbCPiLj-scEPmV_s5E"
+    },
+    {
+      "name": "Camera Paid",
+      "resourceName": "customers/9385017797/conversionActions/7740881425",
+      "primary": false,
+      "destination": "AW-18419256057/TEo-CJH0kescEPmV_s5E"
+    },
+    {
+      "name": "Fabsy completed ticket upload",
+      "resourceName": "customers/9385017797/conversionActions/7759411421",
+      "primary": false,
+      "destination": "AW-18419256057/-7vLCN3x_PMcEPmV_s5E"
+    },
+    {
+      "name": "Fabsy qualified call 60s",
+      "resourceName": "customers/9385017797/conversionActions/7759542606",
+      "primary": false
+    },
+    {
+      "name": "Qualified Ticket Upload",
+      "resourceName": "customers/9385017797/conversionActions/7801915860",
+      "primary": true,
+      "destination": "AW-18419256057/9uX6CNSTn4gdEPmV_s5E"
+    }
+  ]
+}

@@ -154,6 +154,8 @@ const PrivacyPolicy = () => {
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">7. Cookies and Website Analytics</h2>
+            <p className="mt-4">Google ad measurement is enabled by default. Use the measurement opt-out link at the bottom of any page to turn it off in this browser. We share only marketing identifiers, stable event identifiers, service type, transaction amounts and SHA-256 hashed email or phone for conversion matching. Hashing does not make contact information anonymous. Google may process this information outside Canada. Ticket images, ticket numbers, licence details and case narratives are never shared for ad measurement. Ad personalization is disabled. Opting out does not affect your Fabsy service.</p>
+
             <p className="mb-4">
               Our public website uses Tawk.to for live chat. Tawk.to uses cookies and browser storage
               to maintain chat sessions and recognize returning visitors. Conversation continuity depends
@@ -180,14 +182,12 @@ const PrivacyPolicy = () => {
               any previously active session leaves the live count within 90 seconds.
             </p>
             <p>
-              Fabsy's first-party funnel measurement, Google Analytics 4, Google Ads measurement,
-              Meta measurement and OpenAI Ads measurement are optional. Fabsy does not record an
-              optional funnel event, and the Google, Meta or OpenAI Ads scripts do not load, before
-              you choose Allow measurement. Fabsy, Google, Meta and OpenAI Ads permissions are stored separately, so an earlier provider
-              choice does not silently authorize a newly introduced measurement purpose. The
-              current Privacy choices control lets you allow or decline all four together. You
-              can revisit it at any time. We remember each choice in this browser for up to 180
-              days; clearing browser storage or using another browser may remove a choice.
+              Google Analytics 4 and Google Ads measurement are enabled by default with the
+              opt-out control described above. An existing refusal is respected. Meta and OpenAI Ads
+              remain disabled unless their separate permission has already been recorded; Google
+              measurement does not enable them. Fabsy's separate first-party Live View and legacy
+              funnel measurement retain their existing permission controls. Choices are stored in
+              this browser. Clearing browser storage or using another browser may remove a choice.
             </p>
             <p className="mt-4">
               Before that optional measurement choice, Fabsy counts paid-ad landing requests and
@@ -214,7 +214,7 @@ const PrivacyPolicy = () => {
               400 days for campaign and conversion-rate comparison, then can be purged.
             </p>
             <p className="mt-4">
-              With your permission, Google measurement records visits to approved public
+              Unless you opt out, Google measurement records visits to approved public
               information pages, a generic ticket-upload completion on a clean public bridge,
               and completed purchases confirmed by our server. Google may
               use cookies and similar technologies and process device and browser information,
@@ -279,7 +279,7 @@ const PrivacyPolicy = () => {
               first-party funnel events on ticket intake contain only the named progress step
               described above and no form contents. Meta automatic events and advanced matching are
               disabled. No Meta retargeting audience is configured for this release. Google
-              personalized advertising, Google signals and enhanced conversions remain disabled.
+              personalized advertising and Google signals remain disabled. Google enhanced conversion matching uses only the SHA-256 contact hashes described above; automatic collection of contact information is disabled.
             </p>
             <p className="mt-4">
               Learn more about these providers in the{' '}
@@ -311,7 +311,7 @@ const PrivacyPolicy = () => {
               </a>.
             </p>
             <p className="mt-4">
-              These choices control optional Google, Meta and OpenAI Ads measurement, not every website provider.
+              The Google opt-out controls Google measurement. Separate provider permissions control Meta and OpenAI Ads measurement.
               Providers needed for hosting, security, payments and case services remain
               separate. Existing Cloudflare infrastructure and performance analytics are
               also separate. Declining measurement does not turn off all cookies,

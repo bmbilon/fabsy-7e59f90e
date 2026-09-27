@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import {opaqueTransactionId} from '@/lib/paidPurchaseMeasurement';
+import {rememberEnhancedContact,measureSavedTicket} from '@/lib/adsFunnel';
 import type { PreparedTicketSubmission, SavedTicketSubmission } from "@/lib/ticket/submitIntake";
 import FeeRefundNotice from "@/components/FeeRefundNotice";
 import { CreditCard, DollarSign, FileSearch, Shield } from "lucide-react";
@@ -260,6 +262,7 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
         }
       }
 
+      await measureSavedTicket(submission,formData.email,formData.phone,false);
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("create-payment", {
         body: {
           formData: { email: formData.email, firstName: formData.firstName, lastName: formData.lastName, ticketNumber: formData.ticketNumber },
@@ -307,6 +310,11 @@ export default function PaymentStep({ formData, updateFormData, intakeDraft = nu
       });
       if (notificationError) console.error("Submission notification failed", notificationError);
       window.dispatchEvent(new CustomEvent("fabsy:intake-checkout-started"));
+      await rememberEnhancedContact(formData.email,formData.phone,checkout.sessionId);
+      if(checkout.idrOrderId&&/^cs_live_[A-Za-z0-9]+$/.test(checkout.sessionId||'')){
+        const hash=await opaqueTransactionId(checkout.sessionId);
+        if(hash)try{window.sessionStorage.setItem(`fabsy-report-next:${hash}`,JSON.stringify({orderId:checkout.idrOrderId,sessionId:checkout.sessionId}));}catch{/* The existing report access email remains available. */}
+      }
       window.location.assign(checkout.url);
     } catch (error) {
       console.error("Ticket checkout failed", error);

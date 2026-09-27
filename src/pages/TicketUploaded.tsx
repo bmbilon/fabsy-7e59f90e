@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import {dispatchPendingAdsUploads} from '@/lib/adsUploadMeasurement';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -36,6 +37,7 @@ export default function TicketUploaded() {
 
   useEffect(() => {
     const attempt = () => {
+      dispatchPendingAdsUploads();
       const handoff = readTicketUploadMeasurementHandoff();
       if (!handoff) return;
       let googleReported = handoff.googleReported;

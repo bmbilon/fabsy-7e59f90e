@@ -1,3 +1,4 @@
+import { measureSavedTicket } from '@/lib/adsFunnel';
 import { supabase } from "@/integrations/supabase/client";
 import type { FormData } from "@/components/TicketForm";
 import { readActiveReferral } from "@/lib/referrals/capture";
@@ -66,5 +67,7 @@ export async function savePhotoTicket(data: FormData, attempt: PhotoIntakeAttemp
     const detail = await functionErrorDetails(error, consent?.error || "Your consent could not be saved. Please submit again.");
     throw new IntakeSaveError(detail.message, detail.code);
   }
-  return { ...attempt, clientId: prepared.clientId, consentFormPath: consent.consentFormPath, contactSaved: prepared.contactSaved === true };
+  const saved = { ...attempt, clientId: prepared.clientId, consentFormPath: consent.consentFormPath, contactSaved: prepared.contactSaved === true };
+  void measureSavedTicket(saved,data.email,data.phone);
+  return saved;
 }

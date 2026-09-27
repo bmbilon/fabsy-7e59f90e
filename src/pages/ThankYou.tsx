@@ -1,3 +1,4 @@
+import {opaqueTransactionId} from '@/lib/paidPurchaseMeasurement';
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -19,6 +20,12 @@ const ThankYou: React.FC = () => {
   const [checking, setChecking] = useState(false);
   const summary = paidCheckoutSummary(receipt);
   usePaidPurchaseTracking(receipt, sessionId);
+  const [reportNext,setReportNext]=useState<string|null>(null);
+  useEffect(()=>{let cancelled=false;
+    if(!receipt||receipt.order_type!=='rapid_resolution_bundle'||receipt.payment_status!=='paid'||!sessionId)return;
+    void opaqueTransactionId(sessionId).then(hash=>{if(!hash||cancelled)return;try{const next=JSON.parse(window.sessionStorage.getItem(`fabsy-report-next:${hash}`)||'null');if(next?.sessionId===sessionId&&/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(next.orderId))setReportNext(`/insurance-damage-report/intake?checkout=success&order_id=${encodeURIComponent(next.orderId)}&session_id=${encodeURIComponent(sessionId)}`);}catch{/* Existing access email is the fallback. */}});
+    return()=>{cancelled=true;};
+  },[receipt,sessionId]);
   const offer = summary?.photoRadar ? PHOTO_RADAR : RAPID_RESOLUTION;
   const url = 'https://fabsy.ca/thank-you';
   useSafeHead({
@@ -93,13 +100,14 @@ const ThankYou: React.FC = () => {
           <div className="rounded-lg border p-4 bg-card">
             <h2 className="font-semibold text-foreground mb-1">Outcome standard</h2>
             <p className="text-sm text-muted-foreground">
-              {offer.speedDisclaimer} No legal outcome is guaranteed. {summary.photoRadar ? "Your written purchase terms continue to apply." : "Your service-fee refund rights follow the written purchase terms for your order."}
+              {offer.speedDisclaimer} No legal outcome is guaranteed. {summary.photoRadar ? "Camera service fees are nonrefundable." : "Your service-fee refund rights follow the written purchase terms for your order."}
             </p>
           </div>
         </div> : null}
 
         {summary && !summary.photoRadar && !summary.proDiscountApplied ? <div className="mt-6 rounded-lg border bg-card p-5 text-left"><p>Alberta Class 1, 2 or 4 licence? Send a photo of your licence for 20% off. Once verified, we refund the difference.</p><Link to="/portal/pro-discount" className="mt-3 inline-block font-semibold text-primary underline">Verify your licence privately</Link></div> : null}
 
+        {reportNext&&<a href={reportNext} referrerPolicy="no-referrer" className="mt-6 inline-flex min-h-12 items-center rounded-md bg-primary px-6 py-3 font-semibold text-white">Continue to your Insurance Planning Report</a>}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to={summary?.photoRadar ? PHOTO_RADAR.intakePath : RAPID_RESOLUTION.intakePath} className="inline-block">
             <span className="inline-flex items-center rounded-md bg-primary px-6 py-3 font-semibold text-white hover:opacity-90 transition">Submit another ticket</span>

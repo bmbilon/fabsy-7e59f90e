@@ -117,7 +117,7 @@ function assertAddress(value: string, label: string): string {
   return clean;
 }
 
-async function accessToken(): Promise<string> {
+export async function workspaceAccessToken(): Promise<string> {
   const config = credentials();
   const cacheKey = `${config.clientId}|${config.sender}`;
   if (
@@ -156,6 +156,8 @@ async function accessToken(): Promise<string> {
   };
   return result.access_token;
 }
+
+const accessToken = workspaceAccessToken;
 
 function htmlToText(html: string): string {
   return html

@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "currency": "CAD",
+  "timezone": "America/Edmonton",
+  "spendingAuthorized": false,
+  "paused": true,
+  "learningSpendLimitCad": null,
+  "startDate": null,
+  "durationDays": 30,
+  "freshnessMinutes": 120,
+  "monitorMinutes": 15,
+  "googleApiVersion": "v23",
+  "existingCampaignIds": {},
+  "googleQualifiedConversionAction": "customers/9385017797/conversionActions/7801915860",
+  "googlePurchaseConversionActions": [
+    "customers/9385017797/conversionActions/7740835320",
+    "customers/9385017797/conversionActions/7740881425"
+  ],
+  "albertaGeoTarget": "geoTargetConstants/20113",
+  "googleCustomerId": "9385017797",
+  "campaigns": {
+    "G-Search-Officer": {
+      "service": "officer",
+      "dailyBudgetCad": 50,
+      "planningCpaCad": 90
+    },
+    "G-Search-Camera": {
+      "service": "camera",
+      "dailyBudgetCad": 20,
+      "planningCpaCad": 35
+    }
+  },
+  "meta": {
+    "active": false,
+    "budgetCad": null,
+    "advantagePlusCreativeText": false,
+    "advantagePlusVisualEnhancements": false
+  },
+  "aiMax": false,
+  "automaticallyCreatedAssets": false,
+  "primaryGoal": "qualified_ticket_upload",
+  "secondaryGoal": "client_paid",
+  "bidding": "MAXIMIZE_CONVERSIONS",
+  "targetCpa": null,
+  "retiredCampaignIds": [
+    "24214394599",
+    "24266674718"
+  ]
+}

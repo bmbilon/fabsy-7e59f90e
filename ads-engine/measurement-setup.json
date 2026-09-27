@@ -1,0 +1,48 @@
+{
+  "batch": {
+    "id": "fae376aa-fa31-40c1-8bea-7ad8c7e51345",
+    "payload_hash": "97888615779feb3c8d4504504c86d3ac077a7c67319a9f652b2bafd9fd7df552",
+    "status": "pending"
+  },
+  "operations": [
+    {
+      "conversionActionOperation": {
+        "create": {
+          "name": "Qualified Ticket Upload",
+          "category": "SUBMIT_LEAD_FORM",
+          "primaryForGoal": true,
+          "type": "WEBPAGE",
+          "status": "ENABLED",
+          "countingType": "ONE_PER_CLICK",
+          "valueSettings": {
+            "defaultValue": 0,
+            "defaultCurrencyCode": "CAD",
+            "alwaysUseDefaultValue": true
+          }
+        }
+      }
+    },
+    {
+      "conversionActionOperation": {
+        "update": {
+          "resourceName": "customers/9385017797/conversionActions/7740835320",
+          "name": "Officer Paid",
+          "primaryForGoal": false,
+          "status": "ENABLED"
+        },
+        "updateMask": "name,primary_for_goal,status"
+      }
+    },
+    {
+      "conversionActionOperation": {
+        "update": {
+          "resourceName": "customers/9385017797/conversionActions/7740881425",
+          "name": "Camera Paid",
+          "primaryForGoal": false,
+          "status": "ENABLED"
+        },
+        "updateMask": "name,primary_for_goal,status"
+      }
+    }
+  ]
+}

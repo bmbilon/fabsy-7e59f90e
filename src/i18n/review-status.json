@@ -8,7 +8,7 @@
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-fc2adbde",
+      "sourceFingerprint": "fnv1a-2d75621a",
       "bundleFingerprint": "fnv1a-0aae1b72",
       "serviceReady": false,
       "publication": {
@@ -20,11 +20,11 @@
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-5b38a5ab",
+        "src/pages/TermsOfService.tsx": "fnv1a-cbdd4b1d",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-db6ca86b",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-d6ebaa46",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-09ab4088",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-5e3e4468",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-4090e1af",
@@ -32,14 +32,14 @@
       },
       "policyCorrection": {
         "date": "2026-09-27",
-        "basis": "Brett explicitly instructed removal of all $79 refund language; $198 service only. Existing machine-translation publication basis retained; no native-language review asserted."
+        "basis": "Brett explicitly instructed no camera-service refunds and default-granted Google measurement with opt-out. Existing machine-translation publication basis retained. English legal source remains controlling; no native-language review asserted."
       }
     },
     "tl": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-fc2adbde",
+      "sourceFingerprint": "fnv1a-2d75621a",
       "bundleFingerprint": "fnv1a-4d941013",
       "serviceReady": false,
       "publication": {
@@ -51,11 +51,11 @@
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-5b38a5ab",
+        "src/pages/TermsOfService.tsx": "fnv1a-cbdd4b1d",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-db6ca86b",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-d6ebaa46",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-09ab4088",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-5e3e4468",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-4090e1af",
@@ -63,14 +63,14 @@
       },
       "policyCorrection": {
         "date": "2026-09-27",
-        "basis": "Brett explicitly instructed removal of all $79 refund language; $198 service only. Existing machine-translation publication basis retained; no native-language review asserted."
+        "basis": "Brett explicitly instructed no camera-service refunds and default-granted Google measurement with opt-out. Existing machine-translation publication basis retained. English legal source remains controlling; no native-language review asserted."
       }
     },
     "zh-hans": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-fc2adbde",
+      "sourceFingerprint": "fnv1a-2d75621a",
       "bundleFingerprint": "fnv1a-afdbad6f",
       "serviceReady": false,
       "publication": {
@@ -82,11 +82,11 @@
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-5b38a5ab",
+        "src/pages/TermsOfService.tsx": "fnv1a-cbdd4b1d",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-db6ca86b",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-d6ebaa46",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-09ab4088",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-5e3e4468",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-4090e1af",
@@ -94,14 +94,14 @@
       },
       "policyCorrection": {
         "date": "2026-09-27",
-        "basis": "Brett explicitly instructed removal of all $79 refund language; $198 service only. Existing machine-translation publication basis retained; no native-language review asserted."
+        "basis": "Brett explicitly instructed no camera-service refunds and default-granted Google measurement with opt-out. Existing machine-translation publication basis retained. English legal source remains controlling; no native-language review asserted."
       }
     },
     "zh-hant": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-fc2adbde",
+      "sourceFingerprint": "fnv1a-2d75621a",
       "bundleFingerprint": "fnv1a-5cfa318c",
       "serviceReady": false,
       "publication": {
@@ -113,11 +113,11 @@
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-5b38a5ab",
+        "src/pages/TermsOfService.tsx": "fnv1a-cbdd4b1d",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-db6ca86b",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-d6ebaa46",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-09ab4088",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-5e3e4468",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-4090e1af",
@@ -125,14 +125,14 @@
       },
       "policyCorrection": {
         "date": "2026-09-27",
-        "basis": "Brett explicitly instructed removal of all $79 refund language; $198 service only. Existing machine-translation publication basis retained; no native-language review asserted."
+        "basis": "Brett explicitly instructed no camera-service refunds and default-granted Google measurement with opt-out. Existing machine-translation publication basis retained. English legal source remains controlling; no native-language review asserted."
       }
     },
     "ar": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-fc2adbde",
+      "sourceFingerprint": "fnv1a-2d75621a",
       "bundleFingerprint": "fnv1a-d5d06690",
       "serviceReady": false,
       "publication": {
@@ -144,11 +144,11 @@
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-5b38a5ab",
+        "src/pages/TermsOfService.tsx": "fnv1a-cbdd4b1d",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-db6ca86b",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-d6ebaa46",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-09ab4088",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-5e3e4468",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-4090e1af",
@@ -156,14 +156,14 @@
       },
       "policyCorrection": {
         "date": "2026-09-27",
-        "basis": "Brett explicitly instructed removal of all $79 refund language; $198 service only. Existing machine-translation publication basis retained; no native-language review asserted."
+        "basis": "Brett explicitly instructed no camera-service refunds and default-granted Google measurement with opt-out. Existing machine-translation publication basis retained. English legal source remains controlling; no native-language review asserted."
       }
     },
     "hi": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-fc2adbde",
+      "sourceFingerprint": "fnv1a-2d75621a",
       "bundleFingerprint": "fnv1a-8bb0214b",
       "serviceReady": false,
       "publication": {
@@ -175,11 +175,11 @@
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-5b38a5ab",
+        "src/pages/TermsOfService.tsx": "fnv1a-cbdd4b1d",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-db6ca86b",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-d6ebaa46",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-09ab4088",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-5e3e4468",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-4090e1af",
@@ -187,14 +187,14 @@
       },
       "policyCorrection": {
         "date": "2026-09-27",
-        "basis": "Brett explicitly instructed removal of all $79 refund language; $198 service only. Existing machine-translation publication basis retained; no native-language review asserted."
+        "basis": "Brett explicitly instructed no camera-service refunds and default-granted Google measurement with opt-out. Existing machine-translation publication basis retained. English legal source remains controlling; no native-language review asserted."
       }
     },
     "es": {
       "status": "published",
       "reviewedBy": null,
       "reviewedAt": null,
-      "sourceFingerprint": "fnv1a-fc2adbde",
+      "sourceFingerprint": "fnv1a-2d75621a",
       "bundleFingerprint": "fnv1a-a26b69bd",
       "serviceReady": false,
       "publication": {
@@ -206,11 +206,11 @@
         "disclaimerVersion": "not-legal-advice-machine-translation-v1"
       },
       "sourceDocuments": {
-        "src/pages/TermsOfService.tsx": "fnv1a-5b38a5ab",
+        "src/pages/TermsOfService.tsx": "fnv1a-cbdd4b1d",
         "src/pages/TermsOfPurchase.tsx": "fnv1a-db6ca86b",
         "src/components/form-steps/ConsentStep.tsx": "fnv1a-d6ebaa46",
         "src/components/form-steps/LeadCaptureFields.tsx": "fnv1a-29f32858",
-        "src/pages/PrivacyPolicy.tsx": "fnv1a-09ab4088",
+        "src/pages/PrivacyPolicy.tsx": "fnv1a-5e3e4468",
         "src/config/pro-drivers.ts": "fnv1a-dca51dc3",
         "src/config/offers.ts": "fnv1a-4b290fd6",
         "src/config/feeRefund.json": "fnv1a-4090e1af",
@@ -218,7 +218,7 @@
       },
       "policyCorrection": {
         "date": "2026-09-27",
-        "basis": "Brett explicitly instructed removal of all $79 refund language; $198 service only. Existing machine-translation publication basis retained; no native-language review asserted."
+        "basis": "Brett explicitly instructed no camera-service refunds and default-granted Google measurement with opt-out. Existing machine-translation publication basis retained. English legal source remains controlling; no native-language review asserted."
       }
     }
   },

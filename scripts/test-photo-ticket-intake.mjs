@@ -168,6 +168,7 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
   window.IS_REACT_ACT_ENVIRONMENT = true;
   window.__ticketReviewBackend = {
     invoke(name, options) {
+      if (name === "ads-measurement") return Promise.resolve({ data: null, error: null });
       if (name === "photo-ticket-intake") {
         saves.push({ name: options.body.action, body: options.body });
         if (options.body.action === "prepare") {

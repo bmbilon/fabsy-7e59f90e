@@ -63,15 +63,16 @@ function savedConsentValue(): string | null {
 }
 
 export function getGoogleConsentChoice(): GoogleConsentChoice {
-  return parseGoogleConsent(savedConsentValue());
+  const value=savedConsentValue();
+  try {if(value&&JSON.parse(value).choice==='declined')return 'declined';}catch{/* Invalid records use the default. */}
+  try {if(window.localStorage.getItem('fabsy_ads_consent_v1')==='denied')return 'declined';}catch{/* Optional storage. */}
+  return typeof window==='undefined'?'unknown':'accepted';
 }
 
 /** Schedule retirement even when a tagged page remains open and foregrounded. */
-export function googleConsentRemainingMilliseconds(now = Date.now()): number | null {
-  const value = savedConsentValue();
-  if (parseGoogleConsent(value, now) === 'unknown') return null;
-  const record = JSON.parse(value!) as SavedConsent;
-  return Math.max(0, record.savedAt + GOOGLE_CONSENT_MAX_AGE_MS - now);
+export function googleConsentRemainingMilliseconds(_now = Date.now()): number | null {
+  // Defaults stay granted. An explicit opt-out is retained until changed.
+  return null;
 }
 
 export function clearTemporaryGoogleConsent(): void {
@@ -92,6 +93,7 @@ export function setGoogleConsentChoice(choice: 'accepted' | 'declined'): void {
       try { window.localStorage.removeItem(GOOGLE_CONSENT_STORAGE_KEY); } catch { /* Persisted acceptance also requires a writable store on read. */ }
     }
   }
+  if(choice==='declined'){try{window.localStorage.setItem('fabsy_ads_consent_v1','denied');window.sessionStorage.removeItem('fabsy_ads_contact');window.sessionStorage.removeItem('fabsy_marketing_v2');for(let i=window.sessionStorage.length-1;i>=0;i--){const key=window.sessionStorage.key(i);if(key?.startsWith('fabsy_ads_contact:'))window.sessionStorage.removeItem(key);}}catch{/* The in-memory choice remains. */}}else{try{window.localStorage.removeItem('fabsy_ads_consent_v1');}catch{/* Optional storage. */}}
   window.dispatchEvent(new Event(GOOGLE_CONSENT_CHANGED));
 }
 

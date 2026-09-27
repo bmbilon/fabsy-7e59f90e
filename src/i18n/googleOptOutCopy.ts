@@ -1,0 +1,11 @@
+// UI translation only; the English privacy policy remains the source notice.
+export const googleOptOutCopy = {
+ en:{notice:'Google measures visits, uploads and purchases using marketing identifiers and hashed email or phone. Ticket documents and case details stay private.',off:'Google measurement is off in this browser.',optOut:'Opt out of Google measurement',enable:'Enable Google measurement',privacy:'Privacy policy'},
+ pa:{notice:'Google ਮਾਰਕੀਟਿੰਗ ਪਛਾਣਕਰਤਾਵਾਂ ਅਤੇ ਹੈਸ਼ ਕੀਤੇ ਈਮੇਲ ਜਾਂ ਫ਼ੋਨ ਨਾਲ ਦੌਰਿਆਂ, ਅੱਪਲੋਡਾਂ ਅਤੇ ਖਰੀਦਾਂ ਨੂੰ ਮਾਪਦਾ ਹੈ। ਟਿਕਟ ਦਸਤਾਵੇਜ਼ ਅਤੇ ਕੇਸ ਦੇ ਵੇਰਵੇ ਨਿੱਜੀ ਰਹਿੰਦੇ ਹਨ।',off:'ਇਸ ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ Google ਮਾਪ ਬੰਦ ਹੈ।',optOut:'Google ਮਾਪ ਬੰਦ ਕਰੋ',enable:'Google ਮਾਪ ਚਾਲੂ ਕਰੋ',privacy:'ਪਰਦੇਦਾਰੀ ਨੀਤੀ'},
+ tl:{notice:'Sinusukat ng Google ang mga pagbisita, upload at pagbili gamit ang marketing identifier at na-hash na email o telepono. Pribado ang mga dokumento ng tiket at detalye ng kaso.',off:'Naka-off ang Google measurement sa browser na ito.',optOut:'I-off ang Google measurement',enable:'I-on ang Google measurement',privacy:'Patakaran sa privacy'},
+ 'zh-hans':{notice:'Google 使用营销标识符和经过哈希处理的电子邮箱或电话号码衡量访问、上传和购买。罚单文件和案件详情保持私密。',off:'此浏览器中的 Google 衡量功能已关闭。',optOut:'关闭 Google 衡量功能',enable:'开启 Google 衡量功能',privacy:'隐私政策'},
+ 'zh-hant':{notice:'Google 使用行銷識別碼和經雜湊處理的電子郵件或電話號碼衡量造訪、上傳和購買。罰單文件和案件詳情保持私密。',off:'此瀏覽器中的 Google 衡量功能已關閉。',optOut:'關閉 Google 衡量功能',enable:'開啟 Google 衡量功能',privacy:'隱私政策'},
+ ar:{notice:'يقيس Google الزيارات وعمليات الرفع والشراء باستخدام معرّفات التسويق والبريد الإلكتروني أو الهاتف بعد التجزئة. تبقى مستندات المخالفة وتفاصيل القضية خاصة.',off:'قياس Google متوقف في هذا المتصفح.',optOut:'إيقاف قياس Google',enable:'تشغيل قياس Google',privacy:'سياسة الخصوصية'},
+ hi:{notice:'Google मार्केटिंग पहचानकर्ताओं और हैश किए गए ईमेल या फ़ोन से विज़िट, अपलोड और खरीदारी मापता है। टिकट दस्तावेज़ और मामले के विवरण निजी रहते हैं।',off:'इस ब्राउज़र में Google मापन बंद है।',optOut:'Google मापन बंद करें',enable:'Google मापन चालू करें',privacy:'गोपनीयता नीति'},
+ es:{notice:'Google mide visitas, cargas y compras con identificadores de marketing y correo o teléfono cifrados mediante hash. Los documentos de multas y los detalles del caso son privados.',off:'La medición de Google está desactivada en este navegador.',optOut:'Desactivar medición de Google',enable:'Activar medición de Google',privacy:'Política de privacidad'},
+};

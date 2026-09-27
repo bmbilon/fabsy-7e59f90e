@@ -1,3 +1,4 @@
+import { getFabsyEmailSignature, getFabsyEmailSignatureText } from "./email-signature.ts";
 /** Incoming email is untrusted data. No links, instructions or attachments are executed. */
 export interface IncomingEmail {
   from?: { email?: string };
@@ -102,25 +103,41 @@ export interface NoticeSnapshot {
   submission_id: string;
 }
 
-/** Version 2: a verified request receipt, without asserting that evidence arrived. */
+/** Verified request receipt; dates and estimates come only from the saved source. */
 export function disclosureNotice(snapshot: NoticeSnapshot) {
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(snapshot.recipient)
-    || typeof snapshot.ticket_number !== "string"
+  if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(snapshot.recipient)
     || !/^[A-Z0-9]{5,30}$/.test(snapshot.ticket_number) || !/\d/.test(snapshot.ticket_number)
     || !/^[0-9a-f-]{36}$/i.test(snapshot.submission_id)) throw new Error("Invalid notice snapshot");
+  let date: string | null = null;
+  if (snapshot.confirmed_on) {
+    const parsed = new Date(`${snapshot.confirmed_on}T12:00:00Z`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(snapshot.confirmed_on) || !Number.isFinite(parsed.getTime())
+      || parsed.toISOString().slice(0, 10) !== snapshot.confirmed_on) throw new Error("Invalid confirmation date");
+    date = new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(parsed);
+  }
   const greeting = snapshot.first_name || "there";
   const caseUrl = `https://fabsy.ca/portal/cases/${snapshot.submission_id}`;
+  const timeframe = snapshot.timeframe_text?.trim();
+  const receipt = date
+    ? `The Crown confirmed receipt of the disclosure request for ticket ${snapshot.ticket_number} on ${date}.`
+    : `We’ve requested disclosure of evidence from the Crown for ticket ${snapshot.ticket_number}.`;
+  const estimate = timeframe
+    ? `The Crown's stated timeframe is:\n${timeframe}\n\nThis is the Crown's estimate, not a guaranteed delivery date.`
+    : "A processing timeframe has not been confirmed. We will share the Crown's estimate when it is available.";
+  const next = "The disclosure itself has not yet been received. We will review the evidence when it becomes available and keep you updated as your file progresses.";
+  const deadline = "A disclosure request does not change the deadlines on your ticket.";
   return {
-    from: "Fabsy <hello@fabsy.ca>", to: [snapshot.recipient], reply_to: "hello@fabsy.ca",
-    subject: `Ticket ${snapshot.ticket_number} — Disclosure requested`,
-    text: `Hello ${greeting},\n\nWe’ve requested disclosure of evidence from the Crown for ticket ${snapshot.ticket_number}.\n\nWe’ll review the evidence when it becomes available and keep you updated.\n\nView your case update: ${caseUrl}\n\nFabsy\nhello@fabsy.ca\n(825) 793-2279`,
+    from: "The Fabsy Team <hello@fabsy.ca>", to: [snapshot.recipient], reply_to: "hello@fabsy.ca",
+    subject: `Ticket ${snapshot.ticket_number} — ${date ? "Disclosure request confirmed" : "Disclosure requested"}`,
+    text: [`Hello ${greeting},`, receipt, estimate, next, deadline, `View your case update: ${caseUrl}`, getFabsyEmailSignatureText({ includeServiceOffer: false })].join("\n\n"),
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;color:#1e293b;line-height:1.6">
-<h1 style="font-size:24px">Disclosure requested</h1>
+<h1 style="font-size:24px">${date ? "Your disclosure request is confirmed" : "Disclosure requested"}</h1>
 <p>Hello ${escapeHtml(greeting)},</p>
-<p>We’ve requested disclosure of evidence from the Crown for ticket <strong>${escapeHtml(snapshot.ticket_number)}</strong>.</p>
-<p>We’ll review the evidence when it becomes available and keep you updated.</p>
+<p>${escapeHtml(receipt)}</p>
+${timeframe ? `<p>The Crown's stated timeframe is:</p><blockquote style="border-left:3px solid #3b82f6;padding-left:16px">${escapeHtml(timeframe)}</blockquote><p>This is the Crown's estimate, not a guaranteed delivery date.</p>` : `<p>${escapeHtml(estimate)}</p>`}
+<p>${escapeHtml(next)}</p><p>${deadline}</p>
 <p><a href="${caseUrl}">View your case update</a></p>
-<p>Fabsy<br><a href="mailto:hello@fabsy.ca">hello@fabsy.ca</a><br>(825) 793-2279</p></div>`,
+${getFabsyEmailSignature({ includeServiceOffer: false })}</div>`,
   };
 }
 

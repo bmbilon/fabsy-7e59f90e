@@ -1,0 +1,83 @@
+{
+  "observedDate": "2026-09-27",
+  "source": "Signed-in Chrome Google Ads and Meta UI",
+  "google": {
+    "customerId": "9385017797",
+    "accountName": "Fabsy",
+    "identity": "brett@execom.ca",
+    "currencyDisplay": "CAD",
+    "timezoneDisplay": "Mountain Time",
+    "adsTagId": "AW-18419256057",
+    "purchaseActions": [
+      {
+        "name": "Officer Paid",
+        "id": "7740835320",
+        "label": "MyAbCPiLj-scEPmV_s5E",
+        "primary": false,
+        "status": "Misconfigured",
+        "enhancedConversions": "Not configured"
+      },
+      {
+        "name": "Camera Paid",
+        "id": "7740881425",
+        "label": "TEo-CJH0kescEPmV_s5E",
+        "primary": false,
+        "status": "Misconfigured",
+        "enhancedConversions": "Not configured"
+      }
+    ],
+    "existingUploadAction": {
+      "name": "Fabsy completed ticket upload",
+      "id": "7759411421",
+      "primary": false,
+      "status": "Misconfigured",
+      "qualifiedMeaningVerified": false
+    },
+    "existingCampaignNames": [
+      "RR-Search-Alberta-140-20260918",
+      "RR-Search-Alberta-202609"
+    ],
+    "oauthConfigured": true,
+    "cloudBlocker": null,
+    "productionApiAccessVerified": true,
+    "cloudProjectId": "fabsy-content-ge-1759519281609",
+    "cloudProjectNumber": "581064929475",
+    "cloudLoginVerified": true,
+    "oauthClientsPresent": true,
+    "adsApiEnabled": true,
+    "productionApiAccessLevel": "Explorer",
+    "oauthClientId": "581064929475-bldk0e0laqgojd8h65gpucaptrh2gcn0.apps.googleusercontent.com",
+    "oauthClientType": "Desktop",
+    "oauthAudience": "Internal",
+    "clientSecretsStoredLocallyAndServer": true,
+    "refreshTokenStored": true,
+    "passkeyCreatedForBusinessIdentity": true,
+    "serverCredentialDigestsMatch": true,
+    "apiAccountReadVerified": true,
+    "currencyVerified": "CAD",
+    "timezoneVerified": "America/Edmonton",
+    "liveAccountHash": "2ba862f3949ec49a2741d909be329d7fe8f859f9146fe584872dd114b1f2e6e6",
+    "launchHold": "REAL_UPLOAD_PAYMENT_DIAGNOSTICS_REQUIRED",
+    "platformCredentialSetupApproved": true,
+    "qualifiedUploadAction": {
+      "name": "Qualified Ticket Upload",
+      "id": "7801915860",
+      "primary": true,
+      "status": "Awaiting conversions"
+    },
+    "customerDataTermsAccepted": false,
+    "enhancedConversionsConfigured": false
+  },
+  "meta": {
+    "accountName": "Fabsy Canada",
+    "accountId": "1102946998970411",
+    "businessId": "1716937736206286",
+    "existingActiveAds": true,
+    "existingUnpublishedDrafts": true,
+    "apiConnectionVerified": false
+  },
+  "platformWritesPerformed": true,
+  "newEngineSpendingAuthorized": false,
+  "conversionSetupBatch": "fae376aa-fa31-40c1-8bea-7ad8c7e51345",
+  "pendingLaunchBatch": "246b7561-98ef-4f38-807a-1287f89f8148"
+}

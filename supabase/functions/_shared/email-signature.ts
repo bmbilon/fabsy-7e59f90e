@@ -4,8 +4,27 @@
  * for reliable rendering across email clients.
  */
 
-export const getFabsyEmailSignature = () => {
+interface SignatureOptions {
+  /** Disable only when the template already includes the standard sign-off. */
+  signOff?: boolean;
+  /** Case correspondence omits the service-price promotion. */
+  includeServiceOffer?: boolean;
+}
+
+export const FABSY_CONFIDENTIALITY_NOTICE = "This email and any attachments are confidential and intended solely for the recipient. If you are not the intended recipient, please delete this email and notify the sender immediately.";
+export const FABSY_SERVICE_DISCLAIMER = "Fabsy is an agent service for Alberta traffic matters, not a law firm. This communication is general information and does not constitute legal advice or create a solicitor-client relationship.";
+
+export const getFabsyEmailSignatureText = ({ signOff = true, includeServiceOffer = true }: SignatureOptions = {}) => [
+  ...(signOff ? ["Thank you,\nThe Fabsy Team"] : []),
+  "Fabsy\nAlberta traffic ticket agent services.\nPhone: (825) 793-2279\nEmail: hello@fabsy.ca\nWeb: https://fabsy.ca\nArea: Alberta, Canada",
+  ...(includeServiceOffer ? ["Rapid Resolution is $198 CAD plus GST for eligible Alberta pre-trial matters. Trial representation and government fines are separate."] : []),
+  `Confidentiality Notice: ${FABSY_CONFIDENTIALITY_NOTICE}`,
+  `Service Disclaimer: ${FABSY_SERVICE_DISCLAIMER}`,
+].join("\n\n");
+
+export const getFabsyEmailSignature = ({ signOff = true, includeServiceOffer = true }: SignatureOptions = {}) => {
   return `
+    ${signOff ? '<p style="margin:24px 0 0;font-family:Arial,sans-serif;line-height:1.6;color:#334155">Thank you,<br>The Fabsy Team</p>' : ''}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 600px; margin-top: 40px; border-collapse: collapse; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
       <tr>
         <td style="padding-top: 24px; border-top: 2px solid #E2E8F0;">
@@ -19,7 +38,7 @@ export const getFabsyEmailSignature = () => {
               <td valign="top" style="padding: 0; vertical-align: top;">
                 <a href="https://fabsy.ca" style="color: #3B82F6; font-size: 24px; font-weight: 700; line-height: 1.15; letter-spacing: -0.5px; text-decoration: none;">Fabsy</a>
                 <div style="margin-top: 4px; color: #475569; font-size: 13px; font-weight: 500; line-height: 1.5;">
-                  Traffic ticket agent services for Alberta drivers
+                  Alberta traffic ticket agent services.
                 </div>
 
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top: 12px; border-collapse: collapse; color: #334155; font-size: 13px; line-height: 1.5;">
@@ -44,21 +63,20 @@ export const getFabsyEmailSignature = () => {
             </tr>
           </table>
 
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; margin-top: 16px; border: 1px solid #BFDBFE; border-radius: 8px; border-collapse: separate; background-color: #EFF6FF;">
+          ${includeServiceOffer ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; margin-top: 16px; border: 1px solid #BFDBFE; border-radius: 8px; border-collapse: separate; background-color: #EFF6FF;">
             <tr>
               <td style="padding: 10px 12px; color: #0F172A; font-size: 12px; font-weight: 600; line-height: 1.5;">
-                <span style="color: #1D4ED8; font-weight: 700;">Rapid Resolution</span> is $198 CAD plus GST for eligible Alberta pre-trial matters. Trial and government fines are separate.
+                <span style="color: #1D4ED8; font-weight: 700;">Rapid Resolution</span> is $198 CAD plus GST for eligible Alberta pre-trial matters. Trial representation and government fines are separate.
               </td>
             </tr>
-          </table>
+          </table>` : ''}
 
           <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid #E2E8F0; color: #64748B; font-size: 11px; line-height: 1.6;">
             <p style="margin: 0 0 8px 0;">
-              <strong style="color: #64748B;">Confidentiality Notice:</strong> This email and any attachments are confidential and intended solely for the recipient.
-              If you are not the intended recipient, please delete this email and notify the sender immediately.
+              <strong style="color: #64748B;">Confidentiality Notice:</strong> ${FABSY_CONFIDENTIALITY_NOTICE}
             </p>
             <p style="margin: 0;">
-              <strong style="color: #64748B;">Service Disclaimer:</strong> Fabsy is an agent service for Alberta traffic matters, not a law firm. This communication is general information and does not constitute legal advice or create a solicitor-client relationship.
+              <strong style="color: #64748B;">Service Disclaimer:</strong> ${FABSY_SERVICE_DISCLAIMER}
             </p>
           </div>
         </td>

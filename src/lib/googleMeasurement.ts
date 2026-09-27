@@ -18,6 +18,9 @@ declare global {
 }
 
 export const GOOGLE_MEASUREMENT_READY = 'fabsy:google-measurement-ready';
+// Enable hashes only after the Ads account customer-data setup is saved.
+const enhancedConversionsEnabled = () => import.meta.env.VITE_GADS_ENHANCED_CONVERSIONS_ENABLED === 'true';
+
 export const GOOGLE_CONTEXT_READY = 'fabsy:google-context-ready';
 
 interface MeasurementEnvironment {
@@ -26,12 +29,13 @@ interface MeasurementEnvironment {
   VITE_GA4_MEASUREMENT_ID?: string;
   VITE_GADS_ID?: string;
   VITE_GADS_CONVERSION_LABEL?: string;
+  VITE_GADS_QUALIFIED_UPLOAD_LABEL?: string;
   VITE_GADS_PURCHASE_LABEL?: string;
   VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL?: string;
 }
 
 // The deployment gate and exact production origins are necessary, but never
-// sufficient: a visitor's explicit consent and a safe document are also needed.
+// sufficient: opt-outs and private document boundaries are also respected.
 export function googleMeasurementConfig(env: MeasurementEnvironment, origin: string): PaidPurchaseConfig {
   if (!env.PROD || env.VITE_GOOGLE_MEASUREMENT_ENABLED !== 'true' ||
       !['https://fabsy.ca', 'https://www.fabsy.ca'].includes(origin)) return {};
@@ -40,6 +44,7 @@ export function googleMeasurementConfig(env: MeasurementEnvironment, origin: str
     ga4Id: /^G-[A-Z0-9]+$/.test(ga4Id) && !/\s/.test(ga4Id) ? ga4Id : undefined,
     adsId: /^AW-\d+$/.test(env.VITE_GADS_ID || '') && !/\s/.test(env.VITE_GADS_ID || '') ? env.VITE_GADS_ID : undefined,
     leadLabel: env.VITE_GADS_CONVERSION_LABEL,
+    qualifiedLabel: env.VITE_GADS_QUALIFIED_UPLOAD_LABEL,
     rrLabel: env.VITE_GADS_PURCHASE_LABEL,
     photoLabel: env.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL,
   };
@@ -200,21 +205,37 @@ function queue(..._args: unknown[]): void {
 
 export function dispatchGoogleMeasurement(eventName: string, params: Record<string, unknown>): boolean {
   const context = currentGooglePageContext();
-  if (!tagLoaded || !context || !window.fabsyAnalyticsInitialized || restarting ||
-      getGoogleConsentChoice() !== 'accepted' || !googleTagMayLoadInDocument(window)) return false;
+  if (getGoogleConsentChoice() !== 'accepted' || !tagLoaded || !context || !window.fabsyAnalyticsInitialized || restarting || !googleTagMayLoadInDocument(window)) return false;
   const destination = params.send_to;
   const adsConfig = { destinationId: configured.adsId, officerPurchaseLabel: configured.rrLabel, photoRadarPurchaseLabel: configured.photoLabel };
   const allowed = eventName === 'conversion'
-    ? [typeof params.order_type === 'string' ? purchaseAdsDestination(params.order_type, adsConfig) : null]
-    : eventName === 'purchase' || eventName === 'page_view' ? [configured.ga4Id] : [];
+    ? [params.conversion_kind === 'qualified_ticket_upload' && /^AW-\d+$/.test(configured.adsId||'') && /^[A-Za-z0-9_-]+$/.test(configured.qualifiedLabel || '') && ![configured.rrLabel,configured.photoLabel].includes(configured.qualifiedLabel) ? `${configured.adsId}/${configured.qualifiedLabel}` : typeof params.order_type === 'string' ? purchaseAdsDestination(params.order_type, adsConfig) : null]
+    : ['purchase','page_view','ticket_uploaded','qualified_ticket_upload','checkout_started'].includes(eventName) ? [configured.ga4Id] : [];
   if (typeof destination !== 'string' || !allowed.includes(destination)) return false;
+  const allowedKeys = ['send_to','transaction_id','event_id','order_type','service','value','currency','tax','items'];
+  const safe:Record<string,unknown> = Object.fromEntries(allowedKeys.filter(k=>k in params).map(k=>[k,params[k]]));
+  for(const key of ['value','tax'])if(key in safe&&(!Number.isFinite(safe[key])||Number(safe[key])<0))delete safe[key];
+  if('currency' in safe&&safe.currency!=='CAD')delete safe.currency;
+  if('service' in safe&&!['officer','camera'].includes(String(safe.service)))delete safe.service;
+  if('order_type' in safe&&!['photo_radar','rapid_resolution','rapid_resolution_bundle'].includes(String(safe.order_type)))delete safe.order_type;
+  for(const key of ['event_id','transaction_id'])if(key in safe&&!/^(?:[a-f0-9]{64}|(?:upload|qualified):[a-f0-9]{64})$/.test(String(safe[key])))delete safe[key];
+  if('items' in safe){
+    const items=safe.items;
+    if(!Array.isArray(items))delete safe.items;
+    else safe.items=items.filter(i=>/^(?:photo_radar|rapid_resolution|rapid_resolution_bundle)(?:_service_\d+)?$/.test(i?.item_id||'')&&['Rapid Resolution: Photo Radar','Rapid Resolution','Rapid Resolution Bundle','Insurance Planning Report'].includes(i?.item_name)&&Number.isSafeInteger(i.quantity)&&i.quantity>0&&Number.isFinite(i.price)&&i.price>=0).map(i=>({item_id:i.item_id,item_name:i.item_name,quantity:i.quantity,price:i.price}));
+  }
+  let hashes: Record<string,string> = {};
+  try { const stored=JSON.parse(window.sessionStorage.getItem(typeof params.transaction_id==='string'&&/^[a-f0-9]{64}$/.test(params.transaction_id)?`fabsy_ads_contact:${params.transaction_id}`:'fabsy_ads_contact')||'{}');hashes=Object.fromEntries(['sha256_email_address','sha256_phone_number'].filter(k=>/^[a-f0-9]{64}$/.test(stored[k]||'')).map(k=>[k,stored[k]])); } catch { /* Optional enhanced conversions. */ }
+  if(eventName==='conversion'&&enhancedConversionsEnabled())queue('set','user_data',hashes);
   queue('event', eventName, {
-    ...params, ...context,
-    ...(eventName === 'page_view' ? googleCampaignParameters(window.location.href, document.referrer) : {}),
+    ...safe, ...context,
+    ...(destination===configured.ga4Id?googleCampaignParameters(window.location.href,document.referrer):{}),
     allow_google_signals: false, allow_ad_personalization_signals: false,
   });
+  if(eventName==='conversion'&&enhancedConversionsEnabled())queue('set','user_data',{});
   return true;
 }
+
 
 function ticketUploadAdsDestination(config: PaidPurchaseConfig): string | null {
   if (!/^AW-\d+$/.test(config.adsId || '') || /\s/.test(config.adsId || '') ||
@@ -305,11 +326,11 @@ export function initializeGoogleMeasurement(): void {
   // receipt dispatchers are the only application event producers for this cut.
   window.gtag = () => undefined;
   queue('consent', 'default', {
-    analytics_storage: 'denied', ad_storage: 'denied',
-    ad_user_data: 'denied', ad_personalization: 'denied',
+    analytics_storage: 'granted', ad_storage: config.adsId ? 'granted' : 'denied',
+    ad_user_data: config.adsId ? 'granted' : 'denied', ad_personalization: 'denied',
   });
-  // Basic mode: nothing above is sent until this explicit visitor choice.
-  // Ads measurement is permitted; personalization and enhanced data stay off.
+  // Measurement defaults granted; visitor opt-outs stop collection.
+  // Personalization stays disabled and enhanced data is limited to hashes.
   queue('consent', 'update', {
     analytics_storage: 'granted', ad_storage: config.adsId ? 'granted' : 'denied',
     ad_user_data: config.adsId ? 'granted' : 'denied', ad_personalization: 'denied',
@@ -319,7 +340,7 @@ export function initializeGoogleMeasurement(): void {
     ads_data_redaction: true, url_passthrough: false, ...context,
   });
   queue('js', new Date());
-  const options = { ...context, send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false };
+  const options = { ...context, send_page_view: false, allow_enhanced_conversions: enhancedConversionsEnabled(), allow_google_signals: false, allow_ad_personalization_signals: false };
   if (config.ga4Id) queue('config', config.ga4Id, { ...options, ...googleCampaignParameters(window.location.href, document.referrer) });
   if (config.adsId) queue('config', config.adsId, options);
   window.fabsyAnalyticsInitialized = true;

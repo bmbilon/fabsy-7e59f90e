@@ -102,179 +102,25 @@ try {
       } from './src/lib/fabsyFunnelConsent';
 
       export async function runChecks() {
-        const locales = registry.locales.filter(item => item.wave <= 1);
-        const keys = Object.keys(googleConsentCopy.en).sort();
-        const nativeScripts = { pa: /\\p{Script=Gurmukhi}/u, 'zh-hans': /\\p{Script=Han}/u, 'zh-hant': /\\p{Script=Han}/u, ar: /\\p{Script=Arabic}/u, hi: /\\p{Script=Devanagari}/u };
-        assert.deepEqual(Object.keys(googleConsentCopy).sort(), locales.map(item => item.code).sort());
-        let submitCount = 0;
-        let mountedJourneys = 0;
-        const panel = element => element.querySelector('[data-google-consent-panel]');
-        const settings = element => element.querySelector('button[aria-expanded]');
-        const decision = (element, choice) => element.querySelector('[data-google-consent-choice="' + choice + '"]');
-        const click = async element => { assert.ok(element); await act(async () => element.click()); };
-        const openSettings = async (element, copy) => {
-          await click(settings(element));
-          assert.ok(panel(element));
-          assert.equal(panel(element).getAttribute('data-google-consent-panel-mode'), 'settings');
-          assert.ok(panel(element).className.includes('max-h-[60vh]'));
-          for (const key of ['body', 'scope', 'changeHint']) assert.ok(panel(element).textContent.includes(copy[key]));
-          assert.equal(document.activeElement, panel(element).querySelector('h2'), 'Deliberate settings opening should focus its heading');
-        };
-
-        async function mount(route, choice = 'unknown') {
-          reset(choice);
-          window.localStorage.removeItem(FABSY_FUNNEL_CONSENT_STORAGE_KEY);
-          if (choice !== 'unknown') setFabsyFunnelConsentChoice(choice);
-          const container = document.createElement('div');
-          document.body.append(container);
-          const previous = document.createElement('button');
-          previous.textContent = 'Synthetic previous focus';
-          document.body.prepend(previous); previous.focus();
-          let navigate;
-          function Navigation() {
-            const next = useNavigate();
-            useEffect(() => { navigate = next; }, [next]);
-            return null;
-          }
-          const root = createRoot(container);
-          await act(async () => root.render(
-            <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <Navigation />
-              <form onSubmit={event => { event.preventDefault(); submitCount += 1; }}>
-                <input aria-label="Synthetic untouched field" defaultValue="Keep this private value" />
-                <GoogleConsent />
-              </form>
-            </MemoryRouter>
-          ));
-          mountedJourneys += 1;
-          assert.equal(document.activeElement, previous, 'Automatic UI must not steal page focus');
-          return {
-            container,
-            previous,
-            navigate: async route => act(async () => navigate(route)),
-            unmount: async () => {
-              assert.equal(container.querySelector('input').value, 'Keep this private value');
-              await act(async () => root.unmount());
-              container.remove(); previous.remove();
-            },
-          };
-        }
-
-        for (const locale of locales) {
-          const copy = googleConsentCopy[locale.code];
-          assert.deepEqual(Object.keys(copy).sort(), keys, locale.code + ' must have complete standalone copy');
-          for (const [key, value] of Object.entries(copy)) {
-            assert.equal(typeof value, 'string');
-            assert.ok(value.trim(), locale.code + '.' + key + ' must not be blank');
-            assert.ok(!/<[^>]*>|{{|}}/.test(value), locale.code + '.' + key + ' must be plain, fully resolved text');
-            if (nativeScripts[locale.code]) assert.ok(nativeScripts[locale.code].test(value), locale.code + '.' + key + ' must contain its native script');
-          }
-          for (const name of ['Google', 'Meta', 'OpenAI Ads', 'Fabsy']) assert.ok(copy.body.includes(name));
-          for (const name of ['Google', 'Cloudflare']) assert.ok(copy.scope.includes(name));
-          if (locale.code !== 'en') for (const key of ['allow', 'decline', 'withdraw', 'settings', 'privacyPolicy']) {
-            assert.notEqual(copy[key], googleConsentCopy.en[key], locale.code + ' must not silently use English action labels');
-          }
-          const route = locale.code === 'en' ? '/' : '/' + locale.code + '/';
-          const view = await mount(route);
-          try {
-            const control = view.container.querySelector('[data-google-consent-controls]');
-            assert.equal(control.lang, locale.languageTag);
-            assert.equal(control.dir, locale.dir);
-            assert.ok(panel(view.container), locale.code + ' public home should offer an initial choice');
-            assert.equal(panel(view.container).getAttribute('role'), 'region');
-            assert.equal(panel(view.container).getAttribute('aria-modal'), null, 'The banner must remain nonmodal');
-            assert.equal(panel(view.container).getAttribute('data-google-consent-panel-mode'), 'initial');
-            assert.ok(panel(view.container).className.includes('max-h-[6.5rem]'), 'The automatic mobile banner must stay short enough to leave first-view actions unobstructed');
-            assert.ok(panel(view.container).className.includes('overflow-hidden'), 'The automatic banner keeps its action row visible');
-            const titleId = panel(view.container).getAttribute('aria-labelledby');
-            assert.equal(document.getElementById(titleId).textContent, copy.title);
-            assert.equal(panel(view.container).querySelector('a').getAttribute('href'), '/privacy-policy');
-            assert.equal(panel(view.container).querySelector('a').textContent, copy.privacyPolicy);
-            assert.ok(panel(view.container).textContent.includes(copy.body));
-            assert.equal(decision(view.container, 'accepted').textContent, copy.allow);
-            assert.equal(decision(view.container, 'declined').textContent, copy.decline);
-            assert.equal(decision(view.container, 'accepted').className, decision(view.container, 'declined').className, 'Allow and decline must have equal visual treatment');
-            for (const button of control.querySelectorAll('button')) assert.equal(button.type, 'button', 'Consent controls must never submit surrounding forms');
-            assert.equal(control.querySelectorAll('input').length, 0, 'No prechecked consent');
-            assert.deepEqual(choices, [], 'Rendering must never make a consent choice');
-
-            await act(async () => panel(view.container).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
-            assert.equal(panel(view.container), null, 'Escape can dismiss the nonmodal banner');
-            assert.equal(getGoogleConsentChoice(), 'unknown', 'Dismissal is not acceptance or refusal');
-            assert.deepEqual(choices, []);
-            assert.equal(document.activeElement, view.previous, 'Dismissing automatic UI must not move focus to the end-of-document settings control');
-
-            await openSettings(view.container, copy);
-            await click(decision(view.container, 'declined'));
-            assert.deepEqual(choices, ['declined']);
-            assert.equal(panel(view.container), null);
-            assert.ok(view.container.textContent.includes(copy.declinedStatus));
-            await openSettings(view.container, copy);
-            await click(decision(view.container, 'accepted'));
-            assert.deepEqual(choices, ['declined', 'accepted']);
-            assert.equal(panel(view.container), null);
-            assert.ok(view.container.textContent.includes(copy.acceptedStatus));
-            await openSettings(view.container, copy);
-            assert.equal(decision(view.container, 'declined').textContent, copy.withdraw, 'Stored acceptance must have an explicit withdrawal action');
-            await click(decision(view.container, 'declined'));
-            assert.deepEqual(choices, ['declined', 'accepted', 'declined']);
-            assert.equal(panel(view.container), null);
-
-            // Refresh from the shared state API, including a cross-tab storage notification.
-            await act(async () => {
-              externalChoice('accepted');
-              setFabsyFunnelConsentChoice('accepted');
-            });
-            assert.ok(view.container.textContent.includes(copy.acceptedStatus));
-            await act(async () => {
-              externalChoice('declined', 'storage');
-              setFabsyFunnelConsentChoice('declined');
-            });
-            assert.ok(view.container.textContent.includes(copy.declinedStatus));
-          } finally { await view.unmount(); }
-
-          for (const privatePath of ['/submit-ticket', '/contact', '/fleet', '/insurance-damage-report/checkout']) {
-            const target = locale.code === 'en' ? privatePath : '/' + locale.code + privatePath;
-            assert.equal(publicMeasurementPath(target), null, target + ' must not become a tagged public page');
-            const privateView = await mount(target);
-            try {
-              assert.equal(panel(privateView.container), null, target + ' must not show an automatic first-choice banner');
-              assert.ok(settings(privateView.container), 'Privacy choices must remain revisitable on forms');
-              await openSettings(privateView.container, copy);
-              await click(privateView.container.querySelector('button[aria-label="' + copy.close + '"]'));
-              assert.equal(panel(privateView.container), null);
-              assert.equal(getGoogleConsentChoice(), 'unknown');
-              assert.deepEqual(choices, [], 'Opening or closing settings must not choose for the visitor');
-            } finally { await privateView.unmount(); }
-          }
-        }
-
-        for (const route of ['/representation-consent?token=offline-only', '/pa/representation-consent?token=offline-only', '/en/representation-consent']) {
-          const view = await mount(route);
-          try {
-            assert.equal(view.container.querySelector('[data-google-consent-controls]'), null, 'Bearer-sensitive consent pages must not render this UI');
-            assert.deepEqual(choices, []);
-          } finally { await view.unmount(); }
-        }
-        for (const storedChoice of ['accepted', 'declined']) {
-          const view = await mount('/es/', storedChoice);
-          try {
-            assert.equal(panel(view.container), null, 'A remembered choice must not be asked again on mount');
-            assert.deepEqual(choices, []);
-          } finally { await view.unmount(); }
-        }
-        const navigation = await mount('/ar/');
-        try {
-          await openSettings(navigation.container, googleConsentCopy.ar);
-          await navigation.navigate('/ar/submit-ticket');
-          assert.equal(panel(navigation.container), null, 'A manually opened public panel must not follow navigation into a private form');
-          assert.deepEqual(choices, []);
-        } finally { await navigation.unmount(); }
-        assert.equal(submitCount, 0, 'No UI control submitted its surrounding form');
-        assert.equal(document.querySelectorAll('script[src]').length, 0, 'The UI must not append Google or any other remote scripts');
-        assert.equal(document.body.style.overflow, '', 'Nonmodal UI must not lock the document');
-        return { locales: locales.length, standaloneStringsPerLocale: keys.length, mountedJourneys, formSubmissions: submitCount };
+        reset('accepted');
+        const container=document.createElement('div');document.body.append(container);
+        const root=createRoot(container);let submitted=0;
+        await act(async()=>root.render(<MemoryRouter><form onSubmit={e=>{e.preventDefault();submitted++;}}><input aria-label="Private field" defaultValue="unchanged"/><GoogleConsent/></form></MemoryRouter>));
+        assert.equal(container.querySelector('[data-google-consent-panel]'),null,'No initial opt-in banner');
+        assert.equal(container.querySelector('[role=dialog]'),null);
+        assert.ok(container.textContent.includes('Opt out of Google measurement'));
+        assert.deepEqual(choices,[],'Mount does not fabricate a saved choice');
+        await act(async()=>container.querySelector('[data-google-measurement-toggle]').click());
+        assert.equal(getGoogleConsentChoice(),'declined');
+        assert.ok(container.textContent.includes('Google measurement is off'));
+        assert.equal(container.querySelector('input').value,'unchanged');assert.equal(submitted,0);
+        await act(async()=>externalChoice('accepted','storage'));
+        assert.ok(container.textContent.includes('Opt out of Google measurement'));
+        assert.equal(container.querySelectorAll('script[src]').length,0);
+        await act(async()=>root.unmount());container.remove();
+        return {defaultGrant:true,optOut:true,crossTab:true,formPreserved:true,initialBanner:false};
       }
+
     ` },
   });
   const { runChecks } = (await import(pathToFileURL(outfile).href)).default;

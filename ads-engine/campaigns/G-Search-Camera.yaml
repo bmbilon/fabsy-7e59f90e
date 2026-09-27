@@ -1,0 +1,119 @@
+{
+  "name": "G-Search-Camera",
+  "service": "camera",
+  "status": "PAUSED",
+  "destination": "https://fabsy.ca/photo-radar",
+  "geo": "Alberta",
+  "network": "SEARCH_ONLY",
+  "bidding": "MAXIMIZE_CONVERSIONS",
+  "targetCpa": null,
+  "aiMax": false,
+  "automaticallyCreatedAssets": false,
+  "primaryGoal": "qualified_ticket_upload",
+  "secondaryGoal": "client_paid",
+  "negativeKeywords": [
+    "pay ticket online",
+    "ticket lookup",
+    "jobs"
+  ],
+  "groups": [
+    {
+      "name": "Photo Radar",
+      "keywords": [
+        "photo radar ticket help alberta",
+        "fight photo radar ticket alberta",
+        "photo radar ticket agent alberta",
+        "photo radar ticket representation",
+        "photo radar ticket reduction alberta",
+        "photo radar ticket help calgary",
+        "photo radar ticket help edmonton",
+        "dispute photo radar ticket alberta",
+        "photo radar ticket review alberta",
+        "photo radar ticket service alberta",
+        "contest photo radar ticket alberta",
+        "photo radar fine help alberta"
+      ],
+      "matchType": "PHRASE",
+      "headlines": [
+        "$79 CAD + GST",
+        "Alberta Ticket Agent Services",
+        "Upload Your Ticket Photo",
+        "Eligible Pre-Trial Service",
+        "Government Fines Are Separate",
+        "You Approve Any Crown Deal",
+        "Disclosure Review Included",
+        "Secure Digital Ticket Intake",
+        "Fabsy Traffic Ticket Services",
+        "Photo Radar Ticket Help"
+      ],
+      "pinnedHeadlineIndex": 0,
+      "descriptions": [
+        "$79 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
+        "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
+        "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
+        "Government fines and trial representation are separate. No outcome is promised."
+      ]
+    },
+    {
+      "name": "Red Light Camera",
+      "keywords": [
+        "red light camera ticket help alberta",
+        "fight red light camera ticket alberta",
+        "red light camera ticket agent alberta",
+        "red light camera ticket representation",
+        "red light camera ticket reduction alberta",
+        "red light camera ticket help calgary",
+        "red light camera ticket help edmonton",
+        "dispute red light camera ticket alberta",
+        "red light camera ticket review alberta",
+        "red light camera ticket service alberta",
+        "contest red light camera ticket alberta",
+        "red light camera fine help alberta"
+      ],
+      "matchType": "PHRASE",
+      "headlines": [
+        "$79 CAD + GST",
+        "Alberta Ticket Agent Services",
+        "Upload Your Ticket Photo",
+        "Eligible Pre-Trial Service",
+        "Government Fines Are Separate",
+        "You Approve Any Crown Deal",
+        "Disclosure Review Included",
+        "Secure Digital Ticket Intake",
+        "Fabsy Traffic Ticket Services",
+        "Photo Radar Ticket Help"
+      ],
+      "pinnedHeadlineIndex": 0,
+      "descriptions": [
+        "$79 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
+        "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
+        "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
+        "Government fines and trial representation are separate. No outcome is promised."
+      ]
+    }
+  ],
+  "callouts": [
+    "Eligible Alberta Tickets",
+    "Digital Ticket Intake",
+    "Government Fines Separate",
+    "You Approve Any Deal"
+  ],
+  "sitelinks": [
+    {
+      "text": "Upload Your Ticket Photo",
+      "url": "https://fabsy.ca/photo-radar#ticket-form-container"
+    },
+    {
+      "text": "Service Scope",
+      "url": "https://fabsy.ca/photo-radar#scope"
+    }
+  ],
+  "priceAssets": [
+    {
+      "header": "Photo Radar",
+      "description": "Pre-trial service + GST",
+      "amountCad": 79,
+      "url": "https://fabsy.ca/photo-radar"
+    }
+  ]
+}

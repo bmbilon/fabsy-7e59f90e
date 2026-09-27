@@ -1,3 +1,4 @@
+import {measureSavedTicket} from '@/lib/adsFunnel';
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import type { FormData } from "./TicketForm";
@@ -38,6 +39,7 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
         const result = await photoIntakeAction<PhotoIntakeStatus>(saved, "status");
         if (cancelled) return;
         setStatus(result); onFields.current(result.fields);
+        void measureSavedTicket(saved,result.fields.email,result.fields.phone);
         if (["pending_scan", "scanning"].includes(result.reviewStatus) && --remaining > 0) timer = setTimeout(read, 2000);
       } catch { /* The receipt and contact details remain saved if scanning is unavailable. */ }
     };

@@ -131,7 +131,7 @@ const TermsOfService = () => {
 
           <section id="photo-radar-terms" className="scroll-mt-24">
             <h2 className="text-2xl font-semibold mb-4">5C. Rapid Resolution: Photo Radar Terms</h2>
-            <p className="mb-4">Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is promised.</p>
+            <p className="mb-4">Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is promised. Camera service fees are nonrefundable.</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>The service applies to Alberta automated enforcement notices mailed to the registered owner under Traffic Safety Act section 160(1), including photo radar speeding and red-light camera notices.</li>
               <li>Fabsy enters the not-guilty plea, requests disclosure and pursues a Crown reduction or withdrawal after accepting the file and receiving your authorization.</li>

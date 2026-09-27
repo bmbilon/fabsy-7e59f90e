@@ -119,7 +119,7 @@ const PhotoRadar = () => {
                     <Link to={PHOTO_RADAR.intakePath} data-funnel-action="primary_cta" data-funnel-position="section">Upload your notice</Link>
                   </Button>
                   <p className="mt-4 text-xs leading-relaxed text-slate-600">
-                    Government fines are separate. The service fee is paid upfront. No legal outcome is promised.
+                    Government fines are separate. Camera service fees are nonrefundable. No legal outcome is promised.
                   </p>
                 </div>
               </Card>

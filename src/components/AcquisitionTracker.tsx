@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import {captureMarketingAttribution as captureAdsAttribution} from '@/lib/adsMarketingAttribution';
+import {GOOGLE_CONSENT_CHANGED} from '@/lib/googleConsent';
 import { useLocation } from 'react-router-dom';
 import {
   captureMarketingAttribution,
@@ -16,6 +18,7 @@ export default function AcquisitionTracker() {
 
   useEffect(() => {
     captureMarketingAttribution(location.search, location.pathname, document.referrer);
+    captureAdsAttribution(location.search, location.pathname, document.referrer);
   }, [location]);
 
   useEffect(() => {
@@ -27,5 +30,10 @@ export default function AcquisitionTracker() {
     return () => window.removeEventListener(FABSY_FUNNEL_CONSENT_CHANGED, onChoice);
   }, []);
 
+  useEffect(() => {
+    const onChoice=()=>captureAdsAttribution(window.location.search,window.location.pathname,document.referrer);
+    window.addEventListener(GOOGLE_CONSENT_CHANGED,onChoice);
+    return()=>window.removeEventListener(GOOGLE_CONSENT_CHANGED,onChoice);
+  },[]);
   return null;
 }

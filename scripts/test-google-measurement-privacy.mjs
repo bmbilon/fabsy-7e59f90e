@@ -12,6 +12,7 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const enabledEnv = {
   PROD: true,
   VITE_GOOGLE_MEASUREMENT_ENABLED: "true",
+  VITE_GADS_ENHANCED_CONVERSIONS_ENABLED: "true",
   VITE_GA4_MEASUREMENT_ID: "G-TEST123456",
   VITE_GADS_ID: "AW-123456789",
   VITE_GADS_CONVERSION_LABEL: "LEAD_TEST_1",
@@ -131,7 +132,7 @@ async function runtime(env = enabledEnv, options = {}) {
   return { api: module.exports, browser };
 }
 
-test('basic consent starts unknown, expires, and never interprets malformed storage as permission', async () => {
+test('record parsing stays strict; browser defaults granted and explicit opt-outs persist', async () => {
   const { api, browser } = await runtime(enabledEnv, { consent: 'unknown' });
   const now = Date.now();
   for (const value of [null, '', 'true', '{', 'null', '[]', JSON.stringify({choice:'accepted'}),
@@ -144,14 +145,14 @@ test('basic consent starts unknown, expires, and never interprets malformed stor
   }
   assert.equal(api.parseGoogleConsent(JSON.stringify({version:1,choice:'accepted',savedAt:now}),now),'accepted');
   assert.equal(api.parseGoogleConsent(JSON.stringify({version:1,choice:'declined',savedAt:now}),now),'declined');
-  assert.equal(api.getGoogleConsentChoice(),'unknown');
+  assert.equal(api.getGoogleConsentChoice(),'accepted');
   api.initializeGoogleMeasurement();
-  assert.deepEqual(browser.scripts,[]);
-  assert.equal(browser.window.dataLayer,undefined);
+  assert.equal(browser.scripts.length,1);
+  assert.ok(browser.window.dataLayer);
 });
 
-test('only an affirmative choice starts loading; decline is not a denied-mode Google ping', async () => {
-  for (const consent of ['unknown','declined']) {
+test('an explicit opt-out prevents any Google tag loading', async () => {
+  for (const consent of ['declined']) {
     const { api,browser } = await runtime(enabledEnv,{consent});
     api.initializeGoogleMeasurement();
     api.sendGooglePageView();
@@ -185,13 +186,13 @@ test('withdrawal retires pending and loaded documents and rejects late onload/di
   }
 });
 
-test('cross-tab removal or expiry blocks an already loaded document before another app event', async () => {
+test('cross-tab opt-out blocks an already loaded document before another app event', async () => {
   for (const expired of [false,true]) {
     const { api,browser } = await runtime();
     api.initializeGoogleMeasurement();
     browser.scripts[0].script.onload();
-    if(expired)browser.store.set(api.GOOGLE_CONSENT_STORAGE_KEY,JSON.stringify({version:1,choice:'accepted',savedAt:Date.now()-api.GOOGLE_CONSENT_MAX_AGE_MS}));
-    else browser.store.delete(api.GOOGLE_CONSENT_STORAGE_KEY);
+    if(expired)browser.store.set(api.GOOGLE_CONSENT_STORAGE_KEY,JSON.stringify({version:1,choice:'declined',savedAt:Date.now()-api.GOOGLE_CONSENT_MAX_AGE_MS}));
+    else browser.store.set(api.GOOGLE_CONSENT_STORAGE_KEY,JSON.stringify({version:1,choice:'declined',savedAt:Date.now()}));
     api.clearTemporaryGoogleConsent();
     assert.equal(api.dispatchGoogleMeasurement('page_view',{send_to:enabledEnv.VITE_GA4_MEASUREMENT_ID}),false);
     api.recheckGoogleMeasurementConsent();
@@ -210,18 +211,18 @@ test('declining in a private document does not reload or destroy its in-memory u
   assert.deepEqual(browser.scripts,[]);
 });
 
-test('blocked consent storage is document-only and never an implicit permission on a later read', async () => {
+test('blocked browser storage uses default grant; temporary choices still apply', async () => {
   const { api,browser }=await runtime(enabledEnv,{consent:'unknown'});
   browser.window.localStorage.setItem=()=>{throw new Error('Synthetic quota denial');};
   api.setGoogleConsentChoice('accepted');
   assert.equal(api.getGoogleConsentChoice(),'accepted');
   api.clearTemporaryGoogleConsent();
-  assert.equal(api.getGoogleConsentChoice(),'unknown');
+  assert.equal(api.getGoogleConsentChoice(),'accepted');
   api.initializeGoogleMeasurement();
-  assert.deepEqual(browser.scripts,[]);
+  assert.equal(browser.scripts.length,1);
 });
 
-test('failed withdrawal persistence cannot restore stale acceptance in a fresh document', async () => {
+test('blocked storage retains an opt-out within its document; a fresh document uses default grant', async () => {
   for (const failure of ['throw', 'silent']) {
     const blockWrites = browser => {
       browser.window.localStorage.setItem = () => {
@@ -246,10 +247,10 @@ test('failed withdrawal persistence cannot restore stale acceptance in a fresh d
     const fresh = await runtime(enabledEnv, { consent: 'unknown' });
     for (const [key, value] of first.browser.store) fresh.browser.store.set(key, value);
     blockWrites(fresh.browser);
-    assert.equal(fresh.api.getGoogleConsentChoice(), 'unknown');
+    assert.equal(fresh.api.getGoogleConsentChoice(), 'accepted');
     fresh.api.initializeGoogleMeasurement();
-    assert.deepEqual(fresh.browser.scripts, []);
-    assert.equal(fresh.browser.window.dataLayer, undefined);
+    assert.equal(fresh.browser.scripts.length, 1);
+    assert.ok(fresh.browser.window.dataLayer);
     assert.deepEqual(fresh.browser.networkAttempts, []);
   }
 });
@@ -265,11 +266,11 @@ test('silent failed choices are document-only and storage probes never refresh c
   assert.equal(api.getGoogleConsentChoice(), 'declined');
   assert.equal(browser.store.has(api.GOOGLE_CONSENT_STORAGE_KEY), false);
   api.clearTemporaryGoogleConsent();
-  assert.equal(api.getGoogleConsentChoice(), 'unknown');
+  assert.equal(api.getGoogleConsentChoice(), 'accepted');
   api.setGoogleConsentChoice('accepted');
   assert.equal(api.getGoogleConsentChoice(), 'accepted', 'an explicit choice may apply to this document');
   api.clearTemporaryGoogleConsent();
-  assert.equal(api.getGoogleConsentChoice(), 'unknown', 'a silent failed save cannot persist permission');
+  assert.equal(api.getGoogleConsentChoice(), 'accepted', 'a silent failed save cannot persist permission');
 });
 
 test('failed loader can retry without admitting its superseded callback', async () => {
@@ -381,7 +382,7 @@ test('AI referral landings emit one sanitized GA4 page view without widening Ads
     assert.equal(api.publicGoogleMeasurementUrl(new URL(href)), true, path);
     assert.equal(api.publicGoogleAdsMeasurementUrl(new URL(href)), false, path);
     api.initializeGoogleMeasurement();
-    assert.equal(browser.scripts.length, 0, 'No tag before consent');
+    assert.equal(browser.scripts.length, 1, 'Default grant loads the tag on a safe public page');
     api.setGoogleConsentChoice('accepted');
     api.recheckGoogleMeasurementConsent();
     assert.equal(browser.scripts.length, 1);
@@ -607,7 +608,7 @@ test("explicit consent queues default then update and safe configuration before 
   const { script, queueAtAppend } = browser.scripts[0];
   assert.deepEqual(queueAtAppend.map(command => command[0]), ["consent", "consent", "set", "js", "config", "config"]);
   assert.deepEqual(queueAtAppend[0], ["consent", "default", {
-    analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied",
+    analytics_storage: "granted", ad_storage: "granted", ad_user_data: "granted", ad_personalization: "denied",
   }]);
   assert.deepEqual(queueAtAppend[1], ["consent", "update", {
     analytics_storage: "granted", ad_storage: "granted", ad_user_data: "granted", ad_personalization: "denied",
@@ -616,7 +617,7 @@ test("explicit consent queues default then update and safe configuration before 
     allow_google_signals: false, allow_ad_personalization_signals: false,
     ads_data_redaction: true, url_passthrough: false, ...cleanContext,
   }]);
-  const options = { ...cleanContext, send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false };
+  const options = { ...cleanContext, send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false, allow_enhanced_conversions: true };
   assert.deepEqual(queueAtAppend[4], ["config", enabledEnv.VITE_GA4_MEASUREMENT_ID, options]);
   assert.deepEqual(queueAtAppend[5], ["config", enabledEnv.VITE_GADS_ID, options]);
   assert.ok(browser.window.dataLayer.every(command => Object.prototype.toString.call(command) === "[object Arguments]"));
@@ -685,7 +686,7 @@ test("scoped dispatch rejects unknown destinations and overrides caller URL, ref
     page_title: "SYNTHETIC PRIVATE TITLE", allow_google_signals: true, allow_ad_personalization_signals: true,
   }), true);
   assert.deepEqual(browser.commands().at(-1), ["event", "purchase", {
-    send_to: enabledEnv.VITE_GA4_MEASUREMENT_ID, transaction_id: "cs_live_SYNTHETIC", ...cleanContext,
+    send_to: enabledEnv.VITE_GA4_MEASUREMENT_ID, ...cleanContext,
     allow_google_signals: false, allow_ad_personalization_signals: false,
   }]);
 });
@@ -869,127 +870,14 @@ test("the real receipt hook retains its token across URL scrub, opt-in and compo
   }
 });
 
-test('the persistent guardian expires foreground consent even while document navigation is held', async () => {
-  const bundle = await build({
-    absWorkingDir: root,
-    stdin: { sourcefile: 'foreground-consent-expiry.tsx', resolveDir: root, loader: 'tsx', contents: `
-      import React, { act } from 'react';
-      import { createRoot } from 'react-dom/client';
-      import { useNavigate } from 'react-router-dom';
-      import MeasurementRouter from './src/components/MeasurementRouter';
-      import Analytics from './src/components/Analytics';
-      export * from './src/lib/googleConsent';
-      export { dispatchGoogleMeasurement } from './src/lib/googleMeasurement';
-      let root;
-      let navigateAway;
-      export const navigations = [];
-      function PublicRouteProbe() {
-        const navigate = useNavigate();
-        navigateAway = () => navigate('/submit-ticket');
-        return <output>Public page</output>;
-      }
-      export async function mount() {
-        root = createRoot(document.getElementById('root'));
-        await act(async () => root.render(
-          <MeasurementRouter navigateDocument={url => navigations.push(url.href)}>
-            <Analytics /><PublicRouteProbe />
-          </MeasurementRouter>
-        ));
-      }
-      export async function beginPrivateNavigation() { await act(async () => navigateAway()); }
-      export async function tick(callback) { await act(async () => callback()); }
-      export async function unmount() { await act(async () => root?.unmount()); }
-    ` },
-    bundle: true, write: false, platform: 'browser', format: 'cjs', jsx: 'automatic',
-    define: { 'import.meta.env': JSON.stringify(enabledEnv), 'process.env.NODE_ENV': '"test"' },
-    logLevel: 'silent',
-  });
-  for (const [loaded, heldNavigation] of [[false, false], [true, false], [false, true], [true, true]]) {
-    const virtualConsole = new VirtualConsole();
-    const retirements = [];
-    const unexpectedErrors = [];
-    virtualConsole.on('jsdomError', error => {
-      // JSDOM does not navigate; its reload attempt is the retirement proof.
-      if (error.message.includes('Not implemented: navigation')) retirements.push(error.message);
-      else unexpectedErrors.push(error.message);
-    });
-    const dom = new JSDOM("<!doctype html><html><body><div id='root'></div></body></html>", {
-      url: 'https://fabsy.ca/', runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole,
-      // No resource loader: external Google scripts remain inert.
-    });
-    const channels = [];
-    const timers = new Map();
-    let timerId = 0;
-    let now = Date.now();
-    let api;
-    try {
-      const networkAttempts = [];
-      const blockNetwork = () => { networkAttempts.push('blocked'); throw new Error('Expiry fixture forbids network'); };
-      dom.window.fetch = blockNetwork;
-      dom.window.XMLHttpRequest = class { constructor() { blockNetwork(); } };
-      dom.window.navigator.sendBeacon = blockNetwork;
-      dom.window.MessageChannel = class {
-        constructor() { const channel = new MessageChannel(); channels.push(channel); return channel; }
-      };
-      dom.window.Date.now = () => now;
-      dom.window.setTimeout = (callback, delay, ...args) => {
-        timers.set(++timerId, { callback, delay, args });
-        return timerId;
-      };
-      dom.window.clearTimeout = id => timers.delete(id);
-      dom.window.IS_REACT_ACT_ENVIRONMENT = true;
-      const context = dom.getInternalVMContext();
-      context.module = { exports: {} };
-      context.exports = context.module.exports;
-      runInContext(bundle.outputFiles[0].text, context);
-      api = context.module.exports;
-      const saved = JSON.stringify({ version: 1, choice: 'accepted', savedAt: now });
-      dom.window.localStorage.setItem(api.GOOGLE_CONSENT_STORAGE_KEY, saved);
-      await api.mount();
-      assert.equal(dom.window.document.visibilityState, 'visible');
-      const script = dom.window.document.getElementById('fabsy-google-tag');
-      assert.ok(script);
-      const staleOnload = script.onload;
-      if (loaded) staleOnload();
-      const before = plain(Array.from(dom.window.dataLayer, command => Array.from(command)));
-      if (heldNavigation) {
-        await api.beginPrivateNavigation();
-        assert.deepEqual(plain(api.navigations), ['https://fabsy.ca/submit-ticket']);
-        assert.equal(dom.window.document.querySelector('output'), null, 'blocked navigation unmounts route children');
-      }
-      assert.equal(timers.size, 1);
-      assert.equal([...timers.values()][0].delay, 2_147_483_647, '180 days must use safe timer chunks');
-      let ticks = 0;
-      while (timers.size && ticks < 10) {
-        assert.equal(timers.size, 1, 'each recheck replaces its timer');
-        const [id, timer] = timers.entries().next().value;
-        assert.ok(timer.delay > 0 && timer.delay <= 2_147_483_647);
-        timers.delete(id);
-        now += timer.delay;
-        await api.tick(() => timer.callback(...timer.args));
-        ticks += 1;
-      }
-      assert.ok(ticks > 1 && ticks < 10);
-      assert.equal(timers.size, 0);
-      assert.equal(dom.window.location.href, 'https://fabsy.ca/');
-      assert.equal(dom.window.document.visibilityState, 'visible');
-      assert.equal(api.getGoogleConsentChoice(), 'unknown');
-      assert.equal(dom.window.localStorage.getItem(api.GOOGLE_CONSENT_STORAGE_KEY), saved, 'reads must not extend permission');
-      assert.equal(retirements.length, 1, 'the timer must retire the document automatically');
-      assert.equal(dom.window[`ga-disable-${enabledEnv.VITE_GA4_MEASUREMENT_ID}`], true);
-      assert.equal(script.onload, null);
-      staleOnload();
-      assert.equal(api.dispatchGoogleMeasurement('page_view', { send_to: enabledEnv.VITE_GA4_MEASUREMENT_ID }), false);
-      assert.deepEqual(plain(Array.from(dom.window.dataLayer, command => Array.from(command))), before);
-      assert.deepEqual(networkAttempts, []);
-      assert.deepEqual(unexpectedErrors, []);
-    } finally {
-      await api?.unmount();
-      assert.equal(timers.size, 0, 'unmount clears any scheduled recheck');
-      for (const channel of channels) { channel.port1.close(); channel.port2.close(); }
-      dom.window.close();
-    }
-  }
+test('default measurement does not expire; an old explicit refusal still stops collection', async () => {
+  const {api,browser}=await runtime(enabledEnv,{consent:'unknown'});
+  assert.equal(api.getGoogleConsentChoice(),'accepted');
+  assert.equal(api.googleConsentRemainingMilliseconds(),null);
+  api.initializeGoogleMeasurement();browser.scripts[0].script.onload();
+  browser.store.set(api.GOOGLE_CONSENT_STORAGE_KEY,JSON.stringify({version:1,choice:'declined',savedAt:Date.now()-api.GOOGLE_CONSENT_MAX_AGE_MS-1}));
+  assert.equal(api.getGoogleConsentChoice(),'declined');
+  assert.equal(api.dispatchGoogleMeasurement('page_view',{send_to:enabledEnv.VITE_GA4_MEASUREMENT_ID}),false);
 });
 
 

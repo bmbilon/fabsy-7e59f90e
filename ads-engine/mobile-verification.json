@@ -1,0 +1,13 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "cameraNoRefund": true,
+  "noHorizontalOverflow": true,
+  "optOutPersists": true,
+  "cameraUploadEntry": true,
+  "privateFormUntagged": true,
+  "errors": [],
+  "realUploadAndPayment": false
+}

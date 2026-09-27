@@ -140,6 +140,8 @@ async function runtime(t, props = {}, { cacheKey, resumeDraft = false, resumeSte
     // Deliberately omit resources: images, scripts and styles cannot load.
   });
   const { window } = dom;
+  // Intake behavior is independent of the separately tested Google bridge.
+  window.localStorage.setItem("fabsy:google-measurement-consent:v1", JSON.stringify({ version: 1, choice: "declined", savedAt: Date.now() }));
   const requests = [];
   const draftRequests = [];
   const contactRequests = [];
