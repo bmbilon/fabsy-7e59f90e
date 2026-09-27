@@ -39,3 +39,9 @@ Machine-translation publication fingerprints reflect this explicitly requested p
 - 25 backend intake/consent/PDF checks pass; the two focused suites pass again with explicit camera no-refund assertions (14 tests).
 
 Deployment receipt will be appended after publication. These local checks alone are not a live-site deployment claim.
+
+## Backend publication
+
+- `photo-ticket-intake` version 10 is ACTIVE with its existing authentication configuration.
+- `generate-consent-form` version 190 is ACTIVE with its existing authentication configuration. Cloud bundle from the reviewed correction was uploaded through the official Supabase function-update API after local Docker storage failed.
+- Consent bundle SHA-256: `a23c870be91179fa3528fe879694a9db3c2e5e39ce7d0561da3b65f6aeab9189`; compressed deployment hash: `79eb97be5b4dadb796123809344d81f4d7f3f039eab710dc25dc444b92372183`. Provider receipt: September 27, 2026, 13:18 UTC.
