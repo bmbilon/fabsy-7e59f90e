@@ -21,9 +21,8 @@ interface SavedConsent {
 }
 
 // A blocked browser store must not stop the site working. An explicit choice
-// may apply to this document only; a new document then starts with no consent.
+// may apply to this document only; a new document uses the granted default.
 let temporaryChoice: SavedConsent | null = null;
-let writeProbeSequence = 0;
 
 export function parseGoogleConsent(value: string | null, now = Date.now()): GoogleConsentChoice {
   if (!value || value.length > 512) return 'unknown';
@@ -43,35 +42,21 @@ export function parseGoogleConsent(value: string | null, now = Date.now()): Goog
 function savedConsentValue(): string | null {
   if (typeof window === 'undefined') return null;
   if (temporaryChoice) return JSON.stringify(temporaryChoice);
-  try {
-    const value = window.localStorage.getItem(GOOGLE_CONSENT_STORAGE_KEY);
-    if (parseGoogleConsent(value) === 'accepted') {
-      // A readable but now read-only store could retain stale acceptance after
-      // a failed withdrawal. Trust persisted acceptance only while the browser
-      // can record changes. A short-lived, data-free probe also detects silent
-      // failed writes/removals without changing the saved choice or its age.
-      const probeKey = `${GOOGLE_CONSENT_STORAGE_KEY}:write-check:${Date.now()}:${++writeProbeSequence}:${Math.random()}`;
-      window.localStorage.setItem(probeKey, '1');
-      if (window.localStorage.getItem(probeKey) !== '1') return null;
-      window.localStorage.removeItem(probeKey);
-      if (window.localStorage.getItem(probeKey) !== null) return null;
-    }
-    return value;
-  } catch {
-    return null;
-  }
+  try { return window.localStorage.getItem(GOOGLE_CONSENT_STORAGE_KEY); }
+  catch { return null; }
 }
 
 export function getGoogleConsentChoice(): GoogleConsentChoice {
-  return parseGoogleConsent(savedConsentValue());
+  const value=savedConsentValue();
+  try {if(value&&JSON.parse(value).choice==='declined')return 'declined';}catch{/* Invalid records use the default. */}
+  try {if(window.localStorage.getItem('fabsy_ads_consent_v1')==='denied')return 'declined';}catch{/* Optional storage. */}
+  return typeof window==='undefined'?'unknown':'accepted';
 }
 
 /** Schedule retirement even when a tagged page remains open and foregrounded. */
-export function googleConsentRemainingMilliseconds(now = Date.now()): number | null {
-  const value = savedConsentValue();
-  if (parseGoogleConsent(value, now) === 'unknown') return null;
-  const record = JSON.parse(value!) as SavedConsent;
-  return Math.max(0, record.savedAt + GOOGLE_CONSENT_MAX_AGE_MS - now);
+export function googleConsentRemainingMilliseconds(_now = Date.now()): number | null {
+  // Defaults stay granted. An explicit opt-out is retained until changed.
+  return null;
 }
 
 export function clearTemporaryGoogleConsent(): void {
@@ -92,6 +77,7 @@ export function setGoogleConsentChoice(choice: 'accepted' | 'declined'): void {
       try { window.localStorage.removeItem(GOOGLE_CONSENT_STORAGE_KEY); } catch { /* Persisted acceptance also requires a writable store on read. */ }
     }
   }
+  if(choice==='declined'){try{window.localStorage.setItem('fabsy_ads_consent_v1','denied');window.sessionStorage.removeItem('fabsy_ads_contact');window.sessionStorage.removeItem('fabsy_marketing_v2');for(let i=window.sessionStorage.length-1;i>=0;i--){const key=window.sessionStorage.key(i);if(key?.startsWith('fabsy_ads_contact:'))window.sessionStorage.removeItem(key);}}catch{/* The in-memory choice remains. */}}else{try{window.localStorage.removeItem('fabsy_ads_consent_v1');}catch{/* Optional storage. */}}
   window.dispatchEvent(new Event(GOOGLE_CONSENT_CHANGED));
 }
 

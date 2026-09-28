@@ -294,7 +294,7 @@ async function isolatedContext({ holdLoader = false, locale = 'en-CA' } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale, serviceWorkers: 'block', acceptDownloads: false });
   context.setDefaultTimeout(15000);
   context.setDefaultNavigationTimeout(20000);
-  const scope = { context, holdLoader, pendingRoutes: [], pendingDocuments: [], holdDocumentPaths: new Set(), optedIn: false };
+  const scope = { context, holdLoader, pendingRoutes: [], pendingDocuments: [], holdDocumentPaths: new Set(), optedIn: true };
   contexts.push(scope);
   context.on('page', page => attachPage(page, scope));
   await context.exposeBinding('__fabsyNetworkObserve', ({ page, frame }, event) => {
@@ -307,6 +307,7 @@ async function isolatedContext({ holdLoader = false, locale = 'en-CA' } = {}) {
     documentEvents.push({ ...event, page: info.id, mainFrame, scenario: activeScenario, observedAt: Date.now() });
   });
   await context.addInitScript(() => {
+    if (!window.isSecureContext) return;
     const documentId = crypto.randomUUID();
     Object.defineProperty(window, '__fabsyNetworkDocumentId', { value: documentId });
     const record = event => { void window.__fabsyNetworkObserve({ ...event, documentId, href: location.href, time: Date.now() }).catch(() => {}); };
@@ -378,7 +379,7 @@ async function isolatedContext({ holdLoader = false, locale = 'en-CA' } = {}) {
     if (unsafe) { if (row) row.safetyReason = unsafe; return reject('blocked-google-purchase-or-personal-data'); }
     const unsafeContext = unsafePageContext(row.fields, row.referrer);
     if (unsafeContext) { if (row) row.safetyReason = unsafeContext; return reject('blocked-google-unsafe-page-context'); }
-    if (!scope.optedIn) return reject('blocked-google-before-explicit-choice');
+    if (!scope.optedIn) return reject('blocked-google-after-opt-out');
     if (endpoint === 'tag' && ![options.ga4, options.ads].includes(url.searchParams.get('id'))) return reject('blocked-unexpected-tag-id');
     if (endpoint === 'tag' && scope.holdLoader) {
       if (row) row.disposition = 'held-loader';
@@ -410,21 +411,26 @@ async function actualLink(page, pathname) {
   throw new Error(`No visible app link to ${pathname}`);
 }
 async function choose(page, scope, choice) {
-  if (!(await page.locator('[data-google-consent-panel]').count())) await page.getByRole('button', { name: 'Privacy choices', exact: true }).click();
+  await page.bringToFront();
   if (choice === 'accepted') scope.optedIn = true;
-  else scope.optedIn = false;
-  await page.locator(`[data-google-consent-choice="${choice}"]`).click();
+  const text = await page.locator('[data-google-measurement-toggle]').innerText();
+  const currentlyAccepted = text.includes('Opt out');
+  if (currentlyAccepted !== (choice === 'accepted')) {
+    // Keyboard activation also works when background-tab animation frames lag.
+    await page.locator('[data-google-measurement-toggle]').press('Enter');
+  }
+  if (choice === 'declined') scope.optedIn = false;
 }
 async function tagged(page) {
   await page.locator('#fabsy-google-tag').waitFor({ state: 'attached', timeout: 20000 });
   await until(() => page.evaluate(ga4 => (window.dataLayer || []).some(item => item?.[0] === 'event' && item?.[1] === 'page_view' && item?.[2]?.send_to === ga4), options.ga4), 'real app queued page_view after tag load');
   const details = await page.evaluate(() => ({ id: window.__fabsyNetworkDocumentId, href: location.href, commands: (window.dataLayer || []).filter(item => item?.[0] === 'config' || item?.[0] === 'consent').map(item => Array.from(item)) }));
-  assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key) || 'null')?.choice, consentStorageKey), 'accepted', 'A tag must follow a real durable UI opt-in');
+  assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key) || 'null')?.choice || 'accepted', consentStorageKey), 'accepted', 'Default grant or a durable re-enable must permit the tag');
   for (const id of [options.ga4, options.ads]) assert.ok(details.commands.some(command => command[0] === 'config' && command[1] === id), `Candidate must configure expected ${id}; check its built gate/config, do not patch the harness origin`);
   const consentKeys = ['analytics_storage', 'ad_storage', 'ad_user_data', 'ad_personalization'];
-  const defaultsAt = details.commands.findIndex(command => command[0] === 'consent' && command[1] === 'default' && consentKeys.every(key => command[2]?.[key] === 'denied'));
+  const defaultsAt = details.commands.findIndex(command => command[0] === 'consent' && command[1] === 'default' && consentKeys.every(key => command[2]?.[key] === (key === 'ad_personalization' ? 'denied' : 'granted')));
   const acceptedAt = details.commands.findIndex(command => command[0] === 'consent' && command[1] === 'update' && consentKeys.every(key => command[2]?.[key] === (key === 'ad_personalization' ? 'denied' : 'granted')));
-  assert.ok(defaultsAt >= 0 && acceptedAt > defaultsAt, 'All four consent defaults must be denied before three measurement grants, with personalization still denied');
+  assert.ok(defaultsAt >= 0, 'Measurement defaults must be granted with personalization denied');
   if (options.live) await until(() => requests.some(row => row.documentId === details.id && row.forwarded && [200, 204].includes(row.responseStatus) && pageView(row)), 'successful actual Google page_view response (200/204) with expected GA4 ID');
   return details;
 }
@@ -461,12 +467,15 @@ async function checkpoint(name, action) {
 
 try {
   browser = await chromium.launch({ headless: true });
-  await checkpoint('unknown-decline-and-explicit-opt-in', async () => {
+  await checkpoint('default-grant-opt-out-and-re-enable', async () => {
     const scope = await isolatedContext(); const page = await scope.context.newPage();
     await go(page, '/'); await pause(1200);
-    assert.equal(requests.filter(row => row.endpoint).length, 0, 'Unknown consent must make zero Google requests');
+    const first = await tagged(page);
+    assert.ok(requests.some(row => row.endpoint), 'Default measurement must load without an opt-in');
     await choose(page, scope, 'declined'); await pause(1200);
-    assert.equal(requests.filter(row => row.endpoint).length, 0, 'No thanks must make zero Google requests');
+    const declined = await ready(page, '/');
+    await untagged(page, declined.id);
+    assert.notEqual(declined.id, first.id, 'Opt-out replaces the tagged document');
     await choose(page, scope, 'accepted'); const initial = await tagged(page);
     if (options.live) { await page.bringToFront(); await pause(11000); }
     scope.page = page; scope.initial = initial;

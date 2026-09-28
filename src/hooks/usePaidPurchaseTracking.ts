@@ -1,3 +1,4 @@
+import {dispatchPendingAdsUploads} from '@/lib/adsUploadMeasurement';
 import { useEffect } from 'react';
 import { createPaidPurchaseReporter } from '@/lib/paidPurchaseMeasurement';
 import { paidCheckoutSummary, type CheckoutReceipt } from '@/lib/checkoutReceipt';
@@ -30,6 +31,7 @@ export function usePaidPurchaseTracking(receipt: CheckoutReceipt | null, session
 
   useEffect(() => {
     const attempt = () => {
+      dispatchPendingAdsUploads();
       const context = currentGooglePageContext();
       const config = currentGoogleMeasurementConfig();
       if (context && /\/thank-you$/.test(new URL(context.page_location).pathname)) {

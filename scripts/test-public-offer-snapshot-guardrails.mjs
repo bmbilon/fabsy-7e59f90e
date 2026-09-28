@@ -271,7 +271,8 @@ try {
   rejected(notice, '/pa/', 'English component exception does not bypass localized copy checks');
   for (const route of ['/rapid-resolution', '/faq', '/terms-of-purchase']) accepted(actual.render(route), route, `${route}: actual updated refund page`);
   const photoRefundPage = actual.render('/photo-radar');
-  assert.doesNotMatch(photoRefundPage, /refund|money.back/i);
+  assert.match(photoRefundPage, /Camera service fees are nonrefundable\./);
+  assert.doesNotMatch(photoRefundPage.replaceAll("Camera service fees are nonrefundable.", ""), /refund|money.back/i);
   assert.doesNotMatch(actual.render('/photo-refund-notice'), /refund|money.back/i);
   rejected(photoRefundPage.replace('</main>', '<p>We refund your fee if no reduction is obtained.</p></main>'), '/photo-radar', 'Camera services cannot advertise a refund');
   // These pages emit JSON-LD during SSR. FAQSection installs its schema in a

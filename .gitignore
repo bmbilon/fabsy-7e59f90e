@@ -38,3 +38,7 @@ dist-ssr
 .vercel
 
 /dist-anderhue/
+
+# Local deployment state
+.wrangler/
+supabase/.temp/linked-project.json

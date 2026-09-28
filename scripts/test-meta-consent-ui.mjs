@@ -82,22 +82,15 @@ test('a prior Google-only acceptance prompts for Meta and the combined controls 
     assert.equal(api.getGoogleConsentChoice(), 'accepted');
     assert.equal(api.getMetaConsentChoice(), 'unknown');
     await api.mount();
-    assert.ok(dom.window.document.querySelector('[data-google-consent-panel]'), 'Meta unknown must reopen the choice UI');
-    assert.ok(dom.window.document.body.textContent.includes(api.googleConsentCopy.en.mixedStatus));
-
-    await api.click('[data-google-consent-choice="accepted"]');
-    assert.equal(api.getGoogleConsentChoice(), 'accepted');
-    assert.equal(api.getMetaConsentChoice(), 'accepted');
-    assert.equal(api.getFabsyFunnelConsentChoice(), 'accepted');
-    assert.equal(dom.window.document.querySelector('[data-google-consent-panel]'), null);
-    assert.ok(dom.window.document.body.textContent.includes(api.googleConsentCopy.en.acceptedStatus));
-
-    await api.click('button[aria-expanded]');
-    await api.click('[data-google-consent-choice="declined"]');
-    assert.equal(api.getGoogleConsentChoice(), 'declined');
-    assert.equal(api.getMetaConsentChoice(), 'declined');
-    assert.equal(api.getFabsyFunnelConsentChoice(), 'declined');
-    assert.ok(dom.window.document.body.textContent.includes(api.googleConsentCopy.en.declinedStatus));
+    assert.equal(dom.window.document.querySelector('[data-google-consent-panel]'),null,'Google default grant must not introduce a Meta opt-in prompt');
+    await api.click('[data-google-measurement-toggle]');
+    assert.equal(api.getGoogleConsentChoice(),'declined');
+    assert.equal(api.getMetaConsentChoice(),'unknown','Google opt-out does not create a Meta permission');
+    assert.equal(api.getFabsyFunnelConsentChoice(),'unknown');
+    assert.ok(dom.window.document.body.textContent.includes('Google measurement is off'));
+    await api.click('[data-google-measurement-toggle]');
+    assert.equal(api.getGoogleConsentChoice(),'accepted');
+    assert.equal(api.getMetaConsentChoice(),'unknown');
     assert.equal(dom.window.document.querySelectorAll('script[src]').length, 0);
     assert.deepEqual(network, []);
     assert.deepEqual(errors, []);

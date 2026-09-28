@@ -21,6 +21,7 @@ import LeadCaptureFields from "./form-steps/LeadCaptureFields";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "react-router-dom";
 import PhotoTicketForm from "./PhotoTicketForm";
+import {measureDraftTicket} from '@/lib/adsFunnel';
 import { resumeTokenFromHash } from "@/lib/ticket/intakeDraft";
 import { PHOTO_RADAR, PHOTO_RADAR_PRICE_LABEL, RAPID_RESOLUTION } from "@/config/offers";
 import { useLocale } from "@/i18n/locale-context";
@@ -487,6 +488,7 @@ export const LegacyTicketForm = ({
       setFormData(current => ({ ...current, ticketImage: null }));
       setCompletedTicketFile(null);
       setCaptureState("complete");
+      await measureDraftTicket({...saved,accessToken:saved.accessToken||intakeDraft.capability?.accessToken||''},formData.email,formData.phone);
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
       toast({ title: "Your ticket is saved", description: resumeDeliveryMessage(saved.resumeDelivery) });
       if ((getGoogleConsentChoice() === 'accepted' || getOpenAIAdsConsentChoice() === 'accepted') &&
@@ -547,7 +549,7 @@ export const LegacyTicketForm = ({
     const previous = replacementTicketSnapshot.current;
     window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-upload-started"));
     try {
-      await intakeDraft.createOrUpload(
+      const saved = await intakeDraft.createOrUpload(
         replacementTicketFile,
         formData as unknown as Record<string, unknown>,
       );
@@ -556,6 +558,7 @@ export const LegacyTicketForm = ({
       setFormData(current => ({ ...current, ticketImage: null }));
       setCompletedTicketFile(null);
       setCaptureState("complete");
+      await measureDraftTicket({...saved,accessToken:saved.accessToken||intakeDraft.capability?.accessToken||''},formData.email,formData.phone);
       window.dispatchEvent(new CustomEvent("fabsy:intake-ticket-uploaded"));
       toast({
         title: "Replacement ticket saved",
@@ -720,6 +723,7 @@ export const LegacyTicketForm = ({
     }
   };
 
+  useEffect(()=>{if(intakeDraft.capability&&intakeDraft.record?.ticketUploadedAt)void measureDraftTicket(intakeDraft.capability,formData.email,formData.phone);},[intakeDraft.capability,intakeDraft.record?.ticketUploadedAt,formData.email,formData.phone]);
   const delivery = intakeDraft.record?.resumeDelivery;
   const hasPendingTicketUpload = intakeDraft.record?.hasPendingTicketUpload === true;
   const resumeAccess = intakeDraft.capability ? <div lang="en" className="my-6 flex flex-col items-stretch gap-4 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -1041,7 +1045,7 @@ export const LegacyTicketForm = ({
 
           {renderStep()}
 
-          {resumeAccess}
+    {resumeAccess}
 
           {/* Navigation - Bottom */}
           {contactOnly && formData.ticketImage && <div className="mt-8 border-t pt-6">

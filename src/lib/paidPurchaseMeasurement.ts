@@ -4,6 +4,7 @@ export interface PaidPurchaseConfig {
   ga4Id?: string;
   adsId?: string;
   leadLabel?: string;
+  qualifiedLabel?: string;
   rrLabel?: string;
   photoLabel?: string;
 }

@@ -24,6 +24,7 @@ dom.window.scrollTo = () => {};
 try {
   const outfile = path.join(temporary, "TicketForm.mjs");
   const mocks = {
+    "@/lib/adsFunnel": "export const measureDraftTicket = async () => {}; export const measureSavedTicket = async () => {};",
     "@/i18n/locale-context": `export const useLocale = () => ({ locale: "en", setIntakeHandoff: globalThis.__intakeDateTest.setIntakeHandoff });`,
     "@/lib/ticket/intakeDraft": "export const resumeTokenFromHash = () => null;",
     "@/hooks/use-toast": `export const useToast = () => ({ toast: globalThis.__intakeDateTest.toast });`,

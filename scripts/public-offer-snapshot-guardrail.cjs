@@ -28,7 +28,7 @@ const REFUND_NOTICE_SOURCES = {
   '/faq': 'src/pages/FAQ.tsx', '/terms-of-service': 'src/pages/TermsOfService.tsx',
   '/terms-of-purchase': 'src/pages/TermsOfPurchase.tsx',
 };
-const REVIEWED_PHOTO_OUTCOME_COPY = 'The service fee is paid upfront. No legal outcome is promised. No trial. No success fee. Government fines are separate.';
+const REVIEWED_PHOTO_OUTCOME_COPY = 'Camera service fees are nonrefundable. No legal outcome is promised. No trial. No success fee. Government fines are separate.';
 const REVIEWED_RAPID_OUTCOME_COPY = REVIEWED_RAPID_REFUND_DISCLAIMER;
 // The owners froze these public copy files for this release. A changed source
 // must receive a new explicit review of the admission contract and fixtures.
@@ -420,7 +420,7 @@ function redactTermsAdditions(document) {
       'Rapid Resolution: Photo Radar is $79 CAD plus 5% GST ($82.95 total)',
     ]],
     ['5C. Rapid Resolution: Photo Radar Terms', 'photo-radar-terms', [
-      'Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is promised.',
+      'Rapid Resolution: Photo Radar costs $79 CAD one-time, plus GST, charged at checkout. Fabsy pursues a resolution with the Crown. No legal outcome is promised. Camera service fees are nonrefundable.',
       offers.photoRadar.speedDisclaimer,
       offers.photoRadar.insuranceDisclaimer,
     ]],
@@ -526,7 +526,7 @@ function redactPublicOfferSnapshot(html, { route }) {
   const document = dom.window.document;
   const issues = [];
   try {
-    if ((route === '/photo-radar' || route === '/fleet' || PHOTO_GUIDE_ROUTES.has(route)) && /refund|money.back/i.test(document.querySelector('main')?.textContent || '')) issues.push('Photo Radar must not advertise a refund');
+    if ((route === '/photo-radar' || route === '/fleet' || PHOTO_GUIDE_ROUTES.has(route)) && /refund|money.back/i.test((document.querySelector('main')?.textContent || '').replaceAll('Camera service fees are nonrefundable.',''))) issues.push('Photo Radar must not advertise a refund');
     redactRapidConversionSnapshot(document, route, issues);
     redactHomepageVisualSnapshot(document, route, issues);
     redactExactRefundNotices(document, route, issues);

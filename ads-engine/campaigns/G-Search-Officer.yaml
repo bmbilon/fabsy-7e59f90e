@@ -1,0 +1,119 @@
+{
+  "name": "G-Search-Officer",
+  "service": "officer",
+  "status": "PAUSED",
+  "destination": "https://fabsy.ca/rapid-resolution",
+  "geo": "Alberta",
+  "network": "SEARCH_ONLY",
+  "bidding": "MAXIMIZE_CONVERSIONS",
+  "targetCpa": null,
+  "aiMax": false,
+  "automaticallyCreatedAssets": false,
+  "primaryGoal": "qualified_ticket_upload",
+  "secondaryGoal": "client_paid",
+  "negativeKeywords": [
+    "pay ticket online",
+    "ticket lookup",
+    "jobs"
+  ],
+  "groups": [
+    {
+      "name": "Speeding",
+      "keywords": [
+        "speeding ticket help alberta",
+        "fight speeding ticket alberta",
+        "speeding ticket agent alberta",
+        "speeding ticket representation",
+        "speeding ticket reduction alberta",
+        "speeding ticket help calgary",
+        "speeding ticket help edmonton",
+        "dispute speeding ticket alberta",
+        "speeding ticket review alberta",
+        "speeding ticket service alberta",
+        "contest speeding ticket alberta",
+        "speeding fine help alberta"
+      ],
+      "matchType": "PHRASE",
+      "headlines": [
+        "$198 CAD + GST",
+        "Alberta Ticket Agent Services",
+        "Upload Your Ticket Photo",
+        "Eligible Pre-Trial Service",
+        "Government Fines Are Separate",
+        "You Approve Any Crown Deal",
+        "Disclosure Review Included",
+        "Secure Digital Ticket Intake",
+        "Fabsy Traffic Ticket Services",
+        "Officer-Issued Ticket Help"
+      ],
+      "pinnedHeadlineIndex": 0,
+      "descriptions": [
+        "$198 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
+        "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
+        "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
+        "Government fines and trial representation are separate. No outcome is promised."
+      ]
+    },
+    {
+      "name": "Traffic",
+      "keywords": [
+        "traffic ticket help alberta",
+        "fight traffic ticket alberta",
+        "traffic ticket agent alberta",
+        "traffic ticket representation",
+        "traffic ticket reduction alberta",
+        "traffic ticket help calgary",
+        "traffic ticket help edmonton",
+        "dispute traffic ticket alberta",
+        "traffic ticket review alberta",
+        "traffic ticket service alberta",
+        "contest traffic ticket alberta",
+        "traffic fine help alberta"
+      ],
+      "matchType": "PHRASE",
+      "headlines": [
+        "$198 CAD + GST",
+        "Alberta Ticket Agent Services",
+        "Upload Your Ticket Photo",
+        "Eligible Pre-Trial Service",
+        "Government Fines Are Separate",
+        "You Approve Any Crown Deal",
+        "Disclosure Review Included",
+        "Secure Digital Ticket Intake",
+        "Fabsy Traffic Ticket Services",
+        "Officer-Issued Ticket Help"
+      ],
+      "pinnedHeadlineIndex": 0,
+      "descriptions": [
+        "$198 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
+        "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
+        "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
+        "Government fines and trial representation are separate. No outcome is promised."
+      ]
+    }
+  ],
+  "callouts": [
+    "Eligible Alberta Tickets",
+    "Digital Ticket Intake",
+    "Government Fines Separate",
+    "You Approve Any Deal"
+  ],
+  "sitelinks": [
+    {
+      "text": "Upload Your Ticket Photo",
+      "url": "https://fabsy.ca/rapid-resolution#ticket-form-container"
+    },
+    {
+      "text": "Service Scope",
+      "url": "https://fabsy.ca/rapid-resolution#scope"
+    }
+  ],
+  "priceAssets": [
+    {
+      "header": "Officer Tickets",
+      "description": "Pre-trial service + GST",
+      "amountCad": 198,
+      "url": "https://fabsy.ca/rapid-resolution"
+    }
+  ]
+}

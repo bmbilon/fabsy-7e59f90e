@@ -1,3 +1,4 @@
+import {saveEvent} from '../../../ads-engine/platform/store.ts';
 import { CHECKOUT_CONSENT_VERSION, checkoutConsentMatches } from "../_shared/manual-representation.ts";
 import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { intakeAccessTokenHash } from "../_shared/ticket-completion.ts";
@@ -815,6 +816,7 @@ serve(async (req) => {
       );
       return json(req, {
         url: reservation.url,
+      sessionId: reservation.sessionId,
         checkoutIntentId: reservation.orderId,
         idrOrderId: includeIdrAddon ? reservation.orderId : null,
         reused: true,
@@ -933,7 +935,7 @@ serve(async (req) => {
 
     // The report portal is still English. Only translated public return pages
     // receive a prefix; inventing a localized portal URL would break checkout.
-    const successUrl = includeIdrAddon ? `${siteUrl}/insurance-damage-report/intake?checkout=success&order_id=${idrOrderId}&session_id={CHECKOUT_SESSION_ID}` : `${siteUrl}${localizedPublicPath(preferredLocale, "/thank-you")}?session_id={CHECKOUT_SESSION_ID}`;
+    const successUrl = `${siteUrl}${localizedPublicPath(preferredLocale, "/thank-you")}?session_id={CHECKOUT_SESSION_ID}`;
     const params = {
       customer_email: customerEmail,
       client_reference_id: submissionId,
@@ -1046,8 +1048,14 @@ serve(async (req) => {
       submissionId,
       session.expires_at,
     );
+    // Optional internal measurement never changes fulfillment or checkout.
+    try {
+      const attribution=await admin.from('ads_attribution').select('fields').eq('submission_id',submissionId).maybeSingle();
+      await saveEvent(admin,{event_id:`checkout:${session.id}`,submission_id:submissionId,event_type:'checkout_started',service:product.product==='photo_radar'?'camera':'officer',attribution:attribution.data?.fields||{},livemode:session.livemode});
+    } catch { console.error('Ads checkout measurement unavailable'); }
     return json(req, {
       url: session.url,
+      sessionId: session.id,
       checkoutIntentId,
       idrOrderId,
       ...(paymentLinkCode ? { paymentLinkCode } : {}),

@@ -36,6 +36,7 @@ serve(async (req) => {
       quantity: li.quantity,
       amount_total: li.amount_total,
       amount_subtotal: li.amount_subtotal,
+      amount_discount: li.amount_discount,
       amount_tax: li.amount_tax,
       currency: li.currency,
       price: li.price?.id || null,
@@ -45,6 +46,7 @@ serve(async (req) => {
     const response = {
       id: session.id,
       mode: session.mode,
+      livemode: session.livemode,
       amount_total: session.amount_total,
       amount_subtotal: session.amount_subtotal ?? null,
       currency: session.currency,

@@ -1,0 +1,60 @@
+{
+  "name": "fabsy-portal-agent",
+  "account_id": "f5ec7e7a593ad551d17d700df2cc3bd5",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-25",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "browser": {
+    "binding": "BROWSER"
+  },
+  "workers_dev": true,
+  "observability": {
+    "enabled": false
+  },
+  "routes": [
+    {
+      "pattern": "fabsy.ca/admin/portal*",
+      "zone_name": "fabsy.ca"
+    }
+  ],
+  "vars": {
+    "BROKER_URL": "https://gcasbisxfrssonllpqrw.supabase.co/functions/v1/portal-agent"
+  },
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  },
+  "queues": {
+    "producers": [
+      {
+        "queue": "fabsy-portal-runs",
+        "binding": "RUNS"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "fabsy-portal-runs",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 0,
+        "max_concurrency": 1
+      }
+    ]
+  },
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.html",
+        "**/*.txt"
+      ],
+      "fallthrough": false
+    }
+  ],
+  "build": {
+    "command": "npm run build"
+  }
+}

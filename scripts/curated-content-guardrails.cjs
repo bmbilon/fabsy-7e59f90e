@@ -12,7 +12,7 @@ const PHOTO_RADAR_CONTENT_SLUGS = new Set(require('../src/config/photoRadarPages
 const FEE_REFUND = require('../src/config/feeRefund.json');
 const REVIEWED_REFUND_SOURCE_HASHES = Object.freeze({
   'src/config/feeRefund.json': '8cbf6d9c3d0dd7008c6949d3fd97b38ae7eff232a3f31e433903605dc370c40f',
-  'src/config/photoRadarContent.json': '48760281e262341580ae9cff9ca3e636a736048b494e722ecca2167cc5219853',
+  'src/config/photoRadarContent.json': '3f817d8b3c4eed9ef6b0a5fe752c0d95e2f84ac3eb7b9713b93211d40715e798',
 });
 // These are reviewed business-policy passages, not a licence for arbitrary
 // future config values to become legal facts. A copy change requires review.

@@ -1,0 +1,895 @@
+{
+  "dryRun": true,
+  "spendingAuthorized": false,
+  "specs": [
+    {
+      "name": "G-Search-Officer",
+      "service": "officer",
+      "status": "PAUSED",
+      "destination": "https://fabsy.ca/rapid-resolution",
+      "geo": "Alberta",
+      "network": "SEARCH_ONLY",
+      "bidding": "MAXIMIZE_CONVERSIONS",
+      "targetCpa": null,
+      "aiMax": false,
+      "automaticallyCreatedAssets": false,
+      "primaryGoal": "qualified_ticket_upload",
+      "secondaryGoal": "client_paid",
+      "negativeKeywords": [
+        "pay ticket online",
+        "ticket lookup",
+        "jobs"
+      ],
+      "groups": [
+        {
+          "name": "Speeding",
+          "keywords": [
+            "speeding ticket help alberta",
+            "fight speeding ticket alberta",
+            "speeding ticket agent alberta",
+            "speeding ticket representation",
+            "speeding ticket reduction alberta",
+            "speeding ticket help calgary",
+            "speeding ticket help edmonton",
+            "dispute speeding ticket alberta",
+            "speeding ticket review alberta",
+            "speeding ticket service alberta",
+            "contest speeding ticket alberta",
+            "speeding fine help alberta"
+          ],
+          "matchType": "PHRASE",
+          "headlines": [
+            "$198 CAD + GST",
+            "Alberta Ticket Agent Services",
+            "Upload Your Ticket Photo",
+            "Eligible Pre-Trial Service",
+            "Government Fines Are Separate",
+            "You Approve Any Crown Deal",
+            "Disclosure Review Included",
+            "Secure Digital Ticket Intake",
+            "Fabsy Traffic Ticket Services",
+            "Officer-Issued Ticket Help"
+          ],
+          "pinnedHeadlineIndex": 0,
+          "descriptions": [
+            "$198 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
+            "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
+            "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
+            "Government fines and trial representation are separate. No outcome is promised."
+          ]
+        },
+        {
+          "name": "Traffic",
+          "keywords": [
+            "traffic ticket help alberta",
+            "fight traffic ticket alberta",
+            "traffic ticket agent alberta",
+            "traffic ticket representation",
+            "traffic ticket reduction alberta",
+            "traffic ticket help calgary",
+            "traffic ticket help edmonton",
+            "dispute traffic ticket alberta",
+            "traffic ticket review alberta",
+            "traffic ticket service alberta",
+            "contest traffic ticket alberta",
+            "traffic fine help alberta"
+          ],
+          "matchType": "PHRASE",
+          "headlines": [
+            "$198 CAD + GST",
+            "Alberta Ticket Agent Services",
+            "Upload Your Ticket Photo",
+            "Eligible Pre-Trial Service",
+            "Government Fines Are Separate",
+            "You Approve Any Crown Deal",
+            "Disclosure Review Included",
+            "Secure Digital Ticket Intake",
+            "Fabsy Traffic Ticket Services",
+            "Officer-Issued Ticket Help"
+          ],
+          "pinnedHeadlineIndex": 0,
+          "descriptions": [
+            "$198 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket.",
+            "Fabsy provides traffic ticket agent services where permitted. Outcomes vary.",
+            "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal.",
+            "Government fines and trial representation are separate. No outcome is promised."
+          ]
+        }
+      ],
+      "callouts": [
+        "Eligible Alberta Tickets",
+        "Digital Ticket Intake",
+        "Government Fines Separate",
+        "You Approve Any Deal"
+      ],
+      "sitelinks": [
+        {
+          "text": "Upload Your Ticket Photo",
+          "url": "https://fabsy.ca/rapid-resolution#ticket-form-container"
+        },
+        {
+          "text": "Service Scope",
+          "url": "https://fabsy.ca/rapid-resolution#scope"
+        }
+      ],
+      "priceAssets": [
+        {
+          "header": "Officer Tickets",
+          "description": "Pre-trial service + GST",
+          "amountCad": 198,
+          "url": "https://fabsy.ca/rapid-resolution"
+        }
+      ]
+    }
+  ],
+  "config": {
+    "version": 1,
+    "currency": "CAD",
+    "timezone": "America/Edmonton",
+    "spendingAuthorized": false,
+    "paused": true,
+    "learningSpendLimitCad": 150,
+    "startDate": "2026-09-27",
+    "durationDays": 14,
+    "freshnessMinutes": 120,
+    "monitorMinutes": 15,
+    "googleApiVersion": "v23",
+    "existingCampaignIds": {},
+    "googleQualifiedConversionAction": "customers/9385017797/conversionActions/7801915860",
+    "googlePurchaseConversionActions": [
+      "customers/9385017797/conversionActions/7740835320",
+      "customers/9385017797/conversionActions/7740881425"
+    ],
+    "albertaGeoTarget": "geoTargetConstants/20113",
+    "googleCustomerId": "9385017797",
+    "campaigns": {
+      "G-Search-Officer": {
+        "service": "officer",
+        "budgetType": "TOTAL",
+        "totalBudgetCad": 150,
+        "planningCpaCad": 90
+      }
+    },
+    "priceAssetsEnabled": false,
+    "meta": {
+      "active": false,
+      "budgetCad": null,
+      "advantagePlusCreativeText": false,
+      "advantagePlusVisualEnhancements": false
+    },
+    "aiMax": false,
+    "automaticallyCreatedAssets": false,
+    "primaryGoal": "qualified_ticket_upload",
+    "secondaryGoal": "client_paid",
+    "bidding": "MAXIMIZE_CONVERSIONS",
+    "targetCpa": null,
+    "retiredCampaignIds": [
+      "24214394599",
+      "24266674718"
+    ]
+  },
+  "copyHash": "c3ca7667530e3d6819cc05c4bf4596b37c91ccb855643b1fe1a84e961b63c649",
+  "liveAccountHash": "e11bdaec9695ca1336f3644e4dbf1e476c6bfd435fb47c21ae6e5d9a8be5f932",
+  "plan": {
+    "operations": [
+      {
+        "campaignBudgetOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/campaignBudgets/-1",
+            "name": "G-Search-Officer launch v1",
+            "totalAmountMicros": "150000000",
+            "period": "CUSTOM_PERIOD",
+            "deliveryMethod": "STANDARD",
+            "explicitlyShared": false
+          }
+        }
+      },
+      {
+        "campaignOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/campaigns/-2",
+            "name": "G-Search-Officer",
+            "status": "PAUSED",
+            "startDateTime": "2026-09-27 00:00:00",
+            "endDateTime": "2026-10-10 23:59:59",
+            "finalUrlSuffix": "utm_source=google&utm_medium=cpc&utm_campaign=G-Search-Officer&utm_content=officer_launch_v1&variant_id=officer_v1",
+            "maximizeConversions": {},
+            "networkSettings": {
+              "targetGoogleSearch": true,
+              "targetSearchNetwork": false,
+              "targetContentNetwork": false,
+              "targetPartnerSearchNetwork": false
+            },
+            "geoTargetTypeSetting": {
+              "positiveGeoTargetType": "PRESENCE",
+              "negativeGeoTargetType": "PRESENCE"
+            },
+            "aiMaxSetting": {
+              "enableAiMax": false
+            },
+            "assetAutomationSettings": [
+              {
+                "assetAutomationType": "TEXT_ASSET_AUTOMATION",
+                "assetAutomationStatus": "OPTED_OUT"
+              },
+              {
+                "assetAutomationType": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+                "assetAutomationStatus": "OPTED_OUT"
+              }
+            ],
+            "campaignBudget": "customers/9385017797/campaignBudgets/-1",
+            "advertisingChannelType": "SEARCH",
+            "containsEuPoliticalAdvertising": "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+          }
+        }
+      },
+      {
+        "campaignCriterionOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "location": {
+              "geoTargetConstant": "geoTargetConstants/20113"
+            }
+          }
+        }
+      },
+      {
+        "campaignCriterionOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "negative": true,
+            "keyword": {
+              "text": "pay ticket online",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "campaignCriterionOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "negative": true,
+            "keyword": {
+              "text": "ticket lookup",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "campaignCriterionOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "negative": true,
+            "keyword": {
+              "text": "jobs",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/adGroups/-3",
+            "campaign": "customers/9385017797/campaigns/-2",
+            "name": "Speeding",
+            "status": "ENABLED",
+            "type": "SEARCH_STANDARD"
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket help alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "fight speeding ticket alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket agent alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket representation",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket reduction alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket help calgary",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket help edmonton",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "dispute speeding ticket alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket review alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding ticket service alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "contest speeding ticket alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "speeding fine help alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupAdOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-3",
+            "status": "ENABLED",
+            "ad": {
+              "finalUrls": [
+                "https://fabsy.ca/rapid-resolution"
+              ],
+              "responsiveSearchAd": {
+                "headlines": [
+                  {
+                    "text": "$198 CAD + GST",
+                    "pinnedField": "HEADLINE_1"
+                  },
+                  {
+                    "text": "Alberta Ticket Agent Services"
+                  },
+                  {
+                    "text": "Upload Your Ticket Photo"
+                  },
+                  {
+                    "text": "Eligible Pre-Trial Service"
+                  },
+                  {
+                    "text": "Government Fines Are Separate"
+                  },
+                  {
+                    "text": "You Approve Any Crown Deal"
+                  },
+                  {
+                    "text": "Disclosure Review Included"
+                  },
+                  {
+                    "text": "Secure Digital Ticket Intake"
+                  },
+                  {
+                    "text": "Fabsy Traffic Ticket Services"
+                  },
+                  {
+                    "text": "Officer-Issued Ticket Help"
+                  }
+                ],
+                "descriptions": [
+                  {
+                    "text": "$198 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket."
+                  },
+                  {
+                    "text": "Fabsy provides traffic ticket agent services where permitted. Outcomes vary."
+                  },
+                  {
+                    "text": "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal."
+                  },
+                  {
+                    "text": "Government fines and trial representation are separate. No outcome is promised."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "adGroupOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/adGroups/-4",
+            "campaign": "customers/9385017797/campaigns/-2",
+            "name": "Traffic",
+            "status": "ENABLED",
+            "type": "SEARCH_STANDARD"
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket help alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "fight traffic ticket alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket agent alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket representation",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket reduction alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket help calgary",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket help edmonton",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "dispute traffic ticket alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket review alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic ticket service alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "contest traffic ticket alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupCriterionOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "keyword": {
+              "text": "traffic fine help alberta",
+              "matchType": "PHRASE"
+            }
+          }
+        }
+      },
+      {
+        "adGroupAdOperation": {
+          "create": {
+            "adGroup": "customers/9385017797/adGroups/-4",
+            "status": "ENABLED",
+            "ad": {
+              "finalUrls": [
+                "https://fabsy.ca/rapid-resolution"
+              ],
+              "responsiveSearchAd": {
+                "headlines": [
+                  {
+                    "text": "$198 CAD + GST",
+                    "pinnedField": "HEADLINE_1"
+                  },
+                  {
+                    "text": "Alberta Ticket Agent Services"
+                  },
+                  {
+                    "text": "Upload Your Ticket Photo"
+                  },
+                  {
+                    "text": "Eligible Pre-Trial Service"
+                  },
+                  {
+                    "text": "Government Fines Are Separate"
+                  },
+                  {
+                    "text": "You Approve Any Crown Deal"
+                  },
+                  {
+                    "text": "Disclosure Review Included"
+                  },
+                  {
+                    "text": "Secure Digital Ticket Intake"
+                  },
+                  {
+                    "text": "Fabsy Traffic Ticket Services"
+                  },
+                  {
+                    "text": "Officer-Issued Ticket Help"
+                  }
+                ],
+                "descriptions": [
+                  {
+                    "text": "$198 CAD plus GST for eligible Alberta tickets. Upload a photo of your ticket."
+                  },
+                  {
+                    "text": "Fabsy provides traffic ticket agent services where permitted. Outcomes vary."
+                  },
+                  {
+                    "text": "Disclosure review and pursuit of a Crown reduction or withdrawal. You approve any deal."
+                  },
+                  {
+                    "text": "Government fines and trial representation are separate. No outcome is promised."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "assetOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/assets/-5",
+            "name": "G-Search-Officer: Eligible Alberta Tickets",
+            "calloutAsset": {
+              "calloutText": "Eligible Alberta Tickets"
+            }
+          }
+        }
+      },
+      {
+        "campaignAssetOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "asset": "customers/9385017797/assets/-5",
+            "fieldType": "CALLOUT",
+            "status": "ENABLED"
+          }
+        }
+      },
+      {
+        "assetOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/assets/-6",
+            "name": "G-Search-Officer: Digital Ticket Intake",
+            "calloutAsset": {
+              "calloutText": "Digital Ticket Intake"
+            }
+          }
+        }
+      },
+      {
+        "campaignAssetOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "asset": "customers/9385017797/assets/-6",
+            "fieldType": "CALLOUT",
+            "status": "ENABLED"
+          }
+        }
+      },
+      {
+        "assetOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/assets/-7",
+            "name": "G-Search-Officer: Government Fines Separate",
+            "calloutAsset": {
+              "calloutText": "Government Fines Separate"
+            }
+          }
+        }
+      },
+      {
+        "campaignAssetOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "asset": "customers/9385017797/assets/-7",
+            "fieldType": "CALLOUT",
+            "status": "ENABLED"
+          }
+        }
+      },
+      {
+        "assetOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/assets/-8",
+            "name": "G-Search-Officer: You Approve Any Deal",
+            "calloutAsset": {
+              "calloutText": "You Approve Any Deal"
+            }
+          }
+        }
+      },
+      {
+        "campaignAssetOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "asset": "customers/9385017797/assets/-8",
+            "fieldType": "CALLOUT",
+            "status": "ENABLED"
+          }
+        }
+      },
+      {
+        "assetOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/assets/-9",
+            "name": "G-Search-Officer: Upload Your Ticket Photo",
+            "sitelinkAsset": {
+              "linkText": "Upload Your Ticket Photo"
+            },
+            "finalUrls": [
+              "https://fabsy.ca/rapid-resolution#ticket-form-container"
+            ]
+          }
+        }
+      },
+      {
+        "campaignAssetOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "asset": "customers/9385017797/assets/-9",
+            "fieldType": "SITELINK",
+            "status": "ENABLED"
+          }
+        }
+      },
+      {
+        "assetOperation": {
+          "create": {
+            "resourceName": "customers/9385017797/assets/-10",
+            "name": "G-Search-Officer: Service Scope",
+            "sitelinkAsset": {
+              "linkText": "Service Scope"
+            },
+            "finalUrls": [
+              "https://fabsy.ca/rapid-resolution#scope"
+            ]
+          }
+        }
+      },
+      {
+        "campaignAssetOperation": {
+          "create": {
+            "campaign": "customers/9385017797/campaigns/-2",
+            "asset": "customers/9385017797/assets/-10",
+            "fieldType": "SITELINK",
+            "status": "ENABLED"
+          }
+        }
+      }
+    ],
+    "rollback": [],
+    "newCampaignIndexes": [
+      1
+    ],
+    "createdOperationKinds": {
+      "0": "campaignBudget",
+      "1": "campaign",
+      "2": "campaignCriterion",
+      "3": "campaignCriterion",
+      "4": "campaignCriterion",
+      "5": "campaignCriterion",
+      "6": "adGroup",
+      "7": "adGroupCriterion",
+      "8": "adGroupCriterion",
+      "9": "adGroupCriterion",
+      "10": "adGroupCriterion",
+      "11": "adGroupCriterion",
+      "12": "adGroupCriterion",
+      "13": "adGroupCriterion",
+      "14": "adGroupCriterion",
+      "15": "adGroupCriterion",
+      "16": "adGroupCriterion",
+      "17": "adGroupCriterion",
+      "18": "adGroupCriterion",
+      "19": "adGroupAd",
+      "20": "adGroup",
+      "21": "adGroupCriterion",
+      "22": "adGroupCriterion",
+      "23": "adGroupCriterion",
+      "24": "adGroupCriterion",
+      "25": "adGroupCriterion",
+      "26": "adGroupCriterion",
+      "27": "adGroupCriterion",
+      "28": "adGroupCriterion",
+      "29": "adGroupCriterion",
+      "30": "adGroupCriterion",
+      "31": "adGroupCriterion",
+      "32": "adGroupCriterion",
+      "33": "adGroupAd",
+      "34": "asset",
+      "35": "campaignAsset",
+      "36": "asset",
+      "37": "campaignAsset",
+      "38": "asset",
+      "39": "campaignAsset",
+      "40": "asset",
+      "41": "campaignAsset",
+      "42": "asset",
+      "43": "campaignAsset",
+      "44": "asset",
+      "45": "campaignAsset"
+    },
+    "sourceHash": "e11bdaec9695ca1336f3644e4dbf1e476c6bfd435fb47c21ae6e5d9a8be5f932",
+    "requiresPostCreateGoalSync": true
+  },
+  "hold": null
+}

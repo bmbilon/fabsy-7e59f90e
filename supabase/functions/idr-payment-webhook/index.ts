@@ -1,3 +1,4 @@
+import {recordAdsPayment} from '../_shared/ads-payment.ts';
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { recordServiceOrderPayment } from "../_shared/service-order-payment.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
@@ -269,6 +270,10 @@ async function persistProPayment(
     .eq("ticket_type", "officer_issued").select("id").maybeSingle();
   if (orderError) throw orderError;
   if (!order) throw new Error("Paid pro discount does not match the verified officer order.");
+}
+
+async function recordCurrentAdsPayment(db:SupabaseAdmin,stripe:Stripe,session:CheckoutSessionData,created:number){
+ try{const items=await stripe.checkout.sessions.listLineItems(session.id,{limit:100});await recordAdsPayment(db,session,items.data,new Date(created*1000).toISOString());}catch{console.error('Ads paid measurement unavailable');}
 }
 
 async function recordRepresentationPayment(supabase: SupabaseAdmin, session: CheckoutSessionData) {
@@ -1346,6 +1351,7 @@ export async function handler(req: Request): Promise<Response> {
       const result = await persistPaidPhotoRadarCheckout(supabase, session);
       await enqueuePaymentSms(supabase, event, session);
       await recordRepresentationPayment(supabase, session);
+      await recordCurrentAdsPayment(supabase,stripe,session,event.created);
       await recordCurrentPaidFunnelPurchaseIfEligible(supabase, event, session);
       await recordCurrentPaidPaymentPurchaseIfEligible(supabase, event, session);
       await enqueueCurrentMetaPurchaseIfEligible(supabase, event, session);
@@ -1365,6 +1371,7 @@ export async function handler(req: Request): Promise<Response> {
       const result = await persistPaidTicketCheckout(supabase, session);
       await enqueuePaymentSms(supabase, event, session);
       await recordRepresentationPayment(supabase, session);
+      await recordCurrentAdsPayment(supabase,stripe,session,event.created);
       if (isUuid(session.metadata.source_assessment_id)) {
         const ticketBaseCents = metadataPriceCents(
           session.metadata.ticket_base_cents,
@@ -1389,6 +1396,7 @@ export async function handler(req: Request): Promise<Response> {
     await enqueuePaymentSms(supabase, event, session);
     if (session.metadata?.fabsy_checkout_kind === "ticket_with_addon") {
       await recordRepresentationPayment(supabase, session);
+      await recordCurrentAdsPayment(supabase,stripe,session,event.created);
     }
     await sendAccessEmail(supabase, session.metadata!.idr_order_id);
     if (isUuid(session.metadata?.source_assessment_id)) {

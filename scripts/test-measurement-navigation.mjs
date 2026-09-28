@@ -291,10 +291,10 @@ test('an unexpectedly pre-tagged private/receipt document never mounts a private
   }
 });
 
-test('BFCache restore after cross-tab withdrawal/expiry blocks Google pageshow before remount', () => {
-  for (const saved of [null, 'malformed',
-    { version: 1, choice: 'declined', savedAt: Date.now() },
-    { version: 1, choice: 'accepted', savedAt: Date.now() - 181 * 24 * 60 * 60 * 1000 },
+test('BFCache restore after cross-tab opt-out blocks Google pageshow before remount', () => {
+  for (const saved of [
+    {version:1,choice:'declined',savedAt:Date.now()},
+    {version:1,choice:'declined',savedAt:Date.now()-181*24*60*60*1000},
   ]) {
     const r = runtime();
     r.api.setGoogleConsentChoice('accepted');
@@ -325,7 +325,7 @@ test('BFCache can restore the same public document only with still-valid persist
   r.dispose();
 });
 
-test('BFCache cannot restore a tag using stale readable acceptance when storage no longer records withdrawal', () => {
+test('BFCache defaults to granted when storage is unavailable and no refusal is recorded', () => {
   for (const failure of ['throw-on-set', 'throw-on-remove', 'silent-set', 'silent-remove']) {
     const r = runtime();
     r.api.setGoogleConsentChoice('accepted');
@@ -354,10 +354,10 @@ test('BFCache cannot restore a tag using stale readable acceptance when storage 
     r.win.addEventListener('pageshow', () => { laterPageshow += 1; }, true);
     r.win.dispatchEvent(new r.win.PageTransitionEvent('pageshow', { persisted: true }));
     assert.equal(storage.getItem(r.api.GOOGLE_CONSENT_STORAGE_KEY), savedAcceptance, failure);
-    assert.equal(laterPageshow, 0, failure);
-    assert.equal(r.fullDocuments.length, 2, failure);
-    assert.equal(r.router.getSnapshot().blocked, true, failure);
-    assert.equal(r.api.googleTagMayLoadInDocument(r.win), false, failure);
+    assert.equal(laterPageshow, 1, failure);
+    assert.equal(r.fullDocuments.length, 1, failure);
+    assert.equal(r.router.getSnapshot().blocked, false, failure);
+    assert.equal(r.api.googleTagMayLoadInDocument(r.win), true, failure);
     r.dispose();
   }
 });

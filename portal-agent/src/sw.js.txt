@@ -1,0 +1,27 @@
+// No offline caching: case pages and authentication stay on the server.
+self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
+self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+self.addEventListener('push', event => {
+  let data = {};
+  try {data = event.data?.json() || {};} catch {}
+  const valid = /^\/admin\/portal(?:\?(?:job|draft)=[a-f0-9-]{36})?$/.test(data.url || '');
+  event.waitUntil(self.registration.showNotification('Fabsy Admin', {
+    body: typeof data.body === 'string' ? data.body.slice(0, 180) : 'A portal step needs your attention.',
+    icon: '/apple-touch-icon.png', badge: '/apple-touch-icon.png',
+    tag: typeof data.tag === 'string' ? data.tag.slice(0, 80) : 'fabsy-portal',
+    data: {url: valid ? data.url : '/admin/portal'},
+  }));
+});
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const path = event.notification.data?.url || '/admin/portal';
+  const url = new URL(path, self.location.origin);
+  if (url.origin !== self.location.origin || url.pathname !== '/admin/portal') return;
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({type: 'window', includeUncontrolled: true});
+    for (const client of windows) {
+      if (new URL(client.url).pathname === '/admin/portal') {await client.navigate(url.href); await client.focus(); return;}
+    }
+    await self.clients.openWindow(url.href);
+  })());
+});

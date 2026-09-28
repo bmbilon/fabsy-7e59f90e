@@ -108,6 +108,8 @@ function fixture(options = {}) {
     ticket_submissions: [submission],
     idr_checkout_intents: [],
     idr_orders: [],
+    ads_attribution: [],
+    ads_funnel_events: [],
     pro_licence_verifications: pro ? [{
       id: ids.verification,
       ticket_submission_id: ids.submission,
@@ -206,6 +208,7 @@ function offlineHandler(data, { failLink = false, failFunnelWithdrawal = false }
     const builder = {
       select(fields) { selectFields = fields; return builder; },
       insert(input) { operation = "insert"; values = input; return builder; },
+      upsert(input) { operation = "insert"; values = input; return builder; },
       update(input) { operation = "update"; values = input; return builder; },
       maybeSingle() { return execute("optional"); },
       single() { return execute("required"); },
@@ -373,9 +376,7 @@ function expectedParams(options = {}) {
     ...(pro ? { discounts: [{ coupon: "PRO20" }] } : { allow_promotion_codes: false }),
     automatic_tax: { enabled: !photoRadar },
     tax_id_collection: { enabled: false },
-    success_url: addon
-      ? `https://fabsy.ca/insurance-damage-report/intake?checkout=success&order_id=${ids.intent}&session_id={CHECKOUT_SESSION_ID}`
-      : `https://fabsy.ca${prefix}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `https://fabsy.ca${prefix}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `https://fabsy.ca${prefix}/payment-canceled${draft ? `?draft=${ids.submission}` : ""}`,
     metadata,
     payment_intent_data: { metadata: structuredClone(metadata) },
@@ -423,7 +424,7 @@ for (const [label, options] of [
     const result = await harness.invoke();
     assert.deepEqual(result, {
       status: 200,
-      body: { url: createdSession.url, checkoutIntentId: ids.intent, idrOrderId: options.addon ? ids.intent : null },
+      body: { url: createdSession.url, sessionId: createdSession.id, checkoutIntentId: ids.intent, idrOrderId: options.addon ? ids.intent : null },
     });
     assertSdkScope(harness.calls, options);
     const create = harness.calls.stripe.find(call => call.name === "checkout.sessions.create");
@@ -484,7 +485,7 @@ for (const photoRadar of [false, true]) {
     const harness = offlineHandler(data);
     assert.deepEqual(await harness.invoke(), {
       status: 200,
-      body: { url: oldSession.url, checkoutIntentId: ids.intent, idrOrderId: null, reused: true },
+      body: { url: oldSession.url, sessionId: oldSession.id, checkoutIntentId: ids.intent, idrOrderId: null, reused: true },
     });
     assertSdkScope(harness.calls, { creates: 0, photoRadar });
     assert.deepEqual(harness.calls.stripe.map(({ name, args }) => ({ name, args })), [

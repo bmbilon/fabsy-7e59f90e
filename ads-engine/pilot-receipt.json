@@ -1,0 +1,161 @@
+{
+  "observedAt": "2026-09-27T23:58:39.956Z",
+  "source": "Live Google Ads API plus deployed ads-engine monitor/status",
+  "customerId": "9385017797",
+  "currency": "CAD",
+  "timezone": "America/Edmonton",
+  "batchId": "13b9e5c2-d665-428a-95fd-90aa555ce9ca",
+  "batchStatus": "approved",
+  "approvedAt": "2026-09-27T23:44:32.940797+00:00",
+  "actions": [
+    {
+      "id": "d586da7c-50a7-4a53-bdc1-94199cc2b80d",
+      "kind": "launch",
+      "status": "applied",
+      "created_at": "2026-09-27T23:57:31.414344+00:00"
+    },
+    {
+      "id": "0d3d01bd-de95-4e16-ae9d-33ecf0f3b16b",
+      "kind": "sync",
+      "status": "applied",
+      "created_at": "2026-09-27T23:55:37.867459+00:00"
+    },
+    {
+      "id": "eb68bdfd-52c6-4bdf-9c70-f5da2faf9349",
+      "kind": "sync",
+      "status": "applied",
+      "created_at": "2026-09-27T23:45:21.093826+00:00"
+    },
+    {
+      "id": "7a950772-6c0c-4157-b9b0-c8bbc892c4fe",
+      "kind": "pause",
+      "status": "applied",
+      "created_at": "2026-09-27T23:33:11.254032+00:00"
+    }
+  ],
+  "retiredCampaigns": [
+    {
+      "id": "24214394599",
+      "name": "RR-Search-Alberta-202609",
+      "status": "PAUSED"
+    },
+    {
+      "id": "24266674718",
+      "name": "RR-Search-Alberta-140-20260918",
+      "status": "PAUSED"
+    }
+  ],
+  "pilot": {
+    "campaign": {
+      "resourceName": "customers/9385017797/campaigns/24294977663",
+      "status": "ENABLED",
+      "advertisingChannelType": "SEARCH",
+      "networkSettings": {
+        "targetGoogleSearch": true,
+        "targetSearchNetwork": false,
+        "targetContentNetwork": false,
+        "targetPartnerSearchNetwork": false
+      },
+      "biddingStrategyType": "MAXIMIZE_CONVERSIONS",
+      "geoTargetTypeSetting": {
+        "positiveGeoTargetType": "PRESENCE",
+        "negativeGeoTargetType": "PRESENCE"
+      },
+      "name": "G-Search-Officer",
+      "id": "24294977663",
+      "campaignBudget": "customers/9385017797/campaignBudgets/15906156135",
+      "finalUrlSuffix": "utm_source=google&utm_medium=cpc&utm_campaign=G-Search-Officer&utm_content=officer_launch_v1&variant_id=officer_v1",
+      "assetAutomationSettings": [
+        {
+          "assetAutomationType": "TEXT_ASSET_AUTOMATION",
+          "assetAutomationStatus": "OPTED_OUT"
+        },
+        {
+          "assetAutomationType": "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION",
+          "assetAutomationStatus": "OPTED_OUT"
+        }
+      ],
+      "aiMaxSetting": {
+        "enableAiMax": false
+      },
+      "startDateTime": "2026-09-27 17:45:24",
+      "endDateTime": "2026-10-10 23:59:59"
+    },
+    "campaignBudget": {
+      "resourceName": "customers/9385017797/campaignBudgets/15906156135",
+      "period": "CUSTOM_PERIOD",
+      "totalAmountMicros": "150000000",
+      "explicitlyShared": false
+    }
+  },
+  "campaignGoals": [
+    {
+      "category": "SUBMIT_LEAD_FORM",
+      "origin": "WEBSITE",
+      "biddable": true
+    },
+    {
+      "category": "PHONE_CALL_LEAD",
+      "origin": "CALL_FROM_ADS",
+      "biddable": false
+    },
+    {
+      "category": "PURCHASE",
+      "origin": "WEBSITE",
+      "biddable": false
+    }
+  ],
+  "adReviews": [
+    {
+      "resourceName": "customers/9385017797/adGroupAds/198359936577~826166330397",
+      "reviewStatus": "REVIEW_IN_PROGRESS",
+      "approvalStatus": "UNKNOWN"
+    },
+    {
+      "resourceName": "customers/9385017797/adGroupAds/199838013839~826205560036",
+      "reviewStatus": "REVIEW_IN_PROGRESS",
+      "approvalStatus": "UNKNOWN"
+    }
+  ],
+  "cameraCampaignCreated": false,
+  "priceExtensionsEnabled": false,
+  "monitor": {
+    "checkedAt": "2026-09-27T23:58:38.046Z",
+    "stops": []
+  },
+  "spend": {
+    "date": "2026-09-27",
+    "observedAt": "2026-09-27T23:58:40.772Z",
+    "learningSpendCad": 36.81,
+    "campaigns": [
+      {
+        "name": "G-Search-Officer",
+        "resourceName": "customers/9385017797/campaigns/24294977663",
+        "status": "ENABLED",
+        "spendCad": 0,
+        "clicks": 0,
+        "impressions": 0,
+        "service": "officer"
+      }
+    ]
+  },
+  "engine": {
+    "paused": false,
+    "frozen": false,
+    "lastError": null
+  },
+  "liveAccountHash": "97c980eaaffb2fc3e2b09accb9f4676ca46257b7fa6559125c8975fa07dd5178",
+  "frontend": {
+    "commit": "9be969d678f36e1fb05b34943cc9021c3d87385a",
+    "deployment": "https://37781a5b.fabsy-9qa.pages.dev",
+    "publicDestination": "https://fabsy.ca/rapid-resolution",
+    "enhancedConversionsEnabled": true,
+    "contactData": "Code-supplied SHA256 email/phone hashes only; automatic detection and selectors disabled"
+  },
+  "diagnostics": {
+    "additionalCheckoutTest": "Waived by Brett after the missing diagnostic evidence was explained",
+    "googleRecordingVerified": false,
+    "realTestTransactionCreated": false
+  },
+  "budgetRamp": "Requires separate owner approval"
+}
