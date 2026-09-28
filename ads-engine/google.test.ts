@@ -43,10 +43,23 @@ Deno.test('paused graph converges after goal sync and launch keeps the approved 
  for(const row of live.campaigns)for(const category of ['SUBMIT_LEAD_FORM','PURCHASE'])live.goals.push({campaignConversionGoal:{campaign:row.campaign.resourceName,resourceName:`goal/${sequence++}`,category,origin:'WEBSITE',biddable:category==='PURCHASE'}});
  live.hash=await digest(live);
  const second=planGoogle(specs,config,live);assertEquals(second.operations.length,4);
- for(const row of live.goals)row.campaignConversionGoal.biddable=row.campaignConversionGoal.category==='SUBMIT_LEAD_FORM';
+ // Google's REST readback omits the non-optional false goal flag.
+ for(const row of live.goals){if(row.campaignConversionGoal.category==='SUBMIT_LEAD_FORM')row.campaignConversionGoal.biddable=true;else delete row.campaignConversionGoal.biddable;}
+ for(const row of live.ads)for(const field of ['headlines','descriptions'])for(const asset of row.adGroupAd.ad.responsiveSearchAd[field])Object.assign(asset,{assetPerformanceLabel:'PENDING',policySummaryInfo:{reviewStatus:'REVIEW_IN_PROGRESS'}});
  assertEquals(planGoogle(specs,config,live).operations.length,0);
+ const firstHeadline=live.ads[0].adGroupAd.ad.responsiveSearchAd.headlines[0];
+ firstHeadline.pinnedField='HEADLINE_2';
+ assertThrows(()=>planGoogle(specs,config,live),Error,'EXISTING_COPY_REQUIRES_REVIEW');
+ firstHeadline.pinnedField='HEADLINE_1';
+ const savedText=firstHeadline.text;firstHeadline.text='Changed offer';
+ assertThrows(()=>planGoogle(specs,config,live),Error,'EXISTING_COPY_REQUIRES_REVIEW');
+ firstHeadline.text=savedText;
  const google=new GoogleAds(()=>undefined);const launch=await google.approvedPlan({payload:{specs,config}},'launch',live);
  assertEquals(launch.operations.length,2);assertEquals(launch.operations.every((o:Json)=>o.campaignOperation.update.status==='ENABLED'),true);
+ live.ads[0].adGroupAd.policySummary={approvalStatus:'UNKNOWN',reviewStatus:'REVIEW_IN_PROGRESS'};
+ assertEquals((await google.approvedPlan({payload:{specs,config}},'launch',live)).operations.length,2);
+ live.ads[0].adGroupAd.policySummary.approvalStatus='DISAPPROVED';
+ try{await google.approvedPlan({payload:{specs,config}},'launch',live);throw new Error('disapproved ad was enabled');}catch(e){assertEquals((e as Error).message,'ADS_NOT_APPROVED_BY_GOOGLE');}
 });
 
 Deno.test('conversion setup reuses paid actions and only creates the qualified web action',()=>{
@@ -76,4 +89,11 @@ Deno.test('officer pilot has one lifetime budget and a fixed 14-day serving wind
  assertEquals(budgets.length,1);assertEquals(budgets[0].period,'CUSTOM_PERIOD');assertEquals(budgets[0].totalAmountMicros,'150000000');assertEquals(budgets[0].amountMicros,undefined);assertEquals(budgets[0].explicitlyShared,false);
  assertEquals(campaigns.length,1);assertEquals(campaigns[0].status,'PAUSED');assertEquals(campaigns[0].startDateTime,'2026-09-27 00:00:00');assertEquals(campaigns[0].endDateTime,'2026-10-10 23:59:59');
  assertEquals(plan.operations.some((o:Json)=>o.assetOperation?.create.priceAsset),false);
+});
+Deno.test('neutral Google device criteria are accepted while explicit restrictions remain held',()=>{
+ const live=empty();live.campaigns=[{campaign:{id:'100',resourceName:'existing',name:specs[0].name,advertisingChannelType:'SEARCH',biddingStrategyType:'MAXIMIZE_CONVERSIONS',campaignBudget:'budget'},campaignBudget:{amountMicros:'50000000',period:'DAILY',explicitlyShared:false}}];
+ live.criteria=[{campaignCriterion:{campaign:'existing',type:'DEVICE',device:{type:'MOBILE'},negative:false}}];
+ planGoogle([specs[0]],config,live);
+ live.criteria[0].campaignCriterion.bidModifier=0;
+ assertThrows(()=>planGoogle([specs[0]],config,live),Error,'EXISTING_TARGETING_REQUIRES_REVIEW');
 });

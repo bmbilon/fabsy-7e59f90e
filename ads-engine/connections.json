@@ -1,6 +1,6 @@
 {
   "observedDate": "2026-09-27",
-  "source": "Signed-in Chrome Google Ads and Meta UI",
+  "source": "Signed-in Chrome Google Ads/Meta UI and live Google Ads API with deployed ads-engine status/monitor",
   "google": {
     "customerId": "9385017797",
     "accountName": "Fabsy",
@@ -14,24 +14,27 @@
         "id": "7740835320",
         "label": "MyAbCPiLj-scEPmV_s5E",
         "primary": false,
-        "status": "Misconfigured",
-        "enhancedConversions": "Not configured"
+        "enhancedConversions": "Account-level manual setup enabled; action recording unverified",
+        "diagnosticStatusLastObserved": "Misconfigured",
+        "diagnosticObservedBeforeCurrentDeployment": true
       },
       {
         "name": "Camera Paid",
         "id": "7740881425",
         "label": "TEo-CJH0kescEPmV_s5E",
         "primary": false,
-        "status": "Misconfigured",
-        "enhancedConversions": "Not configured"
+        "enhancedConversions": "Account-level manual setup enabled; action recording unverified",
+        "diagnosticStatusLastObserved": "Misconfigured",
+        "diagnosticObservedBeforeCurrentDeployment": true
       }
     ],
     "existingUploadAction": {
       "name": "Fabsy completed ticket upload",
       "id": "7759411421",
       "primary": false,
-      "status": "Misconfigured",
-      "qualifiedMeaningVerified": false
+      "qualifiedMeaningVerified": false,
+      "diagnosticStatusLastObserved": "Misconfigured",
+      "diagnosticObservedBeforeCurrentDeployment": true
     },
     "existingCampaignNames": [
       "RR-Search-Alberta-140-20260918",
@@ -56,17 +59,45 @@
     "apiAccountReadVerified": true,
     "currencyVerified": "CAD",
     "timezoneVerified": "America/Edmonton",
-    "liveAccountHash": "2ba862f3949ec49a2741d909be329d7fe8f859f9146fe584872dd114b1f2e6e6",
-    "launchHold": "REAL_UPLOAD_PAYMENT_DIAGNOSTICS_REQUIRED",
+    "liveAccountHash": "97c980eaaffb2fc3e2b09accb9f4676ca46257b7fa6559125c8975fa07dd5178",
+    "launchHold": null,
     "platformCredentialSetupApproved": true,
     "qualifiedUploadAction": {
       "name": "Qualified Ticket Upload",
       "id": "7801915860",
       "primary": true,
-      "status": "Awaiting conversions"
+      "status": "Awaiting conversions",
+      "googleRecordingVerified": false
     },
-    "customerDataTermsAccepted": false,
-    "enhancedConversionsConfigured": false
+    "customerDataTermsAccepted": true,
+    "enhancedConversionsConfigured": true,
+    "enhancedConversionsMethod": "Google Tag; manual code-supplied SHA256 email/phone",
+    "automaticUserDataDetection": false,
+    "userDataSelectorsConfigured": false,
+    "googleRecordingVerified": false,
+    "retiredCampaigns": [
+      {
+        "id": "24214394599",
+        "name": "RR-Search-Alberta-202609",
+        "status": "PAUSED"
+      },
+      {
+        "id": "24266674718",
+        "name": "RR-Search-Alberta-140-20260918",
+        "status": "PAUSED"
+      }
+    ],
+    "pilot": {
+      "campaignId": "24294977663",
+      "budgetId": "15906156135",
+      "status": "ENABLED",
+      "totalBudgetCad": 150,
+      "budgetPeriod": "CUSTOM_PERIOD",
+      "startDate": "2026-09-27",
+      "endDateTime": "2026-10-10 23:59:59",
+      "adReviewStatus": "REVIEW_IN_PROGRESS",
+      "cameraEnabled": false
+    }
   },
   "meta": {
     "accountName": "Fabsy Canada",
@@ -77,7 +108,11 @@
     "apiConnectionVerified": false
   },
   "platformWritesPerformed": true,
-  "newEngineSpendingAuthorized": false,
+  "newEngineSpendingAuthorized": true,
   "conversionSetupBatch": "fae376aa-fa31-40c1-8bea-7ad8c7e51345",
-  "pendingLaunchBatch": "246b7561-98ef-4f38-807a-1287f89f8148"
+  "pendingLaunchBatch": null,
+  "observedAt": "2026-09-27T23:58:39.956Z",
+  "rejectedLaunchBatch": "246b7561-98ef-4f38-807a-1287f89f8148",
+  "approvedLaunchBatch": "13b9e5c2-d665-428a-95fd-90aa555ce9ca",
+  "additionalCheckoutTestWaivedByOwner": true
 }

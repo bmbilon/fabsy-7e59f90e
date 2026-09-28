@@ -30,8 +30,8 @@ export class GoogleAds {
       this.read("SELECT campaign.resource_name, campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, campaign.campaign_budget, campaign.start_date_time, campaign.end_date_time, campaign.maximize_conversions.target_cpa_micros, campaign.bidding_strategy_type, campaign.ai_max_setting.enable_ai_max, campaign.asset_automation_settings, campaign.network_settings.target_google_search, campaign.network_settings.target_search_network, campaign.network_settings.target_content_network, campaign.network_settings.target_partner_search_network, campaign.geo_target_type_setting.positive_geo_target_type, campaign.geo_target_type_setting.negative_geo_target_type, campaign.final_url_suffix, campaign_budget.amount_micros, campaign_budget.total_amount_micros, campaign_budget.period, campaign_budget.explicitly_shared FROM campaign WHERE campaign.status != 'REMOVED'"),
       this.read("SELECT ad_group.resource_name, ad_group.campaign, ad_group.name, ad_group.status FROM ad_group WHERE ad_group.status != 'REMOVED'"),
       this.read("SELECT ad_group_criterion.resource_name, ad_group_criterion.ad_group, ad_group_criterion.status, ad_group_criterion.negative, ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type FROM ad_group_criterion WHERE ad_group_criterion.type = 'KEYWORD' AND ad_group_criterion.status != 'REMOVED'"),
-      this.read("SELECT campaign_criterion.resource_name, campaign_criterion.campaign, campaign_criterion.negative, campaign_criterion.type, campaign_criterion.location.geo_target_constant, campaign_criterion.keyword.text, campaign_criterion.keyword.match_type FROM campaign_criterion"),
-      this.read("SELECT ad_group_ad.resource_name, ad_group_ad.ad_group, ad_group_ad.status, ad_group_ad.ad.final_urls, ad_group_ad.ad.responsive_search_ad.headlines, ad_group_ad.ad.responsive_search_ad.descriptions, ad_group_ad.policy_summary.approval_status FROM ad_group_ad WHERE ad_group_ad.status != 'REMOVED'"),
+      this.read("SELECT campaign_criterion.resource_name, campaign_criterion.campaign, campaign_criterion.negative, campaign_criterion.type, campaign_criterion.bid_modifier, campaign_criterion.device.type, campaign_criterion.location.geo_target_constant, campaign_criterion.keyword.text, campaign_criterion.keyword.match_type FROM campaign_criterion"),
+      this.read("SELECT ad_group_ad.resource_name, ad_group_ad.ad_group, ad_group_ad.status, ad_group_ad.ad.final_urls, ad_group_ad.ad.responsive_search_ad.headlines, ad_group_ad.ad.responsive_search_ad.descriptions, ad_group_ad.policy_summary.approval_status, ad_group_ad.policy_summary.review_status FROM ad_group_ad WHERE ad_group_ad.status != 'REMOVED'"),
       this.read("SELECT campaign_asset.resource_name, campaign_asset.campaign, campaign_asset.asset, campaign_asset.field_type, campaign_asset.status, asset.name, asset.callout_asset.callout_text, asset.sitelink_asset.link_text, asset.final_urls, asset.price_asset.type, asset.price_asset.language_code, asset.price_asset.price_offerings FROM campaign_asset WHERE campaign_asset.status != 'REMOVED'"),
       this.read('SELECT campaign_conversion_goal.resource_name, campaign_conversion_goal.campaign, campaign_conversion_goal.category, campaign_conversion_goal.origin, campaign_conversion_goal.biddable FROM campaign_conversion_goal'),
       this.read("SELECT conversion_action.resource_name, conversion_action.name, conversion_action.category, conversion_action.type, conversion_action.primary_for_goal, conversion_action.status FROM conversion_action WHERE conversion_action.status != 'REMOVED'"),
@@ -52,7 +52,8 @@ export class GoogleAds {
       const goals=live.goals.filter((r:Json)=>r.campaignConversionGoal.campaign===row.campaign.resourceName).map((r:Json)=>r.campaignConversionGoal);
       const qualified=live.conversions.find((r:Json)=>r.conversionAction.resourceName===config.googleQualifiedConversionAction).conversionAction;
       if(!goals.some((g:Json)=>g.category===qualified.category&&g.origin==='WEBSITE'&&g.biddable)||goals.some((g:Json)=>g.biddable&&(g.category!==qualified.category||g.origin!=='WEBSITE')))throw new Error('EXACT_PRIMARY_GOAL_REQUIRED');
-      if(live.ads.some((r:Json)=>live.groups.some((g:Json)=>g.adGroup.campaign===row.campaign.resourceName&&g.adGroup.resourceName===r.adGroupAd.adGroup)&&r.adGroupAd.policySummary?.approvalStatus!=='APPROVED'))throw new Error('ADS_NOT_APPROVED_BY_GOOGLE');
+      const ads=live.ads.filter((r:Json)=>live.groups.some((g:Json)=>g.adGroup.campaign===row.campaign.resourceName&&g.adGroup.resourceName===r.adGroupAd.adGroup));
+      if(ads.some((r:Json)=>{const p=r.adGroupAd.policySummary;return p?.approvalStatus!=='APPROVED'&&!(p?.approvalStatus==='UNKNOWN'&&p?.reviewStatus==='REVIEW_IN_PROGRESS');}))throw new Error('ADS_NOT_APPROVED_BY_GOOGLE');
     }
     return {sourceHash:live.hash,operations:campaigns.map((r:Json)=>statusOperation(r.campaign.resourceName,'ENABLED')),rollback:campaigns.map((r:Json)=>statusOperation(r.campaign.resourceName,'PAUSED'))};
   }
@@ -73,6 +74,8 @@ export class GoogleAds {
 
 const update=(kind:string,fields:Json,mask:string)=>({[`${kind}Operation`]:{update:fields,updateMask:mask}});
 export const statusOperation=(campaign:string,status:string)=>update('campaign',{resourceName:campaign,status},'status');
+// Google adds performance and policy metadata to text assets on readback.
+const rsaContent=(rsa:Json)=>({...rsa,...Object.fromEntries(['headlines','descriptions'].map(key=>[key,rsa[key]?.map(({assetPerformanceLabel:_performance,policySummaryInfo:_policy,...content}:Json)=>content)]))});
 
 /** Measurement setup cannot enable campaign delivery. */
 export function planMeasurement(config:Json,live:Json):Json {
@@ -145,7 +148,9 @@ export function planGoogle(specs:Json[],config:Json,live:Json):Json {
       const fields={...settings,resourceName:campaign};
       const mask='name,status,maximize_conversions,network_settings,geo_target_type_setting,ai_max_setting,asset_automation_settings,final_url_suffix'+(totalBudget?',start_date_time,end_date_time':'');
       const oldFields=Object.fromEntries(Object.keys(settings).map(k=>[k,existing.campaign[k]??(k==='maximizeConversions'?{}:undefined)]));
-      const normalized={...oldFields,networkSettings:Object.fromEntries(Object.keys(settings.networkSettings).map(k=>[k,existing.campaign.networkSettings?.[k]===true])),aiMaxSetting:{enableAiMax:existing.campaign.aiMaxSetting?.enableAiMax===true},assetAutomationSettings:existing.campaign.assetAutomationSettings?.filter((a:Json)=>settings.assetAutomationSettings.some(v=>v.assetAutomationType===a.assetAutomationType)).sort((a:Json,b:Json)=>a.assetAutomationType.localeCompare(b.assetAutomationType))};
+      const normalized:Json={...oldFields,networkSettings:Object.fromEntries(Object.keys(settings.networkSettings).map(k=>[k,existing.campaign.networkSettings?.[k]===true])),aiMaxSetting:{enableAiMax:existing.campaign.aiMaxSetting?.enableAiMax===true},assetAutomationSettings:existing.campaign.assetAutomationSettings?.filter((a:Json)=>settings.assetAutomationSettings.some(v=>v.assetAutomationType===a.assetAutomationType)).sort((a:Json,b:Json)=>a.assetAutomationType.localeCompare(b.assetAutomationType))};
+      // The approved start has calendar granularity; Google clamps a same-day start to creation time.
+      if(totalBudget&&existing.campaign.startDateTime?.slice(0,10)===config.startDate)normalized.startDateTime=settings.startDateTime;
       const compare={...settings,assetAutomationSettings:[...settings.assetAutomationSettings].sort((a,b)=>a.assetAutomationType.localeCompare(b.assetAutomationType))};
       if(canonical(normalized)!==canonical(compare)){
         operations.push(update('campaign',fields,mask));
@@ -164,7 +169,8 @@ export function planGoogle(specs:Json[],config:Json,live:Json):Json {
     const ownedCriteria=live.criteria.filter((r:Json)=>r.campaignCriterion.campaign===campaign);
     for(const row of ownedCriteria){
       const c=row.campaignCriterion;
-      const wanted=c.type==='LOCATION'&&!c.negative&&c.location?.geoTargetConstant===config.albertaGeoTarget||c.type==='KEYWORD'&&c.negative&&c.keyword?.matchType==='PHRASE'&&spec.negativeKeywords.includes(c.keyword.text);
+      const neutralDevice=c.type==='DEVICE'&&!c.negative&&['DESKTOP','MOBILE','TABLET'].includes(c.device?.type)&&(c.bidModifier===undefined||c.bidModifier===1);
+      const wanted=neutralDevice||c.type==='LOCATION'&&!c.negative&&c.location?.geoTargetConstant===config.albertaGeoTarget||c.type==='KEYWORD'&&c.negative&&c.keyword?.matchType==='PHRASE'&&spec.negativeKeywords.includes(c.keyword.text);
       if(!wanted)throw new Error('EXISTING_TARGETING_REQUIRES_REVIEW');
     }
     if(!ownedCriteria.some((r:Json)=>r.campaignCriterion.location?.geoTargetConstant===config.albertaGeoTarget))add('campaignCriterion',{campaign,location:{geoTargetConstant:config.albertaGeoTarget}});
@@ -181,11 +187,11 @@ export function planGoogle(specs:Json[],config:Json,live:Json):Json {
       for(const text of group.keywords)if(!existingKeywords.some((r:Json)=>r.adGroupCriterion.keyword.text===text))add('adGroupCriterion',{adGroup,status:'ENABLED',keyword:{text,matchType:'PHRASE'}});
       const rsa={headlines:group.headlines.map((text:string,i:number)=>({text,...(i===group.pinnedHeadlineIndex?{pinnedField:'HEADLINE_1'}:{})})),descriptions:group.descriptions.map((text:string)=>({text}))};
       const existingAds=live.ads.filter((r:Json)=>r.adGroupAd.adGroup===adGroup);
-      if(existingAds.some((r:Json)=>canonical(r.adGroupAd.ad.responsiveSearchAd)!==canonical(rsa)||canonical(r.adGroupAd.ad.finalUrls)!==canonical([spec.destination])))throw new Error('EXISTING_COPY_REQUIRES_REVIEW');
+      if(existingAds.some((r:Json)=>canonical(rsaContent(r.adGroupAd.ad.responsiveSearchAd))!==canonical(rsa)||canonical(r.adGroupAd.ad.finalUrls)!==canonical([spec.destination])))throw new Error('EXISTING_COPY_REQUIRES_REVIEW');
       if(!existingAds.length)add('adGroupAd',{adGroup,status:'ENABLED',ad:{finalUrls:[spec.destination],responsiveSearchAd:rsa}});
     }
     const goals=live.goals.filter((r:Json)=>r.campaignConversionGoal.campaign===campaign);
-    for(const row of goals){const g=row.campaignConversionGoal;const biddable=g.category===qualified.category&&g.origin==='WEBSITE';if(g.biddable!==biddable){operations.push(update('campaignConversionGoal',{resourceName:g.resourceName,biddable},'biddable'));rollback.unshift(update('campaignConversionGoal',{resourceName:g.resourceName,biddable:g.biddable},'biddable'));}}
+    for(const row of goals){const g=row.campaignConversionGoal;const biddable=g.category===qualified.category&&g.origin==='WEBSITE';if((g.biddable===true)!==biddable){operations.push(update('campaignConversionGoal',{resourceName:g.resourceName,biddable},'biddable'));rollback.unshift(update('campaignConversionGoal',{resourceName:g.resourceName,biddable:g.biddable===true},'biddable'));}}
     // New campaign goals are configured after the paused create, in a second approved sync.
     for(const [type,entries] of [['CALLOUT',spec.callouts.map((text:string)=>({name:`${spec.name}: ${text}`,calloutAsset:{calloutText:text}}))],['SITELINK',spec.sitelinks.map((s:Json)=>({name:`${spec.name}: ${s.text}`,sitelinkAsset:{linkText:s.text},finalUrls:[s.url]}))],...(config.priceAssetsEnabled===false?[]:[['PRICE',[{name:`${spec.name}: Price`,priceAsset:{type:'SERVICES',languageCode:'en',priceOfferings:[...spec.priceAssets,...specs.filter(s=>s.name!==spec.name).flatMap(s=>s.priceAssets),{header:'Resolution Bundle',description:'Service and report + GST',amountCad:229,url:'https://fabsy.ca/rapid-resolution'}].map((a:Json)=>({header:a.header,description:a.description,price:{amountMicros:String(a.amountCad*1e6),currencyCode:'CAD'},finalUrl:a.url}))}}]]])] as [string,Json[]][]){
       for(const value of entries){

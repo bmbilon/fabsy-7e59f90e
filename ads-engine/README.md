@@ -2,7 +2,7 @@
 
 ## Current status
 
-Public frontend, Google conversion setup, cloud backend and phone controls are deployed. Brett authorized an officer-only pilot on September 27: C$150 campaign total budget over 14 calendar days, with camera ads off. Both older Search campaigns are confirmed paused. The public release corrects camera refunds and uses granted Google defaults with a footer opt-out. Customer Data Terms and Google tag enhanced conversions are saved, with automatic user-data detection off.
+Public frontend, Google conversion setup, cloud backend and phone controls are deployed. Brett's officer-only pilot is enabled: C$150 campaign total budget over 14 calendar days, September 27 through October 10, with camera ads off. Both older Search campaigns are confirmed paused. The ads are awaiting Google's policy review; actual delivery and conversion recording are not yet verified. The public release corrects camera refunds and uses granted Google defaults with a footer opt-out. Customer Data Terms and Google tag enhanced conversions are saved, with automatic user-data detection off. See pilot-receipt.json for the API readback and applied action IDs.
 
 Read ASSUMPTIONS.md for evidence. Live account sync passes the primary conversion check. Google recording is unverified. Brett explicitly instructed this pilot to launch without an additional real checkout test; that instruction is retained in the frozen readiness evidence. No test or conversion receipt is invented.
 
