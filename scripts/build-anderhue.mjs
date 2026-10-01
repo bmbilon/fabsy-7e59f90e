@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { copyFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { copyFileSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -36,3 +36,10 @@ for (const file of readdirSync(site)) {
   if (skip.has(file) || !statSync(source).isFile()) continue;
   copyFileSync(source, pathToFileURL(path.join(outDir, file)));
 }
+
+// This folder is already built. Override inherited Vercel build/install
+// detection so deployment does not try to run npm without package.json.
+const deploymentConfig = JSON.parse(readFileSync(new URL('vercel.json', site), 'utf8'));
+writeFileSync(path.join(outDir, 'vercel.json'), JSON.stringify({
+  ...deploymentConfig, framework: null, buildCommand: '', installCommand: '', outputDirectory: '.',
+}, null, 2) + '\n');

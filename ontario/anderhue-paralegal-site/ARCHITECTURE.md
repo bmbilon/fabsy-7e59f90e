@@ -238,3 +238,48 @@ Order matters: the portal must be live before any client email can link to it.
 4. After Resend verifies the domain: `update ltb_practices set client_updates_enabled = true, notice_from = 'AnderHue Case Desk <files@anderhue.ca>' where id = 'anderhue-paralegal';`
 5. Point `alert_emails` at the practice inbox once forwarding works (today alerts go to info@onlineparalegals.ca and brett@execom.ca).
 6. Have the AnderHue team work files at anderhue.ca/admin. The Fabsy admin's LTB pages still work but send no client emails.
+
+### Production deployment command
+
+Run `npm run deploy:anderhue` from the repository root. It builds first, links the
+fresh output directory to `execom/anderhue-paralegal`, verifies the expected project
+and team IDs, then deploys with an explicit working directory and configuration.
+Vite removes the previous output directory, including `.vercel`, during a build;
+never assume a link made before the build still exists. The generated deployment
+configuration disables npm build/install detection because the output is already
+built. Passing only `--cwd` from the Fabsy root can pick up the parent project's
+configuration and omit the AnderHue routes and headers.
+
+### Launch status, October 1, 2026
+
+- The practice-files migration is applied to `gcasbisxfrssonllpqrw` and recorded
+  in migration history. The three edge functions and both `PRACTICE_*` secrets
+  are deployed. The allowed origins include the production apex, www, production
+  Vercel alias and the separate preview alias. A temporary authenticated probe
+  confirmed `cf-connecting-ip` reaches the edge runtime; that probe was deleted.
+- Production deployment `dpl_G8wMCWorsuy5QktjTqvG5VaMNk1N` serves `anderhue.ca`.
+  Public pages, `/start`, `/files`, `/admin` and nested portal routes returned 200
+  with the production CSP. Private app routes carry `noindex, nofollow`.
+- All 48 practice unit tests, the local PostgreSQL SQL harness, and the complete
+  browser suite (including 22 staff checks) passed. The keyboard-focus assertion
+  now waits for the application's scheduled focus change. Live traffic/general
+  submission, signed upload and finalization passed with synthetic records;
+  zero notices were queued, and the test records and objects were removed.
+- The unverified Ontario Paralegal Association membership chip was removed.
+- Cloudflare inbound MX, SPF and routing DKIM records are installed. A forwarding
+  destination for `hello@anderhue.ca` still needs to be selected and configured.
+  `brett@execom.ca` is already a verified Cloudflare destination;
+  `info@onlineparalegals.ca` is not in the current verified destination list.
+- Resend's production secret exists and is restricted to sending. It cannot list
+  or manage domains. The browser's `brettbilon@gmail.com` Resend account lists
+  `auth.fabsy.ca`, but neither `fabsy.ca` nor `anderhue.ca`; the production email
+  account must be identified before adding/verifying AnderHue's sending records.
+- **Client updates remain disabled.** Template approval has not been recorded.
+  Staff alerts still target `info@onlineparalegals.ca` and `brett@execom.ca`.
+  The minute notice-worker schedule is active; its outbox is empty.
+- The imported `anderhue-files.bundle` was verified against the GitHub branch
+  and removed from `fabsy-ltb`.
+
+The prior production deployment for rollback is
+`anderhue-paralegal-f94b46s09-execom.vercel.app`. A frontend rollback does not undo
+the additive database migration or enable client emails.

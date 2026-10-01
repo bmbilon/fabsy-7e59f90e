@@ -751,6 +751,7 @@ async function landlordFlow(ctx, kind) {
   await page.getByRole('heading', { name: 'About the tenancy' }).waitFor();
   await continueButton(page).click();
   await page.getByText('Choose the closest match.', { exact: false }).waitFor();
+  await page.waitForFunction(() => document.activeElement?.id === 'f-issue');
   assert.equal(await page.evaluate(() => document.activeElement?.id), 'f-issue', 'focus moves to the first problem');
   await shot(ctx, s, '04-ltb-details-error');
   await page.getByLabel('What is the issue?').selectOption('arrears');
