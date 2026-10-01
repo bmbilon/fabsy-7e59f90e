@@ -228,6 +228,29 @@ Email and password sign-in (same rules as the current `AnderHuePortal.tsx`: sign
 - `supabase/tests/practice-files.test.sql` (rolled-back transaction, same style as `ltb-intake.test.sql`), run locally against PostgreSQL 16 with Supabase stubs.
 - `scripts/verify-anderhue-browser.mjs` (Playwright, fixtures only): public pages, `/start` for all three areas, `/files` link request, token portal, upload, staff sign-in, Today, boards, file detail, stage change preview, practice scoping.
 
+### Browser compatibility
+
+The `AnderHue browser compatibility` GitHub workflow runs the complete suite in
+Chromium, Google Chrome, Microsoft Edge, Firefox and WebKit on each relevant pull
+request. WebKit runs on macOS. Choose one locally with
+`AH_QA_BROWSER=webkit npm run verify:anderhue` (also `chromium`, `chrome`, `msedge`,
+or `firefox`); install its runtime first with `npx playwright install <browser>`.
+Chrome and Edge use their branded stable channels, not a user-agent override.
+
+Coverage includes 360/390/1440 px layouts, mobile navigation, keyboard focus,
+touch file selection, all three intake flows, reload recovery, partial uploads,
+portal sign-in and expiry, document downloads, and the 22 staff checks. Firefox
+uses narrow viewports with touch because its Playwright driver does not support
+the `isMobile` flag. This is browser-engine and device emulation coverage, not a
+claim that every physical phone or OS version has been tested.
+
+Intake text drafts save after each field update and flush when the page is
+hidden, avoiding lost answers during quick reloads or mobile backgrounding.
+Downloads in QA use a real local HTTP attachment because WebKit's mocked PDF
+responses do not emit a download event (Playwright issue 22691). The download
+still requires the fixture portal's client/document authorization and checks
+the actual browser download filename. No production data or emails are used.
+
 ## 7. Go-live checklist
 
 Order matters: the portal must be live before any client email can link to it.

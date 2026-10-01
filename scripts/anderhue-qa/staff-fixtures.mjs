@@ -927,7 +927,7 @@ export async function installSupabaseMocks(context, { origin, state, requests = 
     const url = new URL(request.url());
     // Branded Chromium browsers load their built-in PDF viewer from an
     // internal extension. Do not replace its module scripts with a 204 mock.
-    if (url.protocol === 'chrome-extension:') return route.continue();
+    if (url.protocol === 'chrome-extension:' || url.protocol === 'chrome:') return route.continue();
     if (url.origin === origin) return route.continue();
     if (url.hostname === 'fonts.googleapis.com') return route.fulfill({ status: 200, contentType: 'text/css', body: fontCss(fontsDir) });
     if (url.hostname === 'fonts.gstatic.com') {
@@ -1163,7 +1163,10 @@ export async function openStaffContext(browser, origin, options = {}) {
   let release = () => undefined;
   const holdMembership = hold ? new Promise(resolve => { release = resolve; }) : null;
   await installSupabaseMocks(context, { origin, state, requests, fontsDir, holdMembership, externals, latencyMs });
-  if (signedIn) await context.addInitScript(([key, value]) => localStorage.setItem(key, JSON.stringify(value)), [AUTH_STORAGE_KEY, fixtureSession()]);
+  if (signedIn) await context.addInitScript(([appOrigin, key, value]) => {
+    // Never seed authentication into a PDF viewer or a cross-origin frame.
+    if (location.origin === appOrigin) localStorage.setItem(key, JSON.stringify(value));
+  }, [origin, AUTH_STORAGE_KEY, fixtureSession()]);
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
