@@ -1830,7 +1830,12 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
         timeout: 15_000,
       });
       const downloaded = browser.browserType().name() === 'chromium'
-        ? page.waitForEvent('download', { timeout: 15_000 }) : null;
+        ? page.waitForEvent('download', {
+          // Headless Shell downloads inline PDF previews too. Match the
+          // attachment caused by this button, not a late preview download.
+          predicate: item => new URL(item.url()).pathname === '/__qa__/download.pdf',
+          timeout: 15_000,
+        }) : null;
       await button.click();
       assert.equal(new URL((await request).url()).searchParams.get('download'), expected);
       if (downloaded) assert.equal((await downloaded).suggestedFilename(), expected);
