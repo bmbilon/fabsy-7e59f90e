@@ -251,7 +251,10 @@ without opening a second window after the signed-link request.
 Downloads in QA use a real local HTTP attachment because WebKit's mocked PDF
 responses do not emit a download event (Playwright issue 22691). The download
 still requires the fixture client or staff document authorization and checks
-the actual browser download filename. PDF previews also use real HTTP responses.
+the actual browser download filename. Chromium-based staff PDF checks also use
+real HTTP responses. Firefox and WebKit cannot fulfill intercepted redirects,
+so their staff checks assert the authorized download URL and safe filename;
+their native attachment download is exercised through the client portal.
 Playwright 1.63 drives the current branded browsers. No production data or
 emails are used.
 
