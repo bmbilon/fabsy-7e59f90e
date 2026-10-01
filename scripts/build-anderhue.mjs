@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const site = new URL('../ontario/anderhue-paralegal-site/', import.meta.url);
 // Reuse the public browser credential already shipped with the intake form.
-const key = readFileSync(new URL('index.html', site), 'utf8').match(/data-key="([^"]+)"/)?.[1];
+const key = readFileSync(new URL('landlords.html', site), 'utf8').match(/data-key="([^"]+)"/)?.[1];
 assert.ok(key, 'The published intake form must provide its public anon key');
 const payload = JSON.parse(Buffer.from(key.split('.')[1], 'base64url').toString());
 assert.equal(payload.role, 'anon');
@@ -17,6 +17,6 @@ const result = spawnSync(process.execPath, ['node_modules/vite/bin/vite.js', 'bu
 });
 if (result.error) throw result.error;
 if (result.status !== 0) process.exit(result.status || 1);
-for (const file of ['index.html', 'vercel.json']) {
+for (const file of ['index.html', 'landlords.html', 'traffic-tickets.html', 'other-matters.html', 'public.css', 'crest.svg', 'robots.txt', 'sitemap.xml', 'vercel.json']) {
   copyFileSync(new URL(file, site), new URL(`../dist-anderhue/${file}`, import.meta.url));
 }

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title id="title">AnderHue Paralegal laurel crest</title>
+  <circle cx="60" cy="60" r="56" fill="#2d1848"/>
+  <circle cx="60" cy="60" r="49" fill="none" stroke="#c4a16a" stroke-width="1"/>
+  <g fill="none" stroke="#c4a16a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M42 85C24 75 23 54 34 37M78 85c18-10 19-31 8-48"/>
+    <path d="M34 69c-7-1-10-5-11-11 6 0 10 3 12 7M31 57c-6-3-8-8-7-13 6 2 9 6 9 10M31 46c-5-4-5-10-3-15 5 4 7 8 6 13M37 77c-7 1-12-2-15-7 7-2 11 0 14 3M86 69c7-1 10-5 11-11-6 0-10 3-12 7M89 57c6-3 8-8 7-13-6 2-9 6-9 10M89 46c5-4 5-10 3-15-5 4-7 8-6 13M83 77c7 1 12-2 15-7-7-2-11 0-14 3"/>
+  </g>
+  <text x="60" y="68" text-anchor="middle" fill="#f7f1e8" font-family="Georgia,serif" font-size="25" letter-spacing="-2">AH</text>
+  <path d="M48 79h24" stroke="#c4a16a" stroke-width="1"/>
+</svg>

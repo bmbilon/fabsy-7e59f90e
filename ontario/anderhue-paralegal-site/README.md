@@ -1,49 +1,27 @@
-# AnderHue Paralegal LTB page
+# AnderHue Paralegal public site
 
-Static landing page for AnderHue Paralegal Professional Corporation (landlord LTB work). Fabsy is the software vendor only.
+Static Ontario public site and private LTB workspace for AnderHue Paralegal Professional Corporation. Fabsy is the software vendor only.
 
-- Vercel project: `anderhue-paralegal` (execom team), aliases `anderhue-paralegal.vercel.app` and `anderson-paralegal.vercel.app`.
-- Deploy: run `npm run build:anderhue` at the repository root and upload `dist-anderhue/` to the existing Vercel project. No serverless functions.
-- The form posts to the Supabase edge function `ltb-intake` (`submit`, then private uploads to bucket `ltb-documents`, then `finalize`). The anon key in `data-key` is the public key.
-- New origins must be added to the `LTB_ALLOWED_ORIGINS` function secret.
+- Production project: `anderhue-paralegal` in the `execom` Vercel team.
+- Canonical public domain: `https://anderhue.ca`. The `www` host and existing `vercel.app` aliases remain attached to the project.
+- Build: `npm run build:anderhue` at the repository root. Deploy the complete `dist-anderhue/` directory. The build includes static public pages, the bundled portal and its assets, and Vercel routing.
+- Public routes: `/`, `/landlords`, `/traffic-tickets`, `/other-matters`.
+- Private routes: `/sign-in` and `/admin/ltb`, both served by the portal bundle.
 
-## Pipeline
+The homepage links to all three practice areas. `/landlords` retains the existing N4, L1 and L2 information, date calculator and connected LTB intake. The Traffic Tickets and Other Matters pages currently offer a phone and email consultation. They do not use the Alberta ticket checkout, open an Ontario case or collect payment. A full Ontario traffic workflow requires its own verified scope, intake rules and backend before launch.
 
-1. `ltb-intake` registers or reuses the client (`ltb_clients`), opens a case (`ltb_cases`, `LTB-YYYY-NNNN`) and returns signed upload URLs.
-2. Uploaded photos are read by `process-ltb-intake` (Lovable AI gateway). Registration and tenancy fields fill only empty values. Conflicts, low confidence, PDFs and missing registration data put the case in `needs_review`. ID numbers are never stored.
-3. When reading finishes, `ltb_intake_alerts` queues one email per case. The `fabsy-ltb-intake-alerts` cron job sends it to `ltb_practices.alert_emails`.
-4. Staff work the file at `/admin/ltb` (practice members and Fabsy admins only).
+The public pages use a shared purple, ivory and gold identity. The private sign-in uses the same crest and palette. Public pages are indexable; the sign-in and admin routes remain `noindex`. `robots.txt` and `sitemap.xml` cover the public routes.
 
-### Practice access
+## Landlord intake and access
 
-Add an existing login to `ltb_practice_members` for `anderhue-paralegal` with
-role `licensee` or `clerk`. This grants access to that practice's LTB files only.
-Do not add a practice member to `user_roles` as `admin` or `case_manager`, since
-those separate roles grant access to the Fabsy traffic workspace. The shared
-admin shell redirects members without a traffic role to `/admin/ltb` before
-mounting other admin pages. Database policies enforce the same separation for
-traffic data and limit LTB records to the member's practice.
+The landlord form posts to the Supabase Edge Function `ltb-intake` (`submit`, private document uploads, then `finalize`). The anon key in `data-key` is a public browser key. The `LTB_ALLOWED_ORIGINS` function secret includes both Vercel aliases plus `https://anderhue.ca` and `https://www.anderhue.ca`. Changes to this function must be deployed individually with `--use-api`.
 
-## Pending
+`ltb-intake` registers or reuses a client, opens an `LTB-YYYY-NNNN` case and returns signed upload URLs. `process-ltb-intake` reads uploaded photos and fills only empty fields. Conflicts, low confidence, PDFs and missing registration data require review. Staff receive one case alert and work the file at `/admin/ltb`.
 
-- LSO licence number (`P#####` placeholders).
-- Custom domain.
+Practice access is granted through `ltb_practice_members` for `anderhue-paralegal`, using `licensee` or `clerk`. This grants LTB access only. Do not add a practice member to traffic `user_roles` unless separately authorized. Database policies and portal routing enforce the separation. Signing up creates a login only; membership must be granted after email confirmation.
 
-## Branded team sign-in
+Supabase Auth must allow `https://anderhue.ca/sign-in` and `https://www.anderhue.ca/sign-in` as redirect URLs, while preserving the existing Vercel aliases and the Fabsy site URL. The public site omits a licence number until Don's exact LSO number is confirmed. Do not publish a placeholder number.
 
-The team link is `https://anderhue-paralegal.vercel.app/sign-in`. The standalone
-portal uses the existing Supabase Auth accounts and LTB database policies. It
-requires membership in `anderhue-paralegal` before mounting any file screen.
-Traffic pages are not included in this app. Signing up creates a login only;
-a practice administrator must add the membership after the email is confirmed.
+## Release checks
 
-Build from the repository root with `npm run build:anderhue`. The output in
-`dist-anderhue/` contains the unchanged landing page, the portal and its assets,
-and the Vercel routing configuration. Deploy that entire directory to the
-existing `anderhue-paralegal` project in the `execom` team. Do not deploy only
-the two landing-page files, which would remove the sign-in app. Test a preview
-and require passing PR checks before promoting the reviewed release.
-
-Keep `/sign-in` on both existing Vercel aliases in Supabase Auth's redirect
-allowlist so email confirmation returns to the branded page. Preserve the
-existing site URL and all other redirect entries for shared accounts.
+Run `npm run build:anderhue` and `node scripts/verify-anderhue-browser.mjs`. The browser check uses fixtures for authentication and data, so it cannot create accounts or read production cases. Deploy a preview, require passing PR checks, then promote the reviewed build. Verify the public pages, private sign-in and landlord intake CORS on the final domain.

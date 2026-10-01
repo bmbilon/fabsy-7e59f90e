@@ -1,16 +1,16 @@
 html[data-app="anderhue"] {
-  --background: 90 21% 95%;
-  --foreground: 142 19% 11%;
-  --primary: 156 51% 23%;
-  --primary-dark: 156 51% 18%;
-  --ring: 156 51% 23%;
-  --card: 75 33% 98%;
-  --card-foreground: 142 19% 11%;
-  --border: 101 16% 80%;
-  --input: 101 16% 80%;
-  --muted: 90 21% 92%;
-  --muted-foreground: 142 10% 37%;
-  --accent: 101 16% 89%;
-  --font-display: system-ui, sans-serif;
+  --background: 36 38% 94%;
+  --foreground: 271 40% 17%;
+  --primary: 269 49% 32%;
+  --primary-dark: 269 49% 24%;
+  --ring: 36 38% 52%;
+  --card: 40 100% 99%;
+  --card-foreground: 271 40% 17%;
+  --border: 283 16% 78%;
+  --input: 283 16% 78%;
+  --muted: 283 18% 91%;
+  --muted-foreground: 278 12% 38%;
+  --accent: 282 20% 88%;
+  --font-display: Georgia, "Times New Roman", serif;
   --font-body: system-ui, sans-serif;
 }
