@@ -541,6 +541,8 @@ export async function mockClientApi(context, options = {}) {
   // Lowest priority: everything not matched below. Local app files pass; anything else is recorded and blocked.
   await context.route('**/*', route => {
     const url = new URL(route.request().url());
+    // WebKit exposes local object-URL thumbnail reads to routing; Chromium does not.
+    if (url.protocol === 'blob:' && /^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url.origin)) return route.continue();
     if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') return route.continue();
     controller.unexpected.push(`${route.request().method()} ${url.href}`);
     return route.abort('blockedbyclient');
@@ -652,7 +654,10 @@ const NETWORK_ERROR = /Failed to load resource: net::ERR_FAILED/;
 async function openPage(ctx, kind, mockOptions = {}) {
   const device = VIEWPORTS[kind];
   const context = await ctx.browser.newContext({
-    viewport: device.viewport, isMobile: device.isMobile, hasTouch: device.hasTouch, deviceScaleFactor: 1,
+    viewport: device.viewport,
+    // Firefox supports touch and narrow layouts, but not Playwright's mobile viewport emulation.
+    ...(ctx.browser.browserType().name() === 'firefox' ? {} : { isMobile: device.isMobile }),
+    hasTouch: device.hasTouch, deviceScaleFactor: 1,
     serviceWorkers: 'block', acceptDownloads: true, locale: 'en-CA', timezoneId: 'America/Toronto',
   });
   const api = await mockClientApi(context, mockOptions);
@@ -937,6 +942,8 @@ async function intakeErrors(ctx, kind) {
   const s = await openPage(ctx, kind);
   s.console.allow(HTTP_ERROR);
   s.console.allow(NETWORK_ERROR);
+  // Firefox describes the deliberately aborted practice-intake request as CORS.
+  s.console.allow(/Cross-Origin Request Blocked:.*\/functions\/v1\/practice-intake\. \(Reason: CORS request did not succeed\)\. Status code: \(null\)/);
   const { page, api } = s;
   await page.goto(`${ctx.origin}/start?area=other`);
   await continueButton(page).click();
@@ -1034,7 +1041,9 @@ async function portalFiles(ctx, kind) {
   await shot(ctx, s, '25-portal-detail-request', { fold: true });
 
   // Download: download action, then the browser follows the signed URL.
-  const downloadEvent = page.waitForEvent('download');
+  const downloadEvent = page.waitForEvent('download').catch(error => {
+    throw new Error(`${error.message}\nURL: ${page.url()}\nDownloads: ${JSON.stringify(api.downloads)}\nConsole: ${JSON.stringify(s.console.unexpected())}`);
+  });
   await page.getByRole('button', { name: 'Download Fee quote and next steps.pdf' }).click();
   const download = await downloadEvent;
   assert.equal(download.suggestedFilename(), 'Fee quote and next steps.pdf');

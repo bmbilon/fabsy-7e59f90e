@@ -15,6 +15,8 @@
 //   ANDERHUE_OUT_DIR           build folder (default dist-anderhue)
 //   ANDERHUE_QA_SCREENSHOTS    folder for screenshots of every state
 //   AH_QA_FONTS_DIR            local woff2 copies of the Google Fonts (optional)
+//   AH_QA_BROWSER              chromium (default), firefox, webkit, chrome, msedge
+import { chromium, firefox, webkit } from 'playwright';
 import { existsSync, mkdtempSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -31,8 +33,18 @@ if (!existsSync(path.join(buildDir, 'client.html')) || !existsSync(path.join(bui
 const shots = process.env.ANDERHUE_QA_SCREENSHOTS ? path.resolve(process.env.ANDERHUE_QA_SCREENSHOTS) : null;
 const fontsDir = process.env.AH_QA_FONTS_DIR || null;
 const started = Date.now();
+const engine = process.env.AH_QA_BROWSER || 'chromium';
+const launchers = {
+  chromium: () => launchChromium(),
+  firefox: () => firefox.launch(),
+  webkit: () => webkit.launch(),
+  chrome: () => chromium.launch({ channel: 'chrome' }),
+  msedge: () => chromium.launch({ channel: 'msedge' }),
+};
+if (!launchers[engine]) throw new Error(`Unknown AH_QA_BROWSER: ${engine}`);
+const browser = await launchers[engine]();
+console.log(`Browser: ${engine} ${browser.version()}`);
 const server = await startAnderhueServer(buildDir);
-const browser = await launchChromium();
 const log = message => console.log(`  ok  ${message}`);
 try {
   console.log('Public pages');

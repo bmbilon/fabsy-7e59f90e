@@ -88,13 +88,12 @@ export default function Wizard({ area, files, onFilesChange, onSent }: WizardPro
   // Typed answers survive a reload (files cannot).
   const rememberedCount = files.length || (lostFiles && draft ? draft.fileCount : 0);
   useEffect(() => {
-    if (sending) return undefined;
-    const timer = window.setTimeout(() => saveDraft(area, fields, rememberedCount), 250);
-    return () => window.clearTimeout(timer);
+    // These small text drafts must be stored before navigation. A delayed save
+    // can be lost when a browser reloads or suspends the page without pagehide.
+    if (!sending) saveDraft(area, fields, rememberedCount);
   }, [area, fields, rememberedCount, sending]);
 
-  // Flush the latest answers when the page is closed or reloaded, so nothing
-  // typed inside the save delay is lost.
+  // Also flush on pagehide and when a mobile browser backgrounds the page.
   const latestDraft = useRef({ area, fields, rememberedCount, sending });
   latestDraft.current = { area, fields, rememberedCount, sending };
   useEffect(() => {
@@ -102,8 +101,15 @@ export default function Wizard({ area, files, onFilesChange, onSent }: WizardPro
       const draft = latestDraft.current;
       if (!draft.sending) saveDraft(draft.area, draft.fields, draft.rememberedCount);
     };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
     window.addEventListener('pagehide', flush);
-    return () => window.removeEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   useEffect(() => {
