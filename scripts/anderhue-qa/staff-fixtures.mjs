@@ -1165,6 +1165,15 @@ export async function startStaffServer(outDir) {
  * options: signedIn, membership ('member' | 'none' | 'other' | 'fail'), hold,
  * updatesEnabled, authFail, viewport, fontsDir, data, now.
  */
+const pendingStaffRequests = new WeakMap();
+
+async function waitForStaffRequests(page) {
+  const pending = pendingStaffRequests.get(page);
+  const deadline = Date.now() + 15_000;
+  while (pending?.size && Date.now() < deadline) await page.waitForTimeout(50);
+  assert.equal(pending?.size || 0, 0, `Unfinished staff API requests: ${[...(pending || [])].map(request => request.url()).join(', ')}`);
+}
+
 export async function openStaffContext(browser, origin, options = {}) {
   const {
     signedIn = true, membership = 'member', hold = false, updatesEnabled = true, authFail = false,
@@ -1184,6 +1193,13 @@ export async function openStaffContext(browser, origin, options = {}) {
     if (location.origin === appOrigin) localStorage.setItem(key, JSON.stringify(value));
   }, [origin, AUTH_STORAGE_KEY, fixtureSession()]);
   const page = await context.newPage();
+  const pending = new Set();
+  pendingStaffRequests.set(page, pending);
+  page.on('request', request => {
+    if (['fetch', 'xhr'].includes(request.resourceType()) && new URL(request.url()).hostname.endsWith('.supabase.co')) pending.add(request);
+  });
+  page.on('requestfinished', request => pending.delete(request));
+  page.on('requestfailed', request => pending.delete(request));
   const errors = [];
   page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
   page.on('console', message => {
@@ -1257,13 +1273,15 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     // Let post-click React effects enqueue their invalidated queries before
     // checking network idle; a previously idle load state can resolve at once.
     await waitForQuiet(page);
-    await page.waitForLoadState('networkidle');
+    // WebKit leaves intercepted attachment navigations pending. Wait for
+    // application API requests specifically, not the browser download.
+    await waitForStaffRequests(page);
     await page.goto(url);
   };
   const allRequests = [];
   const finish = async session => {
     await waitForQuiet(session.page);
-    await session.page.waitForLoadState('networkidle');
+    await waitForStaffRequests(session.page);
     assert.deepEqual(session.errors, [], `Console or page errors:\n${session.errors.join('\n')}`);
     assert.deepEqual(session.externals, [], `Unexpected external requests:\n${session.externals.join('\n')}`);
     assertPracticeScoping(session.requests);
