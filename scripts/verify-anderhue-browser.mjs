@@ -9,9 +9,18 @@ import { chromium } from 'playwright';
 const root = path.resolve('dist-anderhue');
 const server = createServer((request, response) => {
   const pathname = new URL(request.url, 'http://localhost').pathname;
-  const target = pathname.startsWith('/assets/') ? path.join(root, 'assets', path.basename(pathname)) : path.join(root, 'portal.html');
+  const publicPage = pathname === '/' ? 'index.html' : {
+    '/landlords': 'landlords.html',
+    '/traffic-tickets': 'traffic-tickets.html',
+    '/other-matters': 'other-matters.html',
+    '/crest.svg': 'crest.svg',
+    '/public.css': 'public.css',
+    '/robots.txt': 'robots.txt',
+    '/sitemap.xml': 'sitemap.xml',
+  }[pathname];
+  const target = pathname.startsWith('/assets/') ? path.join(root, 'assets', path.basename(pathname)) : path.join(root, publicPage || 'portal.html');
   if (!existsSync(target)) { response.writeHead(404).end(); return; }
-  response.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : 'text/html');
+  response.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : target.endsWith('.svg') ? 'image/svg+xml' : 'text/html');
   response.end(readFileSync(target));
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -53,6 +62,23 @@ async function fixture({ signedIn = true, practice = 'anderhue-paralegal', fail 
 }
 
 try {
+  const publicContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const publicPage = await publicContext.newPage();
+  await publicPage.goto(origin);
+  await publicPage.getByRole('heading', { name: /Steady counsel/ }).waitFor();
+  assert.deepEqual(await publicPage.locator('.tile h3').allTextContents(), ['Landlords', 'Traffic Tickets', 'Other Matters']);
+  assert.ok(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  for (const [route, heading] of [['/landlords', 'Unpaid rent'], ['/traffic-tickets', 'Traffic Tickets'], ['/other-matters', 'Other Matters']]) {
+    await publicPage.goto(`${origin}${route}`);
+    await publicPage.getByRole('heading', { name: new RegExp(heading) }).first().waitFor();
+    assert.ok(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route} must fit a phone viewport`);
+  }
+  assert.ok((await publicPage.locator('body').innerText()).includes('Ontario'));
+  await publicPage.goto(`${origin}/landlords`);
+  assert.match(await publicPage.locator('#intake-form').getAttribute('data-endpoint'), /\/functions\/v1\/ltb-intake$/);
+  assert.doesNotMatch(await publicPage.locator('body').innerText(), /P#####|Draft · licence number pending/);
+  await publicContext.close();
+
   const anon = await fixture({ signedIn: false });
   await anon.page.goto(`${origin}/admin/ltb`);
   await anon.page.waitForURL(`${origin}/sign-in`);
@@ -98,7 +124,7 @@ try {
     if (options.hold) { denied.release(); await denied.page.getByRole('region', { name: 'LTB file stages, scroll horizontally' }).waitFor(); }
     await denied.close();
   }
-  console.log('PASS: AnderHue branding, signup return URL, sign-in/out, practice scope, denied access, traffic routes and mobile layout');
+  console.log('PASS: AnderHue public routes, landlord intake, mobile layout, branding, signup return URL, sign-in/out, practice scope and denied access');
 } finally {
   await browser.close();
   await new Promise(resolve => server.close(resolve));
