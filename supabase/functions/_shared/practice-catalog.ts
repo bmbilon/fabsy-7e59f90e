@@ -153,7 +153,7 @@ export const STAGES: Record<PracticeArea, StageDef[]> = {
     { value: "trial_scheduled", staffLabel: "Trial scheduled", clientLabel: "Trial scheduled", phase: "active", notify: true,
       clientNext: "Your trial date is set. We will appear for you and tell you whether you need to attend." },
     { value: "closed", staffLabel: "Closed", clientLabel: "File closed", phase: "done", notify: true, terminal: true,
-      clientNext: "Your file is closed. The result is shown on this page." },
+      clientNext: "Your file is closed. The result is recorded in your file." },
     { value: "declined", staffLabel: "Declined", clientLabel: "Not taken on", phase: "done", notify: true, terminal: true,
       clientNext: "We are not able to take on this ticket. The deadline on your ticket still applies, so choose an option before it passes." },
   ],

@@ -1,6 +1,7 @@
-// Local static server for dist-anderhue that mirrors the Vercel routing in
-// ontario/anderhue-paralegal-site/vercel.json (clean URLs plus app rewrites).
-// Used by Playwright QA scripts; never talks to Supabase.
+// Local static server for dist-anderhue that mirrors the Vercel routing and
+// headers in ontario/anderhue-paralegal-site/vercel.json (clean URLs, app
+// rewrites, and the response headers, including the Content-Security-Policy,
+// so browser QA catches CSP violations). Never talks to Supabase.
 import { createServer } from 'node:http';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -24,11 +25,42 @@ export function resolveAnderhuePath(root, pathname) {
   return null;
 }
 
-export async function startAnderhueServer(root = path.resolve('dist-anderhue')) {
+// Vercel source patterns used in vercel.json: literal paths, "(.*)" groups and ":name*" segments.
+function sourcePattern(source) {
+  const pattern = source.split('(.*)').map(part => part
+    .split(/(\/:[a-z]+\*)/i)
+    .map(piece => /^\/:[a-z]+\*$/i.test(piece) ? '(?:/.*)?' : piece.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('')).join('(.*)');
+  return new RegExp(`^${pattern}$`);
+}
+
+export function vercelHeaders(root, { local = true } = {}) {
+  const file = path.join(root, 'vercel.json');
+  if (!existsSync(file)) return () => ({});
+  const rules = (JSON.parse(readFileSync(file, 'utf8')).headers || [])
+    .map(rule => ({ pattern: sourcePattern(rule.source), headers: rule.headers }));
+  return pathname => {
+    const result = {};
+    for (const rule of rules) {
+      if (!rule.pattern.test(pathname)) continue;
+      for (const { key, value } of rule.headers) {
+        // Plain-http localhost cannot honour HTTPS-only directives.
+        if (local && key === 'Strict-Transport-Security') continue;
+        result[key] = local && key === 'Content-Security-Policy'
+          ? value.replace(/;\s*upgrade-insecure-requests/, '') : value;
+      }
+    }
+    return result;
+  };
+}
+
+export async function startAnderhueServer(root = path.resolve('dist-anderhue'), { headers = true } = {}) {
+  const headersFor = headers ? vercelHeaders(root) : () => ({});
   const server = createServer((request, response) => {
     const pathname = new URL(request.url, 'http://localhost').pathname;
     const target = resolveAnderhuePath(root, pathname);
     if (!target) { response.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found'); return; }
+    for (const [key, value] of Object.entries(headersFor(pathname))) response.setHeader(key, value);
     response.setHeader('Content-Type', TYPES[path.extname(target)] || 'application/octet-stream');
     response.end(readFileSync(target));
   });
