@@ -83,12 +83,26 @@ alter table public.ltb_clients
   add constraint ltb_clients_id_practice_key unique (id, practice_id);
 
 -- Client portal state on landlord files (same columns as practice_matters).
+-- portal_visible: a public intake for a client who already has a file stays
+-- out of the client portal (and sends no receipt) until staff take it forward,
+-- so a stranger cannot plant files in someone else's portal.
 alter table public.ltb_cases
   add column client_request_message text check (char_length(client_request_message) between 1 and 1000),
   add column client_request_at timestamptz,
   add column client_uploaded_at timestamptz,
+  add column portal_visible boolean not null default true,
   add constraint ltb_cases_client_request_check
     check ((client_request_message is null) = (client_request_at is null));
+
+-- A landlord file's client must belong to the same practice. The composite key
+-- replaces the original client_id key (it implies it) under the same name, so
+-- PostgREST still sees exactly one ltb_cases -> ltb_clients relationship and
+-- existing ltb_clients(...) embeds keep working. Added NOT VALID and then
+-- validated, the usual pattern for checking existing rows.
+alter table public.ltb_cases drop constraint ltb_cases_client_id_fkey;
+alter table public.ltb_cases add constraint ltb_cases_client_id_fkey foreign key (client_id, practice_id)
+  references public.ltb_clients (id, practice_id) not valid;
+alter table public.ltb_cases validate constraint ltb_cases_client_id_fkey;
 
 -- Existing rows are intake uploads, so they keep the 'client' default.
 alter table public.ltb_case_documents
@@ -169,12 +183,15 @@ returns boolean language sql immutable security definer set search_path = public
 $$;
 
 -- Trims, removes control characters (single-line fields turn line breaks into
--- spaces) and caps the length. Empty input becomes null.
+-- spaces) and caps the length. Empty input becomes null. Zero-width and
+-- bidirectional formatting characters are removed first, so a name such as
+-- "scan<RLO>fdp.exe" cannot display as something it is not.
 create function public.practice_clean_text(p_value text, p_max integer, p_multiline boolean default false)
 returns text language sql immutable security definer set search_path = public, pg_temp as $$
   select nullif(btrim(left(btrim(
-    case when p_multiline then regexp_replace(p_value, '[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]', '', 'g')
-         else regexp_replace(p_value, '[[:cntrl:]]+', ' ', 'g') end, E' \t\r\n'), p_max), E' \t\r\n'), '');
+    case when p_multiline then regexp_replace(v.visible, '[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]', '', 'g')
+         else regexp_replace(v.visible, '[[:cntrl:]]+', ' ', 'g') end, E' \t\r\n'), p_max), E' \t\r\n'), '')
+  from (select regexp_replace(p_value, '[​-‏‪-‮⁠-⁩﻿]', '', 'g') as visible) v;
 $$;
 
 -- Strict YYYY-MM-DD dates. Empty means null; anything else invalid raises.
@@ -380,10 +397,11 @@ create table public.practice_matters (
   deadline_date date,
   other_party text check (char_length(other_party) <= 200),
   client_city text check (char_length(client_city) <= 100),
-  -- Client portal
+  -- Client portal (portal_visible: see ltb_cases.portal_visible)
   client_request_message text check (char_length(client_request_message) between 1 and 1000),
   client_request_at timestamptz,
   client_uploaded_at timestamptz,
+  portal_visible boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint practice_matters_stage_check check (
@@ -515,6 +533,24 @@ create index practice_notices_pending_idx on public.practice_notices (next_attem
   where status in ('pending', 'retry', 'sending');
 create index practice_notices_case_idx on public.practice_notices (case_id, created_at desc)
   where case_id is not null;
+-- Receipt throttling looks up a client's recent receipts.
+create index practice_notices_client_kind_idx on public.practice_notices (client_id, kind, created_at desc)
+  where client_id is not null;
+
+-- ---------------------------------------------------------------------------
+-- Rate limiter for the public edge functions (mirror of
+-- ticket_intake_draft_rate_limits). The functions send only a keyed hash of
+-- what they limit (for example an HMAC of action and network address); raw
+-- addresses are never stored. Counting happens in one row-locked upsert, so
+-- parallel requests cannot slip past the limit.
+-- ---------------------------------------------------------------------------
+create table public.practice_rate_limits (
+  key_hash text primary key check (key_hash ~ '^[0-9a-f]{64}$'),
+  window_started_at timestamptz not null,
+  hits integer not null check (hits >= 1),
+  updated_at timestamptz not null default now()
+);
+create index practice_rate_limits_updated_idx on public.practice_rate_limits (updated_at);
 
 -- ---------------------------------------------------------------------------
 -- File helpers. Every function that works across areas picks its table with
@@ -536,15 +572,29 @@ end $$;
 -- Same as practice_case_ref, but locks the file row for the rest of the
 -- transaction (stage changes, requests and uploads serialize on it).
 create function public.practice_lock_case(p_area text, p_case_id uuid)
-returns table (practice_id text, client_id uuid, stage text, outcome text, source text)
+returns table (practice_id text, client_id uuid, stage text, outcome text, source text, portal_visible boolean)
 language plpgsql security definer set search_path = public, pg_temp as $$
 begin
   if p_area = 'ltb' then
-    return query select c.practice_id, c.client_id, c.stage, c.outcome, c.source
+    return query select c.practice_id, c.client_id, c.stage, c.outcome, c.source, c.portal_visible
       from public.ltb_cases c where c.id = p_case_id for update;
   elsif p_area in ('traffic', 'general') then
-    return query select m.practice_id, m.client_id, m.stage, m.outcome, m.source
+    return query select m.practice_id, m.client_id, m.stage, m.outcome, m.source, m.portal_visible
       from public.practice_matters m where m.id = p_case_id and m.area = p_area for update;
+  end if;
+end $$;
+
+-- Puts a held file into the client portal. Called when staff deliberately
+-- engage the client on it (asking for documents, sharing one); a stage move
+-- out of new_intake does the same through practice_reveal_on_stage.
+create function public.practice_reveal_file(p_area text, p_case_id uuid)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if p_area = 'ltb' then
+    update public.ltb_cases c set portal_visible = true where c.id = p_case_id and not c.portal_visible;
+  elsif p_area in ('traffic', 'general') then
+    update public.practice_matters m set portal_visible = true
+      where m.id = p_case_id and m.area = p_area and not m.portal_visible;
   end if;
 end $$;
 
@@ -718,10 +768,13 @@ begin
 end $$;
 
 -- Queues one notice. Audience follows the kind. Client notices need the
--- practice's client_updates_enabled switch and a valid client address; staff
--- notices go to the practice alert_emails. Smoke tests never queue anything.
--- The event key makes every notice idempotent. Returns the new id, or null
--- when nothing was queued (switched off, no recipient, smoke test, duplicate).
+-- practice's client_updates_enabled switch, a valid client address and a file
+-- the client can see in the portal; staff notices go to the practice
+-- alert_emails. Smoke tests never queue anything, and a client receives at
+-- most two intake receipts a day (public intakes are anonymous). The event key
+-- makes every notice idempotent. Returns the new id, or null when nothing was
+-- queued (switched off, no recipient, held file, throttled, smoke test,
+-- duplicate).
 create function public.practice_enqueue_notice(p_practice_id text, p_area text, p_case_id uuid, p_client_id uuid,
   p_kind text, p_event_key text, p_detail jsonb default '{}'::jsonb, p_delay_seconds integer default 0,
   p_actor uuid default null)
@@ -783,6 +836,17 @@ begin
       raise exception 'PRACTICE_NOTICE_INVALID';
     end if;
     if not public.practice_is_email(v_email) then
+      return null;
+    end if;
+    if p_case_id is not null and not coalesce(case when p_area = 'ltb'
+        then (select c.portal_visible from public.ltb_cases c where c.id = p_case_id)
+        else (select m.portal_visible from public.practice_matters m where m.id = p_case_id) end, false) then
+      return null;
+    end if;
+    if p_kind = 'intake_received' and (
+        select count(*) from public.practice_notices x
+        where x.client_id = v_client_id and x.kind = 'intake_received'
+          and x.created_at > now() - interval '24 hours') >= 2 then
       return null;
     end if;
     v_recipients := array[v_email];
@@ -871,6 +935,40 @@ create trigger practice_matters_guard before update on public.practice_matters
 create trigger practice_matters_touch before update on public.practice_matters
   for each row execute function public.ltb_touch_updated_at();
 
+-- Portal hold. Public intakes are anonymous, so a new public file for a client
+-- who already has a file (in any area) is held out of the client portal until
+-- staff take it forward; it sends no receipt meanwhile. A client's first file,
+-- staff-opened files and smoke tests are not held.
+create function public.practice_hold_returning_intake()
+returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if new.source in ('ltb-landing', 'anderhue-site') and (
+      exists (select 1 from public.ltb_cases c where c.client_id = new.client_id and c.id <> new.id)
+      or exists (select 1 from public.practice_matters m where m.client_id = new.client_id and m.id <> new.id)) then
+    new.portal_visible := false;
+  end if;
+  return new;
+end $$;
+create trigger ltb_cases_portal_hold before insert on public.ltb_cases
+  for each row execute function public.practice_hold_returning_intake();
+create trigger practice_matters_portal_hold before insert on public.practice_matters
+  for each row execute function public.practice_hold_returning_intake();
+
+-- Moving a held file out of new_intake is the staff decision that it is real,
+-- whichever path moves it (practice_set_stage or the legacy LTB RPC).
+create function public.practice_reveal_on_stage()
+returns trigger language plpgsql set search_path = public, pg_temp as $$
+begin
+  new.portal_visible := true;
+  return new;
+end $$;
+create trigger ltb_cases_portal_reveal before update of stage on public.ltb_cases
+  for each row when (not new.portal_visible and new.stage is distinct from old.stage and new.stage <> 'new_intake')
+  execute function public.practice_reveal_on_stage();
+create trigger practice_matters_portal_reveal before update of stage on public.practice_matters
+  for each row when (not new.portal_visible and new.stage is distinct from old.stage and new.stage <> 'new_intake')
+  execute function public.practice_reveal_on_stage();
+
 -- Staff edits through RLS are logged with the changed field names only, like
 -- ltb_log_case_edit. Stage, outcome and portal request changes are logged by
 -- the functions that make them.
@@ -887,7 +985,7 @@ begin
   join jsonb_each(to_jsonb(old)) o using (key)
   where n.value is distinct from o.value
     and n.key not in ('updated_at', 'stage', 'stage_changed_at', 'outcome', 'closed_at', 'field_sources',
-      'client_request_message', 'client_request_at', 'client_uploaded_at');
+      'client_request_message', 'client_request_at', 'client_uploaded_at', 'portal_visible');
   if cardinality(changed) > 0 then
     insert into public.practice_matter_events (matter_id, practice_id, actor_id, event, detail)
     values (new.id, new.practice_id, auth.uid(), 'case_updated', jsonb_build_object('fields', to_jsonb(changed)));
@@ -898,9 +996,10 @@ create trigger practice_matters_log_edit after update on public.practice_matters
   for each row execute function public.practice_log_matter_edit();
 
 -- LTB edit logging, extended for the shared client registry: portal request
--- columns are logged by the practice functions instead, the portal revocation
--- stamp by practice_revoke_portal_access, and client edits and registration
--- changes now reach every file of the client, not only landlord files.
+-- and visibility columns are logged by the practice functions instead, the
+-- portal revocation stamp by practice_revoke_portal_access, and client edits
+-- and registration changes now reach every file of the client, not only
+-- landlord files.
 create or replace function public.ltb_log_case_edit()
 returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -914,7 +1013,7 @@ begin
   join jsonb_each(to_jsonb(old)) o using (key)
   where n.value is distinct from o.value
     and n.key not in ('updated_at', 'stage', 'stage_changed_at', 'outcome', 'closed_at', 'field_sources',
-      'client_request_message', 'client_request_at', 'client_uploaded_at');
+      'client_request_message', 'client_request_at', 'client_uploaded_at', 'portal_visible');
   if cardinality(changed) > 0 then
     insert into public.ltb_case_events (case_id, practice_id, actor_id, event, detail)
     values (new.id, new.practice_id, auth.uid(), 'case_updated', jsonb_build_object('fields', to_jsonb(changed)));
@@ -996,11 +1095,12 @@ end $$;
 -- read; the area comes from the table)
 -- ---------------------------------------------------------------------------
 
--- Client update on every move into a notifying stage. practice_set_stage sets
--- two transaction-local settings before its update: practice.client_message
--- (staff's personal line, empty for none) and practice.notify ('off'
--- suppresses the email). The legacy ltb_set_case_stage sets neither, which
--- means notify with no message. Sending waits 90 seconds
+-- Client update on every move into a notifying stage made through
+-- practice_set_stage, which sets two transaction-local settings before its
+-- update: practice.notify ('on' or 'off', always set) and
+-- practice.client_message (staff's personal line, empty for none). Only 'on'
+-- queues an email: other paths, such as the legacy ltb_set_case_stage, have no
+-- preview or undo and so never email clients. Sending waits 90 seconds
 -- (STAGE_NOTICE_DELAY_SECONDS) so a slip can be undone; claim_practice_notices
 -- supersedes overtaken updates.
 create function public.practice_queue_stage_notice()
@@ -1008,8 +1108,7 @@ returns trigger language plpgsql security definer set search_path = public, pg_t
 declare
   v_area text;
 begin
-  if new.source = 'smoke-test'
-     or coalesce(nullif(current_setting('practice.notify', true), ''), 'on') = 'off' then
+  if new.source = 'smoke-test' or coalesce(current_setting('practice.notify', true), '') <> 'on' then
     return new;
   end if;
   if tg_table_name = 'ltb_cases' then
@@ -1035,7 +1134,7 @@ create trigger practice_matters_stage_notice after update of stage on public.pra
 
 -- "We have your file" once a public intake is finalized (or opened already
 -- finalized when no documents were chosen). Staff-opened files and smoke tests
--- are not public intakes.
+-- are not public intakes, and a file held out of the portal sends no receipt.
 create function public.practice_queue_intake_receipt()
 returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -1043,7 +1142,8 @@ declare
 begin
   if new.intake_finalized_at is null
      or (tg_op = 'UPDATE' and old.intake_finalized_at is not null)
-     or new.source not in ('ltb-landing', 'anderhue-site') then
+     or new.source not in ('ltb-landing', 'anderhue-site')
+     or not new.portal_visible then
     return new;
   end if;
   if tg_table_name = 'ltb_cases' then
@@ -1269,7 +1369,8 @@ end $$;
 -- ---------------------------------------------------------------------------
 -- Client portal (service role only; practice-portal verifies the signed link
 -- and its revocation before calling). Every function proves the file belongs
--- to p_client_id; smoke tests are never visible.
+-- to p_client_id; smoke tests and files held out of the portal
+-- (portal_visible false) are never visible.
 -- ---------------------------------------------------------------------------
 create function public.practice_portal_session(p_client_id uuid)
 returns jsonb language plpgsql stable security definer set search_path = public, pg_temp as $$
@@ -1296,7 +1397,7 @@ begin
           and (c.client_uploaded_at is null or c.client_uploaded_at < c.client_request_at),
         'closed', c.stage in ('closed', 'declined')) as item
     from public.ltb_cases c
-    where c.client_id = p_client_id and c.source <> 'smoke-test'
+    where c.client_id = p_client_id and c.source <> 'smoke-test' and c.portal_visible
     union all
     select m.updated_at, m.created_at, jsonb_build_object(
         'area', m.area, 'id', m.id, 'number', m.matter_number, 'stage', m.stage, 'outcome', m.outcome,
@@ -1306,7 +1407,7 @@ begin
           and (m.client_uploaded_at is null or m.client_uploaded_at < m.client_request_at),
         'closed', m.stage in ('closed', 'declined'))
     from public.practice_matters m
-    where m.client_id = p_client_id and m.source <> 'smoke-test'
+    where m.client_id = p_client_id and m.source <> 'smoke-test' and m.portal_visible
     order by 1 desc, 2 desc
     limit 100
   ) f;
@@ -1363,7 +1464,7 @@ begin
         ), '[]'::jsonb))
       into v_file
     from public.ltb_cases c
-    where c.id = p_case_id and c.client_id = p_client_id and c.source <> 'smoke-test';
+    where c.id = p_case_id and c.client_id = p_client_id and c.source <> 'smoke-test' and c.portal_visible;
   elsif p_area in ('traffic', 'general') then
     select jsonb_build_object(
         'area', m.area, 'id', m.id, 'number', m.matter_number, 'stage', m.stage, 'outcome', m.outcome,
@@ -1399,7 +1500,8 @@ begin
         ), '[]'::jsonb))
       into v_file
     from public.practice_matters m
-    where m.id = p_case_id and m.area = p_area and m.client_id = p_client_id and m.source <> 'smoke-test';
+    where m.id = p_case_id and m.area = p_area and m.client_id = p_client_id and m.source <> 'smoke-test'
+      and m.portal_visible;
   end if;
   return v_file;
 end $$;
@@ -1420,7 +1522,8 @@ declare
   v_result jsonb := '[]'::jsonb;
 begin
   select * into v_case from public.practice_lock_case(p_area, p_case_id);
-  if not found or v_case.client_id is distinct from p_client_id or v_case.source = 'smoke-test' then
+  if not found or v_case.client_id is distinct from p_client_id or v_case.source = 'smoke-test'
+     or not v_case.portal_visible then
     raise exception 'PRACTICE_CASE_NOT_FOUND';
   end if;
   if v_case.stage in ('closed', 'declined') then
@@ -1486,7 +1589,8 @@ declare
   v_detail jsonb;
 begin
   select * into v_case from public.practice_lock_case(p_area, p_case_id);
-  if not found or v_case.client_id is distinct from p_client_id or v_case.source = 'smoke-test' then
+  if not found or v_case.client_id is distinct from p_client_id or v_case.source = 'smoke-test'
+     or not v_case.portal_visible then
     raise exception 'PRACTICE_CASE_NOT_FOUND';
   end if;
   if char_length(v_note) > 1000 then
@@ -1549,7 +1653,7 @@ begin
     from public.ltb_case_documents d
     join public.ltb_cases c on c.id = d.case_id
     where d.id = p_document_id and d.case_id = p_case_id and c.client_id = p_client_id
-      and c.source <> 'smoke-test' and d.uploaded_at is not null
+      and c.source <> 'smoke-test' and c.portal_visible and d.uploaded_at is not null
       and (d.uploaded_by = 'client' or d.shared_with_client);
   elsif p_area in ('traffic', 'general') then
     return query
@@ -1557,13 +1661,13 @@ begin
     from public.practice_matter_documents d
     join public.practice_matters m on m.id = d.matter_id
     where d.id = p_document_id and d.matter_id = p_case_id and m.area = p_area and m.client_id = p_client_id
-      and m.source <> 'smoke-test' and d.uploaded_at is not null
+      and m.source <> 'smoke-test' and m.portal_visible and d.uploaded_at is not null
       and (d.uploaded_by = 'client' or d.shared_with_client);
   end if;
 end $$;
 
--- Queues a fresh portal link for a known client with at least one real file,
--- at most once per 10-minute window. The edge function always answers the
+-- Queues a fresh portal link for a known client with at least one real file
+-- in the portal, at most once per 10-minute window. The edge function always answers the
 -- same way, so the result never reveals whether the email is a client.
 create function public.practice_request_portal_link(p_practice_id text, p_email text)
 returns boolean language plpgsql security definer set search_path = public, pg_temp as $$
@@ -1580,9 +1684,9 @@ begin
     return false;
   end if;
   if not exists (select 1 from public.ltb_cases k
-                 where k.client_id = v_client_id and k.source <> 'smoke-test')
+                 where k.client_id = v_client_id and k.source <> 'smoke-test' and k.portal_visible)
      and not exists (select 1 from public.practice_matters m
-                     where m.client_id = v_client_id and m.source <> 'smoke-test') then
+                     where m.client_id = v_client_id and m.source <> 'smoke-test' and m.portal_visible) then
     return false;
   end if;
   return public.practice_enqueue_notice(p_practice_id, null, null, v_client_id, 'portal_link',
@@ -1590,18 +1694,58 @@ begin
     '{}'::jsonb, 0, null) is not null;
 end $$;
 
+-- Counts one hit against a fixed window per key: true when the hit is allowed
+-- (and counted), false when the key is over p_limit for the current window.
+-- One row-locked upsert does the counting, so parallel calls serialize on the
+-- key; denied hits stop counting at p_limit + 1. Each call also removes a
+-- bounded batch of keys idle for more than two days (windows are at most one
+-- day, so no live window is lost).
+create function public.practice_rate_limit_hit(p_key_hash text, p_limit integer, p_window_seconds integer)
+returns boolean language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_hits integer;
+begin
+  if p_key_hash is null or p_key_hash !~ '^[0-9a-f]{64}$'
+     or p_limit is null or p_limit not between 1 and 10000
+     or p_window_seconds is null or p_window_seconds not between 1 and 86400 then
+    raise exception 'PRACTICE_RATE_LIMIT_INVALID';
+  end if;
+
+  delete from public.practice_rate_limits r
+    where r.key_hash in (select x.key_hash from public.practice_rate_limits x
+                         where x.updated_at < now() - interval '2 days'
+                         limit 100 for update skip locked);
+
+  insert into public.practice_rate_limits as r (key_hash, window_started_at, hits, updated_at)
+  values (p_key_hash, now(), 1, now())
+  on conflict (key_hash) do update set
+    window_started_at = case when r.window_started_at <= now() - make_interval(secs => p_window_seconds)
+                             then now() else r.window_started_at end,
+    hits = case when r.window_started_at <= now() - make_interval(secs => p_window_seconds)
+                then 1 else least(r.hits, p_limit) + 1 end,
+    updated_at = now()
+  returning r.hits into v_hits;
+  return v_hits <= p_limit;
+end $$;
+
 -- ---------------------------------------------------------------------------
 -- Notice outbox functions (service role only; process-practice-notices)
 -- ---------------------------------------------------------------------------
 
 -- Same claim contract as claim_ltb_intake_alerts (3-minute lease, 23-hour
--- idempotency window). First, pending stage updates that would tell the
--- client something stale are superseded:
---   stage_moved              the file is no longer in that stage
---   replaced_by_newer_update a later stage update exists for the same file
---   client_already_told      the last update the client may have received was
---                            already about this stage and there is no new
---                            personal message (undoing a slip sends nothing)
+-- idempotency window), with two steps first:
+-- 1. Kill switch: while a practice has client emails switched off, its client
+--    notices that have not gone out are cancelled (client_updates_disabled),
+--    including ones whose sending lease ran out (they would be claimed again).
+-- 2. Stage updates that would tell the client something stale are superseded.
+--    A file's state is its (stage, outcome) pair, so an outcome correction
+--    counts as a change:
+--    stage_moved              the file is no longer in that state
+--    replaced_by_newer_update a later live update (not cancelled, superseded
+--                             or failed) for the file's current state exists
+--    client_already_told      the last update the client may have received was
+--                             about this same state and there is no new
+--                             personal message (undoing a slip sends nothing)
 create function public.claim_practice_notices(p_limit integer default 10)
 returns setof public.practice_notices
 language plpgsql security definer set search_path = public, pg_temp as $$
@@ -1610,29 +1754,45 @@ begin
     raise exception 'PRACTICE_NOTICE_LIMIT_INVALID';
   end if;
 
+  update public.practice_notices n
+    set status = 'cancelled', failure_code = 'client_updates_disabled', claim_id = null, claim_expires_at = null
+    from public.ltb_practices p
+    where p.id = n.practice_id and not p.client_updates_enabled and n.audience = 'client'
+      and (n.status in ('pending', 'retry') or (n.status = 'sending' and n.claim_expires_at <= clock_timestamp()));
+
   with stale as (
     select n.id, case when f.moved then 'stage_moved' when f.replaced then 'replaced_by_newer_update'
                       else 'client_already_told' end as reason
     from public.practice_notices n
+    left join lateral (
+      select c.stage, c.outcome from public.ltb_cases c where n.area = 'ltb' and c.id = n.case_id
+      union all
+      select m.stage, m.outcome from public.practice_matters m
+        where n.area in ('traffic', 'general') and m.area = n.area and m.id = n.case_id
+    ) cur on true
+    left join lateral (
+      select t.detail->>'stage' as stage, t.detail->>'outcome' as outcome
+      from public.practice_notices t
+      where t.case_id = n.case_id and t.area = n.area and t.kind = 'stage_changed'
+        and t.status in ('sent', 'sending', 'indeterminate')
+      order by t.created_at desc, t.id desc
+      limit 1
+    ) told on true
     cross join lateral (
       select
-        n.detail->>'stage' is distinct from (case when n.area = 'ltb'
-          then (select c.stage from public.ltb_cases c where c.id = n.case_id)
-          else (select m.stage from public.practice_matters m where m.id = n.case_id and m.area = n.area) end)
-          as moved,
+        (n.detail->>'stage', n.detail->>'outcome') is distinct from (cur.stage, cur.outcome) as moved,
         exists (
           select 1 from public.practice_notices newer
           where newer.case_id = n.case_id and newer.area = n.area and newer.kind = 'stage_changed'
+            and newer.status not in ('cancelled', 'superseded', 'failed')
+            and (newer.detail->>'stage', newer.detail->>'outcome') is not distinct from (cur.stage, cur.outcome)
             and (newer.created_at, newer.id) > (n.created_at, n.id)) as replaced,
-        n.detail->>'message' is null and n.detail->>'stage' = (
-          select told.detail->>'stage' from public.practice_notices told
-          where told.case_id = n.case_id and told.area = n.area and told.kind = 'stage_changed'
-            and told.status in ('sent', 'sending', 'indeterminate')
-          order by told.created_at desc, told.id desc
-          limit 1) as repeated
+        n.detail->>'message' is null and told.stage is not null
+          and (n.detail->>'stage', n.detail->>'outcome') is not distinct from (told.stage, told.outcome)
+          as repeated
     ) f
     where n.kind = 'stage_changed' and n.status in ('pending', 'retry')
-      and (f.moved or f.replaced or coalesce(f.repeated, false))
+      and (f.moved or f.replaced or f.repeated)
     for update of n skip locked
   )
   update public.practice_notices n
@@ -1741,7 +1901,9 @@ end $$;
 
 -- Moves a file between stages in any area (replaces ltb_set_case_stage in the
 -- AnderHue workspace). Calling with the current stage changes nothing, except
--- that a closed file's outcome can be corrected (no client email).
+-- that a closed file's outcome can be corrected; with p_notify the client gets
+-- a fresh update with the corrected outcome (the queued or sent one with the
+-- old outcome is superseded or outdated by it).
 create function public.practice_set_stage(
   p_area text, p_case_id uuid, p_stage text, p_outcome text default null, p_note text default null,
   p_client_message text default null, p_notify boolean default true
@@ -1811,17 +1973,32 @@ begin
   if v_case.stage = p_stage then
     perform public.practice_log_event(p_area, p_case_id, v_case.practice_id, auth.uid(), 'outcome_changed',
       jsonb_strip_nulls(jsonb_build_object('stage', p_stage, 'outcome', v_outcome, 'note', v_note)));
+    -- The stage did not move, so the stage trigger stays quiet; queue the
+    -- corrected update here, keyed by the clock so each correction is new.
+    if coalesce(p_notify, true) and p_stage = any (public.practice_notify_stages(p_area)) then
+      v_notice_id := public.practice_enqueue_notice(v_case.practice_id, p_area, p_case_id, v_case.client_id,
+        'stage_changed', format('stage/%s/%s/%s/%s', p_area, p_case_id, p_stage,
+          public.practice_epoch_ms(clock_timestamp())),
+        jsonb_strip_nulls(jsonb_build_object('stage', p_stage, 'outcome', v_outcome, 'message', v_message)),
+        90, auth.uid());
+    end if;
   else
     perform public.practice_log_event(p_area, p_case_id, v_case.practice_id, auth.uid(), 'stage_changed',
       jsonb_strip_nulls(jsonb_build_object('stage', p_stage, 'outcome', v_outcome, 'note', v_note)));
-    select n.id into v_notice_id from public.practice_notices n
-      where n.event_key = format('stage/%s/%s/%s/%s', p_area, p_case_id, p_stage, public.practice_epoch_ms(v_changed_at));
+    -- A quiet move reports no notice, even one an earlier move left under the
+    -- same key.
+    if coalesce(p_notify, true) then
+      select n.id into v_notice_id from public.practice_notices n
+        where n.event_key = format('stage/%s/%s/%s/%s', p_area, p_case_id, p_stage,
+          public.practice_epoch_ms(v_changed_at));
+    end if;
   end if;
   return jsonb_build_object('stage', p_stage, 'outcome', v_outcome, 'noticeId', v_notice_id);
 end $$;
 
 -- Asks the client for documents through the portal. Returns the queued
--- notice id (null while client emails are switched off).
+-- notice id (null while client emails are switched off). Asking the client is
+-- a staff decision that the file is real, so a held file enters the portal.
 create function public.practice_request_documents(p_area text, p_case_id uuid, p_message text)
 returns uuid language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -1844,9 +2021,11 @@ begin
   end if;
 
   if p_area = 'ltb' then
-    update public.ltb_cases c set client_request_message = v_message, client_request_at = now() where c.id = p_case_id;
+    update public.ltb_cases c set client_request_message = v_message, client_request_at = now(), portal_visible = true
+      where c.id = p_case_id;
   else
-    update public.practice_matters m set client_request_message = v_message, client_request_at = now()
+    update public.practice_matters m set client_request_message = v_message, client_request_at = now(),
+      portal_visible = true
       where m.id = p_case_id;
   end if;
   perform public.practice_log_event(p_area, p_case_id, v_case.practice_id, auth.uid(), 'documents_requested',
@@ -1856,8 +2035,8 @@ begin
     jsonb_build_object('message', v_message), 0, auth.uid());
 end $$;
 
--- Closes the open request. A request email still waiting to go out is
--- cancelled with it.
+-- Closes the open request. A request email that has not gone out (pending or
+-- waiting to retry) is cancelled with it.
 create function public.practice_clear_request(p_area text, p_case_id uuid)
 returns void language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -1875,8 +2054,9 @@ begin
       where m.id = p_case_id and m.client_request_message is not null;
   end if;
   if found then
-    update public.practice_notices n set status = 'cancelled'
-      where n.area = p_area and n.case_id = p_case_id and n.kind = 'documents_requested' and n.status = 'pending';
+    update public.practice_notices n set status = 'cancelled', failure_code = 'request_cleared'
+      where n.area = p_area and n.case_id = p_case_id and n.kind = 'documents_requested'
+        and n.status in ('pending', 'retry');
     perform public.practice_log_event(p_area, p_case_id, v_case.practice_id, auth.uid(), 'request_cleared',
       '{}'::jsonb);
   end if;
@@ -1929,7 +2109,8 @@ begin
 end $$;
 
 -- Marks a staff upload received once its object is in storage. A document
--- registered as shared is announced to the client now (once per document).
+-- registered as shared is announced to the client (once per document, after
+-- the 90-second undo window); sharing puts a held file into the portal.
 create function public.practice_staff_confirm_document(p_area text, p_document_id uuid)
 returns boolean language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -1956,20 +2137,24 @@ begin
   perform public.practice_log_event(p_area, v_doc.case_id, v_doc.practice_id, auth.uid(), 'staff_uploaded',
     jsonb_strip_nulls(jsonb_build_object('documentId', p_document_id, 'documentName', v_doc.original_name)));
   if v_doc.shared_with_client then
+    perform public.practice_reveal_file(p_area, v_doc.case_id);
     perform public.practice_log_event(p_area, v_doc.case_id, v_doc.practice_id, auth.uid(), 'document_shared',
       jsonb_strip_nulls(jsonb_build_object('documentId', p_document_id, 'documentName', v_doc.original_name)));
     perform public.practice_enqueue_notice(v_doc.practice_id, p_area, v_doc.case_id, null,
       'document_shared', 'shared/' || p_document_id,
       jsonb_strip_nulls(jsonb_build_object('documentId', p_document_id, 'documentName', v_doc.original_name)),
-      0, auth.uid());
+      90, auth.uid());
   end if;
   return true;
 end $$;
 
 -- Shares or unshares a practice document with the client. Returns whether the
 -- flag changed. Client uploads are always visible to their client and cannot
--- be toggled. The share email goes out once per document, however often it
--- is toggled.
+-- be toggled. A share is announced once per document, 90 seconds later.
+-- Unsharing withdraws an announcement that has not gone out (the email names
+-- the document): a pending one is deleted, so a later share announces afresh;
+-- one waiting to retry may already have been delivered, so it is cancelled and
+-- keeps its key.
 create function public.practice_set_document_shared(p_area text, p_document_id uuid, p_shared boolean)
 returns boolean language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -1992,21 +2177,26 @@ begin
     update public.practice_matter_documents d set shared_with_client = p_shared where d.id = p_document_id;
   end if;
   if not p_shared then
+    delete from public.practice_notices n
+      where n.event_key = 'shared/' || p_document_id and n.status = 'pending';
+    update public.practice_notices n set status = 'cancelled', failure_code = 'document_unshared'
+      where n.event_key = 'shared/' || p_document_id and n.status = 'retry';
     perform public.practice_log_event(p_area, v_doc.case_id, v_doc.practice_id, auth.uid(), 'document_unshared',
       jsonb_build_object('documentId', p_document_id));
   elsif v_doc.uploaded_at is not null then
+    perform public.practice_reveal_file(p_area, v_doc.case_id);
     perform public.practice_log_event(p_area, v_doc.case_id, v_doc.practice_id, auth.uid(), 'document_shared',
       jsonb_strip_nulls(jsonb_build_object('documentId', p_document_id, 'documentName', v_doc.original_name)));
     perform public.practice_enqueue_notice(v_doc.practice_id, p_area, v_doc.case_id, null,
       'document_shared', 'shared/' || p_document_id,
       jsonb_strip_nulls(jsonb_build_object('documentId', p_document_id, 'documentName', v_doc.original_name)),
-      0, auth.uid());
+      90, auth.uid());
   end if;
   return true;
 end $$;
 
--- Stops a client email that has not started sending. Returns false for staff
--- alerts and anything already claimed, sent or closed.
+-- Stops a client email that has not gone out (pending, or waiting to retry).
+-- Returns false for staff alerts and anything being sent, sent or closed.
 create function public.practice_cancel_notice(p_notice_id uuid)
 returns boolean language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -2017,10 +2207,11 @@ begin
   if not found or not public.ltb_can_access(v_notice.practice_id) then
     raise exception 'PRACTICE_CASE_NOT_FOUND';
   end if;
-  if v_notice.audience <> 'client' or v_notice.status <> 'pending' then
+  if v_notice.audience <> 'client' or v_notice.status not in ('pending', 'retry') then
     return false;
   end if;
-  update public.practice_notices n set status = 'cancelled' where n.id = p_notice_id;
+  update public.practice_notices n set status = 'cancelled', failure_code = 'cancelled_by_staff'
+    where n.id = p_notice_id;
   if v_notice.case_id is not null then
     perform public.practice_log_event(v_notice.area, v_notice.case_id, v_notice.practice_id, auth.uid(),
       'notice_cancelled', jsonb_build_object('noticeId', p_notice_id, 'kind', v_notice.kind));
@@ -2114,8 +2305,9 @@ begin
   return query select v_case_id, v_number, v_client.client_id, v_notice_id;
 end $$;
 
--- Invalidates every portal link issued so far for this client. The client
--- can still ask for a fresh link by email.
+-- Invalidates every portal link issued so far for this client, and cancels
+-- the client's emails that have not gone out (their links would be revoked
+-- too). The client can still ask for a fresh link by email.
 create function public.practice_revoke_portal_access(p_client_id uuid)
 returns timestamptz language plpgsql security definer set search_path = public, pg_temp as $$
 declare
@@ -2128,6 +2320,8 @@ begin
   end if;
   update public.ltb_clients c set portal_revoked_before = now() where c.id = p_client_id
     returning c.portal_revoked_before into v_revoked;
+  update public.practice_notices n set status = 'cancelled', failure_code = 'portal_access_revoked'
+    where n.client_id = p_client_id and n.audience = 'client' and n.status in ('pending', 'retry');
   insert into public.ltb_case_events (case_id, practice_id, actor_id, event, detail)
   select k.id, k.practice_id, auth.uid(), 'portal_access_revoked', '{}'::jsonb
   from public.ltb_cases k where k.client_id = p_client_id;
@@ -2135,6 +2329,45 @@ begin
   select m.id, m.practice_id, auth.uid(), 'portal_access_revoked', '{}'::jsonb
   from public.practice_matters m where m.client_id = p_client_id;
   return v_revoked;
+end $$;
+
+-- Corrects a client's email address (the column itself is not a staff
+-- column: every address change must also cut off the old address). Links
+-- already sent to the old address are revoked and emails not yet sent to it
+-- are cancelled. Returns the stored, normalized address; setting the current
+-- address again changes nothing.
+create function public.practice_set_client_email(p_client_id uuid, p_email text)
+returns text language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_client public.ltb_clients%rowtype;
+  v_email text := lower(btrim(coalesce(p_email, '')));
+begin
+  select * into v_client from public.ltb_clients c where c.id = p_client_id for update;
+  if not found or not public.ltb_can_access(v_client.practice_id) then
+    raise exception 'PRACTICE_CLIENT_NOT_FOUND';
+  end if;
+  if not public.practice_is_email(v_email) then
+    raise exception 'PRACTICE_EMAIL_INVALID';
+  end if;
+  if v_email = v_client.email then
+    return v_email;
+  end if;
+  if exists (select 1 from public.ltb_clients c
+             where c.practice_id = v_client.practice_id and c.email = v_email and c.id <> p_client_id) then
+    raise exception 'PRACTICE_EMAIL_TAKEN';
+  end if;
+  begin
+    update public.ltb_clients c set
+      email = v_email,
+      portal_revoked_before = now(),
+      field_sources = c.field_sources || jsonb_build_object('email', jsonb_build_object('source', 'staff'))
+    where c.id = p_client_id;
+  exception when unique_violation then
+    raise exception 'PRACTICE_EMAIL_TAKEN';
+  end;
+  update public.practice_notices n set status = 'cancelled', failure_code = 'client_email_changed'
+    where n.client_id = p_client_id and n.audience = 'client' and n.status in ('pending', 'retry');
+  return v_email;
 end $$;
 
 -- Storage INSERT check for staff uploads: only a registered staff document
@@ -2164,9 +2397,11 @@ alter table public.practice_matter_documents enable row level security;
 alter table public.practice_matter_events enable row level security;
 alter table public.practice_notices enable row level security;
 alter table public.practice_notices force row level security;
+alter table public.practice_rate_limits enable row level security;
+alter table public.practice_rate_limits force row level security;
 
 revoke all on public.practice_matters, public.practice_matter_documents, public.practice_matter_events,
-  public.practice_notices from public, anon, authenticated;
+  public.practice_notices, public.practice_rate_limits from public, anon, authenticated;
 -- File numbers are drawn only by practice_assign_matter_number (as owner) and
 -- identity values need no sequence privilege, so nobody may move a sequence.
 revoke all on sequence public.practice_traffic_number_seq, public.practice_general_number_seq,
@@ -2187,7 +2422,7 @@ grant update (ticket_type, ticket_city, ticket_received_on, option_chosen, offen
   on public.practice_matters to authenticated;
 
 grant all on public.practice_matters, public.practice_matter_documents, public.practice_matter_events,
-  public.practice_notices to service_role;
+  public.practice_notices, public.practice_rate_limits to service_role;
 grant usage, select on sequence public.practice_traffic_number_seq, public.practice_general_number_seq
   to service_role;
 
@@ -2221,6 +2456,7 @@ revoke all on function public.practice_epoch_ms(timestamptz) from public, anon, 
 revoke all on function public.practice_case_ref(text, uuid) from public, anon, authenticated, service_role;
 revoke all on function public.practice_lock_case(text, uuid) from public, anon, authenticated, service_role;
 revoke all on function public.practice_lock_document(text, uuid) from public, anon, authenticated, service_role;
+revoke all on function public.practice_reveal_file(text, uuid) from public, anon, authenticated, service_role;
 revoke all on function public.practice_log_event(text, uuid, text, uuid, text, jsonb)
   from public, anon, authenticated, service_role;
 revoke all on function public.practice_upsert_client(text, text, text, text, text, text, text, text)
@@ -2235,6 +2471,8 @@ revoke all on function public.practice_log_matter_edit() from public, anon, auth
 revoke all on function public.practice_queue_stage_notice() from public, anon, authenticated, service_role;
 revoke all on function public.practice_queue_intake_receipt() from public, anon, authenticated, service_role;
 revoke all on function public.practice_queue_staff_intake_notice() from public, anon, authenticated, service_role;
+revoke all on function public.practice_hold_returning_intake() from public, anon, authenticated, service_role;
+revoke all on function public.practice_reveal_on_stage() from public, anon, authenticated, service_role;
 
 revoke all on function public.practice_register_intake(text, text, jsonb, text, jsonb)
   from public, anon, authenticated, service_role;
@@ -2256,6 +2494,8 @@ revoke all on function public.freeze_practice_notice(uuid, uuid, jsonb)
   from public, anon, authenticated, service_role;
 revoke all on function public.finish_practice_notice(uuid, uuid, text, text, text)
   from public, anon, authenticated, service_role;
+revoke all on function public.practice_rate_limit_hit(text, integer, integer)
+  from public, anon, authenticated, service_role;
 
 revoke all on function public.practice_set_stage(text, uuid, text, text, text, text, boolean)
   from public, anon, authenticated, service_role;
@@ -2272,6 +2512,7 @@ revoke all on function public.practice_cancel_notice(uuid) from public, anon, au
 revoke all on function public.practice_create_matter(text, text, jsonb, jsonb, boolean)
   from public, anon, authenticated, service_role;
 revoke all on function public.practice_revoke_portal_access(uuid) from public, anon, authenticated, service_role;
+revoke all on function public.practice_set_client_email(uuid, text) from public, anon, authenticated, service_role;
 revoke all on function public.practice_staff_can_upload(text, text) from public, anon, authenticated, service_role;
 
 -- Service role: edge functions, plus what direct service-role writes evaluate
@@ -2295,6 +2536,7 @@ grant execute on function public.practice_request_portal_link(text, text) to ser
 grant execute on function public.claim_practice_notices(integer) to service_role;
 grant execute on function public.freeze_practice_notice(uuid, uuid, jsonb) to service_role;
 grant execute on function public.finish_practice_notice(uuid, uuid, text, text, text) to service_role;
+grant execute on function public.practice_rate_limit_hit(text, integer, integer) to service_role;
 
 -- Staff (signed-in practice members; every function checks ltb_can_access).
 grant execute on function public.practice_set_stage(text, uuid, text, text, text, text, boolean) to authenticated;
@@ -2307,12 +2549,15 @@ grant execute on function public.practice_set_document_shared(text, uuid, boolea
 grant execute on function public.practice_cancel_notice(uuid) to authenticated;
 grant execute on function public.practice_create_matter(text, text, jsonb, jsonb, boolean) to authenticated;
 grant execute on function public.practice_revoke_portal_access(uuid) to authenticated;
+grant execute on function public.practice_set_client_email(uuid, text) to authenticated;
 grant execute on function public.practice_staff_can_upload(text, text) to authenticated;
 
 comment on table public.practice_matters is
   'Practice files for Ontario traffic tickets and other paralegal matters. Practice data processed by Fabsy as software vendor; not Fabsy Alberta clients.';
 comment on table public.practice_notices is
   'Per-practice email outbox for client updates and staff alerts. Snapshot and payload hold client contact details and portal links; staff may read delivery status only.';
+comment on table public.practice_rate_limits is
+  'Fixed-window counters for the public practice edge functions, keyed by a hash; no raw network addresses. Service role only.';
 
 -- ---------------------------------------------------------------------------
 -- Private document storage

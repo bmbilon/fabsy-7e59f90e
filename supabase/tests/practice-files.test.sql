@@ -158,12 +158,14 @@ begin
     end loop;
   end loop;
 
-  -- Moving into a stage queues a client email exactly for the notify markers.
+  -- Moving into a stage through practice_set_stage (practice.notify = 'on')
+  -- queues a client email exactly for the notify markers.
   for r in select * from catalog_lists where list = 'notify' loop
     v_id := (v_files->>r.area)::uuid;
     foreach v_value in array public.practice_stages(r.area) loop
       begin
         update public.ltb_practices set client_updates_enabled = true where id = 'anderhue-paralegal';
+        perform set_config('practice.notify', 'on', true);
         if r.area = 'ltb' then
           update public.ltb_cases set stage = v_value,
             outcome = case v_value when 'closed' then 'other' when 'declined' then 'declined' end,
@@ -183,6 +185,34 @@ begin
       end;
       if v_notified is distinct from (v_value = any (r.items)) then
         raise exception 'Practice test failed: % stage % notified=% by the stage trigger', r.area, v_value, v_notified;
+      end if;
+    end loop;
+  end loop;
+
+  -- Any other path that moves a stage (no practice.notify) never emails clients.
+  for r in select * from catalog_lists where list = 'notify' loop
+    v_id := (v_files->>r.area)::uuid;
+    foreach v_value in array r.items loop
+      begin
+        update public.ltb_practices set client_updates_enabled = true where id = 'anderhue-paralegal';
+        if r.area = 'ltb' then
+          update public.ltb_cases set stage = v_value,
+            outcome = case v_value when 'closed' then 'other' when 'declined' then 'declined' end,
+            closed_at = case when v_value in ('closed', 'declined') then now() end
+          where id = v_id;
+        else
+          update public.practice_matters set stage = v_value,
+            outcome = case v_value when 'closed' then 'other' when 'declined' then 'declined' end,
+            closed_at = case when v_value in ('closed', 'declined') then now() end
+          where id = v_id;
+        end if;
+        v_notified := exists (select 1 from public.practice_notices n where n.case_id = v_id);
+        raise exception 'probe accepted';
+      exception when raise_exception then
+        if sqlerrm <> 'probe accepted' then raise; end if;
+      end;
+      if v_notified then
+        raise exception 'Practice test failed: % stage % emailed the client without practice_set_stage', r.area, v_value;
       end if;
     end loop;
   end loop;
@@ -260,11 +290,11 @@ select setval('public.ltb_case_number_seq', :seq_ltb_last, :'seq_ltb_called'::bo
 set local role service_role;
 
 select * from public.practice_register_intake('anderhue-paralegal', 'traffic',
-  '{"email":" Driver@Example.com ","firstName":"Dana","lastName":"Driver","phone":"4165550100",
+  '{"email":" Driver@Example.com ","firstName":"Da\u202ena\u200b","lastName":"Driver","phone":"4165550100",
     "notes":"Stopped on the 401","userAgent":"test-agent","ticketType":"speeding","ticketCity":"Toronto",
     "ticketReceivedOn":"2026-09-20","optionChosen":"none"}',
   repeat('a', 64),
-  '[{"id":"72200000-0000-4000-8000-000000000001","extension":"jpg","contentType":"image/jpeg","size":1000,"name":"front.jpg"},
+  '[{"id":"72200000-0000-4000-8000-000000000001","extension":"jpg","contentType":"image/jpeg","size":1000,"name":"front\u2066.jpg\ufeff"},
     {"id":"72200000-0000-4000-8000-000000000002","contentType":"application/pdf","size":2000,"name":"back.pdf"}]') \gset t1_
 
 select pg_temp.ok(:'t1_matter_number' ~ ('^TKT-' || to_char(now() at time zone 'America/Toronto', 'YYYY') || '-[0-9]{4,}$')
@@ -288,6 +318,12 @@ select pg_temp.ok((select count(*) = 2 and bool_and(uploaded_by = 'client' and e
 select pg_temp.ok((select count(*) = 1 from public.practice_matter_events where matter_id = :'t1_matter_id'
   and event = 'intake_received' and detail = '{"returningClient": false, "documents": 2, "source": "anderhue-site"}'),
   'intake logged');
+select pg_temp.ok((select first_name = 'Dana' from public.ltb_clients where id = :'t1_client_id')
+  and (select original_name = 'front.jpg' from public.practice_matter_documents
+       where id = '72200000-0000-4000-8000-000000000001'),
+  'zero-width and bidirectional formatting characters are stripped from names');
+select pg_temp.ok((select portal_visible from public.practice_matters where id = :'t1_matter_id'),
+  'a client''s first file is in the portal');
 select pg_temp.ok((select count(*) = 0 from public.practice_notices where case_id = :'t1_matter_id'),
   'nothing queued before documents are read');
 
@@ -426,6 +462,8 @@ select pg_temp.ok((select area = 'general' and ticket_type is null and category 
   from public.practice_matters where id = :'g1_matter_id'), 'no-document intake finalized into review; traffic keys ignored');
 select pg_temp.ok((select count(*) = 1 from public.practice_notices where kind = 'staff_new_intake'
   and case_id = :'g1_matter_id' and snapshot->'file'->>'documentCount' = '0'), 'no-document intake alerts staff at once');
+select pg_temp.ok((select not portal_visible from public.practice_matters where id = :'g1_matter_id'),
+  'a public intake for a client who already has a file is held out of the portal');
 
 -- Other matters with uploads go straight to staff review at finalize.
 select * from public.practice_register_intake('anderhue-paralegal', 'general',
@@ -524,12 +562,34 @@ select pg_temp.ok((select count(*) = 1 from public.practice_notices where event_
     and snapshot->'client'->>'firstName' = 'Rita'), 'receipt queued for a public intake; client notes stay internal');
 select pg_temp.ok((select snapshot->'file'->>'clientNotes' = 'Camera ticket' from public.practice_notices
   where case_id = :'r1_matter_id' and kind = 'staff_new_intake'), 'staff alerts keep the client notes');
+
+-- Further public intakes for the same client are held: no receipt, staff told.
+select * from public.practice_register_intake('anderhue-paralegal', 'traffic',
+  '{"email":"receipt@example.com","firstName":"Rita","ticketType":"speeding"}', repeat('f', 64), '[]') \gset r3_
+select * from public.practice_register_intake('anderhue-paralegal', 'general',
+  '{"email":"receipt@example.com","category":"tribunal","notes":"Board letter"}', repeat('f', 64), '[]') \gset r4_
+select * from public.practice_register_intake('anderhue-paralegal', 'general',
+  '{"email":"receipt@example.com","category":"other","notes":"Another matter"}', repeat('f', 64), '[]') \gset r5_
+select pg_temp.ok((select count(*) = 3 and bool_and(not portal_visible) from public.practice_matters
+  where id in (:'r3_matter_id', :'r4_matter_id', :'r5_matter_id')), 'repeat public intakes are held');
+select pg_temp.ok((select count(*) = 0 from public.practice_notices where kind = 'intake_received'
+  and case_id in (:'r3_matter_id', :'r4_matter_id', :'r5_matter_id'))
+  and (select count(*) = 3 from public.practice_notices where kind = 'staff_new_intake'
+  and case_id in (:'r3_matter_id', :'r4_matter_id', :'r5_matter_id')), 'held files send no receipt; staff are told');
+
+-- Defence in depth: at most two receipts per client per day.
+select pg_temp.ok(public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'r1_matter_id', null,
+  'intake_received', 'intake/throttle/' || :'r1_matter_id') is not null, 'a second receipt within a day is allowed');
+select pg_temp.ok(public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'r1_matter_id', null,
+  'intake_received', 'intake/throttle-again/' || :'r1_matter_id') is null, 'a third receipt within a day is not');
+select pg_temp.ok(public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'r3_matter_id', null,
+  'upload_invite', 'invite/held/' || :'r3_matter_id') is null, 'no client email for a file the portal cannot show');
 select pg_temp.ok((select snapshot->'file' ? 'reviewNotes' and snapshot->'file'->>'reviewNotes' like 'No ticket uploaded%'
     and snapshot->'file'->'returningClient' = 'false'::jsonb and snapshot->'client' ? 'phone'
   from public.practice_notices where case_id = :'r1_matter_id' and kind = 'staff_new_intake'),
   'staff alerts carry review notes, phone and the returning-client flag');
-select pg_temp.ok((select not (snapshot->'file' ? 'reviewNotes') and not (snapshot->'client' ? 'phone')
-    and not (snapshot->'file' ? 'returningClient')
+select pg_temp.ok((select count(*) = 2 and bool_and(not (snapshot->'file' ? 'reviewNotes')
+    and not (snapshot->'client' ? 'phone') and not (snapshot->'file' ? 'returningClient'))
   from public.practice_notices where case_id = :'r1_matter_id' and kind = 'intake_received'),
   'client notices never carry review notes or staff-only fields');
 
@@ -538,6 +598,22 @@ select * from public.ltb_register_intake('anderhue-paralegal', '{"email":"landlo
 select pg_temp.ok((select count(*) = 1 from public.practice_notices where event_key = 'intake/ltb/' || :'l1_case_id'
     and kind = 'intake_received' and area = 'ltb' and snapshot->'file'->>'number' = :'l1_case_number'
     and snapshot->'file'->>'issue' = 'arrears' and snapshot->'file'->>'city' = 'Oshawa'), 'landlord intakes get a receipt');
+select * from public.ltb_register_intake('anderhue-paralegal', '{"email":"landlord@example.com","issue":"n12_own_use"}',
+  repeat('5', 64), '[]') \gset l2_
+select pg_temp.ok((select not portal_visible from public.ltb_cases where id = :'l2_case_id')
+  and (select count(*) = 0 from public.practice_notices where case_id = :'l2_case_id'),
+  'a repeat landlord intake is held too, with no receipt');
+reset role;
+insert into public.ltb_case_documents (id, case_id, practice_id, storage_path, original_name, content_type, size_bytes,
+  uploaded_at, extraction_status)
+values ('72200000-0000-4000-8000-000000000051', :'l2_case_id', 'anderhue-paralegal',
+  :'l2_case_id' || '/72200000-0000-4000-8000-000000000051.pdf', 'lease.pdf', 'application/pdf', 10, now(), 'skipped');
+set local role service_role;
+select pg_temp.ok((select jsonb_array_length(j->'files') = 1 and j->'files'->0->>'id' = :'l1_case_id'
+    from (select public.practice_portal_session(:'l1_client_id') as j) s)
+  and public.practice_portal_file(:'l1_client_id', 'ltb', :'l2_case_id') is null
+  and (select count(*) = 0 from public.practice_portal_document(:'l1_client_id', 'ltb', :'l2_case_id',
+    '72200000-0000-4000-8000-000000000051')), 'a held landlord file is not listed, opened or downloadable');
 select * from public.ltb_register_intake('anderhue-paralegal', '{"email":"smoke@example.com","issue":"other",
   "source":"smoke-test"}', repeat('6', 64), '[]') \gset smoke_
 select pg_temp.ok((select count(*) = 0 from public.practice_notices where case_id = :'smoke_case_id'),
@@ -627,12 +703,17 @@ select pg_temp.ok((select (public.practice_set_stage('traffic', :'r1_matter_id',
 select public.practice_set_stage('traffic', :'r1_matter_id', 'closed', 'withdrawn', 'Withdrawn at first appearance') as result \gset cw_
 select pg_temp.ok((:'cw_result')::jsonb->>'outcome' = 'withdrawn' and (:'cw_result')::jsonb->>'noticeId' is not null,
   'closing queues an update with the outcome');
-select pg_temp.ok((select (public.practice_set_stage('traffic', :'r1_matter_id', 'closed', 'amended'))
-  = '{"stage":"closed","outcome":"amended","noticeId":null}'::jsonb), 'outcome corrected without a second email');
+select public.practice_set_stage('traffic', :'r1_matter_id', 'closed', 'amended', null, 'Corrected result.') as result \gset ca_
+select pg_temp.ok((:'ca_result')::jsonb->>'outcome' = 'amended' and (:'ca_result')::jsonb->>'noticeId' is not null
+  and (:'ca_result')::jsonb->>'noticeId' <> (:'cw_result')::jsonb->>'noticeId',
+  'an outcome correction emails the corrected outcome');
+select pg_temp.ok((select (public.practice_set_stage('traffic', :'r1_matter_id', 'closed', 'other', null, null, false))
+  = '{"stage":"closed","outcome":"other","noticeId":null}'::jsonb), 'a silent outcome correction queues nothing');
 select public.practice_set_stage('traffic', :'r1_matter_id', 'declined', 'withdrawn') as result \gset dc_
 select pg_temp.ok((:'dc_result')::jsonb->>'outcome' = 'declined', 'declining forces the declined outcome');
-select pg_temp.ok((select count(*) = 1 from public.practice_matter_events where matter_id = :'r1_matter_id'
-  and event = 'outcome_changed' and detail = '{"stage":"closed","outcome":"amended"}'), 'outcome correction logged');
+select pg_temp.ok((select count(*) = 2 from public.practice_matter_events where matter_id = :'r1_matter_id'
+  and event = 'outcome_changed' and detail->>'stage' = 'closed' and detail->>'outcome' in ('amended', 'other')),
+  'outcome corrections logged');
 
 -- Landlord files through the same function, and through the legacy RPC.
 select pg_temp.fails(format('select public.practice_set_stage(%L, %L, %L)', 'ltb', :'l1_case_id', 'option_filed'),
@@ -644,6 +725,11 @@ select pg_temp.ok((:'lu_result')::jsonb->>'noticeId' is not null and (select cou
   where case_id = :'l1_case_id' and event = 'stage_changed' and detail = '{"stage":"under_review","note":"Reading the N4"}'),
   'landlord stage change logged in ltb_case_events');
 select pg_temp.ok((select stage = 'quoted' from public.ltb_set_case_stage(:'l1_case_id', 'quoted')), 'legacy RPC still works');
+-- Moving a held file out of new_intake puts it into the portal, by either path.
+select pg_temp.ok((select (public.practice_set_stage('traffic', :'r3_matter_id', 'under_review'))->>'noticeId' is not null),
+  'a held file taken forward is announced to its client');
+select pg_temp.ok((select stage = 'under_review' from public.ltb_set_case_stage(:'l2_case_id', 'under_review')),
+  'legacy RPC moves a held landlord file');
 select pg_temp.ok((select (public.practice_set_stage('ltb', :'smoke_case_id', 'under_review'))->'noticeId' = 'null'::jsonb),
   'staff can work a smoke-test file but it never emails anyone');
 reset role;
@@ -668,10 +754,20 @@ select pg_temp.ok((select detail = '{"stage":"declined","outcome":"declined"}' a
   from public.practice_notices where id = ((:'dc_result')::jsonb->>'noticeId')::uuid), 'declined update queued');
 select pg_temp.ok((select stage = 'declined' and outcome = 'declined' and closed_at = now()
   from public.practice_matters where id = :'r1_matter_id'), 'declined file closed');
-select pg_temp.ok((select count(*) = 1 from public.practice_notices where case_id = :'l1_case_id' and kind = 'stage_changed'
-    and detail = '{"stage":"quoted"}' and next_attempt_at = now() + interval '90 seconds'
-    and created_by = '72100000-0000-4000-8000-000000000001'),
-  'legacy ltb_set_case_stage queues an update with no message');
+select pg_temp.ok((select count(*) = 0 from public.practice_notices where case_id = :'l1_case_id' and kind = 'stage_changed'
+    and detail->>'stage' = 'quoted'), 'the legacy ltb_set_case_stage emails no client (it has no preview or undo)');
+select pg_temp.ok((select detail = '{"stage":"closed","outcome":"amended","message":"Corrected result."}'
+    and next_attempt_at = now() + interval '90 seconds'
+    and event_key like format('stage/traffic/%s/closed/%%', :'r1_matter_id')
+    and event_key <> (select event_key from public.practice_notices where id = ((:'cw_result')::jsonb->>'noticeId')::uuid)
+  from public.practice_notices where id = ((:'ca_result')::jsonb->>'noticeId')::uuid),
+  'the correction is a fresh update with its own key and the same undo window');
+select pg_temp.ok((select portal_visible from public.practice_matters where id = :'r3_matter_id')
+  and (select portal_visible from public.ltb_cases where id = :'l2_case_id')
+  and (select count(*) = 0 from public.practice_notices where case_id = :'l2_case_id' and audience = 'client'),
+  'held files enter the portal when they leave new_intake');
+select pg_temp.ok((select not portal_visible from public.practice_matters where id = :'r4_matter_id'),
+  'other held files stay held');
 
 -- Fabsy staff outside the practice see and change nothing.
 set local role authenticated;
@@ -690,16 +786,16 @@ select set_config('request.jwt.claim.sub', '', true) as claim \gset
 -- Hold everything queued so far; each check below makes its own notices due.
 update public.practice_notices set next_attempt_at = now() + interval '1 day' where status = 'pending';
 select id as n_ur from public.practice_notices where case_id = :'r1_matter_id' and detail->>'stage' = 'under_review' \gset
-select id as n_cl from public.practice_notices where case_id = :'r1_matter_id' and detail->>'stage' = 'closed' \gset
+select (:'cw_result')::jsonb->>'noticeId' as n_cl, (:'ca_result')::jsonb->>'noticeId' as n_ca \gset
 select id as n_dc from public.practice_notices where case_id = :'r1_matter_id' and detail->>'stage' = 'declined' \gset
 select id as n_lu from public.practice_notices where case_id = :'l1_case_id' and detail->>'stage' = 'under_review' \gset
-select id as n_lq from public.practice_notices where case_id = :'l1_case_id' and detail->>'stage' = 'quoted' \gset
--- Two updates for the same stage of g1 (still new_intake), and an
+select id as n_r3 from public.practice_notices where case_id = :'r3_matter_id' and kind = 'stage_changed' \gset
+-- Two updates for the same stage of r2 (still new_intake), and an
 -- already-told stage on g2 (also new_intake).
-select public.practice_enqueue_notice('anderhue-paralegal', 'general', :'g1_matter_id', null, 'stage_changed',
-  'stage/general/' || :'g1_matter_id' || '/new_intake/1', '{"stage":"new_intake"}') as b_old \gset
-select public.practice_enqueue_notice('anderhue-paralegal', 'general', :'g1_matter_id', null, 'stage_changed',
-  'stage/general/' || :'g1_matter_id' || '/new_intake/2', '{"stage":"new_intake"}') as b_new \gset
+select public.practice_enqueue_notice('anderhue-paralegal', 'general', :'r2_matter_id', null, 'stage_changed',
+  'stage/general/' || :'r2_matter_id' || '/new_intake/1', '{"stage":"new_intake"}') as b_old \gset
+select public.practice_enqueue_notice('anderhue-paralegal', 'general', :'r2_matter_id', null, 'stage_changed',
+  'stage/general/' || :'r2_matter_id' || '/new_intake/2', '{"stage":"new_intake"}') as b_new \gset
 select public.practice_enqueue_notice('anderhue-paralegal', 'general', :'g2_matter_id', null, 'stage_changed',
   'stage/general/' || :'g2_matter_id' || '/new_intake/1', '{"stage":"new_intake"}') as c_sent \gset
 update public.practice_notices set status = 'sent', provider_email_id = 'em_told', sent_at = now(),
@@ -717,12 +813,11 @@ select pg_temp.ok((select count(*) = 1 and bool_and(id = :'b_new' and status = '
     and attempt_count = 1 and first_attempt_at is not null and claim_expires_at > clock_timestamp() + interval '170 seconds'
     and claim_expires_at <= clock_timestamp() + interval '180 seconds')
   from claim_one), 'only the due, current update is claimed, with a three-minute lease');
-select pg_temp.ok((select status = 'superseded' and failure_code = 'stage_moved' from public.practice_notices
-  where id = :'n_ur') and (select status = 'superseded' and failure_code = 'stage_moved' from public.practice_notices
-  where id = :'n_cl') and (select status = 'superseded' and failure_code = 'stage_moved' from public.practice_notices
-  where id = :'n_lu'), 'updates for stages the file has left are superseded before sending');
+select pg_temp.ok((select count(*) = 4 from public.practice_notices
+  where id in (:'n_ur', :'n_cl', :'n_ca', :'n_lu') and status = 'superseded' and failure_code = 'stage_moved'),
+  'updates for stages the file has left are superseded before sending');
 select pg_temp.ok((select status = 'pending' from public.practice_notices where id = :'n_dc')
-  and (select status = 'pending' from public.practice_notices where id = :'n_lq'), 'current updates stay queued until due');
+  and (select status = 'pending' from public.practice_notices where id = :'n_r3'), 'current updates stay queued until due');
 select pg_temp.ok((select status = 'superseded' and failure_code = 'replaced_by_newer_update' from public.practice_notices
   where id = :'b_old'), 'an older update for the same file is superseded by the newer one');
 select pg_temp.ok((select status = 'superseded' and failure_code = 'client_already_told' from public.practice_notices
@@ -731,35 +826,35 @@ select pg_temp.ok((select count(*) = 0 from public.claim_practice_notices(10)), 
 
 select claim_id as c1_claim from claim_one \gset
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
-  '{"to":["driver@example.com"],"subject":"s","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'from required');
+  '{"to":["later@example.com"],"subject":"s","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'from required');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
-  '{"from":"f","to":"driver@example.com","subject":"s","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'to is an array');
+  '{"from":"f","to":"later@example.com","subject":"s","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'to is an array');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
   '{"from":"f","to":[],"subject":"s","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'at least one recipient');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
   '{"from":"f","to":["a@b.co","a@b.co","a@b.co","a@b.co","a@b.co","a@b.co"],"subject":"s","html":"h"}'),
   'PRACTICE_NOTICE_PAYLOAD_INVALID', 'at most five recipients');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
-  '{"from":"f","to":["driver@example.com"],"subject":" ","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'subject required');
+  '{"from":"f","to":["later@example.com"],"subject":" ","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'subject required');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
-  '{"from":"f","to":["driver@example.com"],"subject":"s"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'html required');
+  '{"from":"f","to":["later@example.com"],"subject":"s"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID', 'html required');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
-  '{"from":"f","to":["driver@example.com"],"subject":"s","html":"h","text":7}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID',
+  '{"from":"f","to":["later@example.com"],"subject":"s","html":"h","text":7}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID',
   'text is a string');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
-  '{"from":"f","to":["driver@example.com"],"subject":"s","html":"h","reply_to":7}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID',
+  '{"from":"f","to":["later@example.com"],"subject":"s","html":"h","reply_to":7}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID',
   'reply_to is an address');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim',
   '{"from":"f","to":["someone-else@example.com"],"subject":"s","html":"h"}'), 'PRACTICE_NOTICE_PAYLOAD_INVALID',
   'emails go only to the notice recipients');
 select pg_temp.fails(format('select public.freeze_practice_notice(%L, %L, %L)', :'b_new', gen_random_uuid(),
-  '{"from":"f","to":["driver@example.com"],"subject":"s","html":"h"}'), 'PRACTICE_NOTICE_CLAIM_LOST', 'claim checked');
+  '{"from":"f","to":["later@example.com"],"subject":"s","html":"h"}'), 'PRACTICE_NOTICE_CLAIM_LOST', 'claim checked');
 select pg_temp.ok(public.freeze_practice_notice(:'b_new', :'c1_claim',
-  '{"from":"AnderHue Paralegal <files@anderhue.ca>","to":["Dana Driver <Driver@Example.com>"],
+  '{"from":"AnderHue Paralegal <files@anderhue.ca>","to":["Lee Later <Later@Example.com>"],
     "reply_to":"hello@anderhue.ca","subject":"MAT · Request received","html":"<p>Hello</p>","text":"Hello"}')->>'subject'
   = 'MAT · Request received', 'payload frozen (recipient matched through its display name)');
 select pg_temp.ok(public.freeze_practice_notice(:'b_new', :'c1_claim',
-  '{"from":"f","to":["driver@example.com"],"subject":"Changed","html":"h"}')->>'subject' = 'MAT · Request received',
+  '{"from":"f","to":["later@example.com"],"subject":"Changed","html":"h"}')->>'subject' = 'MAT · Request received',
   'a frozen payload never changes');
 select pg_temp.fails(format('select public.finish_practice_notice(%L, %L, %L)', :'b_new', :'c1_claim', 'sent'),
   'PRACTICE_NOTICE_OUTCOME_INVALID', 'sent needs a provider id');
@@ -783,7 +878,7 @@ select claim_id as c2_claim from claim_two \gset
 select pg_temp.ok((select count(*) = 1 and bool_and(id = :'b_new' and attempt_count = 2 and claim_id <> :'c1_claim'
   and email_payload->>'subject' = 'MAT · Request received') from claim_two), 'a due retry is claimed again with its frozen email');
 select pg_temp.ok(public.freeze_practice_notice(:'b_new', :'c2_claim',
-  '{"from":"f","to":["driver@example.com"],"subject":"Other","html":"h"}')->>'subject' = 'MAT · Request received',
+  '{"from":"f","to":["later@example.com"],"subject":"Other","html":"h"}')->>'subject' = 'MAT · Request received',
   'retries resend the same email');
 select pg_temp.ok(public.finish_practice_notice(:'b_new', :'c2_claim', 'sent', 'em_123'), 'sent recorded');
 select pg_temp.ok((select status = 'sent' and provider_email_id = 'em_123' and sent_at is not null and failure_code is null
@@ -815,10 +910,137 @@ select pg_temp.ok((select count(*) = 0 from public.claim_practice_notices(10)), 
 select pg_temp.ok((select status = 'indeterminate' and failure_code = 'idempotency_window_elapsed'
   from public.practice_notices where id = :'c_msg'), 'old attempts become indeterminate');
 
+-- A file's state is its stage and outcome together: an outcome correction
+-- overtakes the update it corrects, and still goes out after the client was
+-- told the old outcome.
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000001', true) as claim \gset
+select (public.practice_set_stage('traffic', :'n1_matter_id', 'closed', 'withdrawn'))->>'noticeId' as h_withdrawn \gset
+select (public.practice_set_stage('traffic', :'n1_matter_id', 'closed', 'convicted', null,
+  'Sorry, our last email had the wrong result.'))->>'noticeId' as h_convicted \gset
+reset role;
+update public.practice_notices set next_attempt_at = now() - interval '1 second'
+  where id in (:'h_withdrawn', :'h_convicted');
+set local role service_role;
+create temp table claim_h on commit drop as select * from public.claim_practice_notices(10);
+select pg_temp.ok((select count(*) = 1 and bool_and(id = :'h_convicted') from claim_h)
+  and (select status = 'superseded' and failure_code = 'stage_moved' from public.practice_notices
+    where id = :'h_withdrawn'), 'the corrected outcome goes out and the old one is superseded');
+select claim_id as h_claim from claim_h \gset
+select pg_temp.ok(public.finish_practice_notice(:'h_convicted', :'h_claim', 'sent', 'em_h1'), 'correction sent');
+reset role;
+set local role authenticated;
+select pg_sleep(0.002); -- corrections are keyed by the clock millisecond
+select (public.practice_set_stage('traffic', :'n1_matter_id', 'closed', 'withdrawn'))->>'noticeId' as h_back \gset
+reset role;
+update public.practice_notices set next_attempt_at = now() - interval '1 second' where id = :'h_back';
+set local role service_role;
+select pg_temp.ok((select count(*) = 1 and bool_and(id = :'h_back') from public.claim_practice_notices(10)),
+  'a new outcome without a message is not mistaken for one the client already has');
+
+-- Only a live update about the file's current state replaces an older one.
+-- s1 is quoted (with a message), retained, then quietly moved back to quoted:
+-- the quote still goes out and the retained update is superseded.
+reset role;
+set local role authenticated;
+select (public.practice_set_stage('traffic', :'s1_matter_id', 'quoted', null, null, 'Your quote is attached.'))->>'noticeId'
+  as m_quoted \gset
+select (public.practice_set_stage('traffic', :'s1_matter_id', 'retained'))->>'noticeId' as m_retained \gset
+select pg_temp.ok((select (public.practice_set_stage('traffic', :'s1_matter_id', 'quoted', null, null, null, false))->'noticeId'
+  = 'null'::jsonb), 'a quiet move back reports no notice');
+reset role;
+update public.practice_notices set next_attempt_at = now() - interval '1 second' where id in (:'m_quoted', :'m_retained');
+set local role service_role;
+create temp table claim_m on commit drop as select * from public.claim_practice_notices(10);
+select pg_temp.ok((select count(*) = 1 and bool_and(id = :'m_quoted') from claim_m)
+  and (select status = 'superseded' and failure_code = 'stage_moved' from public.practice_notices
+    where id = :'m_retained'), 'an update about another stage does not replace the current one');
+-- Newer updates that will never be sent (cancelled, superseded, failed) do
+-- not replace a live one either.
+reset role;
+select public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'s2_matter_id', null, 'stage_changed',
+  'stage/traffic/' || :'s2_matter_id' || '/new_intake/1', '{"stage":"new_intake"}') as d_live \gset
+select public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'s2_matter_id', null, 'stage_changed',
+  'stage/traffic/' || :'s2_matter_id' || '/new_intake/2', '{"stage":"new_intake"}', 3600) as d_cancelled \gset
+select public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'s2_matter_id', null, 'stage_changed',
+  'stage/traffic/' || :'s2_matter_id' || '/new_intake/3', '{"stage":"new_intake"}', 3600) as d_superseded \gset
+select public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'s2_matter_id', null, 'stage_changed',
+  'stage/traffic/' || :'s2_matter_id' || '/new_intake/4', '{"stage":"new_intake"}', 3600) as d_failed \gset
+update public.practice_notices set status = 'cancelled', failure_code = 'cancelled_by_staff' where id = :'d_cancelled';
+update public.practice_notices set status = 'superseded', failure_code = 'stage_moved' where id = :'d_superseded';
+update public.practice_notices set status = 'failed', failure_code = 'provider_rejected' where id = :'d_failed';
+set local role service_role;
+select pg_temp.ok((select count(*) = 1 and bool_and(id = :'d_live') from public.claim_practice_notices(10)),
+  'cancelled, superseded and failed updates never replace a live one');
+
+-- Kill switch: switching client emails off stops what is already queued,
+-- including a send whose lease ran out. A send in flight and staff alerts are
+-- left alone.
+reset role;
+update public.ltb_practices set client_updates_enabled = true where id = 'other-practice';
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000004', true) as claim \gset
+select (public.practice_set_stage('traffic', :'o1_matter_id', 'under_review'))->>'noticeId' as k_pending \gset
+reset role;
+select public.practice_enqueue_notice('other-practice', 'traffic', :'o1_matter_id', null, 'upload_invite',
+  'invite/traffic/' || :'o1_matter_id') as k_expired \gset
+select public.practice_enqueue_notice('other-practice', 'traffic', :'o1_matter_id', null, 'documents_requested',
+  'request/traffic/' || :'o1_matter_id' || '/1', '{"message":"Please send the ticket."}') as k_flight \gset
+update public.practice_notices set status = 'sending', claim_id = gen_random_uuid(), attempt_count = 1,
+  first_attempt_at = clock_timestamp() - interval '5 minutes', claim_expires_at = clock_timestamp() - interval '1 second'
+  where id = :'k_expired';
+update public.practice_notices set status = 'sending', claim_id = gen_random_uuid(), attempt_count = 1,
+  first_attempt_at = clock_timestamp(), claim_expires_at = clock_timestamp() + interval '3 minutes'
+  where id = :'k_flight';
+update public.ltb_practices set client_updates_enabled = false where id = 'other-practice';
+set local role service_role;
+select pg_temp.ok((select count(*) = 0 from public.claim_practice_notices(10)), 'nothing is claimed for a switched-off practice');
+reset role;
+select pg_temp.ok((select count(*) = 2 from public.practice_notices where id in (:'k_pending', :'k_expired')
+    and status = 'cancelled' and failure_code = 'client_updates_disabled' and claim_id is null and claim_expires_at is null)
+  and (select status = 'sending' from public.practice_notices where id = :'k_flight')
+  and (select status = 'pending' from public.practice_notices where case_id = :'o1_matter_id' and kind = 'staff_new_intake'),
+  'switching client emails off cancels unsent client emails');
+select set_config('request.jwt.claim.sub', '', true) as claim \gset
+
 -- ---------------------------------------------------------------------------
 -- 7. Client portal (service role)
 -- ---------------------------------------------------------------------------
 reset role;
+-- A client upload planted on a held file (r5) for the download check below.
+insert into public.practice_matter_documents (id, matter_id, practice_id, storage_path, original_name, content_type,
+  size_bytes, extraction_status, uploaded_at)
+values ('72200000-0000-4000-8000-000000000050', :'r5_matter_id', 'anderhue-paralegal',
+  :'r5_matter_id' || '/72200000-0000-4000-8000-000000000050.png', 'photo.png', 'image/png', 10, 'skipped', now());
+set local role service_role;
+
+-- Held files (repeat public intakes) stay out of the portal entirely.
+select pg_temp.ok((select jsonb_array_length(j->'files') = 1 and j->'files'->0->>'id' = :'t1_matter_id'
+  from (select public.practice_portal_session(:'t1_client_id') as j) s), 'a held file is not listed');
+select pg_temp.ok(public.practice_portal_file(:'t1_client_id', 'general', :'g1_matter_id') is null,
+  'a held file cannot be opened');
+select pg_temp.fails(format('select public.practice_portal_register_uploads(%L, %L, %L, %L)', :'t1_client_id', 'general',
+  :'g1_matter_id', '[{"contentType":"image/png","size":5}]'), 'PRACTICE_CASE_NOT_FOUND', 'a held file takes no uploads');
+select pg_temp.fails(format('select public.practice_portal_confirm_uploads(%L, %L, %L, %L)', :'r1_client_id', 'general',
+  :'r5_matter_id', array['72200000-0000-4000-8000-000000000050']), 'PRACTICE_CASE_NOT_FOUND',
+  'or confirmations');
+select pg_temp.ok((select count(*) = 0 from public.practice_portal_document(:'r1_client_id', 'general', :'r5_matter_id',
+  '72200000-0000-4000-8000-000000000050')), 'or downloads');
+select pg_temp.ok((select jsonb_array_length(public.practice_portal_session(:'r1_client_id')->'files') = 2),
+  'only the files staff have taken forward are listed');
+
+-- Staff take g1 forward without an email; it joins the portal.
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000001', true) as claim \gset
+select pg_temp.ok((select (public.practice_set_stage('general', :'g1_matter_id', 'under_review', null, null, null, false))
+  ->'noticeId' = 'null'::jsonb), 'held file taken forward quietly');
+reset role;
+select set_config('request.jwt.claim.sub', '', true) as claim \gset
+select pg_temp.ok((select portal_visible from public.practice_matters where id = :'g1_matter_id')
+  and (select count(*) = 0 from public.practice_notices where case_id = :'g1_matter_id' and audience = 'client'),
+  'in the portal, with no email');
 -- t1 has older activity than g1 (the touch trigger is bypassed to backdate).
 set local session_replication_role = replica;
 update public.practice_matters set updated_at = now() - interval '1 day' where id = :'t1_matter_id';
@@ -844,11 +1066,14 @@ select pg_temp.ok((with s as (select public.practice_portal_session(:'t1_client_
   from s), 'session lists the client''s files across areas, newest activity first');
 select pg_temp.ok((select jsonb_array_length(public.practice_portal_session(:'smoke_client_id')->'files') = 0),
   'smoke tests never appear in the portal');
-select pg_temp.ok((select (public.practice_portal_session(:'r1_client_id')->'files'->0->'closed') = 'true'::jsonb),
-  'declined file shown as closed');
-select pg_temp.ok((select jsonb_array_length(public.practice_portal_session(:'l1_client_id')->'files') = 1
-  and public.practice_portal_session(:'l1_client_id')->'files'->0->>'number' = :'l1_case_number'),
-  'landlord files appear in the portal');
+select pg_temp.ok((select f->'closed' = 'true'::jsonb from jsonb_array_elements(
+  public.practice_portal_session(:'r1_client_id')->'files') f where f->>'id' = :'r1_matter_id'), 'declined file shown as closed');
+select pg_temp.ok((select array_agg(f->>'number' order by f->>'number')
+    = (select array_agg(n order by n) from unnest(array[:'l1_case_number', :'l2_case_number']) n)
+  from jsonb_array_elements(public.practice_portal_session(:'l1_client_id')->'files') f),
+  'landlord files appear in the portal, the repeat one once staff moved it');
+select pg_temp.ok((select count(*) = 1 from public.practice_portal_document(:'l1_client_id', 'ltb', :'l2_case_id',
+  '72200000-0000-4000-8000-000000000051')), 'and its documents can be downloaded');
 
 select pg_temp.ok((with f as (select public.practice_portal_file(:'t1_client_id', 'traffic', :'t1_matter_id') as j)
   select pg_temp.keys(j) = pg_temp.sorted(array['area', 'id', 'number', 'stage', 'outcome', 'issue', 'ticketType',
@@ -977,6 +1202,14 @@ select pg_temp.ok((select count(*) = 0 from public.practice_portal_document(:'t1
 select pg_temp.ok(not public.practice_request_portal_link('anderhue-paralegal', 'nobody@example.com'), 'unknown email');
 select pg_temp.ok(not public.practice_request_portal_link('anderhue-paralegal', 'not an email'), 'invalid email');
 select pg_temp.ok(not public.practice_request_portal_link('anderhue-paralegal', 'smoke@example.com'), 'smoke-only client');
+reset role;
+insert into public.ltb_clients (id, practice_id, email) values
+  ('72300000-0000-4000-8000-000000000020', 'anderhue-paralegal', 'held-only@example.com');
+insert into public.practice_matters (practice_id, client_id, area, portal_visible, intake_review_status, intake_finalized_at)
+  values ('anderhue-paralegal', '72300000-0000-4000-8000-000000000020', 'general', false, 'needs_review', now());
+set local role service_role;
+select pg_temp.ok(not public.practice_request_portal_link('anderhue-paralegal', 'held-only@example.com'),
+  'a client whose only file is held');
 select pg_temp.ok(not public.practice_request_portal_link('other-practice', 'driver@example.com'),
   'practice with client emails off');
 select pg_temp.ok(public.practice_request_portal_link('anderhue-paralegal', ' Driver@Example.com '), 'link queued');
@@ -1033,9 +1266,26 @@ select public.practice_clear_request('traffic', :'t1_matter_id');
 select public.practice_clear_request('traffic', :'t1_matter_id');
 reset role;
 select pg_temp.ok((select client_request_message is null and client_request_at is null from public.practice_matters
-  where id = :'t1_matter_id') and (select status = 'cancelled' from public.practice_notices where id = :'rq_notice')
+  where id = :'t1_matter_id')
+  and (select status = 'cancelled' and failure_code = 'request_cleared' from public.practice_notices where id = :'rq_notice')
   and (select count(*) = 1 from public.practice_matter_events where matter_id = :'t1_matter_id' and event = 'request_cleared'),
   'clearing cancels the unsent request email and is logged once');
+
+-- Asking a held file's client for documents takes the file forward into the
+-- portal. A request email waiting to retry is cancelled by clearing too.
+set local role authenticated;
+select public.practice_request_documents('general', :'r4_matter_id', 'Please upload the board letter.') as notice \gset r4rq_
+reset role;
+select pg_temp.ok((select portal_visible from public.practice_matters where id = :'r4_matter_id')
+  and (select count(*) = 1 from public.practice_notices where id = :'r4rq_notice' and recipients = array['receipt@example.com']),
+  'a document request puts a held file into the portal and emails its client');
+update public.practice_notices set status = 'retry', attempt_count = 1, first_attempt_at = clock_timestamp(),
+  failure_code = 'provider_timeout' where id = :'r4rq_notice';
+set local role authenticated;
+select public.practice_clear_request('general', :'r4_matter_id');
+reset role;
+select pg_temp.ok((select status = 'cancelled' and failure_code = 'request_cleared' from public.practice_notices
+  where id = :'r4rq_notice'), 'clearing also stops a request email waiting to retry');
 set local role authenticated;
 
 -- Practice documents.
@@ -1114,15 +1364,26 @@ select pg_temp.fails(format('select public.practice_set_document_shared(%L, %L, 
 select pg_temp.fails(format('select public.practice_set_document_shared(%L, %L, null)', 'traffic', :'sd2_document_id'),
   'PRACTICE_DOCUMENT_INVALID', 'share flag required');
 select pg_temp.ok(not public.practice_set_document_shared('traffic', :'sd1_document_id', true), 'already shared');
+reset role;
+select pg_temp.ok((select count(*) = 1 from public.practice_notices where event_key = 'shared/' || :'sd1_document_id'
+    and status = 'pending' and next_attempt_at = now() + interval '90 seconds'),
+  'sharing is announced after the 90-second undo window');
+set local role authenticated;
 select pg_temp.ok(public.practice_set_document_shared('traffic', :'sd1_document_id', false), 'unshared');
+reset role;
+select pg_temp.ok((select count(*) = 0 from public.practice_notices where event_key = 'shared/' || :'sd1_document_id'),
+  'unsharing withdraws the announcement that has not gone out');
+set local role authenticated;
 select pg_temp.ok(public.practice_set_document_shared('traffic', :'sd1_document_id', true), 'shared again');
 select pg_temp.ok(public.practice_set_document_shared('traffic', :'sd2_document_id', true), 'pending upload marked shared');
 
 reset role;
 select pg_temp.ok((select count(*) = 1 from public.practice_notices where event_key = 'shared/' || :'sd1_document_id'
     and kind = 'document_shared' and audience = 'client' and case_id = :'t1_matter_id' and client_id = :'t1_client_id'
+    and status = 'pending' and next_attempt_at = now() + interval '90 seconds'
+    and created_by = '72100000-0000-4000-8000-000000000001'
     and detail = jsonb_build_object('documentId', :'sd1_document_id', 'documentName', 'Disclosure letter.pdf')),
-  'a shared document is announced once, however often it is toggled');
+  'sharing again announces the document once, after the undo window');
 select pg_temp.ok((select count(*) = 0 from public.practice_notices where event_key = 'shared/' || :'sd2_document_id'),
   'nothing is announced before the upload arrives');
 select pg_temp.ok((select count(*) = 1 from public.practice_matter_events where matter_id = :'t1_matter_id'
@@ -1137,8 +1398,39 @@ insert into storage.objects (bucket_id, name) values ('practice-documents', :'sd
 set local role authenticated;
 select pg_temp.ok(public.practice_staff_confirm_document('traffic', :'sd2_document_id'), 'shared upload confirmed');
 reset role;
-select pg_temp.ok((select count(*) = 1 from public.practice_notices where event_key = 'shared/' || :'sd2_document_id'),
-  'a document registered as shared is announced when it arrives');
+select pg_temp.ok((select count(*) = 1 from public.practice_notices where event_key = 'shared/' || :'sd2_document_id'
+    and status = 'pending' and next_attempt_at = now() + interval '90 seconds'),
+  'a document registered as shared is announced when it arrives, after the undo window');
+-- An announcement waiting to retry may already have been delivered: unsharing
+-- cancels it and it is never sent again.
+update public.practice_notices set status = 'retry', attempt_count = 1, first_attempt_at = clock_timestamp(),
+  failure_code = 'provider_timeout' where event_key = 'shared/' || :'sd2_document_id';
+set local role authenticated;
+select pg_temp.ok(public.practice_set_document_shared('traffic', :'sd2_document_id', false), 'unshared while retrying');
+select pg_temp.ok(public.practice_set_document_shared('traffic', :'sd2_document_id', true), 'and shared again');
+reset role;
+select pg_temp.ok((select count(*) = 1 and bool_and(status = 'cancelled' and failure_code = 'document_unshared')
+  from public.practice_notices where event_key = 'shared/' || :'sd2_document_id'),
+  'an announcement that may have gone out is cancelled, not repeated');
+
+-- Sharing a document on a held file takes the file forward into the portal.
+set local role authenticated;
+select * from public.practice_staff_add_document('general', :'r5_matter_id', 'Engagement letter.pdf', 'application/pdf',
+  700, 'correspondence', true) \gset sd5_
+reset role;
+insert into storage.objects (bucket_id, name) values ('practice-documents', :'sd5_storage_path');
+select pg_temp.ok((select not portal_visible from public.practice_matters where id = :'r5_matter_id'),
+  'registering a document does not reveal the file');
+set local role authenticated;
+select pg_temp.ok(public.practice_staff_confirm_document('general', :'sd5_document_id'), 'shared document on a held file');
+reset role;
+select pg_temp.ok((select portal_visible from public.practice_matters where id = :'r5_matter_id')
+  and (select count(*) = 1 from public.practice_notices where event_key = 'shared/' || :'sd5_document_id'
+    and recipients = array['receipt@example.com']), 'sharing puts the held file into the portal and announces it');
+set local role service_role;
+select pg_temp.ok((select count(*) = 1 from public.practice_portal_document(:'r1_client_id', 'general', :'r5_matter_id',
+  '72200000-0000-4000-8000-000000000050')), 'the file''s documents can now be downloaded');
+reset role;
 
 set local role service_role;
 select pg_temp.ok((select count(*) = 1 from public.practice_portal_document(:'t1_client_id', 'traffic', :'t1_matter_id',
@@ -1180,19 +1472,26 @@ select pg_temp.ok((with f as (select public.practice_portal_file(:'t1_client_id'
 -- ---------------------------------------------------------------------------
 select id as portal_notice from public.practice_notices where kind = 'portal_link' and client_id = :'t1_client_id' \gset
 select id as staff_notice from public.practice_notices where kind = 'staff_new_intake' and case_id = :'g1_matter_id' \gset
+update public.practice_notices set status = 'retry', attempt_count = 1, first_attempt_at = clock_timestamp(),
+  failure_code = 'provider_timeout' where id = :'n_r3';
 set local role authenticated;
 select pg_temp.ok(public.practice_cancel_notice(:'n_dc'), 'pending client update cancelled');
 select pg_temp.ok(not public.practice_cancel_notice(:'n_dc'), 'cancel is single use');
+select pg_temp.ok(public.practice_cancel_notice(:'n_r3'), 'an update waiting to retry can be cancelled too');
 select pg_temp.ok(not public.practice_cancel_notice(:'staff_notice'), 'staff alerts are not cancelled here');
 select pg_temp.ok(not public.practice_cancel_notice(:'b_new'), 'sent emails cannot be cancelled');
+select pg_temp.ok(not public.practice_cancel_notice(:'h_back'), 'an email being sent cannot be cancelled');
 select pg_temp.ok(public.practice_cancel_notice(:'portal_notice'), 'portal link cancelled');
 select pg_temp.fails(format('select public.practice_cancel_notice(%L)', gen_random_uuid()), 'PRACTICE_CASE_NOT_FOUND',
   'unknown notice');
-select pg_temp.ok((select status from public.practice_notices where id = :'n_dc') = 'cancelled'
+select pg_temp.ok((select status = 'cancelled' and failure_code = 'cancelled_by_staff' from public.practice_notices
+    where id = :'n_dc')
+  and (select status = 'cancelled' and failure_code = 'cancelled_by_staff' from public.practice_notices where id = :'n_r3')
+  and (select status = 'sending' from public.practice_notices where id = :'h_back')
   and (select count(*) = 1 from public.practice_matter_events where matter_id = :'r1_matter_id' and event = 'notice_cancelled'),
   'cancelled and logged on the file');
 select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000004', true) as claim \gset
-select pg_temp.fails(format('select public.practice_cancel_notice(%L)', :'n_lq'), 'PRACTICE_CASE_NOT_FOUND',
+select pg_temp.fails(format('select public.practice_cancel_notice(%L)', :'n_dc'), 'PRACTICE_CASE_NOT_FOUND',
   'another practice cannot cancel');
 select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000001', true) as claim \gset
 
@@ -1274,8 +1573,20 @@ select pg_temp.ok((select review_notes like 'Returning client. Name entered on t
   from public.practice_matters where id = :'ri_matter_id')
   and (select review_notes like 'Returning client. Name entered by staff (Someone) differs%'
   from public.practice_matters where id = :'cr_case_id'), 'differences left for staff');
+select pg_temp.ok((select not portal_visible from public.practice_matters where id = :'ri_matter_id')
+  and (select count(*) = 0 from public.practice_notices where case_id = :'ri_matter_id' and audience = 'client'),
+  'a public intake in a registered client''s name is held, with no receipt');
+select pg_temp.ok((select portal_visible from public.ltb_cases where id = :'cl_case_id')
+  and (select count(*) = 3 and bool_and(portal_visible) from public.practice_matters
+    where id in (:'ct_case_id', :'cg_case_id', :'cr_case_id')), 'staff-opened files are always in the portal');
 
--- Revoking portal links.
+-- Revoking portal links. Emails not yet sent to the client are cancelled too
+-- (their links would no longer work).
+reset role;
+select public.practice_enqueue_notice('anderhue-paralegal', 'traffic', :'t1_matter_id', null, 'upload_invite',
+  'invite/traffic/' || :'t1_matter_id') as t1_invite \gset
+update public.practice_notices set status = 'retry', attempt_count = 1, first_attempt_at = clock_timestamp(),
+  failure_code = 'provider_timeout' where id = :'t1_invite';
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000004', true) as claim \gset
 select pg_temp.fails(format('select public.practice_revoke_portal_access(%L)', :'t1_client_id'), 'PRACTICE_CASE_NOT_FOUND',
@@ -1288,9 +1599,66 @@ select pg_temp.ok((select portal_revoked_before = now() from public.ltb_clients 
     and matter_id in (select id from public.practice_matters where client_id = :'t1_client_id'))
   and (select count(*) = 0 from public.practice_matter_events where event = 'client_updated'
     and detail->'fields' ? 'portal_revoked_before'), 'revocation logged on every file of the client');
+select pg_temp.ok((select count(*) = 2 and bool_and(status = 'cancelled' and failure_code = 'portal_access_revoked')
+    from public.practice_notices where id in (:'t1_invite', (select id from public.practice_notices
+      where event_key = 'shared/' || :'sd1_document_id')))
+  and (select count(*) = 0 from public.practice_notices where client_id = :'t1_client_id' and audience = 'client'
+    and status in ('pending', 'retry'))
+  and (select status = 'pending' from public.practice_notices where event_key = 'staff-intake/' || :'t1_matter_id'),
+  'revocation cancels the client''s unsent emails, not staff alerts');
 set local role service_role;
 select pg_temp.ok((select (public.practice_portal_session(:'t1_client_id')->>'revokedBefore')::timestamptz = now()),
   'session reports the revocation');
+
+-- Correcting a client's email address revokes old links and cancels emails
+-- not yet sent to the old address.
+reset role;
+update public.practice_notices set status = 'retry', attempt_count = 1, first_attempt_at = clock_timestamp(),
+  failure_code = 'provider_timeout' where id = :'ct_notice_id';
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000004', true) as claim \gset
+select pg_temp.fails(format('select public.practice_set_client_email(%L, %L)', :'cl_client_id', 'wally@walker.example'),
+  'PRACTICE_CLIENT_NOT_FOUND', 'another practice cannot change the address');
+select set_config('request.jwt.claim.sub', '72100000-0000-4000-8000-000000000001', true) as claim \gset
+select pg_temp.fails(format('select public.practice_set_client_email(%L, %L)', gen_random_uuid(), 'wally@walker.example'),
+  'PRACTICE_CLIENT_NOT_FOUND', 'unknown client');
+select pg_temp.fails(format('select public.practice_set_client_email(%L, %L)', :'cl_client_id', 'not an email'),
+  'PRACTICE_EMAIL_INVALID', 'address format');
+select pg_temp.fails(format('select public.practice_set_client_email(%L, null)', :'cl_client_id'),
+  'PRACTICE_EMAIL_INVALID', 'address required');
+select pg_temp.fails(format('select public.practice_set_client_email(%L, %L)', :'cl_client_id', E'wally@walker.example\u0007'),
+  'PRACTICE_EMAIL_INVALID', 'no control characters');
+select pg_temp.fails(format('select public.practice_set_client_email(%L, %L)', :'cl_client_id', ' Receipt@Example.com '),
+  'PRACTICE_EMAIL_TAKEN', 'another client of the practice has the address');
+select pg_temp.ok(public.practice_set_client_email(:'cl_client_id', ' Walk-In@Example.com ') = 'walk-in@example.com',
+  'the current address again is accepted');
+reset role;
+select pg_temp.ok((select portal_revoked_before is null from public.ltb_clients where id = :'cl_client_id')
+  and (select count(*) = 2 from public.practice_notices where id in (:'cl_notice_id', :'ct_notice_id')
+    and status in ('pending', 'retry')), 'and changes nothing');
+set local role authenticated;
+select pg_temp.ok(public.practice_set_client_email(:'cl_client_id', ' Wally@Walker.Example ') = 'wally@walker.example',
+  'address corrected');
+reset role;
+select pg_temp.ok((select email = 'wally@walker.example' and portal_revoked_before = now()
+    and field_sources->'email' = '{"source":"staff"}' from public.ltb_clients where id = :'cl_client_id')
+  and (select count(*) = 2 from public.practice_notices where id in (:'cl_notice_id', :'ct_notice_id')
+    and status = 'cancelled' and failure_code = 'client_email_changed'),
+  'old links revoked and emails to the old address cancelled');
+select pg_temp.ok((select count(*) = 1 from public.ltb_case_events where case_id = :'cl_case_id' and event = 'client_updated'
+    and detail = '{"fields":["email"]}')
+  and (select count(*) = 1 from public.practice_matter_events where matter_id = :'ct_case_id' and event = 'client_updated'
+    and detail = '{"fields":["email"]}'), 'the correction is logged on the client''s files');
+set local role authenticated;
+select (public.practice_set_stage('traffic', :'ct_case_id', 'under_review'))->>'noticeId' as wc_notice \gset
+reset role;
+select pg_temp.ok((select recipients = array['wally@walker.example'] and snapshot->'client'->>'email' = 'wally@walker.example'
+  from public.practice_notices where id = :'wc_notice'), 'new emails go to the corrected address');
+set local role service_role;
+select pg_temp.ok(not public.practice_request_portal_link('anderhue-paralegal', 'walk-in@example.com'),
+  'the old address no longer gets portal links');
+select pg_temp.ok(public.practice_request_portal_link('anderhue-paralegal', 'wally@walker.example'),
+  'the corrected one does');
 
 -- ---------------------------------------------------------------------------
 -- 10. Row level security and grants
@@ -1308,6 +1676,17 @@ select pg_temp.ok((select count(*) = :anderhue_matters from public.practice_matt
   'practice members see only their practice');
 select pg_temp.ok((select count(*) > 0 from (select id, practice_id, area, case_id, audience, kind, detail, status,
   next_attempt_at, sent_at, failure_code, created_at from public.practice_notices) n), 'staff read notice status columns');
+select pg_temp.ok((select count(*) > 0 from (select id, portal_visible from public.practice_matters) m)
+  and (select count(*) > 0 from (select id, portal_visible from public.ltb_cases) c), 'staff see which files are in the portal');
+select pg_temp.fails(format('update public.practice_matters set portal_visible = true where id = %L', :'ri_matter_id'),
+  '42501', 'portal visibility changes only through staff actions');
+select pg_temp.fails(format('update public.ltb_cases set portal_visible = true where id = %L', :'l1_case_id'),
+  '42501', 'on landlord files too');
+select pg_temp.fails(format('update public.ltb_clients set email = %L where id = %L', 'x@example.com', :'t1_client_id'),
+  '42501', 'client addresses change only through practice_set_client_email');
+select pg_temp.fails('select count(*) from public.practice_rate_limits', '42501', 'staff cannot read rate limits');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 3, 60)', repeat('e', 64)), '42501',
+  'or use the rate limiter');
 select pg_temp.fails('select snapshot from public.practice_notices', '42501', 'staff never read snapshots');
 select pg_temp.fails('select email_payload from public.practice_notices', '42501', 'staff never read rendered emails');
 select pg_temp.fails('select recipients from public.practice_notices', '42501', 'staff never read recipients');
@@ -1365,11 +1744,59 @@ select pg_temp.fails(format('select public.practice_set_stage(%L, %L, %L)', 'tra
   'or staff functions');
 select pg_temp.fails('select public.practice_staff_can_upload(''practice-documents'', ''x'')', '42501',
   'or the storage helper');
+select pg_temp.fails(format('select public.practice_set_client_email(%L, %L)', :'t1_client_id', 'x@example.com'), '42501',
+  'or client address changes');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 3, 60)', repeat('e', 64)), '42501',
+  'or the rate limiter');
+select pg_temp.fails('select count(*) from public.practice_rate_limits', '42501', 'or its table');
 
 reset role;
 set local role service_role;
 select pg_temp.fails(format('select public.practice_set_stage(%L, %L, %L)', 'traffic', :'t1_matter_id', 'quoted'), '42501',
   'staff functions are not service functions');
+select pg_temp.fails(format('select public.practice_set_client_email(%L, %L)', :'t1_client_id', 'x@example.com'), '42501',
+  'client address changes are staff decisions');
+
+-- Rate limiter for the public edge functions: a counted window per key hash.
+select pg_temp.fails('select public.practice_rate_limit_hit(''abc'', 3, 60)', 'PRACTICE_RATE_LIMIT_INVALID',
+  'keys are SHA-256 hex digests');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 3, 60)', repeat('A', 64)),
+  'PRACTICE_RATE_LIMIT_INVALID', 'in lower case');
+select pg_temp.fails('select public.practice_rate_limit_hit(null, 3, 60)', 'PRACTICE_RATE_LIMIT_INVALID', 'key required');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 0, 60)', repeat('a', 64)),
+  'PRACTICE_RATE_LIMIT_INVALID', 'limit at least 1');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 10001, 60)', repeat('a', 64)),
+  'PRACTICE_RATE_LIMIT_INVALID', 'limit at most 10000');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, null, 60)', repeat('a', 64)),
+  'PRACTICE_RATE_LIMIT_INVALID', 'limit required');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 3, 0)', repeat('a', 64)),
+  'PRACTICE_RATE_LIMIT_INVALID', 'window at least a second');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 3, 86401)', repeat('a', 64)),
+  'PRACTICE_RATE_LIMIT_INVALID', 'window at most a day');
+select pg_temp.fails(format('select public.practice_rate_limit_hit(%L, 3, null)', repeat('a', 64)),
+  'PRACTICE_RATE_LIMIT_INVALID', 'window required');
+select pg_temp.ok(public.practice_rate_limit_hit(repeat('a', 64), 3, 60), 'first hit allowed');
+select pg_temp.ok(public.practice_rate_limit_hit(repeat('a', 64), 3, 60), 'second hit allowed');
+select pg_temp.ok(public.practice_rate_limit_hit(repeat('a', 64), 3, 60), 'third hit allowed');
+select pg_temp.ok(not public.practice_rate_limit_hit(repeat('a', 64), 3, 60), 'fourth hit refused');
+select pg_temp.ok(not public.practice_rate_limit_hit(repeat('a', 64), 3, 60), 'and every further hit in the window');
+select pg_temp.ok(public.practice_rate_limit_hit(repeat('d', 64), 1, 60), 'keys count separately');
+reset role;
+select pg_temp.ok((select hits = 4 and window_started_at = now() from public.practice_rate_limits
+  where key_hash = repeat('a', 64)), 'refused hits stop counting one past the limit');
+update public.practice_rate_limits set window_started_at = now() - interval '61 seconds' where key_hash = repeat('a', 64);
+insert into public.practice_rate_limits (key_hash, window_started_at, hits, updated_at) values
+  (repeat('b', 64), now() - interval '3 days', 5, now() - interval '3 days'),
+  (repeat('c', 64), now() - interval '1 day', 5, now() - interval '1 day');
+set local role service_role;
+select pg_temp.ok(public.practice_rate_limit_hit(repeat('a', 64), 3, 60), 'a new window starts after the old one');
+select pg_temp.ok((select hits = 1 and window_started_at = now() from public.practice_rate_limits
+  where key_hash = repeat('a', 64)), 'counting starts again');
+select pg_temp.ok((select array_agg(left(key_hash, 1) order by key_hash) = array['a', 'c', 'd']
+  from public.practice_rate_limits where key_hash in (repeat('a', 64), repeat('b', 64), repeat('c', 64), repeat('d', 64))),
+  'keys idle for more than two days are deleted');
+select pg_temp.fails(format('insert into public.practice_rate_limits (key_hash, window_started_at, hits) values (%L, now(), 1)',
+  'not-a-hash'), '23514', 'only key hashes are stored');
 -- Background workers write directly as the service role (like process-ltb-intake).
 insert into public.practice_matter_events (matter_id, practice_id, event, detail)
   values (:'t1_matter_id', 'anderhue-paralegal', 'documents_read', '{"read":1,"unread":0}');
@@ -1395,6 +1822,12 @@ select pg_temp.fails(format('insert into public.practice_matter_documents (id, m
   :'g1_matter_id' || '/72200000-0000-4000-8000-0000000000ff.png', 'image/png'), '23514', 'documents live in their file''s folder');
 select pg_temp.fails(format('insert into public.practice_matters (practice_id, client_id, area) values (%L, %L, %L)',
   'anderhue-paralegal', :'o1_client_id', 'traffic'), '23503', 'files belong to a client of the same practice');
+select pg_temp.fails(format('insert into public.ltb_cases (practice_id, client_id) values (%L, %L)',
+  'anderhue-paralegal', :'o1_client_id'), '23503', 'landlord files too');
+select pg_temp.ok((select count(*) = 1 and bool_and(conname = 'ltb_cases_client_id_fkey' and convalidated
+    and array_length(conkey, 1) = 2)
+  from pg_constraint where conrelid = 'public.ltb_cases'::regclass and confrelid = 'public.ltb_clients'::regclass
+    and contype = 'f'), 'one validated ltb_cases to ltb_clients key, so PostgREST embeds stay unambiguous');
 
 reset role;
 select 'practice-files tests passed' as result;
