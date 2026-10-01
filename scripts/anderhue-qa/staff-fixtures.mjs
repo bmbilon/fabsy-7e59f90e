@@ -941,6 +941,12 @@ export async function installSupabaseMocks(context, { origin, state, requests = 
     }
     const method = request.method();
     const headers = request.headers();
+    const cors = {
+      'access-control-allow-origin': origin,
+      'access-control-allow-methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+      'access-control-allow-headers': headers['access-control-request-headers'] || 'authorization, apikey, content-type, prefer, x-client-info, x-supabase-api-version, x-upsert',
+    };
+    if (method === 'OPTIONS') return route.fulfill({ status: 204, headers: cors, body: '' });
     let body = null;
     const raw = request.postData();
     if (raw && (headers['content-type'] || '').includes('application/json')) {
@@ -954,14 +960,14 @@ export async function installSupabaseMocks(context, { origin, state, requests = 
     requests.push(entry);
     const json = (value, status = 200, extra = {}) => {
       entry.status = status;
-      return route.fulfill({ status, contentType: 'application/json', body: value === undefined ? '' : JSON.stringify(value), headers: extra });
+      return route.fulfill({ status, contentType: 'application/json', body: value === undefined ? '' : JSON.stringify(value), headers: { ...cors, ...extra } });
     };
 
     try {
       // Auth -----------------------------------------------------------------
       if (url.pathname.startsWith('/auth/v1/')) {
         if (url.pathname.endsWith('/signup')) return json({ user: { ...STAFF_USER, email: body?.email || STAFF_USER.email }, session: null });
-        if (url.pathname.endsWith('/logout')) { entry.status = 204; return route.fulfill({ status: 204, body: '' }); }
+        if (url.pathname.endsWith('/logout')) { entry.status = 204; return route.fulfill({ status: 204, headers: cors, body: '' }); }
         if (url.pathname.endsWith('/user')) return json(STAFF_USER);
         if (url.pathname.endsWith('/token')) {
           if (state.authFail) return json({ error: 'invalid_grant', error_description: 'Invalid login credentials', msg: 'Invalid login credentials' }, 400);
@@ -980,7 +986,7 @@ export async function installSupabaseMocks(context, { origin, state, requests = 
         const result = handler(state, body || {});
         entry.result = result;
         if (entry.rpc === 'ltb_my_practices') entry.membershipOk = result.some(row => row.practice_id === PRACTICE_ID);
-        if (result === null || result === undefined) { entry.status = 204; return route.fulfill({ status: 204, body: '' }); }
+        if (result === null || result === undefined) { entry.status = 204; return route.fulfill({ status: 204, headers: cors, body: '' }); }
         return json(result);
       }
 
@@ -1310,12 +1316,16 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   await step('legacy redirects', async () => {
     await page.goto(`${origin}/admin/ltb`);
     await page.waitForURL(`${origin}/admin/landlord`);
+    await waitForQuiet(page);
     await page.goto(`${origin}/admin/ltb/cases/${keys.ltbReview}`);
     await page.waitForURL(`${origin}/admin/files/ltb/${keys.ltbReview}`);
+    await waitForQuiet(page);
     await page.goto(`${origin}/admin/not-a-page`);
     await page.waitForURL(`${origin}/admin/today`);
+    await waitForQuiet(page);
     await page.goto(`${origin}/admin`);
     await page.waitForURL(`${origin}/admin/today`);
+    await waitForQuiet(page);
   });
 
   await step('Today: KPIs, attention queue and activity', async () => {
@@ -1581,7 +1591,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     }
     const card = page.locator('a.ahs-file-card', { hasText: held });
     const badge = card.locator('.ahs-hold');
-    assert.equal(await badge.innerText(), PORTAL_HOLD_LABEL);
+    assert.equal((await badge.innerText()).trim(), PORTAL_HOLD_LABEL);
     assert.equal(await badge.getAttribute('title'), PORTAL_HOLD_HELP);
     assert.match(await card.getAttribute('aria-label'), /not shown to the client yet/);
     assert.equal(await page.locator('a.ahs-file-card .ahs-hold').count(), 1, 'Only the held file carries the badge');
