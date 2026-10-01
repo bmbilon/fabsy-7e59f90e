@@ -5,6 +5,7 @@
 import { createServer } from 'node:http';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { makePdf } from './pdf.mjs';
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png',
@@ -57,7 +58,18 @@ export function vercelHeaders(root, { local = true } = {}) {
 export async function startAnderhueServer(root = path.resolve('dist-anderhue'), { headers = true } = {}) {
   const headersFor = headers ? vercelHeaders(root) : () => ({});
   const server = createServer((request, response) => {
-    const pathname = new URL(request.url, 'http://localhost').pathname;
+    const url = new URL(request.url, 'http://localhost');
+    const pathname = url.pathname;
+    // Serve a real HTTP attachment: WebKit cannot emit download events for
+    // route.fulfill() PDFs (playwright#22691). This endpoint exists only in QA.
+    if (pathname === '/__qa__/download.pdf') {
+      const name = (url.searchParams.get('name') || 'document.pdf').replace(/[\r\n"]/g, '');
+      response.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${name}"`,
+      }).end(makePdf(name, ['Fixture download']));
+      return;
+    }
     const target = resolveAnderhuePath(root, pathname);
     if (!target) { response.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found'); return; }
     for (const [key, value] of Object.entries(headersFor(pathname))) response.setHeader(key, value);

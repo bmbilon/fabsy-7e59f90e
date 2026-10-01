@@ -925,6 +925,9 @@ export async function installSupabaseMocks(context, { origin, state, requests = 
   await context.route('**/*', async route => {
     const request = route.request();
     const url = new URL(request.url());
+    // Branded Chromium browsers load their built-in PDF viewer from an
+    // internal extension. Do not replace its module scripts with a 204 mock.
+    if (url.protocol === 'chrome-extension:') return route.continue();
     if (url.origin === origin) return route.continue();
     if (url.hostname === 'fonts.googleapis.com') return route.fulfill({ status: 200, contentType: 'text/css', body: fontCss(fontsDir) });
     if (url.hostname === 'fonts.gstatic.com') {
@@ -1167,7 +1170,7 @@ export async function openStaffContext(browser, origin, options = {}) {
   page.on('console', message => {
     if (message.type() !== 'error') return;
     const text = message.text();
-    if (!allowConsole.some(pattern => pattern.test(text))) errors.push(`console: ${text}`);
+    if (!allowConsole.some(pattern => pattern.test(text))) errors.push(`console: ${text} (${message.location().url})`);
   });
   return {
     context, page, state, requests, externals, errors, release: () => release(),
@@ -1665,7 +1668,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
       await input.fill(value);
       const response = page.waitForResponse(item => item.url().endsWith('/rest/v1/rpc/practice_set_client_email'));
       await save.click();
-      await response;
+      assert.equal((await response).status(), 400, 'A refused email change returns 400');
       await dialog.getByText(message, { exact: true }).waitFor();
       assert.equal(member.rpcCalls('practice_set_client_email').at(-1).body.p_email, value.trim());
     };
@@ -1679,7 +1682,6 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     const added = member.errors.splice(logged);
     const refused = added.filter(message => /status of 400 \(Bad Request\)/.test(message));
     member.errors.push(...added.filter(message => !refused.includes(message)));
-    assert.equal(refused.length, 3, 'Each refused change logs exactly one 400 response');
     await input.fill('  Daniel.Okafor@Example.org ');
     await shoot(page, 'change-email', { full: false });
     await save.click();
@@ -1915,4 +1917,3 @@ if (invokedDirectly) {
     await server.close();
   }
 }
-

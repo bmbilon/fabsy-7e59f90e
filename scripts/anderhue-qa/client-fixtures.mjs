@@ -25,6 +25,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { deflateSync } from 'node:zlib';
 import { chromium } from 'playwright';
 import { startAnderhueServer } from './serve.mjs';
+import { makePdf } from './pdf.mjs';
+export { makePdf } from './pdf.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const siteConfig = JSON.parse(readFileSync(path.join(here, '../../ontario/anderhue-paralegal-site/site-config.json'), 'utf8'));
@@ -130,29 +132,6 @@ function ledgerPhoto() {
     if (x === 250 && y > 90) return [210, 120, 120];
     return [250, 248, 242];
   });
-}
-
-/** Single-page PDF with a title and a few lines of text. */
-export function makePdf(title, lines = []) {
-  const esc = text => String(text).replace(/[\\()]/g, match => `\\${match}`);
-  const content = [`BT /F1 18 Tf 72 720 Td (${esc(title)}) Tj ET`, ...lines.map((line, index) => `BT /F1 11 Tf 72 ${690 - index * 16} Td (${esc(line)}) Tj ET`)].join('\n');
-  const objects = [
-    '<< /Type /Catalog /Pages 2 0 R >>',
-    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
-    `<< /Length ${Buffer.byteLength(content, 'latin1')} >>\nstream\n${content}\nendstream`,
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
-  ];
-  let out = '%PDF-1.4\n';
-  const offsets = [];
-  objects.forEach((object, index) => {
-    offsets.push(Buffer.byteLength(out, 'latin1'));
-    out += `${index + 1} 0 obj\n${object}\nendobj\n`;
-  });
-  const xref = Buffer.byteLength(out, 'latin1');
-  out += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n${offsets.map(offset => `${String(offset).padStart(10, '0')} 00000 n \n`).join('')}`;
-  out += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
-  return Buffer.from(out, 'latin1');
 }
 
 /**
@@ -483,7 +462,9 @@ export async function mockClientApi(context, options = {}) {
       const document = file.documents.find(item => item.id === body.documentId);
       if (!document) return [404, { error: 'We could not find that document.' }];
       const bucket = file.area === 'ltb' ? 'ltb-documents' : 'practice-documents';
-      const url = `${SUPABASE_ORIGIN}/storage/v1/object/sign/${bucket}/${file.id}/${document.id}.${EXTENSIONS[document.contentType] || 'bin'}?token=${randomBytes(24).toString('base64url')}&download=${encodeURIComponent(document.name)}`;
+      const url = settings.downloadOrigin
+        ? `${settings.downloadOrigin}/__qa__/download.pdf?name=${encodeURIComponent(document.name)}`
+        : `${SUPABASE_ORIGIN}/storage/v1/object/sign/${bucket}/${file.id}/${document.id}.${EXTENSIONS[document.contentType] || 'bin'}?token=${randomBytes(24).toString('base64url')}&download=${encodeURIComponent(document.name)}`;
       return [200, { ok: true, url, name: document.name }];
     }
     if (body.action === 'prepare_upload') {
@@ -541,6 +522,10 @@ export async function mockClientApi(context, options = {}) {
   // Lowest priority: everything not matched below. Local app files pass; anything else is recorded and blocked.
   await context.route('**/*', route => {
     const url = new URL(route.request().url());
+    if (url.origin === settings.downloadOrigin && url.pathname === '/__qa__/download.pdf') {
+      controller.downloads.push(url.href);
+      return route.continue();
+    }
     // WebKit exposes local object-URL thumbnail reads to routing; Chromium does not.
     if (url.protocol === 'blob:' && /^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url.origin)) return route.continue();
     if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') return route.continue();
@@ -660,7 +645,7 @@ async function openPage(ctx, kind, mockOptions = {}) {
     hasTouch: device.hasTouch, deviceScaleFactor: 1,
     serviceWorkers: 'block', acceptDownloads: true, locale: 'en-CA', timezoneId: 'America/Toronto',
   });
-  const api = await mockClientApi(context, mockOptions);
+  const api = await mockClientApi(context, { downloadOrigin: ctx.origin, ...mockOptions });
   const page = await context.newPage();
   const consoleLog = trackConsole(page);
   return {
