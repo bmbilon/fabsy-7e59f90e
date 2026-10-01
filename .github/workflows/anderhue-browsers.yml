@@ -62,7 +62,17 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Install browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+        shell: bash
+        run: |
+          if [ "${{ matrix.browser }}" = chrome ] && command -v google-chrome >/dev/null 2>&1; then
+            # GitHub's Ubuntu runner already has branded Chrome. Reinstalling
+            # it can stall on the external apt repository; the browser test
+            # prints the actual installed version it launches.
+            google-chrome --version
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps ${{ matrix.browser }}
+          fi
       - name: Build and verify public, client and staff flows
         run: npm run verify:anderhue
         env:
