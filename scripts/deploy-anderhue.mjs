@@ -9,15 +9,18 @@ const output = path.resolve(root, process.env.ANDERHUE_OUT_DIR || 'dist-anderhue
 const projectId = 'prj_9Nqy5wSZtRYgx1Bkpplvvq1RPh5q';
 const orgId = 'team_EE3Kx2plLFZj8TgX9R1DAsWO';
 const env = { ...process.env, VERCEL_PROJECT_ID: projectId, VERCEL_ORG_ID: orgId };
-function run(command, args, cwd) {
-  const result = spawnSync(command, args, { cwd, env, stdio: 'inherit' });
+const linkEnv = { ...process.env };
+delete linkEnv.VERCEL_PROJECT_ID;
+delete linkEnv.VERCEL_ORG_ID;
+function run(command, args, cwd, commandEnv = env) {
+  const result = spawnSync(command, args, { cwd, env: commandEnv, stdio: 'inherit' });
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status || 1);
 }
 
 run(process.execPath, ['scripts/build-anderhue.mjs'], root);
 // Vite empties the output directory, including a previous .vercel link.
-run('vercel', ['link', '--yes', '--project', 'anderhue-paralegal', '--scope', 'execom'], output);
+run('vercel', ['link', '--yes', '--project', 'anderhue-paralegal', '--scope', 'execom'], output, linkEnv);
 const linked = JSON.parse(readFileSync(path.join(output, '.vercel/project.json'), 'utf8'));
 assert.equal(linked.projectId, projectId, 'Refusing to deploy to a different Vercel project');
 assert.equal(linked.orgId, orgId, 'Refusing to deploy to a different Vercel team');

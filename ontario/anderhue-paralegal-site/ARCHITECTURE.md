@@ -257,12 +257,14 @@ configuration and omit the AnderHue routes and headers.
   are deployed. The allowed origins include the production apex, www, production
   Vercel alias and the separate preview alias. A temporary authenticated probe
   confirmed `cf-connecting-ip` reaches the edge runtime; that probe was deleted.
-- Production deployment `dpl_G8wMCWorsuy5QktjTqvG5VaMNk1N` serves `anderhue.ca`.
+- Production deployment `dpl_7xmrqijMXLwtLggux1xTJrQqb8P2` serves `anderhue.ca`.
   Public pages, `/start`, `/files`, `/admin` and nested portal routes returned 200
   with the production CSP. Private app routes carry `noindex, nofollow`.
 - All 48 practice unit tests, the local PostgreSQL SQL harness, and the complete
   browser suite (including 22 staff checks) passed. The keyboard-focus assertion
-  now waits for the application's scheduled focus change. Live traffic/general
+  now waits for the application's scheduled focus change. The portal stepper
+  uses a dark base foreground and light checkmarks only on completed steps,
+  passing the shared contrast guard. Live traffic/general
   submission, signed upload and finalization passed with synthetic records;
   zero notices were queued, and the test records and objects were removed.
 - The unverified Ontario Paralegal Association membership chip was removed.
