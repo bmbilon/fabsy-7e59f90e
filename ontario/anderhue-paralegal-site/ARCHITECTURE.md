@@ -258,6 +258,11 @@ their native attachment download is exercised through the client portal.
 Playwright 1.63 drives the current branded browsers. No production data or
 emails are used.
 
+The browser Supabase SDK is 2.117.2 or newer. Firefox 155 exposed an unhandled
+Navigator LockManager error in the former 2.57.4 auth initialization. The
+supported SDK uses lockless session coordination with refresh deduplication
+and stale-refresh commit guards; we do not disable auth or supply a no-op lock.
+
 ## 7. Go-live checklist
 
 Order matters: the portal must be live before any client email can link to it.

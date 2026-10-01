@@ -1190,7 +1190,7 @@ export async function openStaffContext(browser, origin, options = {}) {
   await installSupabaseMocks(context, { origin, state, requests, fontsDir, holdMembership, externals, latencyMs });
   if (signedIn) await context.addInitScript(([appOrigin, key, value]) => {
     // Never seed authentication into a PDF viewer or a cross-origin frame.
-    if (location.origin === appOrigin) localStorage.setItem(key, JSON.stringify(value));
+    if (window === window.top && location.origin === appOrigin && localStorage) localStorage.setItem(key, JSON.stringify(value));
   }, [origin, AUTH_STORAGE_KEY, fixtureSession()]);
   const page = await context.newPage();
   const pending = new Set();
@@ -1201,7 +1201,7 @@ export async function openStaffContext(browser, origin, options = {}) {
   page.on('requestfinished', request => pending.delete(request));
   page.on('requestfailed', request => pending.delete(request));
   const errors = [];
-  page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
+  page.on('pageerror', error => errors.push(`pageerror: ${error.stack || error.message}`));
   page.on('console', message => {
     if (message.type() !== 'error') return;
     const text = message.text();
