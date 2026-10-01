@@ -69,7 +69,6 @@ jobs:
             # it can stall on the external apt repository; the browser test
             # prints the actual installed version it launches.
             google-chrome --version
-            npx playwright install-deps chromium
           else
             npx playwright install --with-deps ${{ matrix.browser }}
           fi
