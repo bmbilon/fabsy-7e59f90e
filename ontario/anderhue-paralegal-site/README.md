@@ -10,7 +10,7 @@ Static Ontario public site and private LTB workspace for AnderHue Paralegal Prof
 
 The homepage links to all three practice areas. `/landlords` retains the existing N4, L1 and L2 information, date calculator and connected LTB intake. The Traffic Tickets and Other Matters pages currently offer a phone and email consultation. They do not use the Alberta ticket checkout, open an Ontario case or collect payment. A full Ontario traffic workflow requires its own verified scope, intake rules and backend before launch.
 
-The public pages use a shared purple, ivory and gold identity. The private sign-in uses the same crest and palette. Public pages are indexable; the sign-in and admin routes remain `noindex`. `robots.txt` and `sitemap.xml` cover the public routes.
+The public pages use a shared purple, ivory and gold identity. The crest is adapted from the AnderHue Canada Inc. image supplied by Brett, using only its laurel and circuit-A mark. The company name, address and firm number from that image are not practice details on this site. The private sign-in uses the same crest and palette. Public pages are indexable; the sign-in and admin routes remain `noindex`. `robots.txt` and `sitemap.xml` cover the public routes.
 
 ## Landlord intake and access
 

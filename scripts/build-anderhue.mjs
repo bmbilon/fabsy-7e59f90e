@@ -17,6 +17,6 @@ const result = spawnSync(process.execPath, ['node_modules/vite/bin/vite.js', 'bu
 });
 if (result.error) throw result.error;
 if (result.status !== 0) process.exit(result.status || 1);
-for (const file of ['index.html', 'landlords.html', 'traffic-tickets.html', 'other-matters.html', 'public.css', 'crest.svg', 'robots.txt', 'sitemap.xml', 'vercel.json']) {
+for (const file of ['index.html', 'landlords.html', 'traffic-tickets.html', 'other-matters.html', 'public.css', 'crest.png', 'robots.txt', 'sitemap.xml', 'vercel.json']) {
   copyFileSync(new URL(file, site), new URL(`../dist-anderhue/${file}`, import.meta.url));
 }
