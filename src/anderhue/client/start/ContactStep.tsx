@@ -18,7 +18,7 @@ export default function ContactStep({ fields, errors, setField, company, setComp
 
   return (
     <section aria-labelledby="step-title">
-      <StepHeading ref={headingRef} title="How can we reach you?" intro="We email your secure file link and our reply to this address." />
+      <StepHeading ref={headingRef} title="How can we reach you?" intro="We will email your secure file link and our reply to this address." />
       <div className="mt-6 grid gap-6">
         <Field id="f-name" label="Full name" error={errors.name}>
           {control => (

@@ -1,13 +1,14 @@
 import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as SwitchPrimitive from '@radix-ui/react-switch';
+import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { Link, type LinkProps } from 'react-router-dom';
-import { Briefcase, Building2, CalendarClock, CarFront, Loader2, X } from 'lucide-react';
+import { Briefcase, Building2, CalendarClock, CarFront, EyeOff, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AREAS, stageDef, staffStageLabel, type PracticeArea } from './catalog';
 import { formatTableDate } from './format';
 import {
-  KEY_DATE_SHORT, REVIEW_LABELS, REVIEW_TONES, dateTone, outcomeLabel, relativeDays,
+  KEY_DATE_SHORT, PORTAL_HOLD_HELP, PORTAL_HOLD_LABEL, REVIEW_LABELS, REVIEW_TONES, dateTone, outcomeLabel, relativeDays,
   type FieldSource, type KeyDate, type Reason, type ReviewStatus, type Tone,
 } from './model';
 
@@ -145,6 +146,35 @@ export function DateChip({ keyDate, days, today, short = true, large = false }: 
     title={`${keyDate.label}${keyDate.estimate ? ' (estimate)' : ''}: ${keyDate.date}`}>
     <CalendarClock aria-hidden="true" />{text}{keyDate.estimate && short ? <span className="sr-only"> (estimate)</span> : null}
   </span>;
+}
+
+/**
+ * A file held out of the client portal (portal_visible false). Inside a link
+ * (board cards and rows) it carries the explanation as a title; on the file
+ * page it is focusable and shows the explanation as a tooltip.
+ */
+export function PortalHoldBadge({ withTooltip = false, large = false, className }: {
+  withTooltip?: boolean; large?: boolean; className?: string;
+}) {
+  const classes = cn('ahs-chip ahs-hold', large && 'ahs-chip-lg', className);
+  if (!withTooltip) {
+    return <span className={classes} title={PORTAL_HOLD_HELP}><EyeOff aria-hidden="true" /><span className="truncate">{PORTAL_HOLD_LABEL}</span></span>;
+  }
+  return <TooltipPrimitive.Provider delayDuration={150}>
+    <TooltipPrimitive.Root>
+      <TooltipPrimitive.Trigger asChild>
+        <span className={cn(classes, 'cursor-help')} tabIndex={0}>
+          <EyeOff aria-hidden="true" />{PORTAL_HOLD_LABEL}
+        </span>
+      </TooltipPrimitive.Trigger>
+      <TooltipPrimitive.Portal>
+        <TooltipPrimitive.Content side="bottom" align="start" sideOffset={6} collisionPadding={12} className="ahs-tooltip">
+          {PORTAL_HOLD_HELP}
+          <TooltipPrimitive.Arrow className="ahs-tooltip-arrow" width={10} height={5} />
+        </TooltipPrimitive.Content>
+      </TooltipPrimitive.Portal>
+    </TooltipPrimitive.Root>
+  </TooltipPrimitive.Provider>;
 }
 
 export function SourceTag({ source }: { source?: FieldSource }) {

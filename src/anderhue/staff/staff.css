@@ -172,6 +172,22 @@ html[data-app="anderhue"] h4 {
 .ahs-tone-success { --chip-bg: #deede4; --chip-fg: #22533c; --chip-ring: #bfd9c9; }
 .ahs-tone-neutral { --chip-bg: #f2ece4; --chip-fg: #54465d; --chip-ring: #e1d6ca; }
 
+/* Held out of the client portal: quiet colours, dashed outline so it never reads as a flag. */
+.ahs-hold {
+  max-width: 100%; background: #fbf8f3; color: #54465d; box-shadow: none; border: 1px dashed #b3a2b2;
+}
+.ahs-hold svg { flex: none; color: #6f5f78; }
+.ahs-hold:focus-visible { outline: 2px solid var(--ah-gold-500); outline-offset: 2px; }
+
+.ahs-tooltip {
+  z-index: 70; max-width: 290px; padding: 8px 11px; border-radius: 6px;
+  background: var(--ah-plum-950); color: var(--ah-ivory-50); font-size: 12.5px; line-height: 1.45; font-weight: 500;
+  box-shadow: var(--ahs-shadow-raised);
+}
+.ahs-tooltip-arrow { fill: var(--ah-plum-950); }
+.ahs-tooltip[data-state="delayed-open"], .ahs-tooltip[data-state="instant-open"] { animation: ahs-tooltip-in 0.14s var(--ahs-ease); }
+@keyframes ahs-tooltip-in { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+
 .ahs-pill {
   display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 9px 0 8px; border-radius: 999px;
   font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap;
@@ -576,4 +592,5 @@ html[data-app="anderhue"] h4 {
 @media (prefers-reduced-motion: reduce) {
   .ahs-file-card:hover { transform: none; }
   .ahs-skel { animation: none; }
+  .ahs-tooltip { animation: none !important; }
 }

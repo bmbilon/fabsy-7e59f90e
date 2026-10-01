@@ -72,12 +72,12 @@ export default function SignInCard({ notice }: { notice: PortalNotice }) {
           <span className="ahc-drop-icon" aria-hidden="true"><MailCheck size={24} /></span>
           <h1 id="check-title" ref={heading} tabIndex={-1} className="ah-display mt-5 text-[30px] sm:text-[34px]">Check your email</h1>
           <p className="mt-3 text-[16px] leading-relaxed text-[color:var(--ah-ink-2)]">
-            If <strong className="font-semibold text-[color:var(--ah-ink)] [overflow-wrap:anywhere]">{sentTo}</strong> matches a file with us, a secure link to your file is on its way.
+            If <strong className="font-semibold text-[color:var(--ah-ink)] [overflow-wrap:anywhere]">{sentTo}</strong> matches a file with us, we will email a secure link to that address.
           </p>
           <ul className="mt-6 grid gap-4 text-[15px] text-[color:var(--ah-ink-2)]">
             <li className="flex gap-3"><KeyRound size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[color:var(--ah-plum-600)]" /><span>The link opens your file directly. No password needed.</span></li>
             <li className="flex gap-3"><Clock size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[color:var(--ah-plum-600)]" /><span>Links expire after {PORTAL_LINK_DAYS} days. You can ask for a fresh one here any time.</span></li>
-            <li className="flex gap-3"><Inbox size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[color:var(--ah-plum-600)]" /><span>Not there in a few minutes? Check your spam or junk folder for a message from {ANDERHUE_PRACTICE.name}.</span></li>
+            <li className="flex gap-3"><Inbox size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[color:var(--ah-plum-600)]" /><span>Not in your inbox? Check your spam or junk folder for a message from {ANDERHUE_PRACTICE.name}.</span></li>
           </ul>
           {resent ? <Alert tone="success" className="mt-6">We sent another link.</Alert> : null}
           {error ? <Alert tone="error" className="mt-6">{error}</Alert> : null}

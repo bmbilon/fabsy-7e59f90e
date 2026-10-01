@@ -57,6 +57,12 @@ async function signature(secret: string, payload: string): Promise<string> {
   return base64url(new Uint8Array(digest));
 }
 
+/** Lowercase hex HMAC-SHA256 of `message` (used for rate-limit keys, never for tokens). */
+export async function hmacHex(secret: string, message: string): Promise<string> {
+  const digest = await crypto.subtle.sign("HMAC", await hmacKey(secret), encoder.encode(message));
+  return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
 /** Compares two strings without an early exit on the first difference. */
 export function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;

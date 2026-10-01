@@ -203,6 +203,8 @@ function makeToken(clientId, iatOffsetDays, expOffsetDays) {
 
 export const FIXTURE_TOKENS = {
   multi: makeToken(CLIENT_ID, -1, 29),
+  /** A newer link for the same client as `multi`. */
+  multiRenewed: makeToken(CLIENT_ID, 0, 30),
   single: makeToken(SINGLE_CLIENT_ID, -2, 28),
   expired: makeToken(CLIENT_ID, -45, -14),
 };
@@ -677,6 +679,8 @@ async function checkPage(page, label) {
   const text = await page.locator('body').innerText();
   assert.doesNotMatch(text, /\u2014/, `${label}: em dash in visible copy`);
   assert.doesNotMatch(text, /fabsy/i, `${label}: vendor name in client copy`);
+  // Receipt and link emails can be held for review: no promise of when they arrive.
+  assert.doesNotMatch(text, /have emailed|on its way|take a few minutes to arrive|in a few minutes\?/i, `${label}: email timing promise`);
 }
 
 // Playwright's fullPage capture drops Chromium's touch emulation (pointer: coarse turns false for the
@@ -788,6 +792,8 @@ async function landlordFlow(ctx, kind) {
   const number = await page.getByTestId('file-number').innerText();
   assert.match(number, /^LTB-2026-\d{4}$/);
   await page.getByText('dana.whitfield@gmail.com').waitFor();
+  assert.match(await page.locator('#sent-title + p + div + p').innerText(), /^We will email a secure link to dana\.whitfield@gmail\.com so you can follow your file and add documents\.$/);
+  await page.getByText('If you do not see it, check your spam or junk folder.', { exact: false }).waitFor();
   await page.getByText('We have your file. We will review your documents and reply with your next deadline and the fee that applies.').waitFor();
   await shot(ctx, s, '09-ltb-success', { fold: true });
 
@@ -1098,6 +1104,56 @@ async function portalFiles(ctx, kind) {
   await s.close();
 }
 
+/**
+ * Security review L1: opening a link must not silently replace a link remembered
+ * on this device for a different client. Same client: the remembered link is
+ * renewed. Covers a fresh page load and a link pasted into an open tab (hashchange).
+ */
+async function portalTokenSwitch(ctx, kind) {
+  const s = await openPage(ctx, kind);
+  s.console.allow(HTTP_ERROR); // the expected 404 for another client's file
+  const { page } = s;
+  const stored = () => page.evaluate(() => ({
+    session: sessionStorage.getItem('anderhue.portal.v1'),
+    local: localStorage.getItem('anderhue.portal.v1'),
+  }));
+  const remember = page.getByLabel('Remember this device');
+
+  await page.goto(portalUrl(ctx.origin, '/files', FIXTURE_TOKENS.multi));
+  await page.getByRole('heading', { name: 'Hello, Priya' }).waitFor();
+  await remember.check();
+  assert.deepEqual(await stored(), { session: FIXTURE_TOKENS.multi, local: FIXTURE_TOKENS.multi });
+
+  // Same client, newer link: the remembered link is replaced and stays remembered.
+  await page.goto(portalUrl(ctx.origin, '/files', FIXTURE_TOKENS.multiRenewed));
+  await page.getByRole('heading', { name: 'Hello, Priya' }).waitFor();
+  assert.deepEqual(await stored(), { session: FIXTURE_TOKENS.multiRenewed, local: FIXTURE_TOKENS.multiRenewed }, 'same client renews the remembered link');
+  assert.ok(await remember.isChecked(), 'still remembered for the same client');
+
+  // Another client's link: the remembered link is removed, not overwritten; the new one stays in this tab only.
+  await page.goto(portalUrl(ctx.origin, '/files', FIXTURE_TOKENS.single));
+  await page.waitForURL(new RegExp(`/files/traffic/${FIXTURE_IDS.singleTraffic}$`));
+  await page.getByRole('heading', { name: 'Ticket received' }).waitFor();
+  assert.deepEqual(await stored(), { session: FIXTURE_TOKENS.single, local: null }, 'other client removes the remembered link');
+  assert.equal(await remember.isChecked(), false, 'Remember this device starts unchecked for the other client');
+  await page.getByText('marc.tremblay@example.com').waitFor();
+  await shot(ctx, s, '31-portal-other-client-link');
+
+  // A link pasted into an open tab (only the hash changes) follows the same rule. The tab is
+  // signed in as the other client, so Priya's file is not found until her link arrives.
+  await remember.check();
+  assert.equal((await stored()).local, FIXTURE_TOKENS.single);
+  await page.goto(`${ctx.origin}/files/ltb/${FIXTURE_IDS.ltb}`);
+  await page.getByRole('heading', { name: 'We could not find that file' }).waitFor();
+  await page.evaluate(token => { window.location.hash = `t=${token}`; }, FIXTURE_TOKENS.multi);
+  await page.getByRole('heading', { name: 'We need a document from you' }).waitFor();
+  assert.equal(new URL(page.url()).hash, '', 'token removed from the address bar');
+  assert.deepEqual(await stored(), { session: FIXTURE_TOKENS.multi, local: null }, 'pasted link for another client removes the remembered link');
+  assert.equal(await remember.isChecked(), false);
+  await page.getByText('priya.sharma@example.com').first().waitFor();
+  await s.close();
+}
+
 /** 360 px: every key state fits without horizontal scrolling. */
 async function narrowChecks(ctx) {
   const s = await openPage(ctx, 'narrow');
@@ -1133,7 +1189,7 @@ async function narrowChecks(ctx) {
   await s.close();
 }
 
-export const SCENARIOS = { landlordFlow, trafficFlow, otherFlow, intakeErrors, portalSignIn, portalFiles };
+export const SCENARIOS = { landlordFlow, trafficFlow, otherFlow, intakeErrors, portalSignIn, portalFiles, portalTokenSwitch };
 
 /**
  * Runs every scenario at 390x844 (touch) and 1440x900, then the 360 px checks.

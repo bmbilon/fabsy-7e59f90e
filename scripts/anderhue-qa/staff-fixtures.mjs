@@ -41,7 +41,8 @@ export const ALLOWED_TABLES = ['ltb_practices', ...PRACTICE_TABLES];
 export const STAFF_RPCS = [
   'ltb_my_practices', 'practice_set_stage', 'practice_request_documents', 'practice_clear_request',
   'practice_staff_add_document', 'practice_staff_confirm_document', 'practice_set_document_shared',
-  'practice_cancel_notice', 'practice_create_matter', 'practice_revoke_portal_access', 'ltb_set_client_registration',
+  'practice_cancel_notice', 'practice_create_matter', 'practice_revoke_portal_access', 'practice_set_client_email',
+  'ltb_set_client_registration',
 ];
 export const NOTICE_COLUMNS = ['id', 'area', 'case_id', 'audience', 'kind', 'detail', 'status', 'next_attempt_at', 'sent_at', 'failure_code', 'created_at'];
 export const UPDATE_GRANTS = {
@@ -57,6 +58,9 @@ export const UPDATE_GRANTS = {
 };
 /** Fabsy traffic tables the AnderHue workspace must never touch. */
 export const FABSY_TABLES = ['ticket_submissions', 'clients', 'case_statuses', 'ticket_upload_alerts', 'user_roles', 'idr_reports'];
+/** Copy for a file held out of the client portal (portal_visible false). */
+export const PORTAL_HOLD_LABEL = 'Not shown to the client yet';
+export const PORTAL_HOLD_HELP = 'This file came in under an email that already has a file. The client sees it once you move it out of New intake.';
 
 // Catalog values the mock needs (mirror of supabase/functions/_shared/practice-catalog.ts).
 const STAGES = {
@@ -91,10 +95,12 @@ function addDays(iso, days) {
 const id = (prefix, n) => `${prefix}-0000-4000-8000-${String(n).padStart(12, '0')}`;
 
 /**
- * Realistic practice data relative to `now`: 19 files across Landlord, Traffic
+ * Realistic practice data relative to `now`: 20 files across Landlord, Traffic
  * and Other in varied stages, with documents, events and client updates,
  * including an open request, a client upload, due-soon and overdue dates, a
- * file ready for its L1, a failed client update and a scheduled one.
+ * file ready for its L1, a failed client update, a scheduled one, one waiting
+ * to retry, a file held out of the client portal (portal_visible false) and
+ * client documents whose names disguise their type.
  */
 export function buildStaffFixtureData({ now = new Date() } = {}) {
   const today = torontoDate(now);
@@ -162,7 +168,7 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
     notice_termination_date: null, hearing_date: null, intake_review_status: 'ready', intake_scan_started_at: null, review_notes: null,
     client_notes: null, field_sources: {}, returning_client: false, intake_token_hash: 'f'.repeat(64), intake_finalized_at: ago({ days: 1 }),
     source: 'ltb-landing', user_agent: null, outcome: null, closed_at: null, client_request_message: null, client_request_at: null,
-    client_uploaded_at: null, created_at: ago({ days: 1 }), updated_at: ago({ days: 1 }), ...fields,
+    client_uploaded_at: null, portal_visible: true, created_at: ago({ days: 1 }), updated_at: ago({ days: 1 }), ...fields,
   });
   const ltbCases = [
     ltbCase(12, { client_id: C(1), stage: 'new_intake', intake_review_status: 'needs_review', unit_city: 'Hamilton', notice_served: 'yes',
@@ -209,7 +215,8 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
     offence_number: null, offence_date: null, offence_description: null, statute_section: null, set_fine_cents: null,
     total_payable_cents: null, court_location: null, option_deadline: null, disclosure_requested_on: null, meeting_date: null,
     trial_date: null, category: null, deadline_date: null, other_party: null, client_city: null, client_request_message: null,
-    client_request_at: null, client_uploaded_at: null, created_at: ago({ days: 1 }), updated_at: ago({ days: 1 }), ...fields,
+    client_request_at: null, client_uploaded_at: null, portal_visible: true, created_at: ago({ days: 1 }), updated_at: ago({ days: 1 }),
+    ...fields,
   });
   const matters = [
     matter('traffic', 24, { client_id: C(7), stage: 'new_intake', intake_review_status: 'needs_review', ticket_type: 'speeding',
@@ -258,6 +265,11 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
       created_at: ago({ hours: 5 }), stage_changed_at: ago({ hours: 5 }), updated_at: ago({ hours: 5 }) }),
     matter('general', 3, { client_id: C(16), stage: 'declined', outcome: 'declined', category: 'offence',
       closed_at: ago({ days: 16 }), created_at: ago({ days: 18 }), stage_changed_at: ago({ days: 16 }), updated_at: ago({ days: 16 }) }),
+    // A public intake under an email that already has a file: held out of the client portal (portal_visible false).
+    matter('general', 9, { client_id: C(15), stage: 'new_intake', intake_review_status: 'needs_review', category: 'small_claims',
+      other_party: 'Kingsway Auto Repair', client_city: 'Burlington', returning_client: true, portal_visible: false,
+      client_notes: 'The garage charged me for repairs I never approved and will not return my car until I pay.',
+      created_at: ago({ minutes: 40 }), stage_changed_at: ago({ minutes: 40 }), updated_at: ago({ minutes: 40 }) }),
   ];
   const M = number => matters.find(row => row.matter_number === number).id;
 
@@ -300,6 +312,13 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
       extracted: { fields: { offenceNumber: '4071 893 21', offenceDate: day(-13), statuteSection: 'HTA 128', setFineCents: 9500 }, lowConfidence: ['statuteSection'] } }),
     document('matter', M('TKT-2026-0024'), { original_name: 'Ticket back.jpg', content_type: 'image/jpeg', kind: 'ticket', size_bytes: 1_870_000,
       extraction_status: 'extracted', uploaded_at: ago({ days: 1, hours: 4 }), created_at: ago({ days: 1, hours: 4 }) }),
+    // Uploader-supplied names that disguise the type: a double extension, and a
+    // right-to-left override that displays "fdp.exe" reversed as "exe.pdf".
+    // Both were stored as PDFs, so they must show and download as .pdf.
+    document('matter', M('TKT-2026-0024'), { original_name: 'Ticket scan.pdf.exe', kind: 'ticket', size_bytes: 310_000,
+      uploaded_at: ago({ days: 1, hours: 4 }), created_at: ago({ days: 1, hours: 4 }) }),
+    document('matter', M('TKT-2026-0024'), { original_name: 'Court notice\u202Efdp.exe', kind: 'court_document', size_bytes: 120_000,
+      uploaded_at: ago({ days: 1, hours: 4 }), created_at: ago({ days: 1, hours: 4 }) }),
     document('matter', M('TKT-2026-0023'), { original_name: 'Ticket.jpg', content_type: 'image/jpeg', kind: 'ticket', size_bytes: 1_400_000,
       uploaded_at: ago({ days: 15 }), created_at: ago({ days: 15 }) }),
     document('matter', M('TKT-2026-0023'), { original_name: 'Notice of trial.pdf', kind: 'court_document', size_bytes: 96_000,
@@ -314,7 +333,8 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
     document('matter', M('MAT-2026-0007'), { original_name: 'Contract and deposit receipt.pdf', kind: 'evidence', uploaded_at: ago({ days: 3 }), created_at: ago({ days: 3 }) }),
     document('matter', M('MAT-2026-0007'), { original_name: 'Text messages.png', content_type: 'image/png', kind: 'correspondence', uploaded_at: ago({ days: 3 }), created_at: ago({ days: 3 }) }),
     document('matter', M('MAT-2026-0006'), { original_name: 'Notice of hearing (tribunal).pdf', kind: 'court_document', uploaded_at: ago({ days: 40 }), created_at: ago({ days: 40 }) }),
-    document('matter', M('MAT-2026-0006'), { original_name: 'Reply submissions draft.pdf', kind: 'correspondence', uploaded_by: 'staff', uploaded_at: ago({ days: 22 }), created_at: ago({ days: 22 }) }),
+    document('matter', M('MAT-2026-0006'), { original_name: 'Reply submissions draft.pdf', kind: 'correspondence', uploaded_by: 'staff',
+      shared_with_client: true, uploaded_at: ago({ days: 22 }), created_at: ago({ days: 22 }) }),
   ];
 
   let eventN = 0;
@@ -348,8 +368,8 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
     return { ...row, matter_id: matterId };
   };
   const matterEvents = [
-    mEvent(M('TKT-2026-0024'), 'intake_received', ago({ days: 1, hours: 4 }), { documents: 2, source: 'anderhue-site' }),
-    mEvent(M('TKT-2026-0024'), 'documents_uploaded', ago({ days: 1, hours: 4 }), { count: 2 }),
+    mEvent(M('TKT-2026-0024'), 'intake_received', ago({ days: 1, hours: 4 }), { documents: 4, source: 'anderhue-site' }),
+    mEvent(M('TKT-2026-0024'), 'documents_uploaded', ago({ days: 1, hours: 4 }), { count: 4 }),
     mEvent(M('TKT-2026-0023'), 'intake_received', ago({ days: 15 }), { documents: 1, source: 'anderhue-site' }),
     mEvent(M('TKT-2026-0023'), 'stage_changed', ago({ days: 12 }), { stage: 'quoted' }, true),
     mEvent(M('TKT-2026-0023'), 'staff_uploaded', ago({ days: 4 }), { name: 'Retainer agreement (signed).pdf' }, true),
@@ -363,12 +383,15 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
     mEvent(M('MAT-2026-0007'), 'intake_received', ago({ days: 3 }), { documents: 2, source: 'anderhue-site' }),
     mEvent(M('MAT-2026-0007'), 'stage_changed', ago({ days: 2 }), { stage: 'under_review' }, true),
     mEvent(M('MAT-2026-0006'), 'stage_changed', ago({ days: 21 }), { stage: 'in_progress' }, true),
+    mEvent(M('MAT-2026-0006'), 'document_shared', ago({ minutes: 6 }), { documentName: 'Reply submissions draft.pdf' }, true),
     mEvent(M('MAT-2026-0008'), 'intake_received', ago({ hours: 5 }), { documents: 0, source: 'anderhue-site' }),
+    mEvent(M('MAT-2026-0009'), 'intake_received', ago({ minutes: 40 }), { documents: 0, returningClient: true, source: 'anderhue-site' }),
   ];
 
   let noticeN = 0;
+  const clientOf = (area, caseId) => (area === 'ltb' ? ltbCases : matters).find(row => row.id === caseId)?.client_id || null;
   const notice = (area, caseId, kind, status, createdAt, extra = {}) => ({
-    id: id('e5000000', ++noticeN), practice_id: PRACTICE_ID, area, case_id: caseId, client_id: null,
+    id: id('e5000000', ++noticeN), practice_id: PRACTICE_ID, area, case_id: caseId, client_id: clientOf(area, caseId),
     audience: kind.startsWith('staff_') ? 'staff' : 'client', kind, detail: {}, status, next_attempt_at: createdAt,
     sent_at: status === 'sent' ? createdAt : null, failure_code: null, created_at: createdAt,
     // Columns staff can never read (the mock must never return them).
@@ -393,7 +416,9 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
     notice('traffic', M('TKT-2026-0019'), 'stage_changed', 'sent', ago({ days: 30 }), { detail: { stage: 'trial_scheduled' } }),
     notice('general', M('MAT-2026-0007'), 'stage_changed', 'cancelled', ago({ days: 2 }), { detail: { stage: 'under_review' } }),
     notice('general', M('MAT-2026-0006'), 'stage_changed', 'sent', ago({ days: 21 }), { detail: { stage: 'in_progress' } }),
-    notice('general', M('MAT-2026-0006'), 'document_shared', 'retry', ago({ days: 21 }), { detail: { documentName: 'Reply submissions draft.pdf' } }),
+    // First delivery attempt bounced with a temporary error; the sender tries again in a few minutes.
+    notice('general', M('MAT-2026-0006'), 'document_shared', 'retry', ago({ minutes: 6 }), {
+      detail: { documentName: 'Reply submissions draft.pdf' }, next_attempt_at: ahead(4 * 60 + 10), failure_code: 'smtp_temporary' }),
   ];
 
   return {
@@ -402,7 +427,7 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
     keyFiles: {
       ltbReview: L(12), ltbReady: L(10), ltbFailedUpdate: L(9), ltbRequest: L(8),
       trafficNew: M('TKT-2026-0024'), trafficUploaded: M('TKT-2026-0023'), trafficScheduled: M('TKT-2026-0021'), trafficTrial: M('TKT-2026-0019'),
-      generalDue: M('MAT-2026-0007'), generalOverdue: M('MAT-2026-0006'),
+      trafficClosed: M('TKT-2026-0015'), generalDue: M('MAT-2026-0007'), generalOverdue: M('MAT-2026-0006'), generalHeld: M('MAT-2026-0009'),
     },
   };
 }
@@ -427,7 +452,7 @@ export function createMockState({ now = new Date(), membership = 'member', updat
   for (const doc of [...state.ltbDocuments, ...state.matterDocuments]) {
     if (doc.uploaded_at) state.storage.set(doc.storage_path, { contentType: doc.content_type, size: doc.size_bytes });
   }
-  state.next = { ltb: 13, traffic: 26, general: 9 };
+  state.next = { ltb: 13, traffic: 26, general: 10 };
   return state;
 }
 
@@ -611,17 +636,41 @@ function logEvent(state, area, caseId, name, detail, staff = true) {
   list.push(area === 'ltb' ? { ...row, case_id: caseId } : { ...row, matter_id: caseId });
 }
 
+/** practice_enqueue_notice: no client email while updates are off or the file is held out of the portal. */
 function enqueue(state, area, caseId, kind, detail, delaySeconds = 0) {
-  if (!state.practice.client_updates_enabled && !kind.startsWith('staff_')) return null;
+  const staffAlert = kind.startsWith('staff_');
+  if (!state.practice.client_updates_enabled && !staffAlert) return null;
+  const file = caseId ? (area === 'ltb' ? state.ltbCases : state.matters).find(row => row.id === caseId) : null;
+  if (!staffAlert && file && file.portal_visible === false) return null;
   const now = new Date();
   const row = {
-    id: randomUUID(), practice_id: PRACTICE_ID, area, case_id: caseId, client_id: null,
-    audience: kind.startsWith('staff_') ? 'staff' : 'client', kind, detail, status: 'pending',
+    id: randomUUID(), practice_id: PRACTICE_ID, area, case_id: caseId, client_id: file?.client_id || null,
+    audience: staffAlert ? 'staff' : 'client', kind, detail, status: 'pending',
     next_attempt_at: new Date(now.getTime() + delaySeconds * 1000).toISOString(), sent_at: null, failure_code: null,
     created_at: now.toISOString(), snapshot: { secret: 'snapshot-never-exposed' }, email_payload: null, recipients: ['client@example.com'],
   };
   state.notices.push(row);
   return row.id;
+}
+
+/** practice_reveal_file: a deliberate staff step puts a held file into the client portal. */
+function reveal(row) {
+  if (row.portal_visible === false) row.portal_visible = true;
+}
+
+/** Client emails that have not gone out (pending, or waiting to retry) matching `test` are cancelled. */
+function cancelUnsent(state, test, failureCode) {
+  for (const notice of state.notices) {
+    if (notice.audience !== 'client' || !['pending', 'retry'].includes(notice.status) || !test(notice)) continue;
+    notice.status = 'cancelled';
+    notice.failure_code = failureCode;
+  }
+}
+
+/** practice_is_email: lower case, at most 254 characters, no controls, one @ and a dot in the domain. */
+function isPracticeEmail(value) {
+  return typeof value === 'string' && value === value.toLowerCase() && value.length <= 254
+    && !/[\u0000-\u001f\u007f]/.test(value) && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value); // eslint-disable-line no-control-regex
 }
 
 function touch(row) { row.updated_at = new Date().toISOString(); }
@@ -642,22 +691,25 @@ const RPC = {
     if (args.p_client_message && args.p_client_message.length > 1000) throw new RpcError('PRACTICE_MESSAGE_TOO_LONG');
     const outcome = args.p_stage === 'closed' ? args.p_outcome : args.p_stage === 'declined' ? 'declined' : null;
     if (row.stage === args.p_stage && (row.outcome || null) === outcome) return { stage: row.stage, outcome: row.outcome, noticeId: null };
+    const detail = Object.fromEntries(Object.entries({ stage: args.p_stage, outcome, note: args.p_note }).filter(([, value]) => value));
+    const notify = args.p_notify !== false && !QUIET_STAGES.has(args.p_stage) && row.source !== 'smoke-test';
+    const update = { stage: args.p_stage, outcome, message: args.p_client_message || '' };
     if (row.stage === args.p_stage) {
-      // Same stage: only a closed file's outcome can be corrected, without a client email.
+      // Same stage: a closed file's outcome is corrected, and with p_notify the client gets a fresh update.
       row.outcome = outcome;
       touch(row);
-      logEvent(state, args.p_area, row.id, 'outcome_changed', Object.fromEntries(Object.entries({ stage: args.p_stage, outcome, note: args.p_note }).filter(([, value]) => value)));
-      return { stage: row.stage, outcome, noticeId: null };
+      logEvent(state, args.p_area, row.id, 'outcome_changed', detail);
+      return { stage: row.stage, outcome, noticeId: notify ? enqueue(state, args.p_area, row.id, 'stage_changed', update, 90) : null };
     }
     row.stage = args.p_stage;
     row.outcome = outcome;
     row.stage_changed_at = new Date().toISOString();
     row.closed_at = ['closed', 'declined'].includes(args.p_stage) ? row.closed_at || row.stage_changed_at : null;
+    // practice_reveal_on_stage: leaving new_intake puts a held file into the client portal.
+    if (args.p_stage !== 'new_intake') reveal(row);
     touch(row);
-    logEvent(state, args.p_area, row.id, 'stage_changed', Object.fromEntries(Object.entries({ stage: args.p_stage, outcome, note: args.p_note }).filter(([, value]) => value)));
-    const noticeId = args.p_notify !== false && !QUIET_STAGES.has(args.p_stage) && row.source !== 'smoke-test'
-      ? enqueue(state, args.p_area, row.id, 'stage_changed', { stage: args.p_stage, outcome, message: args.p_client_message || '' }, 90)
-      : null;
+    logEvent(state, args.p_area, row.id, 'stage_changed', detail);
+    const noticeId = notify ? enqueue(state, args.p_area, row.id, 'stage_changed', update, 90) : null;
     return { stage: row.stage, outcome: row.outcome, noticeId };
   },
   practice_request_documents: (state, args) => {
@@ -668,6 +720,7 @@ const RPC = {
     if (['closed', 'declined'].includes(row.stage)) throw new RpcError('PRACTICE_FILE_CLOSED');
     row.client_request_message = message;
     row.client_request_at = new Date().toISOString();
+    reveal(row);
     touch(row);
     logEvent(state, args.p_area, row.id, 'documents_requested', { message });
     return enqueue(state, args.p_area, row.id, 'documents_requested', { message });
@@ -678,9 +731,7 @@ const RPC = {
     row.client_request_message = null;
     row.client_request_at = null;
     touch(row);
-    for (const notice of state.notices) {
-      if (notice.area === args.p_area && notice.case_id === row.id && notice.kind === 'documents_requested' && notice.status === 'pending') notice.status = 'cancelled';
-    }
+    cancelUnsent(state, notice => notice.area === args.p_area && notice.case_id === row.id && notice.kind === 'documents_requested', 'request_cleared');
     logEvent(state, args.p_area, row.id, 'request_cleared', {});
     return null;
   },
@@ -708,8 +759,9 @@ const RPC = {
     doc.uploaded_at = new Date().toISOString();
     logEvent(state, args.p_area, caseId, 'staff_uploaded', { documentId: doc.id, documentName: doc.original_name });
     if (doc.shared_with_client) {
+      reveal(findCase(state, args.p_area, caseId));
       logEvent(state, args.p_area, caseId, 'document_shared', { documentId: doc.id, documentName: doc.original_name });
-      enqueue(state, args.p_area, caseId, 'document_shared', { documentId: doc.id, documentName: doc.original_name });
+      enqueue(state, args.p_area, caseId, 'document_shared', { documentId: doc.id, documentName: doc.original_name }, 90);
     }
     return true;
   },
@@ -719,20 +771,26 @@ const RPC = {
     const caseId = doc.case_id || doc.matter_id;
     if (typeof args.p_shared !== 'boolean' || doc.uploaded_by !== 'staff') throw new RpcError('PRACTICE_DOCUMENT_INVALID');
     if (doc.shared_with_client === args.p_shared) return false;
-    const newly = !doc.shared_with_client && args.p_shared;
     doc.shared_with_client = args.p_shared;
-    if (!args.p_shared) logEvent(state, args.p_area, caseId, 'document_unshared', { documentId: doc.id });
-    if (newly && doc.uploaded_at) {
+    const announces = notice => notice.kind === 'document_shared' && notice.detail?.documentId === doc.id;
+    if (!args.p_shared) {
+      // A pending announcement is withdrawn; one waiting to retry may have been delivered, so it is cancelled.
+      state.notices = state.notices.filter(notice => !(announces(notice) && notice.status === 'pending'));
+      cancelUnsent(state, announces, 'document_unshared');
+      logEvent(state, args.p_area, caseId, 'document_unshared', { documentId: doc.id });
+    } else if (doc.uploaded_at) {
+      reveal(findCase(state, args.p_area, caseId));
       logEvent(state, args.p_area, caseId, 'document_shared', { documentId: doc.id, documentName: doc.original_name });
-      enqueue(state, args.p_area, caseId, 'document_shared', { documentId: doc.id, documentName: doc.original_name });
+      enqueue(state, args.p_area, caseId, 'document_shared', { documentId: doc.id, documentName: doc.original_name }, 90);
     }
     return true;
   },
   practice_cancel_notice: (state, args) => {
     const row = state.notices.find(item => item.id === args.p_notice_id && item.practice_id === PRACTICE_ID);
     if (!row) throw new RpcError('PRACTICE_CASE_NOT_FOUND');
-    if (row.audience !== 'client' || row.status !== 'pending') return false;
+    if (row.audience !== 'client' || !['pending', 'retry'].includes(row.status)) return false;
     row.status = 'cancelled';
+    row.failure_code = 'cancelled_by_staff';
     if (row.case_id) logEvent(state, row.area, row.case_id, 'notice_cancelled', { noticeId: row.id, kind: row.kind });
     return true;
   },
@@ -786,11 +844,32 @@ const RPC = {
   },
   practice_revoke_portal_access: (state, args) => {
     const client = state.clients.find(item => item.id === args.p_client_id && item.practice_id === PRACTICE_ID);
-    if (!client) throw new RpcError('PRACTICE_CLIENT_NOT_FOUND');
+    if (!client) throw new RpcError('PRACTICE_CASE_NOT_FOUND');
     client.portal_revoked_before = new Date().toISOString();
+    cancelUnsent(state, notice => notice.client_id === client.id, 'portal_access_revoked');
     for (const row of state.ltbCases.filter(item => item.client_id === client.id)) logEvent(state, 'ltb', row.id, 'portal_access_revoked', {});
     for (const row of state.matters.filter(item => item.client_id === client.id)) logEvent(state, row.area, row.id, 'portal_access_revoked', {});
     return client.portal_revoked_before;
+  },
+  practice_set_client_email: (state, args) => {
+    const client = state.clients.find(item => item.id === args.p_client_id);
+    if (!client || client.practice_id !== PRACTICE_ID) throw new RpcError('PRACTICE_CLIENT_NOT_FOUND');
+    const email = String(args.p_email ?? '').trim().toLowerCase();
+    if (!isPracticeEmail(email)) throw new RpcError('PRACTICE_EMAIL_INVALID');
+    if (email === client.email) return email;
+    if (state.clients.some(item => item.practice_id === client.practice_id && item.email === email && item.id !== client.id)) {
+      throw new RpcError('PRACTICE_EMAIL_TAKEN');
+    }
+    const now = new Date().toISOString();
+    client.email = email;
+    client.portal_revoked_before = now;
+    client.field_sources = { ...(client.field_sources || {}), email: { source: 'staff' } };
+    client.updated_at = now;
+    cancelUnsent(state, notice => notice.client_id === client.id, 'client_email_changed');
+    // ltb_log_client_edit logs the changed column on every file of the client.
+    for (const row of state.ltbCases.filter(item => item.client_id === client.id)) logEvent(state, 'ltb', row.id, 'client_updated', { fields: ['email'] });
+    for (const row of state.matters.filter(item => item.client_id === client.id)) logEvent(state, row.area, row.id, 'client_updated', { fields: ['email'] });
+    return email;
   },
   ltb_set_client_registration: (state, args) => {
     const client = state.clients.find(item => item.id === args.p_client_id && item.practice_id === PRACTICE_ID);
@@ -830,6 +909,7 @@ function applyPatch(state, table, params, body) {
     if (fields.length && table === 'practice_matters') logEvent(state, row.area, row.id, 'case_updated', { fields });
     if (fields.length && table === 'ltb_clients') {
       for (const item of state.ltbCases.filter(candidate => candidate.client_id === row.id)) logEvent(state, 'ltb', item.id, 'client_updated', { fields });
+      for (const item of state.matters.filter(candidate => candidate.client_id === row.id)) logEvent(state, item.area, item.id, 'client_updated', { fields });
     }
   }
   return changed;
@@ -1244,10 +1324,10 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     const first = await queue.locator('li').first().innerText();
     assert.match(first, /MAT-2026-0006/, 'Overdue file is first in the queue');
     const tiles = await page.getByRole('region', { name: 'Key numbers' }).innerText();
-    assert.match(tiles, /Needs review\s*3/);
+    assert.match(tiles, /Needs review\s*4/);
     assert.match(tiles, /Client uploads waiting\s*1/);
     assert.match(tiles, /Due within 7 days\s*6/);
-    assert.match(tiles, /Active files\s*14/);
+    assert.match(tiles, /Active files\s*15/);
     assert.ok((await page.getByRole('heading', { name: 'Recent activity' }).count()) === 1);
     await checkPage(page, 'Today');
     await shoot(page, 'today');
@@ -1481,6 +1561,230 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     await updates.getByText(/Sends in \d:\d{2}/).waitFor();
     await updates.getByRole('button', { name: /Cancel the stage update email/ }).click();
     await page.locator('.ahs-toast').filter({ hasText: 'Client update cancelled' }).waitFor();
+  });
+
+  await step('file held out of the client portal: badge, tooltip, reveal', async () => {
+    const held = 'MAT-2026-0009';
+    await page.goto(`${origin}/admin/other`);
+    await page.getByRole('heading', { name: 'Other matters', level: 1 }).waitFor();
+    await waitForQuiet(page);
+    const board = member.requests.filter(entry => entry.method === 'GET' && entry.table === 'practice_matters' && entry.params.area === 'eq.general').at(-1);
+    assert.ok(parseSelect(board.params.select).some(item => item.column === 'portal_visible'), 'Boards select portal_visible');
+    if (await page.getByRole('button', { name: 'Board', exact: true }).getAttribute('aria-pressed') !== 'true') {
+      await page.getByRole('button', { name: 'Board', exact: true }).click();
+    }
+    const card = page.locator('a.ahs-file-card', { hasText: held });
+    const badge = card.locator('.ahs-hold');
+    assert.equal(await badge.innerText(), PORTAL_HOLD_LABEL);
+    assert.equal(await badge.getAttribute('title'), PORTAL_HOLD_HELP);
+    assert.match(await card.getAttribute('aria-label'), /not shown to the client yet/);
+    assert.equal(await page.locator('a.ahs-file-card .ahs-hold').count(), 1, 'Only the held file carries the badge');
+    await shoot(page, 'board-held', { full: false });
+    await page.getByRole('button', { name: 'List', exact: true }).click();
+    await page.locator('table.ahs-table tr', { hasText: held }).locator('.ahs-hold').waitFor();
+    assert.equal(await page.locator('table.ahs-table .ahs-hold').count(), 1);
+    await page.setViewportSize(MOBILE);
+    await page.getByRole('list', { name: 'Other matters' }).locator('li', { hasText: held }).locator('.ahs-hold').waitFor();
+    await checkPage(page, 'held file in the list at 390 px');
+    await shoot(page, 'list-held', { full: false });
+    await page.getByRole('button', { name: 'Board', exact: true }).click();
+    await card.locator('.ahs-hold').waitFor();
+    await checkPage(page, 'held file on the board at 390 px');
+    await page.setViewportSize(DESKTOP);
+
+    await page.goto(`${origin}/admin/files/general/${keys.generalHeld}`);
+    await page.getByRole('heading', { name: 'Ethan Clarke', level: 1 }).waitFor();
+    await waitForQuiet(page);
+    const detail = member.requests.filter(entry => entry.method === 'GET' && entry.table === 'practice_matters' && entry.params.id === `eq.${keys.generalHeld}`).at(-1);
+    assert.ok(parseSelect(detail.params.select).some(item => item.column === 'portal_visible'), 'The file page selects portal_visible');
+    const headerBadge = page.locator('.ahs-hold[tabindex="0"]');
+    await headerBadge.hover();
+    const tooltip = page.getByRole('tooltip');
+    await tooltip.waitFor();
+    assert.equal((await tooltip.textContent()).trim(), PORTAL_HOLD_HELP);
+    await shoot(page, 'file-held', { full: false });
+    // Leave the badge (Radix keeps the tooltip open while the pointer travels toward it).
+    await page.mouse.move(700, 600, { steps: 4 });
+    await page.mouse.move(705, 610, { steps: 2 });
+    await tooltip.waitFor({ state: 'detached' });
+    await headerBadge.focus();
+    await page.getByRole('tooltip').waitFor();
+    await page.keyboard.press('Escape');
+    await headerBadge.blur();
+    const stageCard = page.getByRole('region', { name: 'Stage', exact: true });
+    assert.match(await stageCard.innerText(), new RegExp(PORTAL_HOLD_HELP.replace(/[.]/g, '\\.')));
+    await page.setViewportSize(MOBILE);
+    await waitForQuiet(page);
+    await checkPage(page, 'held file at 390 px');
+    await shoot(page, 'file-held', { full: false });
+    await page.setViewportSize(DESKTOP);
+
+    // Asking for documents, or a stage move out of New intake, puts the file into the client portal.
+    await page.getByRole('button', { name: 'Request documents' }).first().click();
+    const request = page.getByRole('dialog', { name: 'Request documents' });
+    await request.getByText(`${PORTAL_HOLD_LABEL}. Sending this request adds it to the client’s files.`).waitFor();
+    await request.getByRole('button', { name: 'Cancel' }).click();
+    await request.waitFor({ state: 'detached' });
+    await page.getByRole('button', { name: 'Change stage' }).first().click();
+    const dialog = page.getByRole('dialog', { name: 'Change stage' });
+    await dialog.getByText(`${PORTAL_HOLD_LABEL}. Moving it out of New intake adds it to the client’s files.`).waitFor();
+    assert.equal(await dialog.getByLabel('New stage').inputValue(), 'under_review');
+    await shoot(page, 'change-stage-held', { full: false });
+    await dialog.getByRole('button', { name: 'Update stage' }).click();
+    await dialog.waitFor({ state: 'detached' });
+    await headerBadge.waitFor({ state: 'detached' });
+    const row = state.matters.find(item => item.id === keys.generalHeld);
+    assert.equal(row.portal_visible, true, 'Leaving New intake shows the file to the client');
+    assert.ok(member.rpcCalls('practice_set_stage').at(-1).result.noticeId, 'The client is told once the file is shown');
+    assert.equal(await stageCard.getByText(PORTAL_HOLD_LABEL).count(), 0);
+  });
+
+  await step('change client email: explanation, errors, refresh', async () => {
+    const daniel = state.clients.find(item => item.email === 'd.okafor@example.com');
+    await page.goto(`${origin}/admin/files/ltb/${keys.ltbRequest}`);
+    await page.getByRole('heading', { name: 'Daniel Okafor', level: 1 }).waitFor();
+    await waitForQuiet(page);
+    // Queue a client update first, so the change has an unsent email to cancel.
+    await page.getByRole('button', { name: 'Change stage' }).first().click();
+    const stageDialog = page.getByRole('dialog', { name: 'Change stage' });
+    await stageDialog.getByRole('button', { name: 'Update stage' }).click();
+    await stageDialog.waitFor({ state: 'detached' });
+    const updates = page.getByRole('region', { name: 'Client updates', exact: true });
+    await updates.getByText('Scheduled', { exact: true }).waitFor();
+    const queued = member.rpcCalls('practice_set_stage').at(-1).result.noticeId;
+
+    const client = page.getByRole('region', { name: 'Client', exact: true });
+    await client.getByRole('button', { name: 'Change email' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Change client email' });
+    await dialog.getByText('The client is signed out of every link we sent, and unsent updates are cancelled. New updates go to the new address.').waitFor();
+    const input = dialog.getByLabel('New email address');
+    assert.equal(await input.inputValue(), 'd.okafor@example.com');
+    const save = dialog.getByRole('button', { name: 'Change email' });
+    assert.equal(await save.isDisabled(), true, 'The current address cannot be saved again');
+    const attempt = async (value, message) => {
+      await input.fill(value);
+      const response = page.waitForResponse(item => item.url().endsWith('/rest/v1/rpc/practice_set_client_email'));
+      await save.click();
+      await response;
+      await dialog.getByText(message, { exact: true }).waitFor();
+      assert.equal(member.rpcCalls('practice_set_client_email').at(-1).body.p_email, value.trim());
+    };
+    const logged = member.errors.length;
+    await attempt('daniel@okafor', 'Enter a valid email address, like name@example.com.');
+    await attempt('priya.raman@example.com', 'Another client of the practice already uses this email address.');
+    daniel.practice_id = 'another-practice';
+    await attempt('daniel.okafor@example.org', 'This client is not available to your account.');
+    daniel.practice_id = PRACTICE_ID;
+    // Each refused change is a deliberate 400 from the RPC, which the browser logs as a resource error.
+    const added = member.errors.splice(logged);
+    const refused = added.filter(message => /status of 400 \(Bad Request\)/.test(message));
+    member.errors.push(...added.filter(message => !refused.includes(message)));
+    assert.equal(refused.length, 3, 'Each refused change logs exactly one 400 response');
+    await input.fill('  Daniel.Okafor@Example.org ');
+    await shoot(page, 'change-email', { full: false });
+    await save.click();
+    await page.locator('.ahs-toast').filter({ hasText: 'Client email changed' }).waitFor();
+    const call = member.rpcCalls('practice_set_client_email').at(-1);
+    assert.deepEqual(call.body, { p_client_id: daniel.id, p_email: 'Daniel.Okafor@Example.org' });
+    assert.equal(call.result, 'daniel.okafor@example.org');
+    await client.getByRole('link', { name: 'daniel.okafor@example.org' }).waitFor();
+    await client.getByText(/Client links issued before .* were revoked\./).waitFor();
+    assert.equal(state.notices.find(item => item.id === queued).failure_code, 'client_email_changed');
+    await updates.getByText('Not sent. The client email changed').waitFor();
+    await page.getByRole('region', { name: 'Activity', exact: true }).getByText('Client details edited').first().waitFor();
+    // Boards and search use the new address.
+    await page.keyboard.press('Control+k');
+    const palette = page.getByRole('dialog', { name: 'Search files and actions' });
+    await palette.waitFor();
+    await page.keyboard.type('daniel.okafor@example.org');
+    await palette.getByRole('option', { name: /LTB-2026-0008/ }).waitFor();
+    await page.keyboard.press('Escape');
+    await page.setViewportSize(MOBILE);
+    await client.getByRole('button', { name: 'Change email' }).click();
+    await dialog.waitFor();
+    await checkPage(page, 'change email at 390 px');
+    await shoot(page, 'change-email', { full: false });
+    await page.keyboard.press('Escape');
+    await page.setViewportSize(DESKTOP);
+  });
+
+  await step('client update waiting to retry can be cancelled', async () => {
+    const retry = state.notices.find(item => item.case_id === keys.generalOverdue && item.status === 'retry');
+    retry.next_attempt_at = new Date(Date.now() + 4 * 60_000).toISOString();
+    await page.goto(`${origin}/admin/files/general/${keys.generalOverdue}`);
+    await page.getByRole('heading', { name: 'Northline Contracting Ltd.', level: 1 }).waitFor();
+    await waitForQuiet(page);
+    const updates = page.getByRole('region', { name: 'Client updates', exact: true });
+    await updates.getByText('Retrying', { exact: true }).waitFor();
+    await updates.getByText(/^Not sent yet\. It will be retried in \d+ min unless you cancel it\.$/).waitFor();
+    await updates.scrollIntoViewIfNeeded();
+    await shoot(page, 'update-retrying', { full: false });
+    const response = page.waitForResponse(item => item.url().endsWith('/rest/v1/rpc/practice_cancel_notice'));
+    await updates.getByRole('button', { name: 'Cancel the document shared email' }).click();
+    await response;
+    assert.equal(member.rpcCalls('practice_cancel_notice').at(-1).body.p_notice_id, retry.id);
+    assert.equal(retry.status, 'cancelled');
+    await updates.getByText('Cancelled', { exact: true }).waitFor();
+  });
+
+  await step('outcome correction on a closed file: update and Undo', async () => {
+    await page.goto(`${origin}/admin/files/traffic/${keys.trafficClosed}`);
+    await page.getByRole('heading', { name: 'Liam O’Connor', level: 1 }).waitFor();
+    await waitForQuiet(page);
+    await page.getByRole('button', { name: 'Change stage' }).first().click();
+    const dialog = page.getByRole('dialog', { name: 'Change stage' });
+    await dialog.waitFor();
+    assert.equal(await dialog.getByLabel('New stage').inputValue(), 'closed');
+    assert.equal(await dialog.getByLabel('Outcome').inputValue(), 'withdrawn');
+    assert.equal(await dialog.getByRole('button', { name: 'Update stage' }).isDisabled(), true, 'Nothing to save until the outcome changes');
+    await dialog.getByLabel('Outcome').selectOption('amended');
+    assert.equal(await dialog.getByRole('switch').getAttribute('aria-checked'), 'true', 'The corrected outcome is emailed by default');
+    assert.match(await dialog.getByTestId('email-preview-subject').innerText(), /^TKT-2026-0015 · File closed: /);
+    await dialog.getByRole('button', { name: 'Update stage' }).click();
+    const toast = page.locator('.ahs-toast').filter({ hasText: 'Outcome corrected. The client update goes out in about 90 seconds.' });
+    await toast.waitFor();
+    await shoot(page, 'outcome-toast', { full: false });
+    const call = member.rpcCalls('practice_set_stage').at(-1);
+    assert.deepEqual([call.body.p_stage, call.body.p_outcome, call.body.p_notify], ['closed', 'amended', true]);
+    assert.ok(call.result.noticeId, 'The correction queues a fresh client update');
+    // The first delivery attempt failed: Undo still stops an update waiting to retry.
+    const notice = state.notices.find(item => item.id === call.result.noticeId);
+    notice.status = 'retry';
+    const response = page.waitForResponse(item => item.url().endsWith('/rest/v1/rpc/practice_cancel_notice'));
+    await toast.getByRole('button', { name: 'Undo' }).click();
+    await response;
+    assert.equal(member.rpcCalls('practice_cancel_notice').at(-1).body.p_notice_id, call.result.noticeId);
+    assert.equal(notice.status, 'cancelled');
+    await page.locator('.ahs-toast').filter({ hasText: 'Client update cancelled' }).last().waitFor();
+    await page.getByRole('region', { name: 'Activity', exact: true }).getByText('Outcome corrected').first().waitFor();
+  });
+
+  await step('document names cannot disguise their type', async () => {
+    await page.goto(`${origin}/admin/files/traffic/${keys.trafficNew}`);
+    await page.getByRole('heading', { name: 'Jordan Mitchell', level: 1 }).waitFor();
+    await waitForQuiet(page);
+    const documents = page.getByRole('region', { name: 'Documents', exact: true });
+    await documents.getByTitle('Ticket scan.pdf.exe.pdf', { exact: true }).waitFor();
+    await documents.getByTitle('Court noticefdp.exe.pdf', { exact: true }).waitFor();
+    const hidden = await page.evaluate(() => /[\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/.test(document.body.innerText));
+    assert.equal(hidden, false, 'No bidi or zero-width characters reach the page');
+    const downloadAs = async (button, expected) => {
+      const request = member.context.waitForEvent('request', item => item.method() === 'GET'
+        && item.url().includes('/storage/v1/object/sign/') && new URL(item.url()).searchParams.has('download'));
+      await button.click();
+      assert.equal(new URL((await request).url()).searchParams.get('download'), expected);
+    };
+    await documents.getByRole('button', { name: 'View Court noticefdp.exe.pdf' }).click();
+    const viewer = page.getByRole('dialog', { name: 'Court noticefdp.exe.pdf' });
+    await viewer.locator('iframe[title="Court noticefdp.exe.pdf"]').waitFor();
+    await shoot(page, 'document-safe-name', { full: false });
+    await downloadAs(viewer.getByRole('button', { name: 'Download' }), 'Court noticefdp.exe.pdf');
+    await page.bringToFront();
+    await page.keyboard.press('Escape');
+    await viewer.waitFor({ state: 'detached' });
+    await downloadAs(documents.getByRole('button', { name: 'Download Ticket scan.pdf.exe.pdf' }), 'Ticket scan.pdf.exe.pdf');
+    for (const extra of member.context.pages().filter(other => other !== page)) await extra.close();
+    await page.bringToFront();
   });
 
   await step('new file opened by staff', async () => {

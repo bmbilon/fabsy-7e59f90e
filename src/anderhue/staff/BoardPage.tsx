@@ -10,11 +10,11 @@ import { STAGES, type PracticeArea } from './catalog';
 import { formatTableDate, relativeTime } from './format';
 import { useLocalStorageState, useWorkspace } from './hooks';
 import {
-  AREA_PAGE_TITLE, KEY_DATE_SHORT, compareRecent, compareUrgency, dateTone, fileHref, laneStages, matchesQuery, outcomeLabel,
-  relativeDays, stageIndex, type FileWithSignals,
+  AREA_PAGE_TITLE, KEY_DATE_SHORT, PORTAL_HOLD_LABEL, compareRecent, compareUrgency, dateTone, fileHref, laneStages, matchesQuery,
+  outcomeLabel, relativeDays, stageIndex, type FileWithSignals,
 } from './model';
 import { useStaffUi } from './session';
-import { Button, DateChip, EmptyState, ReasonChips, Skeleton, StagePill } from './ui';
+import { Button, DateChip, EmptyState, PortalHoldBadge, ReasonChips, Skeleton, StagePill } from './ui';
 
 type Filter = 'all' | 'attention' | 'due' | 'uploaded';
 type View = 'board' | 'list';
@@ -45,8 +45,10 @@ const cardReasons = (file: FileWithSignals) => file.signals.reasons.filter(reaso
 function FileCard({ file, today }: { file: FileWithSignals; today: string }) {
   const { keyDate, keyDays } = file.signals;
   const outcome = file.terminal ? outcomeLabel(file.area, file.outcome) : '';
+  const spoken = [file.number, file.clientName, file.title, ...cardReasons(file).slice(0, 3).map(reason => reason.label),
+    file.portalHidden ? PORTAL_HOLD_LABEL.toLowerCase() : ''].filter(Boolean).join(', ');
   return <Link to={fileHref(file.area, file.id)} className="ahs-file-card" data-attention={file.signals.attention ? 'true' : undefined}
-    data-terminal={file.terminal ? 'true' : undefined} aria-label={`${file.number}, ${file.clientName}, ${file.title}`}>
+    data-terminal={file.terminal ? 'true' : undefined} aria-label={spoken}>
     <div className="flex items-center justify-between gap-2">
       <span className="ahs-mono text-[11.5px] text-[color:var(--ah-ink-2)]">{file.number}</span>
       <span className="text-[11px] text-[color:var(--ah-muted)]" title={`Updated ${file.updatedAt}`}>{relativeTime(file.updatedAt)}</span>
@@ -58,6 +60,7 @@ function FileCard({ file, today }: { file: FileWithSignals; today: string }) {
       {keyDate && <DateChip keyDate={keyDate} days={keyDays} today={today} />}
       {cardReasons(file).slice(0, 3).map(reason => <span key={reason.key} className={`ahs-chip ahs-tone-${reason.tone}`}>{reason.label}</span>)}
     </div>}
+    {file.portalHidden && <div className="mt-1.5 flex"><PortalHoldBadge /></div>}
   </Link>;
 }
 
@@ -168,13 +171,13 @@ function ListView({ area, files, today }: { area: PracticeArea; files: FileWithS
           <caption className="sr-only">{AREA_PAGE_TITLE[area]}. Select a column heading to sort.</caption>
           <thead>
             <tr>
-              <SortHeader label="File" value="number" sort={sort} onSort={onSort} className="w-[13%]" />
-              <SortHeader label="Client" value="client" sort={sort} onSort={onSort} className="w-[21%]" />
-              <SortHeader label="Matter" value="title" sort={sort} onSort={onSort} className="hidden w-[17%] xl:table-cell" />
-              <SortHeader label="Stage" value="stage" sort={sort} onSort={onSort} className="w-[18%]" />
-              <SortHeader label="Flags" value="flags" sort={sort} onSort={onSort} className="hidden w-[15%] lg:table-cell" />
+              <SortHeader label="File" value="number" sort={sort} onSort={onSort} className="w-[12%]" />
+              <SortHeader label="Client" value="client" sort={sort} onSort={onSort} className="w-[19%]" />
+              <SortHeader label="Matter" value="title" sort={sort} onSort={onSort} className="hidden w-[16%] xl:table-cell" />
+              <SortHeader label="Stage" value="stage" sort={sort} onSort={onSort} className="w-[21%]" />
+              <SortHeader label="Flags" value="flags" sort={sort} onSort={onSort} className="hidden w-[14%] lg:table-cell" />
               <SortHeader label="Key date" value="date" sort={sort} onSort={onSort} className="w-[12%]" />
-              <SortHeader label="Updated" value="updated" sort={sort} onSort={onSort} className="w-[10%] text-right" />
+              <SortHeader label="Updated" value="updated" sort={sort} onSort={onSort} className="w-[9%] text-right" />
             </tr>
           </thead>
           <tbody>
@@ -195,7 +198,10 @@ function ListView({ area, files, today }: { area: PracticeArea; files: FileWithS
                   <p className="truncate text-[color:var(--ah-ink-2)]" title={file.title}>{file.title}</p>
                   {file.city && <p className="truncate text-[12px] text-[color:var(--ah-muted)]">{file.city}</p>}
                 </td>
-                <td><StagePill area={file.area} stage={file.stage} outcome={file.outcome} className="max-w-full" /></td>
+                <td>
+                  <StagePill area={file.area} stage={file.stage} outcome={file.outcome} className="max-w-full" />
+                  {file.portalHidden && <div className="mt-1 flex min-w-0"><PortalHoldBadge /></div>}
+                </td>
                 <td className="hidden lg:table-cell"><ReasonChips reasons={cardReasons(file)} max={2} /></td>
                 <td>
                   {keyDate ? <div className="min-w-0">
@@ -221,9 +227,10 @@ function ListView({ area, files, today }: { area: PracticeArea; files: FileWithS
           </div>
           <p className="mt-1 truncate text-[14px] font-semibold">{file.clientName}</p>
           <p className="truncate text-[12.5px] text-[color:var(--ah-muted)]">{file.title}{file.city ? ` · ${file.city}` : ''}</p>
-          {(file.signals.keyDate || cardReasons(file).length > 0) && <div className="mt-2 flex flex-wrap gap-1">
+          {(file.signals.keyDate || cardReasons(file).length > 0 || file.portalHidden) && <div className="mt-2 flex flex-wrap gap-1">
             {file.signals.keyDate && <DateChip keyDate={file.signals.keyDate} days={file.signals.keyDays} today={today} />}
             {cardReasons(file).slice(0, 3).map(reason => <span key={reason.key} className={`ahs-chip ahs-tone-${reason.tone}`}>{reason.label}</span>)}
+            {file.portalHidden && <PortalHoldBadge />}
           </div>}
         </Link>
       </li>)}

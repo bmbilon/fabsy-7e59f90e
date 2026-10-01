@@ -22,7 +22,7 @@ import {
   stageDef,
   type StaffNoticeKind,
 } from "./practice-catalog.ts";
-import { isEmail, isUuid } from "./practice-intake-core.ts";
+import { greetingName, isEmail, isUuid } from "./practice-intake-core.ts";
 import { keyDateList } from "./practice-portal-core.ts";
 import { issuePortalToken, PORTAL_SECRET_MIN_LENGTH, PortalTokenError } from "./practice-portal-token.ts";
 
@@ -198,6 +198,10 @@ function telHref(phone: string): string {
 
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 
+// The greeting uses greetingName (practice-intake-core.ts): only a name-like
+// first word of the untrusted stored first name, otherwise "Hello,".
+export { greetingName };
+
 // ---------------------------------------------------------------------------
 // Client emails
 // ---------------------------------------------------------------------------
@@ -241,10 +245,14 @@ function brandOf(snapshot: PracticeNoticeSnapshot, siteUrl: string): PracticeBra
   };
 }
 
-/** The portal link for a client notice, signed for 30 days from created_at. */
+/**
+ * The portal link for a client notice, signed for 30 days from created_at.
+ * Without the signing secret the notice waits (retry), so it goes out once the
+ * secret is configured; staff alerts carry no portal link and are unaffected.
+ */
 export async function clientNoticeLink(notice: PracticeNotice, signingSecret: string, siteUrl: string): Promise<string> {
   if (typeof signingSecret !== "string" || signingSecret.length < PORTAL_SECRET_MIN_LENGTH) {
-    throw new PracticeNoticeError("signing_secret_missing", true);
+    throw new PracticeNoticeError("signing_secret_missing");
   }
   const createdMs = Date.parse(str(notice.created_at));
   const clientId = str(notice.snapshot?.client?.id || notice.client_id).toLowerCase();
@@ -259,9 +267,10 @@ export async function clientNoticeLink(notice: PracticeNotice, signingSecret: st
       issuedAt: Math.floor(createdMs / 1000), days: PORTAL_LINK_DAYS,
     });
   } catch (error) {
-    const code = error instanceof PortalTokenError && error.code === "signing_secret_missing"
-      ? "signing_secret_missing" : "snapshot_invalid";
-    throw new PracticeNoticeError(code, true);
+    if (error instanceof PortalTokenError && error.code === "signing_secret_missing") {
+      throw new PracticeNoticeError("signing_secret_missing");
+    }
+    throw new PracticeNoticeError("snapshot_invalid", true);
   }
   if (notice.kind === "portal_link") return `${siteUrl}/files#t=${token}`;
   return `${siteUrl}/files/${file!.area}/${str(file!.id).toLowerCase()}#t=${token}`;
@@ -270,7 +279,7 @@ export async function clientNoticeLink(notice: PracticeNotice, signingSecret: st
 function buildClientContent(notice: PracticeNotice, kind: ClientNoticeKind, brand: PracticeBrand, url: string): ClientContent {
   const snapshot = notice.snapshot || {};
   const detail = notice.detail || {};
-  const firstName = cleanText(snapshot.client?.firstName, 100);
+  const firstName = greetingName(snapshot.client?.firstName);
   const greeting = firstName ? `Hello ${firstName},` : "Hello,";
   const linkNote = `This link is personal to you and works for ${PORTAL_LINK_DAYS} days. Please do not forward this email.`;
   // Staff messages may be written by a clerk, so they are attributed to the practice.

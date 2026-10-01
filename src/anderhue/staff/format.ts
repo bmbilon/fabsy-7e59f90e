@@ -1,5 +1,5 @@
 /** Formatting helpers for the staff workspace. Ontario deadlines run on Toronto time. */
-import { daysUntil, torontoToday } from './catalog';
+import { UPLOAD_LIMITS, daysUntil, torontoToday } from './catalog';
 
 export const TORONTO = 'America/Toronto';
 const DAY = 86_400_000;
@@ -154,4 +154,58 @@ export function humanize(value: string | null | undefined): string {
   if (!value) return '';
   const text = value.replace(/_/g, ' ').trim();
   return text ? text[0].toUpperCase() + text.slice(1) : '';
+}
+
+// ---------------------------------------------------------------------------
+// Document names. Names come from whoever uploaded the file, so they can carry
+// bidirectional and zero-width controls that disguise the real extension
+// ("invoice" + U+202E + "fdp.exe" displays as "invoiceexe.pdf"), or an
+// extension that does not match what was stored.
+// ---------------------------------------------------------------------------
+
+// C0 and C1 controls, the Arabic letter mark, zero-width and direction marks
+// (U+200B to U+200F), bidi embeddings and overrides (U+202A to U+202E), word
+// joiner and bidi isolates (U+2060 to U+2069) and the byte order mark.
+// eslint-disable-next-line no-control-regex
+const INVISIBLE_CHARACTERS = /[\u0000-\u001F\u007F-\u009F\u061C\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/g;
+
+/** Text without invisible or direction-changing characters, on one line. */
+export function cleanDisplayText(value: string | null | undefined): string {
+  return (value || '').replace(INVISIBLE_CHARACTERS, '').replace(/\s+/g, ' ').trim();
+}
+
+function withStoredExtension(name: string, contentType: string): string {
+  const extension = UPLOAD_LIMITS.contentTypes[contentType] || '';
+  const current = (name.match(/\.([a-z0-9]{1,8})$/i)?.[1] || '').toLowerCase();
+  return extension && UPLOAD_LIMITS.extensionTypes[current] !== contentType ? `${name}.${extension}` : name;
+}
+
+/**
+ * The name staff see for a document: invisible characters removed, ending in
+ * the extension of its stored content type, so "ticket.pdf.exe" stored as a
+ * PDF shows as "ticket.pdf.exe.pdf".
+ */
+export function safeDocumentName(original: string | null | undefined, contentType: string, fallback = 'Document'): string {
+  const name = cleanDisplayText(original).slice(0, 200).trim();
+  return withStoredExtension(/[\p{L}\p{N}]/u.test(name) ? name : fallback, contentType);
+}
+
+/**
+ * The file name for a download (mirrors downloadName in
+ * supabase/functions/_shared/practice-portal-core.ts, after removing invisible
+ * characters): letters, digits, spaces, dots, dashes, underscores and brackets
+ * only, so it cannot change the signed URL's query string, ending in the
+ * stored type's extension, at most 120 characters.
+ */
+export function downloadFileName(original: string | null | undefined, contentType: string, fallback = 'document'): string {
+  let name = cleanDisplayText(original).slice(0, 200)
+    .replace(/[^\p{L}\p{N} ._()-]+/gu, '_').replace(/_{2,}/g, '_').replace(/^[\s._]+/, '').trim();
+  if (!name) name = fallback;
+  name = withStoredExtension(name, contentType);
+  if (name.length > 120) {
+    const dot = name.lastIndexOf('.');
+    const suffix = dot > 0 && name.length - dot <= 9 ? name.slice(dot) : '';
+    name = `${name.slice(0, 120 - suffix.length).trim()}${suffix}`;
+  }
+  return name;
 }

@@ -19,6 +19,7 @@ import {
   torontoToday,
   UPLOAD_LIMITS,
 } from "./practice-catalog.ts";
+import { hmacHex, PORTAL_SECRET_MIN_LENGTH } from "./practice-portal-token.ts";
 
 export const PRACTICE_DEFAULT_ID = "anderhue-paralegal";
 export const PRACTICE_INTAKE_AREAS = ["traffic", "general"] as const;
@@ -58,6 +59,22 @@ export function isUuid(value: unknown): value is string {
 
 export function isEmail(value: unknown): value is string {
   return typeof value === "string" && value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+/** A single name-like word: a letter, then letters, apostrophes or hyphens. */
+const GREETING_NAME = /^[\p{L}][\p{L}'’-]{0,39}$/u;
+
+/**
+ * The name to greet a client by, in emails and in the portal. Public intakes
+ * are anonymous, so the stored first name is untrusted: only its first word is
+ * used, and only when it looks like a name, so nothing the practice shows a
+ * client can carry a stranger's sentence or link. Otherwise "" (greet with
+ * "Hello,").
+ */
+export function greetingName(firstName: unknown): string {
+  if (typeof firstName !== "string") return "";
+  const first = firstName.normalize("NFC").trim().split(/\s+/)[0] || "";
+  return GREETING_NAME.test(first) ? first : "";
 }
 
 // ---------------------------------------------------------------------------
@@ -507,27 +524,79 @@ export async function readJsonBody(req: Request, maxBytes = 65_536): Promise<Rec
   return value as Record<string, unknown>;
 }
 
-export function clientIp(req: Request): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+/**
+ * The caller's network address for rate limiting (mirror of requestAddress in
+ * ticket-intake-draft.ts). Cloudflare overwrites cf-connecting-ip at the
+ * trusted edge; forwarding headers can be supplied by the client, so they never
+ * create a bucket of their own. Anything else shares the "unknown" bucket.
+ */
+export function requestAddress(req: Request): string {
+  const value = req.headers.get("cf-connecting-ip")?.trim() || "";
+  const ipv4 = value.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4 && ipv4.slice(1).every(part => Number(part) <= 255)) return value;
+  if (value.length >= 2 && value.length <= 45 && value.includes(":") && /^[0-9a-f:]+$/i.test(value)) {
+    try {
+      new URL(`http://[${value}]/`);
+      return value.toLowerCase();
+    } catch {
+      // Fall through to the shared anonymous bucket.
+    }
+  }
+  return "unknown";
 }
 
-/** Per-isolate fixed-window limiter. Returns false once `limit` hits are used in the window. */
-export function createRateLimiter(limit: number, windowMs: number, maxKeys = 10_000) {
-  const hits = new Map<string, { count: number; until: number }>();
-  return (key: string, now: number = Date.now()): boolean => {
-    const bucket = hits.get(key);
-    if (bucket && bucket.until > now) {
-      if (bucket.count >= limit) return false;
-      bucket.count += 1;
+export interface RateLimitRule {
+  bucket: string;
+  limit: number;
+  windowSeconds: number;
+}
+
+/** Database-backed limits (practice_rate_limit_hit), each a fixed window. */
+export const RATE_LIMITS = {
+  intakeAddress: { bucket: "intake-address", limit: 8, windowSeconds: 3600 },
+  linkAddress: { bucket: "link-address", limit: 5, windowSeconds: 3600 },
+  linkEmail: { bucket: "link-email", limit: 3, windowSeconds: 3600 },
+} as const satisfies Record<string, RateLimitRule>;
+
+/** The keyed hash the limiter stores: hex HMAC-SHA256 of "rate-limit:{bucket}:{value}". Raw values never leave the function. */
+export function rateLimitKey(secret: string, bucket: string, value: string): Promise<string> {
+  return hmacHex(secret, `rate-limit:${bucket}:${value}`);
+}
+
+export interface RateLimitDeps {
+  rpc: RpcCall;
+  env: (key: string) => string | undefined;
+  /** Receives codes only, never personal data. */
+  log: (...parts: string[]) => void;
+}
+
+/**
+ * Counts one hit for `value` under `rule`. True when the request may go
+ * ahead. Fails open, logging only a code, when the signing secret is missing
+ * or the limiter cannot answer: the honeypot still applies, and turning away
+ * a real client is worse than letting a few extra requests through.
+ */
+export async function rateLimitAllows(deps: RateLimitDeps, rule: RateLimitRule, value: string): Promise<boolean> {
+  const secret = deps.env("PRACTICE_PORTAL_SIGNING_SECRET") || "";
+  if (secret.length < PORTAL_SECRET_MIN_LENGTH) {
+    deps.log("practice rate limit skipped", "signing_secret_missing");
+    return true;
+  }
+  try {
+    const { data, error } = await deps.rpc("practice_rate_limit_hit", {
+      p_key_hash: await rateLimitKey(secret, rule.bucket, value),
+      p_limit: rule.limit,
+      p_window_seconds: rule.windowSeconds,
+    });
+    if (error) {
+      deps.log("practice rate limit unavailable", error.code || "unknown");
       return true;
     }
-    if (hits.size >= maxKeys) {
-      for (const [entry, value] of hits) if (value.until <= now) hits.delete(entry);
-      if (hits.size >= maxKeys) hits.delete(hits.keys().next().value as string);
-    }
-    hits.set(key, { count: 1, until: now + windowMs });
+    return data !== false;
+  } catch (error) {
+    deps.log("practice rate limit unavailable", error instanceof Error ? error.name : "unknown");
     return true;
-  };
+  }
 }
 
 /** True when the honeypot is filled or the form was sent faster than a person can. */

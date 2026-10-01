@@ -57,7 +57,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   PRACTICE_UPLOAD_MISSING: 'The upload did not reach secure storage. Try again.',
   PRACTICE_NOTICE_NOT_FOUND: 'That email has already gone out or was cancelled.',
   PRACTICE_NOTICE_NOT_PENDING: 'That email has already gone out or was cancelled.',
-  PRACTICE_EMAIL_INVALID: 'Enter a valid client email address.',
+  PRACTICE_EMAIL_INVALID: 'Enter a valid email address, like name@example.com.',
+  PRACTICE_EMAIL_TAKEN: 'Another client of the practice already uses this email address.',
   PRACTICE_CLIENT_INVALID: 'Check the client details and try again.',
   PRACTICE_DETAILS_INVALID: 'Check the file details and try again.',
   PRACTICE_INTAKE_INVALID: 'Check the file details and try again.',
@@ -117,7 +118,7 @@ const CLIENT_FULL = 'ltb_clients(id,client_type,first_name,last_name,organizatio
   'phone,mailing_address,city,province,postal_code,occupation,registration_status,registered_at,identity_verified_at,' +
   'identity_document_type,field_sources,portal_revoked_before)';
 const CASE_COMMON = 'id,client_id,stage,stage_changed_at,outcome,intake_review_status,returning_client,source,' +
-  'client_request_message,client_request_at,client_uploaded_at,created_at,updated_at';
+  'client_request_message,client_request_at,client_uploaded_at,portal_visible,created_at,updated_at';
 
 const BOARD_SELECT: Record<PracticeArea, string> = {
   ltb: `${CASE_COMMON},case_number,issue,unit_city,arrears_claimed_cents,arrears_reported_text,notice_form,` +
@@ -426,6 +427,18 @@ export async function revokePortalAccess(clientId: string): Promise<string | nul
   const { data, error } = await db.rpc('practice_revoke_portal_access', { p_client_id: clientId });
   if (error) fail(error, 'Client links could not be revoked. Try again.');
   return (data as string | null) || null;
+}
+
+/**
+ * Changes the client's email (shared by all of their files). The server
+ * revokes every link already sent and cancels unsent client updates, then
+ * returns the stored, normalized address.
+ */
+export async function setClientEmail(clientId: string, email: string): Promise<string> {
+  const { data, error } = await db.rpc('practice_set_client_email', { p_client_id: clientId, p_email: email.trim() });
+  if (error) fail(error, 'The email address could not be changed. Try again.');
+  if (typeof data !== 'string' || !data) throw new StaffError('The email address could not be changed. Try again.');
+  return data;
 }
 
 export async function setClientRegistration(clientId: string, status: RegistrationStatus, idType?: string | null): Promise<void> {

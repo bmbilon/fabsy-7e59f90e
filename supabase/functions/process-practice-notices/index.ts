@@ -6,7 +6,6 @@ import {
   processPracticeNotices,
   sendPracticeNoticeEmail,
 } from "../_shared/practice-notices.ts";
-import { PORTAL_SECRET_MIN_LENGTH } from "../_shared/practice-portal-token.ts";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -38,11 +37,8 @@ export async function handler(req: Request): Promise<Response> {
   try {
     const { data: swept } = await db.rpc("practice_sweep_stalled_intakes");
     if (!apiKey) return json({ ok: false, swept: swept ?? 0, error: "email_configuration_missing" }, 503);
-    // Client emails cannot carry a portal link without the secret. Leave the
-    // outbox untouched instead of failing every client notice permanently.
-    if (signingSecret.length < PORTAL_SECRET_MIN_LENGTH) {
-      return json({ ok: false, swept: swept ?? 0, error: "portal_signing_secret_missing" }, 503);
-    }
+    // Without PRACTICE_PORTAL_SIGNING_SECRET, client emails (which carry a
+    // portal link) are retried with signing_secret_missing; staff alerts still go out.
     const result = await processPracticeNotices({
       claim: async () => {
         const { data, error } = await db.rpc("claim_practice_notices", { p_limit: 10 });

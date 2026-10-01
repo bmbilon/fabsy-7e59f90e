@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, Download, Eye, FileImage, FileText, Files, Loader2 } from 'lucide-react';
 import { DOCUMENT_KINDS, type PracticeArea } from '../catalog';
 import { friendlyError, setDocumentShared, signedDocumentUrl, staffKeys } from '../api';
-import { formatBytes, formatDate, humanize, relativeTime, torontoDateOf } from '../format';
+import { downloadFileName, formatBytes, formatDate, humanize, relativeTime, safeDocumentName, torontoDateOf } from '../format';
 import type { DocumentRow } from '../model';
 import { notifyError, notifySuccess } from '../notify';
 import { useStaffSession } from '../session';
@@ -20,11 +20,17 @@ function kindLabel(area: PracticeArea, kind: string | null): string {
   return DOCUMENT_KINDS[area].find(option => option.value === kind)?.label || humanize(kind);
 }
 
-const docName = (area: PracticeArea, doc: DocumentRow) => doc.original_name || kindLabel(area, doc.kind);
+/**
+ * The name shown for a document (list, viewer title): uploader-supplied, so
+ * invisible and direction-changing characters are removed and the extension
+ * always matches the stored content type.
+ */
+const docName = (area: PracticeArea, doc: DocumentRow) =>
+  safeDocumentName(doc.original_name, doc.content_type, doc.kind ? kindLabel(area, doc.kind) : 'Document');
 
 async function download(area: PracticeArea, doc: DocumentRow) {
   try {
-    const url = await signedDocumentUrl(area, doc.storage_path, docName(area, doc));
+    const url = await signedDocumentUrl(area, doc.storage_path, downloadFileName(docName(area, doc), doc.content_type));
     const link = document.createElement('a');
     link.href = url;
     link.target = '_blank';
@@ -163,7 +169,7 @@ export default function DocumentsCard({ view }: { view: FileView }) {
       {group('From the practice', fromPractice, 'Nothing uploaded by the practice yet.')}
       <div className="border-t border-[color:var(--ahs-line-soft)] pt-4">
         <h3 className="mb-2.5 text-[11.5px] font-bold uppercase tracking-[0.12em] text-[color:var(--ah-muted)]">Add documents</h3>
-        <StaffUploader area={area} id={id} updatesOn={view.updatesOn} onUploaded={view.refresh} />
+        <StaffUploader area={area} id={id} updatesOn={view.updatesOn} held={view.file.portalHidden} onUploaded={view.refresh} />
       </div>
     </div>
     <DocumentViewer area={area} doc={viewing} onOpenChange={open => { if (!open) setViewing(null); }} />

@@ -56,7 +56,7 @@ export default function SuccessScreen({ summary, onStartAnother }: SuccessScreen
             ) : null}
           </div>
           <p className="mt-6 max-w-[30rem] text-[17px] leading-relaxed text-[color:var(--ah-ink-2)]">
-            We have emailed a secure link to <strong className="font-semibold text-[color:var(--ah-ink)] [overflow-wrap:anywhere]">{summary.email}</strong>.
+            We will email a secure link to <strong className="font-semibold text-[color:var(--ah-ink)] [overflow-wrap:anywhere]">{summary.email}</strong> so you can follow your file and add documents.
           </p>
         </div>
 
@@ -87,7 +87,7 @@ export default function SuccessScreen({ summary, onStartAnother }: SuccessScreen
           <p className="flex gap-3 rounded-[6px] bg-[color:var(--ah-ivory-100)] p-4 text-[15px] leading-relaxed text-[color:var(--ah-ink-2)]">
             <Mail size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[color:var(--ah-plum-600)]" />
             <span>
-              Use the link in that email to follow your file, add documents and see each update. It can take a few minutes to arrive. If you do not see it, check your spam folder.
+              The email comes from {ANDERHUE_PRACTICE.name}. If you do not see it, check your spam or junk folder.
             </span>
           </p>
 

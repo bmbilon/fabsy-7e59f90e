@@ -72,7 +72,7 @@ export default function FileDetailPage() {
   const load = useCallback(async (quiet = false) => {
     if (!token || !area || !valid) return;
     const current = ++requestId.current;
-    if (!quiet) setState(previous => ({ status: 'loading', file: previous.file && previous.file.id === id ? previous.file : null, error: null }));
+    if (!quiet) setState({ status: 'loading', file: null, error: null });
     try {
       const response = await portal.file(token, area, id);
       if (current === requestId.current) setState({ status: 'ready', file: response.file, error: null });

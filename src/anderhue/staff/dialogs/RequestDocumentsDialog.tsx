@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Check, Plus } from 'lucide-react';
+import { Check, EyeOff, Plus } from 'lucide-react';
 import { friendlyError, requestDocuments } from '../api';
 import { formatDate, torontoDateOf } from '../format';
-import { REQUEST_SUGGESTIONS } from '../model';
+import { PORTAL_HOLD_LABEL, REQUEST_SUGGESTIONS } from '../model';
 import { notifySuccess } from '../notify';
 import { Button, Field, StaffDialog, TextArea } from '../ui';
 import type { FileView } from '../file/types';
@@ -79,6 +79,10 @@ export default function RequestDocumentsDialog({ open, onOpenChange, view }: {
       </Field>
       {record.client_request_at && <p className="rounded-[6px] bg-[color:var(--ah-ivory-100)] px-3 py-2 text-[12.5px] text-[color:var(--ah-ink-2)]">
         This replaces the open request from {formatDate(torontoDateOf(record.client_request_at))}.
+      </p>}
+      {view.file.portalHidden && <p className="flex gap-2 rounded-[6px] border border-dashed border-[#c9bcc8] bg-[#fbf8f3] px-3 py-2 text-[12.5px] leading-5 text-[color:var(--ah-ink-2)]">
+        <EyeOff className="mt-[3px] h-3.5 w-3.5 shrink-0 text-[#6f5f78]" aria-hidden="true" />
+        <span>{PORTAL_HOLD_LABEL}. Sending this request adds it to the client’s files.</span>
       </p>}
     </div>
   </StaffDialog>;

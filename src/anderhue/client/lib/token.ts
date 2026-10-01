@@ -14,6 +14,29 @@ export function isPlausibleToken(value: string | null | undefined): value is str
   return typeof value === 'string' && TOKEN_PATTERN.test(value);
 }
 
+/** The client id segment of `ahp1.{clientId}.{iat}.{exp}.{sig}`; empty when the token has another shape. */
+export function tokenClientId(token: string | null | undefined): string {
+  if (typeof token !== 'string') return '';
+  const [prefix, clientId] = token.split('.');
+  return prefix === 'ahp1' && clientId ? clientId : '';
+}
+
+/**
+ * Stores a newly opened link. It always goes to sessionStorage. A link
+ * remembered on this device is replaced only when both belong to the same
+ * client; a link for someone else removes the remembered one (never
+ * overwrites it), so "Remember this device" starts unchecked for them.
+ */
+export function storeIncomingToken(token: string): void {
+  const remembered = readItem('local', PORTAL_TOKEN_KEY);
+  if (remembered) {
+    const sameClient = tokenClientId(remembered) !== '' && tokenClientId(remembered) === tokenClientId(token);
+    if (sameClient) writeItem('local', PORTAL_TOKEN_KEY, token);
+    else removeItem('local', PORTAL_TOKEN_KEY);
+  }
+  writeItem('session', PORTAL_TOKEN_KEY, token);
+}
+
 /** Reads #t=... once at startup, stores it and removes it from the URL. */
 export function captureTokenFromLocation(): string | null {
   if (typeof window === 'undefined') return null;
@@ -31,9 +54,7 @@ export function captureTokenFromLocation(): string | null {
   }
   const token = raw.trim();
   if (!isPlausibleToken(token)) return null;
-  const remembered = Boolean(readItem('local', PORTAL_TOKEN_KEY));
-  writeItem('session', PORTAL_TOKEN_KEY, token);
-  if (remembered) writeItem('local', PORTAL_TOKEN_KEY, token);
+  storeIncomingToken(token);
   return token;
 }
 

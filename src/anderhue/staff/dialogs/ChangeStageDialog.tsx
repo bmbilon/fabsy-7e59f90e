@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { EyeOff } from 'lucide-react';
 import { ANDERHUE_PRACTICE } from '@/anderhue/config';
 import {
   OUTCOMES, PHASES, STAGES, STAGE_NOTICE_DELAY_SECONDS, formatLongDate, stageDef, staffStageLabel, torontoToday,
   type PracticeArea,
 } from '../catalog';
 import { cancelNotice, friendlyError, setStage } from '../api';
-import { clientGreetingName, laneStages, stageHeadline } from '../model';
+import { PORTAL_HOLD_LABEL, clientGreetingName, laneStages, stageHeadline, stageWithOutcome } from '../model';
 import { notifyError, notifySuccess, notifyWithAction } from '../notify';
 import { Button, Field, SelectInput, StaffDialog, TextArea, Toggle } from '../ui';
 import type { FileView } from '../file/types';
@@ -104,7 +105,10 @@ export default function ChangeStageDialog({ open, onOpenChange, view, practiceNa
   };
 
   const unchanged = stage === current && (stage !== 'closed' || (outcome || null) === (record.outcome || null));
+  // Same stage, new outcome: practice_set_stage corrects a closed file's outcome and, with an email, queues a fresh update.
+  const correction = stage === current && !unchanged;
   const needsOutcome = stage === 'closed' && !outcome;
+  const reveals = view.file.portalHidden && stage !== 'new_intake';
   const groups = useMemo(() => PHASES.map(phase => ({
     ...phase, stages: STAGES[area].filter(item => item.phase === phase.value),
   })).filter(group => group.stages.length), [area]);
@@ -119,24 +123,26 @@ export default function ChangeStageDialog({ open, onOpenChange, view, practiceNa
       const result = await setStage({ area, id, stage, outcome: stage === 'closed' ? outcome : null, note, message, notify: sendEmail });
       onOpenChange(false);
       view.refresh();
-      const label = staffStageLabel(area, result.stage);
+      const label = stageWithOutcome(area, result.stage, result.outcome);
+      const done = correction ? 'Outcome corrected' : 'Stage updated';
       if (result.noticeId) {
         const noticeId = result.noticeId;
         notifyWithAction({
-          title: `Stage updated. The client update goes out in about ${Math.round(STAGE_NOTICE_DELAY_SECONDS)} seconds.`,
+          title: `${done}. The client update goes out in about ${Math.round(STAGE_NOTICE_DELAY_SECONDS)} seconds.`,
           description: `${view.number} is now ${label}.`,
           actionLabel: 'Undo',
           altText: 'Undo the client update email',
           onAction: () => {
+            // practice_cancel_notice stops it while it is scheduled or waiting to retry.
             void cancelNotice(noticeId).then(cancelled => {
               view.refresh();
               if (cancelled) notifySuccess('Client update cancelled', `The email will not be sent. The file stays at ${label}.`);
-              else notifyError('Too late to undo', 'The email has already gone out.');
+              else notifyError('Too late to undo', 'That email is no longer waiting to be sent.');
             }).catch(cause => notifyError('Not cancelled', friendlyError(cause)));
           },
         });
       } else {
-        notifySuccess('Stage updated.', sendEmail
+        notifySuccess(`${done}.`, sendEmail
           ? `${view.number} is now ${label}.`
           : updatesOn ? `${view.number} is now ${label}. No email was sent.` : `${view.number} is now ${label}. Client emails are off for this practice.`);
       }
@@ -179,6 +185,10 @@ export default function ChangeStageDialog({ open, onOpenChange, view, practiceNa
         </Field>}
         {stage === 'declined' && <p className="rounded-[6px] bg-[color:var(--ah-ivory-100)] px-3 py-2 text-[12.5px] text-[color:var(--ah-ink-2)]">
           The outcome is recorded as Declined.
+        </p>}
+        {reveals && <p className="flex gap-2 rounded-[6px] border border-dashed border-[#c9bcc8] bg-[#fbf8f3] px-3 py-2 text-[12.5px] leading-5 text-[color:var(--ah-ink-2)]">
+          <EyeOff className="mt-[3px] h-3.5 w-3.5 shrink-0 text-[#6f5f78]" aria-hidden="true" />
+          <span>{PORTAL_HOLD_LABEL}. Moving it out of New intake adds it to the client’s files.</span>
         </p>}
         <Field id="stage-note" label="Internal note" help="Staff only. Saved in the file activity."
           extra={<span className="ahs-counter ml-auto">{note.length} / 1,000</span>}>

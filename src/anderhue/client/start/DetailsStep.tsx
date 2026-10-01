@@ -75,7 +75,7 @@ function DeadlineNote({ deadline }: { deadline: string }) {
       <CalendarDays size={18} aria-hidden="true" />
       <span>
         {days < 0 ? 'This date has passed.' : days === 0 ? 'This deadline is today.' : `This deadline is ${days === 1 ? 'tomorrow' : `in ${days} days`}.`}
-        {' '}After you send this, call us at {ANDERHUE_PRACTICE.phoneDisplay} so we can look at it right away.
+        {' '}After you send this, call us at {ANDERHUE_PRACTICE.phoneDisplay} so we know it is urgent.
       </span>
     </p>
   );

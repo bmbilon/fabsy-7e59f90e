@@ -28,9 +28,8 @@ import {
 import {
   allowedOrigins,
   cleanMultiline,
-  clientIp,
   corsHeaders,
-  createRateLimiter,
+  greetingName,
   isBot,
   isEmail,
   isUuid,
@@ -39,7 +38,10 @@ import {
   PRACTICE_DEFAULT_ID,
   practiceErrorCode,
   presentDocumentIds,
+  RATE_LIMITS,
+  rateLimitAllows,
   readJsonBody,
+  requestAddress,
   RequestError,
   type RpcCall,
   type RpcError,
@@ -184,7 +186,8 @@ export function mapPortalSession(session: Record<string, unknown>, claims: Porta
     });
   return {
     ok: true as const,
-    client: { firstName, displayName, email },
+    // The portal greets with firstName, so it follows the same name-like rule as the emails.
+    client: { firstName: greetingName(firstName), displayName, email },
     practice: {
       name: text(practice.name),
       displayName: text(practice.displayName) || text(practice.name),
@@ -285,7 +288,7 @@ export function createPortalHandler(deps: PortalHandlerDeps): (req: Request) => 
   const now = deps.now || (() => Date.now());
   const log = deps.log || ((...parts: string[]) => console.error(...parts));
   const randomUUID = deps.randomUUID || (() => crypto.randomUUID());
-  const linkLimiter = createRateLimiter(5, 3_600_000);
+  const limits = { rpc: deps.rpc, env: deps.env, log };
 
   const wake = () => {
     if (!deps.background || !deps.wakeNotices) return;
@@ -335,7 +338,11 @@ export function createPortalHandler(deps: PortalHandlerDeps): (req: Request) => 
     if (isBot(body)) return { ok: true };
     const email = cleanText(body.email, 254).toLowerCase();
     if (!isEmail(email)) throw new RequestError(PORTAL_MESSAGES.invalidEmail, 422);
-    if (!linkLimiter(`link:${clientIp(req)}`, now())) throw new RequestError(PORTAL_MESSAGES.tooManyLinks, 429);
+    // Per network address, then per address asked about (so one inbox cannot be flooded from many networks).
+    if (!await rateLimitAllows(limits, RATE_LIMITS.linkAddress, requestAddress(req)) ||
+        !await rateLimitAllows(limits, RATE_LIMITS.linkEmail, email)) {
+      throw new RequestError(PORTAL_MESSAGES.tooManyLinks, 429);
+    }
     const { data, error } = await deps.rpc("practice_request_portal_link", { p_practice_id: practiceId, p_email: email });
     if (error) throw failure("request_link", error, PORTAL_MESSAGES.linkUnavailable);
     if (data === true) wake();

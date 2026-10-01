@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BadgeCheck, Copy, ShieldCheck, UserRound } from 'lucide-react';
+import { BadgeCheck, Copy, PencilLine, ShieldCheck, UserRound } from 'lucide-react';
 import { friendlyError, setClientRegistration, updateClient } from '../api';
+import ChangeEmailDialog from '../dialogs/ChangeEmailDialog';
 import { formatDate, torontoDateOf } from '../format';
 import { REGISTRATION_LABELS, fileHref, type FieldSources, type FileWithSignals } from '../model';
-import { useEditableForm } from '../hooks';
+import { useEditableForm, useRefreshAfterWrite } from '../hooks';
 import { notifyError, notifySuccess } from '../notify';
 import { Button, Card, CardHead, Chip, Field, SelectInput, SourceTag, StagePill, TextInput } from '../ui';
 import { CLIENT_FIELDS } from './fields';
@@ -14,6 +15,8 @@ const date = (timestamp: string | null) => formatDate(torontoDateOf(timestamp));
 
 export default function ClientCard({ view, otherFiles }: { view: FileView; otherFiles: FileWithSignals[] }) {
   const { client } = view;
+  const refreshEverything = useRefreshAfterWrite();
+  const [emailOpen, setEmailOpen] = useState(false);
   const sources = (client.field_sources || {}) as FieldSources;
   const initial = useMemo(() => ({
     client_type: client.client_type || 'individual',
@@ -87,13 +90,18 @@ export default function ClientCard({ view, otherFiles }: { view: FileView; other
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-0 flex-1">
           <p className="ahs-label">Email</p>
-          <p className="flex min-w-0 items-center gap-1.5 text-[14px] font-medium text-[color:var(--ah-ink)]">
-            <a href={`mailto:${client.email}`} className="truncate text-inherit no-underline hover:underline">{client.email}</a>
-            <button type="button" onClick={() => void copyEmail()} aria-label="Copy email address"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-[color:var(--ah-muted)] hover:bg-[color:var(--ah-ivory-100)] hover:text-[color:var(--ah-ink)]">
-              <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-            </button>
-          </p>
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[14px] font-medium text-[color:var(--ah-ink)]">
+            <span className="flex min-w-0 max-w-full items-center gap-1">
+              <a href={`mailto:${client.email}`} className="truncate text-inherit no-underline hover:underline">{client.email}</a>
+              <button type="button" onClick={() => void copyEmail()} aria-label="Copy email address" title="Copy email address"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-[color:var(--ah-muted)] hover:bg-[color:var(--ah-ivory-100)] hover:text-[color:var(--ah-ink)]">
+                <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </span>
+            <Button size="xs" variant="ghost" onClick={() => setEmailOpen(true)} disabled={busy !== null}>
+              <PencilLine aria-hidden="true" />Change email
+            </Button>
+          </div>
         </div>
         <Field id="client-type" label="Client type" className="w-44">
           <SelectInput id="client-type" small value={form.client_type} disabled={busy !== null}
@@ -155,5 +163,8 @@ export default function ClientCard({ view, otherFiles }: { view: FileView; other
         {dirty ? 'Save the client details first.' : `To register, add ${missing.length > 1 ? `${missing.slice(0, -1).join(', ')} and ${missing[missing.length - 1]}` : missing[0]}.`}
       </p>}
     </div>
+    {/* The address is on every file and board row for this client, so refresh them all. */}
+    <ChangeEmailDialog open={emailOpen} onOpenChange={setEmailOpen} clientId={client.id} clientName={view.file.clientName}
+      currentEmail={client.email} onChanged={() => refreshEverything()} />
   </Card>;
 }

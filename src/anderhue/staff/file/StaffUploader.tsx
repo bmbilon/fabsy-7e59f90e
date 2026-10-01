@@ -2,7 +2,7 @@ import { useId, useRef, useState, type DragEvent } from 'react';
 import { AlertCircle, CheckCircle2, CloudUpload, Loader2 } from 'lucide-react';
 import { DOCUMENT_KINDS, UPLOAD_LIMITS, type PracticeArea } from '../catalog';
 import { addStaffDocument, friendlyError, uploadProblem, type UploadStep } from '../api';
-import { formatBytes, plural } from '../format';
+import { cleanDisplayText, formatBytes, plural } from '../format';
 import { notifyError, notifySuccess } from '../notify';
 import { Button, Field, SelectInput } from '../ui';
 
@@ -23,8 +23,8 @@ const STEP_LABEL: Record<ItemState, string> = {
 const ACCEPT = '.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif';
 
 /** Staff document upload: kind, optional sharing, drop zone or file picker, per-file progress. */
-export default function StaffUploader({ area, id, updatesOn, onUploaded }: {
-  area: PracticeArea; id: string; updatesOn: boolean; onUploaded: () => void;
+export default function StaffUploader({ area, id, updatesOn, held = false, onUploaded }: {
+  area: PracticeArea; id: string; updatesOn: boolean; held?: boolean; onUploaded: () => void;
 }) {
   const uid = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -40,7 +40,9 @@ export default function StaffUploader({ area, id, updatesOn, onUploaded }: {
     if (!list.length || busy) return;
     const batch = list.slice(0, UPLOAD_LIMITS.maxFilesPerBatch);
     if (list.length > batch.length) notifyError('Too many files', `Upload up to ${UPLOAD_LIMITS.maxFilesPerBatch} files at a time.`);
-    const queued: Item[] = batch.map((file, index) => ({ key: `${Date.now()}-${index}-${file.name}`, name: file.name, size: file.size, state: 'queued' }));
+    const queued: Item[] = batch.map((file, index) => ({
+      key: `${Date.now()}-${index}-${file.name}`, name: cleanDisplayText(file.name) || 'Document', size: file.size, state: 'queued',
+    }));
     setItems(queued);
     let added = 0;
     for (const [index, file] of batch.entries()) {
@@ -82,7 +84,9 @@ export default function StaffUploader({ area, id, updatesOn, onUploaded }: {
         <input type="checkbox" className="ahs-check mt-0.5" checked={share} disabled={busy} onChange={event => setShare(event.target.checked)} />
         <span className="text-[13px] leading-5">
           <span className="font-semibold text-[color:var(--ah-ink)]">Share with client</span>
-          <span className="block text-[12px] text-[color:var(--ah-muted)]">{updatesOn ? 'They see it in their file and get an email.' : 'They see it in their file. No email is sent.'}</span>
+          <span className="block text-[12px] text-[color:var(--ah-muted)]">{held
+            ? `Sharing also adds this file to the client’s files${updatesOn ? ' and emails them' : ''}.`
+            : updatesOn ? 'They see it in their file and get an email.' : 'They see it in their file. No email is sent.'}</span>
         </span>
       </label>
     </div>

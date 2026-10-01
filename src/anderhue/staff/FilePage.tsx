@@ -20,7 +20,9 @@ import type { FileView } from './file/types';
 import { useFileDetail, usePracticeSettings, useRefreshAfterWrite, useWorkspace } from './hooks';
 import { AREA_PAGE_TITLE, boardHref, computeSignals, toStaffFile, type NoticeRow } from './model';
 import { notifyError, notifySuccess } from './notify';
-import { AreaChip, Button, ButtonLink, ConfirmDialog, DateChip, EmptyState, ReasonChips, ReviewPill, Skeleton, StagePill } from './ui';
+import {
+  AreaChip, Button, ButtonLink, ConfirmDialog, DateChip, EmptyState, PortalHoldBadge, ReasonChips, ReviewPill, Skeleton, StagePill,
+} from './ui';
 
 type DialogName = 'stage' | 'request' | 'upload' | 'revoke' | null;
 
@@ -157,6 +159,7 @@ export default function FilePage() {
             <h1 className="ahs-display mt-1 truncate text-[26px] leading-tight text-[color:var(--ah-plum-950)] sm:text-[30px]">{file.clientName}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <StagePill area={area} stage={record.stage} outcome={record.outcome} large />
+              {file.portalHidden && <PortalHoldBadge withTooltip large />}
               <ReviewPill status={record.intake_review_status} large />
               {signals.keyDate && <DateChip keyDate={signals.keyDate} days={signals.keyDays} short={false} large />}
               <ReasonChips reasons={signals.reasons.filter(reason => reason.attention && !['needs_review', 'reading', 'due', 'overdue'].includes(reason.key))} max={3} />

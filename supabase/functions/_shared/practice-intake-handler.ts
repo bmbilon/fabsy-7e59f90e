@@ -15,9 +15,7 @@
 import { AREAS } from "./practice-catalog.ts";
 import {
   allowedOrigins,
-  clientIp,
   corsHeaders,
-  createRateLimiter,
   documentPath,
   intakeRecord,
   isUuid,
@@ -25,7 +23,10 @@ import {
   parsePracticeSubmission,
   practiceErrorCode,
   presentDocumentIds,
+  RATE_LIMITS,
+  rateLimitAllows,
   readJsonBody,
+  requestAddress,
   RequestError,
   type RpcCall,
   type StorageBucket,
@@ -75,7 +76,7 @@ export function createIntakeHandler(deps: IntakeHandlerDeps): (req: Request) => 
   const randomUUID = deps.randomUUID || (() => crypto.randomUUID());
   const randomToken = deps.randomToken || randomHexToken;
   const now = deps.now || (() => new Date());
-  const limiter = createRateLimiter(8, 3_600_000);
+  const limits = { rpc: deps.rpc, env: deps.env, log };
 
   const later = (task: () => Promise<unknown>, label: string) => {
     if (!deps.background) return;
@@ -89,7 +90,9 @@ export function createIntakeHandler(deps: IntakeHandlerDeps): (req: Request) => 
     const submission = parsePracticeSubmission(input, now());
     // Bots get an ordinary-looking receipt and nothing is stored.
     if (submission.bot) return { ok: true, matterId: null, matterNumber: null, intakeToken: null, uploads: [] };
-    if (!limiter(`intake:${clientIp(req)}`, now().getTime())) throw new RequestError(INTAKE_MESSAGES.tooMany, 429);
+    if (!await rateLimitAllows(limits, RATE_LIMITS.intakeAddress, requestAddress(req))) {
+      throw new RequestError(INTAKE_MESSAGES.tooMany, 429);
+    }
     const intakeToken = randomToken();
     const documents = submission.files.map((file, index) => ({
       id: randomUUID().toLowerCase(), extension: file.extension, contentType: file.contentType,

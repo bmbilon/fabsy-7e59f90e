@@ -49,8 +49,9 @@ export default function PortalLayout() {
   }, [handleError]);
 
   useEffect(() => {
+    // A new token may belong to another client: never show the previous session while loading.
+    setSession({ status: auth.token ? 'loading' : 'idle', data: null, error: null });
     if (auth.token) void loadSession(auth.token);
-    else setSession({ status: 'idle', data: null, error: null });
   }, [auth.token, loadSession]);
 
   // A link pasted into a tab that already has the portal open only changes the hash.

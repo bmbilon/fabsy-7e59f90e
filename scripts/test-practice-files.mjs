@@ -54,6 +54,7 @@ const sequence = (prefix = "f") => {
   return () => `${prefix}0000000-0000-4000-8000-${String(++n).padStart(12, "0")}`;
 };
 const hmac = (secret, payload) => crypto.createHmac("sha256", secret).update(payload).digest("base64url");
+const hmacHex = (secret, payload) => crypto.createHmac("sha256", secret).update(payload).digest("hex");
 const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
 const post = (handler, url, body, headers = { origin: ORIGIN }) => handler(new Request(url, {
   method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body),
@@ -444,8 +445,26 @@ test("token: revocation compares iat with portal_revoked_before and fails closed
 // Portal handler against an in-memory practice
 // ---------------------------------------------------------------------------
 
+/** In-memory practice_rate_limit_hit with the SQL's answer: true while the window's hits stay within p_limit. */
+function fakeLimiter() {
+  const hits = new Map();
+  const calls = [];
+  return {
+    calls,
+    hit(args) {
+      calls.push(args);
+      assert.match(args.p_key_hash, /^[0-9a-f]{64}$/, "only a keyed hash reaches the database");
+      const count = Math.min(hits.get(args.p_key_hash) || 0, args.p_limit) + 1;
+      hits.set(args.p_key_hash, count);
+      return { data: count <= args.p_limit, error: null };
+    },
+  };
+}
+const limitKey = (bucket, value) => hmacHex(SECRET, `rate-limit:${bucket}:${value}`);
+
 function portalFixture() {
   const state = {
+    limiter: fakeLimiter(),
     clients: {
       [CLIENT_A]: { id: CLIENT_A, email: "jordan@example.com", firstName: "Jordan", lastName: "Driver", organizationName: null, revokedBefore: null },
       [CLIENT_B]: { id: CLIENT_B, email: "sam@example.com", firstName: "Sam", lastName: "Other", organizationName: null, revokedBefore: null },
@@ -501,11 +520,13 @@ function portalFixture() {
   const bucketOf = area => catalog.AREAS[area].bucket;
   const pathOf = doc => `${doc.fileId}/${doc.id}.${catalog.UPLOAD_LIMITS.contentTypes[doc.contentType]}`;
   for (const doc of state.documents) state.objects[bucketOf(fileOf(doc.fileId).area)].add(pathOf(doc));
-  const owned = args => state.files.find(file =>
+  // Like the SQL, a file held out of the portal (portal_visible false) does not exist for its client.
+  const owned = args => state.files.find(file => file.portalVisible !== false &&
     file.clientId === args.p_client_id && file.area === args.p_area && file.id === args.p_case_id);
   const visible = doc => doc.uploadedAt && (doc.uploadedBy === "client" || doc.shared);
   const raise = code => ({ data: null, error: { code: "P0001", message: code } });
   const rpc = async (name, args) => {
+    if (name === "practice_rate_limit_hit") return state.limiter.hit(args);
     state.calls.push([name, args]);
     switch (name) {
       case "practice_portal_session": {
@@ -517,7 +538,7 @@ function portalFixture() {
             practice: { id: "anderhue-paralegal", name: "AnderHue Paralegal Professional Corporation", displayName: "AnderHue Paralegal",
               phone: "(289) 985-0166", publicEmail: "hello@anderhue.ca", siteUrl: "https://anderhue.ca" },
             revokedBefore: client.revokedBefore,
-            files: state.files.filter(file => file.clientId === client.id).map(file => ({
+            files: state.files.filter(file => file.clientId === client.id && file.portalVisible !== false).map(file => ({
               area: file.area, id: file.id, number: file.number, stage: file.stage, outcome: file.outcome, issue: file.issue,
               ticketType: file.ticketType, category: file.category, createdAt: file.createdAt, updatedAt: file.updatedAt,
               requestOpen: Boolean(file.request), closed: ["closed", "declined"].includes(file.stage),
@@ -751,6 +772,29 @@ test("portal: another client's file is never reachable, whatever area and id are
   assert.ok(fixture.state.signed.length === 0, "nothing was signed for another client");
 });
 
+test("portal: a file held out of the portal is not found on every action", async () => {
+  const fixture = portalFixture();
+  const held = fixture.state.files.find(file => file.id === TRAFFIC_ID);
+  held.portalVisible = false;
+  fixture.state.objects["practice-documents"].add(`${TRAFFIC_ID}/${DOC_CLIENT}.jpg`);
+  const handler = makePortal(fixture);
+  const signed = await tokenFor(CLIENT_A);
+  const session = await (await post(handler, PORTAL_URL, { action: "session", token: signed })).json();
+  assert.deepEqual(session.files.map(file => file.id), [LTB_ID, CLOSED_ID]);
+  const base = { token: signed, area: "traffic", id: TRAFFIC_ID };
+  for (const body of [
+    { action: "file", ...base },
+    { action: "download", ...base, documentId: DOC_CLIENT },
+    { action: "prepare_upload", ...base, files: [{ name: "a.jpg", contentType: "image/jpeg", size: 10 }] },
+    { action: "confirm_upload", ...base, documentIds: [DOC_CLIENT] },
+  ]) {
+    const response = await post(handler, PORTAL_URL, body);
+    assert.equal(response.status, 404, body.action);
+    assert.match((await response.json()).error, /could not be found\.$/);
+  }
+  assert.equal(fixture.state.signed.length, 0);
+});
+
 test("portal: download signs a 120 second URL named after the original file", async () => {
   const fixture = portalFixture();
   const handler = makePortal(fixture);
@@ -837,14 +881,16 @@ test("portal: storage listing failures and upload limits answer with plain sente
   assert.deepEqual([limit.status, (await limit.json()).error], [422, "This file has reached the limit for online uploads. Email or call the office to send more documents."]);
 });
 
+const askForLink = (handler, email, extra = {}, headers = { "cf-connecting-ip": "203.0.113.5" }) => post(handler, PORTAL_URL,
+  { action: "request_link", practiceId: "anderhue-paralegal", email, company: "", elapsedMs: 6000, ...extra },
+  { origin: ORIGIN, ...headers });
+const TOO_MANY_LINKS = "Too many link requests. Please try again later or call the office.";
+
 test("portal: request_link never reveals whether an email has a file", async () => {
   const fixture = portalFixture();
   const handler = makePortal(fixture);
-  const ask = (email, extra = {}, ip = "203.0.113.5") => post(handler, PORTAL_URL,
-    { action: "request_link", practiceId: "anderhue-paralegal", email, company: "", elapsedMs: 6000, ...extra },
-    { origin: ORIGIN, "x-forwarded-for": `${ip}, 10.0.0.1` });
-  const known = await ask("Jordan@Example.com");
-  const unknown = await ask("nobody@example.com");
+  const known = await askForLink(handler, "Jordan@Example.com");
+  const unknown = await askForLink(handler, "nobody@example.com");
   assert.deepEqual([known.status, await known.json()], [200, { ok: true }]);
   assert.deepEqual([unknown.status, await unknown.json()], [200, { ok: true }]);
   assert.deepEqual(fixture.state.calls.slice(-2).map(([name, args]) => [name, args]), [
@@ -855,21 +901,51 @@ test("portal: request_link never reveals whether an email has a file", async () 
   assert.equal(fixture.state.woken, 1, "only a queued link wakes the worker");
 
   const calls = fixture.state.calls.length;
-  assert.deepEqual(await (await ask("jordan@example.com", { company: "Spam Inc" })).json(), { ok: true });
-  assert.deepEqual(await (await ask("jordan@example.com", { elapsedMs: 300 })).json(), { ok: true });
+  const hits = fixture.state.limiter.calls.length;
+  assert.deepEqual(await (await askForLink(handler, "jordan@example.com", { company: "Spam Inc" })).json(), { ok: true });
+  assert.deepEqual(await (await askForLink(handler, "jordan@example.com", { elapsedMs: 300 })).json(), { ok: true });
   assert.equal(fixture.state.calls.length, calls, "bots never reach the database");
-  const invalid = await ask("not-an-email");
+  assert.equal(fixture.state.limiter.calls.length, hits, "bots are not even counted");
+  const invalid = await askForLink(handler, "not-an-email");
   assert.deepEqual([invalid.status, await invalid.json()], [422, { error: "Enter a valid email address." }]);
-
-  for (let index = 0; index < 3; index += 1) assert.equal((await ask("someone@example.com")).status, 200);
-  const limited = await ask("someone@example.com");
-  assert.deepEqual([limited.status, (await limited.json()).error], [429, "Too many link requests. Please try again later or call the office."]);
-  assert.equal((await ask("someone@example.com", {}, "198.51.100.7")).status, 200, "limits are per IP");
+  assert.equal(fixture.state.limiter.calls.length, hits, "an invalid email is refused before counting");
 
   const broken = makePortal({ ...fixture, rpc: async () => ({ data: null, error: { code: "XX000", message: "boom" } }) });
   const failed = await post(broken, PORTAL_URL, { action: "request_link", email: "jordan@example.com", elapsedMs: 6000 });
   assert.equal(failed.status, 503);
-  for (const line of fixture.state.logs) assert.ok(!/@|Jordan|Driver/.test(line), `log line carries no personal data: ${line}`);
+  for (const line of fixture.state.logs) assert.ok(!/@|Jordan|Driver|203\.0\.113/.test(line), `log line carries no personal data: ${line}`);
+});
+
+test("portal: request_link is limited in the database per network address and per email", async () => {
+  const fixture = portalFixture();
+  const handler = makePortal(fixture);
+  await askForLink(handler, "Jordan@Example.com");
+  assert.deepEqual(fixture.state.limiter.calls, [
+    { p_key_hash: limitKey("link-address", "203.0.113.5"), p_limit: 5, p_window_seconds: 3600 },
+    { p_key_hash: limitKey("link-email", "jordan@example.com"), p_limit: 3, p_window_seconds: 3600 },
+  ], "keyed HMACs of the bucket and value, never the raw address or email");
+
+  // Five per address per hour, whatever emails are asked about.
+  for (let index = 1; index < 5; index += 1) assert.equal((await askForLink(handler, `person${index}@example.com`)).status, 200);
+  const perAddress = await askForLink(handler, "person9@example.com");
+  assert.deepEqual([perAddress.status, (await perAddress.json()).error], [429, TOO_MANY_LINKS]);
+  assert.equal((await askForLink(handler, "person9@example.com", {}, { "cf-connecting-ip": "198.51.100.7" })).status, 200);
+
+  // Three per email per hour, from any number of networks.
+  for (const ip of ["192.0.2.1", "192.0.2.2", "192.0.2.3"]) {
+    assert.equal((await askForLink(handler, "target@example.com", {}, { "cf-connecting-ip": ip })).status, 200);
+  }
+  const perEmail = await askForLink(handler, "Target@Example.com", {}, { "cf-connecting-ip": "192.0.2.4" });
+  assert.deepEqual([perEmail.status, (await perEmail.json()).error], [429, TOO_MANY_LINKS], "lowercased before counting");
+
+  // Forwarding headers are client-controlled, so they never make a new bucket.
+  const viaForwarded = makePortal(portalFixture());
+  for (let index = 0; index < 5; index += 1) {
+    const response = await askForLink(viaForwarded, `f${index}@example.com`, {}, { "x-forwarded-for": `10.0.0.${index}` });
+    assert.equal(response.status, 200);
+  }
+  const spoofed = await askForLink(viaForwarded, "f9@example.com", {}, { "x-forwarded-for": "10.9.9.9", "x-real-ip": "10.9.9.9" });
+  assert.equal(spoofed.status, 429, "all requests without cf-connecting-ip share one bucket");
 });
 
 // ---------------------------------------------------------------------------
@@ -879,8 +955,12 @@ test("portal: request_link never reveals whether an email has a file", async () 
 const MATTER_ID = "9a9a9a9a-0000-4000-8000-00000000000a";
 const INTAKE_URL = "https://project.test/functions/v1/practice-intake";
 function intakeFixture(overrides = {}) {
-  const state = { calls: [], background: [], woken: 0, readers: [], logs: [], objects: new Set(), finalizeStatus: "pending_scan", listError: null };
+  const state = { calls: [], background: [], woken: 0, readers: [], logs: [], objects: new Set(), finalizeStatus: "pending_scan",
+    listError: null, limiter: fakeLimiter(), limiterError: null };
   const rpc = async (name, args) => {
+    if (name === "practice_rate_limit_hit") {
+      return state.limiterError ? { data: null, error: state.limiterError } : state.limiter.hit(args);
+    }
     state.calls.push([name, args]);
     if (name === "practice_register_intake") {
       if (args.p_intake.email === "broken@example.com") return { data: null, error: { code: "XX000", message: "boom" } };
@@ -905,7 +985,7 @@ function intakeFixture(overrides = {}) {
   });
   const handler = intake.createIntakeHandler({
     rpc, storage,
-    env: () => undefined,
+    env: key => ({ PRACTICE_PORTAL_SIGNING_SECRET: SECRET })[key],
     background: task => state.background.push(task),
     startReader: async matterId => { state.readers.push(matterId); },
     wakeNotices: async () => { state.woken += 1; },
@@ -931,6 +1011,7 @@ test("intake handler: CORS, bots and bad input never reach the database", async 
   assert.deepEqual([invalid.status, await invalid.json()], [422, { error: "Check these fields: email." }]);
   assert.equal((await post(handler, INTAKE_URL, { action: "delete" })).status, 400);
   assert.equal(state.calls.length, 0);
+  assert.equal(state.limiter.calls.length, 0, "the honeypot and validation come before counting");
 });
 
 test("intake handler: submit opens the matter and returns private upload slots in file order", async () => {
@@ -973,13 +1054,69 @@ test("intake handler: submit opens the matter and returns private upload slots i
   for (const line of state.logs) assert.ok(!/@|Jordan|broken/.test(line), `log line carries no personal data: ${line}`);
 });
 
-test("intake handler: 8 submissions per IP per hour", async () => {
-  const { handler } = intakeFixture();
-  const send = ip => post(handler, INTAKE_URL, trafficForm(), { origin: ORIGIN, "x-forwarded-for": ip });
-  for (let index = 0; index < 8; index += 1) assert.equal((await send("203.0.113.9")).status, 200);
-  const limited = await send("203.0.113.9");
-  assert.deepEqual([limited.status, (await limited.json()).error], [429, "Too many submissions. Please try again later or call the office."]);
-  assert.equal((await send("203.0.113.10")).status, 200);
+const TOO_MANY_SUBMISSIONS = "Too many submissions. Please try again later or call the office.";
+
+test("intake handler: 8 submissions per network address per hour, counted in the database", async () => {
+  const { state, handler } = intakeFixture();
+  const send = headers => post(handler, INTAKE_URL, trafficForm(), { origin: ORIGIN, ...headers });
+  for (let index = 0; index < 8; index += 1) assert.equal((await send({ "cf-connecting-ip": "203.0.113.9" })).status, 200);
+  const limited = await send({ "cf-connecting-ip": "203.0.113.9" });
+  assert.deepEqual([limited.status, (await limited.json()).error], [429, TOO_MANY_SUBMISSIONS]);
+  assert.equal(state.calls.filter(([name]) => name === "practice_register_intake").length, 8, "a refused intake opens nothing");
+  assert.deepEqual(state.limiter.calls[0], { p_key_hash: limitKey("intake-address", "203.0.113.9"), p_limit: 8, p_window_seconds: 3600 });
+  assert.equal((await send({ "cf-connecting-ip": "203.0.113.10" })).status, 200);
+  assert.equal((await send({ "cf-connecting-ip": "2001:DB8::1" })).status, 200);
+  assert.equal(state.limiter.calls.at(-1).p_key_hash, limitKey("intake-address", "2001:db8::1"), "IPv6 is lowercased");
+
+  // Without a trustworthy address every request shares one bucket, however the
+  // forwarding headers are set.
+  const shared = intakeFixture();
+  for (let index = 0; index < 8; index += 1) {
+    const headers = [{ "x-forwarded-for": `10.0.0.${index}` }, { "cf-connecting-ip": "999.1.1.1" },
+      { "cf-connecting-ip": "1.2.3.4, 5.6.7.8" }, {}][index % 4];
+    assert.equal((await post(shared.handler, INTAKE_URL, trafficForm(), { origin: ORIGIN, ...headers })).status, 200);
+  }
+  const spoofed = await post(shared.handler, INTAKE_URL, trafficForm(), { origin: ORIGIN, "x-forwarded-for": "10.9.9.9" });
+  assert.equal(spoofed.status, 429);
+  assert.ok(shared.state.limiter.calls.every(call => call.p_key_hash === limitKey("intake-address", "unknown")));
+});
+
+test("intake handler: the database limiter fails open and logs only a code", async () => {
+  const failing = intakeFixture();
+  failing.state.limiterError = { code: "57014", message: "canceling statement due to statement timeout" };
+  for (let index = 0; index < 10; index += 1) {
+    assert.equal((await post(failing.handler, INTAKE_URL, trafficForm(), { origin: ORIGIN, "cf-connecting-ip": "203.0.113.9" })).status, 200);
+  }
+  assert.ok(failing.state.logs.includes("practice rate limit unavailable 57014"));
+
+  const secretless = intakeFixture({ env: () => undefined });
+  assert.equal((await post(secretless.handler, INTAKE_URL, trafficForm(), { origin: ORIGIN, "cf-connecting-ip": "203.0.113.9" })).status, 200);
+  assert.equal(secretless.state.limiter.calls.length, 0, "nothing is counted without the keying secret");
+  assert.deepEqual(secretless.state.logs, ["practice rate limit skipped signing_secret_missing"]);
+  for (const line of [...failing.state.logs, ...secretless.state.logs]) {
+    assert.ok(!/203\.0\.113|@/.test(line), `log line carries no address or email: ${line}`);
+  }
+});
+
+test("requestAddress mirrors ticket-intake-draft and the limiter key is a keyed hash", async () => {
+  const draftPath = path.join(temporary, "ticket-intake-draft.mjs");
+  await build({ entryPoints: [path.join(sharedDir, "ticket-intake-draft.ts")], outfile: draftPath, bundle: true,
+    format: "esm", platform: "node", logLevel: "silent" });
+  const draft = await import(pathToFileURL(draftPath).href);
+  const samples = ["203.0.113.9", " 203.0.113.9 ", "255.255.255.255", "256.1.1.1", "1.2.3", "1.2.3.4, 5.6.7.8", "2001:DB8::1",
+    "::1", "fe80::1%eth0", "2001:db8::g", ":", "1:2:3:4:5:6:7:8:9", "", "unknown", "not-an-ip", "0.0.0.0", "::ffff:192.0.2.1"];
+  for (const value of samples) {
+    const req = new Request("https://x.test", { headers: value ? { "cf-connecting-ip": value } : {} });
+    assert.equal(core.requestAddress(req), draft.requestAddress(req), `cf-connecting-ip ${JSON.stringify(value)}`);
+  }
+  const forwarded = new Request("https://x.test", { headers: { "x-forwarded-for": "203.0.113.9", "x-real-ip": "203.0.113.9" } });
+  assert.equal(core.requestAddress(forwarded), "unknown");
+  assert.equal(await core.rateLimitKey(SECRET, "link-email", "a@b.co"), hmacHex(SECRET, "rate-limit:link-email:a@b.co"));
+  assert.deepEqual(core.RATE_LIMITS, {
+    intakeAddress: { bucket: "intake-address", limit: 8, windowSeconds: 3600 },
+    linkAddress: { bucket: "link-address", limit: 5, windowSeconds: 3600 },
+    linkEmail: { bucket: "link-email", limit: 3, windowSeconds: 3600 },
+  });
 });
 
 test("intake handler: finalize trusts storage and starts the ticket reader for traffic", async () => {
@@ -1041,7 +1178,7 @@ const makeNotice = (kind, area = "traffic", overrides = {}) => {
   const client = kind.startsWith("staff_") ? false : true;
   const snapshot = {
     practice: practiceSnapshot(overrides.practice),
-    client: { id: CLIENT_A, firstName: "Jordan <i>", lastName: "Driver", organizationName: null, email: "jordan@example.com", ...overrides.client },
+    client: { id: CLIENT_A, firstName: "Jordan", lastName: "Driver", organizationName: null, email: "jordan@example.com", ...overrides.client },
     file: kind === "portal_link" ? null : fileSnapshot(area, overrides.file),
   };
   return {
@@ -1069,10 +1206,9 @@ async function assertClientEmail(email, { subject, link, headline }) {
   for (const piece of ['src="https://anderhue.ca/crest-email.png"', 'width="56"', 'alt="AnderHue Paralegal"', "max-width:600px",
     "background-color:#f7f1e8", "background-color:#1d1032", "background-color:#b28d54", "color:#1d1032", "font-family:Georgia",
     "font-family:Arial", 'role="presentation"', "(289) 985-0166", "hello@anderhue.ca", "AnderHue Paralegal Professional Corporation",
-    "Representation begins only after a written retainer.", "Hello Jordan &lt;i&gt;,", escapeHtml(headline)]) {
+    "Representation begins only after a written retainer.", "Hello Jordan,", escapeHtml(headline)]) {
     assert.ok(html.includes(piece), `html includes ${piece}`);
   }
-  assert.ok(!html.includes("<i>"), "names are escaped");
   assert.ok(!/<script/i.test(html), "no script survives");
   const button = hrefs(html).find(href => href.includes("#t="));
   assert.ok(button.startsWith(link), `${button} starts with ${link}`);
@@ -1081,7 +1217,7 @@ async function assertClientEmail(email, { subject, link, headline }) {
   assert.deepEqual(claims, { clientId: CLIENT_A, iat: CREATED_S, exp: CREATED_S + 30 * 86_400 }, "30-day link from created_at");
   assert.ok(text.includes(headline) && text.includes(button) && text.includes("Representation begins only after a written retainer."),
     "plain text alternative carries the headline, link and footer");
-  assert.ok(text.includes("Hello Jordan <i>,"), "plain text is not HTML-escaped");
+  assert.ok(text.includes("Hello Jordan,"), "plain text greets the same way");
 }
 const escapeHtml = value => value.replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
 
@@ -1102,6 +1238,7 @@ test("notices: every client kind renders branded, escaped, linked email with a t
   await assertClientEmail(requested, { subject: "TKT-2026-0007 · We need a document from you", link: fileLink, headline: "We need a document from you" });
   assert.ok(requested.html.includes("What we need"));
   assert.ok(requested.html.includes("&lt;script&gt;alert(1)&lt;/script&gt;<br>and your licence class."));
+  assert.ok(requested.text.includes("<script>alert(1)</script>\nand your licence class."), "plain text is not HTML-escaped");
   assert.ok(requested.html.includes(">Upload documents</a>"));
   const order = (body, ...pieces) => pieces.map(piece => body.indexOf(piece)).every((at, index, all) => at >= 0 && (index === 0 || at > all[index - 1]));
   assert.ok(order(requested.html, "Please send us the following", "What we need", "Use the button below", ">Upload documents</a>"),
@@ -1164,7 +1301,7 @@ test("notices: stage updates render for every notify stage in every area", async
 });
 
 test("notices: staff alerts carry the intake summary and the admin link", async () => {
-  const traffic = await render(makeNotice("staff_new_intake"));
+  const traffic = await render(makeNotice("staff_new_intake", "traffic", { client: { firstName: "Jordan <i>" } }));
   assert.equal(traffic.from, "Fabsy Case Desk <hello@fabsy.ca>");
   assert.deepEqual(traffic.to, ["info@onlineparalegals.ca", "brett@execom.ca"]);
   assert.equal(traffic.subject, "New traffic file TKT-2026-0007 · Speeding · Mississauga");
@@ -1198,7 +1335,6 @@ test("notices: unsafe or incomplete notices are refused permanently", async () =
   await refuse(makeNotice("stage_changed", "traffic", { practice: { clientEmailFrom: null }, detail: { stage: "quoted" } }), "sender_missing");
   await refuse(makeNotice("intake_received", "traffic", { practice: { clientReplyTo: "" } }), "sender_missing");
   await refuse(makeNotice("intake_received", "traffic", { practice: { clientEmailFrom: "Evil\r\nBcc: x@y.z" } }), "sender_missing");
-  await refuse(makeNotice("intake_received"), "signing_secret_missing", "");
   await refuse(makeNotice("intake_received", "traffic", { recipients: ["someone-else@example.com"] }), "recipients_missing");
   await refuse(makeNotice("staff_new_intake", "traffic", { recipients: [] }), "recipients_missing");
   await refuse(makeNotice("stage_changed", "traffic", { detail: { stage: "warp_speed" } }), "stage_unknown");
@@ -1253,12 +1389,72 @@ test("notices: processing sends, retries, fails permanently and accounts for rec
   ]);
   assert.deepEqual(result, { claimed: 8, sent: 1, retry: 2, failed: 3, recordingFailed: 2 });
   assert.ok(!frozen.includes("sender"), "a refused notice is never frozen or sent");
-  const secretless = await notices.processPracticeNotices({
-    claim: async () => [makeNotice("intake_received")], freeze: async (_n, email) => email,
-    send: async () => "em", finish: async (notice, status, _id, code) => { finished.push([notice.id, status, code]); return true; },
+});
+
+test("notices: a missing signing secret delays client emails and never staff alerts", async () => {
+  for (const secret of ["", "too-short"]) {
+    await assert.rejects(notices.renderPracticeNotice(makeNotice("intake_received"), { signingSecret: secret }),
+      error => error instanceof notices.PracticeNoticeError && error.code === "signing_secret_missing" && error.permanent === false);
+  }
+  const finished = [];
+  const sent = [];
+  const result = await notices.processPracticeNotices({
+    claim: async () => [makeNotice("intake_received", "traffic", { id: "client" }), makeNotice("portal_link", "traffic", { id: "link" }),
+      makeNotice("staff_new_intake", "traffic", { id: "staff" }), makeNotice("staff_client_uploaded", "ltb", { id: "upload", detail: { count: 2 } })],
+    freeze: async (_notice, email) => email,
+    send: async (email, id) => { sent.push([id, email.to]); return `em_${id}`; },
+    finish: async (notice, status, providerId, code) => { finished.push([notice.id, status, providerId, code]); return true; },
     signingSecret: "",
   });
-  assert.deepEqual([secretless.failed, finished.at(-1)], [1, ["notice-intake_received", "failed", "signing_secret_missing"]]);
+  assert.deepEqual(finished, [
+    ["client", "retry", null, "signing_secret_missing"],
+    ["link", "retry", null, "signing_secret_missing"],
+    ["staff", "sent", "em_staff", null],
+    ["upload", "sent", "em_upload", null],
+  ]);
+  assert.deepEqual(result, { claimed: 4, sent: 2, retry: 2, failed: 0, recordingFailed: 0 });
+  assert.deepEqual(sent.map(([id]) => id), ["staff", "upload"], "no client email goes out without its link");
+});
+
+test("notices: the greeting uses only a name-like first word of the stored first name", async () => {
+  for (const [stored, expected] of [
+    ["Alice", "Alice"], ["Jean-Luc", "Jean-Luc"], ["O'Brien", "O'Brien"], ["O’Brien", "O’Brien"], ["Zoë", "Zoë"],
+    ["Zoë", "Zoë"], ["  Mary Anne ", "Mary"], ["José María", "José"], ["Ólafur", "Ólafur"], ["李", "李"],
+    ["", ""], [null, ""], [undefined, ""], [42, ""], ["https://evil.example/login", ""], ["<b>Bob</b>", ""], ["Bob!", ""],
+    ["Dr.", ""], ["-Bob", ""], ["'Bob", ""], ["J0hn", ""], ["A".repeat(41), ""], ["A".repeat(40), "A".repeat(40)],
+    ["Alice‮gnp.exe", ""], ["Ali​ce", ""],
+  ]) {
+    assert.equal(notices.greetingName(stored), expected, JSON.stringify(stored));
+  }
+  const attacks = [
+    "Your account is suspended. Verify now at https://evil.example/login",
+    "https://evil.example/login to keep your file open",
+    "Urgent: call 1-900-555-0100 today",
+  ];
+  for (const firstName of attacks) {
+    for (const kind of ["intake_received", "portal_link", "documents_requested"]) {
+      const email = await render(makeNotice(kind, "traffic", { client: { firstName }, detail: { message: "Please send it." } }));
+      for (const part of [email.html, email.text, email.subject]) {
+        for (const fragment of ["evil.example", "https://evil", "suspended", "Verify", "1-900", "keep your file"]) {
+          assert.equal(part.includes(fragment), false, `${kind}: "${fragment}" from the stored name never reaches the email`);
+        }
+      }
+      const greeting = email.text.split("\n").find(line => line.startsWith("Hello"));
+      assert.ok(["Hello Your,", "Hello,", "Hello Urgent,"].includes(greeting), greeting);
+    }
+  }
+  const plain = await render(makeNotice("intake_received", "traffic", { client: { firstName: "<script>alert(1)</script>" } }));
+  assert.ok(plain.html.includes("<p style=\"margin:0 0 16px;\">Hello,</p>") && plain.text.includes("\nHello,\n"));
+  assert.ok(!plain.html.includes("script") && !plain.text.includes("script"));
+
+  // The portal greets with the session's firstName, so it gets the same rule.
+  const fixture = portalFixture();
+  fixture.state.clients[CLIENT_A].firstName = "Your account is suspended. Verify at https://evil.example";
+  const session = await (await post(makePortal(fixture), PORTAL_URL, { action: "session", token: await tokenFor(CLIENT_A) })).json();
+  assert.equal(session.client.firstName, "Your");
+  fixture.state.clients[CLIENT_A].firstName = "https://evil.example";
+  const linkName = await (await post(makePortal(fixture), PORTAL_URL, { action: "session", token: await tokenFor(CLIENT_A) })).json();
+  assert.equal(linkName.client.firstName, "");
 });
 
 test("notices: the provider call carries a stable idempotency key and classifies failures", async () => {
@@ -1587,10 +1783,20 @@ test("entry: process-practice-notices authenticates, sweeps, then claims, freeze
     assert.equal(sent[0].body.from, "AnderHue Paralegal <files@anderhue.ca>");
 
     adminCalls.length = 0;
+    // Without the portal secret, staff alerts still go out; client emails wait.
+    adminCalls.length = 0;
+    sent.length = 0;
     env.PRACTICE_PORTAL_SIGNING_SECRET = "";
+    adminResults.claim_practice_notices = { data: [
+      makeNotice("intake_received", "traffic", { id: "live-client" }),
+      makeNotice("staff_new_intake", "traffic", { id: "live-staff" }),
+    ], error: null };
     const noSecret = await call({ "x-cron-secret": env.IDR_CRON_SECRET });
-    assert.deepEqual([noSecret.status, (await noSecret.json()).error], [503, "portal_signing_secret_missing"]);
-    assert.deepEqual(adminCalls.map(([name]) => name), ["practice_sweep_stalled_intakes"], "the outbox is left untouched");
+    assert.deepEqual([noSecret.status, await noSecret.json()],
+      [200, { ok: true, swept: 2, claimed: 2, sent: 1, retry: 1, failed: 0, recordingFailed: 0 }]);
+    assert.deepEqual(sent.map(item => item.key), ["practice-notice/live-staff"]);
+    assert.deepEqual(adminCalls.filter(([name]) => name === "finish_practice_notice").map(([, args]) => [args.p_id, args.p_status, args.p_failure_code]),
+      [["live-client", "retry", "signing_secret_missing"], ["live-staff", "sent", null]]);
     env.PRACTICE_PORTAL_SIGNING_SECRET = SECRET;
     env.RESEND_API_KEY = "";
     const noKey = await call({ "x-cron-secret": env.IDR_CRON_SECRET });

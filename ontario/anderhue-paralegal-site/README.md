@@ -1,27 +1,36 @@
-# AnderHue Paralegal public site
+# AnderHue Paralegal: anderhue.ca
 
-Static Ontario public site and private LTB workspace for AnderHue Paralegal Professional Corporation. Fabsy is the software vendor only.
+Public site, client intake and file portal, and the practice staff workspace for AnderHue Paralegal Professional Corporation (Don Anderson, licensed by the Law Society of Ontario). Fabsy is the case-software vendor only and appears only as the software credit on the landlords and privacy pages.
 
-- Production project: `anderhue-paralegal` in the `execom` Vercel team.
-- Canonical public domain: `https://anderhue.ca`. The `www` host and existing `vercel.app` aliases remain attached to the project.
-- Build: `npm run build:anderhue` at the repository root. Deploy the complete `dist-anderhue/` directory. The build includes static public pages, the bundled portal and its assets, and Vercel routing.
-- Public routes: `/`, `/landlords`, `/traffic-tickets`, `/other-matters`.
-- Private routes: `/sign-in` and `/admin/ltb`, both served by the portal bundle.
+The build contract (database, edge functions, routes, design tokens, go-live order) is [ARCHITECTURE.md](ARCHITECTURE.md). Stages, labels and client copy live in `supabase/functions/_shared/practice-catalog.ts`.
 
-The homepage links to all three practice areas. `/landlords` retains the existing N4, L1 and L2 information, date calculator and connected LTB intake. The Traffic Tickets and Other Matters pages currently offer a phone and email consultation. They do not use the Alberta ticket checkout, open an Ontario case or collect payment. A full Ontario traffic workflow requires its own verified scope, intake rules and backend before launch.
+## What is where
 
-The public pages use a shared purple, ivory and gold identity. The crest is adapted from the AnderHue Canada Inc. image supplied by Brett, using only its laurel and circuit-A mark. The company name, address and firm number from that image are not practice details on this site. The private sign-in uses the same crest and palette. Public pages are indexable; the sign-in and admin routes remain `noindex`. `robots.txt` and `sitemap.xml` cover the public routes.
+| Route | What it is | Source |
+|---|---|---|
+| `/`, `/landlords`, `/traffic-tickets`, `/other-matters`, `/privacy` | Static public pages | `*.html`, `public.css`, `site.js` in this folder |
+| `/start?area=landlord\|traffic\|other` | Step-by-step secure uploader that opens a file | `client.html` → `src/anderhue/client/` |
+| `/files`, `/files/:area/:id` | Client portal, opened from secure email links | `client.html` → `src/anderhue/client/` |
+| `/sign-in`, `/admin/...` | Practice staff workspace (Today, Landlord, Traffic, Other boards, file pages) | `portal.html` → `src/anderhue/staff/` |
 
-## Landlord intake and access
+Landlord files keep using the live `ltb-intake` function and `ltb_*` tables. Traffic and other matters use `practice-intake` and `practice_matters`. The portal and client update emails cover all three (`practice-portal`, `process-practice-notices`, migration `20261001150000_anderhue_practice_files.sql`).
 
-The landlord form posts to the Supabase Edge Function `ltb-intake` (`submit`, private document uploads, then `finalize`). The anon key in `data-key` is a public browser key. The `LTB_ALLOWED_ORIGINS` function secret includes both Vercel aliases plus `https://anderhue.ca` and `https://www.anderhue.ca`. Changes to this function must be deployed individually with `--use-api`.
+## Build and deploy
 
-`ltb-intake` registers or reuses a client, opens an `LTB-YYYY-NNNN` case and returns signed upload URLs. `process-ltb-intake` reads uploaded photos and fills only empty fields. Conflicts, low confidence, PDFs and missing registration data require review. Staff receive one case alert and work the file at `/admin/ltb`.
+- Production project: `anderhue-paralegal` in the `execom` Vercel team. Domains: `anderhue.ca`, `www.anderhue.ca` and the existing `vercel.app` aliases.
+- Build: `npm run build:anderhue` at the repository root, then deploy the whole `dist-anderhue/` folder (static pages, both app bundles, `vercel.json` with rewrites and security headers including the Content-Security-Policy).
+- Public browser config (Supabase URL and anon key) comes from `site-config.json`.
+- `client_updates_enabled` on the practice row is the go-live switch for client emails. Follow the order in ARCHITECTURE.md section 7.
 
-Practice access is granted through `ltb_practice_members` for `anderhue-paralegal`, using `licensee` or `clerk`. This grants LTB access only. Do not add a practice member to traffic `user_roles` unless separately authorized. Database policies and portal routing enforce the separation. Signing up creates a login only; membership must be granted after email confirmation.
+## Checks
 
-Supabase Auth must allow `https://anderhue.ca/sign-in` and `https://www.anderhue.ca/sign-in` as redirect URLs, while preserving the existing Vercel aliases and the Fabsy site URL. The public site omits a licence number until Don's exact LSO number is confirmed. Do not publish a placeholder number.
+- `npm run test:practice`: edge function logic, catalog parity with the SQL, email rendering, portal tokens.
+- `bash scripts/test-practice-sql.sh`: throwaway PostgreSQL 16 with Supabase stubs; applies the LTB and practice migrations and runs both SQL test files.
+- `npm run verify:anderhue`: builds, then drives the public pages, the uploader, the portal and the staff workspace in Chromium against fixtures (no real accounts, emails or files). Set `ANDERHUE_QA_SCREENSHOTS=<dir>` for screenshots of every state.
+- `node scripts/anderhue-qa/render-emails.mjs <dir>`: renders every client update and staff alert with sample data for one-time template approval.
 
-## Release checks
+## Rules that stay in force
 
-Run `npm run build:anderhue` and `node scripts/verify-anderhue-browser.mjs`. The browser check uses fixtures for authentication and data, so it cannot create accounts or read production cases. Deploy a preview, require passing PR checks, then promote the reviewed build. Verify the public pages, private sign-in and landlord intake CORS on the final domain.
+- Practice members get access through `ltb_practice_members` (`licensee` or `clerk`). Never add them to Fabsy `user_roles`.
+- Do not publish an LSO licence number until Don's exact number is confirmed. Never publish a placeholder.
+- Client emails never carry Fabsy branding. Templates are approved once; individual sends then go out automatically.

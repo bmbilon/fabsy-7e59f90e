@@ -8,7 +8,9 @@ import {
   labelFor, matterTitle, outcomeDef, staffStageLabel, stageDef, torontoToday,
   type PracticeArea, type StageDef,
 } from './catalog';
-import { calendarDaysSince, dueLabel, humanize, isIsoDate, plural, formatCountdown, formatDateTime } from './format';
+import {
+  calendarDaysSince, cleanDisplayText, dueLabel, formatClock, formatCountdown, formatDateTime, humanize, isIsoDate, plural,
+} from './format';
 
 // ---------------------------------------------------------------------------
 // Row shapes
@@ -57,6 +59,8 @@ interface CaseRowBase {
   client_request_message: string | null;
   client_request_at: string | null;
   client_uploaded_at: string | null;
+  /** False while a public intake for a client who already has a file is held out of the client portal. */
+  portal_visible?: boolean | null;
   created_at: string;
   updated_at: string;
   closed_at?: string | null;
@@ -220,11 +224,17 @@ export interface StaffFile {
   requestAt: string | null;
   clientUploadedAt: string | null;
   returningClient: boolean;
+  /** Held out of the client portal until staff take it forward (portal_visible is false). */
+  portalHidden: boolean;
   source: string;
   noticeForm: string | null;
   noticeTerminationDate: string | null;
   dates: KeyDate[];
 }
+
+/** Badge and explanation for a file held out of the client portal (portal_visible false). */
+export const PORTAL_HOLD_LABEL = 'Not shown to the client yet';
+export const PORTAL_HOLD_HELP = 'This file came in under an email that already has a file. The client sees it once you move it out of New intake.';
 
 export function clientDisplayName(client: Partial<ClientBrief> | null | undefined): string {
   if (!client) return 'Name pending';
@@ -334,6 +344,7 @@ export function toStaffFile(area: PracticeArea, row: CaseRow, today = torontoTod
     requestAt: row.client_request_at || null,
     clientUploadedAt: row.client_uploaded_at || null,
     returningClient: Boolean(row.returning_client),
+    portalHidden: row.portal_visible === false,
     source: row.source || '',
     noticeForm: area === 'ltb' ? record.notice_form || null : null,
     noticeTerminationDate: area === 'ltb' ? record.notice_termination_date || null : null,
@@ -558,7 +569,7 @@ export const FIELD_LABELS: Record<string, string> = {
   other_party: 'Other party', client_city: 'Client city', client_type: 'Client type', first_name: 'First name',
   last_name: 'Last name', organization_name: 'Organization', business_number: 'Business number',
   contact_title: 'Title', phone: 'Phone', mailing_address: 'Mailing address', city: 'City', province: 'Province',
-  postal_code: 'Postal code', occupation: 'Occupation', portal_revoked_before: 'Client links',
+  postal_code: 'Postal code', occupation: 'Occupation', portal_revoked_before: 'Client links', email: 'Email',
 };
 
 const fieldList = (value: unknown) => Array.isArray(value)
@@ -651,15 +662,15 @@ export function describeEvent(area: PracticeArea, row: EventRow): EventSummary {
     }
     case 'staff_uploaded':
       title = 'Practice added a document';
-      line = text(detail.name) || text(detail.documentName);
+      line = cleanDisplayText(text(detail.name) || text(detail.documentName));
       break;
     case 'document_shared':
       title = 'Document shared with the client';
-      line = text(detail.documentName) || text(detail.name);
+      line = cleanDisplayText(text(detail.documentName) || text(detail.name));
       break;
     case 'document_unshared':
       title = 'Document no longer shared';
-      line = text(detail.documentName) || text(detail.name);
+      line = cleanDisplayText(text(detail.documentName) || text(detail.name));
       break;
     case 'portal_access_revoked':
     case 'portal_revoked':
@@ -694,39 +705,62 @@ export function noticeSummary(area: PracticeArea, notice: NoticeRow): string {
     return [label, outcome ? outcomeLabel(area, outcome, 'client') : ''].filter(Boolean).join(' · ');
   }
   if (notice.kind === 'documents_requested') return text(detail.message);
-  if (notice.kind === 'document_shared') return text(detail.documentName);
+  if (notice.kind === 'document_shared') return cleanDisplayText(text(detail.documentName));
   return '';
 }
+
+/** Statuses practice_cancel_notice still stops: not gone out, not being sent. */
+export const CANCELLABLE_NOTICE_STATUSES: readonly NoticeStatus[] = ['pending', 'retry'];
 
 export interface NoticeStatusInfo {
   label: string;
   tone: Tone;
   note: string;
-  pending: boolean;
+  /** Shows a countdown to its send time. */
+  live: boolean;
+  /** Staff can still stop it. */
+  cancellable: boolean;
+}
+
+/** Why an update was cancelled (practice_notices.failure_code). */
+const CANCELLED_NOTES: Record<string, string> = {
+  cancelled_by_staff: 'Not sent',
+  request_cleared: 'Not sent. The request was cleared',
+  portal_access_revoked: 'Not sent. Client links were revoked',
+  client_email_changed: 'Not sent. The client email changed',
+  document_unshared: 'Not sent. The document was unshared',
+};
+
+function retryNote(due: number, at: string | null): string {
+  const when = due <= 60_000 ? 'shortly'
+    : due < 3_600_000 ? `in ${Math.ceil(due / 60_000)} min`
+      : at ? `at ${formatClock(at)}` : 'later';
+  return `Not sent yet. It will be retried ${when} unless you cancel it.`;
 }
 
 export function noticeStatusInfo(notice: NoticeRow, now = Date.now()): NoticeStatusInfo {
+  const base = { live: false, cancellable: false };
   switch (notice.status) {
     case 'pending': {
       const due = ms(notice.next_attempt_at) - now;
-      return { label: 'Scheduled', tone: 'gold', pending: true, note: due > 0 ? `Sends in ${formatCountdown(due)}` : 'Sending shortly' };
+      return { label: 'Scheduled', tone: 'gold', live: true, cancellable: true, note: due > 0 ? `Sends in ${formatCountdown(due)}` : 'Sending shortly' };
     }
-    case 'sending':
-      return { label: 'Sending', tone: 'info', pending: false, note: 'On its way' };
     case 'retry':
-      return { label: 'Sending', tone: 'info', pending: false, note: 'Retrying automatically' };
+      return { ...base, label: 'Retrying', tone: 'warn', cancellable: true, note: retryNote(ms(notice.next_attempt_at) - now, notice.next_attempt_at) };
+    case 'sending':
+      return { ...base, label: 'Sending', tone: 'info', note: 'On its way' };
     case 'sent':
-      return { label: 'Sent', tone: 'success', pending: false, note: notice.sent_at ? formatDateTime(notice.sent_at) : '' };
+      return { ...base, label: 'Sent', tone: 'success', note: notice.sent_at ? formatDateTime(notice.sent_at) : '' };
     case 'failed':
-      return { label: 'Failed', tone: 'danger', pending: false, note: notice.failure_code ? humanize(notice.failure_code) : 'Not delivered' };
+      return { ...base, label: 'Failed', tone: 'danger', note: notice.failure_code ? humanize(notice.failure_code) : 'Not delivered' };
     case 'indeterminate':
-      return { label: 'Failed', tone: 'danger', pending: false, note: 'Delivery could not be confirmed' };
+      return { ...base, label: 'Failed', tone: 'danger', note: 'Delivery could not be confirmed' };
     case 'superseded':
-      return { label: 'Superseded', tone: 'neutral', pending: false, note: 'A later stage change replaced it' };
+      return { ...base, label: 'Superseded', tone: 'neutral', note: 'A later stage change replaced it' };
     case 'cancelled':
-      return { label: 'Cancelled', tone: 'neutral', pending: false, note: 'Not sent' };
+      return { ...base, label: 'Cancelled', tone: 'neutral', note: CANCELLED_NOTES[notice.failure_code || ''] || 'Not sent' };
     default:
-      return { label: humanize(notice.status), tone: 'neutral', pending: false, note: '' };
+      return { ...base, label: humanize(notice.status), tone: 'neutral', note: '' };
   }
 }
 

@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { ChevronRight, Clock, FileCheck2, Lock } from 'lucide-react';
+import { ChevronRight, FileCheck2, ListChecks, Lock } from 'lucide-react';
 import { AREAS } from '../catalog';
 import { AREA_COPY, AREA_ORDER } from './content';
 
 const PROMISES = [
   { icon: Lock, title: 'Private', text: 'Documents go straight into your file, not an inbox.' },
-  { icon: Clock, title: 'A few minutes', text: 'Documents, a few details, then how to reach you.' },
+  { icon: ListChecks, title: 'Three short steps', text: 'Documents, a few details, then how to reach you.' },
   { icon: FileCheck2, title: 'No retainer yet', text: 'We reply with your next step and the fee in writing.' },
 ];
 
