@@ -353,10 +353,10 @@ input[type="date"].ahc-input::-webkit-calendar-picker-indicator { cursor: pointe
 .ahc-phase[data-state="done"] + .ahc-phase::before { background: var(--ah-plum-600); }
 .ahc-phase-dot {
   position: relative; z-index: 1; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px;
-  border: 2px solid var(--ah-line-strong); background: #fff; color: #fff;
+  border: 2px solid var(--ah-line-strong); background: #fff; color: var(--ah-ink);
 }
 .ahc-phase[data-state="done"] { color: var(--ah-ink-2); }
-.ahc-phase[data-state="done"] .ahc-phase-dot { background: var(--ah-plum-600); border-color: var(--ah-plum-600); }
+.ahc-phase[data-state="done"] .ahc-phase-dot { background: var(--ah-plum-600); border-color: var(--ah-plum-600); color: var(--ah-ivory-50); }
 .ahc-phase[data-state="current"] { color: var(--ah-plum-900); }
 .ahc-phase[data-state="current"] .ahc-phase-dot { border-color: var(--ah-plum-900); background: var(--ah-plum-900); box-shadow: 0 0 0 5px var(--ah-plum-100); }
 .ahc-phase[data-state="current"] .ahc-phase-dot::after { content: ""; width: 8px; height: 8px; border-radius: 999px; background: var(--ah-gold-300); }
