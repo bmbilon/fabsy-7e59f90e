@@ -13,14 +13,14 @@ const server = createServer((request, response) => {
     '/landlords': 'landlords.html',
     '/traffic-tickets': 'traffic-tickets.html',
     '/other-matters': 'other-matters.html',
-    '/crest.svg': 'crest.svg',
+    '/crest.png': 'crest.png',
     '/public.css': 'public.css',
     '/robots.txt': 'robots.txt',
     '/sitemap.xml': 'sitemap.xml',
   }[pathname];
   const target = pathname.startsWith('/assets/') ? path.join(root, 'assets', path.basename(pathname)) : path.join(root, publicPage || 'portal.html');
   if (!existsSync(target)) { response.writeHead(404).end(); return; }
-  response.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : target.endsWith('.svg') ? 'image/svg+xml' : 'text/html');
+  response.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : target.endsWith('.png') ? 'image/png' : 'text/html');
   response.end(readFileSync(target));
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -67,6 +67,7 @@ try {
   await publicPage.goto(origin);
   await publicPage.getByRole('heading', { name: /Steady counsel/ }).waitFor();
   assert.deepEqual(await publicPage.locator('.tile h3').allTextContents(), ['Landlords', 'Traffic Tickets', 'Other Matters']);
+  assert.ok(await publicPage.locator('.site-header .identity img').evaluate(image => image.complete && image.naturalWidth > 0), 'Supplied crest must load');
   assert.ok(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   for (const [route, heading] of [['/landlords', 'Unpaid rent'], ['/traffic-tickets', 'Traffic Tickets'], ['/other-matters', 'Other Matters']]) {
     await publicPage.goto(`${origin}${route}`);

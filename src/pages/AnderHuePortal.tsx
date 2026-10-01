@@ -14,7 +14,7 @@ import AdminLtbCaseDetail from '@/pages/AdminLtbCaseDetail';
 
 function Brand() {
   return <a href="/" className="inline-flex items-center gap-3 text-foreground" aria-label="AnderHue Paralegal home">
-    <img src="/crest.svg" alt="" aria-hidden="true" className="h-11 w-11" />
+    <img src="/crest.png" alt="" aria-hidden="true" className="h-14 w-14 object-contain" />
     <span className="font-display text-xl tracking-tight">AnderHue <span className="font-normal">Paralegal</span></span>
   </a>;
 }
