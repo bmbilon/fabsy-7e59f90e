@@ -927,7 +927,7 @@ export async function installSupabaseMocks(context, { origin, state, requests = 
     const url = new URL(request.url());
     // Branded Chromium browsers load their built-in PDF viewer from an
     // internal extension. Do not replace its module scripts with a 204 mock.
-    if (url.protocol === 'chrome-extension:' || url.protocol === 'chrome:') return route.continue();
+    if (['chrome-extension:', 'chrome:', 'edge:'].includes(url.protocol)) return route.continue();
     if (url.origin === origin) return route.continue();
     if (url.hostname === 'fonts.googleapis.com') return route.fulfill({ status: 200, contentType: 'text/css', body: fontCss(fontsDir) });
     if (url.hostname === 'fonts.gstatic.com') {
@@ -1032,7 +1032,11 @@ export async function installSupabaseMocks(context, { origin, state, requests = 
         const doc = [...state.ltbDocuments, ...state.matterDocuments].find(item => item.storage_path === storagePath);
         if (!doc) return json({ error: 'not_found' }, 404);
         const disposition = url.searchParams.has('download') ? { 'content-disposition': `attachment; filename="${(url.searchParams.get('download') || 'document').replace(/"/g, '')}"` } : {};
-        if (doc.content_type === 'application/pdf') return route.fulfill({ status: 200, contentType: 'application/pdf', headers: disposition, body: documentPdf(doc.original_name || 'Document') });
+        // Real HTTP PDFs avoid browser-specific hangs in intercepted PDF
+        // navigations, and exercise the native download manager as well.
+        if (doc.content_type === 'application/pdf') return route.fulfill({ status: 302, headers: {
+          location: `${origin}/__qa__/${url.searchParams.has('download') ? 'download' : 'preview'}.pdf?name=${encodeURIComponent(url.searchParams.get('download') || 'document.pdf')}`,
+        } });
         return route.fulfill({ status: 200, contentType: 'image/svg+xml', headers: disposition, body: documentSvg(doc) });
       }
       const uploadMatch = url.pathname.match(/^\/storage\/v1\/object\/([a-z-]+)\/(.+)$/);
@@ -1162,6 +1166,7 @@ export async function openStaffContext(browser, origin, options = {}) {
     viewport = { width: 1440, height: 900 }, fontsDir = null, now = new Date(), data, allowConsole = [], latencyMs = 0, empty = false,
   } = options;
   const context = await browser.newContext({ viewport, serviceWorkers: 'block', locale: 'en-CA', timezoneId: 'America/Toronto' });
+  context.setDefaultTimeout(30_000);
   const state = createMockState({ now, membership, updatesEnabled, data: empty ? emptyFixtureData(now) : data });
   state.authFail = authFail;
   const requests = [];
@@ -1244,11 +1249,16 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   // requests cancelled by rapid test navigation as access-control page errors.
   // App errors remain asserted; nothing is filtered from the console.
   const visit = async (page, url) => {
+    // Let post-click React effects enqueue their invalidated queries before
+    // checking network idle; a previously idle load state can resolve at once.
+    await waitForQuiet(page);
     await page.waitForLoadState('networkidle');
     await page.goto(url);
   };
   const allRequests = [];
   const finish = async session => {
+    await waitForQuiet(session.page);
+    await session.page.waitForLoadState('networkidle');
     assert.deepEqual(session.errors, [], `Console or page errors:\n${session.errors.join('\n')}`);
     assert.deepEqual(session.externals, [], `Unexpected external requests:\n${session.externals.join('\n')}`);
     assertPracticeScoping(session.requests);
@@ -1792,22 +1802,24 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     const hidden = await page.evaluate(() => /[\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/.test(document.body.innerText));
     assert.equal(hidden, false, 'No bidi or zero-width characters reach the page');
     const downloadAs = async (button, expected) => {
-      const request = member.context.waitForEvent('request', item => item.method() === 'GET'
-        && item.url().includes('/storage/v1/object/sign/') && new URL(item.url()).searchParams.has('download'));
+      const request = member.context.waitForEvent('request', {
+        predicate: item => item.method() === 'GET' && item.url().includes('/storage/v1/object/sign/') && new URL(item.url()).searchParams.has('download'),
+        timeout: 15_000,
+      });
+      const downloaded = page.waitForEvent('download', { timeout: 15_000 });
       await button.click();
       assert.equal(new URL((await request).url()).searchParams.get('download'), expected);
+      assert.equal((await downloaded).suggestedFilename(), expected);
     };
     await documents.getByRole('button', { name: 'View Court noticefdp.exe.pdf' }).click();
     const viewer = page.getByRole('dialog', { name: 'Court noticefdp.exe.pdf' });
     await viewer.locator('iframe[title="Court noticefdp.exe.pdf"]').waitFor();
     await shoot(page, 'document-safe-name', { full: false });
     await downloadAs(viewer.getByRole('button', { name: 'Download' }), 'Court noticefdp.exe.pdf');
-    await page.bringToFront();
-    await page.keyboard.press('Escape');
+    // Close the viewer through the same control available to staff.
+    await viewer.getByRole('button', { name: 'Close', exact: true }).click();
     await viewer.waitFor({ state: 'detached' });
     await downloadAs(documents.getByRole('button', { name: 'Download Ticket scan.pdf.exe.pdf' }), 'Ticket scan.pdf.exe.pdf');
-    for (const extra of member.context.pages().filter(other => other !== page)) await extra.close();
-    await page.bringToFront();
   });
 
   await step('new file opened by staff', async () => {
@@ -1876,20 +1888,20 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   // 4. First run and slow network -------------------------------------------
   await step('empty practice and loading skeletons', async () => {
     const empty = await openStaffContext(browser, origin, { empty: true, fontsDir });
-    await empty.page.goto(`${origin}/admin/today`);
+    await visit(empty.page, `${origin}/admin/today`);
     await empty.page.getByText('No files yet').waitFor();
     await checkPage(empty.page, 'empty Today');
     await shoot(empty.page, 'today-empty', { full: false });
-    await empty.page.goto(`${origin}/admin/landlord`);
+    await visit(empty.page, `${origin}/admin/landlord`);
     await empty.page.getByText('No landlord files yet').waitFor();
     await shoot(empty.page, 'board-empty', { full: false });
     await finish(empty);
     const slow = await openStaffContext(browser, origin, { latencyMs: 2500, fontsDir });
-    await slow.page.goto(`${origin}/admin/today`);
+    await visit(slow.page, `${origin}/admin/today`);
     await slow.page.getByRole('heading', { name: 'Today' }).waitFor();
     await slow.page.locator('.ahs-skel').first().waitFor();
     await shoot(slow.page, 'today-loading', { full: false });
-    await slow.page.goto(`${origin}/admin/files/ltb/${slow.state.keyFiles.ltbReview}`);
+    await visit(slow.page, `${origin}/admin/files/ltb/${slow.state.keyFiles.ltbReview}`);
     await slow.page.locator('.ahs-skel').first().waitFor();
     await shoot(slow.page, 'file-loading', { full: false });
     await waitForQuiet(slow.page);
@@ -1899,7 +1911,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   // 5. Client emails switched off -------------------------------------------
   await step('client emails off: stage dialog explains nothing is sent', async () => {
     const session = await openStaffContext(browser, origin, { updatesEnabled: false, fontsDir });
-    await session.page.goto(`${origin}/admin/files/general/${session.state.keyFiles.generalDue}`);
+    await visit(session.page, `${origin}/admin/files/general/${session.state.keyFiles.generalDue}`);
     await session.page.getByRole('heading', { name: 'Grace Thompson', level: 1 }).waitFor();
     await waitForQuiet(session.page);
     await session.page.getByRole('button', { name: 'Change stage' }).first().click();

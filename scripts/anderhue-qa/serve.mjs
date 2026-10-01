@@ -62,11 +62,11 @@ export async function startAnderhueServer(root = path.resolve('dist-anderhue'), 
     const pathname = url.pathname;
     // Serve a real HTTP attachment: WebKit cannot emit download events for
     // route.fulfill() PDFs (playwright#22691). This endpoint exists only in QA.
-    if (pathname === '/__qa__/download.pdf') {
+    if (pathname === '/__qa__/download.pdf' || pathname === '/__qa__/preview.pdf') {
       const name = (url.searchParams.get('name') || 'document.pdf').replace(/[\r\n"]/g, '');
       response.writeHead(200, {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${name}"`,
+        'Content-Disposition': `${pathname.endsWith('/download.pdf') ? 'attachment' : 'inline'}; filename="${name}"`,
       }).end(makePdf(name, ['Fixture download']));
       return;
     }

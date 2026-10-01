@@ -31,13 +31,10 @@ const docName = (area: PracticeArea, doc: DocumentRow) =>
 async function download(area: PracticeArea, doc: DocumentRow) {
   try {
     const url = await signedDocumentUrl(area, doc.storage_path, downloadFileName(docName(area, doc), doc.content_type));
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    // Storage serves this signed URL as an attachment. Use the current tab,
+    // as the client portal does, instead of opening a window after an async
+    // request (which is subject to browser popup and PDF-viewer behaviour).
+    window.location.assign(url);
   } catch (cause) {
     notifyError('Download unavailable', friendlyError(cause));
   }

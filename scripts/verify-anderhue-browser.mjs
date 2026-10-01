@@ -61,7 +61,16 @@ try {
   await runStaffQaFlow({ origin: server.origin, browser, screenshotDir: shots && path.join(shots, 'staff'), fontsDir, log: message => console.log(message) });
 
   console.log(`PASS: AnderHue public pages, client intake and portal, staff workspace (${Math.round((Date.now() - started) / 1000)}s${shots ? `, ${client.screenshots.length} client screenshots in ${shots}` : ''})`);
+} catch (error) {
+  // Report the actual test failure even if a crashed browser hangs on close.
+  console.error(error);
+  process.exitCode = 1;
 } finally {
+  const closeTimeout = setTimeout(() => {
+    console.error(`FAIL: ${engine} did not close within 10 seconds`);
+    process.exit(1);
+  }, 10_000);
   await browser.close();
   await server.close();
+  clearTimeout(closeTimeout);
 }

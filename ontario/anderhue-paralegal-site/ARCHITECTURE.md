@@ -246,10 +246,14 @@ claim that every physical phone or OS version has been tested.
 
 Intake text drafts save after each field update and flush when the page is
 hidden, avoiding lost answers during quick reloads or mobile backgrounding.
+Staff downloads use the same attachment navigation as the client portal,
+without opening a second window after the signed-link request.
 Downloads in QA use a real local HTTP attachment because WebKit's mocked PDF
 responses do not emit a download event (Playwright issue 22691). The download
-still requires the fixture portal's client/document authorization and checks
-the actual browser download filename. No production data or emails are used.
+still requires the fixture client or staff document authorization and checks
+the actual browser download filename. PDF previews also use real HTTP responses.
+Playwright 1.63 drives the current branded browsers. No production data or
+emails are used.
 
 ## 7. Go-live checklist
 
