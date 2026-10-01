@@ -1240,6 +1240,13 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
       throw error;
     }
   };
+  // Finish fixture requests before replacing the document. WebKit reports
+  // requests cancelled by rapid test navigation as access-control page errors.
+  // App errors remain asserted; nothing is filtered from the console.
+  const visit = async (page, url) => {
+    await page.waitForLoadState('networkidle');
+    await page.goto(url);
+  };
   const allRequests = [];
   const finish = async session => {
     assert.deepEqual(session.errors, [], `Console or page errors:\n${session.errors.join('\n')}`);
@@ -1253,7 +1260,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   await step('sign-in page, sign-up and sign-in', async () => {
     const session = await openStaffContext(browser, origin, { signedIn: false, fontsDir });
     const { page } = session;
-    await page.goto(`${origin}/admin/landlord`);
+    await visit(page, `${origin}/admin/landlord`);
     await page.waitForURL(`${origin}/sign-in`);
     await page.getByRole('heading', { name: 'Welcome back' }).waitFor();
     assert.match(await page.title(), /AnderHue Paralegal/);
@@ -1289,7 +1296,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
       const allowConsole = options.membership === 'fail' ? [/status of 503/] : [];
       const session = await openStaffContext(browser, origin, { ...options, fontsDir, allowConsole });
       const { page } = session;
-      await page.goto(`${origin}/admin/today`);
+      await visit(page, `${origin}/admin/today`);
       const text = options.hold ? 'Checking practice access…' : options.membership === 'fail' ? 'Access could not be verified' : 'Your account is ready';
       await page.getByText(text, { exact: true }).waitFor();
       assert.ok(!session.requests.some(entry => entry.table), 'No table reads before membership succeeds');
@@ -1314,22 +1321,22 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   const keys = state.keyFiles;
 
   await step('legacy redirects', async () => {
-    await page.goto(`${origin}/admin/ltb`);
+    await visit(page, `${origin}/admin/ltb`);
     await page.waitForURL(`${origin}/admin/landlord`);
     await waitForQuiet(page);
-    await page.goto(`${origin}/admin/ltb/cases/${keys.ltbReview}`);
+    await visit(page, `${origin}/admin/ltb/cases/${keys.ltbReview}`);
     await page.waitForURL(`${origin}/admin/files/ltb/${keys.ltbReview}`);
     await waitForQuiet(page);
-    await page.goto(`${origin}/admin/not-a-page`);
+    await visit(page, `${origin}/admin/not-a-page`);
     await page.waitForURL(`${origin}/admin/today`);
     await waitForQuiet(page);
-    await page.goto(`${origin}/admin`);
+    await visit(page, `${origin}/admin`);
     await page.waitForURL(`${origin}/admin/today`);
     await waitForQuiet(page);
   });
 
   await step('Today: KPIs, attention queue and activity', async () => {
-    await page.goto(`${origin}/admin/today`);
+    await visit(page, `${origin}/admin/today`);
     await page.getByRole('heading', { name: 'Today' }).waitFor();
     await waitForQuiet(page);
     const queue = page.getByRole('list', { name: 'Needs attention' });
@@ -1354,7 +1361,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
 
   await step('boards in board and list views', async () => {
     for (const [route, title, area] of [['landlord', 'Landlord files', 'ltb'], ['traffic', 'Traffic tickets', 'traffic'], ['other', 'Other matters', 'general']]) {
-      await page.goto(`${origin}/admin/${route}`);
+      await visit(page, `${origin}/admin/${route}`);
       await page.getByRole('heading', { name: title, level: 1 }).waitFor();
       await waitForQuiet(page);
       if (await page.getByRole('button', { name: 'Board', exact: true }).getAttribute('aria-pressed') !== 'true') {
@@ -1367,11 +1374,12 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
       await page.locator('table.ahs-table').waitFor();
       await shoot(page, `list-${area}`);
     }
+    await page.waitForLoadState('networkidle');
     await page.reload();
     await page.locator('table.ahs-table').waitFor();
     assert.equal(await page.getByRole('button', { name: 'List', exact: true }).getAttribute('aria-pressed'), 'true', 'List view is remembered');
     await page.getByRole('button', { name: 'Board', exact: true }).click();
-    await page.goto(`${origin}/admin/traffic`);
+    await visit(page, `${origin}/admin/traffic`);
     await waitForQuiet(page);
     await page.getByRole('button', { name: /^Due soon/ }).click();
     assert.match(await page.getByRole('status').filter({ hasText: 'Showing' }).innerText(), /Showing 2 of 7 files/);
@@ -1382,7 +1390,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   });
 
   await step('command palette (keyboard)', async () => {
-    await page.goto(`${origin}/admin/today`);
+    await visit(page, `${origin}/admin/today`);
     await waitForQuiet(page);
     await page.keyboard.press('Control+k');
     const dialog = page.getByRole('dialog', { name: 'Search files and actions' });
@@ -1397,7 +1405,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
 
   await step('file detail in each area', async () => {
     for (const [area, fileId, name] of [['ltb', keys.ltbReview, 'Priya Raman'], ['traffic', keys.trafficNew, 'Jordan Mitchell'], ['general', keys.generalOverdue, 'Northline Contracting Ltd.']]) {
-      await page.goto(`${origin}/admin/files/${area}/${fileId}`);
+      await visit(page, `${origin}/admin/files/${area}/${fileId}`);
       await page.getByRole('heading', { name, level: 1 }).waitFor();
       await waitForQuiet(page);
       for (const heading of ['Review', 'Client', 'Stage', 'Client request', 'Documents', 'Client updates', 'Activity']) {
@@ -1406,13 +1414,13 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
       await checkPage(page, `${area} file`);
       await shoot(page, `file-${area}`);
     }
-    await page.goto(`${origin}/admin/files/traffic/${keys.trafficNew}`);
+    await visit(page, `${origin}/admin/files/traffic/${keys.trafficNew}`);
     await waitForQuiet(page);
     await page.getByText('(estimate)').first().waitFor();
   });
 
   await step('change stage with email preview, then Undo', async () => {
-    await page.goto(`${origin}/admin/files/traffic/${keys.trafficUploaded}`);
+    await visit(page, `${origin}/admin/files/traffic/${keys.trafficUploaded}`);
     await page.getByRole('heading', { name: 'Aisha Rahman', level: 1 }).waitFor();
     await waitForQuiet(page);
     await page.getByRole('button', { name: 'Change stage' }).first().click();
@@ -1451,7 +1459,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   });
 
   await step('keyboard only: search, open a file, change stage', async () => {
-    await page.goto(`${origin}/admin/today`);
+    await visit(page, `${origin}/admin/today`);
     await waitForQuiet(page);
     await page.keyboard.press('/');
     await page.getByRole('dialog', { name: 'Search files and actions' }).waitFor();
@@ -1479,7 +1487,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   });
 
   await step('request documents with suggestion chips', async () => {
-    await page.goto(`${origin}/admin/files/ltb/${keys.ltbReview}`);
+    await visit(page, `${origin}/admin/files/ltb/${keys.ltbReview}`);
     await page.getByRole('heading', { name: 'Priya Raman', level: 1 }).waitFor();
     await waitForQuiet(page);
     await page.getByRole('button', { name: 'Request documents' }).first().click();
@@ -1570,7 +1578,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   await step('scheduled client update shows a countdown and can be cancelled', async () => {
     const scheduled = state.notices.find(item => item.case_id === keys.trafficScheduled && item.status === 'pending');
     scheduled.next_attempt_at = new Date(Date.now() + 85_000).toISOString();
-    await page.goto(`${origin}/admin/files/traffic/${keys.trafficScheduled}`);
+    await visit(page, `${origin}/admin/files/traffic/${keys.trafficScheduled}`);
     await waitForQuiet(page);
     const updates = page.getByRole('region', { name: 'Client updates', exact: true });
     await updates.getByText('Scheduled').waitFor();
@@ -1581,7 +1589,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
 
   await step('file held out of the client portal: badge, tooltip, reveal', async () => {
     const held = 'MAT-2026-0009';
-    await page.goto(`${origin}/admin/other`);
+    await visit(page, `${origin}/admin/other`);
     await page.getByRole('heading', { name: 'Other matters', level: 1 }).waitFor();
     await waitForQuiet(page);
     const board = member.requests.filter(entry => entry.method === 'GET' && entry.table === 'practice_matters' && entry.params.area === 'eq.general').at(-1);
@@ -1608,7 +1616,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     await checkPage(page, 'held file on the board at 390 px');
     await page.setViewportSize(DESKTOP);
 
-    await page.goto(`${origin}/admin/files/general/${keys.generalHeld}`);
+    await visit(page, `${origin}/admin/files/general/${keys.generalHeld}`);
     await page.getByRole('heading', { name: 'Ethan Clarke', level: 1 }).waitFor();
     await waitForQuiet(page);
     const detail = member.requests.filter(entry => entry.method === 'GET' && entry.table === 'practice_matters' && entry.params.id === `eq.${keys.generalHeld}`).at(-1);
@@ -1657,7 +1665,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
 
   await step('change client email: explanation, errors, refresh', async () => {
     const daniel = state.clients.find(item => item.email === 'd.okafor@example.com');
-    await page.goto(`${origin}/admin/files/ltb/${keys.ltbRequest}`);
+    await visit(page, `${origin}/admin/files/ltb/${keys.ltbRequest}`);
     await page.getByRole('heading', { name: 'Daniel Okafor', level: 1 }).waitFor();
     await waitForQuiet(page);
     // Queue a client update first, so the change has an unsent email to cancel.
@@ -1726,7 +1734,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   await step('client update waiting to retry can be cancelled', async () => {
     const retry = state.notices.find(item => item.case_id === keys.generalOverdue && item.status === 'retry');
     retry.next_attempt_at = new Date(Date.now() + 4 * 60_000).toISOString();
-    await page.goto(`${origin}/admin/files/general/${keys.generalOverdue}`);
+    await visit(page, `${origin}/admin/files/general/${keys.generalOverdue}`);
     await page.getByRole('heading', { name: 'Northline Contracting Ltd.', level: 1 }).waitFor();
     await waitForQuiet(page);
     const updates = page.getByRole('region', { name: 'Client updates', exact: true });
@@ -1743,7 +1751,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   });
 
   await step('outcome correction on a closed file: update and Undo', async () => {
-    await page.goto(`${origin}/admin/files/traffic/${keys.trafficClosed}`);
+    await visit(page, `${origin}/admin/files/traffic/${keys.trafficClosed}`);
     await page.getByRole('heading', { name: 'Liam O’Connor', level: 1 }).waitFor();
     await waitForQuiet(page);
     await page.getByRole('button', { name: 'Change stage' }).first().click();
@@ -1775,7 +1783,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   });
 
   await step('document names cannot disguise their type', async () => {
-    await page.goto(`${origin}/admin/files/traffic/${keys.trafficNew}`);
+    await visit(page, `${origin}/admin/files/traffic/${keys.trafficNew}`);
     await page.getByRole('heading', { name: 'Jordan Mitchell', level: 1 }).waitFor();
     await waitForQuiet(page);
     const documents = page.getByRole('region', { name: 'Documents', exact: true });
@@ -1830,12 +1838,12 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     for (const [route, name] of [['/admin/today', 'today'], ['/admin/landlord', 'board-ltb'], ['/admin/traffic', 'board-traffic'],
       ['/admin/other', 'board-general'], [`/admin/files/ltb/${keys.ltbReview}`, 'file-ltb'],
       [`/admin/files/traffic/${keys.trafficUploaded}`, 'file-traffic'], [`/admin/files/general/${keys.generalDue}`, 'file-general']]) {
-      await page.goto(`${origin}${route}`);
+      await visit(page, `${origin}${route}`);
       await waitForQuiet(page);
       await checkPage(page, `${route} at 390 px`);
       await shoot(page, name);
     }
-    await page.goto(`${origin}/admin/landlord`);
+    await visit(page, `${origin}/admin/landlord`);
     await waitForQuiet(page);
     await page.getByRole('button', { name: 'List', exact: true }).click();
     await checkPage(page, 'landlord list at 390 px');
@@ -1845,7 +1853,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     await page.getByRole('dialog', { name: 'Menu' }).getByRole('link', { name: /Traffic/ }).waitFor();
     await shoot(page, 'menu', { full: false });
     await page.keyboard.press('Escape');
-    await page.goto(`${origin}/admin/files/traffic/${keys.trafficUploaded}`);
+    await visit(page, `${origin}/admin/files/traffic/${keys.trafficUploaded}`);
     await waitForQuiet(page);
     await page.getByRole('button', { name: 'Change stage' }).first().click();
     await page.getByRole('dialog', { name: 'Change stage' }).waitFor();
