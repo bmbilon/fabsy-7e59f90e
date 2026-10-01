@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import { copyFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // Builds anderhue.ca: the two app entries (client and staff) with Vite, then
 // copies every static public file beside them.
 const root = fileURLToPath(new URL('../', import.meta.url));
 const site = new URL('../ontario/anderhue-paralegal-site/', import.meta.url);
+const outDir = path.resolve(root, process.env.ANDERHUE_OUT_DIR || 'dist-anderhue');
 const config = JSON.parse(readFileSync(new URL('site-config.json', site), 'utf8'));
 const key = config.supabaseAnonKey;
 assert.ok(key, 'site-config.json must provide the public anon key');
@@ -32,5 +34,5 @@ const skip = new Set(['client.html', 'portal.html', 'README.md', 'ARCHITECTURE.m
 for (const file of readdirSync(site)) {
   const source = new URL(file, site);
   if (skip.has(file) || !statSync(source).isFile()) continue;
-  copyFileSync(source, new URL(`../dist-anderhue/${file}`, import.meta.url));
+  copyFileSync(source, pathToFileURL(path.join(outDir, file)));
 }

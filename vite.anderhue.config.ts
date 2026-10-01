@@ -16,7 +16,8 @@ export default defineConfig({
   resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
   server: { fs: { allow: [__dirname] } },
   build: {
-    outDir: path.resolve(__dirname, 'dist-anderhue'),
+    // ANDERHUE_OUT_DIR lets parallel QA builds write to separate folders.
+    outDir: process.env.ANDERHUE_OUT_DIR ? path.resolve(process.env.ANDERHUE_OUT_DIR) : path.resolve(__dirname, 'dist-anderhue'),
     emptyOutDir: true,
     rollupOptions: {
       input: {
