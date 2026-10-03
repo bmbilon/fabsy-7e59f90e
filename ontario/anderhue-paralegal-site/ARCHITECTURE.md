@@ -287,6 +287,22 @@ configuration disables npm build/install detection because the output is already
 built. Passing only `--cwd` from the Fabsy root can pick up the parent project's
 configuration and omit the AnderHue routes and headers.
 
+### Service scope update, October 2, 2026
+
+- Production deployment `dpl_wV5aU34VbmqLZqGymkGQhSVF5gZ9` limits new files to
+  LTB and traffic tickets. Public menus, homepage cards and staff new-file
+  controls offer only these two areas. `/other-matters` redirects to `/start`.
+- Migration `20261002120000_anderhue_ltb_traffic_only.sql` is applied and the
+  updated `practice-intake` function is deployed. Live requests using either
+  `other` or `general` return 400 before creating a client or matter. Historical
+  general records remain readable and editable.
+- All 49 practice tests and the PostgreSQL harness pass. Browser coverage includes
+  old intake links, the two-choice staff dialog and historical-file workflows.
+  Live Chrome at 390 px confirms the navigation and chooser without console errors.
+- Client email activation and mailbox setup remain pending as documented below.
+- Previous frontend for rollback: `anderhue-paralegal-q6roz97xz-execom.vercel.app`.
+  Rolling back the frontend does not undo the database restriction.
+
 ### Launch status, October 1, 2026
 
 - The practice-files migration is applied to `gcasbisxfrssonllpqrw` and recorded
