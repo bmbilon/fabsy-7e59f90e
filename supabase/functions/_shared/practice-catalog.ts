@@ -407,3 +407,6 @@ export function formatLongDate(isoDate: string | null | undefined): string {
     timeZone: "UTC", weekday: "short", month: "long", day: "numeric", year: "numeric",
   });
 }
+
+/** Areas available for new AnderHue files; general remains for historical records. */
+export const ANDERHUE_INTAKE_AREAS = ["ltb", "traffic"] as const;

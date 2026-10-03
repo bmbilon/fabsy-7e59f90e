@@ -76,7 +76,7 @@ export default function SignInPage({ session }: { session: Session | null }) {
         <p className="ahs-eyebrow !text-[color:var(--ah-gold-300)]">Practice workspace</p>
         <p className="ahs-display ahs-signin-title mt-4">Every file, document and client update in one place.</p>
         <p className="mt-6 max-w-[460px] text-[15px] leading-7 text-[rgb(231_223_234)]">
-          Landlord, traffic and other Ontario matters for the practice, with secure documents and timely updates for every client.
+          Landlord and Tenant Board matters and Ontario traffic tickets for the practice, with secure documents and timely updates for every client.
         </p>
       </div>
       <p className="relative z-10 text-[12.5px] text-[rgb(199_187_201)]">Private access for AnderHue Paralegal team members.</p>

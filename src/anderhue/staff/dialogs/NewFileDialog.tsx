@@ -1,9 +1,9 @@
 import { useEffect, useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GENERAL_CATEGORIES, LTB_ISSUES, TICKET_TYPES, torontoToday, type PracticeArea } from '../catalog';
+import { ANDERHUE_INTAKE_AREAS, GENERAL_CATEGORIES, LTB_ISSUES, TICKET_TYPES, torontoToday, type PracticeArea } from '../catalog';
 import { createMatter, friendlyError } from '../api';
 import { usePracticeSettings, useRefreshAfterWrite } from '../hooks';
-import { AREA_LIST, fileHref } from '../model';
+import { fileHref } from '../model';
 import { notifySuccess } from '../notify';
 import { AreaIcon, Button, Field, SelectInput, StaffDialog, TextArea, TextInput } from '../ui';
 
@@ -38,7 +38,7 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
   const practice = usePracticeSettings();
   const updatesOn = practice.data?.client_updates_enabled === true;
   const uid = useId();
-  const [area, setArea] = useState<PracticeArea>(initialArea);
+  const [area, setArea] = useState<PracticeArea>(initialArea === 'general' ? 'ltb' : initialArea);
   const [form, setForm] = useState<FormState>(EMPTY);
   const [invite, setInvite] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState | 'form', string>>>({});
@@ -46,7 +46,7 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
 
   useEffect(() => {
     if (!open) return;
-    setArea(initialArea);
+    setArea(initialArea === 'general' ? 'ltb' : initialArea);
     setForm(EMPTY);
     setErrors({});
     setInvite(true);
@@ -112,8 +112,8 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
     </>}>
     <fieldset className="min-w-0">
       <legend className="ahs-label">Practice area</legend>
-      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Practice area">
-        {AREA_LIST.map(item => {
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Practice area">
+        {ANDERHUE_INTAKE_AREAS.map(item => {
           const checked = area === item;
           return <label key={item} className={`relative flex cursor-pointer flex-col gap-0.5 rounded-[6px] border px-3 py-2 transition-colors ${checked
             ? 'border-[color:var(--ah-plum-900)] bg-[color:var(--ah-ivory-50)] shadow-[0_0_0_1px_var(--ah-plum-900)]'

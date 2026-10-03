@@ -1855,6 +1855,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     await page.getByRole('button', { name: 'New file' }).first().click();
     const dialog = page.getByRole('dialog', { name: 'New file' });
     await dialog.waitFor();
+    assert.equal(await dialog.getByRole('radio').count(), 2, 'only LTB and traffic can be opened');
     await dialog.getByText('Traffic', { exact: true }).click();
     await dialog.getByLabel('Email', { exact: true }).fill('chloe.martin@example.com');
     await dialog.getByLabel('First name').fill('Chloé');

@@ -10,7 +10,9 @@ Fabsy is the software vendor only. AnderHue Paralegal Professional Corporation (
 |---|---|---|---|---|---|
 | `ltb` | Landlords | `landlord` | `LTB-2026-0001` | `ltb_cases`, `ltb_case_documents`, `ltb_case_events` (existing) | `ltb-documents` (existing) |
 | `traffic` | Traffic Tickets | `traffic` | `TKT-2026-0001` | `practice_matters` (area `traffic`), `practice_matter_documents`, `practice_matter_events` | `practice-documents` |
-| `general` | Other Matters | `other` | `MAT-2026-0001` | `practice_matters` (area `general`), same | `practice-documents` |
+| `general` | Historical Other Matters only | Unavailable | `MAT-2026-0001` | `practice_matters` (area `general`), same | `practice-documents` |
+
+As of October 2, 2026, AnderHue accepts new LTB and traffic files only. `ANDERHUE_INTAKE_AREAS` controls the public chooser and staff creation controls. The intake API rejects `general`/`other` for AnderHue, and migration `20261002120000_anderhue_ltb_traffic_only.sql` blocks new general records at the table level, including staff RPCs. Existing general records and their workflows remain available. `/other-matters` permanently redirects to `/start`.
 
 The single source of truth for stages, outcomes, labels, client copy, intake vocabularies and upload limits is `supabase/functions/_shared/practice-catalog.ts`. The browser apps import it by relative path. SQL CHECK constraints mirror its values exactly.
 
@@ -18,9 +20,9 @@ Clients are shared across areas: `ltb_clients` is the practice client registry (
 
 ## 2. Client journey
 
-1. Visitor picks a service on anderhue.ca and presses **Start a file**, landing on `/start?area=landlord|traffic|other`.
+1. Visitor picks a service on anderhue.ca and presses **Start a file**, landing on `/start?area=landlord|traffic`.
 2. The step-by-step uploader collects documents first (drag and drop, or camera on phones), then a few details, then contact info.
-3. Submit: `ltb-intake` (landlord, existing contract) or `practice-intake` (traffic, other) opens the file and returns one-time signed upload URLs. The browser uploads each file with progress, then calls `finalize`.
+3. Submit: `ltb-intake` (landlord, existing contract) or `practice-intake` (traffic) opens the file and returns one-time signed upload URLs. The browser uploads each file with progress, then calls `finalize`.
 4. Confirmation screen shows the file number and what happens next. An email (`intake_received`) arrives from `AnderHue Paralegal <files@anderhue.ca>` with a secure link to the file. A public intake under an email that already has a file is held (`portal_visible = false`): no receipt, and it stays out of that client's portal until staff take it forward, so a stranger cannot plant files in someone else's portal.
 5. The secure link opens `/files` (the client portal): status, what happens next, key dates, documents both ways, history, upload more.
 6. Every time staff move the file to a client-visible stage, the client gets an automatic email (template approved once; staff may add a personal line). Staff can also request documents, share a document, or send an upload invite. Each email links back into the portal.

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { areaFromParam, type PracticeArea } from '../catalog';
+import { areaFromParam, ANDERHUE_INTAKE_AREAS, type PracticeArea } from '../catalog';
 import { revokePreview, type PickedFile } from '../lib/files';
 import { useDocumentTitle } from '../lib/hooks';
 import AreaChooser from './AreaChooser';
@@ -14,7 +14,8 @@ type FilesByArea = Record<PracticeArea, PickedFile[]>;
 export default function StartPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const area = areaFromParam(params.get('area'));
+  const requestedArea = areaFromParam(params.get('area'));
+  const area = ANDERHUE_INTAKE_AREAS.some(item => item === requestedArea) ? requestedArea : null;
   const step = params.get('step');
   const [filesByArea, setFilesByArea] = useState<FilesByArea>({ ltb: [], traffic: [], general: [] });
   const [sent, setSent] = useState<SentSummary | null>(() => loadSent());

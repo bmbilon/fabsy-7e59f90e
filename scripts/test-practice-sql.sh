@@ -126,3 +126,4 @@ step "migration 20260925150000_ltb_intake_pipeline" run_sql -f supabase/migratio
 step "migration 20261001150000_anderhue_practice_files" run_sql -f supabase/migrations/20261001150000_anderhue_practice_files.sql
 step "supabase/tests/ltb-intake.test.sql" run_sql -f supabase/tests/ltb-intake.test.sql
 step "supabase/tests/practice-files.test.sql" run_sql -v harness=1 -f supabase/tests/practice-files.test.sql
+step "AnderHue LTB/traffic restriction and historical files" run_sql -f supabase/tests/anderhue-areas.test.sql

@@ -8,12 +8,14 @@ The build contract (database, edge functions, routes, design tokens, go-live ord
 
 | Route | What it is | Source |
 |---|---|---|
-| `/`, `/landlords`, `/traffic-tickets`, `/other-matters`, `/privacy` | Static public pages | `*.html`, `public.css`, `site.js` in this folder |
-| `/start?area=landlord\|traffic\|other` | Step-by-step secure uploader that opens a file | `client.html` → `src/anderhue/client/` |
+| `/`, `/landlords`, `/traffic-tickets`, `/privacy` | Static public pages | `*.html`, `public.css`, `site.js` in this folder |
+| `/start?area=landlord\|traffic` | Step-by-step secure uploader that opens a file | `client.html` → `src/anderhue/client/` |
 | `/files`, `/files/:area/:id` | Client portal, opened from secure email links | `client.html` → `src/anderhue/client/` |
-| `/sign-in`, `/admin/...` | Practice staff workspace (Today, Landlord, Traffic, Other boards, file pages) | `portal.html` → `src/anderhue/staff/` |
+| `/sign-in`, `/admin/...` | Practice staff workspace (Today, Landlord and Traffic boards, file pages) | `portal.html` → `src/anderhue/staff/` |
 
-Landlord files keep using the live `ltb-intake` function and `ltb_*` tables. Traffic and other matters use `practice-intake` and `practice_matters`. The portal and client update emails cover all three (`practice-portal`, `process-practice-notices`, migration `20261001150000_anderhue_practice_files.sql`).
+Landlord files keep using the live `ltb-intake` function and `ltb_*` tables. Traffic and historical other matters use `practice-intake` and `practice_matters`. The portal and client update emails cover all three (`practice-portal`, `process-practice-notices`, migration `20261001150000_anderhue_practice_files.sql`).
+
+As of October 2, 2026, new files are limited to LTB and traffic tickets. `/other-matters` redirects to `/start`; old Other intake links show the two-area chooser. The intake API and migration `20261002120000_anderhue_ltb_traffic_only.sql` reject new AnderHue general matters, including staff-created files. Existing general files remain accessible through search, direct links and the client portal.
 
 ## Build and deploy
 

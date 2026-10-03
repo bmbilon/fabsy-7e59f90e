@@ -1,6 +1,6 @@
 import { Building2, CarFront, Scale, type LucideIcon } from 'lucide-react';
 import { ANDERHUE_PRACTICE } from '../../config';
-import type { PracticeArea } from '../catalog';
+import { ANDERHUE_INTAKE_AREAS, type PracticeArea } from '../catalog';
 
 /** Client-facing copy for each practice area in the uploader. */
 export interface AreaCopy {
@@ -17,7 +17,7 @@ export interface AreaCopy {
   nextSteps: string[];
 }
 
-export const AREA_ORDER: PracticeArea[] = ['ltb', 'traffic', 'general'];
+export const AREA_ORDER = ANDERHUE_INTAKE_AREAS;
 
 export const AREA_COPY: Record<PracticeArea, AreaCopy> = {
   ltb: {

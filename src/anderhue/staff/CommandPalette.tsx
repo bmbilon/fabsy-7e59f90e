@@ -3,9 +3,9 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Command } from 'cmdk';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, CalendarCheck2, CornerDownLeft, Plus, Search } from 'lucide-react';
-import type { PracticeArea } from './catalog';
+import { ANDERHUE_INTAKE_AREAS, type PracticeArea } from './catalog';
 import {
-  AREA_LIST, AREA_PAGE_TITLE, boardHref, compareRecent, compareUrgency, fileHref, matchesQuery, type FileWithSignals,
+  AREA_PAGE_TITLE, boardHref, compareRecent, compareUrgency, fileHref, matchesQuery, type FileWithSignals,
 } from './model';
 import { AreaIcon, Kbd, StagePill } from './ui';
 
@@ -57,12 +57,12 @@ export default function CommandPalette({ open, onOpenChange, files, loading, onN
 
   const actions: Action[] = useMemo(() => [
     { id: 'new', label: 'New file', keywords: 'new file open create add matter client phone walk-in', icon: <Plus />, run: () => { onOpenChange(false); onNewFile(); } },
-    ...AREA_LIST.map(area => ({
+    ...ANDERHUE_INTAKE_AREAS.map(area => ({
       id: `new-${area}`, label: `New ${({ ltb: 'landlord file', traffic: 'traffic ticket', general: 'other matter' })[area]}`,
       keywords: `new create ${area} ${AREA_PAGE_TITLE[area]}`, icon: <Plus />, run: () => { onOpenChange(false); onNewFile(area); },
     })),
     { id: 'today', label: 'Go to Today', keywords: 'today attention queue dashboard home', icon: <CalendarCheck2 />, run: () => go('/admin/today') },
-    ...AREA_LIST.map(area => ({
+    ...ANDERHUE_INTAKE_AREAS.map(area => ({
       id: `board-${area}`, label: `Go to ${AREA_PAGE_TITLE[area]}`, keywords: `board list ${area} ${AREA_PAGE_TITLE[area]}`,
       icon: <AreaIcon area={area} />, run: () => go(boardHref(area)),
     })),

@@ -146,7 +146,7 @@ const trafficForm = (overrides = {}) => ({
   ...overrides,
 });
 const generalForm = (overrides = {}) => ({
-  action: "submit", area: "general", name: "Sam Client", email: "sam@example.com",
+  action: "submit", practiceId: "other-practice", area: "general", name: "Sam Client", email: "sam@example.com",
   notes: "My former landlord kept my deposit.", category: "small_claims", deadline: "2026-11-15",
   otherParty: "Acme Property Ltd.", clientCity: "Hamilton", company: "", elapsedMs: 9000, files: [],
   ...overrides,
@@ -1837,4 +1837,17 @@ test("copy: user-facing messages are plain sentences without em dashes", () => {
     const source = readFileSync(path.join(root, "supabase/functions", file), "utf8");
     assert.equal(source.includes(EM_DASH), false, `${file} has no em dash`);
   }
+});
+
+
+test("AnderHue rejects new Other Matters submissions including aliases and default practice", async () => {
+  const { handler, state } = intakeFixture();
+  for (const area of ['general', 'other']) {
+    for (const practiceId of ['anderhue-paralegal', undefined]) {
+      const response = await post(handler, INTAKE_URL, generalForm({ area, practiceId }));
+      assert.equal(response.status, 400);
+      assert.match((await response.json()).error, /only Landlord and Tenant Board matters and traffic tickets/);
+    }
+  }
+  assert.equal(state.calls.length, 0, 'rejected before creating clients, files, uploads or notices');
 });

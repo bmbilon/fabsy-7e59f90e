@@ -41,6 +41,7 @@ export const staffKeys = {
 // ---------------------------------------------------------------------------
 
 const ERROR_MESSAGES: Record<string, string> = {
+  PRACTICE_AREA_UNAVAILABLE: 'AnderHue accepts only Landlord and Tenant Board matters and traffic tickets.',
   PRACTICE_CASE_NOT_FOUND: 'This file is not available to your account.',
   PRACTICE_CLIENT_NOT_FOUND: 'This client is not available to your account.',
   PRACTICE_STAGE_INVALID: 'That stage is not available for this file.',

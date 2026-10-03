@@ -28,6 +28,9 @@
     { "source": "/admin", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
     { "source": "/admin/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
   ],
+  "redirects": [
+    { "source": "/other-matters", "destination": "/start", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/start", "destination": "/client" },
     { "source": "/start/:path*", "destination": "/client" },

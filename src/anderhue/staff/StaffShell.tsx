@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { CalendarCheck2, LogOut, Menu, Plus, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { PracticeArea } from './catalog';
+import { ANDERHUE_INTAKE_AREAS, type PracticeArea } from './catalog';
 import CommandPalette from './CommandPalette';
 import NewFileDialog from './dialogs/NewFileDialog';
 import { isTypingTarget, searchShortcutLabel } from './format';
 import { useWorkspace } from './hooks';
-import { AREA_LIST, AREA_PAGE_TITLE, boardHref } from './model';
+import { AREA_PAGE_TITLE, boardHref } from './model';
 import { StaffUiContext, useStaffSession, type StaffUiValue } from './session';
 import { AreaIcon, Button, CrestMark, Kbd, StaffSheet } from './ui';
 
@@ -31,7 +31,7 @@ function SidebarContent({ counts, loading, onNewFile, onSearch }: {
     { href: '/admin/today', label: 'Today', icon: <CalendarCheck2 aria-hidden="true" />, count: counts.today, alert: true,
       active: pathname.startsWith('/admin/today'), exact: pathname.startsWith('/admin/today'),
       hint: 'files need attention' },
-    ...AREA_LIST.map(item => ({
+    ...ANDERHUE_INTAKE_AREAS.map(item => ({
       href: boardHref(item), label: { ltb: 'Landlord', traffic: 'Traffic', general: 'Other' }[item],
       icon: <AreaIcon area={item} />, count: counts[item], alert: false,
       active: area === item, exact: pathname === boardHref(item), hint: 'active files',

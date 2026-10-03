@@ -886,40 +886,16 @@ async function trafficFlow(ctx, kind) {
   await s.close();
 }
 
-async function otherFlow(ctx, kind) {
+async function unsupportedArea(ctx, kind) {
   const s = await openPage(ctx, kind);
-  const { page, api } = s;
-  await page.goto(`${ctx.origin}/start?area=other`);
-  await page.getByRole('heading', { name: 'Add your documents' }).waitFor();
-  await continueButton(page).click();
-  await page.getByRole('heading', { name: 'About your matter' }).waitFor();
-  await page.getByLabel('What do you need help with?').fill('Help');
-  await continueButton(page).click();
-  await page.getByText('Tell us a little more, at least 10 characters.').waitFor();
-  await shot(ctx, s, '14-other-details-errors');
-  await page.getByLabel('What kind of matter is it?').selectOption('small_claims');
-  await page.getByLabel('What do you need help with?').fill('A contractor kept my $3,800 deposit and never started the work. I want to file a claim to get it back.');
-  await page.getByLabel(/^Any deadline/).fill('2026-12-15');
-  await page.getByLabel(/^Your city/).fill('Oshawa');
-  await page.getByLabel(/^The other party/).fill('Lakeshore Renovations Ltd.');
-  await continueButton(page).click();
-  await page.getByLabel('Full name').fill('Grace Okafor');
-  await page.getByLabel('Email').fill('grace.okafor@example.com');
-  await continueButton(page).click();
-  await page.getByText('No documents yet. You can add them later from your file link.').waitFor();
-  await shot(ctx, s, '15-other-review');
-  await page.getByRole('button', { name: 'Send my file' }).click();
-  await page.getByRole('heading', { name: 'Your file is open' }).waitFor({ timeout: 20000 });
-  assert.match(await page.getByTestId('file-number').innerText(), /^MAT-2026-\d{4}$/);
-  await shot(ctx, s, '16-other-success');
-  const [submit] = api.actions('practice-intake', 'submit');
-  assert.equal(submit.body.area, 'general');
-  assert.equal(submit.body.category, 'small_claims');
-  assert.equal(submit.body.deadline, '2026-12-15');
-  assert.equal(submit.body.clientCity, 'Oshawa');
-  assert.equal(submit.body.otherParty, 'Lakeshore Renovations Ltd.');
-  assert.deepEqual(submit.body.files, []);
-  assert.equal(api.actions('practice-intake', 'finalize').length, 0, 'no finalize without documents');
+  for (const query of ['', '?area=other', '?area=general&step=contact', '?area=other&step=sent']) {
+    await s.page.goto(`${ctx.origin}/start${query}`);
+    await s.page.getByRole('heading', { name: 'What can we help with?' }).waitFor();
+    const choices = s.page.getByRole('list', { name: 'Kinds of matter' });
+    assert.equal(await choices.getByRole('link').count(), 2);
+    assert.equal(await choices.getByRole('link', { name: /Something else|Other/ }).count(), 0);
+  }
+  assert.equal(s.api.actions('practice-intake', 'submit').length, 0);
   await s.close();
 }
 
@@ -930,10 +906,9 @@ async function intakeErrors(ctx, kind) {
   // Firefox describes the deliberately aborted practice-intake request as CORS.
   s.console.allow(/Cross-Origin Request Blocked:.*\/functions\/v1\/practice-intake\. \(Reason: CORS request did not succeed\)\. Status code: \(null\)/);
   const { page, api } = s;
-  await page.goto(`${ctx.origin}/start?area=other`);
+  await page.goto(`${ctx.origin}/start?area=traffic`);
   await continueButton(page).click();
-  await page.getByLabel('What kind of matter is it?').selectOption('tribunal');
-  await page.getByLabel('What do you need help with?').fill('I received a notice of hearing from a tribunal and need representation.');
+  await page.getByLabel('What is the ticket for?').selectOption('speeding');
   await continueButton(page).click();
   await page.getByLabel('Full name').fill('Sam Ortiz');
   await page.getByLabel('Email').fill('sam.ortiz@example.com');
@@ -1184,7 +1159,7 @@ async function narrowChecks(ctx) {
   await s.close();
 }
 
-export const SCENARIOS = { landlordFlow, trafficFlow, otherFlow, intakeErrors, portalSignIn, portalFiles, portalTokenSwitch };
+export const SCENARIOS = { landlordFlow, trafficFlow, unsupportedArea, intakeErrors, portalSignIn, portalFiles, portalTokenSwitch };
 
 /**
  * Runs every scenario at 390x844 (touch) and 1440x900, then the 360 px checks.

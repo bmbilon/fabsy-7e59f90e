@@ -57,9 +57,16 @@ export function vercelHeaders(root, { local = true } = {}) {
 
 export async function startAnderhueServer(root = path.resolve('dist-anderhue'), { headers = true } = {}) {
   const headersFor = headers ? vercelHeaders(root) : () => ({});
+  const configFile = path.join(root, 'vercel.json');
+  const redirects = existsSync(configFile) ? JSON.parse(readFileSync(configFile, 'utf8')).redirects || [] : [];
   const server = createServer((request, response) => {
     const url = new URL(request.url, 'http://localhost');
     const pathname = url.pathname;
+    const redirect = redirects.find(rule => rule.source === pathname);
+    if (redirect) {
+      response.writeHead(redirect.permanent ? 308 : 307, { Location: redirect.destination }).end();
+      return;
+    }
     // Serve a real HTTP attachment: WebKit cannot emit download events for
     // route.fulfill() PDFs (playwright#22691). This endpoint exists only in QA.
     if (pathname === '/__qa__/download.pdf' || pathname === '/__qa__/preview.pdf') {
