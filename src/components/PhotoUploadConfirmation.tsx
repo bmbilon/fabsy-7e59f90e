@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import type { FormData } from "./TicketForm";
 import { Button } from "./ui/button";
@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import IntakeProgress from "./IntakeProgress";
 import PaymentStep from "./form-steps/PaymentStep";
+import PortalLookupStep from "./PortalLookupStep";
 import { photoIntakeAction, type PhotoIntakeStatus } from "@/lib/ticket/photoIntake";
 import type { SavedTicketSubmission } from "@/lib/ticket/submitIntake";
 
@@ -23,6 +24,9 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
   const [error, setError] = useState("");
   const [status, setStatus] = useState<PhotoIntakeStatus | null>(null);
   const [owner, setOwner] = useState("");
+  const [lookupSavedFor, setLookupSavedFor] = useState<string | null>(null);
+  const lookupKey = saved.submissionId + '/' + saved.accessToken;
+  const onLookupSaved = useCallback((complete: boolean) => setLookupSavedFor(complete ? lookupKey : null), [lookupKey]);
   const emailInput = useRef<HTMLInputElement>(null);
   const inFlight = useRef(false);
   const onFields = useRef(updateFormData);
@@ -102,6 +106,7 @@ export default function PhotoUploadConfirmation({ saved, formData, updateFormDat
       </select>
       <Button onClick={saveOwner} disabled={busy || !owner}>Continue to payment</Button>
     </div>}
-    {ready && !needsOwner && <PaymentStep formData={{ ...formData, ...status.fields }} updateFormData={updateFormData} savedSubmission={saved} />}
+    {ready && !needsOwner && <PortalLookupStep key={lookupKey} submissionId={saved.submissionId} accessToken={saved.accessToken} ticketNumber={status.fields.ticketNumber} onSaved={onLookupSaved} />}
+    {ready && !needsOwner && lookupSavedFor === lookupKey && <PaymentStep formData={{ ...formData, ...status.fields }} updateFormData={updateFormData} savedSubmission={saved} />}
   </section>;
 }

@@ -37,8 +37,8 @@ const compiled = await build({
         if (root) await act(async () => root.unmount());
       }
       export async function changeText(node, value) {
-        const prototype = node instanceof HTMLTextAreaElement
-          ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+        const prototype = node instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype
+          : node instanceof HTMLSelectElement ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
         await act(async () => {
           Object.getOwnPropertyDescriptor(prototype, 'value').set.call(node, value);
           node.dispatchEvent(new Event('input', { bubbles: true }));
@@ -138,6 +138,8 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
   let failConsent = false;
   let failContact = false;
   let failPrepare = false;
+  let lookupSaved = false;
+  let failLookup = false;
   let reviewStatus = "needs_review";
   let ticketType = "officer_issued";
   let registeredOwner = "";
@@ -168,6 +170,14 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
   window.IS_REACT_ACT_ENVIRONMENT = true;
   window.__ticketReviewBackend = {
     invoke(name, options) {
+      if (name === "initial-disclosure-agent") {
+        saves.push({ name: options.body.action, body: options.body });
+        if (options.body.action === "client-lookup-save") {
+          if (failLookup) return Promise.resolve({ data: null, error: new window.Error("Lookup save failed") });
+          lookupSaved = options.body.verified === true;
+        }
+        return Promise.resolve({ data: { saved: lookupSaved, ticket_number: "SCANNED-TICKET" }, error: null });
+      }
       if (name === "photo-ticket-intake") {
         saves.push({ name: options.body.action, body: options.body });
         if (options.body.action === "prepare") {
@@ -276,8 +286,14 @@ async function runtime(t, props = {}, { cacheKey, contactSaved = false, entry = 
     if (!document.querySelector('input[type="radio"]:checked')) await api.click(document.querySelector('input[value="officer_issued"]'));
     if (!field("quick-email").value) await edit("quick-email", "alex@example.test");
     if (!field("quick-consent").checked) await api.click(field("quick-consent")); };
+  const saveLookup = async (kind = "plate", value = "ABC1234") => {
+    await edit("client-lookup-kind", kind); await edit("client-lookup-value", value);
+    const checkbox = document.querySelector('#portal-lookup-heading').parentElement.querySelector('input[type=checkbox]');
+    if (!checkbox.checked) await api.click(checkbox);
+    await api.click(button("Save lookup detail and continue")); await flush();
+  };
   return { window, document, api, requests, cacheRequests, saves, flush, until, button, buttons, continueBlocked, continueEnabled, hiddenDetails, file, choose, waitForScan, finish, field, edit, fill, accept,
-    failUpload: value => { failUpload = value; }, failConsent: value => { failConsent = value; }, failContact: value => { failContact = value; }, failPrepare: value => { failPrepare = value; }, readyForPayment: () => { reviewStatus = "ready"; } };
+    saveLookup, failLookup: value => { failLookup = value; }, failUpload: value => { failUpload = value; }, failConsent: value => { failConsent = value; }, failContact: value => { failContact = value; }, failPrepare: value => { failPrepare = value; }, readyForPayment: () => { reviewStatus = "ready"; } };
 }
 
 test("the upload form shows price, ticket type and email without waiting for OCR or collecting identity", async t => {
@@ -378,6 +394,7 @@ test("camera service carries through ownership confirmation to the $79 checkout"
     select.dispatchEvent(new app.window.Event("change", { bubbles: true }));
   });
   await app.api.click(app.button("Continue to payment")); await app.flush();
+  await app.saveLookup();
   await app.api.click(app.button("$79 + GST")); await app.flush();
   const payment = app.saves.find(x => x.name === "create-payment");
   const prepared = app.saves.find(x => x.name === "prepare");
@@ -503,6 +520,7 @@ test("checkout reuses the completed upload after contact details and background 
   await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   await app.edit("updates-email", "alex@example.test"); await app.api.click(app.button("Save contact details")); await app.flush();
   assert.equal(app.document.getElementById("payment-terms"), null);
+  await app.saveLookup();
   await app.api.click(app.button("Continue to Stripe for $198.00 CAD plus GST")); await app.flush();
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
   assert.equal(app.saves.filter(x => x.name === "upload").length, 1);
@@ -526,6 +544,7 @@ test("saving email at prepare skips the contact screen and proceeds to reviewed 
   assert.equal(app.saves[0].body.email, "alex@example.test");
   assert.equal(app.document.getElementById("updates-email"), null);
   assert.match(app.document.body.textContent, /Ticket and contact details received/);
+  await app.saveLookup();
   await app.api.click(app.button("Continue to Stripe for $198.00 CAD plus GST")); await app.flush();
   assert.equal(app.saves.find(x => x.name === "create-payment").body.formData.email, "alex@example.test");
   assert.equal(app.saves.filter(x => x.name === "prepare").length, 1);
@@ -571,6 +590,7 @@ test("a bundle entry retains the selected add-on through reviewed checkout", asy
   await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.equal(app.saves[0].body.bundleRequested, true);
   assert.equal(app.saves[0].body.landingPage, "rapid-resolution");
+  await app.saveLookup();
   await app.api.click(app.button("Continue to Stripe for $229.00 CAD plus GST")); await app.flush();
   assert.equal(app.saves.find(x => x.name === "create-payment").body.includeIdrAddon, true);
 });
@@ -581,4 +601,31 @@ test("the alternate entry survives client preparation", async t => {
   await app.choose(app.file()); await app.accept();
   await app.api.click(app.button("Save my ticket and continue")); await app.flush();
   assert.equal(app.saves[0].body.landingPage, "rapid-resolution-alt");
+});
+
+test("lookup details must be saved for the exact upload before checkout appears", async t => {
+  const app = await runtime(t, {}, { contactSaved: true }); app.readyForPayment();
+  await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+  assert.equal(app.buttons("Continue to Stripe for $198.00 CAD plus GST").length, 0);
+  assert.equal(app.document.querySelector('#portal-lookup-heading').parentElement.querySelector('input[type=checkbox]').checked, false);
+  app.failLookup(true); await app.saveLookup();
+  assert.equal(app.buttons("Continue to Stripe for $198.00 CAD plus GST").length, 0);
+  assert.equal(app.field("client-lookup-value").value, "ABC1234");
+  app.failLookup(false); await app.saveLookup();
+  assert.equal(app.buttons("Continue to Stripe for $198.00 CAD plus GST").length, 1);
+  const saved = app.saves.filter(item => item.name === 'client-lookup-save').at(-1).body;
+  const prepared = app.saves.find(item => item.name === 'prepare').body;
+  assert.equal(saved.submissionId, prepared.submissionId); assert.equal(saved.accessToken, prepared.accessToken);
+  assert.equal(saved.kind, 'plate'); assert.equal(saved.value, 'ABC1234'); assert.equal(saved.verified, true);
+});
+
+test("a client can provide either a DL or DOB without supplying the other identifiers", async t => {
+  for (const [kind,value] of [['drivers_license','123456-789'],['date_of_birth','1990-02-28']]) await t.test(kind, async sub => {
+    const app = await runtime(sub, {}, { contactSaved: true }); app.readyForPayment();
+    await app.choose(app.file()); await app.accept(); await app.api.click(app.button("Save my ticket and continue")); await app.flush();
+    await app.saveLookup(kind,value);
+    const saved=app.saves.find(item=>item.name==='client-lookup-save').body;
+    assert.equal(saved.kind,kind); assert.equal(saved.value,kind==='drivers_license'?'123456789':value);
+    assert.equal(app.buttons("Continue to Stripe for $198.00 CAD plus GST").length, 1);
+  });
 });

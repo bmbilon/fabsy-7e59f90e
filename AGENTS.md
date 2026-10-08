@@ -6,6 +6,10 @@
 - These pages collect the customer's name, email, standard service selection, and applicable authorization/payment. Tickets may be uploaded or emailed using the same email.
 - Do not create a client-specific page, private link, case record, or deployment for an ordinary link request. Use the existing universal page. Older private links remain supported for existing cases.
 
+## Ticket client identity
+
+- Always display the legal defendant's name exactly as printed on their ticket, preserving capitalization, name order and punctuation. For example, `HOGENHOUT, JAMES EDWARD` is listed that way. Keep given and family names separate where forms require them, and record payers, signers and contacts as distinct roles.
+
 ## Project Overview
 This is a React/TypeScript application for traffic ticket defense services in Alberta, Canada. The application includes:
 
