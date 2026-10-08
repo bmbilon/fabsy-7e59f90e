@@ -15,7 +15,7 @@ export function normalizePortalLookup(kind: unknown, raw: unknown, today = new D
   }
   if (!/^[A-Za-z0-9 .-]+$/.test(raw.trim())) throw new Error('VERIFICATION_DETAIL_INVALID');
   const value = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (/^(?:UNKNOWN|NOTSUPPLIED|NOTPROVIDED|PENDING|PLACEHOLDER)$/.test(value) || /^PHOTOINTAKE/.test(value)
+  if (/^(?:UNKNOWN|NOTSUPPLIED|NOTPROVIDED|PENDING|PLACEHOLDER|NA|NONE|NULL)$/.test(value) || /^PHOTOINTAKE/.test(value)
     || !(kind === 'plate' ? /^[A-Z0-9]{2,12}$/ : /^[A-Z0-9]{5,30}$/).test(value)) throw new Error('VERIFICATION_DETAIL_INVALID');
   return value;
 }

@@ -1,0 +1,7 @@
+# Resolved scope
+
+The conversation establishes the missing first step, cloud hosting, automatic payment/consent dispatch and the September 26 session-terms policy. James's explicit payment confirmation and electronic not-guilty instruction are recorded. A source or authority mismatch must hold rather than infer facts. Future intakes are prospective; James is the only explicitly requested historical admission. No additional product decision is needed before implementation.
+
+The user accepts plate, DL or DOB as the lookup identifier and requires the printed ticket name consistently. E02605341B's actual Part 3 notice and signed consent contain none of those identifiers; the original consent attachment has an empty driver's licence value. No value may be inferred from the officer number, address or ticket dates. The mobile clipboard fix can expose a saved value but cannot recover data that was never supplied.
+
+The October 8 follow-up requires one identifier from the client before accepting a representation checkout, independent of upload count. Storage contains one image for E02605341B. There is no reverse-side evidence, so do not claim a second side would supply DOB/DL/plate. The universal order can precede ticket upload; collecting its identifier does not authorize email-only case matching or relax signer authority. Historical completed charges must continue to reconcile, and existing provider-hosted payment URLs are not retroactively cancelled by this change.

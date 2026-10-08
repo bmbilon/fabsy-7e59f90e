@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, CreditCard, Loader2, LockKeyhole } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import useSafeHead from "@/hooks/useSafeHead";
+import PortalLookupStep from "@/components/PortalLookupStep";
 import { captureManualRepresentationCredentials, functionInvokeMessage, type ManualRepresentationRecord } from "@/lib/manualRepresentation";
 import {
   checkoutAuthorization, CHECKOUT_CONSENT_VERSION, CHECKOUT_PLEA_INSTRUCTION,
@@ -23,6 +24,8 @@ export default function ManualCheckout() {
   const [pleadNotGuilty, setPleadNotGuilty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [lookupSaved, setLookupSaved] = useState(false);
+  const onLookupSaved = useCallback((saved: boolean) => setLookupSaved(saved), []);
   const submitting = useRef(false);
   useSafeHead({ title: "Consent and Payment | Fabsy", robots: "noindex, nofollow, noarchive" });
 
@@ -52,6 +55,7 @@ export default function ManualCheckout() {
 
   const continueCheckout = async () => {
     if (!record || !credentials || submitting.current || ["paid", "unavailable"].includes(record.paymentState) || (!record.consentAccepted && !record.consentSigned && !accepted)) return;
+    if (record.consentSigned && !lookupSaved) return;
     submitting.current = true; setBusy(true); setError("");
     try {
       if (!record.consentAccepted && !record.consentSigned) {
@@ -67,6 +71,10 @@ export default function ManualCheckout() {
         if (failure || !data?.success || !data.consentFormPath) throw new Error(await functionInvokeMessage(failure, "Your consent document could not be saved. Please try again before paying."));
         setRecord(current => current ? { ...current, consentSigned: true } : current);
       }
+      const lookup = await supabase.functions.invoke("initial-disclosure-agent", { body: { action: "client-lookup-status", ...credentials } });
+      if (lookup.error || typeof lookup.data?.saved !== "boolean") throw new Error("Your authorization is saved. Confirm a ticket lookup detail before continuing to payment.");
+      if (!lookup.data.saved) return;
+      setLookupSaved(true);
       const { data, error: failure } = await supabase.functions.invoke("create-payment", { body: {
         ...credentials, clientId: record.clientId, includeIdrAddon: false,
         formData: { email: record.email, firstName: record.firstName, lastName: record.lastName, ticketNumber: record.ticketNumber },
@@ -92,7 +100,8 @@ export default function ManualCheckout() {
             <div className="flex items-start gap-3 rounded-lg border p-4"><Checkbox id="checkout-plea" checked={pleadNotGuilty} disabled={busy} onCheckedChange={value => setPleadNotGuilty(value === true)} /><div><Label htmlFor="checkout-plea" className="cursor-pointer font-semibold">{NOT_GUILTY_PLEA_LABEL}</Label><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{CHECKOUT_PLEA_INSTRUCTION}</p><p className="mt-2 text-xs text-muted-foreground">If left unchecked, Fabsy must obtain your instructions before entering a plea.</p></div></div>
           </>}
           {error ? <Alert variant="destructive"><AlertTitle>Checkout could not continue</AlertTitle><AlertDescription>{error}</AlertDescription></Alert> : null}
-          <Button size="lg" className="w-full whitespace-normal" disabled={!payable || busy || (!consentRecorded && !accepted)} onClick={() => void continueCheckout()}>{busy ? <Loader2 className="mr-2 h-5 w-5 shrink-0 animate-spin" /> : <CreditCard className="mr-2 h-5 w-5 shrink-0" />}{busy ? "Saving and opening checkout…" : record.paymentState === "open" ? "Resume secure payment" : "Continue to secure payment"}</Button>
+          {record.consentSigned && credentials && <PortalLookupStep submissionId={credentials.submissionId} accessToken={credentials.accessToken} ticketNumber={record.ticketNumber} onSaved={onLookupSaved} />}
+          <Button size="lg" className="w-full whitespace-normal" disabled={!payable || busy || (!consentRecorded && !accepted) || (record.consentSigned && !lookupSaved)} onClick={() => void continueCheckout()}>{busy ? <Loader2 className="mr-2 h-5 w-5 shrink-0 animate-spin" /> : <CreditCard className="mr-2 h-5 w-5 shrink-0" />}{busy ? "Saving and opening checkout…" : record.paymentState === "open" ? "Resume secure payment" : "Continue to secure payment"}</Button>
           <p className="text-center text-xs text-muted-foreground">You’ll enter your payment details and complete your purchase securely with Stripe.</p>
         </CardContent></Card>}
       </>}

@@ -10,6 +10,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { functionInvokeMessage } from "@/lib/manualRepresentation";
 import useSafeHead from "@/hooks/useSafeHead";
+import PortalLookupFields, { emptyPortalLookup } from "@/components/PortalLookupFields";
+import { normalizePortalLookup } from "../../supabase/functions/_shared/portal-lookup-values";
 import { SERVICE_PRODUCTS, SERVICE_CONSENT_VERSION, SERVICE_CONFIRMATION, SERVICE_PLEA, SERVICE_PURCHASE_TERMS,
   serviceProduct, serviceAuthorization, type ServiceMode, type ServiceProductKey } from "../../supabase/functions/_shared/service-checkout";
 
@@ -44,10 +46,16 @@ export default function ServiceCheckout() {
   const [terms, setTerms] = useState(false);
   const [plea, setPlea] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [lookup, setLookup] = useState(emptyPortalLookup);
+  const [lookupSavedFor, setLookupSavedFor] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const submitting = useRef(false);
   const product = serviceProduct(productKey || "photo_radar");
+  const requiresLookup = order ? order.product !== "insurance_report" : Boolean(productKey) && product.representation;
+  const lookupSaved = Boolean(credentials && lookupSavedFor === credentials.orderId + "/" + credentials.accessToken);
+  let lookupValid = false;
+  try { normalizePortalLookup(lookup.kind, lookup.value); lookupValid = lookup.confirmed; } catch { /* One valid identifier is required. */ }
   useSafeHead({ title: "Consent and Payment | Fabsy", robots: "noindex, nofollow, noarchive" });
 
   async function call(body: Record<string, unknown>) {
@@ -55,12 +63,24 @@ export default function ServiceCheckout() {
     if (failure || data?.error) throw new Error(data?.error || await functionInvokeMessage(failure, "Please try again. Your saved request will be reused."));
     return data;
   }
+  async function lookupCall(body: Record<string, unknown>) {
+    const { data, error: failure } = await supabase.functions.invoke("initial-disclosure-agent", { body });
+    if (failure || typeof data?.saved !== "boolean") throw new Error("Your ticket lookup detail could not be saved. Please try again before continuing.");
+    return data as { saved: boolean };
+  }
   useEffect(() => {
     let active = true;
     if (credentials) saveCredentials(credentials);
     window.history.replaceState(window.history.state, "", window.location.pathname);
     if (!credentials) { setLoading(false); return; }
-    void call({ action: "status", ...credentials }).then(data => { if (active) setOrder(data.order); }).catch(caught => { if (active) setError(caught.message); }).finally(() => { if (active) setLoading(false); });
+    void call({ action: "status", ...credentials }).then(async data => {
+      if (!active) return;
+      setOrder(data.order);
+      if (data.order.product !== "insurance_report") {
+        const detail = await lookupCall({ action: "order-lookup-status", ...credentials });
+        if (active && detail.saved) setLookupSavedFor(credentials.orderId + "/" + credentials.accessToken);
+      }
+    }).catch(caught => { if (active) setError(caught.message); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
     // Capture the return capability once; subsequent mutations update order directly.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,6 +90,7 @@ export default function ServiceCheckout() {
     try { sessionStorage.removeItem(storageKey); } catch { /* No stored request. */ }
     setCredentials(null); setOrder(null); setForm({ name: "", email: "", representedName: "", ticketNumber: "" });
     setAccepted(false); setTerms(false); setPlea(false); setFile(null); setError(""); setLoading(false);
+    setLookup(emptyPortalLookup()); setLookupSavedFor("");
   }
   async function upload(creds: Credentials) {
     if (!file) return;
@@ -86,9 +107,16 @@ export default function ServiceCheckout() {
     if (submitting.current) return;
     submitting.current = true; setBusy(true); setError("");
     try {
+      if (requiresLookup && !lookupSaved && !lookupValid) throw new Error("Provide a valid licence plate, driver’s licence number or date of birth and confirm it belongs to this ticket.");
       const creds = credentials || newCredentials();
       setCredentials(creds); saveCredentials(creds);
       let current = order;
+      if (requiresLookup && !lookupSaved) {
+        const detail = await lookupCall({ action: "order-lookup-save", ...creds, product: current?.product || productKey,
+          ticketNumber: current?.ticketNumber || form.ticketNumber, kind: lookup.kind, value: normalizePortalLookup(lookup.kind, lookup.value), verified: lookup.confirmed });
+        if (!detail.saved) throw new Error("Your ticket lookup detail was not saved. Please try again.");
+        setLookupSavedFor(creds.orderId + "/" + creds.accessToken); setLookup(emptyPortalLookup());
+      }
       if (!current) {
         const data = await call({ action: "prepare", ...creds, ...form, product: productKey, mode, consentAccepted: accepted,
           consentVersion: SERVICE_CONSENT_VERSION, termsAccepted: mode === "payment" ? terms : accepted, pleadNotGuilty: plea, registeredOwner: productKey === "photo_radar" && accepted });
@@ -122,7 +150,8 @@ export default function ServiceCheckout() {
   };
   const fileInput = <div className="space-y-2"><Label htmlFor="service-file">Ticket or supporting document (optional)</Label><Input id="service-file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif" disabled={busy} onChange={event => chooseFile(event.target.files?.[0])} /><p className="text-xs text-muted-foreground">Photo or PDF, up to 10 MB. Already emailed it? You can leave this blank.</p></div>;
   const needsConsent = mode !== "payment";
-  const ready = Boolean(productKey) && (needsConsent ? accepted : terms);
+  const ready = Boolean(productKey) && (needsConsent ? accepted : terms) && (!requiresLookup || lookupSaved || lookupValid);
+  const lookupFields = <PortalLookupFields lookup={lookup} onChange={setLookup} disabled={busy} />;
 
   return <div className="min-h-screen bg-slate-50 text-slate-900">
     <header className="border-b bg-white"><div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-5"><Link to="/" className="text-2xl font-bold tracking-tight text-primary">fabsy</Link><span className="flex items-center gap-2 text-xs text-slate-500"><LockKeyhole className="h-4 w-4" />Secure checkout</span></div></header>
@@ -136,7 +165,9 @@ export default function ServiceCheckout() {
           <p>{order.consentSaved ? "Your service authorization is saved." : "This was a payment-only request. Service authorization is still required if it has not already been provided."}</p>
           {order.consentSaved && <Button type="button" variant="outline" onClick={() => void consentCopy()}>Download my authorization</Button>}
           {order.mode !== "consent" && <p className="text-lg font-semibold">{money(order.totalCents)} CAD including GST</p>}
-          {!["paid", "refunded", "disputed"].includes(order.paymentStatus) && order.mode !== "consent" && <Button className="w-full min-h-12" disabled={busy} onClick={() => void submit()}>{busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CreditCard className="mr-2 h-4 w-4" />}Continue to secure payment</Button>}
+          {requiresLookup && (lookupSaved ? <p role="status" className="text-sm text-emerald-700">Your ticket lookup detail is saved.</p> : lookupFields)}
+          {!["paid", "refunded", "disputed"].includes(order.paymentStatus) && order.mode !== "consent" && <Button className="w-full min-h-12" disabled={busy || (requiresLookup && !lookupSaved && !lookupValid)} onClick={() => void submit()}>{busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CreditCard className="mr-2 h-4 w-4" />}Continue to secure payment</Button>}
+          {requiresLookup && !lookupSaved && (order.mode === "consent" || order.paymentStatus === "paid") && <Button className="w-full min-h-12" disabled={busy || !lookupValid} onClick={() => void submit()}>Save ticket lookup detail</Button>}
           {["refunded", "disputed"].includes(order.paymentStatus) && <p>Payment status: {order.paymentStatus}. Contact Fabsy for help with this order.</p>}
         </CardContent></Card>
         <Card><CardContent className="space-y-4 pt-6"><h2 className="text-lg font-semibold">Your documents</h2>{order.ticketUploaded ? <p className="text-sm text-emerald-700">Your document is saved with this request.</p> : <>{fileInput}<Button variant="outline" disabled={!file || busy} onClick={() => void uploadLater()}>Upload document</Button></>}
@@ -146,16 +177,17 @@ export default function ServiceCheckout() {
         <Button variant="ghost" disabled={busy} onClick={reset}>Start a new request</Button>
       </> : <form className="space-y-6" onSubmit={event => void submit(event)}><fieldset disabled={busy} className="space-y-6">
         <Card><CardContent className="space-y-5 pt-6"><div className="space-y-2"><Label htmlFor="service-mode">What would you like to complete?</Label><select id="service-mode" className="h-11 w-full rounded-md border bg-white px-3 text-sm" value={mode} onChange={event => { setMode(event.target.value as ServiceMode); setAccepted(false); setPlea(false); setTerms(false); }}><option value="both">Consent and payment</option><option value="consent">Consent only</option><option value="payment">Payment only</option></select></div>
-          <div className="space-y-2"><Label htmlFor="service-product">Service</Label><select id="service-product" className="h-11 w-full rounded-md border bg-white px-3 text-sm" required value={productKey} onChange={event => { setProduct(event.target.value as ServiceProductKey); setAccepted(false); setPlea(false); setTerms(false); }}><option value="" disabled>Choose your service</option>{SERVICE_PRODUCTS.map(p => <option key={p.key} value={p.key}>{p.name} — {money(p.cents)} + GST</option>)}</select><p className="text-sm text-muted-foreground">{productKey ? product.description : "Select the service you need."}</p></div>
+          <div className="space-y-2"><Label htmlFor="service-product">Service</Label><select id="service-product" className="h-11 w-full rounded-md border bg-white px-3 text-sm" required value={productKey} onChange={event => { setProduct(event.target.value as ServiceProductKey); setAccepted(false); setPlea(false); setTerms(false); setLookup(emptyPortalLookup()); setLookupSavedFor(""); }}><option value="" disabled>Choose your service</option>{SERVICE_PRODUCTS.map(p => <option key={p.key} value={p.key}>{p.name} — {money(p.cents)} + GST</option>)}</select><p className="text-sm text-muted-foreground">{productKey ? product.description : "Select the service you need."}</p></div>
           {productKey && mode !== "consent" ? <div className="rounded-lg bg-slate-50 p-4 text-sm"><div className="flex justify-between"><span>Service fee</span><span>{money(product.cents)}</span></div><div className="mt-2 flex justify-between"><span>GST (5%)</span><span>{money(product.gstCents)}</span></div><div className="mt-3 flex justify-between border-t pt-3 text-lg font-bold"><span>Total CAD</span><span>{money(product.totalCents)}</span></div></div> : mode === "consent" ? <p className="rounded-lg bg-slate-50 p-4 text-sm">No payment will be collected for this request.</p> : null}
         </CardContent></Card>
         <Card><CardContent className="space-y-4 pt-6"><h2 className="text-lg font-semibold">Your details</h2>
           <div className="space-y-2"><Label htmlFor="service-name">Your full legal name</Label><Input id="service-name" autoComplete="name" required maxLength={200} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
           <div className="space-y-2"><Label htmlFor="service-email">Email</Label><Input id="service-email" type="email" autoComplete="email" required maxLength={255} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /><p className="text-xs text-muted-foreground">Use the address you used, or will use, to email your ticket.</p></div>
           <details><summary className="cursor-pointer text-sm font-medium">For a company or another person? Add their name.</summary><div className="mt-3 space-y-2"><Label htmlFor="service-represented">Name of person or organization receiving the service</Label><Input id="service-represented" maxLength={200} value={form.representedName} onChange={e => setForm({ ...form, representedName: e.target.value })} /></div></details>
-          <div className="space-y-2"><Label htmlFor="service-ticket">Ticket number (optional)</Label><Input id="service-ticket" maxLength={50} value={form.ticketNumber} onChange={e => setForm({ ...form, ticketNumber: e.target.value })} /></div>
+          <div className="space-y-2"><Label htmlFor="service-ticket">Ticket number (optional)</Label><Input id="service-ticket" maxLength={50} value={form.ticketNumber} onChange={e => { setForm({ ...form, ticketNumber: e.target.value }); setLookupSavedFor(""); }} /></div>
           {fileInput}
         </CardContent></Card>
+        {requiresLookup && <Card><CardContent className="pt-6">{lookupSaved ? <p role="status" className="text-sm text-emerald-700">Your ticket lookup detail is saved.</p> : lookupFields}</CardContent></Card>}
         <Card><CardContent className="space-y-5 pt-6">
           {needsConsent && productKey && <><details className="rounded-lg border p-4"><summary className="cursor-pointer font-semibold">Review the authorization</summary><div className="mt-4 whitespace-pre-line text-sm leading-relaxed">{serviceAuthorization(productKey).join("\n")}</div></details>
             <div className="flex items-start gap-3"><Checkbox id="service-consent" checked={accepted} onCheckedChange={v => setAccepted(v === true)} /><div><Label htmlFor="service-consent" className="cursor-pointer font-semibold">{product.representation ? "I consent for Fabsy to fight my ticket" : "I authorize Fabsy to prepare my report"}</Label><p className="mt-2 text-xs leading-relaxed text-muted-foreground">{SERVICE_CONFIRMATION}{productKey === "photo_radar" ? " I confirm that I, or the person or organization I represent, was the registered owner on the offence date." : ""}</p></div></div>

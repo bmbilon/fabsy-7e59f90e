@@ -77,6 +77,11 @@ jobs:
       - name: Validate universal checkout prices, consent and payment verification
         run: deno test --node-modules-dir=none --allow-env --allow-read --frozen supabase/functions/_shared/service-checkout.test.ts supabase/functions/service-checkout/index.test.ts
 
+      - name: Validate required ticket lookup and filing evidence
+        run: |
+          deno test --node-modules-dir=none --allow-env --frozen supabase/functions/_shared/initial-disclosure-material.test.ts supabase/functions/_shared/portal-lookup-values.test.ts supabase/functions/_shared/service-order-lookup.test.ts
+          deno check --node-modules-dir=none --frozen supabase/functions/initial-disclosure-agent/index.ts
+
       - name: Type-check paid-acquisition Edge Functions
         run: |
           deno check --node-modules-dir=none --frozen \

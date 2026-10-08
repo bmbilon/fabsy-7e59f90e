@@ -23,13 +23,18 @@ define: { 'import.meta.env': '{}', 'process.env.NODE_ENV': '"test"' }, plugins: 
 async function runtime(t, path='/checkout') {
   const dom=new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', { url: `https://fabsy.invalid${path}`, runScripts:'outside-only', pretendToBeVisual:true, virtualConsole:new VirtualConsole() });
   const w=dom.window; const calls=[]; const channels=[]; let saved;
-  const state={ failPayment: false, paymentGate: null };
+  const state={ failPayment: false, failLookup: false, paymentGate: null };
   w.fetch=()=>{throw new Error('Real network forbidden')}; w.IS_REACT_ACT_ENVIRONMENT=true;
   w.Response=Response; w.Headers=Headers; w.Request=Request;
   w.ResizeObserver=class {observe(){} unobserve(){} disconnect(){}};
   w.MessageChannel=class extends MessageChannel {constructor(){super();channels.push(this)}};
   w.__invoke=async(name,{body})=>{
-    assert.equal(name,'service-checkout'); calls.push(body);
+    calls.push(body);
+    if(name==='initial-disclosure-agent') {
+      assert.equal(body.action,'order-lookup-save');
+      return state.failLookup ? {error:new w.Error('Lookup unavailable')} : {data:{saved:true}};
+    }
+    assert.equal(name,'service-checkout');
     if(body.action==='prepare') {
       saved={id:body.orderId,name:body.name,email:body.email,product:body.product,mode:body.mode,productName:'Synthetic service',totalCents:8295,consentSaved:body.mode!=='payment',paymentStatus:'not_started',ticketUploaded:false};
       return {data:{order:saved}};
@@ -45,9 +50,10 @@ async function runtime(t, path='/checkout') {
   t.after(async()=>{await api.unmount();for(const c of channels){c.port1.close();c.port2.close()}w.close()});
   const byId=id=>w.document.getElementById(id);
   const pay=()=>[...w.document.querySelectorAll('button')].find(b=>/Continue to secure payment|Save my consent/.test(b.textContent));
-  async function identity(){await api.change(byId('service-product'),'photo_radar');await api.change(byId('service-name'),'Alex Example');await api.change(byId('service-email'),'alex@example.test')}
+  async function lookup(kind='plate',value='ABC1234'){await api.change(byId('service-lookup-kind'),kind);await api.change(byId('service-lookup-value'),value);await api.click(byId('service-lookup-confirm'));}
+  async function identity(withLookup=true){await api.change(byId('service-product'),'photo_radar');await api.change(byId('service-name'),'Alex Example');await api.change(byId('service-email'),'alex@example.test');if(withLookup)await lookup();}
   async function consent(){await api.click(byId('service-consent'))}
-  return {w,api,calls,state,byId,pay,identity,consent};
+  return {w,api,calls,state,byId,pay,identity,consent,lookup};
 }
 test('public link requires no case token; unchecked consent blocks submission',async t=>{
   const r=await runtime(t);assert.equal(r.calls.length,0);assert.equal(r.pay().disabled,true);
@@ -57,19 +63,46 @@ test('public link requires no case token; unchecked consent blocks submission',a
 });
 test('consent-only saves without creating a payment; ticket is optional',async t=>{
   const r=await runtime(t,'/consent');await r.identity();await r.consent();await r.api.click(r.pay());
-  assert.deepEqual(r.calls.map(c=>c.action),['prepare']);assert.equal(r.calls[0].mode,'consent');assert.equal(r.calls[0].ticketNumber,'');assert.equal(r.calls[0].pleadNotGuilty,false);
+  assert.deepEqual(r.calls.map(c=>c.action),['order-lookup-save','prepare']);const prepared=r.calls.find(c=>c.action==='prepare');assert.equal(prepared.mode,'consent');assert.equal(prepared.ticketNumber,'');assert.equal(prepared.pleadNotGuilty,false);
   assert.match(r.w.document.body.textContent,/Consent saved/);
 });
 test('payment-only shows no representation/plea acceptance and submits none',async t=>{
   const r=await runtime(t,'/payment');await r.identity();assert.equal(r.byId('service-consent'),null);assert.equal(r.byId('service-plea'),null);
   await r.api.click(r.byId('service-terms'));await r.api.click(r.pay());
-  assert.deepEqual(r.calls.map(c=>c.action),['prepare','checkout']);assert.equal(r.calls[0].consentAccepted,false);assert.equal(r.calls[0].pleadNotGuilty,false);
+  assert.deepEqual(r.calls.map(c=>c.action),['order-lookup-save','prepare','checkout']);const prepared=r.calls.find(c=>c.action==='prepare');assert.equal(prepared.consentAccepted,false);assert.equal(prepared.pleadNotGuilty,false);
 });
 test('failed payment retries the saved order without resubmitting consent or creating another order',async t=>{
   const r=await runtime(t);r.state.failPayment=true;await r.identity();await r.consent();await r.api.click(r.pay());
   assert.match(r.w.document.body.textContent,/Payment unavailable/);const id=r.calls[0].orderId;
-  r.state.failPayment=false;await r.api.click(r.pay());assert.deepEqual(r.calls.map(c=>c.action),['prepare','checkout','checkout']);
+  r.state.failPayment=false;await r.api.click(r.pay());assert.deepEqual(r.calls.map(c=>c.action),['order-lookup-save','prepare','checkout','checkout']);
   assert.ok(r.calls.every(c=>c.orderId===id));
+});
+test('missing, placeholder or unconfirmed lookup blocks each public representation route',async t=>{
+  for(const path of ['/checkout','/consent','/payment']) {
+    const r=await runtime(t,path);await r.identity(false);
+    if(path==='/payment')await r.api.click(r.byId('service-terms'));else await r.consent();
+    assert.equal(r.pay().disabled,true);assert.equal(r.byId('service-lookup-confirm').checked,false);
+    await r.api.change(r.byId('service-lookup-value'),'UNKNOWN');await r.api.click(r.byId('service-lookup-confirm'));
+    assert.equal(r.pay().disabled,true);await r.api.click(r.pay());assert.equal(r.calls.length,0);
+    await r.api.change(r.byId('service-lookup-value'),'ABC1234');assert.equal(r.byId('service-lookup-confirm').checked,false);assert.equal(r.pay().disabled,true);
+  }
+});
+for(const [kind,value,expected] of [['plate','abc-1234','ABC1234'],['drivers_license','123456-789','123456789'],['date_of_birth','1990-02-28','1990-02-28']])test(`one ${kind} is sufficient and is saved before checkout`,async t=>{
+  const r=await runtime(t);await r.identity(false);await r.lookup(kind,value);await r.consent();await r.api.click(r.pay());
+  assert.deepEqual(r.calls.map(c=>c.action),['order-lookup-save','prepare','checkout']);
+  assert.equal(r.calls[0].kind,kind);assert.equal(r.calls[0].value,expected);assert.equal(r.calls[0].verified,true);
+  assert.ok(!r.w.sessionStorage.getItem('fabsy-service-checkout-v1').includes(value));assert.ok(!r.w.location.href.includes(value));
+  assert.equal(r.byId('service-lookup-value'),null,'raw value is cleared after a confirmed save');
+});
+test('a failed identifier save creates no service order or payment and can be retried',async t=>{
+  const r=await runtime(t);r.state.failLookup=true;await r.identity();await r.consent();await r.api.click(r.pay());
+  assert.deepEqual(r.calls.map(c=>c.action),['order-lookup-save']);assert.match(r.w.document.body.textContent,/lookup detail could not be saved/);
+  assert.equal(r.byId('service-lookup-value').value,'ABC1234');r.state.failLookup=false;await r.api.click(r.pay());
+  assert.deepEqual(r.calls.map(c=>c.action),['order-lookup-save','order-lookup-save','prepare','checkout']);
+});
+test('a report-only order does not request an unrelated government lookup identifier',async t=>{
+  const r=await runtime(t);await r.identity(false);await r.api.change(r.byId('service-product'),'insurance_report');await r.consent();
+  assert.equal(r.byId('service-lookup-value'),null);await r.api.click(r.pay());assert.deepEqual(r.calls.map(c=>c.action),['prepare','checkout']);
 });
 test('all four services show the correct GST totals and switching resets consent',async t=>{
   const r=await runtime(t);await r.api.change(r.byId('service-product'),'photo_radar');await r.api.click(r.byId('service-consent'));

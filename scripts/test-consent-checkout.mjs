@@ -16,7 +16,7 @@ const compiled = await build({
     let root;
     export { act };
     export async function mount(admin = false) { root = createRoot(document.getElementById('root')); await act(async () => root.render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{admin ? <AdminCheckout /> : <Checkout />}</MemoryRouter>)); }
-    export async function change(element, value) { await act(async () => { Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, value); element.dispatchEvent(new Event('input', { bubbles: true })); }); }
+    export async function change(element, value) { await act(async () => { Object.getOwnPropertyDescriptor(element.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype, 'value').set.call(element, value); element.dispatchEvent(new Event(element.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); }); }
     export async function click(element) { await act(async () => element.click()); }
     export async function unmount() { await act(async () => root.unmount()); }
   ` },
@@ -44,8 +44,8 @@ async function runtime(t, record = {}, hash = credentials, { admin = false, staf
     url: `https://fabsy.invalid/representation-payment${hash}`, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: new VirtualConsole(),
   });
   const { window } = dom;
-  const calls = []; const channels = [];
-  const state = { failConsent: false, failPdf: false, failPayment: false, pendingConsent: null };
+  const calls = []; const lookupCalls = []; const channels = [];
+  const state = { failConsent: false, failPdf: false, failPayment: false, pendingConsent: null, lookupSaved: record.lookupSaved ?? true, failLookup: false };
   const blocked = () => { throw new Error('Unexpected real network in checkout test'); };
   window.fetch = blocked; window.XMLHttpRequest = class { constructor() { blocked(); } }; window.navigator.sendBeacon = blocked;
   window.Response = Response; window.Request = Request; window.Headers = Headers;
@@ -55,6 +55,12 @@ async function runtime(t, record = {}, hash = credentials, { admin = false, staf
   window.__staff = staff;
   window.MessageChannel = class extends MessageChannel { constructor() { super(); channels.push(this); } };
   window.__invoke = async (name, { body }) => {
+    if (name === 'initial-disclosure-agent') {
+      lookupCalls.push(body);
+      if (state.failLookup) return { error: new window.Error('Lookup unavailable') };
+      if (body.action === 'client-lookup-save') state.lookupSaved = true;
+      return { data: { saved: state.lookupSaved, ticket_number: fixture.ticketNumber } };
+    }
     calls.push({ name, body });
     if (name === 'manual-representation-link' && body.action === 'read') return { data: { ...fixture, ...record }, error: null };
     if (name === 'manual-representation-link' && body.action === 'create') return { data: {
@@ -75,7 +81,7 @@ async function runtime(t, record = {}, hash = credentials, { admin = false, staf
   t.after(async () => { await api.unmount(); for (const channel of channels) { channel.port1.close(); channel.port2.close(); } window.close(); });
   await api.mount(admin);
   const button = () => [...window.document.querySelectorAll('button')].find(node => /Continue to secure payment|Resume secure payment|Saving and opening/.test(node.textContent));
-  return { window, api, state, calls, button, checkbox: id => window.document.getElementById(id) };
+  return { window, api, state, calls, lookupCalls, button, checkbox: id => window.document.getElementById(id) };
 }
 
 test('checkboxes start unchecked, and payment cannot start without consent', async t => {
@@ -190,4 +196,25 @@ test('unsigned staff visitors cannot access the link generator', async t => {
   const r = await runtime(t, {}, '', { admin: true, staff: false });
   assert.equal(r.window.document.getElementById('checkout-link-firstName'), null);
   assert.equal(r.calls.length, 0);
+});
+
+test('private checkout holds payment until a missing identifier is saved after signed consent', async t => {
+  const r = await runtime(t, { lookupSaved: false });
+  await r.api.click(r.checkbox('checkout-consent')); await r.api.click(r.button());
+  assert.equal(r.calls.filter(c => c.name === 'create-payment').length, 0);
+  assert.equal(r.button().disabled, true);
+  await r.api.change(r.checkbox('client-lookup-value'), 'ABC1234');
+  await r.api.click(r.window.document.querySelector('#portal-lookup-heading').parentElement.querySelector('input[type="checkbox"]'));
+  const save = [...r.window.document.querySelectorAll('button')].find(b => /Save lookup detail and continue/.test(b.textContent));
+  r.state.failLookup = true; await r.api.click(save);
+  assert.equal(r.button().disabled, true);assert.equal(r.calls.filter(c => c.name === 'create-payment').length, 0);
+  r.state.failLookup = false; await r.api.click(save); await r.api.click(r.button());
+  assert.equal(r.calls.filter(c => c.name === 'create-payment').length, 1);
+  assert.equal(r.lookupCalls.find(c => c.action === 'client-lookup-save').verified, true);
+});
+
+test('already signed intakes cannot resume payment before lookup status is confirmed', async t => {
+  const r = await runtime(t, { consentAccepted: true, consentSigned: true, lookupSaved: false });
+  assert.equal(r.button().disabled, true);await r.api.click(r.button());assert.equal(r.calls.length, 1);
+  assert.equal(r.lookupCalls[0].action, 'client-lookup-status');
 });
