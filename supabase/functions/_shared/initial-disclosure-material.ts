@@ -135,8 +135,8 @@ export async function prepareInitialMaterial(db:SupabaseClient,job:{submission_i
   // The missing-detail hold then needs no repeated model call or browser session.
   const saved=await db.from('initial_disclosure_material').insert({submission_id:ticket.id,case_fingerprint:fingerprint.data,source_path:ticket.ticket_document_path,source_sha256:source.hash,consent_path:ticket.consent_form_path,consent_sha256:consent.hash,verification_ciphertext:await encryptLookup(details,ticket.id),evidence:{...extraction.evidence,authorization,lookup_fingerprints:details.map(detail=>({kind:detail.kind,sha256:detail.fingerprint}))}});if(saved.error)throw new Error('MATERIAL_SAVE_FAILED');
  }
- await importServiceOrderLookup(db,ticket,source.hash);
- const confirmed=await db.from('case_portal_verifications').select('*').eq('submission_id',ticket.id).is('revoked_at',null).maybeSingle();if(confirmed.error)throw new Error('LOOKUP_DETAILS_UNAVAILABLE');
+ let confirmed=await db.from('case_portal_verifications').select('*').eq('submission_id',ticket.id).is('revoked_at',null).maybeSingle();if(confirmed.error)throw new Error('LOOKUP_DETAILS_UNAVAILABLE');
+ if(!confirmed.data){await importServiceOrderLookup(db,ticket,source.hash);confirmed=await db.from('case_portal_verifications').select('*').eq('submission_id',ticket.id).is('revoked_at',null).maybeSingle();if(confirmed.error)throw new Error('LOOKUP_DETAILS_UNAVAILABLE');}
  if(confirmed.data){
   const c=confirmed.data;if(c.ticket_number!==job.ticket_number||c.source_path!==ticket.ticket_document_path||c.source_sha256!==source.hash)throw new Error('LOOKUP_SOURCE_CHANGED');
   const detail=await decryptLookup(c.ciphertext,ticket.id) as LookupDetail;

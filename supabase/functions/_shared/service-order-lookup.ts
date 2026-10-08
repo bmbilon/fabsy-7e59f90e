@@ -35,11 +35,19 @@ export async function importServiceOrderLookup(db: SupabaseClient, ticket: Recor
   if (result.error) throw new Error('ORDER_LOOKUP_UNAVAILABLE');
   const claims = result.data || [];
   if (!claims.length) return;
-  if (claims.length !== 1) throw new Error('EXACT_ORDER_LOOKUP_REQUIRED');
-  const claim = claims[0];
-  const detail = await decryptLookup(claim.ciphertext, 'service-order/' + claim.order_id);
-  if (!detail || detail.kind !== claim.kind || normalizePortalLookup(detail.kind, detail.value) !== detail.value
-    || await initialHash(claim.order_id + '/' + detail.kind + '/' + detail.value) !== claim.value_sha256) throw new Error('VERIFICATION_EVIDENCE_MISMATCH');
+  const verified = [];
+  const values = new Map<string, string>();
+  for (const claim of claims) {
+    const detail = await decryptLookup(claim.ciphertext, 'service-order/' + claim.order_id);
+    if (!detail || detail.kind !== claim.kind || normalizePortalLookup(detail.kind, detail.value) !== detail.value
+      || await initialHash(claim.order_id + '/' + detail.kind + '/' + detail.value) !== claim.value_sha256) throw new Error('VERIFICATION_EVIDENCE_MISMATCH');
+    if (values.has(detail.kind) && values.get(detail.kind) !== detail.value) throw new Error('VERIFICATION_DETAILS_CONFLICT');
+    values.set(detail.kind, detail.value); verified.push({ claim, detail });
+  }
+  // Consent and payment may be separate orders for one exact ticket. Select a
+  // stable, consistent identifier without treating order count as case count.
+  verified.sort((a, b) => String(a.claim.order_id).localeCompare(String(b.claim.order_id)));
+  const { claim, detail } = verified[0];
   const saved = await db.rpc('attach_service_order_portal_lookup', {
     p_order: claim.order_id, p_id: ticket.id, p_claim_hash: claim.value_sha256,
     p_cipher: await encryptLookup(detail, String(ticket.id)),

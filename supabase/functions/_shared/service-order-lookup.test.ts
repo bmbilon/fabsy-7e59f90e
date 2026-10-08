@@ -63,5 +63,21 @@ Deno.test('the agent verifies the frozen order hash and re-encrypts for the exac
   assert(attached?.p_source === ticket.ticket_document_path && attached?.p_source_hash === 'c'.repeat(64));
   assert((await decryptLookup(attached?.p_cipher as { version: number; iv: string; value: string }, ticket.id)).value === 'ABC1234');
   rows = [{ ...claim, value_sha256: 'b'.repeat(64) }]; await rejects(() => importServiceOrderLookup(db, ticket, 'c'.repeat(64)), 'VERIFICATION_EVIDENCE_MISMATCH');
-  rows = [claim, claim]; await rejects(() => importServiceOrderLookup(db, ticket, 'c'.repeat(64)), 'EXACT_ORDER_LOOKUP_REQUIRED');
+  rows = [claim, claim]; await importServiceOrderLookup(db, ticket, 'c'.repeat(64));
+});
+
+Deno.test('separate consent and payment orders may supply consistent details for one exact case', async () => {
+  const second = '20000000-0000-4000-8000-000000000002';
+  async function claim(order: string, kind: string, value: string) {
+    return { order_id: order, kind, ciphertext: await encryptLookup({ kind, value }, 'service-order/' + order), value_sha256: await initialHash(order + '/' + kind + '/' + value) };
+  }
+  let rows = [await claim(second, 'plate', 'ABC1234'), await claim(id, 'plate', 'ABC1234')];
+  let selected: unknown;
+  const db = { rpc(name: string, args: Record<string, unknown>) { if (name === 'service_order_lookup_for_case') return Promise.resolve({ data: rows, error: null }); selected = args.p_order; return Promise.resolve({ data: 'synthetic-record', error: null }); } } as unknown as SupabaseClient;
+  const ticket = { id: '10000000-0000-4000-8000-000000000001', ticket_number: 'T12345678Z', ticket_document_path: 'synthetic/source.jpg' };
+  await importServiceOrderLookup(db, ticket, 'c'.repeat(64));assert(selected === id);
+  rows = [await claim(second, 'date_of_birth', '1990-02-28'), await claim(id, 'plate', 'ABC1234')];
+  await importServiceOrderLookup(db, ticket, 'c'.repeat(64));assert(selected === id);
+  rows = [await claim(second, 'plate', 'XYZ5678'), await claim(id, 'plate', 'ABC1234')];
+  await rejects(() => importServiceOrderLookup(db, ticket, 'c'.repeat(64)), 'VERIFICATION_DETAILS_CONFLICT');
 });

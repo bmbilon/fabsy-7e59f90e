@@ -14,4 +14,4 @@
 - [x] Require and privately save one identifier across universal and private representation checkout paths.
 - [x] Enforce prospective order and ticket checkout reservations in the database before Stripe creation.
 - [x] Verify malformed/missing input, failed saves, existing intake data, private capability ownership and exact-case transfers.
-- [ ] Deploy and verify the required-identifier backend and updated public/private forms.
+- [x] Deploy and verify the required-identifier backend and updated public/private forms.
