@@ -13,14 +13,18 @@ export async function executeInitialDisclosure(page:Page,packet:InitialPacket,se
  if(current==='/request-disclosure'){await portalClick(page,'Back');await portalPath(page,'/ticket-penalty-and-options');current='/ticket-penalty-and-options';}
  if(current==='/ticket-number-search'){
   await portalFill(page,'#ticketNumber',packet.ticket_number);await portalFill(page,'input[type=email]',packet.representative.email);
-  await portalChecked(page,'I agree to the Terms and Conditions.');await portalClick(page,'Next');await portalPath(page,'/search-verification','input[name=verificationType]');current='/search-verification';
+  await portalChecked(page,'I agree to the Terms and Conditions.');await portalClick(page,'Next');await portalPath(page,'/search-verification','input[type=radio]');
+  await page.waitForFunction(()=>['Licence plate',"Driver's licence number",'Date of birth'].every(label=>Array.from(document.querySelectorAll<HTMLInputElement>('main input[type=radio]')).filter(input=>Array.from(input.labels||[]).some(element=>element.textContent?.replace(/\s+/g,' ').trim()===label)).length===1),{timeout:10000});current='/search-verification';
  }
  if(current==='/search-verification'){
   if(!(await portalBody(page)).includes(packet.ticket_number))throw new Error('LIVE_TICKET_IDENTITY_MISMATCH');
   const controls={plate:{label:'Licence plate',selector:'#licencePlate'},drivers_license:{label:"Driver's licence number",selector:'#driversLicence'},date_of_birth:{label:'Date of birth',selector:'#dateOfBirth'}};
   const control=controls[packet.verification.kind];if(!control||!packet.verification.value)throw new Error('VERIFICATION_DETAIL_REQUIRED');
   await portalChecked(page,control.label);await page.waitForSelector(control.selector,{timeout:10000});await portalFill(page,control.selector,packet.verification.value);
-  await page.waitForFunction(()=>Array.from(document.querySelectorAll<HTMLButtonElement>('main button')).some(button=>button.textContent?.trim()==='Find ticket'&&!button.disabled),{timeout:10000});
+  await page.waitForFunction(()=>{
+   const controls=Array.from(document.querySelectorAll<HTMLButtonElement|HTMLInputElement>('main button,main input[type=submit]')).filter(control=>(control.textContent||('value'in control?control.value:'')).replace(/\s+/g,' ').trim()==='Find ticket'&&control.getBoundingClientRect().width>0);
+   return controls.length===1&&!controls[0].disabled;
+  },{timeout:10000});
   await portalClick(page,'Find ticket');await portalPath(page,'/ticket-information');current='/ticket-information';
  }
  if(current==='/ticket-information'){verifyInitialIdentity(await portalBody(page),packet);await portalClick(page,'Next');await portalPath(page,'/ticket-penalty-and-options');current='/ticket-penalty-and-options';}
