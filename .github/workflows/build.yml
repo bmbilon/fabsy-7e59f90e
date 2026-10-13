@@ -153,7 +153,12 @@ jobs:
           node scripts/verify-intake-follow-up-browser.mjs
           node scripts/verify-ltb-access-browser.mjs
 
-      - name: Verify AnderHue portal branding and practice access
+      - name: Verify AnderHue practice files (catalog, edge functions, database)
+        run: |
+          npm run test:practice
+          bash scripts/test-practice-sql.sh
+
+      - name: Verify AnderHue site, client portal and staff workspace in Chromium
         run: |
           npm run build:anderhue
           node scripts/verify-anderhue-browser.mjs
