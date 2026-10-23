@@ -9,6 +9,7 @@
     "prebuild": "npm run validate:browser-config && npm run test:i18n && npm run test:measurement && npm run test:ticket-upload && npm run test:rapid-landing && npm run test:checkout-branding && npm run test:seo && node scripts/contrast-guard.cjs && node scripts/test-published-content-guardrails.mjs && node scripts/test-supabase-generated-content-guardrails.mjs && node scripts/test-rapid-resolution-content-normalizer.cjs && node scripts/test-snapshot-offer-guardrails.cjs && node scripts/test-photo-radar-content.cjs && node scripts/test-pro-referral-snapshots.mjs && node scripts/test-public-offer-snapshot-guardrails.mjs && node scripts/test-homepage-visual-snapshot-guardrails.mjs && node scripts/test-snapshot-runtime-hygiene.mjs && node scripts/sync-pages-from-db.js && node scripts/normalize-rapid-resolution-content.cjs && node scripts/generate-jsonld.js && node scripts/generate-sitemap-from-db.js && node scripts/generate-routes.js && node scripts/generate-static-snapshots.cjs && node scripts/generate-localized-snapshots.mjs && node scripts/validate-snapshot-guardrails.cjs",
     "build": "vite build",
     "build:anderhue": "node scripts/build-anderhue.mjs",
+    "deploy:anderhue": "node scripts/deploy-anderhue.mjs",
     "build:evidence": "node scripts/build-paid-acquisition-evidence.mjs",
     "postbuild": "node scripts/copy-prerendered.js",
     "build:dev": "vite build --mode development",
@@ -30,7 +31,9 @@
     "test:consent-welcome": "deno test --allow-env --allow-net --allow-read --node-modules-dir=none --frozen supabase/functions/_shared/consent-welcome.test.ts supabase/functions/process-consent-welcome/index.test.ts supabase/functions/process-portal-activity/consent.test.ts supabase/functions/_shared/portal-activity-email.test.ts && node --test scripts/test-consent-legacy-notification.mjs && node scripts/test-consent-welcome-db.mjs",
     "test:photo-radar-claims": "node scripts/test-photo-radar-insurance-claims.mjs",
     "test:rapid-landing": "node scripts/test-rapid-landing.mjs",
-    "test:ltb": "node --test scripts/test-ltb-intake.mjs"
+    "test:ltb": "node --test scripts/test-ltb-intake.mjs",
+    "test:practice": "node --test scripts/test-practice-files.mjs",
+    "verify:anderhue": "npm run build:anderhue && node scripts/verify-anderhue-browser.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -61,7 +64,7 @@
     "@radix-ui/react-toggle": "^1.1.9",
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
-    "@supabase/supabase-js": "^2.57.4",
+    "@supabase/supabase-js": "^2.117.2",
     "@tanstack/react-query": "^5.83.0",
     "@types/jsdom": "^27.0.0",
     "class-variance-authority": "^0.7.1",
@@ -109,7 +112,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
-    "playwright": "^1.55.1",
+    "playwright": "^1.63.0",
     "postcss": "^8.5.6",
     "sass": "^1.93.2",
     "tailwindcss": "^3.4.17",

@@ -1,0 +1,86 @@
+/* AnderHue Paralegal app theme (client portal and staff workspace).
+   Tokens mirror ontario/anderhue-paralegal-site/ARCHITECTURE.md section 5.4. */
+html[data-app="anderhue"] {
+  --ah-plum-950: #140a24;
+  --ah-plum-900: #1d1032;
+  --ah-plum-800: #2d1848;
+  --ah-plum-600: #673b86;
+  --ah-plum-100: #ede5ef;
+  --ah-gold-600: #9a7641;
+  --ah-gold-500: #b28d54;
+  --ah-gold-300: #d5b47c;
+  --ah-gold-200: #e9d8b8;
+  --ah-ivory-50: #fffdf9;
+  --ah-ivory-100: #f7f1e8;
+  --ah-ivory-200: #efe6d8;
+  --ah-ink: #261d2c;
+  --ah-ink-2: #54465d;
+  --ah-muted: #6e6274;
+  --ah-line: #ded3c8;
+  --ah-line-strong: #c9b9c6;
+  --ah-danger: #b22a1f;
+  --ah-danger-soft: #f6deda;
+  --ah-success: #2f6b4f;
+  --ah-success-soft: #dcebe2;
+  --ah-warn-soft: #f5e6a8;
+  --ah-warn-ink: #4a3a00;
+  --ah-font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --ah-font-body: "Public Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --ah-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ah-radius: 6px;
+  --ah-shadow-sm: 0 1px 2px rgb(29 16 50 / 0.06), 0 1px 1px rgb(29 16 50 / 0.04);
+  --ah-shadow-md: 0 8px 24px rgb(29 16 50 / 0.10), 0 2px 6px rgb(29 16 50 / 0.06);
+
+  /* shadcn/ui variables (HSL triplets) mapped to the AnderHue palette. */
+  --background: 36 48% 94%;
+  --background-solid: 36 48% 94%;
+  --foreground: 276 21% 14%;
+  --card: 40 100% 99%;
+  --card-foreground: 276 21% 14%;
+  --popover: 40 100% 99%;
+  --popover-foreground: 276 21% 14%;
+  --primary: 266 50% 19%;
+  --primary-foreground: 40 100% 99%;
+  --primary-light: 275 39% 38%;
+  --primary-dark: 266 52% 13%;
+  --secondary: 288 24% 92%;
+  --secondary-foreground: 266 50% 19%;
+  --muted: 288 24% 92%;
+  --muted-foreground: 280 8% 42%;
+  --accent: 36 38% 88%;
+  --accent-foreground: 266 50% 19%;
+  --destructive: 4 70% 41%;
+  --destructive-foreground: 40 100% 99%;
+  --border: 30 25% 83%;
+  --input: 30 25% 83%;
+  --ring: 36 38% 51%;
+  --radius: 0.375rem;
+  color-scheme: light;
+}
+
+html[data-app="anderhue"] body {
+  background: var(--ah-ivory-100);
+  color: var(--ah-ink);
+  font-family: var(--ah-font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html[data-app="anderhue"] :focus-visible {
+  outline: 3px solid var(--ah-gold-500);
+  outline-offset: 2px;
+}
+
+html[data-app="anderhue"] .ah-display { font-family: var(--ah-font-display); font-weight: 400; letter-spacing: -0.015em; }
+html[data-app="anderhue"] .ah-mono { font-family: var(--ah-font-mono); font-variant-numeric: tabular-nums; }
+html[data-app="anderhue"] .ah-eyebrow {
+  font-family: var(--ah-font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ah-gold-600);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-app="anderhue"] *, html[data-app="anderhue"] *::before, html[data-app="anderhue"] *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+  }
+}

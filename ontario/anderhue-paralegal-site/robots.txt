@@ -2,4 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /sign-in
 Disallow: /admin/
+Disallow: /files
+Disallow: /start
+
 Sitemap: https://anderhue.ca/sitemap.xml
