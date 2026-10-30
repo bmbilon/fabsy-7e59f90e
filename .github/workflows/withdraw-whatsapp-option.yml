@@ -1,0 +1,96 @@
+name: Withdraw WhatsApp contact option
+
+on:
+  push:
+    branches: [codex/withdraw-whatsapp-option]
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Verify unchanged approved frontend source and disabled contact flag
+        env:
+          PINNED_FRONTEND: ${{ vars.FABSY_FRONTEND_DEPLOY_COMMIT }}
+          WHATSAPP_FLAG: ${{ vars.VITE_WHATSAPP_ENABLED }}
+        run: |
+          set -euo pipefail
+          base=545c94a90f0956c02bdefef6923202af4da956c6
+          test "$PINNED_FRONTEND" = "$base"
+          test "$WHATSAPP_FLAG" = false
+          test "$(git rev-parse HEAD^)" = "$base"
+          test "$(git diff --name-only "$base" HEAD)" = .github/workflows/withdraw-whatsapp-option.yml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build existing frontend with WhatsApp disabled
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_WHATSAPP_ENABLED: 'false'
+          VITE_GOOGLE_MEASUREMENT_ENABLED: ${{ vars.VITE_GOOGLE_MEASUREMENT_ENABLED }}
+          VITE_META_MEASUREMENT_ENABLED: ${{ vars.VITE_META_MEASUREMENT_ENABLED }}
+          VITE_META_PIXEL_ID: ${{ vars.VITE_META_PIXEL_ID }}
+          VITE_OPENAI_ADS_MEASUREMENT_ENABLED: ${{ vars.VITE_OPENAI_ADS_MEASUREMENT_ENABLED }}
+          VITE_OPENAI_ADS_PIXEL_ID: ${{ vars.VITE_OPENAI_ADS_PIXEL_ID }}
+          VITE_GA4_MEASUREMENT_ID: G-YRP61S5TPF
+          VITE_GADS_ID: ${{ secrets.VITE_GADS_ID }}
+          VITE_GADS_CONVERSION_LABEL: ${{ secrets.VITE_GADS_CONVERSION_LABEL }}
+          VITE_GADS_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PURCHASE_LABEL }}
+          VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL: ${{ secrets.VITE_GADS_PHOTO_RADAR_PURCHASE_LABEL }}
+          REQUIRE_BROWSER_SUPABASE_CONFIG: '1'
+          REQUIRE_PAGE_SYNC: '1'
+          REQUIRE_PAGE_SYNC_MANIFEST: '1'
+          REQUIRE_SNAPSHOT_MANIFEST: '1'
+        run: npm run build
+      - name: Verify FAQ and snapshot guardrails
+        run: |
+          node ci/validate-faq-jsonld.js
+          node scripts/validate-faq-parity.cjs
+          node scripts/validate-snapshot-guardrails.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Verify contact removal and retain phone and email
+        run: |
+          set -euo pipefail
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort > /tmp/whatsapp-withdrawal-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:4173/contact > /dev/null; then break; fi
+            sleep 1
+          done
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch();
+          try {
+            const page = await browser.newPage();
+            const routes = ['/', '/contact', ...['pa','tl','zh-hans','zh-hant','ar','hi','es'].map(code => `/${code}/contact`)];
+            for (const route of routes) {
+              await page.goto(`http://127.0.0.1:4173${route}`);
+              await page.locator('#root h1').first().waitFor();
+              const links = await page.locator('a[href]').evaluateAll(nodes => nodes.map(node => node.getAttribute('href')));
+              assert(!links.some(href => /(?:wa\.me|api\.whatsapp\.com)\/(?:send\?[^#]*phone=)?\+?18257932279/i.test(href)), `Fabsy WhatsApp contact link remains on ${route}`);
+              if (route === '/contact') {
+                assert(links.some(href => href === 'tel:+18257932279'), 'Phone link missing');
+                assert(links.some(href => href === 'sms:+18257932279'), 'SMS link missing');
+                assert(links.some(href => href === 'mailto:hello@fabsy.ca'), 'Email link missing');
+              }
+              console.log(`Verified ${route}: no Fabsy WhatsApp contact link`);
+            }
+          } finally { await browser.close(); }
+          JS
+      - name: Deploy only the verified frontend to existing Cloudflare Pages project
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=fabsy --branch=main --commit-message="Disable public WhatsApp contact option; unchanged approved frontend source"
