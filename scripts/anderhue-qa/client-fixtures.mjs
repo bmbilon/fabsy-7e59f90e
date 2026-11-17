@@ -900,6 +900,9 @@ async function notaryFlow(ctx, kind) {
   await page.getByLabel('What do you need help with?').fill('I need a certified copy of my lease for an application.');
   await page.reload();
   assert.equal(await page.getByLabel('What do you need help with?').inputValue(), 'I need a certified copy of my lease for an application.');
+  await page.getByRole('button', { name: 'Back', exact: true }).click();
+  await page.locator('input[data-picker="browse"]').setInputFiles([payload(ctx.fixtures.leasePdf)]);
+  await continueButton(page).click();
   await continueButton(page).click();
   await page.getByLabel('Full name').fill('Sam Notary');
   await page.getByLabel('Email').fill('sam.notary@example.com');
