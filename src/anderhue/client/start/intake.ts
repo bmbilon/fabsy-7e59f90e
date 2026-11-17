@@ -25,7 +25,7 @@ export interface IntakeFields {
   ticketReceivedOn: string;
   ticketCity: string;
   optionChosen: string;
-  // Something else
+  // Notary and commissioning
   category: string;
   deadline: string;
   otherParty: string;
@@ -362,7 +362,7 @@ interface StoredDraft {
 }
 
 export function loadDraft(area: PracticeArea): { fields: IntakeFields; fileCount: number } | null {
-  const stored = readJson<StoredDraft>('session', `${DRAFT_PREFIX}${area}`);
+  const stored = readJson<StoredDraft>('session', `${DRAFT_PREFIX}${area === 'general' ? 'notary' : area}`);
   if (!stored || typeof stored !== 'object' || !stored.fields) return null;
   const fields = { ...EMPTY_FIELDS };
   for (const key of Object.keys(EMPTY_FIELDS) as FieldName[]) {
@@ -375,14 +375,14 @@ export function loadDraft(area: PracticeArea): { fields: IntakeFields; fileCount
 export function saveDraft(area: PracticeArea, fields: IntakeFields, fileCount: number): void {
   const hasContent = Object.values(fields).some(value => value.trim() !== '') || fileCount > 0;
   if (!hasContent) {
-    removeItem('session', `${DRAFT_PREFIX}${area}`);
+    removeItem('session', `${DRAFT_PREFIX}${area === 'general' ? 'notary' : area}`);
     return;
   }
-  writeJson('session', `${DRAFT_PREFIX}${area}`, { fields, fileCount, savedAt: Date.now() } satisfies StoredDraft);
+  writeJson('session', `${DRAFT_PREFIX}${area === 'general' ? 'notary' : area}`, { fields, fileCount, savedAt: Date.now() } satisfies StoredDraft);
 }
 
 export function clearDraft(area: PracticeArea): void {
-  removeItem('session', `${DRAFT_PREFIX}${area}`);
+  removeItem('session', `${DRAFT_PREFIX}${area === 'general' ? 'notary' : area}`);
 }
 
 export interface SentSummary {

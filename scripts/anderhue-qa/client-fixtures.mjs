@@ -889,13 +889,17 @@ async function trafficFlow(ctx, kind) {
 async function notaryFlow(ctx, kind) {
   const s = await openPage(ctx, kind);
   const { page, api } = s;
+  await page.addInitScript(() => sessionStorage.setItem('anderhue.start.v1.general', JSON.stringify({ fields: { category: 'small_claims', notes: 'Old unrelated matter' }, fileCount: 0, savedAt: Date.now() })));
   await page.goto(`${ctx.origin}/start?area=notary`);
   await page.getByRole('heading', { name: 'Add your documents' }).waitFor();
   await page.locator('input[data-picker="browse"]').setInputFiles([payload(ctx.fixtures.leasePdf)]);
   await continueButton(page).click();
   await page.getByRole('heading', { name: 'About your document' }).waitFor();
   assert.equal(await page.getByLabel('What kind of matter is it?').count(), 0);
+  assert.equal(await page.getByLabel('What do you need help with?').inputValue(), '', 'old general drafts are not reused');
   await page.getByLabel('What do you need help with?').fill('I need a certified copy of my lease for an application.');
+  await page.reload();
+  assert.equal(await page.getByLabel('What do you need help with?').inputValue(), 'I need a certified copy of my lease for an application.');
   await continueButton(page).click();
   await page.getByLabel('Full name').fill('Sam Notary');
   await page.getByLabel('Email').fill('sam.notary@example.com');
