@@ -3,7 +3,7 @@ import { CalendarDays } from 'lucide-react';
 import { ANDERHUE_PRACTICE } from '../../config';
 import { Field } from '../components/ui';
 import {
-  GENERAL_CATEGORIES, LTB_ISSUES, TICKET_OPTION_CHOSEN, TICKET_RESPONSE_DAYS, TICKET_TYPES,
+  LTB_ISSUES, TICKET_OPTION_CHOSEN, TICKET_RESPONSE_DAYS, TICKET_TYPES,
   daysUntil, formatLongDate, type PracticeArea,
 } from '../catalog';
 import { cx } from '../lib/cx';
@@ -196,14 +196,11 @@ export default function DetailsStep({ area, fields, errors, setField, headingRef
 
         {area === 'general' ? (
           <>
-            <Field id="f-category" label="What kind of matter is it?" error={errors.category}>
-              {control => <Select {...control} name="category" value={fields.category} options={GENERAL_CATEGORIES} setField={setField} />}
-            </Field>
             <Field
               id="f-notes"
               label="What do you need help with?"
               hintFirst
-              hint="What happened, who is involved and what you would like to happen."
+              hint="Describe the document, who is requesting it and whether you need notarization, a certified copy or an oath or declaration."
               error={errors.notes}
             >
               {control => (
@@ -216,7 +213,7 @@ export default function DetailsStep({ area, fields, errors, setField, headingRef
               )}
             </Field>
             <div className="grid gap-6 sm:grid-cols-2">
-              <Field id="f-deadline" label="Any deadline?" optional hint="A hearing, filing or response date." error={errors.deadline}>
+              <Field id="f-deadline" label="Any deadline?" optional hint="When the organization needs your completed document." error={errors.deadline}>
                 {control => <input {...control} {...input('deadline')} type="date" />}
               </Field>
               <Field id="f-clientCity" label="Your city" optional>
@@ -224,7 +221,7 @@ export default function DetailsStep({ area, fields, errors, setField, headingRef
               </Field>
             </div>
             {fields.deadline && !errors.deadline ? <DeadlineNote deadline={fields.deadline} /> : null}
-            <Field id="f-otherParty" label="The other party, if any" optional>
+            <Field id="f-otherParty" label="Organization requesting the document, if any" optional>
               {control => <input {...control} {...input('otherParty')} autoComplete="off" placeholder="A person, business or agency" />}
             </Field>
           </>

@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ANDERHUE_INTAKE_AREAS, GENERAL_CATEGORIES, LTB_ISSUES, TICKET_TYPES, torontoToday, type PracticeArea } from '../catalog';
+import { ANDERHUE_INTAKE_AREAS, LTB_ISSUES, TICKET_TYPES, torontoToday, type PracticeArea } from '../catalog';
 import { createMatter, friendlyError } from '../api';
 import { usePracticeSettings, useRefreshAfterWrite } from '../hooks';
 import { fileHref } from '../model';
@@ -10,7 +10,7 @@ import { AreaIcon, Button, Field, SelectInput, StaffDialog, TextArea, TextInput 
 const AREA_CHOICES: Record<PracticeArea, { label: string; hint: string }> = {
   ltb: { label: 'Landlord', hint: 'Landlord and Tenant Board' },
   traffic: { label: 'Traffic', hint: 'Ticket or court notice' },
-  general: { label: 'Other', hint: 'Small claims, tribunals, more' },
+  general: { label: 'Notary', hint: 'Notary & Commissioner of Oaths' },
 };
 
 const ORG_HELP: Record<PracticeArea, string> = {
@@ -22,7 +22,7 @@ const ORG_HELP: Record<PracticeArea, string> = {
 const EMPTY = {
   email: '', firstName: '', lastName: '', organizationName: '', phone: '',
   issue: 'arrears', city: '', ticketType: 'speeding', ticketCity: '', ticketReceivedOn: '',
-  category: 'small_claims', deadline: '', otherParty: '', notes: '',
+  category: 'notary', deadline: '', otherParty: '', notes: '',
 };
 
 type FormState = typeof EMPTY;
@@ -38,7 +38,7 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
   const practice = usePracticeSettings();
   const updatesOn = practice.data?.client_updates_enabled === true;
   const uid = useId();
-  const [area, setArea] = useState<PracticeArea>(initialArea === 'general' ? 'ltb' : initialArea);
+  const [area, setArea] = useState<PracticeArea>(initialArea);
   const [form, setForm] = useState<FormState>(EMPTY);
   const [invite, setInvite] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState | 'form', string>>>({});
@@ -46,7 +46,7 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
 
   useEffect(() => {
     if (!open) return;
-    setArea(initialArea === 'general' ? 'ltb' : initialArea);
+    setArea(initialArea);
     setForm(EMPTY);
     setErrors({});
     setInvite(true);
@@ -80,7 +80,7 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
         ? { issue: form.issue, city: form.city, notes: form.notes }
         : area === 'traffic'
           ? { ticketType: form.ticketType, ticketCity: form.ticketCity, ticketReceivedOn: form.ticketReceivedOn, notes: form.notes }
-          : { category: form.category, deadline: form.deadline, otherParty: form.otherParty, notes: form.notes };
+          : { category: 'notary', deadline: form.deadline, otherParty: form.otherParty, notes: form.notes };
       const sendInvite = updatesOn && invite;
       const result = await createMatter({
         area,
@@ -112,7 +112,7 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
     </>}>
     <fieldset className="min-w-0">
       <legend className="ahs-label">Practice area</legend>
-      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Practice area">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Practice area">
         {ANDERHUE_INTAKE_AREAS.map(item => {
           const checked = area === item;
           return <label key={item} className={`relative flex cursor-pointer flex-col gap-0.5 rounded-[6px] border px-3 py-2 transition-colors ${checked
@@ -181,11 +181,6 @@ export default function NewFileDialog({ open, onOpenChange, initialArea }: {
         </Field>
       </>}
       {area === 'general' && <>
-        <Field id={id('category')} label="Category">
-          <SelectInput id={id('category')} value={form.category} onChange={set('category')}>
-            {GENERAL_CATEGORIES.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </SelectInput>
-        </Field>
         <Field id={id('deadline')} label="Deadline">
           <TextInput id={id('deadline')} type="date" value={form.deadline} onChange={set('deadline')} />
         </Field>

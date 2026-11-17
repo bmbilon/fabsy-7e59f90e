@@ -14,8 +14,10 @@ type FilesByArea = Record<PracticeArea, PickedFile[]>;
 export default function StartPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const requestedArea = areaFromParam(params.get('area'));
-  const area = ANDERHUE_INTAKE_AREAS.some(item => item === requestedArea) ? requestedArea : null;
+  const rawArea = params.get('area');
+  const requestedArea = areaFromParam(rawArea);
+  const retiredGeneralLink = requestedArea === 'general' && rawArea?.trim().toLowerCase() !== 'notary';
+  const area = !retiredGeneralLink && ANDERHUE_INTAKE_AREAS.some(item => item === requestedArea) ? requestedArea : null;
   const step = params.get('step');
   const [filesByArea, setFilesByArea] = useState<FilesByArea>({ ltb: [], traffic: [], general: [] });
   const [sent, setSent] = useState<SentSummary | null>(() => loadSent());

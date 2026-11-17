@@ -32,7 +32,7 @@ function SidebarContent({ counts, loading, onNewFile, onSearch }: {
       active: pathname.startsWith('/admin/today'), exact: pathname.startsWith('/admin/today'),
       hint: 'files need attention' },
     ...ANDERHUE_INTAKE_AREAS.map(item => ({
-      href: boardHref(item), label: { ltb: 'Landlord', traffic: 'Traffic', general: 'Other' }[item],
+      href: boardHref(item), label: { ltb: 'Landlord', traffic: 'Traffic', general: 'Notary' }[item],
       icon: <AreaIcon area={item} />, count: counts[item], alert: false,
       active: area === item, exact: pathname === boardHref(item), hint: 'active files',
     })),

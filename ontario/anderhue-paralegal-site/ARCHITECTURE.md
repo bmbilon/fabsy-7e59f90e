@@ -4,6 +4,12 @@ This is the build contract for the AnderHue client file system: the public site 
 
 Fabsy is the software vendor only. AnderHue Paralegal Professional Corporation (Don Anderson, licensed by the Law Society of Ontario) owns the clients, files and documents. Client-facing surfaces carry the practice brand. Fabsy appears only as a small software credit where one already exists (landlords page footer, privacy page).
 
+## Current service scope (November 17, 2026)
+
+AnderHue offers LTB matters, traffic tickets and Notary & Commissioner of Oaths services. `/notary` and `/start?area=notary` are the public entry points. Notary requests use the existing `general` storage/workflow with `category = notary`; this does not reopen small claims, tribunals or other general intake. Migration `20261117210000_anderhue_notary_service.sql` permits this category through public and staff entry points and blocks category changes that would create unrelated matters. Existing historical records remain editable. The public form fixes the category, asks about the document and deadline, and does not book an appointment. Fees and arrangements are confirmed by the practice. The browser catalog overrides the service label; generic shared workflow data remains intact.
+
+The October service restrictions below describe the prior release and are superseded only for notary/commissioning requests. Client email activation remains subject to the existing template and mailbox requirements.
+
 ## 1. Practice areas
 
 | Area (internal) | Public name | /start param | File number | Tables | Bucket |

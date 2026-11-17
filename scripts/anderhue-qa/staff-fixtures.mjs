@@ -1393,7 +1393,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   });
 
   await step('boards in board and list views', async () => {
-    for (const [route, title, area] of [['landlord', 'Landlord files', 'ltb'], ['traffic', 'Traffic tickets', 'traffic'], ['other', 'Other matters', 'general']]) {
+    for (const [route, title, area] of [['landlord', 'Landlord files', 'ltb'], ['traffic', 'Traffic tickets', 'traffic'], ['other', 'Notary & Commissioner of Oaths', 'general']]) {
       await visit(page, `${origin}/admin/${route}`);
       await page.getByRole('heading', { name: title, level: 1 }).waitFor();
       await waitForQuiet(page);
@@ -1623,7 +1623,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
   await step('file held out of the client portal: badge, tooltip, reveal', async () => {
     const held = 'MAT-2026-0009';
     await visit(page, `${origin}/admin/other`);
-    await page.getByRole('heading', { name: 'Other matters', level: 1 }).waitFor();
+    await page.getByRole('heading', { name: 'Notary & Commissioner of Oaths', level: 1 }).waitFor();
     await waitForQuiet(page);
     const board = member.requests.filter(entry => entry.method === 'GET' && entry.table === 'practice_matters' && entry.params.area === 'eq.general').at(-1);
     assert.ok(parseSelect(board.params.select).some(item => item.column === 'portal_visible'), 'Boards select portal_visible');
@@ -1641,7 +1641,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     await page.locator('table.ahs-table tr', { hasText: held }).locator('.ahs-hold').waitFor();
     assert.equal(await page.locator('table.ahs-table .ahs-hold').count(), 1);
     await page.setViewportSize(MOBILE);
-    await page.getByRole('list', { name: 'Other matters' }).locator('li', { hasText: held }).locator('.ahs-hold').waitFor();
+    await page.getByRole('list', { name: 'Notary & Commissioner of Oaths' }).locator('li', { hasText: held }).locator('.ahs-hold').waitFor();
     await checkPage(page, 'held file in the list at 390 px');
     await shoot(page, 'list-held', { full: false });
     await page.getByRole('button', { name: 'Board', exact: true }).click();
@@ -1855,7 +1855,7 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     await page.getByRole('button', { name: 'New file' }).first().click();
     const dialog = page.getByRole('dialog', { name: 'New file' });
     await dialog.waitFor();
-    assert.equal(await dialog.getByRole('radio').count(), 2, 'only LTB and traffic can be opened');
+    assert.equal(await dialog.getByRole('radio').count(), 3, 'LTB, traffic and notary services can be opened');
     await dialog.getByText('Traffic', { exact: true }).click();
     await dialog.getByLabel('Email', { exact: true }).fill('chloe.martin@example.com');
     await dialog.getByLabel('First name').fill('Chloé');
@@ -1873,6 +1873,21 @@ export async function runStaffQaFlow({ origin, browser, screenshotDir = null, fo
     assert.deepEqual(call.body.p_client, { email: 'chloe.martin@example.com', firstName: 'Chloé', lastName: 'Martin', phone: '(905) 555-0170' });
     assert.equal(call.body.p_send_invite, true);
     await page.locator('.ahs-toast').filter({ hasText: 'TKT-2026-0026 opened' }).waitFor();
+  });
+
+  await step('notary request opened by staff', async () => {
+    await page.getByRole('button', { name: 'New file' }).first().click();
+    const dialog = page.getByRole('dialog', { name: 'New file' });
+    await dialog.getByText('Notary', { exact: true }).click();
+    assert.equal(await dialog.getByLabel('Category', { exact: true }).count(), 0);
+    await dialog.getByLabel('Email', { exact: true }).fill('notary.client@example.com');
+    await dialog.getByLabel('First name').fill('Notary');
+    await dialog.getByLabel('Last name').fill('Client');
+    await dialog.getByRole('button', { name: 'Open file' }).click();
+    await page.waitForURL(/\/admin\/files\/general\/[0-9a-f-]{36}$/);
+    const call = member.rpcCalls('practice_create_matter').at(-1);
+    assert.equal(call.body.p_area, 'general');
+    assert.equal(call.body.p_details.category, 'notary');
   });
 
   await step('phone layout at 390 px', async () => {

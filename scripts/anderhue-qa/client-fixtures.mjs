@@ -886,13 +886,37 @@ async function trafficFlow(ctx, kind) {
   await s.close();
 }
 
+async function notaryFlow(ctx, kind) {
+  const s = await openPage(ctx, kind);
+  const { page, api } = s;
+  await page.goto(`${ctx.origin}/start?area=notary`);
+  await page.getByRole('heading', { name: 'Add your documents' }).waitFor();
+  await page.locator('input[data-picker="browse"]').setInputFiles([payload(ctx.fixtures.leasePdf)]);
+  await continueButton(page).click();
+  await page.getByRole('heading', { name: 'About your document' }).waitFor();
+  assert.equal(await page.getByLabel('What kind of matter is it?').count(), 0);
+  await page.getByLabel('What do you need help with?').fill('I need a certified copy of my lease for an application.');
+  await continueButton(page).click();
+  await page.getByLabel('Full name').fill('Sam Notary');
+  await page.getByLabel('Email').fill('sam.notary@example.com');
+  await continueButton(page).click();
+  await page.getByRole('button', { name: 'Send my file' }).click();
+  await page.getByRole('heading', { name: 'Your file is open' }).waitFor({ timeout: 20000 });
+  const [submit] = api.actions('practice-intake', 'submit');
+  assert.equal(submit.body.area, 'general');
+  assert.equal(submit.body.category, 'notary');
+  assert.equal(api.uploads.length, 1);
+  assert.equal(api.actions('practice-intake', 'finalize').length, 1);
+  await s.close();
+}
+
 async function unsupportedArea(ctx, kind) {
   const s = await openPage(ctx, kind);
   for (const query of ['', '?area=other', '?area=general&step=contact', '?area=other&step=sent']) {
     await s.page.goto(`${ctx.origin}/start${query}`);
     await s.page.getByRole('heading', { name: 'What can we help with?' }).waitFor();
     const choices = s.page.getByRole('list', { name: 'Kinds of matter' });
-    assert.equal(await choices.getByRole('link').count(), 2);
+    assert.equal(await choices.getByRole('link').count(), 3);
     assert.equal(await choices.getByRole('link', { name: /Something else|Other/ }).count(), 0);
   }
   assert.equal(s.api.actions('practice-intake', 'submit').length, 0);
@@ -1159,7 +1183,7 @@ async function narrowChecks(ctx) {
   await s.close();
 }
 
-export const SCENARIOS = { landlordFlow, trafficFlow, unsupportedArea, intakeErrors, portalSignIn, portalFiles, portalTokenSwitch };
+export const SCENARIOS = { landlordFlow, trafficFlow, notaryFlow, unsupportedArea, intakeErrors, portalSignIn, portalFiles, portalTokenSwitch };
 
 /**
  * Runs every scenario at 390x844 (touch) and 1440x900, then the 360 px checks.

@@ -4,6 +4,8 @@ Public site, client intake and file portal, and the practice staff workspace for
 
 The build contract (database, edge functions, routes, design tokens, go-live order) is [ARCHITECTURE.md](ARCHITECTURE.md). Stages, labels and client copy live in `supabase/functions/_shared/practice-catalog.ts`.
 
+As of November 17, 2026, Notary & Commissioner of Oaths is a third service at `/notary`, with intake at `/start?area=notary`. New notary files use `general` with category `notary`; other general matters remain blocked. The earlier two-service restriction below records the October rollout.
+
 ## What is where
 
 | Route | What it is | Source |

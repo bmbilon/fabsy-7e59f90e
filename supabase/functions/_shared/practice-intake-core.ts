@@ -196,8 +196,8 @@ export function parsePracticeSubmission(input: unknown, now: Date = new Date()):
   const practiceId = cleanText(body.practiceId, 60) || PRACTICE_DEFAULT_ID;
   if (!/^[a-z0-9-]{3,60}$/.test(practiceId)) throw new RequestError(MESSAGES.unknownPractice);
   const area = areaFromParam(typeof body.area === "string" ? body.area : "");
-  if (practiceId === PRACTICE_DEFAULT_ID && area === "general") {
-    throw new RequestError("AnderHue accepts only Landlord and Tenant Board matters and traffic tickets.");
+  if (practiceId === PRACTICE_DEFAULT_ID && area === "general" && body.category !== "notary") {
+    throw new RequestError("AnderHue accepts Landlord and Tenant Board matters, traffic tickets, and notary or commissioning requests only.");
   }
   if (area !== "traffic" && area !== "general") throw new RequestError("Unknown practice area.");
 

@@ -58,7 +58,7 @@ export default function CommandPalette({ open, onOpenChange, files, loading, onN
   const actions: Action[] = useMemo(() => [
     { id: 'new', label: 'New file', keywords: 'new file open create add matter client phone walk-in', icon: <Plus />, run: () => { onOpenChange(false); onNewFile(); } },
     ...ANDERHUE_INTAKE_AREAS.map(area => ({
-      id: `new-${area}`, label: `New ${({ ltb: 'landlord file', traffic: 'traffic ticket', general: 'other matter' })[area]}`,
+      id: `new-${area}`, label: `New ${({ ltb: 'landlord file', traffic: 'traffic ticket', general: 'notary request' })[area]}`,
       keywords: `new create ${area} ${AREA_PAGE_TITLE[area]}`, icon: <Plus />, run: () => { onOpenChange(false); onNewFile(area); },
     })),
     { id: 'today', label: 'Go to Today', keywords: 'today attention queue dashboard home', icon: <CalendarCheck2 />, run: () => go('/admin/today') },

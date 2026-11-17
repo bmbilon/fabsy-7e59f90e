@@ -1846,8 +1846,25 @@ test("AnderHue rejects new Other Matters submissions including aliases and defau
     for (const practiceId of ['anderhue-paralegal', undefined]) {
       const response = await post(handler, INTAKE_URL, generalForm({ area, practiceId }));
       assert.equal(response.status, 400);
-      assert.match((await response.json()).error, /only Landlord and Tenant Board matters and traffic tickets/);
+      assert.match((await response.json()).error, /notary or commissioning requests only/);
     }
   }
   assert.equal(state.calls.length, 0, 'rejected before creating clients, files, uploads or notices');
+});
+
+test("AnderHue accepts notary requests without reopening other general categories", async () => {
+  for (const area of ['general', 'notary']) {
+    const { handler, state } = intakeFixture();
+    const response = await post(handler, INTAKE_URL, generalForm({ area, practiceId: 'anderhue-paralegal', category: 'notary', notes: 'I need a certified copy of a document.' }));
+    assert.equal(response.status, 200);
+    const call = state.calls.find(([name]) => name === 'practice_register_intake');
+    assert.equal(call[1].p_area, 'general');
+    assert.equal(call[1].p_intake.category, 'notary');
+  }
+  for (const category of ['small_claims', 'tribunal', 'offence', 'other', undefined]) {
+    const { handler, state } = intakeFixture();
+    const response = await post(handler, INTAKE_URL, generalForm({ area: 'notary', practiceId: 'anderhue-paralegal', category }));
+    assert.equal(response.status, 400);
+    assert.equal(state.calls.length, 0);
+  }
 });

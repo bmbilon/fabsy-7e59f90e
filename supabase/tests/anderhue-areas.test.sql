@@ -38,4 +38,20 @@ select * from public.practice_create_matter('anderhue-paralegal', 'traffic',
   '{"email":"new-traffic@example.test","firstName":"Test"}', '{"ticketType":"speeding"}', false);
 select * from public.practice_create_matter('anderhue-paralegal', 'ltb',
   '{"email":"new-ltb@example.test","firstName":"Test"}', '{"issue":"arrears"}', false);
+
+-- The notary service permits only the notary category, through both entry points.
+\ir ../migrations/20261117210000_anderhue_notary_service.sql
+select * from public.practice_register_intake('anderhue-paralegal', 'general',
+  '{"email":"notary-public@example.test","notes":"Please certify my document copy","category":"notary"}', repeat('b',64), '[]');
+select * from public.practice_create_matter('anderhue-paralegal', 'general',
+  '{"email":"notary-staff@example.test","firstName":"Notary"}', '{"category":"notary"}', false);
+select pg_temp.area_rejected($q$select * from public.practice_register_intake(
+  'anderhue-paralegal', 'general', '{"email":"blocked-again@example.test","notes":"A small claim","category":"small_claims"}', repeat('c',64), '[]')$q$);
+select pg_temp.area_rejected($q$select * from public.practice_create_matter(
+  'anderhue-paralegal', 'general', '{"email":"blocked-staff@example.test","firstName":"Test"}', '{"category":"tribunal"}', false)$q$);
+select pg_temp.area_rejected($q$update public.practice_matters set category='other'
+  where area='general' and category='notary' and practice_id='anderhue-paralegal'$q$);
+update public.practice_matters set client_notes='Historical records still work', category=category
+where id='72400000-0000-4000-8000-000000000002';
+
 rollback;

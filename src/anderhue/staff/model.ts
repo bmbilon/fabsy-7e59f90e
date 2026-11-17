@@ -172,7 +172,7 @@ export interface PracticeRow {
 export const AREA_LIST: PracticeArea[] = ['ltb', 'traffic', 'general'];
 export const AREA_ROUTE: Record<PracticeArea, string> = { ltb: 'landlord', traffic: 'traffic', general: 'other' };
 export const AREA_PAGE_TITLE: Record<PracticeArea, string> = {
-  ltb: 'Landlord files', traffic: 'Traffic tickets', general: 'Other matters',
+  ltb: 'Landlord files', traffic: 'Traffic tickets', general: 'Notary & Commissioner of Oaths',
 };
 export const AREA_NOUN: Record<PracticeArea, string> = { ltb: 'landlord file', traffic: 'traffic ticket', general: 'matter' };
 

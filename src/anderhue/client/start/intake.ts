@@ -1,7 +1,7 @@
 import { ANDERHUE_PRACTICE } from '../../config';
 import type { LtbSubmitRequest, PracticeSubmitRequest, UploadFileSpec } from '../api';
 import {
-  AREAS, GENERAL_CATEGORIES, LTB_ISSUES, TICKET_OPTION_CHOSEN, TICKET_RESPONSE_DAYS, TICKET_TYPES,
+  AREAS, LTB_ISSUES, TICKET_OPTION_CHOSEN, TICKET_RESPONSE_DAYS, TICKET_TYPES,
   addDays, formatLongDate, labelFor, torontoToday, type PracticeArea,
 } from '../catalog';
 import { readJson, removeItem, writeJson } from '../lib/storage';
@@ -124,7 +124,6 @@ export function validateDetails(area: PracticeArea, fields: IntakeFields): Field
       else if (fields.ticketReceivedOn < min) errors.ticketReceivedOn = 'Enter a date within the last two years.';
     }
   } else {
-    if (!fields.category) errors.category = 'Choose the closest match. Pick “Something else” if none fit.';
     if (fields.notes.trim().length < 10) {
       errors.notes = fields.notes.trim()
         ? 'Tell us a little more, at least 10 characters.'
@@ -256,7 +255,7 @@ export function practicePayload(area: 'traffic' | 'general', fields: IntakeField
   return {
     ...common,
     area,
-    category: fields.category || 'other',
+    category: 'notary',
     deadline: fields.deadline,
     otherParty: fields.otherParty.trim(),
     clientCity: fields.clientCity.trim(),
@@ -341,7 +340,7 @@ export function detailRows(area: PracticeArea, fields: IntakeFields): { label: s
     ];
   }
   return [
-    { label: 'Kind of matter', value: labelFor(GENERAL_CATEGORIES, fields.category) },
+    { label: 'Service', value: 'Notary & Commissioner of Oaths' },
     { label: 'What you need help with', value: fields.notes.trim() },
     { label: 'Deadline', value: fields.deadline ? formatLongDate(fields.deadline) || fields.deadline : '' },
     { label: 'Other party', value: fields.otherParty.trim() },

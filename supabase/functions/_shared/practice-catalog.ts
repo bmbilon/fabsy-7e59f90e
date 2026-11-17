@@ -104,7 +104,7 @@ export function areaFromParam(value: string | null | undefined): PracticeArea | 
   const key = (value || "").trim().toLowerCase();
   if (key === "landlord" || key === "landlords" || key === "ltb") return "ltb";
   if (key === "traffic" || key === "ticket" || key === "traffic-tickets") return "traffic";
-  if (key === "other" || key === "general" || key === "other-matters") return "general";
+  if (key === "notary" || key === "other" || key === "general" || key === "other-matters") return "general";
   return null;
 }
 
@@ -408,5 +408,5 @@ export function formatLongDate(isoDate: string | null | undefined): string {
   });
 }
 
-/** Areas available for new AnderHue files; general remains for historical records. */
-export const ANDERHUE_INTAKE_AREAS = ["ltb", "traffic"] as const;
+/** General is available only for notary/commissioning intake at AnderHue. */
+export const ANDERHUE_INTAKE_AREAS = ["ltb", "traffic", "general"] as const;

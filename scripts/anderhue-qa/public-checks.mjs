@@ -12,6 +12,7 @@ export const PUBLIC_PAGES = [
   ['landlords', '/landlords'],
   ['traffic', '/traffic-tickets'],
   ['privacy', '/privacy'],
+  ['notary', '/notary'],
 ];
 
 const DISCLAIMER = 'Information on this site is general and does not create a paralegal-client relationship. Representation begins only after a written retainer.';
@@ -87,10 +88,10 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
       assert.equal(data.unnamed, 0, `${route} has links or buttons without an accessible name`);
       await page.close();
     }
-    for (const required of ['/start?area=landlord', '/start?area=traffic', '/files', '/sign-in', '/privacy']) {
+    for (const required of ['/start?area=landlord', '/start?area=traffic', '/start?area=notary', '/notary', '/files', '/sign-in', '/privacy']) {
       assert.ok(seen.has(required), `no page links to ${required}`);
     }
-    assert.ok(!seen.has('/other-matters') && !seen.has('/start?area=other'), 'only LTB and traffic are offered');
+    assert.ok(!seen.has('/other-matters') && !seen.has('/start?area=other'), 'unrelated general matters remain unavailable');
     const retiredPage = await fetch(origin + '/other-matters', { redirect: 'manual' });
     assert.equal(retiredPage.status, 308, 'retired Other Matters page redirects permanently');
     assert.equal(retiredPage.headers.get('location'), '/start');
@@ -172,14 +173,14 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
     assert.ok(readFileSync(path.join(buildDir, file), 'utf8').includes(FABSY_CREDIT), `${file} keeps the software credit`);
   }
   const titles = new Set();
-  for (const file of ['index.html', 'landlords.html', 'traffic-tickets.html', 'privacy.html']) {
+  for (const file of ['index.html', 'landlords.html', 'traffic-tickets.html', 'privacy.html', 'notary.html']) {
     const text = readFileSync(path.join(buildDir, file), 'utf8');
     for (const needed of [DISCLAIMER, '© 2026 AnderHue Paralegal Professional Corporation', 'rel="canonical"', 'og:image', 'favicon-32.png']) {
       assert.ok(text.includes(needed), `${file} is missing ${needed}`);
     }
     titles.add(text.match(/<title>([^<]+)<\/title>/)[1]);
   }
-  assert.equal(titles.size, 4, 'page titles must be unique');
+  assert.equal(titles.size, 5, 'page titles must be unique');
   const home = readFileSync(path.join(buildDir, 'index.html'), 'utf8');
   const jsonLd = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   assert.equal(jsonLd['@type'], 'LegalService');
