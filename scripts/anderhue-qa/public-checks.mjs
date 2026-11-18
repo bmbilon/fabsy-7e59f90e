@@ -175,7 +175,7 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
   const titles = new Set();
   for (const file of ['index.html', 'landlords.html', 'traffic-tickets.html', 'privacy.html', 'notary.html']) {
     const text = readFileSync(path.join(buildDir, file), 'utf8');
-    for (const needed of [DISCLAIMER, '© 2026 AnderHue Paralegal Professional Corporation', 'rel="canonical"', 'og:image', 'favicon-32.png']) {
+    for (const needed of [DISCLAIMER, '© 2026 AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.', 'rel="canonical"', 'og:image', 'favicon-32.png']) {
       assert.ok(text.includes(needed), `${file} is missing ${needed}`);
     }
     titles.add(text.match(/<title>([^<]+)<\/title>/)[1]);

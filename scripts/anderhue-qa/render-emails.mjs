@@ -22,7 +22,7 @@ const catalog = await load('supabase/functions/_shared/practice-catalog.ts');
 
 const siteUrl = process.env.ANDERHUE_EMAIL_SITE_URL || 'https://anderhue.ca';
 const practice = {
-  id: 'anderhue-paralegal', name: 'AnderHue Paralegal Professional Corporation', displayName: 'AnderHue Paralegal',
+  id: 'anderhue-paralegal', name: 'AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.', displayName: 'AnderHue Paralegal',
   licenseeName: 'Don Anderson', phone: '(289) 985-0166', publicEmail: 'hello@anderhue.ca', siteUrl,
   clientEmailFrom: 'AnderHue Paralegal <files@anderhue.ca>', clientReplyTo: 'hello@anderhue.ca', noticeFrom: null,
 };

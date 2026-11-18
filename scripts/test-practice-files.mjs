@@ -535,7 +535,7 @@ function portalFixture() {
         return {
           data: {
             client: { id: client.id, email: client.email, firstName: client.firstName, lastName: client.lastName, organizationName: null },
-            practice: { id: "anderhue-paralegal", name: "AnderHue Paralegal Professional Corporation", displayName: "AnderHue Paralegal",
+            practice: { id: "anderhue-paralegal", name: "AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.", displayName: "AnderHue Paralegal",
               phone: "(289) 985-0166", publicEmail: "hello@anderhue.ca", siteUrl: "https://anderhue.ca" },
             revokedBefore: client.revokedBefore,
             files: state.files.filter(file => file.clientId === client.id && file.portalVisible !== false).map(file => ({
@@ -670,7 +670,7 @@ test("portal: session maps the client, practice and files with catalog labels", 
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.deepEqual(body.client, { firstName: "Jordan", displayName: "Jordan Driver", email: "jordan@example.com" });
-  assert.deepEqual(body.practice, { name: "AnderHue Paralegal Professional Corporation", displayName: "AnderHue Paralegal",
+  assert.deepEqual(body.practice, { name: "AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.", displayName: "AnderHue Paralegal",
     phone: "(289) 985-0166", publicEmail: "hello@anderhue.ca", siteUrl: "https://anderhue.ca" });
   assert.equal(body.expiresAt, new Date((Math.floor(NOW / 1000) - 60 + 30 * 86_400) * 1000).toISOString());
   assert.deepEqual(body.files.map(file => file.id), [TRAFFIC_ID, LTB_ID, CLOSED_ID], "only this client's files");
@@ -1159,7 +1159,7 @@ const CREATED_S = Math.floor(Date.parse(CREATED_AT) / 1000);
 const NUMBERS = { ltb: "LTB-2026-0003", traffic: "TKT-2026-0007", general: "MAT-2026-0004" };
 const IDS = { ltb: LTB_ID, traffic: TRAFFIC_ID, general: GENERAL_B };
 const practiceSnapshot = (overrides = {}) => ({
-  id: "anderhue-paralegal", name: "AnderHue Paralegal Professional Corporation", displayName: "AnderHue Paralegal",
+  id: "anderhue-paralegal", name: "AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.", displayName: "AnderHue Paralegal",
   licenseeName: "Don Anderson", phone: "(289) 985-0166", publicEmail: "hello@anderhue.ca", siteUrl: "https://anderhue.ca",
   clientEmailFrom: "AnderHue Paralegal <files@anderhue.ca>", clientReplyTo: "hello@anderhue.ca", noticeFrom: null, ...overrides,
 });
@@ -1205,7 +1205,7 @@ async function assertClientEmail(email, { subject, link, headline }) {
   const { html, text } = email;
   for (const piece of ['src="https://anderhue.ca/crest-email.png"', 'width="56"', 'alt="AnderHue Paralegal"', "max-width:600px",
     "background-color:#f7f1e8", "background-color:#1d1032", "background-color:#b28d54", "color:#1d1032", "font-family:Georgia",
-    "font-family:Arial", 'role="presentation"', "(289) 985-0166", "hello@anderhue.ca", "AnderHue Paralegal Professional Corporation",
+    "font-family:Arial", 'role="presentation"', "(289) 985-0166", "hello@anderhue.ca", "AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.",
     "Representation begins only after a written retainer.", "Hello Jordan,", escapeHtml(headline)]) {
     assert.ok(html.includes(piece), `html includes ${piece}`);
   }
@@ -1740,7 +1740,7 @@ test("entry: practice-intake wires the handler, storage and the background reade
 test("entry: practice-portal wires token checks and the session RPC", async () => {
   const { handler } = await loadEntry("supabase/functions/practice-portal/index.ts");
   adminResults.practice_portal_session = { data: { client: { id: CLIENT_A, firstName: "Jordan", email: "jordan@example.com" },
-    practice: { name: "AnderHue Paralegal Professional Corporation", displayName: "AnderHue Paralegal" }, revokedBefore: null, files: [] }, error: null };
+    practice: { name: "AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.", displayName: "AnderHue Paralegal" }, revokedBefore: null, files: [] }, error: null };
   const session = await post(handler, PORTAL_URL, { action: "session", token: await tokenFor(CLIENT_A, Math.floor(Date.now() / 1000) - 5) });
   assert.equal(session.status, 200);
   assert.equal((await session.json()).client.displayName, "Jordan");

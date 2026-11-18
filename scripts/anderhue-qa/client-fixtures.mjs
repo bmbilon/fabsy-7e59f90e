@@ -204,7 +204,7 @@ function isoAgo(days, hour = 15, minute = 0) {
 }
 
 const PRACTICE = {
-  name: 'AnderHue Paralegal Professional Corporation',
+  name: 'AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.',
   displayName: 'AnderHue Paralegal',
   phone: '(289) 985-0166',
   publicEmail: 'hello@anderhue.ca',

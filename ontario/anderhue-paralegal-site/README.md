@@ -1,6 +1,6 @@
 # AnderHue Paralegal: anderhue.ca
 
-Public site, client intake and file portal, and the practice staff workspace for AnderHue Paralegal Professional Corporation (Don Anderson, licensed by the Law Society of Ontario). Fabsy is the case-software vendor only and appears only as the software credit on the landlords and privacy pages.
+Public site, client intake and file portal, and the practice staff workspace for AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc. (Don Anderson, licensed by the Law Society of Ontario). Fabsy is the case-software vendor only and appears only as the software credit on the landlords and privacy pages.
 
 The build contract (database, edge functions, routes, design tokens, go-live order) is [ARCHITECTURE.md](ARCHITECTURE.md). Stages, labels and client copy live in `supabase/functions/_shared/practice-catalog.ts`.
 

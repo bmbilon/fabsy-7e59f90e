@@ -2,7 +2,7 @@
 export const ANDERHUE_PRACTICE = {
   practiceId: (import.meta.env.VITE_ANDERHUE_PRACTICE_ID as string | undefined) || 'anderhue-paralegal',
   name: 'AnderHue Paralegal',
-  legalName: 'AnderHue Paralegal Professional Corporation',
+  legalName: 'AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.',
   licensee: 'Don Anderson',
   phoneDisplay: '(289) 985-0166',
   phoneHref: 'tel:+12899850166',

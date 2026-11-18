@@ -2,7 +2,7 @@
 
 This is the build contract for the AnderHue client file system: the public site at anderhue.ca, the client intake and file portal, the staff workspace at /admin, and the Supabase backend behind them. Every stream of work implements exactly the names, shapes and rules below. If something here is wrong, fix this document first and then the code.
 
-Fabsy is the software vendor only. AnderHue Paralegal Professional Corporation (Don Anderson, licensed by the Law Society of Ontario) owns the clients, files and documents. Client-facing surfaces carry the practice brand. Fabsy appears only as a small software credit where one already exists (landlords page footer, privacy page).
+Fabsy is the software vendor only. AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc. (Don Anderson, licensed by the Law Society of Ontario) owns the clients, files and documents. Client-facing surfaces carry the practice brand. Fabsy appears only as a small software credit where one already exists (landlords page footer, privacy page).
 
 ## Current service scope (November 17, 2026)
 

@@ -1052,7 +1052,7 @@ select pg_temp.ok((with s as (select public.practice_portal_session(:'t1_client_
   select pg_temp.keys(j) = pg_temp.sorted(array['client', 'practice', 'revokedBefore', 'files'])
     and j->'client' = jsonb_build_object('id', :'t1_client_id', 'email', 'driver@example.com', 'firstName', 'Dana',
       'lastName', 'Driver', 'organizationName', null)
-    and j->'practice' = '{"id":"anderhue-paralegal","name":"AnderHue Paralegal Professional Corporation",
+    and j->'practice' = '{"id":"anderhue-paralegal","name":"AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.",
       "displayName":"AnderHue Paralegal","phone":"(289) 985-0166","publicEmail":"hello@anderhue.ca",
       "siteUrl":"https://anderhue.ca"}'::jsonb
     and j->'revokedBefore' = 'null'::jsonb

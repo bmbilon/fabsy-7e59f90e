@@ -112,7 +112,7 @@ export function buildStaffFixtureData({ now = new Date() } = {}) {
   const midday = n => `${day(n)}T16:00:00.000Z`;
 
   const practice = {
-    id: PRACTICE_ID, name: 'AnderHue Paralegal Professional Corporation', display_name: 'AnderHue Paralegal',
+    id: PRACTICE_ID, name: 'AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.', display_name: 'AnderHue Paralegal',
     site_url: 'https://anderhue.ca', client_updates_enabled: true,
   };
 
@@ -680,7 +680,7 @@ const RPC = {
     if (state.membership === 'fail') throw new RpcError('Fixture access failure', 503);
     if (state.membership === 'none') return [];
     if (state.membership === 'other') return [{ practice_id: 'another-practice', practice_name: 'Another Practice', member_role: 'clerk' }];
-    return [{ practice_id: PRACTICE_ID, practice_name: 'AnderHue Paralegal Professional Corporation', member_role: 'licensee' }];
+    return [{ practice_id: PRACTICE_ID, practice_name: 'AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.', member_role: 'licensee' }];
   },
   practice_set_stage: (state, args) => {
     const row = findCase(state, args.p_area, args.p_case_id);
