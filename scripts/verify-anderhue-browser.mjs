@@ -1,132 +1,76 @@
-// All authentication and file requests use local fixtures. No real accounts,
-// emails, membership changes or production file reads are made by this test.
-import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+// Browser verification for anderhue.ca (run after `npm run build:anderhue`).
+//
+//   1. Public pages: layout, links, menu, N4 calculator, copy rules, metadata.
+//   2. Client app: the /start uploader for all three practice areas and the
+//      /files portal (link request, secure link, file view, uploads).
+//   3. Staff workspace: sign-in and membership states, Today, boards, file
+//      pages, stage changes with client email preview, documents, new files,
+//      practice scoping of every query.
+//
+// Everything runs against fixtures. No real accounts, emails, membership
+// changes or production file reads are made. The local server applies the
+// same headers as vercel.json, so Content-Security-Policy violations fail.
+//
+// Options (environment):
+//   ANDERHUE_OUT_DIR           build folder (default dist-anderhue)
+//   ANDERHUE_QA_SCREENSHOTS    folder for screenshots of every state
+//   AH_QA_FONTS_DIR            local woff2 copies of the Google Fonts (optional)
+//   AH_QA_BROWSER              chromium (default), firefox, webkit, chrome, msedge
+import { chromium, firefox, webkit } from 'playwright';
+import { existsSync, mkdtempSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { chromium } from 'playwright';
+import { startAnderhueServer } from './anderhue-qa/serve.mjs';
+import { runPublicChecks } from './anderhue-qa/public-checks.mjs';
+import { launchChromium, runClientQa } from './anderhue-qa/client-fixtures.mjs';
+import { runStaffQaFlow } from './anderhue-qa/staff-fixtures.mjs';
 
-const root = path.resolve('dist-anderhue');
-const server = createServer((request, response) => {
-  const pathname = new URL(request.url, 'http://localhost').pathname;
-  const publicPage = pathname === '/' ? 'index.html' : {
-    '/landlords': 'landlords.html',
-    '/traffic-tickets': 'traffic-tickets.html',
-    '/other-matters': 'other-matters.html',
-    '/crest.png': 'crest.png',
-    '/public.css': 'public.css',
-    '/robots.txt': 'robots.txt',
-    '/sitemap.xml': 'sitemap.xml',
-  }[pathname];
-  const target = pathname.startsWith('/assets/') ? path.join(root, 'assets', path.basename(pathname)) : path.join(root, publicPage || 'portal.html');
-  if (!existsSync(target)) { response.writeHead(404).end(); return; }
-  response.setHeader('Content-Type', target.endsWith('.js') ? 'text/javascript' : target.endsWith('.css') ? 'text/css' : target.endsWith('.png') ? 'image/png' : 'text/html');
-  response.end(readFileSync(target));
-});
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-const origin = `http://127.0.0.1:${server.address().port}`;
-const user = { id: '10000000-0000-4000-8000-000000000001', email: 'member@example.test', aud: 'authenticated', role: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: '2026-01-01T00:00:00Z' };
-const encode = value => Buffer.from(JSON.stringify(value)).toString('base64url');
-const exp = Math.floor(Date.now() / 1000) + 3600;
-const session = { access_token: `${encode({ alg: 'HS256' })}.${encode({ sub: user.id, exp, role: 'authenticated' })}.fixture`, refresh_token: 'fixture', expires_in: 3600, expires_at: exp, token_type: 'bearer', user };
-const browser = await chromium.launch({ headless: true, ...(existsSync('/Applications/Google Chrome.app') ? { channel: 'chrome' } : {}) });
-
-async function fixture({ signedIn = true, practice = 'anderhue-paralegal', fail = false, hold = false } = {}) {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' });
-  const requests = [];
-  let release;
-  const gate = hold ? new Promise(resolve => { release = resolve; }) : Promise.resolve();
-  await context.route('**/*', async route => {
-    const url = new URL(route.request().url());
-    const json = (value, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(value) });
-    if (url.origin === origin) return route.continue();
-    if (!url.hostname.endsWith('.supabase.co')) return route.abort();
-    requests.push(url);
-    if (url.pathname.endsWith('/signup')) return json({ user, session: null });
-    if (url.pathname.startsWith('/auth/v1/')) return json(url.pathname.endsWith('/user') ? user : session);
-    if (url.pathname.endsWith('/rpc/idr_staff_role')) return json(null);
-    if (url.pathname.endsWith('/rpc/ltb_my_practices')) {
-      await gate;
-      return fail ? json({ message: 'Fixture access failure' }, 503) : json([{ practice_id: practice, practice_name: 'AnderHue Paralegal', member_role: 'licensee' }]);
-    }
-    assert.ok(url.pathname.startsWith('/rest/v1/ltb_'), `Unexpected data request ${url.pathname}`);
-    assert.equal(url.searchParams.get('practice_id'), 'eq.anderhue-paralegal', 'Every file query must be practice scoped');
-    return json([]);
-  });
-  await context.routeWebSocket('**/*', socket => socket.close());
-  if (signedIn) await context.addInitScript(value => localStorage.setItem('sb-gcasbisxfrssonllpqrw-auth-token', JSON.stringify(value)), session);
-  const page = await context.newPage();
-  const errors = [];
-  page.on('pageerror', error => errors.push(error.message));
-  return { page, requests, release, async close() { assert.deepEqual(errors, []); await context.close(); } };
+const buildDir = path.resolve(process.env.ANDERHUE_OUT_DIR || 'dist-anderhue');
+if (!existsSync(path.join(buildDir, 'client.html')) || !existsSync(path.join(buildDir, 'portal.html'))) {
+  console.error(`No AnderHue build in ${buildDir}. Run npm run build:anderhue first.`);
+  process.exit(1);
 }
-
+const shots = process.env.ANDERHUE_QA_SCREENSHOTS ? path.resolve(process.env.ANDERHUE_QA_SCREENSHOTS) : null;
+const fontsDir = process.env.AH_QA_FONTS_DIR || null;
+const started = Date.now();
+const engine = process.env.AH_QA_BROWSER || 'chromium';
+const launchers = {
+  chromium: () => launchChromium(),
+  firefox: () => firefox.launch(),
+  webkit: () => webkit.launch(),
+  chrome: () => chromium.launch({ channel: 'chrome' }),
+  msedge: () => chromium.launch({ channel: 'msedge' }),
+};
+if (!launchers[engine]) throw new Error(`Unknown AH_QA_BROWSER: ${engine}`);
+const browser = await launchers[engine]();
+console.log(`Browser: ${engine} ${browser.version()}`);
+const server = await startAnderhueServer(buildDir);
+const log = message => console.log(`  ok  ${message}`);
 try {
-  const publicContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  const publicPage = await publicContext.newPage();
-  await publicPage.goto(origin);
-  await publicPage.getByRole('heading', { name: /Steady counsel/ }).waitFor();
-  assert.deepEqual(await publicPage.locator('.tile h3').allTextContents(), ['Landlords', 'Traffic Tickets', 'Other Matters']);
-  assert.ok(await publicPage.locator('.site-header .identity img').evaluate(image => image.complete && image.naturalWidth > 0), 'Supplied crest must load');
-  assert.ok(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-  for (const [route, heading] of [['/landlords', 'Unpaid rent'], ['/traffic-tickets', 'Traffic Tickets'], ['/other-matters', 'Other Matters']]) {
-    await publicPage.goto(`${origin}${route}`);
-    await publicPage.getByRole('heading', { name: new RegExp(heading) }).first().waitFor();
-    assert.ok(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route} must fit a phone viewport`);
-  }
-  assert.ok((await publicPage.locator('body').innerText()).includes('Ontario'));
-  await publicPage.goto(`${origin}/landlords`);
-  assert.match(await publicPage.locator('#intake-form').getAttribute('data-endpoint'), /\/functions\/v1\/ltb-intake$/);
-  assert.doesNotMatch(await publicPage.locator('body').innerText(), /P#####|Draft · licence number pending/);
-  await publicContext.close();
+  console.log('Public pages');
+  await runPublicChecks({ browser, origin: server.origin, buildDir, screenshotDir: shots && path.join(shots, 'public'), log });
 
-  const anon = await fixture({ signedIn: false });
-  await anon.page.goto(`${origin}/admin/ltb`);
-  await anon.page.waitForURL(`${origin}/sign-in`);
-  await anon.page.getByRole('heading', { name: 'Welcome back' }).waitFor();
-  assert.match(await anon.page.title(), /AnderHue Paralegal/);
-  assert.doesNotMatch(await anon.page.locator('body').innerText(), /Fabsy/i);
-  assert.equal(await anon.page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, nofollow');
-  if (process.env.ANDERHUE_QA_SCREENSHOT) await anon.page.screenshot({ path: process.env.ANDERHUE_QA_SCREENSHOT, fullPage: true });
-  await anon.page.setViewportSize({ width: 390, height: 844 });
-  assert.ok(await anon.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-  await anon.page.getByRole('button', { name: 'First time here? Create an account' }).click();
-  await anon.page.getByLabel('Email address').fill(user.email);
-  await anon.page.getByLabel('Password', { exact: true }).fill('fixture-password-only');
-  await anon.page.getByRole('button', { name: 'Create account', exact: true }).click();
-  await anon.page.getByRole('status').filter({ hasText: 'Check your email' }).waitFor();
-  assert.equal(anon.requests.find(url => url.pathname.endsWith('/signup')).searchParams.get('redirect_to'), `${origin}/sign-in`);
-  await anon.page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await anon.page.waitForURL(`${origin}/admin/ltb`);
-  await anon.page.getByRole('region', { name: 'LTB file stages, scroll horizontally' }).waitFor();
-  await anon.page.getByRole('button', { name: 'Sign out', exact: true }).click();
-  await anon.page.waitForURL(`${origin}/sign-in`);
-  await anon.close();
+  console.log('Client intake and file portal');
+  const client = await runClientQa({
+    browser, origin: server.origin, screenshotDir: shots && path.join(shots, 'client'),
+    fixturesDir: mkdtempSync(path.join(os.tmpdir(), 'anderhue-qa-files-')),
+    log,
+  });
 
-  const member = await fixture();
-  for (const route of ['/admin/ltb', '/admin/cases', '/admin/portal', '/admin/blog']) {
-    await member.page.goto(`${origin}${route}`);
-    await member.page.waitForURL(`${origin}/admin/ltb`);
-    await member.page.getByRole('region', { name: 'LTB file stages, scroll horizontally' }).waitFor();
-    assert.doesNotMatch(await member.page.locator('body').innerText(), /Fabsy/i);
-    assert.deepEqual(await member.page.locator('a[href^="/admin"]').evaluateAll(links => links.map(link => link.getAttribute('href'))), ['/admin/ltb']);
-  }
-  await member.page.goto(`${origin}/admin/ltb/cases/${user.id}`);
-  await member.page.getByText('This file is not available to your account.', { exact: true }).waitFor();
-  assert.match(await member.page.title(), /AnderHue Paralegal/);
-  assert.ok(member.requests.some(url => url.pathname.endsWith('/ltb_case_documents')));
-  await member.close();
+  console.log('Staff workspace');
+  await runStaffQaFlow({ origin: server.origin, browser, screenshotDir: shots && path.join(shots, 'staff'), fontsDir, log: message => console.log(message) });
 
-  for (const options of [{ practice: 'another-practice' }, { fail: true }, { hold: true }]) {
-    const denied = await fixture(options);
-    await denied.page.goto(`${origin}/admin/ltb`);
-    await denied.page.getByText(options.fail ? 'Access could not be verified' : options.hold ? 'Checking practice access…' : 'Your account is ready', { exact: true }).waitFor();
-    assert.ok(!denied.requests.some(url => url.pathname.startsWith('/rest/v1/ltb_')), 'No file reads before membership succeeds');
-    if (options.hold) { denied.release(); await denied.page.getByRole('region', { name: 'LTB file stages, scroll horizontally' }).waitFor(); }
-    await denied.close();
-  }
-  console.log('PASS: AnderHue public routes, landlord intake, mobile layout, branding, signup return URL, sign-in/out, practice scope and denied access');
+  console.log(`PASS: AnderHue public pages, client intake and portal, staff workspace (${Math.round((Date.now() - started) / 1000)}s${shots ? `, ${client.screenshots.length} client screenshots in ${shots}` : ''})`);
+} catch (error) {
+  // Report the actual test failure even if a crashed browser hangs on close.
+  console.error(error);
+  process.exitCode = 1;
 } finally {
+  const closeTimeout = setTimeout(() => {
+    console.error(`FAIL: ${engine} did not close within 10 seconds`);
+    process.exit(1);
+  }, 10_000);
   await browser.close();
-  await new Promise(resolve => server.close(resolve));
+  await server.close();
+  clearTimeout(closeTimeout);
 }

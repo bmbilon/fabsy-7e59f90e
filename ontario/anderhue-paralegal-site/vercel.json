@@ -8,20 +8,36 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'sha256-Du+OJKJSbdUgz5nrHeWWINvez6XKDDU/tyj/5c2uvwo='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://gcasbisxfrssonllpqrw.supabase.co; connect-src 'self' https://gcasbisxfrssonllpqrw.supabase.co wss://gcasbisxfrssonllpqrw.supabase.co; frame-src 'self' https://gcasbisxfrssonllpqrw.supabase.co blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+        }
       ]
     },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    { "source": "/start", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/start/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/files", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/files/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
     { "source": "/sign-in", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/admin", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
     { "source": "/admin/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
   ],
+  "redirects": [
+    { "source": "/other-matters", "destination": "/start", "permanent": true }
+  ],
   "rewrites": [
-    {
-      "source": "/sign-in",
-      "destination": "/portal"
-    },
-    {
-      "source": "/admin/:path*",
-      "destination": "/portal"
-    }
+    { "source": "/start", "destination": "/client" },
+    { "source": "/start/:path*", "destination": "/client" },
+    { "source": "/files", "destination": "/client" },
+    { "source": "/files/:path*", "destination": "/client" },
+    { "source": "/sign-in", "destination": "/portal" },
+    { "source": "/admin", "destination": "/portal" },
+    { "source": "/admin/:path*", "destination": "/portal" }
   ]
 }

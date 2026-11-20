@@ -153,7 +153,7 @@ test("merge: a lease naming a company prompts an organization check", () => {
 
 const snapshot = (overrides = {}) => ({
   caseId: "8f14e45f-ceea-4e7a-9a3b-2c6f1d7e9a10", caseNumber: "LTB-2026-0001", practiceId: "anderhue-paralegal",
-  practiceName: "AnderHue Paralegal Professional Corporation", adminBaseUrl: "https://fabsy.ca",
+  practiceName: "AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.", adminBaseUrl: "https://fabsy.ca",
   recipients: ["info@onlineparalegals.ca", "brett@execom.ca"], clientName: "Mary <b>Landlord</b>",
   email: "mary@example.com", phone: "9055550100", issue: "arrears", noticeServed: "yes", unitCity: "Hamilton",
   arrearsClaimedCents: 240000, reviewStatus: "ready", reviewNotes: "Line one\nLine two", documentCount: 2,
