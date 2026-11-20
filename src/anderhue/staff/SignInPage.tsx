@@ -68,7 +68,7 @@ export default function SignInPage({ session }: { session: Session | null }) {
         <CrestMark className="h-11 w-11" />
         <div>
           <p className="ahs-brand-name">AnderHue Paralegal</p>
-          <p className="ahs-brand-sub mt-1">Professional Corporation</p>
+          <p className="ahs-brand-sub mt-1">Professional Group</p>
         </div>
       </div>
       <CrestMark className="pointer-events-none absolute -bottom-10 -right-10 h-[340px] w-[340px] opacity-[0.07]" />
