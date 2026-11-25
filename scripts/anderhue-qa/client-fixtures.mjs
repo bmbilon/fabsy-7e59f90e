@@ -714,7 +714,7 @@ async function landlordFlow(ctx, kind) {
   await page.getByRole('heading', { name: 'What can we help with?' }).waitFor();
   assert.match(await page.title(), /Start a file \| AnderHue Paralegal/);
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, nofollow');
-  assert.ok(await page.locator('header img[src="/crest-mark.webp"]').evaluate(image => image.complete && image.naturalWidth > 0), 'crest loads');
+  assert.ok(await page.locator('header img[src="/paralegal/crest-mark.webp"]').evaluate(image => image.complete && image.naturalWidth > 0), 'crest loads');
   await shot(ctx, s, '01-start-chooser');
 
   await page.getByRole('link', { name: /Landlord/ }).click();

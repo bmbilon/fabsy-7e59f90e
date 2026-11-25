@@ -124,6 +124,8 @@ step "Supabase stubs" run_sql -f scripts/sql-harness/supabase-stubs.sql
 step "Fabsy prerequisites" run_sql -f scripts/sql-harness/fabsy-prerequisites.sql
 step "migration 20260925150000_ltb_intake_pipeline" run_sql -f supabase/migrations/20260925150000_ltb_intake_pipeline.sql
 step "migration 20261001150000_anderhue_practice_files" run_sql -f supabase/migrations/20261001150000_anderhue_practice_files.sql
+# Match the identity expected by the portal fixtures without changing their email settings.
+step "migration 20261118120000_anderhue_practice_name" run_sql -f supabase/migrations/20261118120000_anderhue_practice_name.sql
 step "supabase/tests/ltb-intake.test.sql" run_sql -f supabase/tests/ltb-intake.test.sql
 step "supabase/tests/practice-files.test.sql" run_sql -v harness=1 -f supabase/tests/practice-files.test.sql
-step "AnderHue LTB/traffic restriction and historical files" run_sql -f supabase/tests/anderhue-areas.test.sql
+step "AnderHue LTB/traffic/notary restriction and historical files" run_sql -f supabase/tests/anderhue-areas.test.sql
