@@ -238,7 +238,7 @@ export function EmptyState({ icon, title, children, action, compact }: {
 }
 
 export function CrestMark({ variant = 'gold', className }: { variant?: 'gold' | 'plum'; className?: string }) {
-  const base = variant === 'gold' ? '/crest-mark-gold' : '/crest-mark';
+  const base = variant === 'gold' ? '/paralegal/crest-mark-gold' : '/paralegal/crest-mark';
   return <picture>
     <source srcSet={`${base}.webp`} type="image/webp" />
     <img src={`${base}.png`} alt="" aria-hidden="true" className={cn('object-contain', className)} width={256} height={256} />

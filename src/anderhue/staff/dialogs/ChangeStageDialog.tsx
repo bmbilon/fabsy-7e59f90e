@@ -52,7 +52,7 @@ function EmailPreview({ view, stage, outcome, message, practiceName }: {
       <dd className="font-semibold text-[color:var(--ah-ink)]" data-testid="email-preview-subject">{view.number} · {headline}</dd>
     </dl>
     <div className="ahs-email">
-      <img src="/crest-email.png" alt="" aria-hidden="true" width={44} height={44} className="h-11 w-11" />
+      <img src="/paralegal/crest-email.png" alt="" aria-hidden="true" width={44} height={44} className="h-11 w-11" />
       <p className="mt-4">{name ? `Hi ${name},` : 'Hello,'}</p>
       <p className="mt-2 text-[17px] font-bold leading-snug text-[color:var(--ah-plum-950)]">{headline}</p>
       <p className="mt-2 text-[color:var(--ah-ink-2)]">{def?.clientNext}</p>

@@ -12,7 +12,7 @@ export default function Shell({ children }: { children: ReactNode }) {
       <header className="ahc-header">
         <div className="ahc-wrap ahc-header-row">
           <a href={SITE_HOME} className="ahc-brand" aria-label={`${ANDERHUE_PRACTICE.name} home`}>
-            <img src="/crest-mark.webp" alt="" width={36} height={36} decoding="async" />
+            <img src="/paralegal/crest-mark.webp" alt="" width={36} height={36} decoding="async" />
             <span className="min-w-0">
               <span className="ahc-brand-name">{ANDERHUE_PRACTICE.name}</span>
               <span className="ahc-brand-sub hidden sm:block">Ontario paralegal services</span>

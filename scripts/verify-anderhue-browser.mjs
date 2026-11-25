@@ -21,12 +21,13 @@ import { existsSync, mkdtempSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { startAnderhueServer } from './anderhue-qa/serve.mjs';
+import { runPrefixedAppChecks } from './anderhue-qa/prefixed-app-checks.mjs';
 import { runPublicChecks } from './anderhue-qa/public-checks.mjs';
 import { launchChromium, runClientQa } from './anderhue-qa/client-fixtures.mjs';
 import { runStaffQaFlow } from './anderhue-qa/staff-fixtures.mjs';
 
 const buildDir = path.resolve(process.env.ANDERHUE_OUT_DIR || 'dist-anderhue');
-if (!existsSync(path.join(buildDir, 'client.html')) || !existsSync(path.join(buildDir, 'portal.html'))) {
+if (!existsSync(path.join(buildDir, 'paralegal/client.html')) || !existsSync(path.join(buildDir, 'paralegal/portal.html'))) {
   console.error(`No AnderHue build in ${buildDir}. Run npm run build:anderhue first.`);
   process.exit(1);
 }
@@ -49,6 +50,9 @@ const log = message => console.log(`  ok  ${message}`);
 try {
   console.log('Public pages');
   await runPublicChecks({ browser, origin: server.origin, buildDir, screenshotDir: shots && path.join(shots, 'public'), log });
+
+  console.log('Canonical paralegal app routes');
+  await runPrefixedAppChecks({ browser, origin: server.origin, log });
 
   console.log('Client intake and file portal');
   const client = await runClientQa({

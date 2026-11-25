@@ -14,10 +14,12 @@ const TYPES = {
 };
 
 export function resolveAnderhuePath(root, pathname) {
-  if (pathname === '/start' || pathname.startsWith('/start/') || pathname === '/files' || pathname.startsWith('/files/')) {
-    return path.join(root, 'client.html');
+  const appPath = pathname.replace(/^\/paralegal(?=\/|$)/, '');
+  if (appPath === '/start' || appPath.startsWith('/start/') || appPath === '/files' || appPath.startsWith('/files/')) {
+    return path.join(root, 'paralegal/client.html');
   }
-  if (pathname === '/sign-in' || pathname === '/admin' || pathname.startsWith('/admin/')) return path.join(root, 'portal.html');
+  if (appPath === '/sign-in' || appPath === '/admin' || appPath.startsWith('/admin/')) return path.join(root, 'paralegal/portal.html');
+  if (pathname === '/paralegal' || pathname === '/paralegal/') return path.join(root, 'paralegal/index.html');
   if (pathname === '/') return path.join(root, 'index.html');
   const direct = path.join(root, decodeURIComponent(pathname));
   if (!direct.startsWith(root)) return null;
@@ -64,7 +66,7 @@ export async function startAnderhueServer(root = path.resolve('dist-anderhue'), 
     const pathname = url.pathname;
     const redirect = redirects.find(rule => rule.source === pathname);
     if (redirect) {
-      response.writeHead(redirect.permanent ? 308 : 307, { Location: redirect.destination }).end();
+      response.writeHead(redirect.permanent ? 308 : 307, { Location: redirect.destination + url.search }).end();
       return;
     }
     // Serve a real HTTP attachment: WebKit cannot emit download events for

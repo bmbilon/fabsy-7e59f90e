@@ -344,3 +344,22 @@ configuration and omit the AnderHue routes and headers.
 The prior production deployment for rollback is
 `anderhue-paralegal-f94b46s09-execom.vercel.app`. A frontend rollback does not undo
 the additive database migration or enable client emails.
+
+
+## Parent-company routing (November 25, 2026)
+
+The parent-company homepage is built from `ontario/anderhue-group` and serves `/`.
+The paralegal public pages and client/staff apps now serve under `/paralegal`.
+Old public URLs (`/landlords`, `/traffic-tickets`, `/notary`, `/privacy`) permanently
+redirect to the corresponding paralegal page. Existing `/start`, `/files`,
+`/admin` and `/sign-in` URLs remain direct app aliases, preserving signed-link
+fragments, query strings and the existing Supabase staff auth callback allowlist.
+The apps choose their router basename from the entry URL; no backend email
+template or Supabase auth change is required for this migration. Root image
+URLs used in previously delivered emails remain available.
+
+The build assembles parent files at the artifact root and paralegal files in
+`dist-anderhue/paralegal`. Validate it with `node scripts/check-anderhue-routes.mjs`
+after `npm run build:anderhue` in the Studio sandbox. Browser QA should cover
+new `/paralegal/start`, `/paralegal/files`, `/paralegal/admin` paths and an old
+`/files#t=...` link. The project-level `/smartaccess` external rewrite is unchanged.

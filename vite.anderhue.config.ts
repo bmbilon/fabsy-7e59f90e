@@ -10,6 +10,7 @@ const site = path.resolve(__dirname, 'ontario/anderhue-paralegal-site');
 //   portal.html -> /sign-in and /admin (practice staff workspace)
 export default defineConfig({
   root: site,
+  base: '/paralegal/',
   envDir: __dirname,
   publicDir: false,
   plugins: [react()],
@@ -17,7 +18,7 @@ export default defineConfig({
   server: { fs: { allow: [__dirname] } },
   build: {
     // ANDERHUE_OUT_DIR lets parallel QA builds write to separate folders.
-    outDir: process.env.ANDERHUE_OUT_DIR ? path.resolve(process.env.ANDERHUE_OUT_DIR) : path.resolve(__dirname, 'dist-anderhue'),
+    outDir: path.resolve(process.env.ANDERHUE_OUT_DIR || path.resolve(__dirname, 'dist-anderhue'), 'paralegal'),
     emptyOutDir: true,
     rollupOptions: {
       input: {

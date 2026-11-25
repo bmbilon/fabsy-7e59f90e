@@ -8,11 +8,11 @@ import { mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
 export const PUBLIC_PAGES = [
-  ['home', '/'],
-  ['landlords', '/landlords'],
-  ['traffic', '/traffic-tickets'],
-  ['privacy', '/privacy'],
-  ['notary', '/notary'],
+  ['home', '/paralegal'],
+  ['landlords', '/paralegal/landlords'],
+  ['traffic', '/paralegal/traffic-tickets'],
+  ['privacy', '/paralegal/privacy'],
+  ['notary', '/paralegal/notary'],
 ];
 
 const DISCLAIMER = 'Information on this site is general and does not create a paralegal-client relationship. Representation begins only after a written retainer.';
@@ -47,7 +47,7 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
   // landmarks, images with alt text, nothing wider than the viewport.
   for (const width of [360, 390, 1440]) {
     const context = await publicContext(browser, origin, { viewport: { width, height: 900 } });
-    for (const [name, route] of PUBLIC_PAGES) {
+    for (const [name, route] of [['group', '/'], ...PUBLIC_PAGES]) {
       const { page, errors } = await open(context, origin + route);
       const facts = await page.evaluate(() => ({
         scroll: document.documentElement.scrollWidth,
@@ -62,6 +62,21 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
       assert.equal(facts.h1, 1, `${route} must have exactly one h1`);
       assert.ok(facts.main && facts.lang === 'en-CA' && facts.missingAlt === 0, `${route} structure ${JSON.stringify(facts)}`);
       assert.ok(facts.crest, `${route} header crest must load`);
+      if (name === 'group') {
+        assert.deepEqual(await page.locator('.business-card h3').allTextContents(),
+          ['AVCM', 'See-Hear', 'AllerGenie', 'SmartAccess', 'AnderHue Paralegal']);
+        for (const person of ['Donald Anderson', 'Annette Anderson']) {
+          const photo = page.getByAltText(person, { exact: true });
+          await photo.scrollIntoViewIfNeeded();
+          await page.waitForFunction(name => {
+            const img = [...document.images].find(image => image.alt === name);
+            return img?.complete && img.naturalWidth > 0;
+          }, person);
+        }
+        assert.ok(await page.evaluate(() => [...document.images].every(image => image.complete && image.naturalWidth > 0)),
+          'parent page photos and crest assets load');
+        await page.evaluate(() => window.scrollTo(0, 0));
+      }
       assert.deepEqual(errors, [], `${route} at ${width}px console errors`);
       if (screenshotDir && width !== 360) await page.screenshot({ path: path.join(screenshotDir, `public-${name}-${width}.png`), fullPage: true });
       await page.close();
@@ -88,13 +103,13 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
       assert.equal(data.unnamed, 0, `${route} has links or buttons without an accessible name`);
       await page.close();
     }
-    for (const required of ['/start?area=landlord', '/start?area=traffic', '/start?area=notary', '/notary', '/files', '/sign-in', '/privacy']) {
+    for (const required of ['/paralegal/start?area=landlord', '/paralegal/start?area=traffic', '/paralegal/start?area=notary', '/paralegal/notary', '/paralegal/files', '/paralegal/sign-in', '/paralegal/privacy']) {
       assert.ok(seen.has(required), `no page links to ${required}`);
     }
-    assert.ok(!seen.has('/other-matters') && !seen.has('/start?area=other'), 'unrelated general matters remain unavailable');
+    assert.ok(!seen.has('/other-matters') && !seen.has('/paralegal/start?area=other'), 'unrelated general matters remain unavailable');
     const retiredPage = await fetch(origin + '/other-matters', { redirect: 'manual' });
     assert.equal(retiredPage.status, 308, 'retired Other Matters page redirects permanently');
-    assert.equal(retiredPage.headers.get('location'), '/start');
+    assert.equal(retiredPage.headers.get('location'), '/paralegal/start');
     for (const [href, from] of seen) {
       if (/^(tel:|mailto:)/.test(href)) {
         assert.match(href, /^tel:\+12899850166$|^mailto:hello@anderhue\.ca(\?.*)?$/, `unexpected contact link ${href} on ${from}`);
@@ -109,10 +124,10 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
       const response = await fetch(url);
       const body = await response.text();
       assert.equal(response.status, 200, `${href} (from ${from})`);
-      if (/^\/(start|files|sign-in)/.test(url.pathname)) assert.ok(body.includes('id="root"'), `${href} must load an app shell`);
+      if (/^\/paralegal\/(start|files|sign-in)/.test(url.pathname)) assert.ok(body.includes('id="root"'), `${href} must load an app shell`);
       if (url.hash && ids[url.pathname]) assert.ok(ids[url.pathname].has(url.hash.slice(1)), `${href} anchor missing on target`);
     }
-    for (const asset of ['/robots.txt', '/sitemap.xml', '/og-image.png', '/site.js', '/public.css', '/favicon-32.png',
+    for (const asset of ['/robots.txt', '/sitemap.xml', '/paralegal/og-image.png', '/paralegal/site.js', '/paralegal/public.css', '/favicon-32.png',
       '/apple-touch-icon.png', '/crest-mark.png', '/crest-mark.webp', '/crest-mark-gold.webp', '/crest-email.png']) {
       assert.equal((await fetch(origin + asset)).status, 200, `${asset} must be deployed`);
     }
@@ -123,7 +138,7 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
   // Mobile menu: opens, moves focus inside, closes on Escape and returns focus.
   {
     const context = await publicContext(browser, origin, { viewport: { width: 390, height: 844 } });
-    const { page, errors } = await open(context, `${origin}/landlords`);
+    const { page, errors } = await open(context, `${origin}/paralegal/landlords`);
     const toggle = page.locator('.menu-toggle');
     assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
     await toggle.click();
@@ -140,7 +155,7 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
   // N4 calculator: same dates as the original landlords page for known cases.
   {
     const context = await publicContext(browser, origin, { viewport: { width: 1440, height: 900 } });
-    const { page } = await open(context, `${origin}/landlords`);
+    const { page } = await open(context, `${origin}/paralegal/landlords`);
     const read = ([date, period, method]) => page.evaluate(([d, p, m]) => {
       const radio = document.querySelector(`input[name="method"][value="${m}"]`);
       radio.checked = true;
@@ -160,32 +175,33 @@ export async function runPublicChecks({ browser, origin, buildDir, screenshotDir
     log('public pages: N4 calculator dates');
   }
 
-  // Copy rules and metadata in the deployed files.
-  const files = readdirSync(buildDir).filter(file => /\.(html|css|js|txt|xml)$/.test(file) && !/^(client|portal)\.html$/.test(file));
+  // Copy rules and metadata in the deployed paralegal files.
+  const legalBuildDir = path.join(buildDir, 'paralegal');
+  const files = readdirSync(legalBuildDir).filter(file => /\.(html|css|js|txt|xml)$/.test(file) && !/^(client|portal)\.html$/.test(file));
   for (const file of files) {
-    const text = readFileSync(path.join(buildDir, file), 'utf8');
+    const text = readFileSync(path.join(legalBuildDir, file), 'utf8');
     assert.ok(!text.includes('—'), `${file} contains an em dash`);
     assert.ok(!/info@onlineparalegals\.ca/.test(text), `${file} still mentions info@onlineparalegals.ca`);
     assert.ok(!/P#####|licence number pending|LSO #/i.test(text), `${file} mentions a licence number placeholder`);
     if (!['landlords.html', 'privacy.html'].includes(file)) assert.ok(!/fabsy/i.test(text), `${file} mentions Fabsy`);
   }
   for (const file of ['landlords.html', 'privacy.html']) {
-    assert.ok(readFileSync(path.join(buildDir, file), 'utf8').includes(FABSY_CREDIT), `${file} keeps the software credit`);
+    assert.ok(readFileSync(path.join(legalBuildDir, file), 'utf8').includes(FABSY_CREDIT), `${file} keeps the software credit`);
   }
   const titles = new Set();
   for (const file of ['index.html', 'landlords.html', 'traffic-tickets.html', 'privacy.html', 'notary.html']) {
-    const text = readFileSync(path.join(buildDir, file), 'utf8');
+    const text = readFileSync(path.join(legalBuildDir, file), 'utf8');
     for (const needed of [DISCLAIMER, '© 2026 AnderHue Paralegal Professional Group, a division of Anderhue Canada Inc.', 'rel="canonical"', 'og:image', 'favicon-32.png']) {
       assert.ok(text.includes(needed), `${file} is missing ${needed}`);
     }
     titles.add(text.match(/<title>([^<]+)<\/title>/)[1]);
   }
   assert.equal(titles.size, 5, 'page titles must be unique');
-  const home = readFileSync(path.join(buildDir, 'index.html'), 'utf8');
+  const home = readFileSync(path.join(legalBuildDir, 'index.html'), 'utf8');
   const jsonLd = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   assert.equal(jsonLd['@type'], 'LegalService');
   assert.ok(!jsonLd.address && !jsonLd.aggregateRating, 'no address or ratings in structured data');
   const robots = readFileSync(path.join(buildDir, 'robots.txt'), 'utf8');
-  for (const blocked of ['/sign-in', '/admin/', '/files', '/start']) assert.ok(robots.includes(`Disallow: ${blocked}`), `robots.txt blocks ${blocked}`);
+  for (const blocked of ['/paralegal/sign-in', '/paralegal/admin', '/paralegal/files', '/paralegal/start']) assert.ok(robots.includes(`Disallow: ${blocked}`), `robots.txt blocks ${blocked}`);
   log('public pages: copy rules, metadata and robots');
 }

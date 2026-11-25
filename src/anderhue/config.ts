@@ -8,7 +8,7 @@ export const ANDERHUE_PRACTICE = {
   phoneHref: 'tel:+12899850166',
   publicEmail: 'hello@anderhue.ca',
   hours: 'Mon–Fri, 9–5',
-  siteUrl: 'https://anderhue.ca',
+  siteUrl: 'https://anderhue.ca/paralegal',
 } as const;
 
 export const SUPABASE_URL = ((import.meta.env.VITE_SUPABASE_URL as string | undefined) || '').replace(/\/$/, '');
