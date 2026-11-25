@@ -1,5 +1,16 @@
 User-agent: *
 Allow: /
 Disallow: /sign-in
-Disallow: /admin/
+Disallow: /admin
+Disallow: /files
+Disallow: /start
+Disallow: /client
+Disallow: /portal
+Disallow: /paralegal/sign-in
+Disallow: /paralegal/admin
+Disallow: /paralegal/files
+Disallow: /paralegal/start
+Disallow: /paralegal/client
+Disallow: /paralegal/portal
+
 Sitemap: https://anderhue.ca/sitemap.xml
