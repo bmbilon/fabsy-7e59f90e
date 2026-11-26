@@ -85,7 +85,7 @@ export default function CheckoutReminderResume({ token }: { token: string }) {
         {state && "ticketNumber" in state && <p>Ticket {state.ticketNumber}</p>}
         {state?.step === "complete" && <p role="status">Your consent and payment are on file.</p>}
         {state?.step === "review" && <p role="status">Your ticket is saved. Fabsy needs to review the details before you can pay.</p>}
-        {state?.step === "redirect" && <Button asChild><a href={state.url}>Continue</a></Button>}
+        {state?.step === "redirect" && <Button asChild><Link to={state.url}>Continue</Link></Button>}
         {state?.step === "owner" && <form className="space-y-4" onSubmit={event => void submit(event, "save-owner", { answer })}>
           <Label htmlFor="resume-camera-owner">Was the vehicle registered to you on the offence date?</Label>
           <select id="resume-camera-owner" className="h-12 w-full rounded-md border bg-background px-3"

@@ -8,6 +8,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 
 
 const token = `c1.${'1'.repeat(32)}.${'a'.repeat(64)}.1999999999.${'b'.repeat(64)}`;
+const reminderToken = 'a1111111-1111-4111-8111-111111111111.' + 'a'.repeat(64);
 const draftId = '11111111-1111-4111-8111-111111111111';
 const base = {
   success: true, draftId, revision: 2, contact: { email: 'fixture@example.test', phone: '4035550100' },
@@ -28,7 +29,7 @@ const mocks = {
   '@/lib/referrals/capture': 'export const referralForCheckout = async () => null;',
 };
 const bundle = await build({
-  stdin: { contents: `import React, { act } from 'react'; import { createRoot } from 'react-dom/client'; import { MemoryRouter } from 'react-router-dom'; import CompleteTicket from './src/pages/CompleteTicket'; window.__act = act; window.__mount = () => { window.__root = createRoot(document.getElementById('root')); window.__root.render(<MemoryRouter><CompleteTicket /></MemoryRouter>); };`, resolveDir: process.cwd(), loader: 'tsx' },
+  stdin: { contents: `import React, { act } from 'react'; import { createRoot } from 'react-dom/client'; import { MemoryRouter } from 'react-router-dom'; import CompleteTicket from './src/pages/CompleteTicket'; window.__act = act; window.__mount = () => { window.__root = createRoot(document.getElementById('root')); window.__root.render(<MemoryRouter initialEntries={[location.pathname + location.search + location.hash]}><CompleteTicket /></MemoryRouter>); };`, resolveDir: process.cwd(), loader: 'tsx' },
   bundle: true, write: false, format: 'iife', platform: 'browser', jsx: 'automatic', define: { 'import.meta.env': '{}' }, logLevel: 'silent',
   plugins: [{ name: 'synthetic-completion-backend', setup(b) { b.onResolve({ filter: /.*/ }, args => mocks[args.path] ? { path: args.path, namespace: 'fixture' } : undefined); b.onLoad({ filter: /.*/, namespace: 'fixture' }, args => ({ contents: mocks[args.path], loader: 'js' })); } }],
 });
@@ -53,7 +54,8 @@ async function runtime(t, options = {}) {
   const virtualConsole = new VirtualConsole();
   const errors = [];
   virtualConsole.on('jsdomError', error => { if (!error.message.includes('navigation')) errors.push(error.message); });
-  const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: `https://fabsy.ca/complete-ticket#access=${options.token ?? token}`, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole });
+  const fragment = options.reminder ? 'reminder=' + reminderToken : 'access=' + (options.token ?? token);
+  const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: `https://fabsy.ca/complete-ticket#${fragment}`, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole });
   const win = dom.window;
   win.scrollTo = () => {};
   win.MessageChannel = class { constructor() { this.port1 = { onmessage: null }; this.port2 = { postMessage: () => setTimeout(() => this.port1.onmessage?.(), 0) }; } };
@@ -67,6 +69,12 @@ async function runtime(t, options = {}) {
   const calls = [], toasts = [];
   win.__fixture = { toasts, invoke: async (name, { body }) => {
     calls.push({ name, body: structuredClone(body) });
+    if (name === 'checkout-reminder-resume' && options.reminder) {
+      assert.equal(body.token, reminderToken);
+      if (body.action === 'read') return { data: { step: 'payment', ticketNumber: 'E12345678A' }, error: null };
+      assert.equal(body.action, 'pay');
+      return { data: { step: 'complete' }, error: null };
+    }
     if (name === 'ticket-intake-draft') {
       if (body.action === 'read') return { data: structuredClone(record), error: null };
       if (body.action === 'discard_pending_upload') { record.hasPendingTicketUpload = false; return { data: structuredClone(record), error: null }; }
@@ -154,4 +162,16 @@ test('unfinished replacement can use the confirmed saved ticket', async t => {
   assert.ok(keep); await f.win.__act(async () => keep.click());
   assert.equal(f.calls.at(-1).body.action, 'discard_pending_upload');
   assert.equal(f.win.document.querySelector('input[type=file]'), null);
+});
+
+test('signed reminder opens the saved payment step without a new upload or consent', async t => {
+  const f = await runtime(t, { reminder: true });
+  assert.match(f.text(), /Continue your saved checkout/);
+  assert.match(f.text(), /E12345678A/);
+  assert.equal(f.win.document.querySelector('input[type=file]'), null);
+  assert.deepEqual(f.calls.map(call => call.body.action), ['read']);
+  await f.click('button[type=submit]');
+  assert.deepEqual(f.calls.map(call => call.body.action), ['read', 'pay']);
+  assert.ok(f.calls.every(call => call.name === 'checkout-reminder-resume'));
+  assert.match(f.text(), /Your consent and payment are on file/);
 });

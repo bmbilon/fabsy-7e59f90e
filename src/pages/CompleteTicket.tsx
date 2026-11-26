@@ -1,5 +1,6 @@
 import CheckoutReminderResume from "./CheckoutReminderResume";
 import { useEffect, useState, type FormEvent } from "react";
+import { useLocation } from "react-router-dom";
 import { CheckCircle2, FileCheck2, LockKeyhole, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
