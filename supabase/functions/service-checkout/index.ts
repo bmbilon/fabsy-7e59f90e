@@ -1,13 +1,16 @@
 import { savedReminderLink } from "../_shared/checkout-reminder-link.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { parseServiceOrder, serviceProduct } from "../_shared/service-checkout.ts";
 import { createConsentPdf } from "../_shared/service-consent-pdf.ts";
 import { recordServiceOrderPayment } from "../_shared/service-order-payment.ts";
 import { queuePhotoIntake } from "../_shared/process-photo-intake.ts";
 
-const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+let adminClient: SupabaseClient | undefined;
+function checkoutAdmin() {
+  return adminClient ??= createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+}
 const site = (Deno.env.get("SITE_URL") || "https://fabsy.ca").replace(/\/$/, "");
 const origins = new Set([site, "https://www.fabsy.ca", "http://localhost:4173", "http://localhost:5173"]);
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -17,6 +20,7 @@ const hash = async (text: string) => Array.from(new Uint8Array(await crypto.subt
 const stripeClient = () => new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-08-27.basil" });
 const rate = new Map<string, { count: number; until: number }>();
 async function staff(req: Request) {
+  const admin = checkoutAdmin();
   const { data, error } = await admin.auth.getUser((req.headers.get("authorization") || "").replace(/^Bearer /, ""));
   if (error || !data.user) throw new RequestError("Staff sign-in required.", 401);
   const { data: role } = await admin.from("user_roles").select("role").eq("user_id", data.user.id).in("role", ["admin", "case_manager"]).limit(1).maybeSingle();
@@ -31,6 +35,7 @@ function publicOrder(order: Record<string, any>) {
 }
 async function consentDocument(order: Record<string, any>) {
   if (!order.consent || order.consent_form_path) return;
+  const admin = checkoutAdmin();
   const bytes = await createConsentPdf({ serviceOrderTitle: "Fabsy service authorization", submissionId: order.id, firstName: order.name,
     lastName: "", email: order.email, phone: "", address: "", city: "", province: "", postalCode: "", driversLicense: "",
     ticketNumber: order.ticket_number || "Not supplied; to be matched using purchase email", violation: `${serviceProduct(order.product).name}; for ${order.represented_name}`,
@@ -43,6 +48,7 @@ async function consentDocument(order: Record<string, any>) {
   order.consent_form_path = path;
 }
 async function reconcile(orderId: string) {
+  const admin = checkoutAdmin();
   const { error } = await admin.rpc("match_service_order", { p_id: orderId });
   if (error) throw error;
   const { error: applyError } = await admin.rpc("apply_service_order", { p_id: orderId });
@@ -71,6 +77,7 @@ async function handleCheckout(req: Request, resume?: { accessHash: string; retur
   if (req.method !== "POST") return json({ error: "Use POST." }, 405);
   if (origin && !origins.has(origin)) return json({ error: "Origin not allowed." }, 403);
   try {
+    const admin = checkoutAdmin();
     const raw = await req.json();
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new RequestError("Invalid request.");
     if (["staff-list", "staff-link", "staff-file"].includes(raw.action)) {

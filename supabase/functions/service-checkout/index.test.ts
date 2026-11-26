@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { mintCheckoutReminderResumeUrl } from "../_shared/checkout-reminder-link.ts";
 import { SERVICE_CONSENT_VERSION } from "../_shared/service-checkout.ts";
 Deno.env.set("SUPABASE_URL", "https://service-checkout.example.test");
 Deno.env.set("SUPABASE_SERVICE_ROLE_KEY", "synthetic-key");
@@ -8,7 +9,7 @@ Deno.env.set("SITE_URL", "https://fabsy.example.test");
 let activeFetch: typeof fetch = () => Promise.reject(new Error("Unexpected network"));
 const original = globalThis.fetch;
 globalThis.fetch = (...args) => activeFetch(...args);
-const { handler } = await import("./index.ts");
+const { handler, resumeServiceOrderPayment } = await import("./index.ts");
 const id = "11111111-1111-4111-8111-111111111111";
 const token = "a".repeat(64);
 const request = (body: Record<string, unknown>) => new Request("https://service-checkout.example.test/functions/v1/service-checkout", {
@@ -83,6 +84,22 @@ Deno.test("a return URL claiming success never marks an unpaid Stripe session pa
     await (await handler(request({ action: "checkout" }))).body?.cancel();
     const result = await handler(request({ action: "status", result: "success", payment_status: "paid" }));
     assert.equal(result.status, 200); assert.equal((await result.json()).order.paymentStatus, "open"); assert.equal(s.order.payment_status,"open");
+  });
+});
+Deno.test("a signed reminder opens the existing consented order in Stripe with the reminder as its return link", async () => {
+  await boundary(async s => {
+    const prepared = await handler(request({ ...form, mode: "both", consentAccepted: true,
+      consentVersion: SERVICE_CONSENT_VERSION, pleadNotGuilty: false, registeredOwner: true }));
+    assert.equal(prepared.status, 200);
+    assert.equal((await prepared.json()).order.consentSaved, true);
+    const link = await mintCheckoutReminderResumeUrl(id, "synthetic-reminder-signing-key-for-test");
+    const response = await resumeServiceOrderPayment(id, s.order.access_token_hash, link);
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).url, "https://checkout.stripe.com/c/pay/cs_test_synthetic");
+    assert.equal(s.sessions, 1);
+    assert.equal(s.stripeBody.get("success_url"), link);
+    assert.equal(s.stripeBody.get("cancel_url"), link);
+    assert.equal(s.order.payment_status, "open");
   });
 });
 globalThis.addEventListener("unload", () => { globalThis.fetch = original; });

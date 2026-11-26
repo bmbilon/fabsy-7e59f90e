@@ -7,6 +7,7 @@ import { createTicketCompletionUrl } from "../_shared/ticket-completion.ts";
 import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { normalizePortalLookup } from "../_shared/portal-lookup-values.ts";
 import { portalLookupSourceHash, savePortalLookup } from "../_shared/initial-disclosure-material.ts";
+import { resumeServiceOrderPayment } from "../service-checkout/index.ts";
 
 const origin = "https://fabsy.ca";
 const headers = {
@@ -116,7 +117,6 @@ export async function resumeCheckout(
         !hashPattern.test(data.access_token_hash || "")) return unavailable();
     if (input.action === "read") return respond({ step: "payment", ticketNumber: ctx.ticket_number, amountCents: data.total_cents });
     if (input.action !== "pay") return unavailable();
-    const { resumeServiceOrderPayment } = await import("../service-checkout/index.ts");
     return stripeHandoff(await resumeServiceOrderPayment(campaign.source_id, data.access_token_hash, link));
   }
 
