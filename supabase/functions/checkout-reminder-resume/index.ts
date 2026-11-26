@@ -7,7 +7,6 @@ import { createTicketCompletionUrl } from "../_shared/ticket-completion.ts";
 import { ticketCompletionSecret } from "../_shared/ticket-completion-secret.ts";
 import { normalizePortalLookup } from "../_shared/portal-lookup-values.ts";
 import { portalLookupSourceHash, savePortalLookup } from "../_shared/initial-disclosure-material.ts";
-import { resumeServiceOrderPayment } from "../service-checkout/index.ts";
 
 const origin = "https://fabsy.ca";
 const headers = {
@@ -117,7 +116,15 @@ export async function resumeCheckout(
         !hashPattern.test(data.access_token_hash || "")) return unavailable();
     if (input.action === "read") return respond({ step: "payment", ticketNumber: ctx.ticket_number, amountCents: data.total_cents });
     if (input.action !== "pay") return unavailable();
-    return stripeHandoff(await resumeServiceOrderPayment(campaign.source_id, data.access_token_hash, link));
+    const checkoutEndpoint = new URL("/functions/v1/service-checkout", Deno.env.get("SUPABASE_URL"));
+    const checkout = await fetch(checkoutEndpoint, {
+      method: "POST", redirect: "error", signal: AbortSignal.timeout(25_000),
+      headers: { "Content-Type": "application/json", Origin: origin,
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` },
+      body: JSON.stringify({ action: "resume-reminder-checkout", orderId: campaign.source_id,
+        accessHash: data.access_token_hash, returnUrl: link }),
+    });
+    return stripeHandoff(checkout);
   }
 
   if (!ctx.consented || ctx.paid) return input.action === "read" ? redirect(oldRoute(ctx)) : unavailable();
