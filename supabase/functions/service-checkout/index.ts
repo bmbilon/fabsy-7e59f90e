@@ -1,14 +1,16 @@
 import { savedReminderLink } from "../_shared/checkout-reminder-link.ts";
-import { equalSecret } from "../_shared/ticket-checkout-reminder.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { parseServiceOrder, serviceProduct } from "../_shared/service-checkout.ts";
 import { createConsentPdf } from "../_shared/service-consent-pdf.ts";
 import { recordServiceOrderPayment } from "../_shared/service-order-payment.ts";
 import { queuePhotoIntake } from "../_shared/process-photo-intake.ts";
 
-const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+let adminClient: SupabaseClient | undefined;
+function checkoutAdmin() {
+  return adminClient ??= createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+}
 const site = (Deno.env.get("SITE_URL") || "https://fabsy.ca").replace(/\/$/, "");
 const origins = new Set([site, "https://www.fabsy.ca", "http://localhost:4173", "http://localhost:5173"]);
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -18,6 +20,7 @@ const hash = async (text: string) => Array.from(new Uint8Array(await crypto.subt
 const stripeClient = () => new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-08-27.basil" });
 const rate = new Map<string, { count: number; until: number }>();
 async function staff(req: Request) {
+  const admin = checkoutAdmin();
   const { data, error } = await admin.auth.getUser((req.headers.get("authorization") || "").replace(/^Bearer /, ""));
   if (error || !data.user) throw new RequestError("Staff sign-in required.", 401);
   const { data: role } = await admin.from("user_roles").select("role").eq("user_id", data.user.id).in("role", ["admin", "case_manager"]).limit(1).maybeSingle();
@@ -32,6 +35,7 @@ function publicOrder(order: Record<string, any>) {
 }
 async function consentDocument(order: Record<string, any>) {
   if (!order.consent || order.consent_form_path) return;
+  const admin = checkoutAdmin();
   const bytes = await createConsentPdf({ serviceOrderTitle: "Fabsy service authorization", submissionId: order.id, firstName: order.name,
     lastName: "", email: order.email, phone: "", address: "", city: "", province: "", postalCode: "", driversLicense: "",
     ticketNumber: order.ticket_number || "Not supplied; to be matched using purchase email", violation: `${serviceProduct(order.product).name}; for ${order.represented_name}`,
@@ -44,13 +48,26 @@ async function consentDocument(order: Record<string, any>) {
   order.consent_form_path = path;
 }
 async function reconcile(orderId: string) {
+  const admin = checkoutAdmin();
   const { error } = await admin.rpc("match_service_order", { p_id: orderId });
   if (error) throw error;
   const { error: applyError } = await admin.rpc("apply_service_order", { p_id: orderId });
   if (applyError) console.error("Service order needs case review", orderId);
 }
 
-export async function handler(req: Request): Promise<Response> {
+export function handler(req: Request): Promise<Response> {
+  return handleCheckout(req);
+}
+
+/** Internal entry point after the reminder worker has verified its frozen recipient and upload. */
+export function resumeServiceOrderPayment(orderId: string, accessHash: string, returnUrl: string): Promise<Response> {
+  if (!/^[a-f0-9]{64}$/.test(accessHash) || !savedReminderLink(returnUrl)) throw new Error("Invalid saved checkout.");
+  const req = new Request(site, { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ orderId, action: "checkout" }) });
+  return handleCheckout(req, { accessHash, returnUrl });
+}
+
+async function handleCheckout(req: Request, resume?: { accessHash: string; returnUrl: string }): Promise<Response> {
   const origin = req.headers.get("origin") || "";
   const headers = { "Access-Control-Allow-Origin": origins.has(origin) ? origin : site,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -60,21 +77,9 @@ export async function handler(req: Request): Promise<Response> {
   if (req.method !== "POST") return json({ error: "Use POST." }, 405);
   if (origin && !origins.has(origin)) return json({ error: "Origin not allowed." }, 403);
   try {
+    const admin = checkoutAdmin();
     const raw = await req.json();
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new RequestError("Invalid request.");
-    let resume: { accessHash: string; returnUrl: string } | undefined;
-    if (raw.action === "resume-reminder-checkout") {
-      const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-      if (!await equalSecret(req.headers.get("authorization") || "", key ? `Bearer ${key}` : "")) {
-        throw new RequestError("Service authorization required.", 401);
-      }
-      if (typeof raw.accessHash !== "string" || !/^[a-f0-9]{64}$/.test(raw.accessHash) ||
-          typeof raw.returnUrl !== "string" || !savedReminderLink(raw.returnUrl)) {
-        throw new RequestError("Invalid saved checkout.", 403);
-      }
-      resume = { accessHash: raw.accessHash, returnUrl: raw.returnUrl };
-      raw.action = "checkout";
-    }
     if (["staff-list", "staff-link", "staff-file"].includes(raw.action)) {
       await staff(req);
       if (raw.action === "staff-file") {

@@ -211,6 +211,8 @@ verify_jwt = false
 
 [functions.checkout-reminder-resume]
 verify_jwt = false
+# The consent engine imported by service checkout loads HarfBuzz at startup.
+static_files = ["./functions/_shared/consent-harfbuzz/harfbuzz.wasm"]
 
 [functions.process-ticket-checkout-reminders]
 verify_jwt = false

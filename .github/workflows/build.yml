@@ -95,7 +95,7 @@ jobs:
         run: deno test --vendor=true --node-modules-dir=none --allow-env --allow-read --frozen supabase/functions/_shared/service-checkout.test.ts supabase/functions/service-checkout/index.test.ts
 
       - name: Verify saved checkout reminders
-        run: deno test --vendor=true --node-modules-dir=none --allow-env --frozen supabase/functions/checkout-reminder-resume/index.test.ts
+        run: deno test --vendor=true --node-modules-dir=none --allow-env --allow-read=supabase/functions/_shared/consent-harfbuzz/harfbuzz.wasm --frozen supabase/functions/checkout-reminder-resume/index.test.ts
 
       - name: Validate required ticket lookup and filing evidence
         run: |
