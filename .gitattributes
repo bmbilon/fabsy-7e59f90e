@@ -1,2 +1,4 @@
 *.pdf binary
 docs/multilingual/translation-review.csv whitespace=cr-at-eol
+# Keep the exact upstream bytes required by the Deno lockfile.
+vendor/esm.sh/**/denonext/*.mjs -text -diff

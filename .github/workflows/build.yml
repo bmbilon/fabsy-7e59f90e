@@ -75,20 +75,36 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Verify cached Deno modules against the lockfile
+        run: |
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFileSync } from 'node:fs';
+          const { remote } = JSON.parse(readFileSync('deno.lock', 'utf8'));
+          const modules = [
+            'esm.sh/@supabase/auth-js@2.71.1/denonext/auth-js.mjs',
+            'esm.sh/async-function@1.0.0/denonext/async-function.mjs',
+          ];
+          for (const module of modules) {
+            const hash = createHash('sha256').update(readFileSync('vendor/' + module)).digest('hex');
+            if (hash !== remote['https://' + module]) throw new Error('Deno module integrity mismatch for ' + module);
+          }
+          NODE
+
       - name: Validate universal checkout prices, consent and payment verification
-        run: deno test --node-modules-dir=none --allow-env --allow-read --frozen supabase/functions/_shared/service-checkout.test.ts supabase/functions/service-checkout/index.test.ts
+        run: deno test --vendor=true --node-modules-dir=none --allow-env --allow-read --frozen supabase/functions/_shared/service-checkout.test.ts supabase/functions/service-checkout/index.test.ts
 
       - name: Verify saved checkout reminders
-        run: deno test --node-modules-dir=none --allow-env --frozen supabase/functions/checkout-reminder-resume/index.test.ts
+        run: deno test --vendor=true --node-modules-dir=none --allow-env --frozen supabase/functions/checkout-reminder-resume/index.test.ts
 
       - name: Validate required ticket lookup and filing evidence
         run: |
-          deno test --node-modules-dir=none --allow-env --frozen supabase/functions/_shared/initial-disclosure-material.test.ts supabase/functions/_shared/portal-lookup-values.test.ts supabase/functions/_shared/service-order-lookup.test.ts
-          deno check --node-modules-dir=none --frozen supabase/functions/initial-disclosure-agent/index.ts
+          deno test --vendor=true --node-modules-dir=none --allow-env --frozen supabase/functions/_shared/initial-disclosure-material.test.ts supabase/functions/_shared/portal-lookup-values.test.ts supabase/functions/_shared/service-order-lookup.test.ts
+          deno check --vendor=true --node-modules-dir=none --frozen supabase/functions/initial-disclosure-agent/index.ts
 
       - name: Type-check paid-acquisition Edge Functions
         run: |
-          deno check --node-modules-dir=none --frozen \
+          deno check --vendor=true --node-modules-dir=none --frozen \
             supabase/functions/_shared/meta-capi.ts \
             supabase/functions/_shared/meta-lead.ts \
             supabase/functions/_shared/meta-purchase.ts \
@@ -111,7 +127,7 @@ jobs:
             supabase/functions/withdraw-meta-measurement/index.ts
       
       - name: Verify photo intake consent and background review
-        run: deno test --allow-env --allow-net --allow-read --node-modules-dir=none --frozen supabase/functions/_shared/intake-consent.test.ts supabase/functions/_shared/consent-pdf.test.ts supabase/functions/photo-ticket-intake/index.test.ts
+        run: deno test --vendor=true --allow-env --allow-net --allow-read --node-modules-dir=none --frozen supabase/functions/_shared/intake-consent.test.ts supabase/functions/_shared/consent-pdf.test.ts supabase/functions/photo-ticket-intake/index.test.ts
 
       - name: Build guarded snapshots and app
         env:

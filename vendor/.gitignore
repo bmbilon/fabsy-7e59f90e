@@ -1,0 +1,7 @@
+*
+!*/
+!.gitignore
+!esm.sh/@supabase/auth-js@2.71.1/LICENSE
+!esm.sh/@supabase/auth-js@2.71.1/denonext/auth-js.mjs
+!esm.sh/async-function@1.0.0/LICENSE
+!esm.sh/async-function@1.0.0/denonext/async-function.mjs
