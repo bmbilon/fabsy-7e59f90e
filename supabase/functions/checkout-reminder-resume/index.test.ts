@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { checkoutReminderEventId, mintCheckoutReminderResumeUrl } from "../_shared/checkout-reminder-link.ts";
-import { reminderCopy, reminderStopToken } from "../_shared/ticket-checkout-reminder.ts";
+import { reminderCopy, reminderEmail, reminderStopToken } from "../_shared/ticket-checkout-reminder.ts";
 import { resumeCheckout } from "./index.ts";
 
 const id = "a1111111-1111-4111-8111-111111111111";
@@ -58,6 +58,10 @@ async function fixture({ lookup = true, email = context.email, paid = false, cam
 Deno.test("reminders use a case-bound link in place of the empty payment form", async () => {
   const { link, token } = await fixture();
   assert(reminderCopy(context, 2, link).link === link, "Saved link was not used");
+  const oneTime = reminderEmail(context, 0, "https://fabsy.ca/stop-test", link);
+  assert(oneTime.subject === `Ticket ${ticketNumber} — Continue your saved checkout`, "One-time reminder must identify the ticket");
+  assert(oneTime.text?.split(/\s+/).includes(link), "One-time reminder must carry the saved checkout link");
+  assert(oneTime.to.length === 1 && oneTime.to[0] === context.email, "One-time reminder must use the exact recipient");
   assert(await checkoutReminderEventId(token, secret) === id, "Link did not verify");
   const stop = await reminderStopToken(id, secret);
   assert(await checkoutReminderEventId(stop, secret) === null, "Unsubscribe token must not authorize checkout");

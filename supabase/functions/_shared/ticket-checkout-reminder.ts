@@ -37,12 +37,15 @@ export function reminderChannel(ctx: CheckoutReminderContext): { channel: "email
   throw new Error("NO_PERMITTED_REMINDER_CONTACT");
 }
 export function reminderCopy(ctx: CheckoutReminderContext, stage: number, resumeUrl?: string) {
+  const oneTime = stage === 0;
   if (!ctx.valid || ctx.review_reason || !/^[A-Z0-9]{5,30}$/.test(ctx.ticket_number) || !/\d/.test(ctx.ticket_number) ||
-    ![1, 2, 3].includes(stage) || (ctx.paid && ctx.consented)) throw new Error("REMINDER_NOT_ELIGIBLE");
-  const steps = ctx.paid ? "submit your consent" : ctx.consented ? "complete payment" : "complete payment and submit your consent";
+    ![0, 1, 2, 3].includes(stage) || (ctx.paid && ctx.consented) ||
+    (oneTime && (ctx.paid || !ctx.consented || !resumeUrl))) throw new Error("REMINDER_NOT_ELIGIBLE");
+  const steps = oneTime ? "finish the remaining checkout steps" : ctx.paid ? "submit your consent" : ctx.consented ? "complete payment" : "complete payment and submit your consent";
   if (resumeUrl && !savedReminderLink(resumeUrl)) throw new Error("INVALID_REMINDER_RESUME_URL");
   const link = resumeUrl || (ctx.paid ? "https://fabsy.ca/consent" : ctx.consented ? "https://fabsy.ca/payment" : "https://fabsy.ca/checkout");
-  const intro = stage === 1 ? "Thanks for uploading your ticket." : stage === 2 ? "A quick reminder about your ticket." : "A final reminder about your ticket.";
+  const intro = oneTime ? "Use this new private link to resume checkout for your saved ticket. The link is valid for seven days."
+    : stage === 1 ? "Thanks for uploading your ticket." : stage === 2 ? "A quick reminder about your ticket." : "A final reminder about your ticket.";
   const receipt = ctx.paid ? "Your payment has been recorded. " : ctx.consented ? "Your consent has been received. " : "";
   return { steps, link, intro, receipt };
 }
@@ -52,8 +55,9 @@ export function reminderEmail(ctx: CheckoutReminderContext, stage: number, stopU
   const text = `${intro}\n\nTicket ${ctx.ticket_number}\n\n${receipt}Please ${steps} so we can proceed with your ticket. You do not need to upload the same ticket again.\n\n${link}\n\nIf you need help, reply to this email or call 825-793-2279.\n\nStop these reminders: ${stopUrl}\n\n${getFabsyEmailSignatureText({ includeServiceOffer: false })}`;
   const localization = { preferredLocale: ctx.preferred_locale, template: "checkout_reminder" as const };
   const fallback = prepareClientSms("", localization).trim();
+  const purpose = stage === 0 ? "Continue your saved checkout" : stage === 3 ? "Final reminder to complete your intake" : "Complete your intake";
   return prepareClientEmail({ from: "Fabsy Traffic Ticket Services <hello@fabsy.ca>", to: [ctx.email],
-    reply_to: "hello@fabsy.ca", subject: `Ticket ${ctx.ticket_number} — ${stage === 3 ? "Final reminder to complete your intake" : "Complete your intake"}`,
+    reply_to: "hello@fabsy.ca", subject: `Ticket ${ctx.ticket_number} — ${purpose}`,
     text: fallback ? `${fallback}\n\n${text}` : text,
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;line-height:1.6"><h2>Ticket ${escape(ctx.ticket_number)}</h2><p>${intro}</p><p>${receipt}Please ${steps} so we can proceed with your ticket. You do not need to upload the same ticket again.</p><p><a href="${link}">Complete your ${ctx.paid ? "consent" : ctx.consented ? "payment" : "payment and consent"}</a></p><p>Need help? Reply to this email or call <a href="tel:+18257932279">825-793-2279</a>.</p><p style="font-size:12px"><a href="${escape(stopUrl)}">Stop these reminders</a></p>${getFabsyEmailSignature({ signOff: true, includeServiceOffer: false })}</div>`,
     headers: { "List-Unsubscribe": `<${stopUrl}>`, "X-Fabsy-Reminder-Stage": String(stage) },
