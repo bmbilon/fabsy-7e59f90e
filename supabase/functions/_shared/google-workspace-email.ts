@@ -433,3 +433,5 @@ export async function getWorkspaceMessage(id: string): Promise<unknown> {
   }
   return result;
 }
+
+export { accessToken as workspaceAccessToken };

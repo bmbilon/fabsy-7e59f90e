@@ -1,3 +1,4 @@
+import { savedReminderLink } from "../_shared/checkout-reminder-link.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import Stripe from "https://esm.sh/stripe@18.5.0";
@@ -48,7 +49,19 @@ async function reconcile(orderId: string) {
   if (applyError) console.error("Service order needs case review", orderId);
 }
 
-export async function handler(req: Request): Promise<Response> {
+export function handler(req: Request): Promise<Response> {
+  return handleCheckout(req);
+}
+
+/** Internal entry point after the reminder worker has verified its frozen recipient and upload. */
+export function resumeServiceOrderPayment(orderId: string, accessHash: string, returnUrl: string): Promise<Response> {
+  if (!/^[a-f0-9]{64}$/.test(accessHash) || !savedReminderLink(returnUrl)) throw new Error("Invalid saved checkout.");
+  const req = new Request(site, { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ orderId, action: "checkout" }) });
+  return handleCheckout(req, { accessHash, returnUrl });
+}
+
+async function handleCheckout(req: Request, resume?: { accessHash: string; returnUrl: string }): Promise<Response> {
   const origin = req.headers.get("origin") || "";
   const headers = { "Access-Control-Allow-Origin": origins.has(origin) ? origin : site,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -94,9 +107,9 @@ export async function handler(req: Request): Promise<Response> {
       if (freshError) throw freshError;
       return json({ orders: fresh, tickets });
     }
-    if (typeof raw.orderId !== "string" || !uuid.test(raw.orderId) || typeof raw.accessToken !== "string" || !/^[a-f0-9]{64}$/.test(raw.accessToken)) throw new RequestError("This checkout session is invalid. Start again from the checkout page.", 403);
+    if (typeof raw.orderId !== "string" || !uuid.test(raw.orderId) || (!resume && (typeof raw.accessToken !== "string" || !/^[a-f0-9]{64}$/.test(raw.accessToken)))) throw new RequestError("This checkout session is invalid. Start again from the checkout page.", 403);
     const orderId = raw.orderId.toLowerCase();
-    const tokenHash = await hash(raw.accessToken);
+    const tokenHash = resume?.accessHash ?? await hash(raw.accessToken);
     let { data: order, error: readError } = await admin.from("service_orders").select("*").eq("id", orderId).maybeSingle();
     if (readError) throw readError;
     if (order && order.access_token_hash !== tokenHash) throw new RequestError("This checkout session could not be verified.", 403);
@@ -223,7 +236,7 @@ export async function handler(req: Request): Promise<Response> {
         line_items: [{ quantity: 1, price_data: { currency: "cad", unit_amount: order.subtotal_cents, tax_behavior: "exclusive", product_data: { name: serviceProduct(order.product).name } }, tax_rates: [taxId] }],
         metadata: { fabsy_checkout_kind: "service_order", service_order_id: orderId, product: order.product, checkout_attempt: String(order.checkout_attempt) },
         payment_intent_data: { metadata: { service_order_id: orderId, product: order.product } },
-        success_url: `${site}/checkout?result=success#${fragment}`, cancel_url: `${site}/checkout?result=canceled#${fragment}`,
+        success_url: resume?.returnUrl || `${site}/checkout?result=success#${fragment}`, cancel_url: resume?.returnUrl || `${site}/checkout?result=canceled#${fragment}`,
 
       }, { idempotencyKey: `service-order-${orderId}-${order.checkout_attempt}` });
       const { error } = await admin.from("service_orders").update({ stripe_session_id: session.id, payment_status: "open" }).eq("id", orderId).neq("payment_status", "paid");

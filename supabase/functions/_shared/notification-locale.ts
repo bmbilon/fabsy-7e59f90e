@@ -7,6 +7,7 @@ export type NotificationTemplate =
   | "report_access"
   | "report_ready"
   | "case_update"
+  | "checkout_reminder"
   | "renewal_reminder"
   | "contact_received"
   | "lead_received";

@@ -1,3 +1,4 @@
+/// <reference types="https://esm.sh/@types/emscripten@1.41.5/index.d.ts" />
 //#region src/helpers.d.ts
 type ValueOf<T> = T[keyof T];
 //#endregion

@@ -1,3 +1,5 @@
+import { intakeAccessTokenHash } from "./ticket-completion.ts";
+import { ticketCompletionSecret } from "./ticket-completion-secret.ts";
 import type {SupabaseClient} from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import {PDFDocument,PDFDict,PDFArray,PDFName,PDFRawStream,PDFString,PDFHexString,decodePDFRawStream} from 'https://esm.sh/pdf-lib@1.17.1';
 import {normalizePortalLookup,type PortalLookupKind} from './portal-lookup-values.ts';
@@ -155,11 +157,13 @@ export async function initialDisclosurePacket(db:SupabaseClient,id:string,lease:
  consent:{name:'Signed consent - '+job.ticket_number+'.pdf',data:base64(consent.bytes)},representative:{first_name:'Brett',last_name:'Bilon',business:'Fabsy Traffic Ticket Services',email:'hello@fabsy.ca'}};
 }
 
-export async function savePortalLookup(db:SupabaseClient,input:{submission_id:string;kind:unknown;value:unknown;staff_id?:string;access_token?:string}){
+export async function savePortalLookup(db:SupabaseClient,input:{submission_id:string;kind:unknown;value:unknown;staff_id?:string;access_token?:string;expected_ticket?:string;expected_path?:string}){
  const kind=String(input.kind) as PortalLookupKind,value=normalizePortalLookup(kind,input.value);
  const record=await db.from('ticket_submissions').select('id,ticket_number,ticket_document_path,consent_form_path,representation_access_token_hash,deleted_at').eq('id',input.submission_id).is('deleted_at',null).maybeSingle(),ticket=record.data;
- if(record.error||!ticket||!ticket.consent_form_path||!ticket.ticket_document_path)throw new Error('CASE_LOOKUP_UNAVAILABLE');
- const tokenHash=input.access_token?await initialHash(input.access_token):null;
+ if(record.error||!ticket||!ticket.consent_form_path||!ticket.ticket_document_path
+  ||(input.expected_ticket&&ticket.ticket_number!==input.expected_ticket)
+  ||(input.expected_path&&ticket.ticket_document_path!==input.expected_path))throw new Error('CASE_LOOKUP_UNAVAILABLE');
+ const tokenHash=input.access_token?await intakeAccessTokenHash(input.access_token,ticketCompletionSecret(),ticket.id):null;
  if(!input.staff_id&&(!tokenHash||tokenHash!==ticket.representation_access_token_hash))throw new Error('CASE_LOOKUP_UNAUTHORIZED');
  const source=await document(db,'assessment-tickets',ticket.ticket_document_path),detail={kind,value};
  const result=await db.rpc('record_case_portal_verification',{p_id:ticket.id,p_ticket:normalize(ticket.ticket_number),p_kind:kind,p_cipher:await encryptLookup(detail,ticket.id),p_hash:await lookupFingerprint(ticket.ticket_number,detail),p_source:ticket.ticket_document_path,p_source_hash:source.hash,p_staff:input.staff_id||null,p_access_hash:tokenHash});

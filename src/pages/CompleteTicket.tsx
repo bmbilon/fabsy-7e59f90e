@@ -1,3 +1,4 @@
+import CheckoutReminderResume from "./CheckoutReminderResume";
 import { useEffect, useState, type FormEvent } from "react";
 import { CheckCircle2, FileCheck2, LockKeyhole, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -31,6 +32,11 @@ function retain(access: CompletionAccess) {
 }
 
 export default function CompleteTicket() {
+  const reminder = new URLSearchParams(useLocation().hash.slice(1)).get("reminder");
+  return reminder === null ? <TicketIntakeCompletion /> : <CheckoutReminderResume key={reminder} token={reminder} />;
+}
+
+function TicketIntakeCompletion() {
   const [access, setAccess] = useState(() => completionAccess(window.location.hash, { getItem: key => sessionStorage.getItem(key) }));
   const [record, setRecord] = useState<IntakeDraftRecord | null>(null);
   const [form, setForm] = useState<FormData | null>(null);
