@@ -23,7 +23,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # The pinned Playwright package supports Chromium on this runner.
+    runs-on: ubuntu-24.04
     
     steps:
       - name: Checkout code
